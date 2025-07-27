@@ -1,10 +1,9 @@
 import importlib.util
 from pathlib import Path
 import shutil
-from typing import Annotated, Any, Optional
+from typing import Any, Optional
 from fastapi.datastructures import UploadFile
 from fastapi.exceptions import HTTPException
-from fastapi.params import File
 from fastapi.routing import APIRouter
 from api.dependencies import ApiSession
 from api.exceptions import NotFound
@@ -68,10 +67,7 @@ def run_plugin(
 
 @plugin_router.post("/", operation_id="uploadPlugin")
 def upload_plugin(
-    file: Annotated[
-        UploadFile,
-        File(description="An OCEL 2.0 event log (.zip format)"),
-    ],
+    file: UploadFile,
 ):
     file_name = file.filename
     if not file_name or not file_name.endswith(".zip"):
