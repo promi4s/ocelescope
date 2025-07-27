@@ -5,6 +5,7 @@ from enum import Enum
 import uuid
 
 from typing import TYPE_CHECKING, Any, Optional
+from api.websocket import TaskMessage, websocket_manager
 
 from pydantic.main import BaseModel
 
@@ -30,7 +31,7 @@ class TaskResult(BaseModel):
 
 
 class Task:
-    def __init__(self, id, name, fn, args, kwargs, session, metadata=None):
+    def __init__(self, id, name, message, fn, args, kwargs, session, metadata=None):
         self.id = id
         self.name = name
         self.fn = fn
@@ -42,6 +43,7 @@ class Task:
         self.thread = None
         self.result: Optional[TaskResult] = None
         self.stop_event = threading.Event()
+        self.message = message
 
     def start(self):
         self.thread = threading.Thread(target=self.run, daemon=True)
@@ -65,7 +67,7 @@ class Task:
                     self.result.output_ids.append(
                         self.session.add_output(
                             output=result,
-                            name=f"{result.type}_{datetime.now().strftime('%Y-%m-%d_%H:%M')}",
+                            name=f"{result.type}_{datetime.now().strftime('%Y-%m-%d_%H:%M')}",  # type: ignore
                         )
                     )
 
@@ -75,6 +77,17 @@ class Task:
             raise
         finally:
             self.session.running_tasks.pop(self.id, None)
+            websocket_manager.send_safe(
+                self.session.id,
+                TaskMessage(
+                    task_id=self.id,
+                    task_message=self.message,
+                    ocel_ids=self.result.ocel_ids if self.result is not None else None,
+                    output_ids=self.result.output_ids
+                    if self.result is not None
+                    else None,
+                ),
+            )
 
     def cancel(self):
         self.stop_event.set()
@@ -85,12 +98,19 @@ class Task:
             self.thread.join(timeout)
 
 
-def task(name=None, dedupe=False, run_once=False):
+def task(
+    name=None, dedupe=False, run_once=False, success_message: Optional[str] = None
+):
     def decorator(fn):
         task_name = name or fn.__name__
 
         @functools.wraps(fn)
-        def wrapper(*args, session: "Session", metadata: dict[str, Any] = {}, **kwargs):
+        def wrapper(
+            *args,
+            session: "Session",
+            metadata: dict[str, Any] = {},
+            **kwargs,
+        ):
             # Compute a hashable deduplication key
             dedupe_key = (
                 task_name
@@ -115,6 +135,7 @@ def task(name=None, dedupe=False, run_once=False):
                 kwargs=kwargs,
                 session=session,
                 metadata=metadata,
+                message=success_message,
             )
 
             # Register task

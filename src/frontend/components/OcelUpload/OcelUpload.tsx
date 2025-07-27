@@ -30,7 +30,11 @@ const OcelUpload: React.FC<{ onUpload: () => void }> = ({ onUpload }) => {
         onUpload={(file) =>
           mutate({ data: { file: file[0] }, params: { name: file[0].name } })
         }
-        accept={[".json", ".jsonocel", ".sqlite", ".xml", ".xmlocel"]}
+        accept={{
+          "application/json": [".json", ".jsonocel"],
+          "application/xml": [".xml", ".xmlocel"],
+          "application/x-sqlite3": [".sqlite"],
+        }}
         content={{
           accept: "Drop files here",
           idle: "Upload OCEL",

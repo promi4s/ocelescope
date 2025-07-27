@@ -59,7 +59,7 @@ def run_plugin(
         },
     }
     if input is not None:
-        setattr(method_kwargs, "input", input_arg)
+        method_kwargs["input"] = input_arg
 
     result = runner["method"](**method_kwargs)
 

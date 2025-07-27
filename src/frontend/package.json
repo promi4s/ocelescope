@@ -46,7 +46,8 @@
     "react-cytoscapejs": "^2.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.60.0",
-    "recharts": "^2.15.3"
+    "recharts": "^2.15.3",
+    "zod": "^4.0.10"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",

@@ -143,10 +143,13 @@ class BasePlugin:
             task_name = f"{plugin_id}:{name}"
             original_method = getattr(cls(), name)
 
+            method_meta = getattr(method, "_plugin_method_metadata", {})
+
             task_wrapped = task(
                 name=task_name,
                 dedupe=True,
                 run_once=False,
+                success_message=f"{method_meta.get('label', name)} run successfully",
             )(original_method)
 
             method_map[name] = MethodInfo(

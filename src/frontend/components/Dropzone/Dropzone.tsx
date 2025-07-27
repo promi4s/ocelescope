@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { ComponentProps, useRef } from "react";
 import { Button, Group, Text, useMantineTheme } from "@mantine/core";
 import { Dropzone, FileWithPath } from "@mantine/dropzone";
 import classes from "@/components/Dropzone/Dropzone.module.css";
@@ -6,7 +6,7 @@ import { DownloadIcon, Upload, X } from "lucide-react";
 
 const FileDropzone: React.FC<{
   onUpload: (files: FileWithPath[]) => void;
-  accept?: string[];
+  accept?: ComponentProps<typeof Dropzone>["accept"];
   content: {
     accept?: React.ReactNode;
     reject?: React.ReactNode;
@@ -51,10 +51,7 @@ const FileDropzone: React.FC<{
 
           <Text className={classes.description}>
             {content.description || (
-              <span>
-                Drag&apos;n&apos;drop files here to upload. We can accept only{" "}
-                <i>{accept?.join(", ")}</i> files.
-              </span>
+              <span>Drag&apos;n&apos;drop files here to upload.</span>
             )}
           </Text>
         </div>

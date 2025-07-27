@@ -21,15 +21,17 @@ import {
 } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import AppShell from "@/components/AppShell/AppShell";
+import WebsocketWrapper from "@/components/WebsocketWrapper/WebsocketWrapper";
 
 export default function App({ Component, pageProps }: any) {
-  const [QueryClienty] = useState(() => new QueryClient());
+  const [client] = useState(() => new QueryClient());
 
   return (
-    <QueryClientProvider client={QueryClienty}>
+    <QueryClientProvider client={client}>
       <HydrationBoundary>
         <MantineProvider theme={theme}>
           <Notifications />
+
           <Head>
             <title>Ocelescope</title>
             <meta
@@ -38,6 +40,7 @@ export default function App({ Component, pageProps }: any) {
             />
             <link rel="shortcut icon" href="/favicon.svg" />
           </Head>
+          <WebsocketWrapper />
           <AppShell>
             <Component {...pageProps} />
           </AppShell>
