@@ -1,4 +1,5 @@
-import { usePlugins } from "@/api/fastapi/plugins/plugins";
+import { usePlugins, useUploadPlugin } from "@/api/fastapi/plugins/plugins";
+import FileUploadButton from "@/components/FileUploadButton/FileUploadButton";
 import { Title, Container, ActionIcon, Group } from "@mantine/core";
 import { Play } from "lucide-react";
 import { DataTable } from "mantine-datatable";
@@ -8,6 +9,7 @@ import { useState } from "react";
 const PluginOverview: React.FC = () => {
   const { data: plugins } = usePlugins();
 
+  const { mutate: uploadPlugin } = useUploadPlugin();
   const [expandedPlugins, setExpandedPlugins] = useState<string[]>([]);
 
   return (
@@ -15,11 +17,37 @@ const PluginOverview: React.FC = () => {
       <Title size={"h3"}> Plugins</Title>
       <DataTable
         columns={[
-          { title: "Name", accessor: "metadata.label" },
+          {
+            title: "Name",
+            accessor: "metadata.label",
+          },
           { title: "Description", accessor: "metadata.description" },
-          { title: "Version", accessor: "metadata.version" },
+          {
+            title: "Version",
+            accessor: "metadata.version",
+            textAlign: "center",
+          },
+          {
+            title: (
+              <Group align="center" justify="end">
+                <FileUploadButton
+                  onFileUpload={(file) => {
+                    if (file != null) {
+                      uploadPlugin({ data: { file: file } });
+                    }
+                  }}
+                />
+              </Group>
+            ),
+            accessor: "actions",
+            width: "0%",
+          },
         ]}
         records={plugins}
+        highlightOnHover
+        withTableBorder
+        borderRadius={"md"}
+        idAccessor={({ metadata }) => `${metadata.name}_${metadata.version}`}
         rowExpansion={{
           allowMultiple: false,
           expanded: {
@@ -39,20 +67,18 @@ const PluginOverview: React.FC = () => {
                     width: "0%", // 👈 set width to 0%
                     textAlign: "right",
                     render: ({ name }) => (
-                      <Group align="center">
-                        <ActionIcon
-                          size={"md"}
-                          component={Link}
-                          href={{
-                            query: { version: record.metadata.version },
-                            pathname: `plugins/${record.metadata.name}/${name}`,
-                          }}
-                          color="green"
-                          variant="subtle"
-                        >
-                          <Play />
-                        </ActionIcon>
-                      </Group>
+                      <ActionIcon
+                        size={"xs"}
+                        component={Link}
+                        href={{
+                          query: { version: record.metadata.version },
+                          pathname: `plugins/${record.metadata.name}/${name}`,
+                        }}
+                        color="green"
+                        variant="subtle"
+                      >
+                        <Play />
+                      </ActionIcon>
                     ),
                   },
                 ]}

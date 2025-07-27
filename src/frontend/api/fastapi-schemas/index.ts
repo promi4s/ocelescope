@@ -10,6 +10,7 @@ export * from './bodyRunPlugin';
 export * from './bodyRunPluginInput';
 export * from './bodyRunPluginInputAnyOf';
 export * from './bodyRunPluginInputOcels';
+export * from './bodyUploadPlugin';
 export * from './booleanAttribute';
 export * from './cytoscapeGraph';
 export * from './cytoscapeGraphElementsItem';

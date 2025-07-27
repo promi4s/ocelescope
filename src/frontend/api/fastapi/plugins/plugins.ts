@@ -25,6 +25,7 @@ import type {
 
 import type {
   BodyRunPlugin,
+  BodyUploadPlugin,
   HTTPValidationError,
   PluginDescription
 } from '../../fastapi-schemas';
@@ -132,6 +133,79 @@ export function usePlugins<TData = Awaited<ReturnType<typeof plugins>>, TError =
 
 
 /**
+ * @summary Upload Plugin
+ */
+export const getUploadPluginUrl = () => {
+
+
+  
+
+  return `http://localhost:8000/plugins/`
+}
+
+export const uploadPlugin = async (bodyUploadPlugin: BodyUploadPlugin, options?: RequestInit): Promise<unknown> => {
+    const formData = new FormData();
+formData.append(`file`, bodyUploadPlugin.file)
+
+  return customFetch<unknown>(getUploadPluginUrl(),
+  {      
+    ...options,
+    method: 'POST'
+    ,
+    body: 
+      formData,
+  }
+);}
+
+
+
+
+export const getUploadPluginMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadPlugin>>, TError,{data: BodyUploadPlugin}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof uploadPlugin>>, TError,{data: BodyUploadPlugin}, TContext> => {
+
+const mutationKey = ['uploadPlugin'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof uploadPlugin>>, {data: BodyUploadPlugin}> = (props) => {
+          const {data} = props ?? {};
+
+          return  uploadPlugin(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UploadPluginMutationResult = NonNullable<Awaited<ReturnType<typeof uploadPlugin>>>
+    export type UploadPluginMutationBody = BodyUploadPlugin
+    export type UploadPluginMutationError = HTTPValidationError
+
+    /**
+ * @summary Upload Plugin
+ */
+export const useUploadPlugin = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadPlugin>>, TError,{data: BodyUploadPlugin}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof uploadPlugin>>,
+        TError,
+        {data: BodyUploadPlugin},
+        TContext
+      > => {
+
+      const mutationOptions = getUploadPluginMutationOptions(options);
+
+      return useMutation(mutationOptions , queryClient);
+    }
+    /**
  * @summary Run Plugin
  */
 export const getRunPluginUrl = (name: string,

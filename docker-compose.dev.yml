@@ -9,10 +9,10 @@ services:
       - "8000:8000"
     volumes:
       - ./data:/app/data
-      - plugins_store:/app/plugin_store
+      - plugins_store:/plugins
     environment:
       - DATA_DIR=/app/data
-      - PLUGIN_DIR=/app/plugin_store 
+      - PLUGIN_DIR=/plugins 
     develop:
       # Create a `watch` configuration to update the app
       # https://docs.docker.com/compose/file-watch/#compose-watch-versus-bind-mounts
