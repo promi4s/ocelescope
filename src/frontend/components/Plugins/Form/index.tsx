@@ -21,7 +21,7 @@ const PluginInput: React.FC<PluginInputProps> = ({
 }) => {
   const { data } = useGetOcels();
 
-  const { mutate } = useRunPlugin({ mutation: { onSuccess } });
+  const { mutate: runPlugin } = useRunPlugin({ mutation: { onSuccess } });
   const defaultValue = Object.fromEntries(
     pluginMethod.input_ocels.map(({ name }) => [name, ""]),
   );
@@ -71,14 +71,27 @@ const PluginInput: React.FC<PluginInputProps> = ({
           <PluginForm
             schema={pluginMethod.input_model}
             ocelContext={ocelValues as Record<string, string>}
-            onSubmit={(formData) => {}}
+            onSubmit={(formData) => {
+              handleSubmit((data) => {
+                runPlugin({
+                  name: pluginName,
+                  version: pluginVersion,
+                  method: pluginMethod.name,
+                  data: {
+                    input: formData,
+                    input_ocels: data as Record<string, string>,
+                  },
+                });
+              })();
+            }}
           />
         )}
       {!pluginMethod.input_model && (
         <Button
+          color="green"
           onClick={() =>
             handleSubmit((data) => {
-              mutate({
+              runPlugin({
                 name: pluginName,
                 version: pluginVersion,
                 method: pluginMethod.name,
