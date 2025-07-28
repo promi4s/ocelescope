@@ -98,6 +98,23 @@ class Task:
             self.thread.join(timeout)
 
 
+def make_hashable(obj):
+    if isinstance(obj, dict):
+        return tuple(sorted((k, make_hashable(v)) for k, v in obj.items()))
+    elif isinstance(obj, (list, tuple, set)):
+        return tuple(make_hashable(i) for i in obj)
+    elif isinstance(obj, BaseModel):
+        return make_hashable(obj.dict())
+    elif isinstance(obj, Enum):
+        return obj.value
+    elif isinstance(obj, datetime):
+        return obj.isoformat()
+    elif isinstance(obj, (str, int, float, bool, type(None))):
+        return obj
+    else:
+        return str(obj)  # fallback to string representation
+
+
 def task(
     name=None, dedupe=False, run_once=False, success_message: Optional[str] = None
 ):
@@ -115,7 +132,7 @@ def task(
             dedupe_key = (
                 task_name
                 if run_once
-                else (task_name, tuple(args), frozenset(kwargs.items()))
+                else (task_name, make_hashable(args), make_hashable(kwargs))
             )
 
             # Deduplication check
