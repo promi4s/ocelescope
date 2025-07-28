@@ -77,9 +77,9 @@ class OutputRegistry:
 
         return decorator
 
-    def visualize(self, output: T) -> Visualization:  # type:ignore
+    def visualize(self, output: T) -> Optional[Visualization]:  # type:ignore
         if output.type not in self._visualizers:  # type:ignore
-            raise ValueError("No registered vizualizations found")
+            return None
 
         return self._visualizers[output.type](output)  # type:ignore
 
