@@ -26,6 +26,7 @@ const OutputTable: React.FC = () => {
         highlightOnHover
         withTableBorder
         borderRadius={"md"}
+        minHeight={300}
         columns={[
           { accessor: "name", title: "Name" },
           {
