@@ -1,15 +1,13 @@
 import { VisualizationByType } from "@/types/outputs";
 import { Box } from "@mantine/core";
 import { ElementDefinition } from "cytoscape";
-import dynamic from "next/dynamic";
-
-const CytoscapeComponent = dynamic(() => import("react-cytoscapejs"), {
-  ssr: false,
-});
+import CytoscapeComponent from "@/components/Cytoscape";
+import ActionButtons from "@/components/Cytoscape/components/ActionButtons";
 
 const GraphViewer: React.FC<{
   visualization: VisualizationByType<"graph">;
-}> = ({ visualization }) => {
+  interactable?: boolean;
+}> = ({ visualization, interactable }) => {
   const nodes: ElementDefinition[] = visualization.nodes.map((node) => ({
     data: {
       id: node.id,
@@ -40,12 +38,16 @@ const GraphViewer: React.FC<{
   }));
 
   return (
-    <Box h={500} w={"100%"}>
+    <Box h={"100%"} w={"100%"} pos={"relative"}>
       <CytoscapeComponent
+        userZoomingEnabled={interactable}
+        userPanningEnabled={interactable}
         style={{ width: "100%", height: "100%" }}
         elements={[...nodes, ...edges]}
         layout={{ name: "preset" }}
-      />
+      >
+        {interactable && <ActionButtons />}
+      </CytoscapeComponent>
     </Box>
   );
 };

@@ -7,4 +7,4 @@
 import type { Graph } from './graph';
 import type { CytoscapeGraph } from './cytoscapeGraph';
 
-export type Output200 = Graph | CytoscapeGraph;
+export type GetOutputResponseVisualizationAnyOf = Graph | CytoscapeGraph;

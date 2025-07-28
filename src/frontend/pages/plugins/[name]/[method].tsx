@@ -1,5 +1,6 @@
 import { usePlugins } from "@/api/fastapi/plugins/plugins";
 import PluginInput from "@/components/Plugins/Form";
+import TaskResult from "@/components/TaskResult/TaskResult";
 import { Container, LoadingOverlay, Stack, Text, Title } from "@mantine/core";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
@@ -7,7 +8,7 @@ import { useMemo, useState } from "react";
 const PluginPage = () => {
   const { data: plugins } = usePlugins();
   const router = useRouter();
-  const [_, setTaskId] = useState<string | undefined>();
+  const [taskId, setTaskId] = useState<string | undefined>();
   const { name, method, version } = router.query;
 
   const pluginFormProps = useMemo(() => {
@@ -44,6 +45,7 @@ const PluginPage = () => {
         {pluginFormProps && (
           <PluginInput onSuccess={setTaskId} {...pluginFormProps} />
         )}
+        {taskId && <TaskResult taskId={taskId} />}
       </Stack>
     </Container>
   );

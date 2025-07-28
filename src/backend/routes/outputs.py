@@ -1,11 +1,13 @@
 from __future__ import annotations
 import io
 import json
+from typing import Optional
 
 
 from fastapi.datastructures import UploadFile
 from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
+from pydantic.main import BaseModel
 from starlette.responses import StreamingResponse
 from api.dependencies import ApiSession
 from outputs.base import OutputApi
@@ -79,11 +81,22 @@ def download_output(session: ApiSession, output_id: str):
     )
 
 
+class GetOutputResponse(BaseModel):
+    output: OutputApi
+    visualization: Optional[Visualization]
+
+
 @output_router.get(path="/{output_id}", operation_id="output")
-def get_output(session: ApiSession, output_id: str) -> Visualization:
+def get_output(session: ApiSession, output_id: str) -> GetOutputResponse:
     output = session.get_output(output_id)
 
-    return output_registry.visualize(output=output.output)
+    return GetOutputResponse(
+        output=OutputApi(
+            **output.model_dump(),
+            type_label=output_registry.outputs[output.output.type].label,
+        ),
+        visualization=output_registry.visualize(output=output.output),
+    )
 
 
 @output_router.delete(path="/{output_id}", operation_id="deleteOutput")

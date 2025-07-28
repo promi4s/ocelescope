@@ -3,6 +3,9 @@ import pm4py
 from pydantic.fields import Field
 from pydantic.main import BaseModel
 
+import plugins
+import plugins.util
+
 
 from .util import convert_flat_pm4py_to_ocpn, compute_ocdfg
 from ocel.ocel_wrapper import OCELWrapper
@@ -18,6 +21,9 @@ class PetriNetInput(BaseModel, frozen=True):
         default=False,
         title="Enable Token Based Replay",
         description="Enable the computation of diagnostics using token-based replay.",
+    )
+    test_outpt: list[str] = plugins.util.ocel_field(
+        field_type="event_type", ocel_id="ocel"
     )
 
 

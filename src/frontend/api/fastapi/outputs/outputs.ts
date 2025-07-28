@@ -25,8 +25,8 @@ import type {
 
 import type {
   BodyUploadOutput,
+  GetOutputResponse,
   HTTPValidationError,
-  Output200,
   OutputApi,
   RenameOutputsParams
 } from '../../fastapi-schemas';
@@ -312,9 +312,9 @@ export const getOutputUrl = (outputId: string,) => {
   return `http://localhost:8000/outputs/${outputId}`
 }
 
-export const output = async (outputId: string, options?: RequestInit): Promise<Output200> => {
+export const output = async (outputId: string, options?: RequestInit): Promise<GetOutputResponse> => {
   
-  return customFetch<Output200>(getOutputUrl(outputId),
+  return customFetch<GetOutputResponse>(getOutputUrl(outputId),
   {      
     ...options,
     method: 'GET'

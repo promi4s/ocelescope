@@ -2,7 +2,7 @@ import { useGetTask } from "@/api/fastapi/tasks/tasks";
 import { useEffect, useRef, useState } from "react";
 
 type UseTaskWaiterProps = {
-  onSuccess: () => void;
+  onSuccess?: () => void;
   taskId?: string;
 };
 
