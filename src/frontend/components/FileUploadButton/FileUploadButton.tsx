@@ -2,11 +2,11 @@ import { ActionIcon, FileInput } from "@mantine/core";
 import { FileUpIcon } from "lucide-react";
 import { useRef } from "react";
 
-const validTypes = "application/zip,application/x-zip-compressed";
 const FileUploadButton: React.FC<{
   size?: number;
+  validTypes: string;
   onFileUpload: (file: File | null) => void;
-}> = ({ size = 16, onFileUpload }) => {
+}> = ({ size = 16, onFileUpload, validTypes }) => {
   const uploadRef = useRef<HTMLButtonElement>(null);
 
   return (

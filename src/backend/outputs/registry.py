@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Callable, Optional, TypeVar, get_type_hints
+from typing import Callable, Optional, Type, TypeVar, get_type_hints
 import hashlib
 
 import json
@@ -17,6 +17,7 @@ class OutputRegistryEntry:
     type: str
     label: str
     shema_hash: str
+    model_cls: Type[OutputBase]
 
 
 class OutputRegistry:
@@ -44,7 +45,10 @@ class OutputRegistry:
 
             if output_type not in self.outputs:
                 self.outputs[output_type] = OutputRegistryEntry(
-                    type=output_type, label=label or output_type, shema_hash=output_hash
+                    type=output_type,
+                    label=label or output_type,
+                    shema_hash=output_hash,
+                    model_cls=cls,
                 )
 
             return cls
@@ -73,11 +77,11 @@ class OutputRegistry:
 
         return decorator
 
-    def visualize(self, output: T) -> Visualization:  # type: ignore
-        if output.type not in self._visualizers:
+    def visualize(self, output: T) -> Visualization:  # type:ignore
+        if output.type not in self._visualizers:  # type:ignore
             raise ValueError("No registered vizualizations found")
 
-        return self._visualizers[output.type](output)
+        return self._visualizers[output.type](output)  # type:ignore
 
     def get_registred_outputs(self):
         print(self.outputs)

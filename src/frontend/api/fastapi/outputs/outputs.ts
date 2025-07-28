@@ -5,24 +5,30 @@
  * OpenAPI spec version: 0.9.12
  */
 import {
+  useMutation,
   useQuery
 } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
   DefinedUseQueryResult,
+  MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult
 } from '@tanstack/react-query';
 
 import type {
+  BodyUploadOutput,
   HTTPValidationError,
   Output200,
-  OutputApi
+  OutputApi,
+  RenameOutputsParams
 } from '../../fastapi-schemas';
 
 import { customFetch } from '../../fetcher';
@@ -128,6 +134,174 @@ export function useOutputs<TData = Awaited<ReturnType<typeof outputs>>, TError =
 
 
 /**
+ * @summary Upload Output
+ */
+export const getUploadOutputUrl = () => {
+
+
+  
+
+  return `http://localhost:8000/outputs/`
+}
+
+export const uploadOutput = async (bodyUploadOutput: BodyUploadOutput, options?: RequestInit): Promise<unknown> => {
+    const formData = new FormData();
+formData.append(`file`, bodyUploadOutput.file)
+
+  return customFetch<unknown>(getUploadOutputUrl(),
+  {      
+    ...options,
+    method: 'POST'
+    ,
+    body: 
+      formData,
+  }
+);}
+
+
+
+
+export const getUploadOutputMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadOutput>>, TError,{data: BodyUploadOutput}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof uploadOutput>>, TError,{data: BodyUploadOutput}, TContext> => {
+
+const mutationKey = ['uploadOutput'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof uploadOutput>>, {data: BodyUploadOutput}> = (props) => {
+          const {data} = props ?? {};
+
+          return  uploadOutput(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UploadOutputMutationResult = NonNullable<Awaited<ReturnType<typeof uploadOutput>>>
+    export type UploadOutputMutationBody = BodyUploadOutput
+    export type UploadOutputMutationError = HTTPValidationError
+
+    /**
+ * @summary Upload Output
+ */
+export const useUploadOutput = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadOutput>>, TError,{data: BodyUploadOutput}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof uploadOutput>>,
+        TError,
+        {data: BodyUploadOutput},
+        TContext
+      > => {
+
+      const mutationOptions = getUploadOutputMutationOptions(options);
+
+      return useMutation(mutationOptions , queryClient);
+    }
+    /**
+ * @summary Download Output
+ */
+export const getDownloadOutputOutputsOutputIdDownloadGetUrl = (outputId: string,) => {
+
+
+  
+
+  return `http://localhost:8000/outputs/${outputId}/download`
+}
+
+export const downloadOutputOutputsOutputIdDownloadGet = async (outputId: string, options?: RequestInit): Promise<unknown> => {
+  
+  return customFetch<unknown>(getDownloadOutputOutputsOutputIdDownloadGetUrl(outputId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+export const getDownloadOutputOutputsOutputIdDownloadGetQueryKey = (outputId: string,) => {
+    return [`http://localhost:8000/outputs/${outputId}/download`] as const;
+    }
+
+    
+export const getDownloadOutputOutputsOutputIdDownloadGetQueryOptions = <TData = Awaited<ReturnType<typeof downloadOutputOutputsOutputIdDownloadGet>>, TError = HTTPValidationError>(outputId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadOutputOutputsOutputIdDownloadGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDownloadOutputOutputsOutputIdDownloadGetQueryKey(outputId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof downloadOutputOutputsOutputIdDownloadGet>>> = ({ signal }) => downloadOutputOutputsOutputIdDownloadGet(outputId, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(outputId),  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof downloadOutputOutputsOutputIdDownloadGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DownloadOutputOutputsOutputIdDownloadGetQueryResult = NonNullable<Awaited<ReturnType<typeof downloadOutputOutputsOutputIdDownloadGet>>>
+export type DownloadOutputOutputsOutputIdDownloadGetQueryError = HTTPValidationError
+
+
+export function useDownloadOutputOutputsOutputIdDownloadGet<TData = Awaited<ReturnType<typeof downloadOutputOutputsOutputIdDownloadGet>>, TError = HTTPValidationError>(
+ outputId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadOutputOutputsOutputIdDownloadGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof downloadOutputOutputsOutputIdDownloadGet>>,
+          TError,
+          Awaited<ReturnType<typeof downloadOutputOutputsOutputIdDownloadGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDownloadOutputOutputsOutputIdDownloadGet<TData = Awaited<ReturnType<typeof downloadOutputOutputsOutputIdDownloadGet>>, TError = HTTPValidationError>(
+ outputId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadOutputOutputsOutputIdDownloadGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof downloadOutputOutputsOutputIdDownloadGet>>,
+          TError,
+          Awaited<ReturnType<typeof downloadOutputOutputsOutputIdDownloadGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDownloadOutputOutputsOutputIdDownloadGet<TData = Awaited<ReturnType<typeof downloadOutputOutputsOutputIdDownloadGet>>, TError = HTTPValidationError>(
+ outputId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadOutputOutputsOutputIdDownloadGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Download Output
+ */
+
+export function useDownloadOutputOutputsOutputIdDownloadGet<TData = Awaited<ReturnType<typeof downloadOutputOutputsOutputIdDownloadGet>>, TError = HTTPValidationError>(
+ outputId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadOutputOutputsOutputIdDownloadGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDownloadOutputOutputsOutputIdDownloadGetQueryOptions(outputId,options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+/**
  * @summary Get Output
  */
 export const getOutputUrl = (outputId: string,) => {
@@ -222,3 +396,153 @@ export function useOutput<TData = Awaited<ReturnType<typeof output>>, TError = H
 
 
 
+/**
+ * @summary Delete Output
+ */
+export const getDeleteOutputUrl = (outputId: string,) => {
+
+
+  
+
+  return `http://localhost:8000/outputs/${outputId}`
+}
+
+export const deleteOutput = async (outputId: string, options?: RequestInit): Promise<unknown> => {
+  
+  return customFetch<unknown>(getDeleteOutputUrl(outputId),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
+
+
+export const getDeleteOutputMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteOutput>>, TError,{outputId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteOutput>>, TError,{outputId: string}, TContext> => {
+
+const mutationKey = ['deleteOutput'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteOutput>>, {outputId: string}> = (props) => {
+          const {outputId} = props ?? {};
+
+          return  deleteOutput(outputId,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteOutputMutationResult = NonNullable<Awaited<ReturnType<typeof deleteOutput>>>
+    
+    export type DeleteOutputMutationError = HTTPValidationError
+
+    /**
+ * @summary Delete Output
+ */
+export const useDeleteOutput = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteOutput>>, TError,{outputId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteOutput>>,
+        TError,
+        {outputId: string},
+        TContext
+      > => {
+
+      const mutationOptions = getDeleteOutputMutationOptions(options);
+
+      return useMutation(mutationOptions , queryClient);
+    }
+    /**
+ * @summary Rename Output
+ */
+export const getRenameOutputsUrl = (outputId: string,
+    params: RenameOutputsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `http://localhost:8000/outputs/${outputId}?${stringifiedParams}` : `http://localhost:8000/outputs/${outputId}`
+}
+
+export const renameOutputs = async (outputId: string,
+    params: RenameOutputsParams, options?: RequestInit): Promise<unknown> => {
+  
+  return customFetch<unknown>(getRenameOutputsUrl(outputId,params),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+
+
+
+
+export const getRenameOutputsMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof renameOutputs>>, TError,{outputId: string;params: RenameOutputsParams}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof renameOutputs>>, TError,{outputId: string;params: RenameOutputsParams}, TContext> => {
+
+const mutationKey = ['renameOutputs'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof renameOutputs>>, {outputId: string;params: RenameOutputsParams}> = (props) => {
+          const {outputId,params} = props ?? {};
+
+          return  renameOutputs(outputId,params,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RenameOutputsMutationResult = NonNullable<Awaited<ReturnType<typeof renameOutputs>>>
+    
+    export type RenameOutputsMutationError = HTTPValidationError
+
+    /**
+ * @summary Rename Output
+ */
+export const useRenameOutputs = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof renameOutputs>>, TError,{outputId: string;params: RenameOutputsParams}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof renameOutputs>>,
+        TError,
+        {outputId: string;params: RenameOutputsParams},
+        TContext
+      > => {
+
+      const mutationOptions = getRenameOutputsMutationOptions(options);
+
+      return useMutation(mutationOptions , queryClient);
+    }
+    

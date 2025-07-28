@@ -5,6 +5,6 @@
  * OpenAPI spec version: 0.9.12
  */
 
-export interface BodyUploadPlugin {
+export interface BodyUploadOutput {
   file: Blob;
 }

@@ -164,6 +164,12 @@ class Session:
     def list_outputs(self) -> list[Output]:
         return list(self._outputs.values())
 
+    def rename_output(self, output_id: str, new_name: str):
+        if output_id not in self._outputs:
+            raise NotFound(f"Output with id {output_id} not found")
+
+        self._outputs[output_id].name = new_name
+
     # endregion
     def invalidate_module_states(self):
         for module_state in self._module_states.values():

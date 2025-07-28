@@ -1,22 +1,31 @@
-import { useOutputs } from "@/api/fastapi/outputs/outputs";
-import { Stack, ActionIcon, Title, Menu } from "@mantine/core";
 import {
-  Download,
-  EllipsisVerticalIcon,
-  FileUpIcon,
-  Pencil,
-  Trash,
-} from "lucide-react";
+  useDeleteOutput,
+  useOutputs,
+  useUploadOutput,
+} from "@/api/fastapi/outputs/outputs";
+import { Stack, ActionIcon, Title, Menu } from "@mantine/core";
+import { Download, EllipsisVerticalIcon, Trash } from "lucide-react";
 import { DataTable } from "mantine-datatable";
 import dayjs from "dayjs";
 import Viewer from "./Viewer";
+import FileUploadButton from "../FileUploadButton/FileUploadButton";
 
 const OutputTable: React.FC = () => {
-  const { data: outputs } = useOutputs();
+  const { data: outputs, refetch } = useOutputs();
+  const { mutate: uploadOutput } = useUploadOutput({
+    mutation: { onSuccess: async () => await refetch() },
+  });
+  const { mutate: deleteOutput } = useDeleteOutput({
+    mutation: { onSuccess: async () => await refetch() },
+  });
+
   return (
     <Stack gap={0}>
       <Title size={"h3"}>Outputs</Title>
       <DataTable
+        highlightOnHover
+        withTableBorder
+        borderRadius={"md"}
         columns={[
           { accessor: "name", title: "Name" },
           {
@@ -30,11 +39,14 @@ const OutputTable: React.FC = () => {
             accessor: "actions",
             textAlign: "right",
             title: (
-              <ActionIcon variant="subtle">
-                <FileUpIcon size={20} />
-              </ActionIcon>
+              <FileUploadButton
+                onFileUpload={(file) => {
+                  if (file != null) uploadOutput({ data: { file } });
+                }}
+                validTypes="application/json"
+              />
             ),
-            render: ({}) => (
+            render: ({ id }) => (
               <Menu width={200} position="left-start">
                 <Menu.Target>
                   <ActionIcon
@@ -46,30 +58,25 @@ const OutputTable: React.FC = () => {
                   </ActionIcon>
                 </Menu.Target>
 
-                <Menu.Dropdown>
+                <Menu.Dropdown onClick={(e) => e.stopPropagation()}>
                   <Menu.Item
-                    onClick={(e) => {}}
-                    leftSection={<Pencil size={16} />}
+                    leftSection={<Download size={16} />}
+                    component={"a"}
+                    href={`http://localhost:8000/outputs/${id}/download`}
                   >
-                    Rename
+                    Download
                   </Menu.Item>
-                  <Menu.Sub>
-                    <Menu.Sub.Target>
-                      <Menu.Sub.Item leftSection={<Download size={16} />}>
-                        Download
-                      </Menu.Sub.Item>
-                    </Menu.Sub.Target>
-                    <Menu.Sub.Dropdown>
-                      {[".xml", ".sqlite", ".json"].map((ext) => (
-                        <Menu.Item component={"a"}>{ext}</Menu.Item>
-                      ))}
-                    </Menu.Sub.Dropdown>
-                  </Menu.Sub>
+
                   <Menu.Divider />
                   <Menu.Item
                     leftSection={<Trash size={16} color={"red"} />}
                     color="red"
                     fw="bold"
+                    onClick={async () => {
+                      if (id) {
+                        deleteOutput({ outputId: id });
+                      }
+                    }}
                   >
                     Delete
                   </Menu.Item>
