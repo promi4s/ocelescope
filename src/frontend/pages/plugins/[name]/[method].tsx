@@ -1,5 +1,5 @@
 import { usePlugins } from "@/api/fastapi/plugins/plugins";
-import PluginForm from "@/components/PluginForm/PluginForm";
+import PluginInput from "@/components/Plugins/Form";
 import { Container, LoadingOverlay, Stack, Text, Title } from "@mantine/core";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
@@ -42,7 +42,7 @@ const PluginPage = () => {
           <Text>{pluginFormProps.pluginMethod.description}</Text>
         </Stack>
         {pluginFormProps && (
-          <PluginForm onSuccess={setTaskId} {...pluginFormProps} />
+          <PluginInput onSuccess={setTaskId} {...pluginFormProps} />
         )}
       </Stack>
     </Container>
