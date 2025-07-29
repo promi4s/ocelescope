@@ -11,6 +11,7 @@ import type { GraphNodeHeight } from './graphNodeHeight';
 import type { GraphNodeColor } from './graphNodeColor';
 import type { GraphNodeX } from './graphNodeX';
 import type { GraphNodeY } from './graphNodeY';
+import type { GraphNodeBorderColor } from './graphNodeBorderColor';
 import type { GraphNodeLabelPos } from './graphNodeLabelPos';
 
 export interface GraphNode {
@@ -22,5 +23,6 @@ export interface GraphNode {
   color?: GraphNodeColor;
   x?: GraphNodeX;
   y?: GraphNodeY;
+  border_color?: GraphNodeBorderColor;
   label_pos?: GraphNodeLabelPos;
 }

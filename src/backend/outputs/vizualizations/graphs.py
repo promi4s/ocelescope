@@ -34,6 +34,7 @@ class GraphNode(BaseModel):
     color: Optional[str] = None
     x: Optional[float] = None
     y: Optional[float] = None
+    border_color: Optional[str] = None
     label_pos: Optional[Literal["top", "center", "bottom"]] = None
 
 

@@ -64,6 +64,7 @@ export * from './graphEdgeArrowsItem1';
 export * from './graphEdgeColor';
 export * from './graphEdgeLabel';
 export * from './graphNode';
+export * from './graphNodeBorderColor';
 export * from './graphNodeColor';
 export * from './graphNodeHeight';
 export * from './graphNodeLabel';
