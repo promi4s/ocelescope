@@ -1,4 +1,4 @@
-import { Button, Divider, LoadingOverlay, Paper, Stack } from "@mantine/core";
+import { Button, Divider, LoadingOverlay, Stack } from "@mantine/core";
 import {
   useGetDefaultOcel,
   useImportDefaultOcel,
@@ -24,7 +24,7 @@ const OcelUpload: React.FC<{ onUpload: () => void }> = ({ onUpload }) => {
   });
 
   return (
-    <Paper withBorder pos={"relative"} shadow="sm" p={22} mt={30} radius="md">
+    <>
       <LoadingOverlay visible={isImportPending || isDefaultImportPending} />
       <FileDropzone
         onUpload={(file) =>
@@ -47,7 +47,7 @@ const OcelUpload: React.FC<{ onUpload: () => void }> = ({ onUpload }) => {
           ),
         }}
       />
-      <Stack gap={0} mt="lg">
+      <Stack gap={0} mt="lg" w={"100%"}>
         <Divider />
         {defaultOcels?.map((ocel) => (
           <>
@@ -66,7 +66,7 @@ const OcelUpload: React.FC<{ onUpload: () => void }> = ({ onUpload }) => {
           </>
         ))}
       </Stack>
-    </Paper>
+    </>
   );
 };
 

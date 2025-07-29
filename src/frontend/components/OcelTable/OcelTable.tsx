@@ -6,13 +6,15 @@ import {
 } from "@/api/fastapi/ocels/ocels";
 import OcelUpload from "@/components/OcelUpload/OcelUpload";
 import {
+  ActionIcon,
+  Box,
   Button,
   Group,
-  Loader,
+  LoadingOverlay,
   Menu,
   Modal,
+  Paper,
   Stack,
-  Table,
   Text,
   TextInput,
   Title,
@@ -22,13 +24,14 @@ import {
   Check,
   Download,
   EllipsisVerticalIcon,
-  FileUp,
+  FileUpIcon,
   Filter,
   Pencil,
   StarIcon,
   Trash,
   X,
 } from "lucide-react";
+import { DataTable } from "mantine-datatable";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
@@ -39,7 +42,11 @@ const OcelTable = () => {
   const [deletedOcelId, setDeletedOcelId] = useState<
     { name: string; id: string } | undefined
   >(undefined);
-  const { data: ocels, refetch } = useGetOcels({
+  const {
+    data: ocels,
+    isLoading,
+    refetch,
+  } = useGetOcels({
     query: {
       refetchInterval: ({ state }) => {
         if (state.data && state.data.uploading_ocels.length > 0) {
@@ -69,6 +76,8 @@ const OcelTable = () => {
       },
     },
   });
+  const isOcelUploaded =
+    ocels?.uploading_ocels.length === 0 && ocels?.ocels.length === 0;
 
   const { mutateAsync: renameOcel } = useRenameOcel();
 
@@ -86,212 +95,220 @@ const OcelTable = () => {
           },
         }}
       >
-        <OcelUpload
-          onUpload={async () => {
-            await queryClient.invalidateQueries();
-            setIsUploadModalOpen(false);
-          }}
-        />
+        <Paper
+          withBorder
+          pos={"relative"}
+          shadow="sm"
+          p={22}
+          m={30}
+          radius={"md"}
+        >
+          <OcelUpload
+            onUpload={async () => {
+              await queryClient.invalidateQueries();
+              setIsUploadModalOpen(false);
+            }}
+          />
+        </Paper>
+      </Modal>
+      <Modal
+        opened={!!deletedOcelId}
+        onClose={() => setDeletedOcelId(undefined)}
+        title={`Delete ${deletedOcelId?.name}`}
+      >
+        <Text>
+          Are you sure you want to delete this ocel? This action cannot be
+          undone.
+        </Text>
+        <Group>
+          <Button
+            mt={"md"}
+            onClick={() => {
+              deleteOcel({ params: { ocel_id: deletedOcelId!.id } });
+              setDeletedOcelId(undefined);
+            }}
+            color={"red"}
+          >
+            Delete
+          </Button>
+        </Group>
       </Modal>
       <Stack gap={0}>
-        <Title size={"h2"}>OCELS</Title>
-        {ocels &&
-        (ocels.ocels.length > 0 || ocels.uploading_ocels.length > 0) ? (
-          <Table.ScrollContainer minWidth={800}>
-            <Table verticalSpacing="sm" highlightOnHover>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th />
-                  <Table.Th>Name</Table.Th>
-                  <Table.Th>Uploaded At</Table.Th>
-                  <Table.Th>Extensions</Table.Th>
-                  <Table.Th
-                    style={{ display: "flex", justifyContent: "end" }}
-                    px={0}
-                    align="right"
-                  >
-                    <Button
-                      variant="subtle"
-                      p={0}
-                      w={30}
-                      h={30}
-                      onClick={() => setIsUploadModalOpen(true)}
-                    >
-                      <FileUp size={20} />
-                    </Button>
-                  </Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {(ocels.ocels ?? []).map(
-                  ({ id, name, created_at, extensions }) => (
-                    <Table.Tr
-                      key={id}
-                      onClick={() =>
-                        setCurrentOcel({ params: { ocel_id: id } })
-                      }
-                    >
-                      <Table.Td>
-                        {id === ocels.current_ocel_id && (
-                          <StarIcon size={14} fill="blue" color="blue" />
-                        )}
-                      </Table.Td>
-                      <Table.Td align="center">
-                        <Group>
-                          {renamedOcel?.id !== id ? (
-                            <>{name}</>
-                          ) : (
-                            <>
-                              <TextInput
-                                value={renamedOcel.value}
-                                onChange={(newName) =>
-                                  setRenamedOcel({
-                                    id,
-                                    value: newName.currentTarget.value,
-                                  })
-                                }
-                              />
-                              <Button
-                                onClick={async (e) => {
-                                  e.stopPropagation();
-                                  await renameOcel({
-                                    params: {
-                                      ocel_id: renamedOcel.id,
-                                      new_name: renamedOcel.value,
-                                    },
-                                  });
-                                  setRenamedOcel(undefined);
-                                  await refetch();
-                                }}
-                                size={"xs"}
-                                color="green"
-                              >
-                                <Check size={16} />
-                              </Button>
-                              <Button
-                                onClick={async (e) => {
-                                  e.stopPropagation();
-
-                                  setRenamedOcel(undefined);
-                                }}
-                                size={"xs"}
-                                color="red"
-                              >
-                                <X size={16} />
-                              </Button>
-                            </>
-                          )}
-                        </Group>
-                      </Table.Td>
-                      <Table.Td>{created_at}</Table.Td>
-                      <Table.Td>{extensions}</Table.Td>
-                      <Table.Td align="right" px={0}>
-                        <Menu width={200} position="left-start">
-                          <Menu.Target>
-                            <Button
-                              p={0}
-                              variant="subtle"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <EllipsisVerticalIcon />
-                            </Button>
-                          </Menu.Target>
-
-                          <Menu.Dropdown>
-                            <Menu.Item
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setRenamedOcel({ id, value: name });
-                              }}
-                              leftSection={<Pencil size={16} />}
-                            >
-                              Rename
-                            </Menu.Item>
-                            <Menu.Item
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                router.push(`/filter/${id}`);
-                              }}
-                              leftSection={<Filter size={16} />}
-                            >
-                              Filter
-                            </Menu.Item>
-                            <Menu.Sub>
-                              <Menu.Sub.Target>
-                                <Menu.Sub.Item
-                                  leftSection={<Download size={16} />}
-                                >
-                                  Download
-                                </Menu.Sub.Item>
-                              </Menu.Sub.Target>
-
-                              <Menu.Sub.Dropdown>
-                                {[".xml", ".sqlite", ".json"].map((ext) => (
-                                  <Menu.Item
-                                    component={"a"}
-                                    href={`http://localhost:8000/ocels/download?ext=${ext}&ocel_id=${id}`}
-                                  >
-                                    {ext}
-                                  </Menu.Item>
-                                ))}
-                              </Menu.Sub.Dropdown>
-                            </Menu.Sub>
-                            <Menu.Divider />
-                            <Menu.Item
-                              leftSection={<Trash size={16} color={"red"} />}
-                              color="red"
-                              fw="bold"
-                              onClick={() => setDeletedOcelId({ id, name })}
-                            >
-                              Delete
-                            </Menu.Item>
-                          </Menu.Dropdown>
-                        </Menu>
-                      </Table.Td>
-                    </Table.Tr>
-                  ),
-                )}
-                {(ocels.uploading_ocels ?? []).map(({ name, uploaded_at }) => (
-                  <Table.Tr>
-                    <Table.Td>
-                      <Loader size={14} />
-                    </Table.Td>
-                    <Table.Td>{name}</Table.Td>
-                    <Table.Td>{uploaded_at}</Table.Td>
-                  </Table.Tr>
-                ))}
-              </Table.Tbody>
-            </Table>
-            <Modal
-              opened={!!deletedOcelId}
-              onClose={() => setDeletedOcelId(undefined)}
-              title={`Delete ${deletedOcelId?.name}`}
-            >
-              <Text>
-                Are you sure you want to delete this ocel? This action cannot be
-                undone.
-              </Text>
-              <Group>
-                <Button
-                  mt={"md"}
-                  onClick={() => {
-                    deleteOcel({ params: { ocel_id: deletedOcelId!.id } });
-                    setDeletedOcelId(undefined);
-                  }}
-                  color={"red"}
+        <Title size={"h3"}>OCELS</Title>
+        <DataTable
+          height={isOcelUploaded ? 500 : undefined}
+          withTableBorder
+          borderRadius={"md"}
+          highlightOnHover
+          onRowClick={({ record }) => {
+            setCurrentOcel({ params: { ocel_id: record.id } });
+          }}
+          columns={[
+            {
+              accessor: "selector",
+              title: "",
+              render: ({ id }) => (
+                <>
+                  {id === ocels?.current_ocel_id && (
+                    <StarIcon size={14} fill="blue" color="blue" />
+                  )}
+                </>
+              ),
+            },
+            {
+              accessor: "name",
+              render: ({ name, id }) => {
+                return (
+                  <Group>
+                    {renamedOcel?.id !== id ? (
+                      <>{name}</>
+                    ) : (
+                      <>
+                        <TextInput
+                          value={renamedOcel.value}
+                          onClick={(e) => e.stopPropagation()}
+                          onChange={(newName) =>
+                            setRenamedOcel({
+                              id,
+                              value: newName.currentTarget.value,
+                            })
+                          }
+                        />
+                        <Button
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            await renameOcel({
+                              params: {
+                                ocel_id: renamedOcel.id,
+                                new_name: renamedOcel.value,
+                              },
+                            });
+                            setRenamedOcel(undefined);
+                            await refetch();
+                          }}
+                          size={"xs"}
+                          color="green"
+                        >
+                          <Check size={16} />
+                        </Button>
+                        <Button
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            setRenamedOcel(undefined);
+                          }}
+                          size={"xs"}
+                          color="red"
+                        >
+                          <X size={16} />
+                        </Button>
+                      </>
+                    )}
+                  </Group>
+                );
+              },
+            },
+            { accessor: "created_at" },
+            { accessor: "extensions" },
+            {
+              title: !isOcelUploaded && (
+                <ActionIcon
+                  variant="subtle"
+                  size={"sm"}
+                  onClick={() => setIsUploadModalOpen(true)}
                 >
-                  Delete
-                </Button>
-              </Group>
-            </Modal>
-          </Table.ScrollContainer>
-        ) : (
-          <OcelUpload
-            onUpload={async () =>
-              queryClient.invalidateQueries({ refetchType: "all" })
-            }
-          />
-        )}
+                  <FileUpIcon size={16} />
+                </ActionIcon>
+              ),
+              textAlign: "right",
+              accessor: "actions",
+              width: "0%",
+              render: ({ id, name }) => {
+                return (
+                  <>
+                    <Menu width={200} position="left-start">
+                      <Menu.Target>
+                        <ActionIcon
+                          variant="subtle"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <EllipsisVerticalIcon size={20} />
+                        </ActionIcon>
+                      </Menu.Target>
+                      <Menu.Dropdown onClick={(e) => e.stopPropagation()}>
+                        <Menu.Item
+                          onClick={() => {
+                            setRenamedOcel({ id, value: name });
+                          }}
+                          leftSection={<Pencil size={16} />}
+                        >
+                          Rename
+                        </Menu.Item>
+                        <Menu.Item
+                          onClick={() => {
+                            router.push(`/filter/${id}`);
+                          }}
+                          leftSection={<Filter size={16} />}
+                        >
+                          Filter
+                        </Menu.Item>
+                        <Menu.Sub>
+                          <Menu.Sub.Target>
+                            <Menu.Sub.Item leftSection={<Download size={16} />}>
+                              Download
+                            </Menu.Sub.Item>
+                          </Menu.Sub.Target>
+
+                          <Menu.Sub.Dropdown>
+                            {[".xml", ".sqlite", ".json"].map((ext) => (
+                              <Menu.Item
+                                component={"a"}
+                                href={`http://localhost:8000/ocels/download?ext=${ext}&ocel_id=${id}`}
+                              >
+                                {ext}
+                              </Menu.Item>
+                            ))}
+                          </Menu.Sub.Dropdown>
+                        </Menu.Sub>
+                        <Menu.Divider />
+                        <Menu.Item
+                          leftSection={<Trash size={16} color={"red"} />}
+                          color="red"
+                          fw="bold"
+                          onClick={() => setDeletedOcelId({ id, name })}
+                        >
+                          Delete
+                        </Menu.Item>
+                      </Menu.Dropdown>
+                    </Menu>
+                  </>
+                );
+              },
+            },
+          ]}
+          emptyState={
+            isOcelUploaded ? (
+              <Box p={"md"} w={"100%"} style={{ pointerEvents: "auto" }}>
+                <OcelUpload
+                  onUpload={async () =>
+                    queryClient.invalidateQueries({ refetchType: "all" })
+                  }
+                />
+              </Box>
+            ) : isLoading ? (
+              <LoadingOverlay />
+            ) : undefined
+          }
+          records={[
+            ...(ocels?.ocels ?? []),
+            ...(ocels?.uploading_ocels.map(
+              ({ name, uploaded_at, task_id }) => ({
+                id: task_id,
+                name,
+                created_at: uploaded_at,
+              }),
+            ) ?? []),
+          ]}
+        />
       </Stack>
     </>
   );
