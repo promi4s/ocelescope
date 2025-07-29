@@ -78,7 +78,7 @@ const TaskResult: React.FC<TaskResultProps> = ({ taskId }) => {
         <LoadingOverlay visible={!task?.result} />
         <Title size={"h4"}>Results</Title>
         {task && (
-          <SimpleGrid cols={2}>
+          <SimpleGrid cols={{ base: 1, md: 2 }}>
             {task &&
               task.result?.output_ids.map((id) => (
                 <OutputCard id={id} onView={() => setOutput(id)} />
