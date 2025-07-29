@@ -18,7 +18,7 @@ def convert_flat_pm4py_to_ocpn(flat_nets: dict[str, PMNet]) -> ObjectCentricPetr
         pm_net = pm_net[0]  # type:ignore
 
         for place in pm_net.places:
-            qualified_id = f"{object_type}:{place.name}"
+            qualified_id = f"{object_type}_{place.name}"
             if qualified_id not in seen_places:
                 place_set.append(
                     Place(
@@ -55,9 +55,9 @@ def convert_flat_pm4py_to_ocpn(flat_nets: dict[str, PMNet]) -> ObjectCentricPetr
 
             # Adjust for qualified place IDs
             if isinstance(arc.source, PMNet.Place):
-                source_id = f"{object_type}:{source_id}"
+                source_id = f"{object_type}_{source_id}"
             if isinstance(arc.target, PMNet.Place):
-                target_id = f"{object_type}:{target_id}"
+                target_id = f"{object_type}_{target_id}"
 
             # If transition, map to unified label
             if isinstance(arc.source, PMNet.Transition):
