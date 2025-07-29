@@ -115,20 +115,10 @@ def init_custom_docs(app: FastAPI):
 
     # app.mount("/static", StaticFiles(directory="static"), name="static")
 
-    @app.get("/docs/{ui}", include_in_schema=False)
+    @app.get("/docs", include_in_schema=False)
     async def docs(ui: Literal["swaggerui", "rapidoc"] = "rapidoc", curl: bool = True):
         if ui == "rapidoc":
             return get_rapidoc_html(
                 openapi_url=app.openapi_url or "/",
                 title=app.title + " - rapidoc",
-            )
-        if ui == "swaggerui":
-            raise NotImplementedError
-            return get_swagger_ui_html(
-                openapi_url=app.openapi_url or "/",
-                title=app.title + " - Swagger UI",
-                oauth2_redirect_url=app.swagger_ui_oauth2_redirect_url,
-                # swagger_js_url="/static/swagger-ui-bundle.js",
-                # swagger_css_url="/static/swagger-ui.css",
-                omit_curl=not curl,
             )

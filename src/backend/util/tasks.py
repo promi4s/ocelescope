@@ -1,9 +1,16 @@
+from datetime import datetime
 import threading
 import functools
 from enum import Enum
 import uuid
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Optional
+from api.websocket import TaskMessage, websocket_manager
+
+from pydantic.main import BaseModel
+
+from ocel.ocel_wrapper import OCELWrapper
+from outputs.base import OutputBase
 
 if TYPE_CHECKING:
     from api.session import Session
@@ -18,19 +25,25 @@ class TaskState(str, Enum):
     CANCELLED = "CANCELLED"
 
 
+class TaskResult(BaseModel):
+    ocel_ids: list[str]
+    output_ids: list[str]
+
+
 class Task:
-    def __init__(self, id, name, fn, args, kwargs, session, metadata=None):
+    def __init__(self, id, name, message, fn, args, kwargs, session, metadata=None):
         self.id = id
         self.name = name
         self.fn = fn
         self.args = args
         self.kwargs = kwargs
-        self.session = session
+        self.session: Session = session
         self.metadata = metadata or {}
         self.state = TaskState.PENDING
         self.thread = None
-        self.result = None
+        self.result: Optional[TaskResult] = None
         self.stop_event = threading.Event()
+        self.message = message
 
     def start(self):
         self.thread = threading.Thread(target=self.run, daemon=True)
@@ -39,18 +52,42 @@ class Task:
     def run(self):
         self.state = TaskState.STARTED
         try:
-            self.result = self.fn(
+            result = self.fn(
                 *self.args,
                 session=self.session,
                 stop_event=self.stop_event,
                 **self.kwargs,
             )
+            result_items = result if isinstance(result, (list, tuple)) else [result]
+            self.result = TaskResult(**{"ocel_ids": [], "output_ids": []})
+            for result in result_items:
+                if isinstance(result, OCELWrapper):
+                    self.result.ocel_ids.append(self.session.add_ocel(result))
+                if isinstance(result, OutputBase):
+                    self.result.output_ids.append(
+                        self.session.add_output(
+                            output=result,
+                            name=f"{result.type}_{datetime.now().strftime('%Y-%m-%d_%H:%M')}",  # type: ignore
+                        )
+                    )
+
             self.state = TaskState.SUCCESS
         except Exception:
             self.state = TaskState.FAILURE
             raise
         finally:
             self.session.running_tasks.pop(self.id, None)
+            websocket_manager.send_safe(
+                self.session.id,
+                TaskMessage(
+                    task_id=self.id,
+                    task_message=self.message,
+                    ocel_ids=self.result.ocel_ids if self.result is not None else None,
+                    output_ids=self.result.output_ids
+                    if self.result is not None
+                    else None,
+                ),
+            )
 
     def cancel(self):
         self.stop_event.set()
@@ -61,17 +98,41 @@ class Task:
             self.thread.join(timeout)
 
 
-def task(name=None, dedupe=False, run_once=False):
+def make_hashable(obj):
+    if isinstance(obj, dict):
+        return tuple(sorted((k, make_hashable(v)) for k, v in obj.items()))
+    elif isinstance(obj, (list, tuple, set)):
+        return tuple(make_hashable(i) for i in obj)
+    elif isinstance(obj, BaseModel):
+        return make_hashable(obj.dict())
+    elif isinstance(obj, Enum):
+        return obj.value
+    elif isinstance(obj, datetime):
+        return obj.isoformat()
+    elif isinstance(obj, (str, int, float, bool, type(None))):
+        return obj
+    else:
+        return str(obj)  # fallback to string representation
+
+
+def task(
+    name=None, dedupe=False, run_once=False, success_message: Optional[str] = None
+):
     def decorator(fn):
         task_name = name or fn.__name__
 
         @functools.wraps(fn)
-        def wrapper(*args, session: "Session", metadata: dict[str, Any] = {}, **kwargs):
+        def wrapper(
+            *args,
+            session: "Session",
+            metadata: dict[str, Any] = {},
+            **kwargs,
+        ):
             # Compute a hashable deduplication key
             dedupe_key = (
                 task_name
                 if run_once
-                else (task_name, tuple(args), frozenset(kwargs.items()))
+                else (task_name, make_hashable(args), make_hashable(kwargs))
             )
 
             # Deduplication check
@@ -91,6 +152,7 @@ def task(name=None, dedupe=False, run_once=False):
                 kwargs=kwargs,
                 session=session,
                 metadata=metadata,
+                message=success_message,
             )
 
             # Register task

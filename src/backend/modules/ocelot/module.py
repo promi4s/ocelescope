@@ -29,7 +29,6 @@ class State(Module):
         activity: str,
         sort_by: Optional[Tuple[str, Literal["asc", "desc"]]] = None,
     ) -> DataFrame:
-        print(f"sorted_event_{ocel.state_id}")
         if sort_by is None:
             sort_by = (ocel.ocel.event_id_column, "asc")
 
@@ -49,8 +48,6 @@ class State(Module):
         page_size: int,
         sort_by: Optional[Tuple[str, Literal["asc", "desc"]]] = None,
     ):
-        print(f"Paginated_Event_Table_{ocel.state_id}")
-
         if sort_by is not None and sort_by[0] == "id":
             sort_by = (ocel.ocel.event_id_column, sort_by[1])
         elif sort_by is not None and sort_by[0] == "timestamp":

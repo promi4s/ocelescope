@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-import inspect
-import re
 from copy import deepcopy
 from datetime import datetime
-from typing import TYPE_CHECKING, Callable, Iterable, Sequence
+from typing import TYPE_CHECKING, Iterable, Sequence
 
 import numpy as np
 import pandas as pd
@@ -227,36 +225,3 @@ def filter_relations(
     if copy:
         return relations.copy()  # type: ignore
     return relations  # type: ignore
-
-
-def print_pm4py_object_summary(pm4py_ocel):
-    names = sorted([k for k in pm4py_ocel.__dir__() if not k.startswith("__")])
-    methods, attrs, dfs, column_names = {}, {}, {}, {}
-    for name in names:
-        value = getattr(pm4py_ocel, name, None)
-        if value is None:
-            continue
-        if isinstance(value, pd.DataFrame):
-            dfs[name] = value
-        elif isinstance(value, Callable):
-            methods[name] = value
-        elif isinstance(value, str) and re.match(r"ocel:\w+", value):
-            column_names[name] = value
-        else:
-            attrs[name] = value
-
-    print("Methods:")
-    for name, method in methods.items():
-        print(name + ": " + str(inspect.signature(method)))
-
-    print("\nTables:")
-    for name, df in dfs.items():
-        print(f"{name}: {len(df)} x {len(df.columns)} [" + ", ".join(df.columns) + "]")
-
-    print("\nOther attributes:")
-    for name, attr in attrs.items():
-        print(name + ": " + str(attr))
-
-    print("\nColumn names:")
-    for name, col in column_names.items():
-        print(name + ": " + col)

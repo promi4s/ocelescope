@@ -5,12 +5,13 @@
  * OpenAPI spec version: 0.9.12
  */
 import type { TaskState } from './taskState';
+import type { TaskSummaryResult } from './taskSummaryResult';
 import type { TaskSummaryMetadata } from './taskSummaryMetadata';
 
 export interface TaskSummary {
   key: string;
   name: string;
   state: TaskState;
-  has_result: boolean;
+  result: TaskSummaryResult;
   metadata: TaskSummaryMetadata;
 }

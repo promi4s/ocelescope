@@ -977,7 +977,6 @@ class OCELWrapper:
                     path.suffix in ext_cls.supported_extensions
                     and ext_cls.has_extension(path)
                 ):
-                    print("test")
                     self._extensions[ext_cls.name] = ext_cls.import_extension(path)
             except Exception as e:
                 logger.warning(f"Extension load failed for '{ext_cls.name}': {e}")

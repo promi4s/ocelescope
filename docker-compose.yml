@@ -7,6 +7,12 @@ services:
       dockerfile: Dockerfile  
     ports:
       - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - plugins_store:/plugins
+    environment:
+      - DATA_DIR=/app/data
+      - PLUGIN_DIR=/plugins 
     restart: unless-stopped
 
   frontend:
@@ -20,3 +26,5 @@ services:
     restart: unless-stopped
     environment:
       - NODE_ENV=production
+volumes:
+  plugins_store:

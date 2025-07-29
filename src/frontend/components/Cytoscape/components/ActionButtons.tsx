@@ -1,11 +1,5 @@
 import { Button, ButtonGroup } from "@mantine/core";
-import {
-  DownloadIcon,
-  Maximize,
-  RefreshCcw,
-  Save,
-  Settings,
-} from "lucide-react";
+import { DownloadIcon, Maximize, Save, Settings } from "lucide-react";
 import { useCytoscapeContext } from "../CytoscapeContext";
 
 const ActionButtons: React.FC<{
@@ -45,31 +39,19 @@ const ActionButtons: React.FC<{
       left={0}
     >
       <>
-        <Button disabled={!context} px={"xs"} variant="default">
-          <Maximize
-            onClick={
-              context &&
-              (() => {
-                if (context.cy.current) context.cy.current.fit();
-              })
-            }
-            size={18}
-          />
-        </Button>
         <Button
+          disabled={!context}
+          px={"xs"}
+          variant="default"
           onClick={
             context &&
             (() => {
-              if (context.cy.current) {
-                context.cy.current.layout(context.layout).run();
-              }
+              console.log(context.cy.current);
+              if (context.cy.current) context.cy.current.fit();
             })
           }
-          px={"xs"}
-          disabled={!context}
-          variant="default"
         >
-          <RefreshCcw size={18} />
+          <Maximize size={18} />
         </Button>
         <Button
           disabled={!context}

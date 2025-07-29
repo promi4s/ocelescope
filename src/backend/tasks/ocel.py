@@ -6,7 +6,7 @@ from ocel.ocel_wrapper import OCELWrapper
 from util.tasks import task
 
 
-@task()
+@task(success_message="Ocel was uploaded successfully")
 def import_ocel_task(
     session: Session,
     path: Path,
@@ -24,4 +24,4 @@ def import_ocel_task(
         upload_date=upload_date,
     )
 
-    session.add_ocel(ocel)
+    return ocel

@@ -2,7 +2,7 @@ import { useGetTask } from "@/api/fastapi/tasks/tasks";
 import { useEffect, useRef, useState } from "react";
 
 type UseTaskWaiterProps = {
-  onSuccess: () => void;
+  onSuccess?: () => void;
   taskId?: string;
 };
 
@@ -35,7 +35,7 @@ const useWaitForTask = ({ taskId, onSuccess }: UseTaskWaiterProps) => {
     }
   }, [task, onSuccess]);
 
-  return { isTaskRunning };
+  return { isTaskRunning, task };
 };
 
 export default useWaitForTask;

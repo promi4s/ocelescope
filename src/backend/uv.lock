@@ -1625,6 +1625,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "cachetools" },
     { name = "fastapi", extra = ["standard"] },
+    { name = "graphviz" },
     { name = "numpy" },
     { name = "pandas" },
     { name = "pint" },
@@ -1649,6 +1650,7 @@ dev = [
 requires-dist = [
     { name = "cachetools", specifier = ">=5.3.2,<6" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.112.2" },
+    { name = "graphviz", specifier = ">=0.20.3" },
     { name = "numpy", specifier = "~=1.26" },
     { name = "pandas", specifier = "~=2.1" },
     { name = "pint", specifier = ">=0.23,<0.24" },

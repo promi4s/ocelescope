@@ -25,10 +25,11 @@ def getTask(session: ApiSession, task_id: str) -> TaskSummary:
     task = session.get_task(task_id)
     if task is None:
         raise NotFound("Session not found")
+
     return TaskSummary(
         key=task.id,
         name=task.name,
         state=task.state,
-        has_result=task.result is not None,
+        result=task.result,
         metadata=task.metadata,
     )

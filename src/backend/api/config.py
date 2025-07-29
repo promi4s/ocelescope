@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Literal, Optional
 from pydantic import DirectoryPath, Field
 from pydantic_settings import BaseSettings
 
@@ -27,6 +27,14 @@ class OceanConfig(BaseSettings):
     DATA_DIR: Optional[DirectoryPath] = Field(
         default=None,
         description="Path to the data directory, relative to `main.py`",
+    )
+
+    PLUGIN_DIR: DirectoryPath = Field(
+        description="Path to the directory, where plugins are stored"
+    )
+
+    MODE: Optional[Literal["production", "development"]] = Field(
+        default="development", description="The mode in which the backend is running"
     )
 
     class Config:

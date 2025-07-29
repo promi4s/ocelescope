@@ -9,8 +9,10 @@ services:
       - "8000:8000"
     volumes:
       - ./data:/app/data
+      - plugins_store:/plugins
     environment:
       - DATA_DIR=/app/data
+      - PLUGIN_DIR=/plugins 
     develop:
       # Create a `watch` configuration to update the app
       # https://docs.docker.com/compose/file-watch/#compose-watch-versus-bind-mounts
@@ -46,3 +48,5 @@ services:
           - action: rebuild
             path: ./src/frontend/package-lock.json
 
+volumes:
+  plugins_store:

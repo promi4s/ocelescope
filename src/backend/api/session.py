@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from datetime import datetime
 import json
 import uuid
 from typing import Any, Optional, Type, TypeVar, cast
@@ -10,7 +9,7 @@ from api.model.module import Module
 from api.model.tasks import TaskSummary
 from filters.config_union import FilterConfig
 from ocel.ocel_wrapper import Filtered_Ocel, OCELWrapper
-from resources import Resource, ResourceUnion
+from outputs.base import Output, OutputBase
 from util.tasks import Task
 
 
@@ -35,7 +34,7 @@ class Session:
         self._module_states: dict[str, Module] = {}
 
         # Resources
-        self._resources: dict[str, Resource] = {}
+        self._outputs: dict[str, Output] = {}
 
         # OCELS
         self.ocels: dict[str, Filtered_Ocel] = {}
@@ -65,7 +64,7 @@ class Session:
                 key=task.id,
                 name=task.name,
                 state=task.state,
-                has_result=task.result is not None,
+                result=task.result,
                 metadata=task.metadata,
             )
             for task in self._tasks.values()
@@ -89,6 +88,7 @@ class Session:
     def update_state(self):
         self.state = str(uuid.uuid4())
 
+    # region OCEL management
     def add_ocel(self, ocel: OCELWrapper) -> str:
         self.ocels[ocel.id] = Filtered_Ocel(ocel)
 
@@ -146,50 +146,31 @@ class Session:
         current_ocel.filtered = current_ocel.original.apply_filter(filters)
         current_ocel.filter = filters
 
-    # Resources
-    def get_resource(self, resource_id: str) -> Resource:
-        resource = self._resources.get(resource_id)
-        if resource is None:
-            raise NotFound(f"Resource with id {resource_id} not found")
+    # endregion
+    # region Output management
+    def add_output(self, output: OutputBase, name: str) -> str:
+        outputWrapper = Output(output=output, name=name)
+        self._outputs[outputWrapper.id] = outputWrapper
+        return outputWrapper.id
 
-        return resource
+    def get_output(self, id: str) -> Output:
+        if id not in self._outputs:
+            raise NotFound(f"Output with id {id} not found")
+        return self._outputs[id]
 
-    def add_resource(
-        self,
-        entity: ResourceUnion,
-        source: str,
-        name: Optional[str] = None,
-        meta_data: Optional[dict[str, Any]] = None,
-    ) -> Resource:
-        created_at = datetime.now().isoformat()
-        new_resource = Resource(
-            id=str(uuid.uuid4()),
-            source=source,
-            entity=entity,
-            created_at=created_at,
-            meta_data=meta_data if meta_data is not None else {},
-            name=name if name is not None else f"{source}_{entity.type}_{created_at}",
-        )
+    def delete_output(self, id: str):
+        self._outputs.pop(id, None)
 
-        self._resources[new_resource.id] = new_resource
+    def list_outputs(self) -> list[Output]:
+        return list(self._outputs.values())
 
-        return new_resource
+    def rename_output(self, output_id: str, new_name: str):
+        if output_id not in self._outputs:
+            raise NotFound(f"Output with id {output_id} not found")
 
-    def update_resource(self, resource_id: str, name: str):
-        if resource_id not in self._resources:
-            raise NotFound(f"Resource with id {resource_id} not found")
+        self._outputs[output_id].name = new_name
 
-        resource = self._resources[resource_id]
-        resource.name = name
-
-        return resource
-
-    def delete_resource(self, resource_id: str):
-        self._resources.pop(resource_id)
-
-    def list_resources(self) -> list[Resource]:
-        return list(self._resources.values())
-
+    # endregion
     def invalidate_module_states(self):
         for module_state in self._module_states.values():
             module_state.clear_cache()
