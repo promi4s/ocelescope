@@ -1,4 +1,4 @@
-import { useEventCounts } from "@/api/fastapi/ocels/ocels";
+import { useEventCounts, useObjectCount } from "@/api/fastapi/ocels/ocels";
 import { Box, MultiSelect, Select } from "@mantine/core";
 import { FieldProps, UiSchema } from "@rjsf/utils";
 
@@ -12,11 +12,11 @@ type OcelFieldProps = {
   requiered?: boolean;
 };
 
+// TODO: Merge EventType and ObjectTypeSelector
 const EventTypeSelector: React.FC<OcelFieldProps> = ({
   ocelId,
   onChange,
   requiered,
-
   value,
   isMulti,
   label,
@@ -41,21 +41,29 @@ const EventTypeSelector: React.FC<OcelFieldProps> = ({
 };
 
 const ObjectTypeSelector: React.FC<OcelFieldProps> = ({
-  label,
   ocelId,
   onChange,
+  requiered,
   value,
+  isMulti,
+  label,
+  description,
 }) => {
+  const { data = {} } = useObjectCount({ ocel_id: ocelId });
+  const SelectComponent = isMulti ? MultiSelect : Select;
+
   return (
-    <div>
-      <label>{label}</label>
-      <input
-        type="text"
-        placeholder="Object type"
-        value={value || ""}
-        onChange={(e) => onChange(e.target.value)}
+    <Box>
+      <SelectComponent
+        value={value}
+        label={label}
+        required={requiered}
+        clearable
+        description={description}
+        onChange={onChange}
+        data={Object.keys(data)}
       />
-    </div>
+    </Box>
   );
 };
 

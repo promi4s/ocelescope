@@ -1,9 +1,12 @@
-from typing import Literal
+from typing import Annotated, Literal
 import pm4py
 from pydantic.fields import Field
 from pydantic.main import BaseModel
 
+from filters.event_type import EventTypeFilterConfig
+from filters.object_type import ObjectTypeFilterConfig
 import plugins
+from plugins.base import OCELAnnotation
 import plugins.util
 
 
@@ -22,8 +25,11 @@ class PetriNetInput(BaseModel, frozen=True):
         title="Enable Token Based Replay",
         description="Enable the computation of diagnostics using token-based replay.",
     )
-    test_outpt: list[str] = plugins.util.ocel_field(
-        field_type="event_type", ocel_id="ocel"
+    excluded_event_types: list[str] = plugins.util.ocel_field(
+        title="Excluded Activities", field_type="event_type", ocel_id="ocel"
+    )
+    excluded_object_types: list[str] = plugins.util.ocel_field(
+        title="Excluded Object Types", field_type="object_type", ocel_id="ocel"
     )
 
 
@@ -33,11 +39,32 @@ class PetriNetInput(BaseModel, frozen=True):
     version="1",
 )
 class BertiDiscovery(BasePlugin):
-    @plugin_method(label="Discover object centric Petri Net")
-    def discover_petri_net(self, input: PetriNetInput, ocel: OCELWrapper):
+    @plugin_method(
+        label="Discover object centric Petri Net",
+        description="Discovers an object-centric Petri net (OCPN) from the provided event log using PM4Py's OCPN discovery algorithm.",
+    )
+    def discover_petri_net(
+        self,
+        input: PetriNetInput,
+        ocel: Annotated[OCELWrapper, OCELAnnotation(label="Event Log")],
+    ):
+        filtered_ocel = ocel.apply_filter(
+            filters=[
+                EventTypeFilterConfig(
+                    type="event_type",
+                    event_types=input.excluded_event_types,
+                    mode="exclude",
+                ),
+                ObjectTypeFilterConfig(
+                    type="object_type",
+                    object_types=input.excluded_object_types,
+                    mode="exclude",
+                ),
+            ]
+        )
         petri_net = pm4py.discover_oc_petri_net(
             inductive_miner_variant=input.variant,
-            ocel=ocel.ocel,
+            ocel=filtered_ocel.ocel,
             diagnostics_with_tbr=input.enable_token_based_replay,
         )
 

@@ -23,8 +23,8 @@ class MethodInfo(TypedDict):
 
 @dataclass
 class OCELAnnotation:
-    label: Optional[str]
-    description: Optional[str]
+    label: Optional[str] = None
+    description: Optional[str] = None
 
 
 class PluginOCEL(BaseModel):
