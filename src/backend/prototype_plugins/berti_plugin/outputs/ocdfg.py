@@ -46,8 +46,9 @@ def visualize_ocdfg(output: ObjectCentricDirectlyFollowsGraph) -> Graph:
             label=object_type,
             shape="circle",
             color=color_map[object_type],
-            width=20,
-            height=20,
+            width=40,
+            height=40,
+            label_pos="top",
         )
         for object_type in output.object_types
     ]
@@ -58,8 +59,9 @@ def visualize_ocdfg(output: ObjectCentricDirectlyFollowsGraph) -> Graph:
             label=object_type,
             shape="circle",
             color=color_map[object_type],
-            width=50,
-            height=50,
+            width=40,
+            height=40,
+            label_pos="bottom",
         )
         for object_type in output.object_types
     ]
