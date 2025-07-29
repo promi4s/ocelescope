@@ -46,8 +46,8 @@ def visualize_ocdfg(output: ObjectCentricDirectlyFollowsGraph) -> Graph:
             label=object_type,
             shape="circle",
             color=color_map[object_type],
-            width=50,
-            height=50,
+            width=20,
+            height=20,
         )
         for object_type in output.object_types
     ]
