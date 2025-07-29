@@ -1,4 +1,4 @@
-from typing import Literal, Optional
+from typing import Any, Literal, Optional, TypedDict
 from graphviz import Digraph
 from typing import Dict
 from pydantic.main import BaseModel
@@ -52,12 +52,17 @@ class Graph(OutputBase):
     edges: list[GraphEdge]
 
 
-def layout_graph(graph: Graph, engine: str = "dot") -> Graph:
+class GraphvizLayoutConfig(TypedDict):
+    engine: str
+    dot_attr: Dict[str, Any]
+
+
+def layout_graph(graph: Graph, layout_config: GraphvizLayoutConfig) -> Graph:
     dot = Digraph(
-        engine=engine,
+        engine=layout_config["engine"],
     )
 
-    dot.attr("graph", rankdir="RL", splines="true", nodesep="0.8", ranksep="0.5")
+    dot.attr("graph", **layout_config["dot_attr"])
 
     for node in graph.nodes:
         node_kwargs = {

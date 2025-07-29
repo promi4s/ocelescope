@@ -101,4 +101,13 @@ def visualize_ocdfg(output: ObjectCentricDirectlyFollowsGraph) -> Graph:
 
     return layout_graph(
         Graph(type="graph", nodes=nodes, edges=edges),
+        {
+            "engine": "dot",
+            "dot_attr": {
+                "rankdir": "BT",
+                "splines": "True",
+                "nodesep": "0.8",
+                "ranksep": "0.5",
+            },
+        },
     )
