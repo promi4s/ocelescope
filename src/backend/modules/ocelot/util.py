@@ -4,7 +4,7 @@ from typing import Literal, Optional, Tuple, cast
 import pandas as pd
 from pandas.core.frame import DataFrame
 
-from ocel.ocel_wrapper import OCELWrapper
+from ocelescope import OCEL
 from modules.ocelot.models import ObjectChange, OcelEntity, PaginatedResponse
 
 
@@ -99,7 +99,7 @@ def get_paginated_dataframe(
     )
 
 
-def get_object_history(ocel: OCELWrapper, object_id: str):
+def get_object_history(ocel: OCEL, object_id: str):
     object_changes = ocel.object_changes
     object_changes = object_changes[
         object_changes[ocel.ocel.object_id_column] == object_id

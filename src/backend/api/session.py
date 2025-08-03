@@ -6,9 +6,9 @@ from typing import Any, Optional, Type, TypeVar, cast
 
 from api.exceptions import NotFound
 from api.model.module import Module
+from api.model.ocel import Filtered_Ocel
 from api.model.tasks import TaskSummary
-from filters.config_union import FilterConfig
-from ocel.ocel_wrapper import Filtered_Ocel, OCELWrapper
+from ocelescope import OCEL, OCELFilter
 from outputs.base import Output, OutputBase
 from util.tasks import Task
 
@@ -89,7 +89,7 @@ class Session:
         self.state = str(uuid.uuid4())
 
     # region OCEL management
-    def add_ocel(self, ocel: OCELWrapper) -> str:
+    def add_ocel(self, ocel: OCEL) -> str:
         self.ocels[ocel.id] = Filtered_Ocel(ocel)
 
         if not self.current_ocel_id:
@@ -99,7 +99,7 @@ class Session:
 
     def get_ocel(
         self, ocel_id: Optional[str] = None, use_original: bool = False
-    ) -> OCELWrapper:
+    ) -> OCEL:
         id = ocel_id if ocel_id is not None else self.current_ocel_id
 
         if id not in self.ocels:
@@ -127,18 +127,18 @@ class Session:
 
         self.ocels.pop(ocel_id, None)
 
-    def get_ocel_filters(self, ocel_id: str) -> list[FilterConfig]:
+    def get_ocel_filters(self, ocel_id: str) -> Optional[OCELFilter]:
         if ocel_id not in self.ocels:
             raise NotFound(f"OCEL with id {ocel_id} not found")
 
-        return self.ocels[ocel_id].filter or []
+        return self.ocels[ocel_id].filter or None
 
-    def filter_ocel(self, ocel_id: str, filters: list[FilterConfig]):
+    def filter_ocel(self, ocel_id: str, filters: Optional[OCELFilter]):
         if ocel_id not in self.ocels:
             raise NotFound(f"OCEL with id {ocel_id} not found")
 
         current_ocel = self.ocels[ocel_id]
-        if len(filters) == 0:
+        if filters is None:
             current_ocel.filtered = None
             current_ocel.filter = None
             return

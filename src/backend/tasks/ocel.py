@@ -1,8 +1,9 @@
 from datetime import datetime
 from pathlib import Path
 
+
 from api.session import Session
-from ocel.ocel_wrapper import OCELWrapper
+from ocelescope import OCEL
 from util.tasks import task
 
 
@@ -16,11 +17,10 @@ def import_ocel_task(
     stop_event=None,
 ):  # Save file
     # pm4py-based import
-    ocel = OCELWrapper.read_ocel(
-        str(path),
+    ocel = OCEL.read_ocel(
+        path,
         original_file_name=name,
         version_info=True,
-        output=True,
         upload_date=upload_date,
     )
 

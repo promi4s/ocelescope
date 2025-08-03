@@ -4,13 +4,15 @@ import shutil
 from tempfile import NamedTemporaryFile
 from typing import Annotated, Literal, Optional
 
+from ocelescope.ocel.filter import OCELFilter
+
 from api.dependencies import ApiOcel, ApiSession
 from api.exceptions import BadRequest, NotFound
 from api.model.events import Date_Distribution_Item, Entity_Time_Info
-from api.model.ocel import Filter, OcelListResponse, OcelMetadata, UploadingOcelMetadata
+from api.model.ocel import OcelListResponse, OcelMetadata, UploadingOcelMetadata
 from api.model.response import TempFileResponse
-from lib.attributes import AttributeSummary
-from lib.relations import RelationCountSummary
+from ocelescope import AttributeSummary, RelationCountSummary
+
 from ocel.default_ocel import (
     DEFAULT_OCEL_KEYS,
     DefaultOCEL,
@@ -213,20 +215,19 @@ def get_object_relations(
 # region Filters
 @ocels_router.get(
     "/filter",
-    response_model=Filter,
+    response_model=OCELFilter,
     operation_id="getFilters",
 )
-def get_filter(ocel: ApiOcel, session: ApiSession) -> Filter:
-    return Filter(pipeline=session.get_ocel_filters(ocel.id))
+def get_filter(ocel: ApiOcel, session: ApiSession) -> Optional[OCELFilter]:
+    return session.get_ocel_filters(ocel.id)
 
 
 @ocels_router.post(
     "/",
     operation_id="setFilters",
 )
-def set_filter(ocel: ApiOcel, session: ApiSession, filter: Filter):
-    session.filter_ocel(ocel_id=ocel.id, filters=filter.pipeline)
-    return
+def set_filter(ocel: ApiOcel, session: ApiSession, filter: OCELFilter):
+    session.filter_ocel(ocel_id=ocel.id, filters=filter)
 
 
 # endregion
@@ -351,7 +352,7 @@ def download_ocel(
         prefix=tmp_file_prefix, suffix=ext, filename=name + (ext or ".sqlite")
     )
 
-    ocel.write_ocel(file_response.tmp_path, ext)
+    ocel.write_ocel(Path(file_response.tmp_path), ext)
 
     return file_response
 

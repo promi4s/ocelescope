@@ -1,5 +1,4 @@
 import pm4py
-from pm4py.objects.ocel.obj import OCEL
 
 from pm4py.objects.petri_net.obj import PetriNet as PMNet
 
@@ -82,7 +81,7 @@ def convert_flat_pm4py_to_ocpn(flat_nets: dict[str, PMNet]) -> ObjectCentricPetr
     )
 
 
-def compute_ocdfg(ocel: OCEL) -> ObjectCentricDirectlyFollowsGraph:
+def compute_ocdfg(ocel: pm4py.OCEL) -> ObjectCentricDirectlyFollowsGraph:
     ocdfg = pm4py.discover_ocdfg(ocel)
 
     edge_count_dict = {}

@@ -6,10 +6,10 @@ from typing import TYPE_CHECKING, Iterable, Sequence
 
 import numpy as np
 import pandas as pd
-from pm4py.objects.ocel.obj import OCEL
+from pm4py.objects.ocel.obj import PM4PYOCEL
 
 if TYPE_CHECKING:
-    from ocel.ocel_wrapper import OCELWrapper
+    from ocelescope import OCEL
 
 
 def add_object_order(
@@ -83,7 +83,7 @@ def filter_activity(
 
 
 def filter_pm4py_ocel(
-    ocel: OCEL,
+    ocel: PM4PYOCEL,
     otypes: list[str] | None = None,
     oids: list[str] | None = None,
     activities: list[str] | None = None,
@@ -181,7 +181,7 @@ def filter_pm4py_ocel(
 
 
 def filter_relations(
-    ocel: OCELWrapper | None = None,
+    ocel: OCEL | None = None,
     relations: pd.DataFrame | None = None,
     otype: str | None = None,
     otypes: Iterable[str] | None = None,

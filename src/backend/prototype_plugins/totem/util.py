@@ -2,18 +2,17 @@ from datetime import datetime
 import math
 import numpy as np
 import pm4py
-from pm4py.objects.ocel.obj import OCEL
 import pandas as pd
 
 import networkx as nx
 from .outputs.totem import Totem, TotemEdge
 
 
-def o2o_tuples(ocel: OCEL):
+def o2o_tuples(ocel: pm4py.OCEL):
     return np.array(list(zip(ocel.o2o["ocel:oid_2"], ocel.o2o["ocel:oid"]))).tolist()
 
 
-def create_event_dict(ocel: OCEL) -> dict:
+def create_event_dict(ocel: pm4py.OCEL) -> dict:
     # Step 1: Get full event table
     df = ocel.get_extended_table()
 
@@ -46,7 +45,7 @@ def create_event_dict(ocel: OCEL) -> dict:
     return df.set_index(ocel.event_id_column).to_dict(orient="index")
 
 
-def compute_event_object_graph(ocel: OCEL) -> nx.DiGraph:
+def compute_event_object_graph(ocel: pm4py.OCEL) -> nx.DiGraph:
     """
     Builds a directed event-object graph (EOG) from an OCEL using directly-follows per object.
 
@@ -78,7 +77,7 @@ def compute_event_object_graph(ocel: OCEL) -> nx.DiGraph:
     return event_object_graph
 
 
-def compute_process_executions_connected_components(ocel: OCEL):
+def compute_process_executions_connected_components(ocel: pm4py.OCEL):
     return sorted(
         nx.weakly_connected_components(compute_event_object_graph(ocel)),
         key=len,
@@ -86,7 +85,7 @@ def compute_process_executions_connected_components(ocel: OCEL):
     )
 
 
-def get_object_types(ocel: OCEL):
+def get_object_types(ocel: pm4py.OCEL):
     return pm4py.ocel_get_object_types(ocel)
 
 

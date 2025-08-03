@@ -20,7 +20,7 @@ from api.utils import (
 from ocel.default_ocel import (
     load_default_ocels,
 )
-from registrar import register_extensions, register_modules, register_initial_plugins
+from registrar import register_modules, register_initial_plugins
 
 from fastapi import FastAPI
 from routes import routes
@@ -65,7 +65,6 @@ app.middleware("http")(ocel_access_middleware)
 app.exception_handler(Exception)(error_handler_server)
 
 register_modules(app)
-register_extensions()
 register_initial_plugins()
 
 for route in routes:

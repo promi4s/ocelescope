@@ -3,15 +3,13 @@ import pm4py
 from pydantic.fields import Field
 from pydantic.main import BaseModel
 
-from filters.event_type import EventTypeFilterConfig
-from filters.object_type import ObjectTypeFilterConfig
 import plugins
 from plugins.base import OCELAnnotation
 import plugins.util
 
 
 from .util import convert_flat_pm4py_to_ocpn, compute_ocdfg
-from ocel.ocel_wrapper import OCELWrapper
+from ocelescope import OCEL, EventTypeFilter, ObjectTypeFilter
 from plugins import register_plugin, plugin_method, BasePlugin
 
 
@@ -46,21 +44,17 @@ class BertiDiscovery(BasePlugin):
     def discover_petri_net(
         self,
         input: PetriNetInput,
-        ocel: Annotated[OCELWrapper, OCELAnnotation(label="Event Log")],
+        ocel: Annotated[OCEL, OCELAnnotation(label="Event Log")],
     ):
         filtered_ocel = ocel.apply_filter(
-            filters=[
-                EventTypeFilterConfig(
-                    type="event_type",
-                    event_types=input.excluded_event_types,
-                    mode="exclude",
+            filters={
+                "event_type": EventTypeFilter(
+                    event_types=input.excluded_event_types, mode="include"
                 ),
-                ObjectTypeFilterConfig(
-                    type="object_type",
-                    object_types=input.excluded_object_types,
-                    mode="exclude",
+                "object_types": ObjectTypeFilter(
+                    object_types=input.excluded_object_types, mode="include"
                 ),
-            ]
+            }
         )
         petri_net = pm4py.discover_oc_petri_net(
             inductive_miner_variant=input.variant,
@@ -73,5 +67,5 @@ class BertiDiscovery(BasePlugin):
         return petri_net
 
     @plugin_method(label="Discover object centric directly follows graph")
-    def discover_object_centric_dfg(self, ocel: OCELWrapper):
+    def discover_object_centric_dfg(self, ocel: OCEL):
         return compute_ocdfg(ocel.ocel)

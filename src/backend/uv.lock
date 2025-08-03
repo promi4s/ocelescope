@@ -1346,8 +1346,8 @@ source = { virtual = "." }
 dependencies = [
     { name = "cachetools" },
     { name = "fastapi", extra = ["standard"] },
-    { name = "graphviz" },
     { name = "numpy" },
+    { name = "ocelescope" },
     { name = "pandas" },
     { name = "pint" },
     { name = "pm4py" },
@@ -1371,11 +1371,11 @@ dev = [
 requires-dist = [
     { name = "cachetools", specifier = ">=6.1.0" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.112.2" },
-    { name = "graphviz", specifier = ">=0.20.3" },
     { name = "numpy", specifier = ">=2.3.2" },
+    { name = "ocelescope", git = "https://github.com/grkmr/ocelescope-tools.git" },
     { name = "pandas", specifier = ">=2.3.1" },
     { name = "pint", specifier = ">=0.23,<0.24" },
-    { name = "pm4py", specifier = ">=2.7.16" },
+    { name = "pm4py", specifier = "~=2.7.15.3" },
     { name = "pydantic", specifier = ">=2.11.7" },
     { name = "pydantic-settings", specifier = ">=2.2.1,<3" },
     { name = "python-multipart", specifier = ">=0.0.9,<0.0.10" },
@@ -1390,6 +1390,19 @@ dev = [
     { name = "matplotlib", specifier = ">=3.8.0,<4" },
     { name = "pre-commit", specifier = ">=4.2.0,<5" },
     { name = "seaborn", specifier = ">=0.13.0,<0.14" },
+]
+
+[[package]]
+name = "ocelescope"
+version = "0.1.0"
+source = { git = "https://github.com/grkmr/ocelescope-tools.git#76a4133d2d06a5bc5c3615a654df5a5e3f57ec1d" }
+dependencies = [
+    { name = "cachetools" },
+    { name = "networkx" },
+    { name = "numpy" },
+    { name = "pandas" },
+    { name = "pm4py" },
+    { name = "pydantic" },
 ]
 
 [[package]]
@@ -1538,7 +1551,7 @@ wheels = [
 
 [[package]]
 name = "pm4py"
-version = "2.7.16"
+version = "2.7.15.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cvxopt", marker = "python_full_version < '3.14'" },
@@ -1557,9 +1570,9 @@ dependencies = [
     { name = "tqdm" },
     { name = "wheel" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/6a/9a/f0813b5c1b8d0ad7fd90de387eee96c49368ea95870f12b5240dfb5a1519/pm4py-2.7.16.tar.gz", hash = "sha256:60c867942f8c837c314f9e284689783694e704926a298426655a4da244d4b1bc", size = 921199, upload-time = "2025-06-27T08:41:46.668Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e4/3c/0b3d6163311a3e332e426d9c59d673b01ebe16a81272dc67c66955109ae1/pm4py-2.7.15.3.tar.gz", hash = "sha256:f1214768a339223d109a285cfa965a3d30ecff9217a0a01150a54489ebd79fac", size = 893322, upload-time = "2025-06-05T05:04:24.622Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/0b/b6/365860adaa578853ad648461d21b5ff821817feaa97554bbb860ed477d2b/pm4py-2.7.16-py3-none-any.whl", hash = "sha256:41d6281d3a8ae507ba1d2f60219e6dac891a39ad78f99502f77e33108f33f733", size = 2165983, upload-time = "2025-06-27T08:41:41.392Z" },
+    { url = "https://files.pythonhosted.org/packages/08/df/32527510d0d03e77302c0e87aeaf4dda0462d1cdbf54a794a0fbe9bb467e/pm4py-2.7.15.3-py3-none-any.whl", hash = "sha256:1ecb4376ce3567fb5645a0fe2024884a092944a8e53ce740e166a4c0303648ab", size = 2135184, upload-time = "2025-06-05T05:04:20.752Z" },
 ]
 
 [[package]]

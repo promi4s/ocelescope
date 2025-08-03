@@ -11,7 +11,8 @@ from typing import (
     get_args,
 )
 from pydantic import BaseModel
-from ocel.ocel_wrapper import OCELWrapper
+from ocelescope import OCEL
+
 from util.tasks import task
 
 
@@ -83,9 +84,7 @@ class BasePlugin:
                 else:
                     base_type = hint
 
-                if not (
-                    isinstance(base_type, type) and issubclass(base_type, OCELWrapper)
-                ):
+                if not (isinstance(base_type, type) and issubclass(base_type, OCEL)):
                     continue
 
                 label = None

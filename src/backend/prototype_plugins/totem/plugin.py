@@ -2,7 +2,7 @@ from pydantic.fields import Field
 from pydantic.main import BaseModel
 
 
-from ocel.ocel_wrapper import OCELWrapper
+from ocelescope import OCEL
 from plugins import register_plugin, plugin_method, BasePlugin
 from .util import mine_totem
 
@@ -23,5 +23,5 @@ class TotemInput(BaseModel, frozen=True):
 )
 class TotemDiscover(BasePlugin):
     @plugin_method(label="Mine TOTem")
-    def totem(self, input: TotemInput, ocel: OCELWrapper):
+    def totem(self, input: TotemInput, ocel: OCEL):
         return mine_totem(ocel=ocel.ocel, tau=input.noise_filter)

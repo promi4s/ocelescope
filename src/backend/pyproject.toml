@@ -5,7 +5,7 @@ description = ""
 authors = [{ name = "Raimund Hensen", email = "raimund.hensen@rwth-aachen.de" }]
 requires-python = "~=3.12"
 dependencies = [
-  "pm4py>=2.7.16",
+  "pm4py~=2.7.15.3",
   "pint>=0.23,<0.24",
   "pandas>=2.3.1",
   "numpy>=2.3.2",
@@ -15,7 +15,7 @@ dependencies = [
   "fastapi[standard]>=0.112.2",
   "uvicorn>=0.28.0,<0.29",
   "python-multipart>=0.0.9,<0.0.10",
-  "graphviz>=0.20.3",
+  "ocelescope",
 ]
 
 [project.urls]

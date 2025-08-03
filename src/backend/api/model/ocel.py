@@ -1,7 +1,8 @@
+from dataclasses import dataclass
 from typing import Optional
+from ocelescope import OCEL
+from ocelescope.ocel.filter import OCELFilter
 from pydantic.main import BaseModel
-
-from filters.config_union import FilterConfig
 
 
 class OcelMetadata(BaseModel):
@@ -23,5 +24,8 @@ class OcelListResponse(BaseModel):
     uploading_ocels: list[UploadingOcelMetadata]
 
 
-class Filter(BaseModel):
-    pipeline: list[FilterConfig]
+@dataclass
+class Filtered_Ocel:
+    original: OCEL
+    filter: Optional[OCELFilter] = None
+    filtered: Optional[OCEL] = None
