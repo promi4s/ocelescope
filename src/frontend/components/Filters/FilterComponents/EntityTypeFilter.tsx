@@ -3,7 +3,7 @@ import { MultiSelect, Stack } from "@mantine/core";
 import BarChartSelect from "@/components/Charts/BarChartSelect";
 import { memo, useMemo } from "react";
 import { Controller } from "react-hook-form";
-import { FilterPropsType } from "..";
+import { FilterPageComponentProps } from "..";
 
 const EntityTypeFilterInput: React.FC<{
   selectedEntityTypes: string[];
@@ -43,8 +43,8 @@ const EntityTypeFilterInput: React.FC<{
   );
 };
 
-export const EventTypeFilterInput: React.FC<FilterPropsType<"event_type">> =
-  memo(({ ocelParams, control }) => {
+export const EventTypeFilterInput: React.FC<FilterPageComponentProps> = memo(
+  ({ ocelParams, control }) => {
     const { data: eventCounts = {} } = useEventCounts({
       ...ocelParams,
     });
@@ -59,21 +59,22 @@ export const EventTypeFilterInput: React.FC<FilterPropsType<"event_type">> =
     return (
       <Controller
         control={control}
-        name={"value.event_types"}
+        name={"event_type.event_types"}
         render={({ field }) => (
           <EntityTypeFilterInput
             onChange={field.onChange}
             entityTypes={values}
             selectedEntityTypes={field.value ?? []}
-            showGraph={false}
+            showGraph={true}
           />
         )}
       />
     );
-  });
+  },
+);
 
-export const ObjectTypeFilterInput: React.FC<FilterPropsType<"object_types">> =
-  memo(({ ocelParams, control }) => {
+export const ObjectTypeFilterInput: React.FC<FilterPageComponentProps> = memo(
+  ({ ocelParams, control }) => {
     const { data: objectCounts = {} } = useObjectCount({
       ...ocelParams,
     });
@@ -88,15 +89,16 @@ export const ObjectTypeFilterInput: React.FC<FilterPropsType<"object_types">> =
     return (
       <Controller
         control={control}
-        name={"value.object_types"}
+        name={"object_types.object_types"}
         render={({ field }) => (
           <EntityTypeFilterInput
             onChange={field.onChange}
             entityTypes={values}
             selectedEntityTypes={field.value ?? []}
-            showGraph={false}
+            showGraph={true}
           />
         )}
       />
     );
-  });
+  },
+);

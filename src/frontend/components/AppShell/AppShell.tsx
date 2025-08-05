@@ -209,6 +209,7 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 <div className={classes.linksInner}>
                   <LinksGroup
                     label={label}
+                    key={moduleName}
                     links={Object.values(routes).map(({ label, name }) => ({
                       label,
                       link: getModuleRoute({
@@ -227,8 +228,13 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <LogoutButton />
         </Stack>
       </MAppShell.Navbar>
-      <MAppShell.Main h="calc(100dvh - var(--app-shell-header-offset, 0rem) - var(--app-shell-footer-height, 0px) + var(--app-shell-padding, 0))">
-        <TaskModalProvider>{children}</TaskModalProvider>
+      <MAppShell.Main
+        style={{ overflow: "hidden" }}
+        h="calc(100dvh - var(--app-shell-header-offset, 0rem) - var(--app-shell-footer-height, 0px) + var(--app-shell-padding, 0))"
+      >
+        <Box h={"100%"} style={{ overflow: "scroll" }}>
+          <TaskModalProvider>{children}</TaskModalProvider>
+        </Box>
       </MAppShell.Main>
     </MAppShell>
   );

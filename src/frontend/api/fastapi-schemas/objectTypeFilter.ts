@@ -8,5 +8,5 @@ import type { ObjectTypeFilterMode } from './objectTypeFilterMode';
 
 export interface ObjectTypeFilter {
   object_types: string[];
-  mode: ObjectTypeFilterMode;
+  mode?: ObjectTypeFilterMode;
 }

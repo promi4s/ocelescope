@@ -225,8 +225,12 @@ def get_filter(ocel: ApiOcel, session: ApiSession) -> Optional[OCELFilter]:
     "/",
     operation_id="setFilters",
 )
-def set_filter(ocel: ApiOcel, session: ApiSession, filter: Optional[OCELFilter]):
+def set_filter(
+    ocel: ApiOcel, session: ApiSession, filter: Optional[OCELFilter]
+) -> Optional[OCELFilter]:
     session.filter_ocel(ocel_id=ocel.id, filters=filter)
+
+    return session.get_ocel_filters(ocel.id)
 
 
 # endregion

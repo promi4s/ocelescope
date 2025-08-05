@@ -8,5 +8,5 @@ import type { EventTypeFilterMode } from './eventTypeFilterMode';
 
 export interface EventTypeFilter {
   event_types: string[];
-  mode: EventTypeFilterMode;
+  mode?: EventTypeFilterMode;
 }

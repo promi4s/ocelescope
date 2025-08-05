@@ -133,7 +133,9 @@ class Session:
 
         return self.ocels[ocel_id].filter or None
 
-    def filter_ocel(self, ocel_id: str, filters: Optional[OCELFilter]):
+    def filter_ocel(
+        self, ocel_id: str, filters: Optional[OCELFilter]
+    ) -> Optional[OCELFilter]:
         if ocel_id not in self.ocels:
             raise NotFound(f"OCEL with id {ocel_id} not found")
 

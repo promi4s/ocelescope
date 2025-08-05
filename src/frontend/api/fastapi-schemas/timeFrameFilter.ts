@@ -14,5 +14,5 @@ export interface TimeFrameFilter {
    * @maxItems 2
    */
   time_range: [TimeFrameFilterTimeRangeItem0, TimeFrameFilterTimeRangeItem1];
-  mode: TimeFrameFilterMode;
+  mode?: TimeFrameFilterMode;
 }
