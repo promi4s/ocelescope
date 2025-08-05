@@ -5,9 +5,8 @@ import { BarChart } from "@mantine/charts";
 import { DateTimePicker } from "@mantine/dates";
 import dayjs from "dayjs";
 import { EntityTimeInfo } from "@/api/fastapi-schemas";
-import { Controller, useFormContext, useWatch } from "react-hook-form";
-import { OcelInputType } from "@/types/ocel";
-import { FilterFormType } from "..";
+import { Controller, useWatch } from "react-hook-form";
+import { FilterPropsType } from "..";
 
 const TimeGraph: React.FC<{
   timeInfo: EntityTimeInfo;
@@ -65,9 +64,8 @@ const TimeGraph: React.FC<{
   );
 });
 
-const TimeFrameFilter: React.FC<{ ocelParams: OcelInputType }> = memo(
-  ({ ocelParams }) => {
-    const { control } = useFormContext<FilterFormType>();
+const TimeFrameFilter: React.FC<FilterPropsType<"time_range">> = memo(
+  ({ ocelParams, control }) => {
     const { data: timeInfo, isLoading } = useTimeInfo({
       ...ocelParams,
     });
@@ -76,7 +74,7 @@ const TimeFrameFilter: React.FC<{ ocelParams: OcelInputType }> = memo(
 
     const value = useWatch({
       control,
-      name: "time_frame.time_range",
+      name: "value.time_range",
     });
 
     const { amountOfDays } = useMemo(() => {
@@ -100,7 +98,7 @@ const TimeFrameFilter: React.FC<{ ocelParams: OcelInputType }> = memo(
             <Grid.Col span={3}>
               <Controller
                 control={control}
-                name={"time_frame.time_range.0"}
+                name={"value.time_range.0"}
                 render={({ field }) => (
                   <DateTimePicker
                     minDate={timeInfo.start_time}
@@ -116,7 +114,7 @@ const TimeFrameFilter: React.FC<{ ocelParams: OcelInputType }> = memo(
             <Grid.Col span={6}>
               <Controller
                 control={control}
-                name={"time_frame.time_range"}
+                name={"value.time_range"}
                 render={({ field }) => (
                   <RangeSlider
                     minRange={0}
@@ -158,7 +156,7 @@ const TimeFrameFilter: React.FC<{ ocelParams: OcelInputType }> = memo(
             <Grid.Col span={3}>
               <Controller
                 control={control}
-                name={"time_frame.time_range.1"}
+                name={"value.time_range.1"}
                 render={({ field }) => {
                   return (
                     <DateTimePicker

@@ -215,7 +215,6 @@ def get_object_relations(
 # region Filters
 @ocels_router.get(
     "/filter",
-    response_model=OCELFilter,
     operation_id="getFilters",
 )
 def get_filter(ocel: ApiOcel, session: ApiSession) -> Optional[OCELFilter]:
@@ -226,7 +225,7 @@ def get_filter(ocel: ApiOcel, session: ApiSession) -> Optional[OCELFilter]:
     "/",
     operation_id="setFilters",
 )
-def set_filter(ocel: ApiOcel, session: ApiSession, filter: OCELFilter):
+def set_filter(ocel: ApiOcel, session: ApiSession, filter: Optional[OCELFilter]):
     session.filter_ocel(ocel_id=ocel.id, filters=filter)
 
 

@@ -1,5 +1,5 @@
 import { useGetFilters, useSetFilters } from "@/api/fastapi/ocels/ocels";
-import FilterPipelineForm from "@/components/Filters";
+import FilterForm from "@/components/Filters";
 import { LoadingOverlay } from "@mantine/core";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/router";
@@ -20,12 +20,12 @@ const FilterPage = () => {
   return (
     <>
       <LoadingOverlay visible={isLoading || isPending} />
-      {filter && (
-        <FilterPipelineForm
-          filter={filter}
-          submit={(filter) =>
-            mutate({ data: filter, params: { ocel_id: slug?.[0] } })
-          }
+      {!isLoading && (
+        <FilterForm
+          filter={filter ?? {}}
+          submit={(filter) => {
+            mutate({ data: filter, params: { ocel_id: slug?.[0] } });
+          }}
           ocel_id={slug?.[0]}
         />
       )}

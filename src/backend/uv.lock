@@ -1395,7 +1395,7 @@ dev = [
 [[package]]
 name = "ocelescope"
 version = "0.1.0"
-source = { git = "https://github.com/grkmr/ocelescope-tools.git#76a4133d2d06a5bc5c3615a654df5a5e3f57ec1d" }
+source = { git = "https://github.com/grkmr/ocelescope-tools.git#1c1beef2530897ca78f640f0bd2e3050dffd533c" }
 dependencies = [
     { name = "cachetools" },
     { name = "networkx" },

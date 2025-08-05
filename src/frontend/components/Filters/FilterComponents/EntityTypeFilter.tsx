@@ -2,23 +2,22 @@ import { useEventCounts, useObjectCount } from "@/api/fastapi/ocels/ocels";
 import { MultiSelect, Stack } from "@mantine/core";
 import BarChartSelect from "@/components/Charts/BarChartSelect";
 import { memo, useMemo } from "react";
-import { Controller, useFormContext } from "react-hook-form";
-import { FilterFormType } from "..";
-import { OcelInputType } from "@/types/ocel";
+import { Controller } from "react-hook-form";
+import { FilterPropsType } from "..";
 
 const EntityTypeFilterInput: React.FC<{
   selectedEntityTypes: string[];
   entityTypes: { key: string; value: number }[];
   onChange: (values: string[]) => void;
   showGraph?: boolean;
-}> = ({ entityTypes, onChange, showGraph = true, selectedEntityTypes }) => {
+}> = ({ entityTypes, onChange, showGraph = false, selectedEntityTypes }) => {
   return (
     <Stack pos={"relative"}>
       <>
         {showGraph && (
           <BarChartSelect
             selected={selectedEntityTypes}
-            values={entityTypes}
+            values={entityTypes ?? []}
             onSelect={(selectedValue) => {
               onChange(
                 selectedEntityTypes.includes(selectedValue)
@@ -44,40 +43,38 @@ const EntityTypeFilterInput: React.FC<{
   );
 };
 
-export const EventTypeFilterInput: React.FC<{
-  ocelParams?: OcelInputType;
-}> = memo(({ ocelParams }) => {
-  const { data: eventCounts = {} } = useEventCounts({
-    ...ocelParams,
+export const EventTypeFilterInput: React.FC<FilterPropsType<"event_type">> =
+  memo(({ ocelParams, control }) => {
+    const { data: eventCounts = {} } = useEventCounts({
+      ...ocelParams,
+    });
+
+    const values = useMemo(() => {
+      return Object.entries(eventCounts).map(([activityType, count]) => ({
+        key: activityType,
+        value: count,
+      }));
+    }, [eventCounts]);
+
+    return (
+      <Controller
+        control={control}
+        name={"value.event_types"}
+        render={({ field }) => (
+          <EntityTypeFilterInput
+            onChange={field.onChange}
+            entityTypes={values}
+            selectedEntityTypes={field.value ?? []}
+            showGraph={false}
+          />
+        )}
+      />
+    );
   });
 
-  const values = useMemo(() => {
-    return Object.entries(eventCounts).map(([activityType, count]) => ({
-      key: activityType,
-      value: count,
-    }));
-  }, [eventCounts]);
-
-  const { control } = useFormContext<FilterFormType>();
-  return (
-    <Controller
-      control={control}
-      name={"event_type.event_types"}
-      render={({ field }) => (
-        <EntityTypeFilterInput
-          onChange={field.onChange}
-          entityTypes={values}
-          selectedEntityTypes={field.value}
-          showGraph={true}
-        />
-      )}
-    />
-  );
-});
-
-export const ObjectTypeFilterInput: React.FC<{ ocelParams: OcelInputType }> =
-  memo(({ ocelParams }) => {
-    const { data: objectCounts = {}, isLoading } = useObjectCount({
+export const ObjectTypeFilterInput: React.FC<FilterPropsType<"object_types">> =
+  memo(({ ocelParams, control }) => {
+    const { data: objectCounts = {} } = useObjectCount({
       ...ocelParams,
     });
 
@@ -88,17 +85,16 @@ export const ObjectTypeFilterInput: React.FC<{ ocelParams: OcelInputType }> =
       }));
     }, [objectCounts]);
 
-    const { control } = useFormContext<FilterFormType>();
     return (
       <Controller
         control={control}
-        name={"object_type.object_types"}
+        name={"value.object_types"}
         render={({ field }) => (
           <EntityTypeFilterInput
             onChange={field.onChange}
             entityTypes={values}
-            selectedEntityTypes={field.value}
-            showGraph={true}
+            selectedEntityTypes={field.value ?? []}
+            showGraph={false}
           />
         )}
       />

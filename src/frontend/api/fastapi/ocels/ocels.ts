@@ -34,13 +34,13 @@ import type {
   EventAttributesParams,
   EventCounts200,
   EventCountsParams,
-  Filter,
   GetDefaultOcelParams,
   GetFiltersParams,
   HTTPValidationError,
   ImportDefaultOcelParams,
   ImportOcelParams,
   O2oParams,
+  OCELFilter,
   ObjectAttributes200,
   ObjectAttributesParams,
   ObjectCount200,
@@ -174,7 +174,7 @@ export const getSetFiltersUrl = (params?: SetFiltersParams,) => {
   return stringifiedParams.length > 0 ? `http://localhost:8000/ocels/?${stringifiedParams}` : `http://localhost:8000/ocels/`
 }
 
-export const setFilters = async (filter: Filter,
+export const setFilters = async (oCELFilter: OCELFilter,
     params?: SetFiltersParams, options?: RequestInit): Promise<unknown> => {
   
   return customFetch<unknown>(getSetFiltersUrl(params),
@@ -183,7 +183,7 @@ export const setFilters = async (filter: Filter,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     body: JSON.stringify(
-      filter,)
+      oCELFilter,)
   }
 );}
 
@@ -191,8 +191,8 @@ export const setFilters = async (filter: Filter,
 
 
 export const getSetFiltersMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setFilters>>, TError,{data: Filter;params?: SetFiltersParams}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof setFilters>>, TError,{data: Filter;params?: SetFiltersParams}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setFilters>>, TError,{data: OCELFilter;params?: SetFiltersParams}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof setFilters>>, TError,{data: OCELFilter;params?: SetFiltersParams}, TContext> => {
 
 const mutationKey = ['setFilters'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -204,7 +204,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof setFilters>>, {data: Filter;params?: SetFiltersParams}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof setFilters>>, {data: OCELFilter;params?: SetFiltersParams}> = (props) => {
           const {data,params} = props ?? {};
 
           return  setFilters(data,params,requestOptions)
@@ -216,18 +216,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type SetFiltersMutationResult = NonNullable<Awaited<ReturnType<typeof setFilters>>>
-    export type SetFiltersMutationBody = Filter
+    export type SetFiltersMutationBody = OCELFilter
     export type SetFiltersMutationError = HTTPValidationError
 
     /**
  * @summary Set Filter
  */
 export const useSetFilters = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setFilters>>, TError,{data: Filter;params?: SetFiltersParams}, TContext>, request?: SecondParameter<typeof customFetch>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setFilters>>, TError,{data: OCELFilter;params?: SetFiltersParams}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof setFilters>>,
         TError,
-        {data: Filter;params?: SetFiltersParams},
+        {data: OCELFilter;params?: SetFiltersParams},
         TContext
       > => {
 
@@ -1201,9 +1201,9 @@ export const getGetFiltersUrl = (params?: GetFiltersParams,) => {
   return stringifiedParams.length > 0 ? `http://localhost:8000/ocels/filter?${stringifiedParams}` : `http://localhost:8000/ocels/filter`
 }
 
-export const getFilters = async (params?: GetFiltersParams, options?: RequestInit): Promise<Filter> => {
+export const getFilters = async (params?: GetFiltersParams, options?: RequestInit): Promise<OCELFilter> => {
   
-  return customFetch<Filter>(getGetFiltersUrl(params),
+  return customFetch<OCELFilter>(getGetFiltersUrl(params),
   {      
     ...options,
     method: 'GET'
