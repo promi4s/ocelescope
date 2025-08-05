@@ -49,7 +49,8 @@ const CurrentOcelMenu: React.FC = () => {
       <Menu.Dropdown>
         <Menu.Item
           component={Link}
-          href="/filter"
+          href={`/filter/${currentOcel?.id}`}
+          disabled={!currentOcel}
           leftSection={<FilterIcon size={16} />}
         >
           Filter
