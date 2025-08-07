@@ -1,14 +1,9 @@
 import importlib.util
 from pathlib import Path
 import shutil
-from typing import Any, Optional
 from fastapi.datastructures import UploadFile
 from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
-from api.dependencies import ApiSession
-from api.exceptions import NotFound
-from plugins import plugin_registry
-from plugins.base import PluginDescription
 from uuid import uuid4
 from api.config import config
 import tempfile
@@ -16,53 +11,6 @@ import zipfile
 import sys
 
 plugin_router = APIRouter(prefix="/plugins", tags=["plugins"])
-
-
-@plugin_router.get("/", operation_id="plugins")
-def list_plugins() -> list[PluginDescription]:
-    return [plugin.describe() for plugin in plugin_registry.all_plugins().values()]
-
-
-@plugin_router.post("/run/{name}/{version}/{method}", operation_id="runPlugin")
-def run_plugin(
-    name: str,
-    version: str,
-    method: str,
-    input_ocels: dict[str, str],
-    session: ApiSession,
-    input: Optional[dict[str, Any]] = None,
-) -> str:
-    # TODO: Make better task plugin interactions
-    method_map = plugin_registry.get_plugin(name=name, version=version).get_method_map(
-        f"{name}_{version}"
-    )
-    runner = method_map[method]
-    if runner is None:
-        raise NotFound("Plugin mehtod could not be found")
-
-    input_arg = (
-        runner["input_model"](**input)
-        if runner["input_model"] is not None and input is not None
-        else None
-    )
-
-    ocel_kwargs = {a: session.get_ocel(b) for a, b in input_ocels.items()}
-    method_kwargs = {
-        **ocel_kwargs,
-        "session": session,
-        "metadata": {
-            "type": "plugin",
-            "name": name,
-            "version": version,
-            "method": method,
-        },
-    }
-    if input is not None:
-        method_kwargs["input"] = input_arg
-
-    result = runner["method"](**method_kwargs)
-
-    return result
 
 
 @plugin_router.post("/", operation_id="uploadPlugin")

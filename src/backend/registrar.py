@@ -2,12 +2,9 @@ import importlib
 import os
 from pathlib import Path
 import pkgutil
-import sys
 
 from fastapi import FastAPI
 from fastapi.routing import APIRoute, APIRouter
-
-from api.config import config
 
 
 # Use direct path-based loading for safety
@@ -46,22 +43,3 @@ def register_modules(app: FastAPI):
 
         if hasattr(mod, "meta"):
             setattr(mod, "_module_meta", mod.meta)
-
-
-def register_initial_plugins():
-    folders = [config.PLUGIN_DIR] + (
-        [prototyping_path] if config.MODE == "development" else []
-    )
-
-    for folder in folders:
-        if str(folder) not in sys.path:
-            sys.path.insert(0, str(folder))
-
-        for subdir in folder.iterdir():
-            if not subdir.is_dir() or not (subdir / "__init__.py").exists():
-                continue
-
-            try:
-                importlib.import_module(subdir.name)
-            except Exception as e:
-                print(f"Failed to load plugin '{subdir.name}': {e}")
