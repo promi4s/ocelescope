@@ -1,7 +1,7 @@
 from ocelescope import Resource
 
 from dataclasses import dataclass
-from typing import Callable, Type, TypeVar
+from typing import Type, TypeVar
 import hashlib
 
 import json
@@ -22,13 +22,12 @@ class ResourceRegistryEntry:
 class ResourceRegistry:
     def __init__(self) -> None:
         self.resources: dict[str, ResourceRegistryEntry] = {}
-        self._visualizers: dict[str, Callable] = {}
 
     def _schema_hash(self, cls: type[BaseModel]) -> str:
         schema = json.dumps(cls.model_json_schema(), sort_keys=True)
         return hashlib.sha256(schema.encode()).hexdigest()
 
-    def register_output(self, resource_class: type[T]):
+    def register_resource(self, resource_class: type[T]):
         resource_type = resource_class.model_fields["type"].default
         resource_hash = self._schema_hash(resource_class)
 
