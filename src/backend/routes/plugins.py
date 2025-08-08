@@ -10,7 +10,15 @@ import tempfile
 import zipfile
 import sys
 
+from api.model.plugin import PluginApi
+from registry import plugin_registy
+
 plugin_router = APIRouter(prefix="/plugins", tags=["plugins"])
+
+
+@plugin_router.get("/", operation_id="plugins")
+def get_plugins() -> list[PluginApi]:
+    return plugin_registy.list_plugins()
 
 
 @plugin_router.post("/", operation_id="uploadPlugin")
