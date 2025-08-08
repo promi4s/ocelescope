@@ -4,6 +4,8 @@ from ocelescope.plugin import Plugin
 
 from api.model.plugin import PluginApi
 
+from registry.resource import resource_registry
+
 
 class PluginRegistry:
     def __init__(self):
@@ -18,6 +20,9 @@ class PluginRegistry:
 
         if plugin is not None:
             self._registry[(module.__name__, plugin.meta().name)] = plugin
+            for method in plugin.method_map().values():
+                for resource in method._resource_types:
+                    resource_registry.register_resource(resource)
 
     def list_plugins(self) -> list[PluginApi]:
         return [
