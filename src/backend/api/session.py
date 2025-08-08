@@ -8,8 +8,8 @@ from api.exceptions import NotFound
 from api.model.module import Module
 from api.model.ocel import Filtered_Ocel
 from api.model.tasks import TaskSummary
-from ocelescope import OCEL, OCELFilter
-from outputs.base import Output, OutputBase
+from ocelescope import OCEL, OCELFilter, Resource as ResourceBase
+from api.model.resource import Resource
 from util.tasks import Task
 
 
@@ -34,7 +34,7 @@ class Session:
         self._module_states: dict[str, Module] = {}
 
         # Resources
-        self._outputs: dict[str, Output] = {}
+        self._resources: dict[str, Resource] = {}
 
         # OCELS
         self.ocels: dict[str, Filtered_Ocel] = {}
@@ -150,27 +150,27 @@ class Session:
 
     # endregion
     # region Output management
-    def add_output(self, output: OutputBase, name: str) -> str:
-        outputWrapper = Output(output=output, name=name)
-        self._outputs[outputWrapper.id] = outputWrapper
+    def add_resource(self, output: ResourceBase, name: str) -> str:
+        outputWrapper = Resource(resource=output, name=name)
+        self._resources[outputWrapper.id] = outputWrapper
         return outputWrapper.id
 
-    def get_output(self, id: str) -> Output:
-        if id not in self._outputs:
-            raise NotFound(f"Output with id {id} not found")
-        return self._outputs[id]
+    def get_resource(self, id: str) -> Resource:
+        if id not in self._resources:
+            raise NotFound(f"Resource with id {id} not found")
+        return self._resources[id]
 
-    def delete_output(self, id: str):
-        self._outputs.pop(id, None)
+    def delete_resource(self, id: str):
+        self._resources.pop(id, None)
 
-    def list_outputs(self) -> list[Output]:
-        return list(self._outputs.values())
+    def list_resources(self) -> list[Resource]:
+        return list(self._resources.values())
 
-    def rename_output(self, output_id: str, new_name: str):
-        if output_id not in self._outputs:
+    def rename_resource(self, output_id: str, new_name: str):
+        if output_id not in self._resources:
             raise NotFound(f"Output with id {output_id} not found")
 
-        self._outputs[output_id].name = new_name
+        self._resources[output_id].name = new_name
 
     # endregion
     def invalidate_module_states(self):

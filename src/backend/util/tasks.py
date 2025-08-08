@@ -9,8 +9,7 @@ from api.websocket import TaskMessage, websocket_manager
 
 from pydantic.main import BaseModel
 
-from ocelescope import OCEL
-from outputs.base import OutputBase
+from ocelescope import OCEL, Resource
 
 if TYPE_CHECKING:
     from api.session import Session
@@ -63,9 +62,9 @@ class Task:
             for result in result_items:
                 if isinstance(result, OCEL):
                     self.result.ocel_ids.append(self.session.add_ocel(result))
-                if isinstance(result, OutputBase):
+                if isinstance(result, Resource):
                     self.result.output_ids.append(
-                        self.session.add_output(
+                        self.session.add_resource(
                             output=result,
                             name=f"{result.type}_{datetime.now().strftime('%Y-%m-%d_%H:%M')}",  # type: ignore
                         )
