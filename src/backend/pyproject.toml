@@ -1,8 +1,11 @@
 [project]
-name = "ocean-backend"
-version = "0.9.9"
+name = "ocelescope-backend"
+version = "0.1"
 description = ""
-authors = [{ name = "Raimund Hensen", email = "raimund.hensen@rwth-aachen.de" }]
+authors = [
+  { name = "Görkem-Emre Öztürk", email = "goerkem.emre.oeztuerk@gmail.com" },
+  { name = "Raimund Hensen", email = "raimund.hensen@rwth-aachen.de" },
+]
 requires-python = "~=3.12"
 dependencies = [
   "pm4py~=2.7.15.3",

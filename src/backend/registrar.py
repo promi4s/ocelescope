@@ -1,15 +1,19 @@
 import importlib
+import importlib.util
 import os
 from pathlib import Path
 import pkgutil
+import sys
 
 from fastapi import FastAPI
 from fastapi.routing import APIRoute, APIRouter
 
+from api.config import config
+from registry.plugin import plugin_registy
+
 
 # Use direct path-based loading for safety
 modules_path = [os.path.join(os.path.dirname(__file__), "modules")]
-extensions_path = [os.path.join(os.path.dirname(__file__), "extensions")]
 prototyping_path = Path(__file__).parent / "prototype_plugins"
 
 
@@ -43,3 +47,23 @@ def register_modules(app: FastAPI):
 
         if hasattr(mod, "meta"):
             setattr(mod, "_module_meta", mod.meta)
+
+
+def register_initial_plugins():
+    folders = [config.PLUGIN_DIR] + (
+        [prototyping_path] if config.MODE == "development" else []
+    )
+
+    for folder in folders:
+        for item in folder.iterdir():
+            if item.is_dir() and (item / "__init__.py").exists():
+                plugin_module_path = item / "__init__.py"
+                module_name = f"plugin_{item.name}"
+                spec = importlib.util.spec_from_file_location(
+                    module_name, plugin_module_path
+                )
+                if spec and spec.loader:
+                    module = importlib.util.module_from_spec(spec)
+                    sys.modules[module_name] = module
+                    spec.loader.exec_module(module)
+                    plugin_registy.register_plugin(module)
