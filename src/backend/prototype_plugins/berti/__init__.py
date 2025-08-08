@@ -1,4 +1,4 @@
-from .plugin import Test
+from .plugin import BertiDiscovery
 
 
-__all__ = ["Test"]
+__all__ = ["BertiDiscovery"]

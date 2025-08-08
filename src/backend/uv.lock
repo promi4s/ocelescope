@@ -1340,8 +1340,21 @@ wheels = [
 ]
 
 [[package]]
-name = "ocean-backend"
-version = "0.9.9"
+name = "ocelescope"
+version = "0.1.0"
+source = { git = "https://github.com/grkmr/ocelescope-tools.git#2eadb8922308dc16aa700aa85d92a82fc22c4e9a" }
+dependencies = [
+    { name = "cachetools" },
+    { name = "networkx" },
+    { name = "numpy" },
+    { name = "pandas" },
+    { name = "pm4py" },
+    { name = "pydantic" },
+]
+
+[[package]]
+name = "ocelescope-backend"
+version = "0.1"
 source = { virtual = "." }
 dependencies = [
     { name = "cachetools" },
@@ -1390,19 +1403,6 @@ dev = [
     { name = "matplotlib", specifier = ">=3.8.0,<4" },
     { name = "pre-commit", specifier = ">=4.2.0,<5" },
     { name = "seaborn", specifier = ">=0.13.0,<0.14" },
-]
-
-[[package]]
-name = "ocelescope"
-version = "0.1.0"
-source = { git = "https://github.com/grkmr/ocelescope-tools.git#2662c60e8e32a86cd8078b9b533bf1866de4ba88" }
-dependencies = [
-    { name = "cachetools" },
-    { name = "networkx" },
-    { name = "numpy" },
-    { name = "pandas" },
-    { name = "pm4py" },
-    { name = "pydantic" },
 ]
 
 [[package]]
