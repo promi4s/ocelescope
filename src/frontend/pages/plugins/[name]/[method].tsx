@@ -1,51 +1,45 @@
 import { usePlugins } from "@/api/fastapi/plugins/plugins";
 import PluginInput from "@/components/Plugins/Form";
-import TaskResult from "@/components/TaskResult/TaskResult";
 import { Container, LoadingOverlay, Stack, Text, Title } from "@mantine/core";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 
 const PluginPage = () => {
   const { data: plugins } = usePlugins();
   const router = useRouter();
-  const [taskId, setTaskId] = useState<string | undefined>();
-  const { name, method, version } = router.query;
+  const { name, method } = router.query;
 
   const pluginFormProps = useMemo(() => {
-    if (!plugins || !name || !method) {
-      return;
-    }
+    const plugin = (plugins ?? []).find(
+      ({ meta, methods }) =>
+        meta.name === name && methods.some(({ name }) => name === method),
+    );
 
-    const plugin = Object.values(plugins)
-      .filter(
-        ({ metadata, methods }) =>
-          metadata.name === name &&
-          (!version || version === metadata.version) &&
-          (method as string) in methods,
-      )
-      .sort((a, b) => b.metadata.version.localeCompare(a.metadata.version))[0];
+    if (!plugin) return;
+
+    const pluginMethod = plugin.methods.find(({ name }) => name === method)!;
 
     return {
-      pluginMethod: plugin.methods[method as string],
-      pluginName: plugin.metadata.name,
-      pluginVersion: plugin.metadata.version,
+      name: plugin.meta.name,
+      version: plugin.meta.version,
+      method: pluginMethod,
     };
   }, [plugins, name, method]);
 
   if (pluginFormProps === undefined) {
-    return <LoadingOverlay />;
+    return <LoadingOverlay visible={true} />;
   }
+
   return (
     <Container>
       <Stack gap={"md"}>
         <Stack gap={0}>
-          <Title>{pluginFormProps.pluginMethod.label}</Title>
-          <Text>{pluginFormProps.pluginMethod.description}</Text>
+          <Title>{pluginFormProps.method.label}</Title>
+          <Text>{pluginFormProps.method.description}</Text>
         </Stack>
         {pluginFormProps && (
-          <PluginInput onSuccess={setTaskId} {...pluginFormProps} />
+          <PluginInput onSuccess={() => {}} {...pluginFormProps} />
         )}
-        {taskId && <TaskResult taskId={taskId} />}
       </Stack>
     </Container>
   );
