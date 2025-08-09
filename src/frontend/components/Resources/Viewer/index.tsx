@@ -1,9 +1,9 @@
-import { useOutput } from "@/api/fastapi/outputs/outputs";
 import { VisualizationByType, VisulizationsTypes } from "@/types/outputs";
 import { LoadingOverlay, Stack, ThemeIcon } from "@mantine/core";
 import { ComponentType } from "react";
 import GraphViewer from "./Viewers/graph";
 import { EyeOffIcon } from "lucide-react";
+import { useResource } from "@/api/fastapi/resources/resources";
 
 type VisualizationProps<T extends VisulizationsTypes> = {
   visualization: VisualizationByType<T>;
@@ -23,7 +23,7 @@ const Viewer: React.FC<{ id: string; interactable?: boolean }> = ({
   id,
   interactable = true,
 }) => {
-  const { data } = useOutput(id);
+  const { data } = useResource(id);
 
   if (!data) {
     return <LoadingOverlay />;

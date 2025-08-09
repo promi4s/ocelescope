@@ -17,7 +17,7 @@ import Viewer from "../Outputs/Viewer";
 import { useOutput } from "@/api/fastapi/outputs/outputs";
 import { DownloadIcon } from "lucide-react";
 import { useState } from "react";
-import OutputModal from "../Outputs/OutputModal";
+import ResourceModal from "../Resources/ResourceModal";
 
 type TaskResultProps = {
   taskId: string;
@@ -73,7 +73,7 @@ const TaskResult: React.FC<TaskResultProps> = ({ taskId }) => {
   return (
     <>
       <Divider />
-      <OutputModal id={openedOutput} onClose={() => setOutput(undefined)} />
+      <ResourceModal id={openedOutput} onClose={() => setOutput(undefined)} />
       <Stack pos={"relative"} gap={0} h={"100%"}>
         <LoadingOverlay visible={!task?.result} />
         <Title size={"h4"}>Results</Title>

@@ -1,17 +1,17 @@
-import { useOutput } from "@/api/fastapi/outputs/outputs";
 import { ActionIcon, Box, Group, Modal, Stack, Title } from "@mantine/core";
 import Viewer from "./Viewer";
 import { XIcon } from "lucide-react";
+import { useResource } from "@/api/fastapi/resources/resources";
 
-const OutputModal: React.FC<{ id?: string; onClose: () => void }> = ({
+const ResourceModal: React.FC<{ id?: string; onClose: () => void }> = ({
   id,
   onClose,
 }) => {
-  const { data } = useOutput(id!, { query: { enabled: !!id } });
+  const { data } = useResource(id!, { query: { enabled: !!id } });
 
   return (
     data &&
-    data.output.id && (
+    data.resource.id && (
       <Modal
         opened={!!data}
         onClose={onClose}
@@ -23,13 +23,13 @@ const OutputModal: React.FC<{ id?: string; onClose: () => void }> = ({
       >
         <Stack w={"100%"} h={"100%"}>
           <Group justify="space-between">
-            <Title size={"h5"}>{data.output.name}</Title>
+            <Title size={"h5"}>{data.resource.name}</Title>
             <ActionIcon variant={"subtle"} color="red" onClick={onClose}>
               <XIcon />
             </ActionIcon>
           </Group>
           <Box w={"100%"} h={"100%"} flex={1}>
-            <Viewer id={data.output.id} />
+            <Viewer id={data.resource.id} />
           </Box>
         </Stack>
       </Modal>
@@ -37,4 +37,4 @@ const OutputModal: React.FC<{ id?: string; onClose: () => void }> = ({
   );
 };
 
-export default OutputModal;
+export default ResourceModal;

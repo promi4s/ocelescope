@@ -1,31 +1,31 @@
-import {
-  useDeleteOutput,
-  useOutputs,
-  useUploadOutput,
-} from "@/api/fastapi/outputs/outputs";
 import { Stack, ActionIcon, Title, Menu } from "@mantine/core";
 import { Download, EllipsisVerticalIcon, Trash } from "lucide-react";
 import { DataTable } from "mantine-datatable";
 import dayjs from "dayjs";
 import FileUploadButton from "../FileUploadButton/FileUploadButton";
 import { useState } from "react";
-import OutputModal from "./OutputModal";
+import ResourceModal from "../Resources/ResourceModal";
+import {
+  useDeleteResource,
+  useResources,
+  useUploadResource,
+} from "@/api/fastapi/resources/resources";
 
-const OutputTable: React.FC = () => {
-  const { data: outputs, refetch } = useOutputs();
-  const [openedOutput, setOpenedOutput] = useState<string | undefined>();
-  const { mutate: uploadOutput } = useUploadOutput({
+const ResourceTable: React.FC = () => {
+  const { data: resources, refetch } = useResources();
+  const [openedResource, setOpenedResource] = useState<string | undefined>();
+  const { mutate: uploadResource } = useUploadResource({
     mutation: { onSuccess: async () => await refetch() },
   });
-  const { mutate: deleteOutput } = useDeleteOutput({
+  const { mutate: deleteResource } = useDeleteResource({
     mutation: { onSuccess: async () => await refetch() },
   });
 
   return (
     <>
-      <OutputModal
-        id={openedOutput}
-        onClose={() => setOpenedOutput(undefined)}
+      <ResourceModal
+        id={openedResource}
+        onClose={() => setOpenedResource(undefined)}
       />
       <Stack gap={0}>
         <Title size={"h3"}>Outputs</Title>
@@ -49,7 +49,7 @@ const OutputTable: React.FC = () => {
               title: (
                 <FileUploadButton
                   onFileUpload={(file) => {
-                    if (file != null) uploadOutput({ data: { file } });
+                    if (file != null) uploadResource({ data: { file } });
                   }}
                   validTypes="application/json"
                 />
@@ -81,7 +81,7 @@ const OutputTable: React.FC = () => {
                       fw="bold"
                       onClick={async () => {
                         if (id) {
-                          deleteOutput({ outputId: id });
+                          deleteResource({ resourceId: id });
                         }
                       }}
                     >
@@ -92,12 +92,12 @@ const OutputTable: React.FC = () => {
               ),
             },
           ]}
-          records={outputs}
-          onRowClick={({ record }) => setOpenedOutput(record.id)}
+          records={resources}
+          onRowClick={({ record }) => setOpenedResource(record.id)}
         />
       </Stack>
     </>
   );
 };
 
-export default OutputTable;
+export default ResourceTable;
