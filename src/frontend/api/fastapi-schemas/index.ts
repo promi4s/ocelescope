@@ -6,6 +6,10 @@
  */
 
 export * from './bodyImportOcel';
+export * from './bodyRunPlugin';
+export * from './bodyRunPluginInput';
+export * from './bodyRunPluginInputOcels';
+export * from './bodyRunPluginInputResources';
 export * from './bodyUploadPlugin';
 export * from './bodyUploadResource';
 export * from './booleanAttribute';

@@ -4,7 +4,7 @@ import { DataTable } from "mantine-datatable";
 import dayjs from "dayjs";
 import FileUploadButton from "../FileUploadButton/FileUploadButton";
 import { useState } from "react";
-import ResourceModal from "../Resources/ResourceModal";
+import ResourceModal from "./ResourceModal";
 import {
   useDeleteResource,
   useResources,

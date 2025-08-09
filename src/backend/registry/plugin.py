@@ -9,7 +9,7 @@ from registry.resource import resource_registry
 
 class PluginRegistry:
     def __init__(self):
-        self._registry: dict[tuple[str, str], type[Plugin]] = {}
+        self._registry: dict[tuple[str, str], Plugin] = {}
 
     def register_plugin(self, module: ModuleType) -> Optional[Plugin]:
         plugin: Optional[type[Plugin]] = None
@@ -19,7 +19,7 @@ class PluginRegistry:
                 break
 
         if plugin is not None:
-            self._registry[(module.__name__, plugin.meta().name)] = plugin
+            self._registry[(module.__name__, plugin.meta().name)] = plugin()
             for method in plugin.method_map().values():
                 for resource in method._resource_types:
                     resource_registry.register_resource(resource)
@@ -30,11 +30,11 @@ class PluginRegistry:
             for plugin in self._registry.values()
         ]
 
-    def get_plugin(self, name: str) -> Optional[type[Plugin]]:
+    def get_plugin(self, name: str) -> Optional[Plugin]:
         return next(
             (
                 plugin
-                for (plugin_name, _), plugin in self._registry.items()
+                for (_, plugin_name), plugin in self._registry.items()
                 if plugin_name == name
             ),
             None,

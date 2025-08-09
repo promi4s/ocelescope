@@ -96,7 +96,7 @@ def get_resource(session: ApiSession, resource_id: str) -> GetResourceResponse:
             **resource.model_dump(),
             type_label=resource_registry.resources[resource.resource.type].label,
         ),
-        visualization=resource.resource.vizualize(),
+        visualization=resource.resource.visualize(),
     )
 
 

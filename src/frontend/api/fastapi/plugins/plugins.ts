@@ -24,6 +24,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  BodyRunPlugin,
   BodyUploadPlugin,
   HTTPValidationError,
   PluginApi
@@ -201,6 +202,80 @@ export const useUploadPlugin = <TError = HTTPValidationError,
       > => {
 
       const mutationOptions = getUploadPluginMutationOptions(options);
+
+      return useMutation(mutationOptions , queryClient);
+    }
+    /**
+ * @summary Run Plugin
+ */
+export const getRunPluginUrl = (pluginName: string,
+    methodName: string,) => {
+
+
+  
+
+  return `http://localhost:8000/plugins/${pluginName}/${methodName}`
+}
+
+export const runPlugin = async (pluginName: string,
+    methodName: string,
+    bodyRunPlugin: BodyRunPlugin, options?: RequestInit): Promise<unknown> => {
+  
+  return customFetch<unknown>(getRunPluginUrl(pluginName,methodName),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      bodyRunPlugin,)
+  }
+);}
+
+
+
+
+export const getRunPluginMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runPlugin>>, TError,{pluginName: string;methodName: string;data: BodyRunPlugin}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof runPlugin>>, TError,{pluginName: string;methodName: string;data: BodyRunPlugin}, TContext> => {
+
+const mutationKey = ['runPlugin'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof runPlugin>>, {pluginName: string;methodName: string;data: BodyRunPlugin}> = (props) => {
+          const {pluginName,methodName,data} = props ?? {};
+
+          return  runPlugin(pluginName,methodName,data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RunPluginMutationResult = NonNullable<Awaited<ReturnType<typeof runPlugin>>>
+    export type RunPluginMutationBody = BodyRunPlugin
+    export type RunPluginMutationError = HTTPValidationError
+
+    /**
+ * @summary Run Plugin
+ */
+export const useRunPlugin = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runPlugin>>, TError,{pluginName: string;methodName: string;data: BodyRunPlugin}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof runPlugin>>,
+        TError,
+        {pluginName: string;methodName: string;data: BodyRunPlugin},
+        TContext
+      > => {
+
+      const mutationOptions = getRunPluginMutationOptions(options);
 
       return useMutation(mutationOptions , queryClient);
     }

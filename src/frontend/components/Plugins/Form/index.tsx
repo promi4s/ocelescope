@@ -5,6 +5,7 @@ import { Controller, useForm, useWatch } from "react-hook-form";
 import { useGetOcels } from "@/api/fastapi/ocels/ocels";
 import { useMemo } from "react";
 import PluginForm from "./PluginForm";
+import { useRunPlugin } from "@/api/fastapi/plugins/plugins";
 
 type PluginInputProps = {
   name: string;
@@ -19,6 +20,8 @@ const PluginInput: React.FC<PluginInputProps> = ({
   onSuccess,
 }) => {
   const { data } = useGetOcels();
+
+  const { mutate: runPlugin } = useRunPlugin();
 
   const defaultValue = Object.fromEntries(
     Object.keys(method.input_ocels ?? {}).map((name) => [name, ""]),
@@ -69,7 +72,19 @@ const PluginInput: React.FC<PluginInputProps> = ({
         <PluginForm
           schema={method.input_schema}
           ocelContext={ocelValues as Record<string, string>}
-          onSubmit={(formData) => {}}
+          onSubmit={(formData) =>
+            handleSubmit((data) =>
+              runPlugin({
+                methodName: method.name,
+                pluginName: name,
+                data: {
+                  input: formData ?? {},
+                  input_ocels: data as Record<string, string>,
+                  input_resources: {},
+                },
+              }),
+            )()
+          }
         />
       )}
     </>
