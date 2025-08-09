@@ -49,7 +49,8 @@ class BertiDiscovery(Plugin):
         return petri_net
 
     @plugin_method(
-        label="Discover Petri net", description="Discover a object-centric petri net"
+        label="Discover Directly Follows Graph",
+        description="Discover a object-centric directly follows graph",
     )
     def directly_follows_graph(
         self,
