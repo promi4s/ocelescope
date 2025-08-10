@@ -10,7 +10,7 @@ from typing import (
 from pydantic.fields import Field
 from pydantic.main import BaseModel
 
-from tasks.base import _call_with_known_params
+from tasks.base import TaskSummary, _call_with_known_params
 from ocelescope.ocel.ocel import OCEL
 from ocelescope.resource.resource import Resource
 
@@ -28,6 +28,11 @@ if TYPE_CHECKING:
     from api.session import Session
 
 P = ParamSpec("P")
+
+
+class PluginTaskSummary(TaskSummary):
+    plugin_name: str
+    method_name: str
 
 
 class PluginInput(TypedDict):
@@ -113,6 +118,14 @@ class PluginTask(TaskBase, Generic[P]):
                     ),
                 ),
             )
+
+    def summarize(self) -> PluginTaskSummary:
+        return PluginTaskSummary(
+            id=self.id,
+            plugin_name=self.plugin_name,
+            method_name=self.method_name,
+            state=self.state,
+        )
 
     @staticmethod
     def _dedupe_key(plugin_name: str, method_name: str, input: PluginInput) -> Hashable:

@@ -1,3 +1,4 @@
+from abc import ABC
 from datetime import datetime
 import inspect
 import threading
@@ -50,6 +51,12 @@ def _call_with_known_params(fn: Callable[..., P], *args, **kwargs) -> P:
     return fn(*args, **filtered)
 
 
+class TaskSummary(BaseModel, ABC):
+    id: str
+    state: TaskState
+    pass
+
+
 class TaskBase:
     def __init__(self):
         self.id = str(uuid.uuid4())
@@ -71,3 +78,6 @@ class TaskBase:
     def join(self, timeout=None):
         if self.thread:
             self.thread.join(timeout)
+
+    def summarize(self) -> TaskSummary:
+        raise NotImplementedError("")

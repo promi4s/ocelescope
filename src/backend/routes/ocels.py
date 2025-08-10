@@ -9,7 +9,7 @@ from ocelescope.ocel.filter import OCELFilter
 from api.dependencies import ApiOcel, ApiSession
 from api.exceptions import BadRequest, NotFound
 from api.model.events import Date_Distribution_Item, Entity_Time_Info
-from api.model.ocel import OcelListResponse, OcelMetadata, UploadingOcelMetadata
+from api.model.ocel import OcelListResponse, OcelMetadata
 from api.model.response import TempFileResponse
 from ocelescope import AttributeSummary, RelationCountSummary
 
@@ -19,9 +19,7 @@ from ocel.default_ocel import (
     filter_default_ocels,
     get_default_ocel,
 )
-from tasks.base import TaskState
 from tasks.ocel import import_ocel_task
-from tasks.system import SystemTask
 from util.constants import SUPPORTED_FILE_TYPES
 
 from fastapi import APIRouter, File, Query, Response, UploadFile
@@ -53,15 +51,6 @@ def getOcels(session: ApiSession) -> OcelListResponse:
                 ],
             )
             for key, value in session.ocels.items()
-        ],
-        uploading_ocels=[
-            UploadingOcelMetadata(
-                task_id=task.key,
-            )
-            for task in session.list_tasks()
-            if isinstance(task, SystemTask)
-            and task.name == "import_ocel_task"
-            and task.state == TaskState.STARTED
         ],
     )
 
@@ -236,9 +225,7 @@ def set_filter(
 
 # endregion
 # region Import/Export
-@ocels_router.post(
-    "/import", summary="Import OCEL 2.0 from .sqlite file", operation_id="importOcel"
-)
+@ocels_router.post("/import", summary="Import OCEL 2.0", operation_id="importOcel")
 def import_ocel(
     session: ApiSession,
     response: Response,
@@ -292,6 +279,10 @@ def import_ocel(
         path=tmp_path,
         upload_date=upload_date,
         name=tmp_file_prefix,
+        metadata={
+            "fileName": name,
+            "uploaded_at": datetime.datetime.now().isoformat(),
+        },
     )
 
     response.status_code = 200

@@ -7,6 +7,7 @@ from typing import (
     Hashable,
     ParamSpec,
     Optional,
+    Sequence,
 )
 
 from api.websocket import (
@@ -14,12 +15,23 @@ from api.websocket import (
     websocket_manager,
 )
 
-from tasks.base import TaskBase, TaskState, make_hashable, _call_with_known_params
+from tasks.base import (
+    TaskBase,
+    TaskState,
+    TaskSummary,
+    make_hashable,
+    _call_with_known_params,
+)
 
 if TYPE_CHECKING:
     from api.session import Session
 
 P = ParamSpec("P")
+
+
+class SystemTaskSummary(TaskSummary):
+    name: str
+    metadata: dict[str, Any]
 
 
 class SystemTask(TaskBase, Generic[P]):
@@ -28,8 +40,9 @@ class SystemTask(TaskBase, Generic[P]):
         *,
         args: tuple[Any, ...],
         kwargs: dict[str, Any],
-        fn: Callable[P, Optional[WebsocketMessage]],
+        fn: Callable[P, list[WebsocketMessage]],
         name: str,
+        metadata: dict[str, Any] = {},
         session: "Session",
     ):
         # TaskBase in your setup expects (fn, args, kwargs)
@@ -40,7 +53,8 @@ class SystemTask(TaskBase, Generic[P]):
         self.name = name
         self.session = session
         self.error: Optional[BaseException] = None
-        self.result: Optional[WebsocketMessage] = None
+        self.result: Sequence[WebsocketMessage] = []
+        self.metadata = metadata
 
     def run(self):
         self.state = TaskState.STARTED
@@ -50,6 +64,7 @@ class SystemTask(TaskBase, Generic[P]):
                 *self.args,
                 session=self.session,
                 stop_event=self.stop_event,
+                metadata=self.metadata,
                 **self.kwargs,
             )
             if self.state != TaskState.CANCELLED:
@@ -60,9 +75,13 @@ class SystemTask(TaskBase, Generic[P]):
             raise
         finally:
             self.session.running_tasks.pop(self.id, None)
-            if self.result is not None:
-                print("Assadasd")
-                websocket_manager.send_safe(self.session.id, self.result)
+            for result in self.result:
+                websocket_manager.send_safe(self.session.id, result)
+
+    def summarize(self) -> SystemTaskSummary:
+        return SystemTaskSummary(
+            id=self.id, state=self.state, name=self.name, metadata=self.metadata
+        )
 
     @staticmethod
     def _dedupe_key(
@@ -89,6 +108,7 @@ class SystemTask(TaskBase, Generic[P]):
         task_name: str,
         run_once: bool = False,
         dedupe: bool = False,
+        metadata: dict[str, Any] = {},
     ) -> str:
         key = cls._dedupe_key(task_name, args, kwargs, run_once=run_once)
 
@@ -104,6 +124,7 @@ class SystemTask(TaskBase, Generic[P]):
             kwargs=kwargs,
             name=task_name,
             session=session,
+            metadata=metadata,
         )
         session.tasks[task.id] = task
         session.running_tasks[task.id] = task
@@ -117,12 +138,14 @@ class SystemTask(TaskBase, Generic[P]):
 
 def system_task(
     name: Optional[str] = None, dedupe: bool = False, run_once: bool = False
-) -> Callable[[Callable[P, Optional[WebsocketMessage]]], Callable[P, str]]:
-    def decorator(fn: Callable[P, Optional[WebsocketMessage]]) -> Callable[P, str]:
+) -> Callable[[Callable[P, Sequence[WebsocketMessage]]], Callable[P, str]]:
+    def decorator(fn: Callable[P, Sequence[WebsocketMessage]]) -> Callable[P, str]:
         task_name = name or fn.__name__
 
         @functools.wraps(fn)
-        def wrapper(*args: Any, session: "Session", **kwargs: Any) -> str:
+        def wrapper(
+            *args: Any, session: "Session", metadata: dict[str, Any] = {}, **kwargs: Any
+        ) -> str:
             return SystemTask.create_system_task(
                 fn=fn,
                 args=args,
@@ -130,6 +153,7 @@ def system_task(
                 session=session,
                 task_name=task_name,
                 run_once=run_once,
+                metadata=metadata,
                 dedupe=dedupe,
             )
 

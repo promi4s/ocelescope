@@ -1288,7 +1288,7 @@ export function useGetFilters<TData = Awaited<ReturnType<typeof getFilters>>, TE
 
 
 /**
- * @summary Import OCEL 2.0 from .sqlite file
+ * @summary Import OCEL 2.0
  */
 export const getImportOcelUrl = (params: ImportOcelParams,) => {
   const normalizedParams = new URLSearchParams();
@@ -1353,7 +1353,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type ImportOcelMutationError = HTTPValidationError
 
     /**
- * @summary Import OCEL 2.0 from .sqlite file
+ * @summary Import OCEL 2.0
  */
 export const useImportOcel = <TError = HTTPValidationError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof importOcel>>, TError,{data: BodyImportOcel;params: ImportOcelParams}, TContext>, request?: SecondParameter<typeof customFetch>}

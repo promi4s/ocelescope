@@ -5,4 +5,4 @@
  * OpenAPI spec version: 0.1
  */
 
-export type TaskSummaryMetadata = { [key: string]: unknown };
+export type SystemTaskSummaryMetadata = { [key: string]: unknown };

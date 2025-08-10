@@ -27,7 +27,6 @@ import {
 import Link from "next/link";
 import { useLogout } from "@/api/fastapi/session/session";
 import { useQueryClient } from "@tanstack/react-query";
-import { TaskModalProvider } from "../TaskModal/TaskModal";
 import { getModuleRoute } from "@/lib/modules";
 import { ModuleName, ModuleRouteName } from "@/types/modules";
 import CurrentOcelMenu from "../CurrentOcelMenu/CurrentOcelMenu";
@@ -233,7 +232,7 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         h="calc(100dvh - var(--app-shell-header-offset, 0rem) - var(--app-shell-footer-height, 0px) + var(--app-shell-padding, 0))"
       >
         <Box h={"100%"} style={{ overflow: "scroll" }}>
-          <TaskModalProvider>{children}</TaskModalProvider>
+          {children}
         </Box>
       </MAppShell.Main>
     </MAppShell>

@@ -4,6 +4,8 @@
  * OCEAn
  * OpenAPI spec version: 0.1
  */
-import type { TaskResult } from './taskResult';
 
-export type TaskSummaryResult = TaskResult | null;
+export type GetSystemTasksParams = {
+task_name?: string | null;
+only_running?: boolean;
+};

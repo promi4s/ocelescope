@@ -4,12 +4,14 @@ import {
   useRenameOcel,
   useSetCurrentOcel,
 } from "@/api/fastapi/ocels/ocels";
+import { useGetSystemTasks } from "@/api/fastapi/tasks/tasks";
 import OcelUpload from "@/components/OcelUpload/OcelUpload";
 import {
   ActionIcon,
   Box,
   Button,
   Group,
+  Loader,
   LoadingOverlay,
   Menu,
   Modal,
@@ -33,7 +35,7 @@ import {
 } from "lucide-react";
 import { DataTable } from "mantine-datatable";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 const OcelTable = () => {
   const queryClient = useQueryClient();
@@ -42,20 +44,30 @@ const OcelTable = () => {
   const [deletedOcelId, setDeletedOcelId] = useState<
     { name: string; id: string } | undefined
   >(undefined);
-  const {
-    data: ocels,
-    isLoading,
-    refetch,
-  } = useGetOcels({
-    query: {
-      refetchInterval: ({ state }) => {
-        if (state.data && state.data.uploading_ocels.length > 0) {
-          return 1000;
-        }
-        return false;
+  const { data: ocels, isLoading, refetch } = useGetOcels();
+
+  const { data: uploadingOcel } = useGetSystemTasks(
+    {
+      task_name: "importOcel",
+      only_running: true,
+    },
+    {
+      query: {
+        refetchInterval: ({ state }) => {
+          if (state.data && state.data.length > 0) {
+            return 1000;
+          }
+          return false;
+        },
       },
     },
-  });
+  );
+
+  const isOcel = useCallback(
+    (id: string) => ocels?.ocels.some(({ id: ocelId }) => ocelId === id),
+    [ocels?.ocels],
+  );
+
   const { mutate: deleteOcel } = useDeleteOcel({
     mutation: {
       onSuccess: async () => {
@@ -65,6 +77,7 @@ const OcelTable = () => {
   });
 
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+
   const [renamedOcel, setRenamedOcel] = useState<
     { id: string; value: string } | undefined
   >(undefined);
@@ -76,10 +89,12 @@ const OcelTable = () => {
       },
     },
   });
-  const isOcelUploaded =
-    ocels?.uploading_ocels.length === 0 && ocels?.ocels.length === 0;
 
   const { mutateAsync: renameOcel } = useRenameOcel();
+
+  const isOcelUploaded =
+    (uploadingOcel && uploadingOcel.length > 0) ||
+    (ocels && ocels.ocels.length > 0);
 
   return (
     <>
@@ -136,23 +151,24 @@ const OcelTable = () => {
       <Stack gap={0}>
         <Title size={"h3"}>OCELS</Title>
         <DataTable
-          height={isOcelUploaded ? 500 : undefined}
+          height={!isOcelUploaded ? 500 : undefined}
           withTableBorder
           borderRadius={"md"}
           highlightOnHover
-          onRowClick={({ record }) => {
-            setCurrentOcel({ params: { ocel_id: record.id } });
+          onRowClick={({ record: { id } }) => {
+            if (isOcel(id)) setCurrentOcel({ params: { ocel_id: id } });
           }}
           columns={[
             {
               accessor: "selector",
               title: "",
               render: ({ id }) => (
-                <>
+                <Group justify="center" p={4}>
                   {id === ocels?.current_ocel_id && (
                     <StarIcon size={14} fill="blue" color="blue" />
                   )}
-                </>
+                  {!isOcel(id) && <Loader size={20} />}
+                </Group>
               ),
             },
             {
@@ -210,7 +226,7 @@ const OcelTable = () => {
             { accessor: "created_at" },
             { accessor: "extensions" },
             {
-              title: !isOcelUploaded && (
+              title: (
                 <ActionIcon
                   variant="subtle"
                   size={"sm"}
@@ -224,7 +240,7 @@ const OcelTable = () => {
               width: "0%",
               render: ({ id, name }) => {
                 return (
-                  <>
+                  isOcel(id) && (
                     <Menu width={200} position="left-start">
                       <Menu.Target>
                         <ActionIcon
@@ -280,13 +296,13 @@ const OcelTable = () => {
                         </Menu.Item>
                       </Menu.Dropdown>
                     </Menu>
-                  </>
+                  )
                 );
               },
             },
           ]}
           emptyState={
-            isOcelUploaded ? (
+            !isOcelUploaded ? (
               <Box p={"md"} w={"100%"} style={{ pointerEvents: "auto" }}>
                 <OcelUpload
                   onUpload={async () =>
@@ -300,13 +316,11 @@ const OcelTable = () => {
           }
           records={[
             ...(ocels?.ocels ?? []),
-            ...(ocels?.uploading_ocels.map(
-              ({ name, uploaded_at, task_id }) => ({
-                id: task_id,
-                name,
-                created_at: uploaded_at,
-              }),
-            ) ?? []),
+            ...(uploadingOcel ?? []).map(({ id, metadata }) => ({
+              id,
+              name: metadata["fileName"] as string,
+              created_at: metadata["uploaded_at"] as string,
+            })),
           ]}
         />
       </Stack>

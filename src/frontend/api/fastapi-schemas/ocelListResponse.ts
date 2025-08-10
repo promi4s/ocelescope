@@ -6,10 +6,8 @@
  */
 import type { OcelListResponseCurrentOcelId } from './ocelListResponseCurrentOcelId';
 import type { OcelMetadata } from './ocelMetadata';
-import type { UploadingOcelMetadata } from './uploadingOcelMetadata';
 
 export interface OcelListResponse {
   current_ocel_id: OcelListResponseCurrentOcelId;
   ocels: OcelMetadata[];
-  uploading_ocels: UploadingOcelMetadata[];
 }

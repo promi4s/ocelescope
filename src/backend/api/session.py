@@ -2,20 +2,22 @@ from __future__ import annotations
 
 import json
 import uuid
-from typing import Any, Hashable, Optional, Type, TypeVar, cast
+from typing import Any, Callable, Hashable, Optional, Type, TypeVar, cast
 
 from api.websocket import websocket_manager, InvalidationRequest
 
 from api.exceptions import NotFound
 from api.model.module import Module
 from api.model.ocel import Filtered_Ocel
-from api.model.tasks import TaskSummary
 from ocelescope import OCEL, OCELFilter, Resource as ResourceBase
 from api.model.resource import Resource
 from tasks.base import TaskBase
 
 
 T = TypeVar("T", bound=Module)  # Constrain T to CachableObject
+
+
+S = TypeVar("S", bound=TaskBase)
 
 
 class Session:
@@ -60,13 +62,11 @@ class Session:
     def get_task(self, task_id: str):
         return self._tasks.get(task_id, None)
 
-    def list_tasks(self) -> list[TaskSummary]:
+    def list_tasks(self, task_type: Type[S], filter: Callable[[S], bool]):
         return [
-            TaskSummary(
-                key=task.id,
-                state=task.state,
-            )
+            task.summarize()
             for task in self._tasks.values()
+            if isinstance(task, task_type) and filter(task)
         ]
 
     def get_module_state(self, key: str, cls: Type[T]) -> T:

@@ -31,7 +31,6 @@ export default function App({ Component, pageProps }: any) {
       <HydrationBoundary>
         <MantineProvider theme={theme}>
           <Notifications />
-
           <Head>
             <title>Ocelescope</title>
             <meta
