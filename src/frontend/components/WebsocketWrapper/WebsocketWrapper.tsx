@@ -1,73 +1,77 @@
+import { WebSocketMessage } from "@/lib/websocket/validator";
 import { showNotification } from "@mantine/notifications";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
-
-type WebSocketResponse = {
-  task_id: string;
-  task_message: string;
-  output_ids: string[];
-  ocel_ids: string[];
-};
 
 const WebsocketWrapper = () => {
   const ws = useRef<WebSocket | null>(null);
 
   const queryClient = useQueryClient();
-
   useEffect(() => {
-    let reconnectTimer: any;
+    let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
 
     const connect = () => {
       ws.current = new WebSocket("ws://localhost:8000/ws");
 
-      ws.current.onopen = () => {};
+      ws.current.onopen = () => {
+        console.log("Connected to WebSocket");
+      };
 
-      ws.current.onmessage = async (event) => {
-        const message: WebSocketResponse = JSON.parse(event.data);
-        if (message.output_ids.length > 0) {
-          await queryClient.invalidateQueries({
-            predicate: (query) =>
-              typeof query.queryKey[0] === "string" &&
-              query.queryKey[0].includes("/outputs"),
-          });
-        }
-        if (message.ocel_ids.length > 0) {
-          await queryClient.invalidateQueries({
-            predicate: (query) =>
-              typeof query.queryKey[0] === "string" &&
-              query.queryKey[0].includes("/ocels"),
-          });
+      ws.current.onmessage = (event) => {
+        const result = WebSocketMessage.safeParse(JSON.parse(event.data));
+
+        if (!result.success) {
+          console.warn("Invalid WS message", result.error);
+          return;
         }
 
-        showNotification({
-          title: message.task_message,
-          message: (
-            <>
-              {message.ocel_ids.length > 0 && (
-                <>{message.ocel_ids.length} Ocels</>
-              )}
-              {message.output_ids.length > 0 && (
-                <>{message.output_ids.length} Outputs</>
-              )}
-            </>
-          ),
-          color: "green",
-        });
+        const message = result.data;
+
+        switch (message.type) {
+          case "notification":
+            showNotification({
+              title: message.title,
+              message: message.message,
+              color: "green",
+            });
+            break;
+          case "invalidation":
+            queryClient.invalidateQueries({
+              predicate: (query) =>
+                typeof query.queryKey[0] === "string" &&
+                message.routes.some((route) =>
+                  (query.queryKey[0] as string).includes(`/${route}`),
+                ),
+            });
+        }
+      };
+
+      const scheduleReconnect = () => {
+        if (!reconnectTimer) {
+          reconnectTimer = setTimeout(() => {
+            reconnectTimer = null;
+            connect();
+          }, 3000);
+        }
       };
 
       ws.current.onclose = () => {
-        reconnectTimer = setTimeout(connect, 3000);
+        console.warn("WebSocket closed, retrying...");
+        scheduleReconnect();
       };
 
-      ws.current.onerror = (err) => {
-        ws.current?.close();
+      ws.current.onerror = () => {
+        console.error("WebSocket error, closing & retrying...");
+        ws.current?.close(); // will trigger onclose and reconnect
       };
     };
 
     connect();
 
     return () => {
-      clearTimeout(reconnectTimer);
+      if (reconnectTimer) {
+        clearTimeout(reconnectTimer);
+      }
       ws.current?.close();
     };
   }, []);

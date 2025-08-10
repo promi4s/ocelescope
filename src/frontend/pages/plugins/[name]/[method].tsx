@@ -1,4 +1,4 @@
-import { usePlugins, useRunPlugin } from "@/api/fastapi/plugins/plugins";
+import { usePlugins } from "@/api/fastapi/plugins/plugins";
 import PluginInput from "@/components/Plugins/Form";
 import { Container, LoadingOverlay, Stack, Text, Title } from "@mantine/core";
 import { useRouter } from "next/router";
@@ -8,8 +8,6 @@ const PluginPage = () => {
   const { data: plugins } = usePlugins();
   const router = useRouter();
   const { name, method } = router.query;
-
-  const { mutate: runPlugin } = useRunPlugin();
 
   const pluginFormProps = useMemo(() => {
     const plugin = (plugins ?? []).find(

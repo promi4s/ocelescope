@@ -1,7 +1,7 @@
-from typing import Any, Generic, Optional, TypeVar
+from typing import Generic, Optional, TypeVar
 from pydantic.main import BaseModel
 
-from util.tasks import TaskResult, TaskState
+from tasks.base import TaskState
 
 
 T = TypeVar("T")
@@ -9,10 +9,7 @@ T = TypeVar("T")
 
 class TaskSummary(BaseModel):
     key: str
-    name: str
     state: TaskState
-    result: Optional[TaskResult]
-    metadata: dict[str, Any]
 
 
 class TaskResponse(BaseModel, Generic[T]):

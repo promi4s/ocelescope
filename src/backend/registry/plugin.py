@@ -1,10 +1,17 @@
 from types import ModuleType
-from typing import Optional
+from typing import Any, Optional, TypedDict
+from ocelescope import OCEL, Resource
 from ocelescope.plugin import Plugin
-
+from ocelescope.plugin.decorators import PluginMethod
 from api.model.plugin import PluginApi
 
 from registry.resource import resource_registry
+
+
+class PluginInput(TypedDict):
+    input_ocels: dict[str, OCEL]
+    input_resources: dict[str, Resource]
+    input: dict[str, Any]
 
 
 class PluginRegistry:
@@ -39,6 +46,17 @@ class PluginRegistry:
             ),
             None,
         )
+
+    def get_method(self, plugin_name: str, method_name: str) -> PluginMethod:
+        plugin = self.get_plugin(plugin_name)
+        if plugin is None:
+            raise KeyError(f"Plugin {plugin_name} could not be found")
+
+        method = plugin.method_map()[method_name]
+
+        method._method = method._method.__get__(plugin, type(plugin))
+
+        return method
 
     def get_plugin_module(self, name: str) -> Optional[str]:
         return next(

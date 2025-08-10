@@ -1,14 +1,48 @@
 import asyncio
-from typing import Optional
+from typing import Annotated, Literal, Optional, Union
 from fastapi import WebSocket
+from pydantic.fields import Field
 from pydantic.main import BaseModel
 
 
-class TaskMessage(BaseModel):
+class OcelLink(BaseModel):
+    type: Literal["ocel"] = "ocel"
+    ocel_id: str
+
+
+class ResourceLink(BaseModel):
+    type: Literal["resource"] = "resource"
+    resource_id: str
+
+
+class PluginLink(BaseModel):
+    type: Literal["plugin"] = "plugin"
+    name: str
+    method: str
     task_id: str
-    task_message: str
-    output_ids: Optional[list[str]]
-    ocel_ids: Optional[list[str]]
+
+
+SystemLink = Annotated[
+    Union[OcelLink, PluginLink, ResourceLink], Field(discriminator="type")
+]
+
+
+class SytemNotificiation(BaseModel):
+    type: Literal["notification"] = "notification"
+    title: str
+    message: str
+    notification_type: Literal["warning", "info", "error"]
+    link: Optional[SystemLink] = None
+
+
+class InvalidationRequest(BaseModel):
+    type: Literal["invalidation"] = "invalidation"
+    routes: list[Literal["resources", "ocels", "tasks"]]
+
+
+WebsocketMessage = Annotated[
+    Union[SytemNotificiation, InvalidationRequest], Field(discriminator="type")
+]
 
 
 class WebSocketManager:
@@ -25,7 +59,7 @@ class WebSocketManager:
     def disconnect(self, session_id: str):
         self.active_connections.pop(session_id, None)
 
-    async def send(self, session_id: str, message: TaskMessage):
+    async def send(self, session_id: str, message: WebsocketMessage):
         ws = self.active_connections.get(session_id)
         if ws:
             await ws.send_json(message.model_dump())
@@ -37,7 +71,7 @@ class WebSocketManager:
     def is_connected(self, session_id: str) -> bool:
         return session_id in self.active_connections
 
-    def send_safe(self, session_id: str, message: TaskMessage):
+    def send_safe(self, session_id: str, message: WebsocketMessage):
         """Call from sync/threaded context."""
         if not self.loop:
             raise RuntimeError("Event loop not set on WebSocketManager")

@@ -19,9 +19,10 @@ from ocel.default_ocel import (
     filter_default_ocels,
     get_default_ocel,
 )
+from tasks.base import TaskState
 from tasks.ocel import import_ocel_task
+from tasks.system import SystemTask
 from util.constants import SUPPORTED_FILE_TYPES
-from util.tasks import TaskState
 
 from fastapi import APIRouter, File, Query, Response, UploadFile
 
@@ -56,11 +57,11 @@ def getOcels(session: ApiSession) -> OcelListResponse:
         uploading_ocels=[
             UploadingOcelMetadata(
                 task_id=task.key,
-                name=task.metadata["file_name"],
-                uploaded_at=task.metadata["upload_date"],
             )
             for task in session.list_tasks()
-            if (task.name == "import_ocel_task") & (task.state == TaskState.STARTED)
+            if isinstance(task, SystemTask)
+            and task.name == "import_ocel_task"
+            and task.state == TaskState.STARTED
         ],
     )
 
@@ -291,8 +292,6 @@ def import_ocel(
         path=tmp_path,
         upload_date=upload_date,
         name=tmp_file_prefix,
-        suffix=suffix,
-        metadata={"file_name": tmp_file_prefix, "upload_date": upload_date.isoformat()},  # type: ignore
     )
 
     response.status_code = 200

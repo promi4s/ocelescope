@@ -7,17 +7,15 @@ from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
 from uuid import uuid4
 
-from ocelescope import OCEL
-from ocelescope import Resource
 from api.config import config
 import tempfile
 import zipfile
 import sys
 from api.dependencies import ApiSession
 
-from api.exceptions import NotFound
 from api.model.plugin import PluginApi
 from registry import plugin_registy
+from tasks.plugin import PluginTask
 
 plugin_router = APIRouter(prefix="/plugins", tags=["plugins"])
 
@@ -35,31 +33,13 @@ def run_plugin(
     session: ApiSession,
     plugin_name: str,
     method_name: str,
-):
-    plugin = plugin_registy.get_plugin(plugin_name)
-
-    if plugin is None:
-        raise NotFound(f"The Plugin {plugin_name} could not be found")
-
-    method = plugin.method_map()[method_name]
-
-    ocel_args: dict[str, OCEL] = {
-        key: session.get_ocel(input_ocels[key]) for key in method.input_ocels.keys()
-    }
-
-    resource_args: dict[str, Resource] = {
-        key: session.get_resource(input_resources[key]).resource
-        for key in method.input_resources.keys()
-    }
-
-    plugin_input = method._input_model(**input) if method._input_model else None
-
-    method_kwargs = {"self": plugin, **ocel_args, **resource_args}
-
-    if plugin_input is not None:
-        method_kwargs["input"] = plugin_input
-
-    method._method(**method_kwargs)
+) -> str:
+    return PluginTask.create_plugin_task(
+        session,
+        plugin_name=plugin_name,
+        method_name=method_name,
+        input={"input": input, "ocels": input_ocels, "resources": input_resources},
+    )
 
 
 @plugin_router.post("/", operation_id="uploadPlugin")

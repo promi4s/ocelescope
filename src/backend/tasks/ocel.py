@@ -3,20 +3,18 @@ from pathlib import Path
 
 
 from api.session import Session
+from api.websocket import OcelLink, SytemNotificiation
 from ocelescope import OCEL
-from util.tasks import task
+from tasks.system import system_task
 
 
-@task(success_message="Ocel was uploaded successfully")
+@system_task()
 def import_ocel_task(
     session: Session,
     path: Path,
     name: str,
-    suffix: str,
     upload_date: datetime,
-    stop_event=None,
-):  # Save file
-    # pm4py-based import
+):
     ocel = OCEL.read_ocel(
         path,
         original_file_name=name,
@@ -24,4 +22,11 @@ def import_ocel_task(
         upload_date=upload_date,
     )
 
-    return ocel
+    ocel_id = session.add_ocel(ocel)
+
+    return SytemNotificiation(
+        title="Ocel successfully uploaded",
+        message=f"{ocel.meta.get('fileName', None) or 'OCEL '} was uploaded successfully",
+        notification_type="info",
+        link=OcelLink(ocel_id=ocel_id),
+    )

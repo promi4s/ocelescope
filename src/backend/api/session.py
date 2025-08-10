@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import json
 import uuid
-from typing import Any, Optional, Type, TypeVar, cast
+from typing import Any, Hashable, Optional, Type, TypeVar, cast
+
+from api.websocket import websocket_manager, InvalidationRequest
 
 from api.exceptions import NotFound
 from api.model.module import Module
@@ -10,7 +12,7 @@ from api.model.ocel import Filtered_Ocel
 from api.model.tasks import TaskSummary
 from ocelescope import OCEL, OCELFilter, Resource as ResourceBase
 from api.model.resource import Resource
-from util.tasks import Task
+from tasks.base import TaskBase
 
 
 T = TypeVar("T", bound=Module)  # Constrain T to CachableObject
@@ -26,9 +28,9 @@ class Session:
         self.id = id or str(uuid.uuid4())
 
         # Tasks
-        self._tasks: dict[str, Task] = {}
-        self._running_tasks: dict[str, Task] = {}
-        self._dedupe_keys: dict[tuple, str] = {}  # dedupe key → task_id
+        self._tasks: dict[str, TaskBase] = {}
+        self._running_tasks: dict[str, TaskBase] = {}
+        self._dedupe_keys: dict[Hashable, str] = {}  # dedupe key → task_id
 
         # Plugins
         self._module_states: dict[str, Module] = {}
@@ -62,10 +64,7 @@ class Session:
         return [
             TaskSummary(
                 key=task.id,
-                name=task.name,
                 state=task.state,
-                result=task.result,
-                metadata=task.metadata,
             )
             for task in self._tasks.values()
         ]
@@ -126,6 +125,7 @@ class Session:
             self.current_ocel_id = None
 
         self.ocels.pop(ocel_id, None)
+        websocket_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
 
     def get_ocel_filters(self, ocel_id: str) -> Optional[OCELFilter]:
         if ocel_id not in self.ocels:
@@ -147,12 +147,16 @@ class Session:
 
         current_ocel.filtered = current_ocel.original.apply_filter(filters)
         current_ocel.filter = filters
+        websocket_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
 
     # endregion
     # region Output management
     def add_resource(self, output: ResourceBase, name: str) -> str:
         outputWrapper = Resource(resource=output, name=name)
         self._resources[outputWrapper.id] = outputWrapper
+
+        websocket_manager.send_safe(self.id, InvalidationRequest(routes=["resources"]))
+
         return outputWrapper.id
 
     def get_resource(self, id: str) -> Resource:
@@ -162,6 +166,7 @@ class Session:
 
     def delete_resource(self, id: str):
         self._resources.pop(id, None)
+        websocket_manager.send_safe(self.id, InvalidationRequest(routes=["resources"]))
 
     def list_resources(self) -> list[Resource]:
         return list(self._resources.values())
@@ -171,6 +176,7 @@ class Session:
             raise NotFound(f"Output with id {output_id} not found")
 
         self._resources[output_id].name = new_name
+        websocket_manager.send_safe(self.id, InvalidationRequest(routes=["resources"]))
 
     # endregion
     def invalidate_module_states(self):

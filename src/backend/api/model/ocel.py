@@ -13,9 +13,7 @@ class OcelMetadata(BaseModel):
 
 
 class UploadingOcelMetadata(BaseModel):
-    name: str
     task_id: str
-    uploaded_at: str
 
 
 class OcelListResponse(BaseModel):
