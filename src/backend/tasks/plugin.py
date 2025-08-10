@@ -74,7 +74,14 @@ class PluginTask(TaskBase, Generic[P]):
                 for key in method.input_resources.keys()
             }
 
-            kwargs = {**ocel_args, **resource_args, "input": input}
+            kwargs = {
+                **ocel_args,
+                **resource_args,
+            }
+
+            if method._input_model is not None:
+                kwargs["input"] = method._input_model(**self.input["input"])
+
             result = _call_with_known_params(method._method, **kwargs)
 
             if not isinstance(result, tuple):
