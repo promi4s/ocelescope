@@ -39,7 +39,7 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 /**
- * @summary Get Outputs
+ * @summary Get Resources
  */
 export const getResourcesUrl = () => {
 
@@ -114,7 +114,7 @@ export function useResources<TData = Awaited<ReturnType<typeof resources>>, TErr
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary Get Outputs
+ * @summary Get Resources
  */
 
 export function useResources<TData = Awaited<ReturnType<typeof resources>>, TError = unknown>(

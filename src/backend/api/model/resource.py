@@ -18,7 +18,7 @@ class Resource(BaseModel, Generic[T]):
 
 
 class ResourceApi(BaseModel):
-    id: str = Field(default_factory=lambda: uuid4().hex)
+    id: str
     created_at: datetime = Field(default_factory=lambda: datetime.now())
     name: str
     type_label: str

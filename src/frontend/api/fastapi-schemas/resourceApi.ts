@@ -6,7 +6,7 @@
  */
 
 export interface ResourceApi {
-  id?: string;
+  id: string;
   created_at?: string;
   name: string;
   type_label: string;
