@@ -19,13 +19,16 @@ resource_router = APIRouter(prefix="/resources", tags=["resources"])
 
 
 @resource_router.get(path="/", operation_id="resources")
-def get_outputs(session: ApiSession) -> list[ResourceApi]:
+def get_resources(
+    session: ApiSession, resource_type: Optional[str] = None
+) -> list[ResourceApi]:
     return [
         ResourceApi(
             **resource.model_dump(),
             type_label=resource_registry.resources[resource.resource.type].label,
         )
         for resource in session.list_resources()
+        if resource_type is not None or resource.resource.type == resource_type
     ]
 
 

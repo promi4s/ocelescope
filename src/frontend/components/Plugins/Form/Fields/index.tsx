@@ -1,6 +1,9 @@
 import { useEventCounts, useObjectCount } from "@/api/fastapi/ocels/ocels";
 import { Box, MultiSelect, Select } from "@mantine/core";
 import { FieldProps, UiSchema } from "@rjsf/utils";
+import { Control, useWatch } from "react-hook-form";
+import { PluginInputType } from "..";
+import React, { memo } from "react";
 
 type OcelFieldProps = {
   value: any;
@@ -40,81 +43,72 @@ const EventTypeSelector: React.FC<OcelFieldProps> = ({
   );
 };
 
-const ObjectTypeSelector: React.FC<OcelFieldProps> = ({
-  ocelId,
-  onChange,
-  requiered,
-  value,
-  isMulti,
-  label,
-  description,
-}) => {
-  const { data = {} } = useObjectCount({ ocel_id: ocelId });
-  const SelectComponent = isMulti ? MultiSelect : Select;
+const ObjectTypeSelector: React.FC<OcelFieldProps> = memo(
+  ({ ocelId, onChange, requiered, value, isMulti, label, description }) => {
+    const { data = {} } = useObjectCount({ ocel_id: ocelId });
+    const SelectComponent = isMulti ? MultiSelect : Select;
 
-  return (
-    <Box>
-      <SelectComponent
-        value={value}
-        label={label}
-        required={requiered}
-        clearable
-        description={description}
-        onChange={onChange}
-        data={Object.keys(data)}
-      />
-    </Box>
-  );
-};
+    return (
+      <Box>
+        <SelectComponent
+          value={value}
+          label={label}
+          required={requiered}
+          clearable
+          description={description}
+          onChange={onChange}
+          data={Object.keys(data)}
+        />
+      </Box>
+    );
+  },
+);
 
-const ocelFieldMap: Record<string, React.FC<OcelFieldProps>> = {
+export const ocelFieldMap: Record<string, React.FC<OcelFieldProps>> = {
   event_type: EventTypeSelector,
   object_type: ObjectTypeSelector,
 };
 
 export const wrapFieldsWithContext = (
-  ocelContext: Record<string, string>,
+  control: Control<PluginInputType>,
   fields: Record<string, React.FC<OcelFieldProps>>,
 ) => {
-  return Object.fromEntries(
-    Object.entries(fields).map(([name, Field]) => [
-      name,
-      ({
-        schema,
-        required,
-        title,
-        formData,
-        onChange,
-        ...props
-      }: FieldProps) => {
-        const ocelRef = schema?.["x-ui-meta"]?.ocel_id;
-        const isMulti = schema?.type === "array";
+  const wrapped: Record<string, React.FC<FieldProps>> = {};
 
-        const label = schema?.title;
-        const description = schema?.description;
+  Object.entries(fields).forEach(([name, Field]) => {
+    const Comp: React.FC<FieldProps> = ({
+      schema,
+      required,
+      formData,
+      onChange,
+    }) => {
+      const ocelRef = schema?.["x-ui-meta"]?.ocel_id;
+      const isMulti = schema?.type === "array";
+      const ocelId = useWatch({ control, name: `input_ocels.${ocelRef}` });
 
-        const ocelId = ocelContext[ocelRef];
-        return (
-          <Field
-            label={label}
-            requiered={required}
-            description={description}
-            isMulti={isMulti}
-            onChange={onChange}
-            value={formData}
-            ocelId={ocelId}
-          />
-        );
-      },
-    ]),
-  );
+      return (
+        <Field
+          label={schema?.title}
+          requiered={required}
+          description={schema?.description}
+          isMulti={isMulti}
+          onChange={onChange}
+          value={formData}
+          ocelId={ocelId}
+        />
+      );
+    };
+
+    wrapped[name] = memo(Comp);
+  });
+
+  return wrapped;
 };
 
 export function buildOcelUiSchema(
   schema: { [key: string]: unknown },
   ui: UiSchema = {},
   path: string[] = [],
-  fields: Record<string, React.FC<any>> = {},
 ): UiSchema {
   if (!schema || typeof schema !== "object") return ui;
 
@@ -126,24 +120,22 @@ export function buildOcelUiSchema(
       const meta = (field as any)["x-ui-meta"];
 
       if (meta && meta.type === "ocel" && meta.field_type in ocelFieldMap) {
-        // Build uiSchema path
         let pointer = ui;
         for (let i = 0; i < fullPath.length - 1; i++) {
           pointer[fullPath[i]] = pointer[fullPath[i]] || {};
           pointer = pointer[fullPath[i]] as UiSchema;
         }
         pointer[fullPath.at(-1)!] = { "ui:field": meta.field_type };
-
-        // Register the custom component
-        fields[meta.field_type] = ocelFieldMap[meta.field_type];
       }
 
+      if (meta && meta.type === "custom") {
+      }
       if (field.type === "object") {
-        buildOcelUiSchema(field, ui, fullPath, fields);
+        buildOcelUiSchema(field, ui, fullPath);
       }
 
       if (field.type === "array" && field.items) {
-        buildOcelUiSchema(field.items, ui, [...fullPath, "items"], fields);
+        buildOcelUiSchema(field.items, ui, [...fullPath, "items"]);
       }
     }
   }

@@ -139,6 +139,7 @@ export * from './resourceAnnotationDescription';
 export * from './resourceApi';
 export * from './resourceResult';
 export * from './resourceResultAnnotation';
+export * from './resourcesParams';
 export * from './setCurrentOcelParams';
 export * from './setFilters200';
 export * from './setFiltersBody';
