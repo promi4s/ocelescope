@@ -7,6 +7,7 @@ from api.session import Session
 from api.websocket import InvalidationRequest, OcelLink, SytemNotificiation
 from ocelescope import OCEL
 from tasks.system import system_task
+from registry import extension_registry
 
 
 class ImportOCELMetadata(TypedDict):
@@ -28,6 +29,8 @@ def import_ocel_task(
         version_info=True,
         upload_date=upload_date,
     )
+
+    ocel.load_extension(extension_registry.get_loaded_extensions())
 
     ocel_id = session.add_ocel(ocel)
 
