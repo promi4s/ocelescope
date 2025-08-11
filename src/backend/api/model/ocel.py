@@ -4,12 +4,14 @@ from ocelescope import OCEL
 from ocelescope.ocel.filter import OCELFilter
 from pydantic.main import BaseModel
 
+from registry.extension import OCELExtensionDescription
+
 
 class OcelMetadata(BaseModel):
     id: str
     name: str
     created_at: str
-    extensions: list[str]
+    extensions: list[OCELExtensionDescription]
 
 
 class UploadingOcelMetadata(BaseModel):

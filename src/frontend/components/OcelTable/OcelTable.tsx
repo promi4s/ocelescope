@@ -1,3 +1,4 @@
+import { OcelMetadata } from "@/api/fastapi-schemas";
 import {
   useDeleteOcel,
   useGetOcels,
@@ -224,7 +225,11 @@ const OcelTable = () => {
               },
             },
             { accessor: "created_at" },
-            { accessor: "extensions" },
+            {
+              accessor: "extensions",
+              render: ({ extensions }) =>
+                extensions.map(({ label }) => label).join(","),
+            },
             {
               title: (
                 <ActionIcon
@@ -314,14 +319,17 @@ const OcelTable = () => {
               <LoadingOverlay />
             ) : undefined
           }
-          records={[
-            ...(ocels?.ocels ?? []),
-            ...(uploadingOcel ?? []).map(({ id, metadata }) => ({
-              id,
-              name: metadata["fileName"] as string,
-              created_at: metadata["uploaded_at"] as string,
-            })),
-          ]}
+          records={
+            [
+              ...(ocels?.ocels ?? []),
+              ...(uploadingOcel ?? []).map(({ id, metadata }) => ({
+                id,
+                name: metadata["fileName"] as string,
+                created_at: metadata["uploaded_at"] as string,
+                extensions: [],
+              })),
+            ] as OcelMetadata[]
+          }
         />
       </Stack>
     </>

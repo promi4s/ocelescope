@@ -1,6 +1,13 @@
 from types import ModuleType
 from typing import Literal, Optional
 from ocelescope import OCELExtension
+from pydantic import BaseModel
+
+
+class OCELExtensionDescription(BaseModel):
+    name: str
+    label: str
+    description: str
 
 
 class ExtensionRegistry:
@@ -21,8 +28,13 @@ class ExtensionRegistry:
             if not file_format or file_format in extension.supported_extensions
         ]
 
-    def get_labels(self):
-        return {key: value.name for key, value in self._registry.items()}
+    def get_extension_description(self) -> dict[str, OCELExtensionDescription]:
+        return {
+            key: OCELExtensionDescription(
+                name=key, label=value.name, description=value.description
+            )
+            for key, value in self._registry.items()
+        }
 
 
 extension_registry = ExtensionRegistry()

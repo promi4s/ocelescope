@@ -37,6 +37,7 @@ import type {
   GetDefaultOcelParams,
   GetFilters200,
   GetFiltersParams,
+  GetOcelsParams,
   HTTPValidationError,
   ImportDefaultOcelParams,
   ImportOcelParams,
@@ -66,17 +67,24 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
  * Returns metadata for all uploaded OCELs along with any OCEL files currently being imported. Includes the ID of the currently active OCEL, if one is selected.
  * @summary List uploaded and uploading OCELs
  */
-export const getGetOcelsUrl = () => {
+export const getGetOcelsUrl = (params?: GetOcelsParams,) => {
+  const normalizedParams = new URLSearchParams();
 
+  Object.entries(params || {}).forEach(([key, value]) => {
+    
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
 
-  
+  const stringifiedParams = normalizedParams.toString();
 
-  return `http://localhost:8000/ocels/`
+  return stringifiedParams.length > 0 ? `http://localhost:8000/ocels/?${stringifiedParams}` : `http://localhost:8000/ocels/`
 }
 
-export const getOcels = async ( options?: RequestInit): Promise<OcelListResponse> => {
+export const getOcels = async (params?: GetOcelsParams, options?: RequestInit): Promise<OcelListResponse> => {
   
-  return customFetch<OcelListResponse>(getGetOcelsUrl(),
+  return customFetch<OcelListResponse>(getGetOcelsUrl(params),
   {      
     ...options,
     method: 'GET'
@@ -87,21 +95,21 @@ export const getOcels = async ( options?: RequestInit): Promise<OcelListResponse
 
 
 
-export const getGetOcelsQueryKey = () => {
-    return [`http://localhost:8000/ocels/`] as const;
+export const getGetOcelsQueryKey = (params?: GetOcelsParams,) => {
+    return [`http://localhost:8000/ocels/`, ...(params ? [params]: [])] as const;
     }
 
     
-export const getGetOcelsQueryOptions = <TData = Awaited<ReturnType<typeof getOcels>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOcels>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetOcelsQueryOptions = <TData = Awaited<ReturnType<typeof getOcels>>, TError = HTTPValidationError>(params?: GetOcelsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOcels>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetOcelsQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getGetOcelsQueryKey(params);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getOcels>>> = ({ signal }) => getOcels({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getOcels>>> = ({ signal }) => getOcels(params, { signal, ...requestOptions });
 
       
 
@@ -111,11 +119,11 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetOcelsQueryResult = NonNullable<Awaited<ReturnType<typeof getOcels>>>
-export type GetOcelsQueryError = unknown
+export type GetOcelsQueryError = HTTPValidationError
 
 
-export function useGetOcels<TData = Awaited<ReturnType<typeof getOcels>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOcels>>, TError, TData>> & Pick<
+export function useGetOcels<TData = Awaited<ReturnType<typeof getOcels>>, TError = HTTPValidationError>(
+ params: undefined |  GetOcelsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOcels>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getOcels>>,
           TError,
@@ -124,8 +132,8 @@ export function useGetOcels<TData = Awaited<ReturnType<typeof getOcels>>, TError
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetOcels<TData = Awaited<ReturnType<typeof getOcels>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOcels>>, TError, TData>> & Pick<
+export function useGetOcels<TData = Awaited<ReturnType<typeof getOcels>>, TError = HTTPValidationError>(
+ params?: GetOcelsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOcels>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getOcels>>,
           TError,
@@ -134,20 +142,20 @@ export function useGetOcels<TData = Awaited<ReturnType<typeof getOcels>>, TError
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetOcels<TData = Awaited<ReturnType<typeof getOcels>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOcels>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export function useGetOcels<TData = Awaited<ReturnType<typeof getOcels>>, TError = HTTPValidationError>(
+ params?: GetOcelsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOcels>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary List uploaded and uploading OCELs
  */
 
-export function useGetOcels<TData = Awaited<ReturnType<typeof getOcels>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOcels>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export function useGetOcels<TData = Awaited<ReturnType<typeof getOcels>>, TError = HTTPValidationError>(
+ params?: GetOcelsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOcels>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetOcelsQueryOptions(options)
+  const queryOptions = getGetOcelsQueryOptions(params,options)
 
   const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

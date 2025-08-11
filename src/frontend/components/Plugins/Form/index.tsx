@@ -51,7 +51,7 @@ const PluginInput: React.FC<PluginInputProps> = ({
     <>
       <Stack gap={0}>
         {Object.entries(method.input_ocels ?? {}).map(
-          ([name, { label, description }]) => (
+          ([name, { label, description, extension }]) => (
             <Controller
               control={control}
               name={name}
@@ -60,6 +60,7 @@ const PluginInput: React.FC<PluginInputProps> = ({
                 <OcelSelect
                   label={label}
                   required
+                  extension={extension ?? undefined}
                   description={description}
                   onChange={field.onChange}
                   value={field.value}

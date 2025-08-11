@@ -5,10 +5,10 @@
  * OpenAPI spec version: 0.1
  */
 import type { OCELAnnotationDescription } from './oCELAnnotationDescription';
-import type { OCELAnnotationExtensionLabel } from './oCELAnnotationExtensionLabel';
+import type { OCELAnnotationExtension } from './oCELAnnotationExtension';
 
 export interface OCELAnnotation {
   label: string;
   description?: OCELAnnotationDescription;
-  extension_label?: OCELAnnotationExtensionLabel;
+  extension?: OCELAnnotationExtension;
 }

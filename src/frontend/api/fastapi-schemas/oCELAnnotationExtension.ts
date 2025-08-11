@@ -5,4 +5,4 @@
  * OpenAPI spec version: 0.1
  */
 
-export type OCELAnnotationExtensionLabel = string | null;
+export type OCELAnnotationExtension = string | null;

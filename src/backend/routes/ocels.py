@@ -24,6 +24,8 @@ from util.constants import SUPPORTED_FILE_TYPES
 
 from fastapi import APIRouter, File, Query, Response, UploadFile
 
+from registry import extension_registry
+
 ocels_router = APIRouter(prefix="/ocels", tags=["ocels"])
 
 
@@ -38,7 +40,11 @@ ocels_router = APIRouter(prefix="/ocels", tags=["ocels"])
     ),
     operation_id="getOcels",
 )
-def getOcels(session: ApiSession) -> OcelListResponse:
+def getOcels(
+    session: ApiSession, extension_name: Optional[str] = None
+) -> OcelListResponse:
+    extension_descriptions = extension_registry.get_extension_description()
+
     return OcelListResponse(
         current_ocel_id=session.current_ocel_id,
         ocels=[
@@ -47,10 +53,18 @@ def getOcels(session: ApiSession) -> OcelListResponse:
                 id=key,
                 name=value.original.meta["fileName"],
                 extensions=[
-                    extension.name for extension in value.original.get_extensions_list()
+                    extension_descriptions[extension.__class__.__name__]
+                    for extension in value.original.get_extensions_list()
+                    if extension.__class__.__name__ in extension_descriptions
                 ],
             )
             for key, value in session.ocels.items()
+            if extension_name is None
+            or extension_name
+            in [
+                extension.__class__.__name__
+                for extension in value.original.get_extensions_list()
+            ]
         ],
     )
 

@@ -4,10 +4,11 @@
  * OCEAn
  * OpenAPI spec version: 0.1
  */
+import type { OCELExtensionDescription } from './oCELExtensionDescription';
 
 export interface OcelMetadata {
   id: string;
   name: string;
   created_at: string;
-  extensions: string[];
+  extensions: OCELExtensionDescription[];
 }
