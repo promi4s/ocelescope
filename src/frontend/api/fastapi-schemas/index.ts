@@ -127,6 +127,7 @@ export * from './pluginMethodInputResources';
 export * from './pluginMethodInputSchema';
 export * from './pluginMethodLabel';
 export * from './pluginMethodResultsItem';
+export * from './pluginOutput';
 export * from './pluginTaskSummary';
 export * from './relationCountSummary';
 export * from './renameOcelParams';

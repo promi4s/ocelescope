@@ -69,7 +69,7 @@ def get_plugin_tasks(
 @tasks_router.get(
     "/plugin/{task_id}",
     summary="returns the task of a given taskId",
-    operation_id="getSystemTask",
+    operation_id="getPluginTask",
 )
 def get_plugin_task(session: ApiSession, task_id: str) -> PluginTaskSummary:
     task = session.get_task(task_id)

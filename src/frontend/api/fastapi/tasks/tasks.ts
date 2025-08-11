@@ -144,12 +144,12 @@ export const getGetSystemTaskUrl = (taskId: string,) => {
 
   
 
-  return `http://localhost:8000/tasks/plugin/${taskId}`
+  return `http://localhost:8000/tasks/system/${taskId}`
 }
 
-export const getSystemTask = async (taskId: string, options?: RequestInit): Promise<PluginTaskSummary> => {
+export const getSystemTask = async (taskId: string, options?: RequestInit): Promise<SystemTaskSummary> => {
   
-  return customFetch<PluginTaskSummary>(getGetSystemTaskUrl(taskId),
+  return customFetch<SystemTaskSummary>(getGetSystemTaskUrl(taskId),
   {      
     ...options,
     method: 'GET'
@@ -161,7 +161,7 @@ export const getSystemTask = async (taskId: string, options?: RequestInit): Prom
 
 
 export const getGetSystemTaskQueryKey = (taskId: string,) => {
-    return [`http://localhost:8000/tasks/plugin/${taskId}`] as const;
+    return [`http://localhost:8000/tasks/system/${taskId}`] as const;
     }
 
     
@@ -323,6 +323,101 @@ export function useGetPluginTasks<TData = Awaited<ReturnType<typeof getPluginTas
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetPluginTasksQueryOptions(params,options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+/**
+ * @summary returns the task of a given taskId
+ */
+export const getGetPluginTaskUrl = (taskId: string,) => {
+
+
+  
+
+  return `http://localhost:8000/tasks/plugin/${taskId}`
+}
+
+export const getPluginTask = async (taskId: string, options?: RequestInit): Promise<PluginTaskSummary> => {
+  
+  return customFetch<PluginTaskSummary>(getGetPluginTaskUrl(taskId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+export const getGetPluginTaskQueryKey = (taskId: string,) => {
+    return [`http://localhost:8000/tasks/plugin/${taskId}`] as const;
+    }
+
+    
+export const getGetPluginTaskQueryOptions = <TData = Awaited<ReturnType<typeof getPluginTask>>, TError = HTTPValidationError>(taskId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPluginTask>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPluginTaskQueryKey(taskId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPluginTask>>> = ({ signal }) => getPluginTask(taskId, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(taskId),  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPluginTask>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetPluginTaskQueryResult = NonNullable<Awaited<ReturnType<typeof getPluginTask>>>
+export type GetPluginTaskQueryError = HTTPValidationError
+
+
+export function useGetPluginTask<TData = Awaited<ReturnType<typeof getPluginTask>>, TError = HTTPValidationError>(
+ taskId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPluginTask>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPluginTask>>,
+          TError,
+          Awaited<ReturnType<typeof getPluginTask>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPluginTask<TData = Awaited<ReturnType<typeof getPluginTask>>, TError = HTTPValidationError>(
+ taskId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPluginTask>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPluginTask>>,
+          TError,
+          Awaited<ReturnType<typeof getPluginTask>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPluginTask<TData = Awaited<ReturnType<typeof getPluginTask>>, TError = HTTPValidationError>(
+ taskId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPluginTask>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary returns the task of a given taskId
+ */
+
+export function useGetPluginTask<TData = Awaited<ReturnType<typeof getPluginTask>>, TError = HTTPValidationError>(
+ taskId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPluginTask>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetPluginTaskQueryOptions(taskId,options)
 
   const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

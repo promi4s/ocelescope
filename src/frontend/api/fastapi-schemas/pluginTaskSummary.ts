@@ -5,10 +5,12 @@
  * OpenAPI spec version: 0.1
  */
 import type { TaskState } from './taskState';
+import type { PluginOutput } from './pluginOutput';
 
 export interface PluginTaskSummary {
   id: string;
   state: TaskState;
   plugin_name: string;
   method_name: string;
+  output: PluginOutput;
 }

@@ -9,7 +9,7 @@ from fastapi import FastAPI
 from fastapi.routing import APIRoute, APIRouter
 
 from api.config import config
-from registry.plugin import plugin_registy
+from registry import plugin_registy, extension_registry
 
 
 # Use direct path-based loading for safety
@@ -66,4 +66,5 @@ def register_initial_plugins():
                     module = importlib.util.module_from_spec(spec)
                     sys.modules[module_name] = module
                     spec.loader.exec_module(module)
-                    plugin_registy.register_plugin(module)
+                    plugin_registy.register(module)
+                    extension_registry.register(module)

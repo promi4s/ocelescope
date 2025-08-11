@@ -30,11 +30,6 @@ if TYPE_CHECKING:
 P = ParamSpec("P")
 
 
-class PluginTaskSummary(TaskSummary):
-    plugin_name: str
-    method_name: str
-
-
 class PluginInput(TypedDict):
     ocels: dict[str, str]
     resources: dict[str, str]
@@ -44,6 +39,12 @@ class PluginInput(TypedDict):
 class PluginOutput(BaseModel):
     ocel_ids: list[str] = Field(default=[])
     resource_ids: list[str] = Field(default=[])
+
+
+class PluginTaskSummary(TaskSummary):
+    plugin_name: str
+    method_name: str
+    output: PluginOutput
 
 
 class PluginTask(TaskBase, Generic[P]):
@@ -95,7 +96,7 @@ class PluginTask(TaskBase, Generic[P]):
                     if isinstance(entitiy, OCEL):
                         self.result.ocel_ids.append(self.session.add_ocel(entitiy))
                     if isinstance(entitiy, Resource):
-                        self.result.ocel_ids.append(
+                        self.result.resource_ids.append(
                             self.session.add_resource(
                                 entitiy,
                                 name=f"{self.plugin_name}_{self.method_name}_{item_index}_{entitiy_index}",
@@ -132,6 +133,7 @@ class PluginTask(TaskBase, Generic[P]):
             plugin_name=self.plugin_name,
             method_name=self.method_name,
             state=self.state,
+            output=self.result,
         )
 
     @staticmethod

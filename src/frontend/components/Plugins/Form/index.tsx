@@ -16,12 +16,13 @@ type PluginInputProps = {
 const PluginInput: React.FC<PluginInputProps> = ({
   method,
   name,
-  version,
   onSuccess,
 }) => {
   const { data } = useGetOcels();
 
-  const { mutate: runPlugin } = useRunPlugin();
+  const { mutate: runPlugin } = useRunPlugin({
+    mutation: { onSuccess },
+  });
 
   const defaultValue = Object.fromEntries(
     Object.keys(method.input_ocels ?? {}).map((name) => [name, ""]),

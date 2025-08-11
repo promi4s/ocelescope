@@ -18,7 +18,7 @@ class PluginRegistry:
     def __init__(self):
         self._registry: dict[tuple[str, str], Plugin] = {}
 
-    def register_plugin(self, module: ModuleType) -> Optional[Plugin]:
+    def register(self, module: ModuleType) -> Optional[Plugin]:
         plugin: Optional[type[Plugin]] = None
         for var in vars(module).values():
             if isinstance(var, type) and issubclass(var, Plugin):
