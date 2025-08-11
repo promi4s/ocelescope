@@ -29,12 +29,14 @@ const CurrentOcelMenu: React.FC = () => {
       <Menu.Target>
         <Stack gap={0}>
           <UnstyledButton px={"md"} pt={"md"} className={classes.button}>
-            <Group pos={"relative"}>
+            <Group pos={"relative"} wrap="nowrap">
               <LoadingOverlay visible={!data} />
-              <Stack flex={1} gap={"xs"}>
+              <Stack flex={1} gap={"xs"} miw={0}>
                 {currentOcel ? (
                   <>
-                    <Text size={"sm"}>{currentOcel.name}</Text>
+                    <Text size={"sm"} truncate>
+                      {currentOcel.name}
+                    </Text>
                     <Text size="xs">{currentOcel.created_at}</Text>
                   </>
                 ) : (
