@@ -28,7 +28,7 @@ def get_resources(
             type_label=resource_registry.resources[resource.resource.type].label,
         )
         for resource in session.list_resources()
-        if resource_type is not None or resource.resource.type == resource_type
+        if resource_type is None or resource.resource.type == resource_type
     ]
 
 
