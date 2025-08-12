@@ -5,6 +5,7 @@ from tempfile import NamedTemporaryFile
 from typing import Annotated, Literal, Optional
 
 from ocelescope.ocel.filter import OCELFilter
+from ocelescope.ocel.ocel import OCELFileExtensions
 
 from api.dependencies import ApiOcel, ApiSession
 from api.exceptions import BadRequest, NotFound
@@ -351,12 +352,13 @@ def import_default_ocel(
 @ocels_router.get("/download", summary="Download OCEL including app state")
 def download_ocel(
     ocel: ApiOcel,
-    ext: Optional[Literal[".xml", ".json", ".sqlite"]],
+    ext: OCELFileExtensions,
 ) -> TempFileResponse:
     name = ocel.meta["fileName"]
     tmp_file_prefix = datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + "-" + name
+
     file_response = TempFileResponse(
-        prefix=tmp_file_prefix, suffix=ext, filename=name + (ext or ".sqlite")
+        prefix=tmp_file_prefix, suffix=ext, filename=name + ext
     )
 
     ocel.write_ocel(Path(file_response.tmp_path), ext)

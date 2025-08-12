@@ -280,7 +280,7 @@ const OcelTable = () => {
                           </Menu.Sub.Target>
 
                           <Menu.Sub.Dropdown>
-                            {[".xml", ".sqlite", ".json"].map((ext) => (
+                            {[".xmlocel", ".sqlite", ".jsonocel"].map((ext) => (
                               <Menu.Item
                                 component={"a"}
                                 href={`http://localhost:8000/ocels/download?ext=${ext}&ocel_id=${id}`}

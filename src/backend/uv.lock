@@ -1342,7 +1342,7 @@ wheels = [
 [[package]]
 name = "ocelescope"
 version = "0.1.0"
-source = { git = "https://github.com/grkmr/ocelescope-tools.git#2e35c855314bbe32031e982f31e62e98721c9c92" }
+source = { git = "https://github.com/grkmr/ocelescope-tools.git#19c8d15cb4e6f519a5ca9ee182e30905bdc2e281" }
 dependencies = [
     { name = "cachetools" },
     { name = "networkx" },
