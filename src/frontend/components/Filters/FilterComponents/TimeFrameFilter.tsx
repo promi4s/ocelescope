@@ -5,9 +5,9 @@ import { BarChart } from "@mantine/charts";
 import { DateTimePicker } from "@mantine/dates";
 import dayjs from "dayjs";
 import { EntityTimeInfo } from "@/api/fastapi-schemas";
-import { Controller, useFormContext, useWatch } from "react-hook-form";
-import { OcelInputType } from "@/types/ocel";
-import { FilterFormType } from "..";
+import { Controller, useWatch } from "react-hook-form";
+import { FilterPageComponentProps } from "..";
+import { useDebouncedValue } from "@mantine/hooks";
 
 const TimeGraph: React.FC<{
   timeInfo: EntityTimeInfo;
@@ -65,9 +65,8 @@ const TimeGraph: React.FC<{
   );
 });
 
-const TimeFrameFilter: React.FC<{ ocelParams: OcelInputType }> = memo(
-  ({ ocelParams }) => {
-    const { control } = useFormContext<FilterFormType>();
+const TimeFrameFilter: React.FC<FilterPageComponentProps> = memo(
+  ({ ocelParams, control }) => {
     const { data: timeInfo, isLoading } = useTimeInfo({
       ...ocelParams,
     });
@@ -76,7 +75,7 @@ const TimeFrameFilter: React.FC<{ ocelParams: OcelInputType }> = memo(
 
     const value = useWatch({
       control,
-      name: "time_frame.time_range",
+      name: "time_range.time_range",
     });
 
     const { amountOfDays } = useMemo(() => {
@@ -92,19 +91,33 @@ const TimeFrameFilter: React.FC<{ ocelParams: OcelInputType }> = memo(
       return { amountOfDays };
     }, [timeInfo, eventCount]);
 
+    const [debouncedTimeValue] = useDebouncedValue(
+      {
+        start: value?.[0] ?? timeInfo?.start_time,
+        end: value?.[1] ?? timeInfo?.end_time,
+      },
+      200,
+    );
     return (
       <Box pos={"relative"} w={"100%"} h={"100%"}>
         <LoadingOverlay visible={isLoading} />
         {timeInfo && (
           <Grid justify="center" align="center">
+            <Grid.Col span={12}>
+              <TimeGraph
+                timeInfo={timeInfo}
+                startDate={debouncedTimeValue.start ?? ""}
+                endDate={debouncedTimeValue.end ?? ""}
+              />
+            </Grid.Col>
             <Grid.Col span={3}>
               <Controller
                 control={control}
-                name={"time_frame.time_range.0"}
+                name={"time_range.time_range.0"}
                 render={({ field }) => (
                   <DateTimePicker
                     minDate={timeInfo.start_time}
-                    maxDate={value[1] ?? timeInfo.end_time}
+                    maxDate={value?.[1] ?? timeInfo.end_time}
                     value={field.value ?? timeInfo.start_time}
                     onChange={(newStartDate) =>
                       field.onChange(dayjs(newStartDate).toISOString())
@@ -116,20 +129,20 @@ const TimeFrameFilter: React.FC<{ ocelParams: OcelInputType }> = memo(
             <Grid.Col span={6}>
               <Controller
                 control={control}
-                name={"time_frame.time_range"}
+                name={"time_range.time_range"}
                 render={({ field }) => (
                   <RangeSlider
                     minRange={0}
                     min={0}
                     max={amountOfDays}
                     value={[
-                      field.value[0]
-                        ? dayjs(value[0]).diff(
+                      field.value?.[0]
+                        ? dayjs(value?.[0]).diff(
                             dayjs(timeInfo.start_time),
                             "day",
                           )
                         : 0,
-                      value[1]
+                      value?.[1]
                         ? dayjs(value[1]).diff(
                             dayjs(timeInfo.start_time),
                             "day",
@@ -158,11 +171,11 @@ const TimeFrameFilter: React.FC<{ ocelParams: OcelInputType }> = memo(
             <Grid.Col span={3}>
               <Controller
                 control={control}
-                name={"time_frame.time_range.1"}
+                name={"time_range.time_range.1"}
                 render={({ field }) => {
                   return (
                     <DateTimePicker
-                      minDate={value[0] ?? timeInfo.start_time}
+                      minDate={value?.[0] ?? timeInfo.start_time}
                       maxDate={timeInfo.end_time}
                       value={field.value ?? timeInfo.end_time}
                       onChange={(newEndDate) =>

@@ -111,16 +111,16 @@ def key_decorator_add_ocelwrapper_state_id():
 
     def decorator(key):
         def key_wrapper(self, *args, **kwargs):
-            from ocel.ocel_wrapper import OCELWrapper
+            from ocelescope import OCEL
 
             value = ""
             for arg in args:
-                if isinstance(arg, OCELWrapper):
+                if isinstance(arg, OCEL):
                     value = getattr(arg, "state_id", "")
                     break
             if not value:
                 for v in kwargs.values():
-                    if isinstance(v, OCELWrapper):
+                    if isinstance(v, OCEL):
                         value = getattr(v, "state_id", "")
                         break
             return key(self, value, *args, **kwargs)

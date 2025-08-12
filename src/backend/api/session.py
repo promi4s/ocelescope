@@ -2,18 +2,22 @@ from __future__ import annotations
 
 import json
 import uuid
-from typing import Any, Optional, Type, TypeVar, cast
+from typing import Any, Callable, Hashable, Optional, Type, TypeVar, cast
+
+from api.websocket import websocket_manager, InvalidationRequest
 
 from api.exceptions import NotFound
 from api.model.module import Module
-from api.model.tasks import TaskSummary
-from filters.config_union import FilterConfig
-from ocel.ocel_wrapper import Filtered_Ocel, OCELWrapper
-from outputs.base import Output, OutputBase
-from util.tasks import Task
+from api.model.ocel import Filtered_Ocel
+from ocelescope import OCEL, OCELFilter, Resource as ResourceBase
+from api.model.resource import Resource
+from tasks.base import TaskBase
 
 
 T = TypeVar("T", bound=Module)  # Constrain T to CachableObject
+
+
+S = TypeVar("S", bound=TaskBase)
 
 
 class Session:
@@ -26,15 +30,15 @@ class Session:
         self.id = id or str(uuid.uuid4())
 
         # Tasks
-        self._tasks: dict[str, Task] = {}
-        self._running_tasks: dict[str, Task] = {}
-        self._dedupe_keys: dict[tuple, str] = {}  # dedupe key → task_id
+        self._tasks: dict[str, TaskBase] = {}
+        self._running_tasks: dict[str, TaskBase] = {}
+        self._dedupe_keys: dict[Hashable, str] = {}  # dedupe key → task_id
 
         # Plugins
         self._module_states: dict[str, Module] = {}
 
         # Resources
-        self._outputs: dict[str, Output] = {}
+        self._resources: dict[str, Resource] = {}
 
         # OCELS
         self.ocels: dict[str, Filtered_Ocel] = {}
@@ -58,16 +62,11 @@ class Session:
     def get_task(self, task_id: str):
         return self._tasks.get(task_id, None)
 
-    def list_tasks(self) -> list[TaskSummary]:
+    def list_tasks(self, task_type: Type[S], filter: Callable[[S], bool]):
         return [
-            TaskSummary(
-                key=task.id,
-                name=task.name,
-                state=task.state,
-                result=task.result,
-                metadata=task.metadata,
-            )
+            task.summarize()
             for task in self._tasks.values()
+            if isinstance(task, task_type) and filter(task)
         ]
 
     def get_module_state(self, key: str, cls: Type[T]) -> T:
@@ -89,7 +88,7 @@ class Session:
         self.state = str(uuid.uuid4())
 
     # region OCEL management
-    def add_ocel(self, ocel: OCELWrapper) -> str:
+    def add_ocel(self, ocel: OCEL) -> str:
         self.ocels[ocel.id] = Filtered_Ocel(ocel)
 
         if not self.current_ocel_id:
@@ -99,7 +98,7 @@ class Session:
 
     def get_ocel(
         self, ocel_id: Optional[str] = None, use_original: bool = False
-    ) -> OCELWrapper:
+    ) -> OCEL:
         id = ocel_id if ocel_id is not None else self.current_ocel_id
 
         if id not in self.ocels:
@@ -126,49 +125,58 @@ class Session:
             self.current_ocel_id = None
 
         self.ocels.pop(ocel_id, None)
+        websocket_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
 
-    def get_ocel_filters(self, ocel_id: str) -> list[FilterConfig]:
+    def get_ocel_filters(self, ocel_id: str) -> Optional[OCELFilter]:
         if ocel_id not in self.ocels:
             raise NotFound(f"OCEL with id {ocel_id} not found")
 
-        return self.ocels[ocel_id].filter or []
+        return self.ocels[ocel_id].filter or None
 
-    def filter_ocel(self, ocel_id: str, filters: list[FilterConfig]):
+    def filter_ocel(
+        self, ocel_id: str, filters: Optional[OCELFilter]
+    ) -> Optional[OCELFilter]:
         if ocel_id not in self.ocels:
             raise NotFound(f"OCEL with id {ocel_id} not found")
 
         current_ocel = self.ocels[ocel_id]
-        if len(filters) == 0:
+        if filters is None:
             current_ocel.filtered = None
             current_ocel.filter = None
             return
 
         current_ocel.filtered = current_ocel.original.apply_filter(filters)
         current_ocel.filter = filters
+        websocket_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
 
     # endregion
     # region Output management
-    def add_output(self, output: OutputBase, name: str) -> str:
-        outputWrapper = Output(output=output, name=name)
-        self._outputs[outputWrapper.id] = outputWrapper
+    def add_resource(self, output: ResourceBase, name: str) -> str:
+        outputWrapper = Resource(resource=output, name=name)
+        self._resources[outputWrapper.id] = outputWrapper
+
+        websocket_manager.send_safe(self.id, InvalidationRequest(routes=["resources"]))
+
         return outputWrapper.id
 
-    def get_output(self, id: str) -> Output:
-        if id not in self._outputs:
-            raise NotFound(f"Output with id {id} not found")
-        return self._outputs[id]
+    def get_resource(self, id: str) -> Resource:
+        if id not in self._resources:
+            raise NotFound(f"Resource with id {id} not found")
+        return self._resources[id]
 
-    def delete_output(self, id: str):
-        self._outputs.pop(id, None)
+    def delete_resource(self, id: str):
+        self._resources.pop(id, None)
+        websocket_manager.send_safe(self.id, InvalidationRequest(routes=["resources"]))
 
-    def list_outputs(self) -> list[Output]:
-        return list(self._outputs.values())
+    def list_resources(self) -> list[Resource]:
+        return list(self._resources.values())
 
-    def rename_output(self, output_id: str, new_name: str):
-        if output_id not in self._outputs:
+    def rename_resource(self, output_id: str, new_name: str):
+        if output_id not in self._resources:
             raise NotFound(f"Output with id {output_id} not found")
 
-        self._outputs[output_id].name = new_name
+        self._resources[output_id].name = new_name
+        websocket_manager.send_safe(self.id, InvalidationRequest(routes=["resources"]))
 
     # endregion
     def invalidate_module_states(self):

@@ -5,6 +5,8 @@ services:
     build:
       context: ./src/backend
       dockerfile: Dockerfile  
+      additional_contexts:
+        ocelescope: ./src/ocelescope
     ports:
       - "8000:8000"
     volumes:

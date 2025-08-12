@@ -5,64 +5,84 @@ from typing import Any, Optional
 from fastapi.datastructures import UploadFile
 from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
-from api.dependencies import ApiSession
-from api.exceptions import NotFound
-from plugins import plugin_registry
-from plugins.base import PluginDescription
 from uuid import uuid4
+
+from ocelescope.ocel.ocel import OCEL
+
 from api.config import config
 import tempfile
 import zipfile
 import sys
+from api.dependencies import ApiSession
+
+from api.model.plugin import PluginApi
+
+# TODO: Put this in own util function
+from tasks.base import _call_with_known_params
+from api.model.resource import Resource
+from registry import plugin_registy
+from tasks.plugin import PluginTask
 
 plugin_router = APIRouter(prefix="/plugins", tags=["plugins"])
 
 
 @plugin_router.get("/", operation_id="plugins")
-def list_plugins() -> list[PluginDescription]:
-    return [plugin.describe() for plugin in plugin_registry.all_plugins().values()]
+def get_plugins() -> list[PluginApi]:
+    return plugin_registy.list_plugins()
 
 
-@plugin_router.post("/run/{name}/{version}/{method}", operation_id="runPlugin")
+@plugin_router.post("/{plugin_name}/{method_name}", operation_id="runPlugin")
 def run_plugin(
-    name: str,
-    version: str,
-    method: str,
     input_ocels: dict[str, str],
+    input_resources: dict[str, str],
     session: ApiSession,
-    input: Optional[dict[str, Any]] = None,
+    plugin_name: str,
+    method_name: str,
+    input: dict[str, Any] = {},
 ) -> str:
-    # TODO: Make better task plugin interactions
-    method_map = plugin_registry.get_plugin(name=name, version=version).get_method_map(
-        f"{name}_{version}"
-    )
-    runner = method_map[method]
-    if runner is None:
-        raise NotFound("Plugin mehtod could not be found")
-
-    input_arg = (
-        runner["input_model"](**input)
-        if runner["input_model"] is not None and input is not None
-        else None
+    return PluginTask.create_plugin_task(
+        session,
+        plugin_name=plugin_name,
+        method_name=method_name,
+        input={"input": input, "ocels": input_ocels, "resources": input_resources},
     )
 
-    ocel_kwargs = {a: session.get_ocel(b) for a, b in input_ocels.items()}
-    method_kwargs = {
-        **ocel_kwargs,
-        "session": session,
-        "metadata": {
-            "type": "plugin",
-            "name": name,
-            "version": version,
-            "method": method,
-        },
+
+@plugin_router.post(
+    "/{plugin_name}/{method_name}/computed/{provider}", operation_id="getComputedValues"
+)
+def get_computed(
+    input_ocels: dict[str, Optional[str]],
+    input_resources: dict[str, Optional[str]],
+    input: dict[str, Any],
+    session: ApiSession,
+    plugin_name: str,
+    provider: str,
+    method_name: str,
+) -> list[str]:
+    method = plugin_registy.get_method(plugin_name, method_name)
+    input_class = method._input_model
+    fn = getattr(input_class, provider, None)
+    if fn is None:
+        raise KeyError(f"{method_name}.{provider} not found")
+
+    ocel_args: dict[str, OCEL] = {
+        key: session.get_ocel(ocel_id)
+        for key, ocel_id in input_ocels.items()
+        if ocel_id is not None
     }
-    if input is not None:
-        method_kwargs["input"] = input_arg
+    resource_args: dict[str, Resource] = {
+        key: session.get_resource(resource_id)
+        for key, resource_id in input_resources.items()
+        if resource_id is not None
+    }
 
-    result = runner["method"](**method_kwargs)
+    kwargs = {**ocel_args, **resource_args, "input": input}
 
-    return result
+    try:
+        return _call_with_known_params(fn, **kwargs)
+    except Exception:
+        return []
 
 
 @plugin_router.post("/", operation_id="uploadPlugin")

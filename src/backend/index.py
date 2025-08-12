@@ -5,7 +5,6 @@ from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 from starlette import status
 from starlette.websockets import WebSocket
-import uvicorn
 
 from api.session import Session
 from api.websocket import websocket_manager
@@ -20,12 +19,11 @@ from api.utils import (
 from ocel.default_ocel import (
     load_default_ocels,
 )
-from registrar import register_extensions, register_modules, register_initial_plugins
+from registrar import register_modules, register_initial_plugins
 
 from fastapi import FastAPI
 from routes import routes
 from version import __version__
-from api.logger import LOGGER_CONFIG
 
 """
 In this file, all API routes of the OCEAn application are defined.
@@ -65,7 +63,6 @@ app.middleware("http")(ocel_access_middleware)
 app.exception_handler(Exception)(error_handler_server)
 
 register_modules(app)
-register_extensions()
 register_initial_plugins()
 
 for route in routes:
@@ -103,12 +100,3 @@ def post_init_tasks():
 
 
 post_init_tasks()
-
-if __name__ == "__main__":
-    uvicorn.run(
-        "index:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=False,
-        log_config=LOGGER_CONFIG,
-    )

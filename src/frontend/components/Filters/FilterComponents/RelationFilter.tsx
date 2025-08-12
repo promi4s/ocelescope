@@ -9,32 +9,33 @@ import {
 } from "@mantine/core";
 import { memo, useMemo } from "react";
 import { PlusIcon, X } from "lucide-react";
-import { RelationCountSummary } from "@/api/fastapi-schemas";
-import { FilterFormType, filterTypes } from "..";
+import { OCELFilter, RelationCountSummary } from "@/api/fastapi-schemas";
 import { useE2o, useO2o } from "@/api/fastapi/ocels/ocels";
-import {
-  Control,
-  Controller,
-  useFieldArray,
-  useFormContext,
-  useWatch,
-} from "react-hook-form";
-import { ConfigByType, FilterType } from "@/types/filters";
-import { OcelInputType } from "@/types/ocel";
+import { Control, Controller, useFieldArray, useWatch } from "react-hook-form";
+import { FilterType } from "@/types/filters";
+import { FilterPageComponentProps } from "..";
 
 const RelationFilter: React.FC<{
   soureRelations?: RelationCountSummary[];
   targetRelations?: RelationCountSummary[];
-  control: Control<FilterFormType>;
+  control: Control<OCELFilter>;
+  relationType: Extract<FilterType, "o2o_count" | "e2o_count">;
+
   index: number;
-  fieldName: Extract<FilterType, "e2o_count" | "o2o_count">;
   remove: () => void;
 }> = memo(
-  ({ control, index, soureRelations, targetRelations, fieldName, remove }) => {
+  ({
+    control,
+    index,
+    relationType,
+    soureRelations,
+    targetRelations,
+    remove,
+  }) => {
     const relationConfig = useWatch({
       control: control,
-      name: `${fieldName}.${index}`,
-    }) as ConfigByType<"e2o_count"> | ConfigByType<"o2o_count">;
+      name: `${relationType}.${index}`,
+    });
 
     const { qualifierNames, sourceNames, targetNames, min, max } =
       useMemo(() => {
@@ -47,7 +48,7 @@ const RelationFilter: React.FC<{
           };
         }
         const relations =
-          relationConfig.direction === "target"
+          relationConfig?.direction === "target"
             ? targetRelations.map(({ target, source, ...rest }) => ({
                 source: target,
                 target: source,
@@ -58,10 +59,11 @@ const RelationFilter: React.FC<{
         const filteredRelations = relations.filter(
           ({ source, target, qualifier, max_count, min_count }) =>
             min_count < max_count &&
-            (relationConfig.source == "" || relationConfig.source == source) &&
-            (!relationConfig.qualifier ||
-              relationConfig.qualifier == qualifier) &&
-            (relationConfig.target == "" || relationConfig.target == target),
+            (relationConfig?.source == "" ||
+              relationConfig?.source == source) &&
+            (!relationConfig?.qualifier ||
+              relationConfig?.qualifier == qualifier) &&
+            (relationConfig?.target == "" || relationConfig?.target == target),
         );
 
         const sourceNames = Array.from(
@@ -102,7 +104,7 @@ const RelationFilter: React.FC<{
             <Group>
               <Controller
                 control={control}
-                name={`${fieldName}.${index}.direction`}
+                name={`${relationType}.${index}.direction`}
                 render={({ field }) => (
                   <>
                     <Select
@@ -119,7 +121,7 @@ const RelationFilter: React.FC<{
               />
               <Controller
                 control={control}
-                name={`${fieldName}.${index}.mode`}
+                name={`${relationType}.${index}.mode`}
                 render={({ field }) => (
                   <Select
                     data={[
@@ -141,7 +143,8 @@ const RelationFilter: React.FC<{
         <Grid.Col span={4}>
           <Controller
             control={control}
-            name={`${fieldName}.${index}.source`}
+            name={`${relationType}.${index}.source`}
+            rules={{ required: "Source is required" }}
             render={({ field }) => (
               <Select
                 data={sourceNames}
@@ -159,7 +162,7 @@ const RelationFilter: React.FC<{
         >
           <Controller
             control={control}
-            name={`${fieldName}.${index}.qualifier`}
+            name={`${relationType}.${index}.qualifier`}
             render={({ field }) => (
               <Select
                 data={qualifierNames}
@@ -173,7 +176,8 @@ const RelationFilter: React.FC<{
         <Grid.Col span={4}>
           <Controller
             control={control}
-            name={`${fieldName}.${index}.target`}
+            name={`${relationType}.${index}.target`}
+            rules={{ required: "Target is required" }}
             render={({ field }) => (
               <Select
                 data={targetNames}
@@ -185,10 +189,10 @@ const RelationFilter: React.FC<{
           />
         </Grid.Col>
         <Grid.Col span={12}>
-          {relationConfig.source && relationConfig.target && (
+          {relationConfig?.source && relationConfig?.target && (
             <Controller
               control={control}
-              name={`${fieldName}.${index}.range`}
+              name={`${relationType}.${index}.range`}
               render={({ field }) => (
                 <RangeSlider
                   py={"md"}
@@ -211,8 +215,9 @@ const RelationFilter: React.FC<{
 const filterRelation = (relationSummary: RelationCountSummary) =>
   relationSummary.min_count < relationSummary.max_count;
 
-export const E2OCountFilter: React.FC<{ ocelParams?: OcelInputType }> = ({
+export const E2OCountFilter: React.FC<FilterPageComponentProps> = ({
   ocelParams,
+  control,
 }) => {
   const { data: e2o = [] } = useE2o({
     ...ocelParams,
@@ -224,9 +229,7 @@ export const E2OCountFilter: React.FC<{ ocelParams?: OcelInputType }> = ({
     direction: "target",
   });
 
-  const { control } = useFormContext<FilterFormType>();
-
-  const currentFilters = useWatch({ control, name: "e2o_count" });
+  const currentFilters = useWatch({ control });
 
   // #TODO: Fix allowing duplicate relation filters
   const { filterableE2ORelation, filterableO2ERelation } = useMemo(() => {
@@ -249,8 +252,8 @@ export const E2OCountFilter: React.FC<{ ocelParams?: OcelInputType }> = ({
           <Paper shadow="xs" p="md" key={field.id}>
             <RelationFilter
               control={control}
-              fieldName="e2o_count"
               index={index}
+              relationType={"e2o_count"}
               soureRelations={filterableE2ORelation}
               targetRelations={filterableO2ERelation}
               remove={() => remove(index)}
@@ -259,7 +262,9 @@ export const E2OCountFilter: React.FC<{ ocelParams?: OcelInputType }> = ({
         ))}
 
         <Button
-          onClick={() => append(filterTypes["e2o_count"].defaultValue)}
+          onClick={() =>
+            append({ source: "", target: "", range: [null, null] })
+          }
           leftSection={<PlusIcon height={30} />}
         >
           Add Filter
@@ -268,8 +273,9 @@ export const E2OCountFilter: React.FC<{ ocelParams?: OcelInputType }> = ({
     </>
   );
 };
-export const O2OCountFilter: React.FC<{ ocelParams?: OcelInputType }> = ({
+export const O2OCountFilter: React.FC<FilterPageComponentProps> = ({
   ocelParams,
+  control,
 }) => {
   const { data: o2o = [] } = useO2o({
     ...ocelParams,
@@ -281,9 +287,7 @@ export const O2OCountFilter: React.FC<{ ocelParams?: OcelInputType }> = ({
     direction: "target",
   });
 
-  const { control } = useFormContext<FilterFormType>();
-
-  const currentFilters = useWatch({ control, name: "o2o_count" });
+  const currentFilters = useWatch({ control });
 
   const { filterableO2ORelation, filterableO2OReverseRelation } =
     useMemo(() => {
@@ -309,7 +313,7 @@ export const O2OCountFilter: React.FC<{ ocelParams?: OcelInputType }> = ({
           <Paper shadow="xs" p="md" key={field.id}>
             <RelationFilter
               control={control}
-              fieldName="o2o_count"
+              relationType="o2o_count"
               index={index}
               soureRelations={filterableO2ORelation}
               targetRelations={filterableO2OReverseRelation}
@@ -319,7 +323,9 @@ export const O2OCountFilter: React.FC<{ ocelParams?: OcelInputType }> = ({
         ))}
 
         <Button
-          onClick={() => append(filterTypes["o2o_count"].defaultValue)}
+          onClick={() =>
+            append({ range: [null, null], source: "", target: "" })
+          }
           leftSection={<PlusIcon height={30} />}
         >
           Add Filter

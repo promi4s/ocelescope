@@ -14,6 +14,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   git \
   graphviz \
   && rm -rf /var/lib/apt/lists/*
+
+COPY --from=ocelescope / /ocelescope
+
 # Install the project's dependencies using the lockfile and settings
 RUN --mount=type=cache,target=/root/.cache/uv \
   --mount=type=bind,source=uv.lock,target=uv.lock \

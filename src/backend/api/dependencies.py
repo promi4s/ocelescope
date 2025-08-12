@@ -6,7 +6,7 @@ from fastapi import Depends
 
 from api.exceptions import NotFound
 from api.session import Session
-from ocel.ocel_wrapper import OCELWrapper
+from ocelescope import OCEL
 
 
 from fastapi import Request, HTTPException
@@ -35,4 +35,4 @@ def get_ocel(
         raise HTTPException(status_code=404, detail="OCEL not found")
 
 
-ApiOcel = Annotated[OCELWrapper, Depends(get_ocel)]
+ApiOcel = Annotated[OCEL, Depends(get_ocel)]

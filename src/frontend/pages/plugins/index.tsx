@@ -1,7 +1,14 @@
 import { usePlugins, useUploadPlugin } from "@/api/fastapi/plugins/plugins";
 import FileUploadButton from "@/components/FileUploadButton/FileUploadButton";
-import { Title, Container, ActionIcon, Group, Stack } from "@mantine/core";
-import { Play } from "lucide-react";
+import {
+  Title,
+  Container,
+  ActionIcon,
+  Group,
+  Stack,
+  ThemeIcon,
+} from "@mantine/core";
+import { ChevronDown, ChevronRight, Play } from "lucide-react";
 import { DataTable } from "mantine-datatable";
 import Link from "next/link";
 import { useState } from "react";
@@ -20,12 +27,12 @@ const PluginOverview: React.FC = () => {
           columns={[
             {
               title: "Name",
-              accessor: "metadata.label",
+              accessor: "meta.label",
             },
-            { title: "Description", accessor: "metadata.description" },
+            { title: "Description", accessor: "meta.description" },
             {
               title: "Version",
-              accessor: "metadata.version",
+              accessor: "meta.version",
               textAlign: "center",
             },
             {
@@ -43,13 +50,29 @@ const PluginOverview: React.FC = () => {
               ),
               accessor: "actions",
               width: "0%",
+              textAlign: "right",
+              render: ({ meta }) => (
+                <Group justify="end">
+                  {expandedPlugins.some(
+                    (key) => key === `${meta.name}_${meta.version}`,
+                  ) ? (
+                    <ThemeIcon variant="subtle">
+                      <ChevronDown />
+                    </ThemeIcon>
+                  ) : (
+                    <ThemeIcon variant="subtle">
+                      <ChevronRight />
+                    </ThemeIcon>
+                  )}
+                </Group>
+              ),
             },
           ]}
           records={plugins}
           highlightOnHover
           withTableBorder
           borderRadius={"md"}
-          idAccessor={({ metadata }) => `${metadata.name}_${metadata.version}`}
+          idAccessor={({ meta }) => `${meta.name}_${meta.version}`}
           rowExpansion={{
             allowMultiple: false,
             expanded: {
@@ -73,8 +96,8 @@ const PluginOverview: React.FC = () => {
                           size={"xs"}
                           component={Link}
                           href={{
-                            query: { version: record.metadata.version },
-                            pathname: `plugins/${record.metadata.name}/${name}`,
+                            query: { version: record.meta.version },
+                            pathname: `plugins/${record.meta.name}/${name}`,
                           }}
                           color="green"
                           variant="subtle"
@@ -84,7 +107,7 @@ const PluginOverview: React.FC = () => {
                       ),
                     },
                   ]}
-                  records={Object.values(record.methods)}
+                  records={record.methods}
                 />
               );
             },

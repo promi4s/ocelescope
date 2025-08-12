@@ -1,56 +1,118 @@
 import Form from "@aokiapp/rjsf-mantine-theme";
 import { Box, Button, Group } from "@mantine/core";
 import validator from "@rjsf/validator-ajv8";
-import { useMemo } from "react";
-import { buildOcelUiSchema, wrapFieldsWithContext } from "./Fields";
+import { ComponentProps, useMemo } from "react";
+import { Control, Controller } from "react-hook-form";
+import { PluginInputType } from ".";
+import { getComputedSelect } from "./Fields/custom";
+import { UiSchema } from "@rjsf/utils";
+import { wrapFieldsWithContext } from "./Fields/ocel";
 
 type PluginFormProps = {
   schema: { [key: string]: any };
-  ocelContext: Record<string, string>;
-  onSubmit: (formData: any) => void;
+  control: Control<PluginInputType>;
+  onSubmit: () => void;
+  pluginName: string;
+  methodName: string;
 };
 
+const pluginTemplate: ComponentProps<typeof Form>["templates"] = {
+  ButtonTemplates: {
+    SubmitButton: () => (
+      <Group align="center" justify="center">
+        <Button type="submit" color="green">
+          Run
+        </Button>
+      </Group>
+    ),
+  },
+  ObjectFieldTemplate: ({ properties, description }) => (
+    <Box style={{ padding: 0, border: "none" }}>
+      {description && <p>{description}</p>}
+      {properties.map((prop) => (
+        <Box key={prop.name} mb="sm">
+          {prop.content}
+        </Box>
+      ))}
+    </Box>
+  ),
+};
+
+export function buildOcelUiSchema(
+  schema: { [key: string]: unknown },
+  ui: UiSchema = {},
+  path: string[] = [],
+): UiSchema {
+  if (!schema || typeof schema !== "object") return ui;
+
+  if (schema.type === "object" && schema.properties) {
+    for (const [key, value] of Object.entries(schema.properties)) {
+      const fullPath = [...path, key];
+      const field = value;
+
+      const meta = (field as any)["x-ui-meta"];
+
+      if (meta && meta.type) {
+        let pointer = ui;
+        for (let i = 0; i < fullPath.length - 1; i++) {
+          pointer[fullPath[i]] = pointer[fullPath[i]] || {};
+          pointer = pointer[fullPath[i]] as UiSchema;
+        }
+        pointer[fullPath.at(-1)!] = {
+          "ui:field": meta.field_type ?? meta.type,
+        };
+      }
+
+      if (field.type === "object") {
+        buildOcelUiSchema(field, ui, fullPath);
+      }
+
+      if (field.type === "array" && field.items) {
+        buildOcelUiSchema(field.items, ui, [...fullPath, "items"]);
+      }
+    }
+  }
+
+  return ui;
+}
 const PluginForm: React.FC<PluginFormProps> = ({
   schema,
-  ocelContext,
+  control,
+  pluginName,
+  methodName,
   onSubmit,
 }) => {
-  const rawFields: Record<string, React.FC<any>> = {};
-  const uiSchema = buildOcelUiSchema(schema, {}, [], rawFields);
-  const fields = wrapFieldsWithContext(ocelContext, rawFields);
-  const ocelResetKey = useMemo(
-    () => JSON.stringify(ocelContext),
-    [ocelContext],
+  const uiSchema = useMemo(() => {
+    return buildOcelUiSchema(schema, {}, []);
+  }, [schema]);
+
+  const fields = useMemo(() => wrapFieldsWithContext(control), [control]);
+
+  const computedFields = useMemo(
+    () => getComputedSelect({ methodName, pluginName, control }),
+    [methodName, pluginName],
   );
+
   return (
-    <Form
-      schema={schema}
-      validator={validator}
-      uiSchema={uiSchema}
-      fields={fields}
-      key={ocelResetKey}
-      onSubmit={({ formData }) => onSubmit(formData)}
-      templates={{
-        ButtonTemplates: {
-          SubmitButton: () => (
-            <Group align="center" justify="center">
-              <Button type="submit" color="green">
-                Run
-              </Button>
-            </Group>
-          ),
-        },
-        ObjectFieldTemplate: ({ properties, description }) => (
-          <Box style={{ padding: 0, border: "none" }}>
-            {description && <p>{description}</p>}
-            {properties.map((prop) => (
-              <Box key={prop.name} mb="sm">
-                {prop.content}
-              </Box>
-            ))}
-          </Box>
-        ),
-      }}
+    <Controller
+      control={control}
+      name="input"
+      render={({ field }) => (
+        <>
+          <Form
+            schema={schema}
+            formData={field.value}
+            validator={validator}
+            uiSchema={uiSchema}
+            fields={{ ...fields, ...computedFields }}
+            onChange={(data) => {
+              field.onChange(data.formData);
+            }}
+            onSubmit={onSubmit}
+            templates={pluginTemplate}
+          />
+        </>
+      )}
     />
   );
 };

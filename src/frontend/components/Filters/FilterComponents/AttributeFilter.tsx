@@ -2,13 +2,7 @@ import {
   useEventAttributes,
   useObjectAttributes,
 } from "@/api/fastapi/ocels/ocels";
-import {
-  Control,
-  Controller,
-  useFieldArray,
-  useFormContext,
-  useWatch,
-} from "react-hook-form";
+import { Control, Controller, useFieldArray, useWatch } from "react-hook-form";
 import {
   Button,
   Grid,
@@ -19,23 +13,23 @@ import {
   TextInput,
 } from "@mantine/core";
 import { memo, ReactNode, useMemo } from "react";
-import { FilterType } from "@/types/filters";
 import {
   EventAttributes200,
   EventAttributes200Item,
   ObjectAttributes200,
   ObjectAttributes200Item,
+  OCELFilter,
 } from "@/api/fastapi-schemas";
 import { DatePickerInput } from "@mantine/dates";
-import { OcelInputType } from "@/types/ocel";
-import { FilterFormType, filterTypes } from "..";
 import { XIcon } from "lucide-react";
+import { FilterPageComponentProps } from "..";
+import { FilterType } from "@/types/filters";
 
 type AttributeFilterProps = {
-  control: Control<FilterFormType>;
+  control: Control<OCELFilter>;
   attributes: EventAttributes200 | ObjectAttributes200;
   index: number;
-  attributeField: Extract<FilterType, "event_attribute" | "object_attribute">;
+  attributeType: Extract<FilterType, "event_attributes" | "object_attributes">;
 };
 
 type AttributeTypes = (
@@ -58,16 +52,16 @@ type AttributeTypeInput = (
 const attributeTypeToInput: {
   [K in AttributeTypes]: AttributeTypeInput;
 } = {
-  boolean: ({ index, control, attributeField }) => (
+  boolean: ({ index, control }) => (
     <Grid.Col span={6}>{"Not Implemented"}</Grid.Col>
   ),
-  date: ({ control, index, attribute, attributeField }) => {
+  date: ({ control, index, attribute, attributeType }) => {
     const { min, max } = attribute as AttirbuteByType<"date">;
     return (
       <Grid.Col span={6}>
         <Controller
           control={control}
-          name={`${attributeField}.${index}.time_range`}
+          name={`${attributeType}.${index}.time_range`}
           render={({ field: { onChange, value } }) => (
             <DatePickerInput
               label={"Date Range"}
@@ -82,12 +76,12 @@ const attributeTypeToInput: {
       </Grid.Col>
     );
   },
-  float: ({ attribute, index, control, attributeField }) => {
+  float: ({ attribute, attributeType, index, control }) => {
     const { min, max } = attribute as AttirbuteByType<"float">;
     return (
       <Controller
         control={control}
-        name={`${attributeField}.${index}.number_range`}
+        name={`${attributeType}.${index}.number_range`}
         render={({ field: { onChange, value } }) => (
           <>
             <Grid.Col span={3}>
@@ -113,12 +107,12 @@ const attributeTypeToInput: {
       />
     );
   },
-  integer: ({ attribute, control, index, attributeField }) => {
+  integer: ({ attribute, attributeType, control, index }) => {
     const { min, max } = attribute as AttirbuteByType<"integer">;
     return (
       <Controller
         control={control}
-        name={`${attributeField}.${index}.number_range`}
+        name={`${attributeType}.${index}.number_range`}
         render={({ field: { onChange, value } }) => (
           <>
             <Grid.Col span={3}>
@@ -144,10 +138,10 @@ const attributeTypeToInput: {
       />
     );
   },
-  nominal: ({ index, control, attributeField }) => (
+  nominal: ({ index, attributeType, control }) => (
     <Controller
       control={control}
-      name={`${attributeField}.${index}.regex`}
+      name={`${attributeType}.${index}.regex`}
       render={({ field }) => (
         <Grid.Col span={6}>
           <TextInput
@@ -164,10 +158,10 @@ const attributeTypeToInput: {
 const AttributeFilter: React.FC<AttributeFilterProps> = ({
   attributes,
   control,
+  attributeType,
   index,
-  attributeField,
 }) => {
-  const value = useWatch({ control, name: `${attributeField}.${index}` });
+  const value = useWatch({ control, name: `${attributeType}.${index}` });
 
   const { attributeNames, targetNames, currentAttribute } = useMemo(() => {
     const filteredAttributes = Object.entries(attributes ?? {})
@@ -209,13 +203,14 @@ const AttributeFilter: React.FC<AttributeFilterProps> = ({
       <Grid.Col span={3}>
         <Controller
           control={control}
-          name={`${attributeField}.${index}.target_type`}
+          name={`${attributeType}.${index}.target_type`}
+          rules={{ required: "The target is Required" }}
           render={({ field }) => (
             <Select
               data={targetNames}
               label={"Type"}
               onChange={field.onChange}
-              value={field.value}
+              value={field?.value}
             />
           )}
         />
@@ -223,7 +218,8 @@ const AttributeFilter: React.FC<AttributeFilterProps> = ({
       <Grid.Col span={3}>
         <Controller
           control={control}
-          name={`${attributeField}.${index}.attribute`}
+          name={`${attributeType}.${index}.attribute`}
+          rules={{ required: "The target is Required" }}
           render={({ field }) => (
             <Select
               label={"Attribute Name"}
@@ -237,23 +233,21 @@ const AttributeFilter: React.FC<AttributeFilterProps> = ({
       {currentAttribute &&
         attributeTypeToInput[currentAttribute.type]({
           attribute: currentAttribute,
-          attributeField: value.type,
           control,
+          attributeType,
           index,
         })}
     </Grid>
   );
 };
 
-export const EventAttributeFilter: React.FC<{ ocelParams: OcelInputType }> =
-  memo(({ ocelParams }) => {
+export const EventAttributeFilter: React.FC<FilterPageComponentProps> = memo(
+  ({ ocelParams, control }) => {
     const { data: attributes = {} } = useEventAttributes({ ...ocelParams });
 
-    const { control } = useFormContext<FilterFormType>();
-
     const { fields, append, remove } = useFieldArray({
-      name: "event_attribute",
       control,
+      name: "event_attributes",
     });
 
     return (
@@ -277,31 +271,28 @@ export const EventAttributeFilter: React.FC<{ ocelParams: OcelInputType }> =
               <Grid.Col span={12}>
                 <AttributeFilter
                   key={field.id}
+                  attributeType="event_attributes"
                   control={control}
                   attributes={attributes}
                   index={index}
-                  attributeField="event_attribute"
                 />
               </Grid.Col>
             </Grid>
           </Paper>
         ))}
-        <Button
-          onClick={() => append(filterTypes["event_attribute"].defaultValue)}
-        >
+        <Button onClick={() => append({ attribute: "", target_type: "" })}>
           Add Filter
         </Button>
       </Stack>
     );
-  });
-export const ObjectAttributeFilter: React.FC<{ ocelParams: OcelInputType }> =
-  memo(({ ocelParams }) => {
+  },
+);
+export const ObjectAttributeFilter: React.FC<FilterPageComponentProps> = memo(
+  ({ ocelParams, control }) => {
     const { data: attributes = {} } = useObjectAttributes({ ...ocelParams });
 
-    const { control } = useFormContext<FilterFormType>();
-
     const { fields, append, remove } = useFieldArray({
-      name: "object_attribute",
+      name: "object_attributes",
       control,
     });
 
@@ -326,20 +317,19 @@ export const ObjectAttributeFilter: React.FC<{ ocelParams: OcelInputType }> =
               <Grid.Col span={12}>
                 <AttributeFilter
                   key={field.id}
+                  attributeType="object_attributes"
                   control={control}
                   attributes={attributes}
                   index={index}
-                  attributeField="object_attribute"
                 />
               </Grid.Col>
             </Grid>
           </Paper>
         ))}
-        <Button
-          onClick={() => append(filterTypes["object_attribute"].defaultValue)}
-        >
+        <Button onClick={() => append({ attribute: "", target_type: "" })}>
           Add Filter
         </Button>
       </Stack>
     );
-  });
+  },
+);

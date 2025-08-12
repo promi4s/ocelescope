@@ -6,8 +6,8 @@ from pandas.core.frame import DataFrame
 
 from api.dependencies import ApiOcel, ApiSession
 from api.model.module import Module
-from lib.attributes import get_objects_with_object_changes
-from ocel.ocel_wrapper import OCELWrapper
+from ocelescope.ocel.util.attributes import get_objects_with_object_changes
+from ocelescope import OCEL
 from modules.ocelot.models import PaginatedResponse
 from modules.ocelot.util import (
     get_object_history,
@@ -25,7 +25,7 @@ class State(Module):
     @instance_lru_cache(make_hashable=True)
     def get_sorted_events(
         self,
-        ocel: OCELWrapper,
+        ocel: OCEL,
         activity: str,
         sort_by: Optional[Tuple[str, Literal["asc", "desc"]]] = None,
     ) -> DataFrame:
@@ -42,7 +42,7 @@ class State(Module):
     @instance_lru_cache(make_hashable=True)
     def get_paginated_event_table(
         self,
-        ocel: OCELWrapper,
+        ocel: OCEL,
         activity: str,
         page: int,
         page_size: int,
@@ -75,7 +75,7 @@ class State(Module):
     @instance_lru_cache(make_hashable=True)
     def get_sorted_objects(
         self,
-        ocel: OCELWrapper,
+        ocel: OCEL,
         object_type: str,
         sort_by: Optional[Tuple[str, Literal["asc", "desc"]]] = None,
     ) -> DataFrame:
@@ -97,7 +97,7 @@ class State(Module):
     )
     def get_paginated_object_table(
         self,
-        ocel: OCELWrapper,
+        ocel: OCEL,
         object_type: str,
         page: int,
         page_size: int,

@@ -11,7 +11,7 @@ from api.config import config
 from api.logger import logger
 from api.model.base import ApiBaseModel
 from api.session import Session
-from ocel.ocel_wrapper import OCELWrapper
+from ocelescope import OCEL
 
 OCEL_BASE_PATH = None
 DEFAULT_OCELS: list["DefaultOCEL"] = []
@@ -45,7 +45,7 @@ class DefaultOCEL(ApiBaseModel):
             return None
         return json.load(open(json_path, "r", encoding="utf8"))
 
-    def get_ocel_copy(self, use_abbreviations: bool = False) -> OCELWrapper:
+    def get_ocel_copy(self, use_abbreviations: bool = False) -> OCEL:
         """Reads the OCEL from the given file (if not done yet), and returns a copy of the stored OCEL object."""
         self.load_ocel()
         ocel = getattr(self, "__ocel")
@@ -59,10 +59,8 @@ class DefaultOCEL(ApiBaseModel):
         if hasattr(self, "__ocel"):
             return
         logger.info('Reading OCEL 2.0 "%s" ...', self.name)
-        ocel = OCELWrapper.read_ocel(
-            str(self.path),
-            output=False,
-            version_info=True,
+        ocel = OCEL.read_ocel(
+            self.path,
         )
         object.__setattr__(self, "__ocel", ocel)
 

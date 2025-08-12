@@ -53,6 +53,7 @@ const OcelUpload: React.FC<{ onUpload: () => void }> = ({ onUpload }) => {
           <>
             <Button
               variant="subtle"
+              key={ocel.key}
               p={0}
               onClick={() => importDefaultOcel({ params: { key: ocel.key } })}
               leftSection={<ContainerIcon />}

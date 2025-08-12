@@ -4,13 +4,16 @@ import shutil
 from tempfile import NamedTemporaryFile
 from typing import Annotated, Literal, Optional
 
+from ocelescope.ocel.filter import OCELFilter
+from ocelescope.ocel.ocel import OCELFileExtensions
+
 from api.dependencies import ApiOcel, ApiSession
 from api.exceptions import BadRequest, NotFound
 from api.model.events import Date_Distribution_Item, Entity_Time_Info
-from api.model.ocel import Filter, OcelListResponse, OcelMetadata, UploadingOcelMetadata
+from api.model.ocel import OcelListResponse, OcelMetadata
 from api.model.response import TempFileResponse
-from lib.attributes import AttributeSummary
-from lib.relations import RelationCountSummary
+from ocelescope import AttributeSummary, RelationCountSummary
+
 from ocel.default_ocel import (
     DEFAULT_OCEL_KEYS,
     DefaultOCEL,
@@ -19,9 +22,10 @@ from ocel.default_ocel import (
 )
 from tasks.ocel import import_ocel_task
 from util.constants import SUPPORTED_FILE_TYPES
-from util.tasks import TaskState
 
 from fastapi import APIRouter, File, Query, Response, UploadFile
+
+from registry import extension_registry
 
 ocels_router = APIRouter(prefix="/ocels", tags=["ocels"])
 
@@ -37,7 +41,11 @@ ocels_router = APIRouter(prefix="/ocels", tags=["ocels"])
     ),
     operation_id="getOcels",
 )
-def getOcels(session: ApiSession) -> OcelListResponse:
+def getOcels(
+    session: ApiSession, extension_name: Optional[str] = None
+) -> OcelListResponse:
+    extension_descriptions = extension_registry.get_extension_description()
+
     return OcelListResponse(
         current_ocel_id=session.current_ocel_id,
         ocels=[
@@ -46,19 +54,18 @@ def getOcels(session: ApiSession) -> OcelListResponse:
                 id=key,
                 name=value.original.meta["fileName"],
                 extensions=[
-                    extension.name for extension in value.original.get_extensions_list()
+                    extension_descriptions[extension.__class__.__name__]
+                    for extension in value.original.get_extensions_list()
+                    if extension.__class__.__name__ in extension_descriptions
                 ],
             )
             for key, value in session.ocels.items()
-        ],
-        uploading_ocels=[
-            UploadingOcelMetadata(
-                task_id=task.key,
-                name=task.metadata["file_name"],
-                uploaded_at=task.metadata["upload_date"],
-            )
-            for task in session.list_tasks()
-            if (task.name == "import_ocel_task") & (task.state == TaskState.STARTED)
+            if extension_name is None
+            or extension_name
+            in [
+                extension.__class__.__name__
+                for extension in value.original.get_extensions_list()
+            ]
         ],
     )
 
@@ -213,27 +220,27 @@ def get_object_relations(
 # region Filters
 @ocels_router.get(
     "/filter",
-    response_model=Filter,
     operation_id="getFilters",
 )
-def get_filter(ocel: ApiOcel, session: ApiSession) -> Filter:
-    return Filter(pipeline=session.get_ocel_filters(ocel.id))
+def get_filter(ocel: ApiOcel, session: ApiSession) -> Optional[OCELFilter]:
+    return session.get_ocel_filters(ocel.id)
 
 
 @ocels_router.post(
     "/",
     operation_id="setFilters",
 )
-def set_filter(ocel: ApiOcel, session: ApiSession, filter: Filter):
-    session.filter_ocel(ocel_id=ocel.id, filters=filter.pipeline)
-    return
+def set_filter(
+    ocel: ApiOcel, session: ApiSession, filter: Optional[OCELFilter]
+) -> Optional[OCELFilter]:
+    session.filter_ocel(ocel_id=ocel.id, filters=filter)
+
+    return session.get_ocel_filters(ocel.id)
 
 
 # endregion
 # region Import/Export
-@ocels_router.post(
-    "/import", summary="Import OCEL 2.0 from .sqlite file", operation_id="importOcel"
-)
+@ocels_router.post("/import", summary="Import OCEL 2.0", operation_id="importOcel")
 def import_ocel(
     session: ApiSession,
     response: Response,
@@ -287,8 +294,10 @@ def import_ocel(
         path=tmp_path,
         upload_date=upload_date,
         name=tmp_file_prefix,
-        suffix=suffix,
-        metadata={"file_name": tmp_file_prefix, "upload_date": upload_date.isoformat()},  # type: ignore
+        metadata={
+            "fileName": name,
+            "uploaded_at": datetime.datetime.now().isoformat(),
+        },
     )
 
     response.status_code = 200
@@ -343,15 +352,16 @@ def import_default_ocel(
 @ocels_router.get("/download", summary="Download OCEL including app state")
 def download_ocel(
     ocel: ApiOcel,
-    ext: Optional[Literal[".xml", ".json", ".sqlite"]],
+    ext: OCELFileExtensions,
 ) -> TempFileResponse:
     name = ocel.meta["fileName"]
     tmp_file_prefix = datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + "-" + name
+
     file_response = TempFileResponse(
-        prefix=tmp_file_prefix, suffix=ext, filename=name + (ext or ".sqlite")
+        prefix=tmp_file_prefix, suffix=ext, filename=name + ext
     )
 
-    ocel.write_ocel(file_response.tmp_path, ext)
+    ocel.write_ocel(Path(file_response.tmp_path), ext)
 
     return file_response
 
