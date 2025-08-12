@@ -5,6 +5,10 @@
  * OpenAPI spec version: 0.1
  */
 
+export * from './bodyGetComputedValues';
+export * from './bodyGetComputedValuesInput';
+export * from './bodyGetComputedValuesInputOcels';
+export * from './bodyGetComputedValuesInputResources';
 export * from './bodyImportOcel';
 export * from './bodyRunPlugin';
 export * from './bodyRunPluginInput';

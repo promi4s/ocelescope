@@ -24,6 +24,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  BodyGetComputedValues,
   BodyRunPlugin,
   BodyUploadPlugin,
   HTTPValidationError,
@@ -279,4 +280,122 @@ export const useRunPlugin = <TError = HTTPValidationError,
 
       return useMutation(mutationOptions , queryClient);
     }
+    /**
+ * @summary Get Computed
+ */
+export const getGetComputedValuesUrl = (pluginName: string,
+    methodName: string,
+    provider: string,) => {
+
+
+  
+
+  return `http://localhost:8000/plugins/${pluginName}/${methodName}/computed/${provider}`
+}
+
+export const getComputedValues = async (pluginName: string,
+    methodName: string,
+    provider: string,
+    bodyGetComputedValues: BodyGetComputedValues, options?: RequestInit): Promise<string[]> => {
+  
+  return customFetch<string[]>(getGetComputedValuesUrl(pluginName,methodName,provider),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      bodyGetComputedValues,)
+  }
+);}
+
+
+
+export const getGetComputedValuesQueryKey = (pluginName: string,
+    methodName: string,
+    provider: string,
+    bodyGetComputedValues: BodyGetComputedValues,) => {
+    return [`http://localhost:8000/plugins/${pluginName}/${methodName}/computed/${provider}`, bodyGetComputedValues] as const;
+    }
+
     
+export const getGetComputedValuesQueryOptions = <TData = Awaited<ReturnType<typeof getComputedValues>>, TError = HTTPValidationError>(pluginName: string,
+    methodName: string,
+    provider: string,
+    bodyGetComputedValues: BodyGetComputedValues, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getComputedValues>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetComputedValuesQueryKey(pluginName,methodName,provider,bodyGetComputedValues);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getComputedValues>>> = ({ signal }) => getComputedValues(pluginName,methodName,provider,bodyGetComputedValues, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(pluginName && methodName && provider),  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getComputedValues>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetComputedValuesQueryResult = NonNullable<Awaited<ReturnType<typeof getComputedValues>>>
+export type GetComputedValuesQueryError = HTTPValidationError
+
+
+export function useGetComputedValues<TData = Awaited<ReturnType<typeof getComputedValues>>, TError = HTTPValidationError>(
+ pluginName: string,
+    methodName: string,
+    provider: string,
+    bodyGetComputedValues: BodyGetComputedValues, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getComputedValues>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getComputedValues>>,
+          TError,
+          Awaited<ReturnType<typeof getComputedValues>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetComputedValues<TData = Awaited<ReturnType<typeof getComputedValues>>, TError = HTTPValidationError>(
+ pluginName: string,
+    methodName: string,
+    provider: string,
+    bodyGetComputedValues: BodyGetComputedValues, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getComputedValues>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getComputedValues>>,
+          TError,
+          Awaited<ReturnType<typeof getComputedValues>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetComputedValues<TData = Awaited<ReturnType<typeof getComputedValues>>, TError = HTTPValidationError>(
+ pluginName: string,
+    methodName: string,
+    provider: string,
+    bodyGetComputedValues: BodyGetComputedValues, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getComputedValues>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Computed
+ */
+
+export function useGetComputedValues<TData = Awaited<ReturnType<typeof getComputedValues>>, TError = HTTPValidationError>(
+ pluginName: string,
+    methodName: string,
+    provider: string,
+    bodyGetComputedValues: BodyGetComputedValues, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getComputedValues>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetComputedValuesQueryOptions(pluginName,methodName,provider,bodyGetComputedValues,options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+

@@ -30,10 +30,13 @@ const PluginInput: React.FC<PluginInputProps> = ({
 
   const defaultValue = {
     input_ocels: Object.fromEntries(
-      Object.keys(method.input_ocels ?? {}).map((name) => [name, ""]),
+      Object.keys(method.input_ocels ?? {}).map((name) => [name, undefined]),
     ),
     input_resources: Object.fromEntries(
-      Object.keys(method.input_resources ?? {}).map((name) => [name, ""]),
+      Object.keys(method.input_resources ?? {}).map((name) => [
+        name,
+        undefined,
+      ]),
     ),
     formData: undefined,
   };
@@ -85,14 +88,16 @@ const PluginInput: React.FC<PluginInputProps> = ({
             />
           ),
         )}
+        <PluginForm
+          pluginName={name}
+          methodName={method.name}
+          schema={method.input_schema}
+          control={control}
+          onSubmit={handleSubmit((data) =>
+            runPlugin({ data, methodName: method.name, pluginName: name }),
+          )}
+        />
       </Stack>
-      <PluginForm
-        schema={method.input_schema}
-        control={control}
-        onSubmit={handleSubmit((data) =>
-          runPlugin({ data, methodName: method.name, pluginName: name }),
-        )}
-      />
     </>
   );
 };

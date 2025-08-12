@@ -22,7 +22,7 @@ dependencies = [
 ]
 
 [project.urls]
-Repository = "https://github.com/rwth-pads/ocean"
+Repository = "https://github.com/rwth-pads/ocelescope"
 
 [dependency-groups]
 dev = [
@@ -45,9 +45,6 @@ ocelescope = { git = "https://github.com/grkmr/ocelescope-tools.git" }
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
-
-[tool.pyright]
-exclude = ["drafts", "data"]
 
 [tool.ruff]
 fix = true

@@ -1,11 +1,13 @@
 import importlib.util
 from pathlib import Path
 import shutil
-from typing import Any
+from typing import Any, Optional
 from fastapi.datastructures import UploadFile
 from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
 from uuid import uuid4
+
+from ocelescope.ocel.ocel import OCEL
 
 from api.config import config
 import tempfile
@@ -14,6 +16,10 @@ import sys
 from api.dependencies import ApiSession
 
 from api.model.plugin import PluginApi
+
+# TODO: Put this in own util function
+from tasks.base import _call_with_known_params
+from api.model.resource import Resource
 from registry import plugin_registy
 from tasks.plugin import PluginTask
 
@@ -40,6 +46,43 @@ def run_plugin(
         method_name=method_name,
         input={"input": input, "ocels": input_ocels, "resources": input_resources},
     )
+
+
+@plugin_router.post(
+    "/{plugin_name}/{method_name}/computed/{provider}", operation_id="getComputedValues"
+)
+def get_computed(
+    input_ocels: dict[str, Optional[str]],
+    input_resources: dict[str, Optional[str]],
+    input: dict[str, Any],
+    session: ApiSession,
+    plugin_name: str,
+    provider: str,
+    method_name: str,
+) -> list[str]:
+    method = plugin_registy.get_method(plugin_name, method_name)
+    input_class = method._input_model
+    fn = getattr(input_class, provider, None)
+    if fn is None:
+        raise KeyError(f"{method_name}.{provider} not found")
+
+    ocel_args: dict[str, OCEL] = {
+        key: session.get_ocel(ocel_id)
+        for key, ocel_id in input_ocels.items()
+        if ocel_id is not None
+    }
+    resource_args: dict[str, Resource] = {
+        key: session.get_resource(resource_id)
+        for key, resource_id in input_resources.items()
+        if resource_id is not None
+    }
+
+    kwargs = {**ocel_args, **resource_args, "input": input}
+
+    try:
+        return _call_with_known_params(fn, **kwargs)
+    except Exception:
+        return []
 
 
 @plugin_router.post("/", operation_id="uploadPlugin")

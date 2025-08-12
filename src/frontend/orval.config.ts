@@ -15,6 +15,9 @@ export default defineConfig({
           path: "./api/fetcher.ts",
           name: "customFetch",
         },
+        operations: {
+          getComputedValues: { query: { useQuery: true } },
+        },
         query: {
           options: {
             staleTime: 1000 * 60 * 5,
