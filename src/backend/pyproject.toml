@@ -39,8 +39,7 @@ package = false
 
 [tool.uv.sources]
 dependentspy = { git = "https://github.com/raihensen/dependentspy", branch = "main" }
-ocelescope-tools = { git = "https://github.com/grkmr/ocelescope-tools.git" }
-ocelescope = { git = "https://github.com/grkmr/ocelescope-tools.git" }
+ocelescope = { path = "../ocelescope", editable = true }
 
 [build-system]
 requires = ["hatchling"]

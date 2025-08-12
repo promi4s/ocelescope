@@ -1342,7 +1342,7 @@ wheels = [
 [[package]]
 name = "ocelescope"
 version = "0.1.0"
-source = { git = "https://github.com/grkmr/ocelescope-tools.git#59a25df19555387a0860df89dc29bd780991ea82" }
+source = { editable = "../ocelescope" }
 dependencies = [
     { name = "cachetools" },
     { name = "networkx" },
@@ -1350,6 +1350,23 @@ dependencies = [
     { name = "pandas" },
     { name = "pm4py" },
     { name = "pydantic" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "cachetools", specifier = ">=6.1.0" },
+    { name = "networkx", specifier = ">=3.5" },
+    { name = "numpy", specifier = ">=2.3.2" },
+    { name = "pandas", specifier = ">=2.3.1" },
+    { name = "pm4py", specifier = "~=2.7.15.3" },
+    { name = "pydantic", specifier = ">=2.11.7" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "black", specifier = ">=25.1.0" },
+    { name = "pre-commit", specifier = ">=4.2.0" },
+    { name = "ruff", specifier = ">=0.12.7" },
 ]
 
 [[package]]
@@ -1385,7 +1402,7 @@ requires-dist = [
     { name = "cachetools", specifier = ">=6.1.0" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.112.2" },
     { name = "numpy", specifier = ">=2.3.2" },
-    { name = "ocelescope", git = "https://github.com/grkmr/ocelescope-tools.git" },
+    { name = "ocelescope", editable = "../ocelescope" },
     { name = "pandas", specifier = ">=2.3.1" },
     { name = "pint", specifier = ">=0.23,<0.24" },
     { name = "pm4py", specifier = "~=2.7.15.3" },
