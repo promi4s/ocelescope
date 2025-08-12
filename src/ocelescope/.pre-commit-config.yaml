@@ -1,0 +1,21 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.3.0
+    hooks:
+      - id: check-yaml
+        files: .*\.py$
+      - id: end-of-file-fixer
+        files: .*\.py$
+      - id: trailing-whitespace
+        files: .*\.py$
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Ruff version.
+    rev: v0.11.12
+    hooks:
+      # Run the linter.
+      - id: ruff
+        types_or: [ python, pyi ]
+        args: [ --fix ,--config=pyproject.toml]
+      # Run the formatter.
+      - id: ruff-format
+        types_or: [ python, pyi ]
