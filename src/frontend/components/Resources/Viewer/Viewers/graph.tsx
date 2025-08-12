@@ -6,8 +6,8 @@ import ActionButtons from "@/components/Cytoscape/components/ActionButtons";
 
 const GraphViewer: React.FC<{
   visualization: VisualizationByType<"graph">;
-  interactable?: boolean;
-}> = ({ visualization, interactable }) => {
+  isPreview?: boolean;
+}> = ({ visualization, isPreview }) => {
   const nodes: ElementDefinition[] = visualization.nodes.map((node) => ({
     data: {
       id: node.id,
@@ -45,13 +45,13 @@ const GraphViewer: React.FC<{
   return (
     <Box h={"100%"} w={"100%"} pos={"relative"}>
       <CytoscapeComponent
-        userZoomingEnabled={interactable}
-        userPanningEnabled={interactable}
+        userZoomingEnabled={!isPreview}
+        userPanningEnabled={!isPreview}
         style={{ width: "100%", height: "100%" }}
         elements={[...nodes, ...edges]}
         layout={{ name: "preset" }}
       >
-        {interactable && <ActionButtons />}
+        {!isPreview && <ActionButtons />}
       </CytoscapeComponent>
     </Box>
   );

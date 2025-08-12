@@ -4,6 +4,6 @@
  * OCEAn
  * OpenAPI spec version: 0.1
  */
-import type { Graph } from './graph';
+import type { GetResourceResponseVisualizationAnyOf } from './getResourceResponseVisualizationAnyOf';
 
-export type GetResourceResponseVisualization = Graph | null;
+export type GetResourceResponseVisualization = GetResourceResponseVisualizationAnyOf | null;

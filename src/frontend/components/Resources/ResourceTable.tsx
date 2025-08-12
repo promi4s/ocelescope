@@ -70,7 +70,7 @@ const ResourceTable: React.FC = () => {
                     <Menu.Item
                       leftSection={<Download size={16} />}
                       component={"a"}
-                      href={`http://localhost:8000/outputs/${id}/download`}
+                      href={`http://localhost:8000/resources/${id}/download`}
                     >
                       Download
                     </Menu.Item>

@@ -28,7 +28,7 @@ const ResourceModal: React.FC<{ id?: string; onClose: () => void }> = ({
               <XIcon />
             </ActionIcon>
           </Group>
-          <Box w={"100%"} h={"100%"} flex={1}>
+          <Box w={"100%"} h={"100%"} flex={1} mih={0}>
             <Viewer id={data.resource.id} />
           </Box>
         </Stack>

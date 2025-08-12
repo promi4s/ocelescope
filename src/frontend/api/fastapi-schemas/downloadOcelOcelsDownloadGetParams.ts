@@ -4,9 +4,10 @@
  * OCEAn
  * OpenAPI spec version: 0.1
  */
+import type { DownloadOcelOcelsDownloadGetExt } from './downloadOcelOcelsDownloadGetExt';
 
 export type DownloadOcelOcelsDownloadGetParams = {
-ext: '.xml' | '.json' | '.sqlite' | null;
+ext: DownloadOcelOcelsDownloadGetExt;
 ocel_id?: string | null;
 ocel_version?: 'original' | 'filtered' | null;
 };

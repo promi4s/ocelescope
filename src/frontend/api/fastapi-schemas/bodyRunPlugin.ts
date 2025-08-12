@@ -11,5 +11,5 @@ import type { BodyRunPluginInput } from './bodyRunPluginInput';
 export interface BodyRunPlugin {
   input_ocels: BodyRunPluginInputOcels;
   input_resources: BodyRunPluginInputResources;
-  input: BodyRunPluginInput;
+  input?: BodyRunPluginInput;
 }

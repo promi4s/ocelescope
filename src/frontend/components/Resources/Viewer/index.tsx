@@ -4,24 +4,23 @@ import { ComponentType } from "react";
 import GraphViewer from "./Viewers/graph";
 import { EyeOffIcon } from "lucide-react";
 import { useResource } from "@/api/fastapi/resources/resources";
+import TableView from "./Viewers/table";
 
 type VisualizationProps<T extends VisulizationsTypes> = {
   visualization: VisualizationByType<T>;
-  interactable?: boolean;
+  isPreview?: boolean;
 };
 
-const visulizationMap = {
-  cytoscape: ({}) => <></>,
-  graph: ({ visualization, interactable }) => (
-    <GraphViewer visualization={visualization} interactable={interactable} />
-  ),
-} satisfies {
+const visulizationMap: {
   [T in VisulizationsTypes]: ComponentType<VisualizationProps<T>>;
+} = {
+  table: TableView,
+  graph: GraphViewer,
 };
 
-const Viewer: React.FC<{ id: string; interactable?: boolean }> = ({
+const Viewer: React.FC<{ id: string; isPreview?: boolean }> = ({
   id,
-  interactable = true,
+  isPreview,
 }) => {
   const { data } = useResource(id);
 
@@ -43,9 +42,7 @@ const Viewer: React.FC<{ id: string; interactable?: boolean }> = ({
     VisualizationProps<typeof data.visualization.type>
   >;
 
-  return (
-    <Component visualization={data.visualization} interactable={interactable} />
-  );
+  return <Component visualization={data.visualization} isPreview={isPreview} />;
 };
 
 export default Viewer;
