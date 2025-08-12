@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Iterable, Sequence
 
 import numpy as np
 import pandas as pd
-from pm4py.objects.ocel.obj import PM4PYOCEL
+from pm4py.objects.ocel.obj import OCEL as PM4PYOCEL
 
 if TYPE_CHECKING:
     from ocelescope import OCEL
