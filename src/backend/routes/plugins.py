@@ -35,10 +35,10 @@ def get_plugins() -> list[PluginApi]:
 def run_plugin(
     input_ocels: dict[str, str],
     input_resources: dict[str, str],
-    input: dict[str, Any],
     session: ApiSession,
     plugin_name: str,
     method_name: str,
+    input: dict[str, Any] = {},
 ) -> str:
     return PluginTask.create_plugin_task(
         session,

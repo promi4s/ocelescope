@@ -38,7 +38,7 @@ const PluginInput: React.FC<PluginInputProps> = ({
         undefined,
       ]),
     ),
-    formData: undefined,
+    formData: {},
   };
 
   const { control, handleSubmit } = useForm<PluginInputType>({
