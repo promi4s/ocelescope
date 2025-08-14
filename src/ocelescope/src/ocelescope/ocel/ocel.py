@@ -619,7 +619,7 @@ class OCEL:
         for ext_cls in extensions:
             try:
                 if path.suffix in ext_cls.supported_extensions and ext_cls.has_extension(path):
-                    self._extensions[ext_cls] = ext_cls.import_extension(path)
+                    self._extensions[ext_cls] = ext_cls.import_extension(ocel=self, path=path)
             except Exception:
                 print("failed to load extension")
 

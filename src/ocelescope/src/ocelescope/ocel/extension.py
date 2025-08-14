@@ -1,9 +1,11 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import TypeVar
+from typing import TYPE_CHECKING, TypeVar
 
 from ocelescope.ocel.constants import OCELFileExtensions
 
+if TYPE_CHECKING:
+    from ocelescope.ocel.ocel import OCEL
 
 T = TypeVar("T", bound="OCELExtension")
 
@@ -28,7 +30,7 @@ class OCELExtension(ABC):
 
     @classmethod
     @abstractmethod
-    def import_extension(cls: type[T], path: Path) -> T:
+    def import_extension(cls: type[T], ocel: "OCEL", path: Path) -> T:
         """
         Create the extension by reading from the given path.
         """
