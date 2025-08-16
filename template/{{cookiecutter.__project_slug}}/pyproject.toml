@@ -1,0 +1,46 @@
+[project]
+name = "{{cookiecutter.__package_name}}"
+version = "{{ cookiecutter.first_version }}"
+description = "{{cookiecutter.plugin_description}}"
+readme = "README.md"
+authors = [
+    { name = "{{cookiecutter.author_name}}", email = "{{cookiecutter.email}}" },
+]
+maintainers = [
+    { name = "{{cookiecutter.author_name}}", email = "{{cookiecutter.email}}" },
+]
+license = { text = "MIT" }
+dependencies = ["ocelescope"]
+requires-python = ">=3.12"
+
+[dependency-groups]
+dev = ["black>=25.1.0", "pre-commit>=4.2.0", "ruff>=0.12.7"]
+
+
+[tool.uv.sources]
+ocelescope = { git = "https://github.com/rwth-pads/ocelescope.git", subdirectory = "src/ocelescope" }
+
+[tool.ty]
+# All rules are enabled as "error" by default; no need to specify unless overriding.
+# Example override: relax a rule for the entire project (uncomment if needed).
+# rules.TY015 = "warn"  # For invalid-argument-type, warn instead of error.
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # Pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "UP", # pyupgrade
+]
+
+[tool.uv]
+package = true
+
+[build-system]
+requires = ["uv_build>=0.8.4,<0.9.0"]
+build-backend = "uv_build"
