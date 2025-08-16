@@ -25,7 +25,6 @@ from ocelescope.plugin import (
     PluginInput,
     PluginResult,
     plugin_method,
-    plugin_meta,
 )
 
 __all__ = [
