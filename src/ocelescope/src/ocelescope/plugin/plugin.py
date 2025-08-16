@@ -1,24 +1,33 @@
+from abc import ABC
 import inspect
 from typing import (
+    ClassVar,
     Optional,
 )
 
-
-from ocelescope.plugin.decorators import PluginMeta, PluginMethod
-
-
-# region PluginBase
+from pydantic import BaseModel
 
 
-class Plugin:
+from ocelescope.plugin.decorators import PluginMethod
+
+
+class PluginMeta(BaseModel):
+    name: str
+    version: str
+    label: str
+    description: Optional[str]
+
+
+class Plugin(ABC):
+    version: ClassVar[str]
+    label: ClassVar[str]
+    description: ClassVar[Optional[str]] = None
+
     @classmethod
     def meta(cls):
-        meta: Optional[PluginMeta] = getattr(cls, "__meta__", None)
-
-        if meta is None:
-            return PluginMeta(name=cls.__name__, version="1.0", description="", label=cls.__name__)
-
-        return meta
+        return PluginMeta(
+            name=cls.__name__, version=cls.version, description=cls.description, label=cls.label
+        )
 
     @classmethod
     def method_map(cls) -> dict[str, PluginMethod]:
@@ -32,6 +41,3 @@ class Plugin:
             method_map[method_meta.name] = method_meta
 
         return method_map
-
-
-# endregion

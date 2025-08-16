@@ -21,35 +21,6 @@ from ocelescope.plugin.input import PluginInput
 from ocelescope.resource.resource import Resource
 
 
-# region Plugin Metadata
-class PluginMeta(BaseModel):
-    name: str
-    version: str
-    label: str
-    description: Optional[str]
-
-
-def plugin_meta(
-    name: Optional[str] = None,
-    version: str = "1.0",
-    label: Optional[str] = None,
-    description: Optional[str] = None,
-):
-    def decorator(cls):
-        cls.__meta__ = PluginMeta(
-            name=name or cls.__name__,
-            version=version,
-            label=label or cls.__name__,
-            description=description,
-        )
-        return cls
-
-    return decorator
-
-
-# endregion
-
-
 # region Plugin Method
 class Annotation(BaseModel):
     label: str

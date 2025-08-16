@@ -5,7 +5,7 @@ from ocelescope import (
     EventTypeFilter,
     ObjectTypeFilter,
 )
-from ocelescope.plugin import Plugin, OCELAnnotation, plugin_meta, plugin_method
+from ocelescope.plugin import Plugin, OCELAnnotation, plugin_method
 from ocelescope.resource.default.dfg import DirectlyFollowsGraph
 import pm4py
 
@@ -14,12 +14,11 @@ from prototype_plugins.berti.discovery.dfg import compute_ocdfg
 from .discovery.petri_net import PetriNetInput, convert_flat_pm4py_to_ocpn
 
 
-@plugin_meta(
-    label="Berti Discovery",
-    description="A plugin to discover object-centric process models using the pm4py python library",
-    version="1.0",
-)
 class BertiDiscovery(Plugin):
+    label = "Berti Discovery"
+    description = "A plugin to discover object-centric process models using the pm4py python library"
+    version = "1.0"
+
     @plugin_method(
         label="Discover Petri net", description="Discover a object-centric petri net"
     )

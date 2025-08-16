@@ -5,7 +5,6 @@ from ocelescope import (
     Plugin,
     PluginInput,
     OCELAnnotation,
-    plugin_meta,
     plugin_method,
     COMPUTED_SELECTION,
 )
@@ -23,8 +22,11 @@ class TestInput(PluginInput, frozen=True):
         return ["asdas", "asdoiqoiq", "diqoiq"]
 
 
-@plugin_meta(description="This is a test", label="Quantity Plugin", version="1.0")
 class QuantityPlugin(Plugin):
+    description = "This is a test"
+    label = "Quantity Plugin"
+    version = "1.0"
+
     @plugin_method(label="Test", description="Test this shit")
     def test(
         self,
