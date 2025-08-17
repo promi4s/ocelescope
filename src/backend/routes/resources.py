@@ -87,7 +87,7 @@ def download_output(session: ApiSession, resource_id: str):
 
 class GetResourceResponse(BaseModel):
     resource: ResourceApi
-    visualization: Optional[Visualization]
+    visualization: Visualization | None
 
 
 @resource_router.get(path="/{resource_id}", operation_id="resource")
