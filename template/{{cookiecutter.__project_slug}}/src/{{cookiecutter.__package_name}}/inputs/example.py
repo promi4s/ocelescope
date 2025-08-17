@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from ocelescope import COMPUTED_SELECTION, OCEL_FIELD, PluginInput
-from pm4py import OCEL
+from ocelescope import COMPUTED_SELECTION, OCEL, OCEL_FIELD, PluginInput
 from pydantic import Field
 
 
@@ -43,21 +42,18 @@ class ExampleInput(PluginInput, frozen=True):
 
     @staticmethod
     def computed_input_function(
-        request: Any,
+        input: Any,
         ocel: OCEL,
     ) -> list[str] | None:
         """
         Build the 'computed_input' options based on the selected event_type.
         Returns a list of attribute names or None if event_type is unset/unknown.
         """
-        # Guard: request may not yet have event_type
-        event_type = getattr(request, "event_type", None)
+        event_type = input["event_type"]
         if not event_type:
             return None
 
-        # Safely get attribute summary for the chosen event type
-        summary = getattr(ocel, "event_attribute_summary", {}) or {}
-        attrs_for_type = summary.get(event_type)
+        attrs_for_type = ocel.event_attribute_summary.get(event_type)
         if not attrs_for_type:
             return None
 
