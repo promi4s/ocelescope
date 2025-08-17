@@ -54,5 +54,4 @@ __all__ = [
     "PluginInput",
     "PluginResult",
     "plugin_method",
-    "plugin_meta",
 ]
