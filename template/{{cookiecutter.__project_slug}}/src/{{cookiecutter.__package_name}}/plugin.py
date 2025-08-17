@@ -11,9 +11,7 @@ class {{cookiecutter.__plugin_class_name}}(Plugin):
     description = "{{cookiecutter.plugin_description}}"
     version = "{{cookiecutter.first_version}}"
 
-    @plugin_method(
-        label="Example Method", description="An example plugin method"
-    )
+    @plugin_method(label="Example Method", description="An example plugin method")
     def example(
         self,
         ocel: Annotated[OCEL, OCELAnnotation(label="Event Log")],

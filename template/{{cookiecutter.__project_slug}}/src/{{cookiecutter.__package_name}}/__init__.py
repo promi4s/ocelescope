@@ -7,5 +7,5 @@ __email__ = "{{ cookiecutter.email }}"
 
 __all__ = [
     "{{cookiecutter.__plugin_class_name}}",
-     {% if cookiecutter.include_example_extension|lower == 'y' %}"ExampleExtension",{% endif %}
+    {% if cookiecutter.include_example_extension|lower == 'y' %}"ExampleExtension",{% endif %}
 ]

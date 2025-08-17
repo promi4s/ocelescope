@@ -8,8 +8,7 @@ import zipfile
 from pathlib import Path
 from types import ModuleType
 
-from ocelescope import Plugin, OCELExtension
-
+from ocelescope import OCELExtension, Plugin
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
