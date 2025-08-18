@@ -1,12 +1,11 @@
 {
-  "full_name": "Audrey M. Roy Greenfeld",
-  "email": "audreyfeldroy@example.com",
-  "github_username": "audreyfeldroy",
-  "pypi_package_name": "python-boilerplate",
-  "project_name": "Python Boilerplate",
-  "project_slug": "{{ cookiecutter.pypi_package_name.replace('-', '_') }}",
-  "project_short_description": "Python Boilerplate contains all the boilerplate you need to create a Python package.",
-  "pypi_username": "{{ cookiecutter.github_username }}",
-  "first_version": "0.1.0",
-  "__gh_slug": "{{ cookiecutter.github_username }}/{{ cookiecutter.project_slug }}"
+	"author_name": "Dr. Data Scientisimy",
+	"email": "example@example.com",
+	"plugin_name": "Example Plugin Name",
+	"plugin_description": "A ocelescope plugin",
+	"first_version": "0.1.0",
+	"include_example_extension": "y",
+	"__project_slug": "{{ cookiecutter.plugin_name | lower | replace(' ', '-') | replace('_', '-') }}",
+	"__package_name": "{{ cookiecutter.plugin_name | lower | replace(' ', '_') | replace('-', '_') }}",
+	"__plugin_class_name": "{{ cookiecutter.plugin_name | replace('-', ' ') | replace('_', ' ') | title | replace(' ', '') }}"
 }

@@ -21,6 +21,7 @@ from api.model.plugin import PluginApi
 from tasks.base import _call_with_known_params
 from api.model.resource import Resource
 from registry import plugin_registy
+from registry import extension_registry
 from tasks.plugin import PluginTask
 
 plugin_router = APIRouter(prefix="/plugins", tags=["plugins"])
@@ -129,6 +130,8 @@ def upload_plugin(
                 module = importlib.util.module_from_spec(spec)
                 sys.modules[module_name] = module
                 spec.loader.exec_module(module)
+                plugin_registy.register(module)
+                extension_registry.register(module)
                 return {"status": "success", "module": module_name}
 
     shutil.rmtree(plugin_dir, ignore_errors=True)

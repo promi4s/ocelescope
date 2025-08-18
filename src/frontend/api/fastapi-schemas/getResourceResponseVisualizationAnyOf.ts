@@ -6,5 +6,6 @@
  */
 import type { Graph } from './graph';
 import type { Table } from './table';
+import type { SVGVis } from './sVGVis';
 
-export type GetResourceResponseVisualizationAnyOf = Graph | Table;
+export type GetResourceResponseVisualizationAnyOf = Graph | Table | SVGVis;

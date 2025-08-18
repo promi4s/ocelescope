@@ -5,8 +5,9 @@ import GraphViewer from "./Viewers/graph";
 import { EyeOffIcon } from "lucide-react";
 import { useResource } from "@/api/fastapi/resources/resources";
 import TableView from "./Viewers/table";
+import SvgViewer from "./Viewers/svg";
 
-type VisualizationProps<T extends VisulizationsTypes> = {
+export type VisualizationProps<T extends VisulizationsTypes> = {
   visualization: VisualizationByType<T>;
   isPreview?: boolean;
 };
@@ -15,6 +16,7 @@ const visulizationMap: {
   [T in VisulizationsTypes]: ComponentType<VisualizationProps<T>>;
 } = {
   table: TableView,
+  svg: SvgViewer,
   graph: GraphViewer,
 };
 
