@@ -146,6 +146,7 @@ export * from './resourceApi';
 export * from './resourceResult';
 export * from './resourceResultAnnotation';
 export * from './resourcesParams';
+export * from './sVGVis';
 export * from './setCurrentOcelParams';
 export * from './setFilters200';
 export * from './setFiltersBody';
