@@ -1,4 +1,8 @@
-import { usePlugins, useUploadPlugin } from "@/api/fastapi/plugins/plugins";
+import {
+  useDeletePlugin,
+  usePlugins,
+  useUploadPlugin,
+} from "@/api/fastapi/plugins/plugins";
 import FileUploadButton from "@/components/FileUploadButton/FileUploadButton";
 import {
   Title,
@@ -7,8 +11,9 @@ import {
   Group,
   Stack,
   ThemeIcon,
+  LoadingOverlay,
 } from "@mantine/core";
-import { ChevronDown, ChevronRight, Play } from "lucide-react";
+import { ChevronDown, ChevronRight, Play, Trash2Icon } from "lucide-react";
 import { DataTable } from "mantine-datatable";
 import Link from "next/link";
 import { useState } from "react";
@@ -16,14 +21,18 @@ import { useState } from "react";
 const PluginOverview: React.FC = () => {
   const { data: plugins } = usePlugins();
 
+  const { mutate: deletePlugin, isPending } = useDeletePlugin();
   const { mutate: uploadPlugin } = useUploadPlugin();
+
   const [expandedPlugins, setExpandedPlugins] = useState<string[]>([]);
 
   return (
-    <Container>
-      <Stack gap={0}>
+    <Container pos={"relative"} h={"100%"}>
+      <LoadingOverlay visible={isPending} />
+      <Stack gap={0} h={"100%"}>
         <Title size={"h3"}> Plugins</Title>
         <DataTable
+          flex={1}
           columns={[
             {
               title: "Name",
@@ -39,7 +48,7 @@ const PluginOverview: React.FC = () => {
               title: (
                 <Group align="center" justify="end">
                   <FileUploadButton
-                    validTypes="application/json"
+                    validTypes=".zip,application/zip,application/x-zip-compressed"
                     onFileUpload={(file) => {
                       if (file != null) {
                         uploadPlugin({ data: { file: file } });
@@ -51,8 +60,15 @@ const PluginOverview: React.FC = () => {
               accessor: "actions",
               width: "0%",
               textAlign: "right",
-              render: ({ meta }) => (
-                <Group justify="end">
+              render: ({ module_id, meta }) => (
+                <Group justify="end" gap={"xs"}>
+                  <ActionIcon
+                    color="red"
+                    variant="subtle"
+                    onClick={() => deletePlugin({ moduleId: module_id })}
+                  >
+                    <Trash2Icon size={16} />
+                  </ActionIcon>
                   {expandedPlugins.some(
                     (key) => key === `${meta.name}_${meta.version}`,
                   ) ? (
@@ -89,7 +105,7 @@ const PluginOverview: React.FC = () => {
                     {
                       accessor: "actions",
                       title: "",
-                      width: "0%", // 👈 set width to 0%
+                      width: "0%",
                       textAlign: "right",
                       render: ({ name }) => (
                         <ActionIcon

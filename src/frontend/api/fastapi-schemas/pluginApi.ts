@@ -8,6 +8,7 @@ import type { PluginMeta } from './pluginMeta';
 import type { PluginMethod } from './pluginMethod';
 
 export interface PluginApi {
+  module_id: string;
   meta: PluginMeta;
   methods: PluginMethod[];
 }

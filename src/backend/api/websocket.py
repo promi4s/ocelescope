@@ -37,7 +37,7 @@ class SytemNotificiation(BaseModel):
 
 class InvalidationRequest(BaseModel):
     type: Literal["invalidation"] = "invalidation"
-    routes: list[Literal["resources", "ocels", "tasks"]]
+    routes: list[Literal["resources", "ocels", "tasks", "plugins"]]
 
 
 WebsocketMessage = Annotated[

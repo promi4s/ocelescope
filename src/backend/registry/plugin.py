@@ -33,8 +33,12 @@ class PluginRegistry:
 
     def list_plugins(self) -> list[PluginApi]:
         return [
-            PluginApi(meta=plugin.meta(), methods=list(plugin.method_map().values()))
-            for plugin in self._registry.values()
+            PluginApi(
+                module_id=key[0],
+                meta=plugin.meta(),
+                methods=list(plugin.method_map().values()),
+            )
+            for key, plugin in self._registry.items()
         ]
 
     def get_plugin(self, name: str) -> Optional[Plugin]:
@@ -68,12 +72,12 @@ class PluginRegistry:
             None,
         )
 
-    def unload_module(self, module_name: str) -> list[str]:
-        keys_to_remove = [key for key in self._registry if key[1] == module_name]
+    def unload_module(self, module: ModuleType) -> list[str]:
+        keys_to_remove = [key for key in self._registry if key[0] == module.__name__]
         for key in keys_to_remove:
             self._registry.pop(key)
 
         return [name for (name, _) in keys_to_remove]
 
 
-plugin_registy = PluginRegistry()
+plugin_registry = PluginRegistry()

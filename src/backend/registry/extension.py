@@ -12,12 +12,12 @@ class OCELExtensionDescription(BaseModel):
 
 class ExtensionRegistry:
     def __init__(self):
-        self._registry: dict[str, type[OCELExtension]] = {}
+        self._registry: dict[tuple[str, str], type[OCELExtension]] = {}
 
     def register(self, module: ModuleType):
         for var in vars(module).values():
             if isinstance(var, type) and issubclass(var, OCELExtension):
-                self._registry[var.__name__] = var
+                self._registry[(module.__name__, var.__name__)] = var
 
     def get_loaded_extensions(
         self, file_format: Optional[Literal[".sqlite", ".xmlocel", ".jsonocel"]] = None
@@ -33,8 +33,15 @@ class ExtensionRegistry:
             key: OCELExtensionDescription(
                 name=key, label=value.name, description=value.description
             )
-            for key, value in self._registry.items()
+            for (_, key), value in self._registry.items()
         }
+
+    def unload_module(self, module: ModuleType) -> list[str]:
+        keys_to_remove = [key for key in self._registry if key[0] == module.__name__]
+        for key in keys_to_remove:
+            self._registry.pop(key)
+
+        return [name for (name, _) in keys_to_remove]
 
 
 extension_registry = ExtensionRegistry()

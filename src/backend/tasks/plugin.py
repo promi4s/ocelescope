@@ -20,7 +20,7 @@ from api.websocket import (
     websocket_manager,
 )
 
-from registry.plugin import plugin_registy
+from registry.plugin import plugin_registry
 
 from tasks.base import TaskBase, TaskState, make_hashable
 
@@ -63,7 +63,7 @@ class PluginTask(TaskBase, Generic[P]):
     def run(self):
         self.state = TaskState.STARTED
         try:
-            method = plugin_registy.get_method(self.plugin_name, self.method_name)
+            method = plugin_registry.get_method(self.plugin_name, self.method_name)
 
             ocel_args: dict[str, OCEL] = {
                 key: self.session.get_ocel(self.input["ocels"][key])

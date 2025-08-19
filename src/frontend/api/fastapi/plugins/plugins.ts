@@ -399,3 +399,74 @@ export function useGetComputedValues<TData = Awaited<ReturnType<typeof getComput
 
 
 
+/**
+ * @summary Delete Plugin
+ */
+export const getDeletePluginUrl = (moduleId: string,) => {
+
+
+  
+
+  return `http://localhost:8000/plugins/${moduleId}`
+}
+
+export const deletePlugin = async (moduleId: string, options?: RequestInit): Promise<unknown> => {
+  
+  return customFetch<unknown>(getDeletePluginUrl(moduleId),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
+
+
+export const getDeletePluginMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deletePlugin>>, TError,{moduleId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deletePlugin>>, TError,{moduleId: string}, TContext> => {
+
+const mutationKey = ['deletePlugin'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deletePlugin>>, {moduleId: string}> = (props) => {
+          const {moduleId} = props ?? {};
+
+          return  deletePlugin(moduleId,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeletePluginMutationResult = NonNullable<Awaited<ReturnType<typeof deletePlugin>>>
+    
+    export type DeletePluginMutationError = HTTPValidationError
+
+    /**
+ * @summary Delete Plugin
+ */
+export const useDeletePlugin = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deletePlugin>>, TError,{moduleId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deletePlugin>>,
+        TError,
+        {moduleId: string},
+        TContext
+      > => {
+
+      const mutationOptions = getDeletePluginMutationOptions(options);
+
+      return useMutation(mutationOptions , queryClient);
+    }
+    
