@@ -30,7 +30,12 @@ const GraphViewer: React.FC<{
   }));
 
   const edges: ElementDefinition[] = visualization.edges.map((edge, index) => ({
-    data: { id: index.toString(), source: edge.source, target: edge.target },
+    data: {
+      id: index.toString(),
+      source: edge.source,
+      target: edge.target,
+      label: edge.label ?? "",
+    },
     css: {
       "line-color": edge.color ?? "#ccc",
       "target-arrow-shape": edge.arrows[1] ?? undefined,
@@ -39,6 +44,9 @@ const GraphViewer: React.FC<{
       "source-arrow-color": edge.color ?? "#ccc",
       "arrow-scale": 1.5,
       "curve-style": "bezier", // ensures arrows are visible at ends
+      label: edge.label ?? "",
+      "text-rotation": "autorotate", // rotate label along edge
+      "font-size": 12,
     },
   }));
 
