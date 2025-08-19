@@ -46,7 +46,6 @@ const ActionButtons: React.FC<{
           onClick={
             context &&
             (() => {
-              console.log(context.cy.current);
               if (context.cy.current) context.cy.current.fit();
             })
           }
