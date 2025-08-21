@@ -7,10 +7,10 @@ services:
       dockerfile: Dockerfile  
       additional_contexts:
         ocelescope: ./src/ocelescope
+        data: ./data
     ports:
       - "8000:8000"
     volumes:
-      - ./data:/app/data
       - plugins_store:/plugins
     environment:
       - DATA_DIR=/app/data

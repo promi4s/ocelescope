@@ -26,6 +26,8 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # Then, add the rest of the project source code and install it
 # Installing separately from its dependencies allows optimal layer caching
 COPY . /app
+COPY --from=data / /app/data
+
 RUN --mount=type=cache,target=/root/.cache/uv \
   uv sync --locked --no-dev
 

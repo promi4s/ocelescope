@@ -25,7 +25,7 @@ class OceanConfig(BaseSettings):
     )
 
     DATA_DIR: Optional[DirectoryPath] = Field(
-        default=None,
+        default="/app/data",
         description="Path to the data directory, relative to `main.py`",
     )
 
