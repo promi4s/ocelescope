@@ -24,16 +24,17 @@ class OceanConfig(BaseSettings):
         description="When set to True, passes details of internal errors via the API. Always set to False in production environment.",
     )
 
-    DATA_DIR: Optional[DirectoryPath] = Field(
+    DATA_DIR: DirectoryPath | None = Field(
         default="/app/data",
         description="Path to the data directory, relative to `main.py`",
     )
 
-    PLUGIN_DIR: DirectoryPath = Field(
-        description="Path to the directory, where plugins are stored"
+    PLUGIN_DIR: DirectoryPath | None = Field(
+        default="/plugins",
+        description="Path to the directory, where plugins are stored",
     )
 
-    MODE: Optional[Literal["production", "development"]] = Field(
+    MODE: Literal["production", "development"] | None = Field(
         default="development", description="The mode in which the backend is running"
     )
 
