@@ -25,6 +25,21 @@ EdgeArrow = Optional[
 
 
 class GraphNode(BaseModel):
+    """[TODO:description]
+
+    Attributes:
+        id: [TODO:attribute]
+        label: [TODO:attribute]
+        shape: [TODO:attribute]
+        width: [TODO:attribute]
+        height: [TODO:attribute]
+        color: [TODO:attribute]
+        x: [TODO:attribute]
+        y: [TODO:attribute]
+        border_color: [TODO:attribute]
+        label_pos: [TODO:attribute]
+    """
+
     id: str
     label: Optional[str] = None
     shape: GraphShapes
