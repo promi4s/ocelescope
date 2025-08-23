@@ -1,16 +1,13 @@
 import importlib
-import importlib.util
 import os
 from pathlib import Path
 import pkgutil
-import sys
 
 from fastapi import FastAPI
 from fastapi.routing import APIRoute, APIRouter
 
 from api.config import config
-from registry.plugin import plugin_registry
-from registry.extension import extension_registry
+from registry import registry_manager
 
 
 # Use direct path-based loading for safety
@@ -55,39 +52,8 @@ def register_initial_plugins():
     if not base.exists():
         return
 
-    for module_dir in base.iterdir():
-        if not module_dir.is_dir():
-            continue
+    plugin_ids = [
+        module_dir.name for module_dir in base.iterdir() if module_dir.is_dir()
+    ]
 
-        module_name = module_dir.name  # same as during upload (uuid hex)
-
-        # Find the first direct child that is a package (contains __init__.py)
-        pkg_dir = None
-        for child in module_dir.iterdir():
-            if child.is_dir() and (child / "__init__.py").exists():
-                pkg_dir = child
-                break
-
-        if not pkg_dir:
-            # nothing to load; skip this folder
-            continue
-
-        try:
-            plugin_module_path = pkg_dir / "__init__.py"
-            spec = importlib.util.spec_from_file_location(
-                module_name, plugin_module_path
-            )
-            if not spec or not spec.loader:
-                print(f"[PLUGIN] No loader for {plugin_module_path}")
-                continue
-
-            module = importlib.util.module_from_spec(spec)
-            sys.modules[module_name] = module
-            spec.loader.exec_module(module)
-
-            plugin_registry.register(module)  # ensure spelling: plugin_registry
-            extension_registry.register(module)
-
-            print(f"[PLUGIN] Loaded {module_name} from {plugin_module_path}")
-        except Exception as e:
-            print(f"[PLUGIN] Failed to load {module_name}: {e}")
+    registry_manager.load_plugins(plugin_ids)

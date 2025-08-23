@@ -3,6 +3,6 @@ from ocelescope.plugin import PluginMeta, PluginMethod
 
 
 class PluginApi(BaseModel):
-    module_id: str
+    id: str
     meta: PluginMeta
     methods: list[PluginMethod]

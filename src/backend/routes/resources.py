@@ -12,8 +12,8 @@ from pydantic.main import BaseModel
 from starlette.responses import StreamingResponse
 from api.dependencies import ApiSession
 
-from registry import resource_registry
-from api.model.resource import ResourceApi
+from api.model.resource import ResourceApi, ResourceStore
+from registry import registry_manager
 
 resource_router = APIRouter(prefix="/resources", tags=["resources"])
 
@@ -23,12 +23,9 @@ def get_resources(
     session: ApiSession, resource_type: Optional[str] = None
 ) -> list[ResourceApi]:
     return [
-        ResourceApi(
-            **resource.model_dump(),
-            type_label=resource_registry.resources[resource.resource.type].label,
-        )
+        resource
         for resource in session.list_resources()
-        if resource_type is None or resource.resource.type == resource_type
+        if resource_type is None or resource.type == resource_type
     ]
 
 
@@ -40,32 +37,12 @@ async def upload_resource(file: UploadFile, session: ApiSession):
     try:
         contents = await file.read()
         data = json.loads(contents)
-    except json.JSONDecodeError:
+        resource = ResourceStore(**data)
+    except Exception:
         raise HTTPException(status_code=400, detail="Invalid JSON file.")
 
-    # Extract the 'type' field to determine the model
-    resource_type = data.get("type")
-    if not resource_type:
-        raise HTTPException(status_code=400, detail="Missing 'type' field in JSON.")
-
-    # Check if the type is registered
-    if resource_type not in resource_registry.resources:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Resource type '{resource_type}' is not registered.",
-        )
-
-    # Get the model class and validate
-    model_cls = resource_registry.resources[resource_type].model_cls
-
-    try:
-        validated_instance = model_cls.model_validate(data)
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Validation failed: {str(e)}")
-
     session.add_resource(
-        validated_instance,
-        name=f"{file.filename}",  # type: ignore
+        resource,
     )
 
 
@@ -74,9 +51,7 @@ def download_output(session: ApiSession, resource_id: str):
     resource = session.get_resource(id=resource_id)
 
     # Convert to JSON and wrap in a BytesIO stream
-    json_bytes = io.BytesIO(
-        json.dumps(resource.resource.model_dump(), indent=2).encode("utf-8")
-    )
+    json_bytes = io.BytesIO(json.dumps(resource.model_dump(), indent=2).encode("utf-8"))
 
     return StreamingResponse(
         content=json_bytes,
@@ -94,12 +69,16 @@ class GetResourceResponse(BaseModel):
 def get_resource(session: ApiSession, resource_id: str) -> GetResourceResponse:
     resource = session.get_resource(resource_id)
 
+    resource_instance = registry_manager.get_resource_instance(resource)
+
     return GetResourceResponse(
         resource=ResourceApi(
+            id=resource_id,
             **resource.model_dump(),
-            type_label=resource_registry.resources[resource.resource.type].label,
         ),
-        visualization=resource.resource.visualize(),
+        visualization=resource_instance.visualize()
+        if resource_instance is not None
+        else None,
     )
 
 

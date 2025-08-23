@@ -1,6 +1,4 @@
-from typing import Literal
 from pydantic import BaseModel
-
 
 from ocelescope.resource.resource import Resource
 
@@ -20,7 +18,9 @@ class ObjectActivityEdge(BaseModel):
 
 
 class DirectlyFollowsGraph(Resource):
-    type: Literal["ocdfg"] = "ocdfg"
+    label = "Directly Follows Graph"
+    description = "A object-centric directly follows graph"
+
     object_types: list[str]
     activities: list[str]
     edges: list[Edge]

@@ -60,18 +60,16 @@ const PluginOverview: React.FC = () => {
               accessor: "actions",
               width: "0%",
               textAlign: "right",
-              render: ({ module_id, meta }) => (
+              render: ({ id, meta }) => (
                 <Group justify="end" gap={"xs"}>
                   <ActionIcon
                     color="red"
                     variant="subtle"
-                    onClick={() => deletePlugin({ moduleId: module_id })}
+                    onClick={() => deletePlugin({ pluginId: id })}
                   >
                     <Trash2Icon size={16} />
                   </ActionIcon>
-                  {expandedPlugins.some(
-                    (key) => key === `${meta.name}_${meta.version}`,
-                  ) ? (
+                  {expandedPlugins.some((pluginId) => pluginId === id) ? (
                     <ThemeIcon variant="subtle">
                       <ChevronDown />
                     </ThemeIcon>
@@ -88,7 +86,6 @@ const PluginOverview: React.FC = () => {
           highlightOnHover
           withTableBorder
           borderRadius={"md"}
-          idAccessor={({ meta }) => `${meta.name}_${meta.version}`}
           rowExpansion={{
             allowMultiple: false,
             expanded: {
@@ -112,8 +109,7 @@ const PluginOverview: React.FC = () => {
                           size={"xs"}
                           component={Link}
                           href={{
-                            query: { version: record.meta.version },
-                            pathname: `plugins/${record.meta.name}/${name}`,
+                            pathname: `plugins/${record.id}/${name}`,
                           }}
                           color="green"
                           variant="subtle"

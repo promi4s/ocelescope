@@ -12,7 +12,7 @@ type PluginFormProps = {
   schema: { [key: string]: any };
   control: Control<PluginInputType>;
   onSubmit: () => void;
-  pluginName: string;
+  pluginId: string;
   methodName: string;
 };
 
@@ -78,7 +78,7 @@ export function buildOcelUiSchema(
 const PluginForm: React.FC<PluginFormProps> = ({
   schema,
   control,
-  pluginName,
+  pluginId,
   methodName,
   onSubmit,
 }) => {
@@ -89,8 +89,8 @@ const PluginForm: React.FC<PluginFormProps> = ({
   const fields = useMemo(() => wrapFieldsWithContext(control), [control]);
 
   const computedFields = useMemo(
-    () => getComputedSelect({ methodName, pluginName, control }),
-    [methodName, pluginName],
+    () => getComputedSelect({ methodName, pluginId, control }),
+    [methodName, pluginId],
   );
 
   return (

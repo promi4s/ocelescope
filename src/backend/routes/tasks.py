@@ -49,13 +49,13 @@ def get_system_task(session: ApiSession, task_id: str) -> SystemTaskSummary:
 )
 def get_plugin_tasks(
     session: ApiSession,
-    plugin_name: Optional[str],
+    plugin_id: Optional[str],
     method_name: Optional[str],
     only_running: bool = True,
 ) -> list[PluginTaskSummary]:
     def filter_tasks(task: PluginTask):
         return (
-            (plugin_name is None or task.plugin_name == plugin_name)
+            (plugin_id is None or task.plugin_id == plugin_id)
             and (method_name is None or task.method_name == method_name)
             and (not only_running or task.state == TaskState.STARTED)
         )

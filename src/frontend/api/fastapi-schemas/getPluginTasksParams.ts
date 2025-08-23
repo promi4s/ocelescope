@@ -6,7 +6,7 @@
  */
 
 export type GetPluginTasksParams = {
-plugin_name: string | null;
+plugin_id: string | null;
 method_name: string | null;
 only_running?: boolean;
 };

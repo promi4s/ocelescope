@@ -7,14 +7,14 @@ import { keepPreviousData } from "@tanstack/react-query";
 import { MultiSelect, Select } from "@mantine/core";
 
 type useSelectOptionsProps = {
-  pluginName: string;
+  pluginId: string;
   methodName: string;
   provider: string;
   control: Control<PluginInputType>;
 };
 
 export const useSelectOptions = ({
-  pluginName,
+  pluginId,
   methodName,
   provider,
   control,
@@ -23,7 +23,7 @@ export const useSelectOptions = ({
   const formValues = useWatch({ control });
 
   const { data } = useGetComputedValues(
-    pluginName,
+    pluginId,
     methodName,
     provider,
     {
@@ -52,11 +52,11 @@ export const useSelectOptions = ({
 };
 
 export const getComputedSelect = ({
-  pluginName,
+  pluginId,
   methodName,
   control,
 }: {
-  pluginName: string;
+  pluginId: string;
   methodName: string;
   control: Control<PluginInputType>;
 }) => ({
@@ -68,7 +68,7 @@ export const getComputedSelect = ({
       const SelectComponent = schema.type === "array" ? MultiSelect : Select;
 
       const { options } = useSelectOptions({
-        pluginName,
+        pluginId,
         methodName,
         control,
         provider: meta.provider,

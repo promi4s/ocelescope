@@ -36,12 +36,12 @@ class ExtensionRegistry:
             for (_, key), value in self._registry.items()
         }
 
-    def unload_module(self, module: ModuleType) -> list[str]:
-        keys_to_remove = [key for key in self._registry if key[0] == module.__name__]
+    def unload_module(self, plugin_id: str) -> list[str]:
+        keys_to_remove = [key for key in self._registry if key[0] == plugin_id]
         for key in keys_to_remove:
             self._registry.pop(key)
 
-        return [name for (name, _) in keys_to_remove]
+        return [name for (_, name) in keys_to_remove]
 
 
 extension_registry = ExtensionRegistry()

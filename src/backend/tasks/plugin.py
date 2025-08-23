@@ -10,6 +10,8 @@ from typing import (
 from pydantic.fields import Field
 from pydantic.main import BaseModel
 
+from api.model.resource import ResourceStore
+from registry import registry_manager
 from tasks.base import TaskSummary, _call_with_known_params
 from ocelescope.ocel.ocel import OCEL
 from ocelescope.resource.resource import Resource
@@ -19,8 +21,6 @@ from api.websocket import (
     SytemNotificiation,
     websocket_manager,
 )
-
-from registry.plugin import plugin_registry
 
 from tasks.base import TaskBase, TaskState, make_hashable
 
@@ -42,18 +42,17 @@ class PluginOutput(BaseModel):
 
 
 class PluginTaskSummary(TaskSummary):
-    plugin_name: str
+    plugin_id: str
     method_name: str
     output: PluginOutput
 
 
 class PluginTask(TaskBase, Generic[P]):
     def __init__(
-        self, plugin_name: str, method_name: str, session: "Session", input: PluginInput
+        self, plugin_id: str, method_name: str, session: "Session", input: PluginInput
     ):
-        # TaskBase in your setup expects (fn, args, kwargs)
         super().__init__()
-        self.plugin_name = plugin_name
+        self.plugin_id = plugin_id
         self.method_name = method_name
         self.input = input
         self.result: PluginOutput = PluginOutput()
@@ -63,17 +62,26 @@ class PluginTask(TaskBase, Generic[P]):
     def run(self):
         self.state = TaskState.STARTED
         try:
-            method = plugin_registry.get_method(self.plugin_name, self.method_name)
+            plugin = registry_manager.get_plugin(plugin_id=self.plugin_id)
+            method = registry_manager.get_plugin_method(
+                self.plugin_id, self.method_name
+            )
 
             ocel_args: dict[str, OCEL] = {
                 key: self.session.get_ocel(self.input["ocels"][key])
                 for key in method.input_ocels.keys()
             }
 
-            resource_args: dict[str, Resource] = {
-                key: self.session.get_resource(self.input["resources"][key]).resource
-                for key in method.input_resources.keys()
-            }
+            resource_args: dict[str, Resource] = {}
+
+            # TODO: Find a better way to do this
+            for key in method.input_resources.keys():
+                resource_instance = registry_manager.get_resource_instance(
+                    self.session.get_resource(self.input["resources"][key])
+                )
+
+                if resource_instance:
+                    resource_args[key] = resource_instance
 
             kwargs = {
                 **ocel_args,
@@ -98,8 +106,19 @@ class PluginTask(TaskBase, Generic[P]):
                     if isinstance(entitiy, Resource):
                         self.result.resource_ids.append(
                             self.session.add_resource(
-                                entitiy,
-                                name=f"{self.plugin_name}_{self.method_name}_{item_index}_{entitiy_index}",
+                                ResourceStore(
+                                    name=f"{plugin.meta().name if plugin else self.plugin_id}_{self.method_name}_{item_index}_{entitiy_index}",
+                                    type=entitiy.get_type(),
+                                    source={
+                                        "task_id": self.id,
+                                        "method_name": self.method_name,
+                                        "plugin_name": plugin.meta().name,
+                                        "version": "",
+                                    }
+                                    if plugin
+                                    else None,
+                                    data=entitiy.model_dump(),
+                                ),
                             )
                         )
 
@@ -116,12 +135,12 @@ class PluginTask(TaskBase, Generic[P]):
                 message=SytemNotificiation(
                     type="notification",
                     title="Plugin successfully run",
-                    message=f"Successfully run plugin {self.plugin_name} {self.method_name}",
+                    message=f"Successfully run plugin {self.plugin_id} {self.method_name}",
                     notification_type="info",
                     link=PluginLink(
                         type="plugin",
                         method=self.method_name,
-                        name=self.plugin_name,
+                        id=self.plugin_id,
                         task_id=self.id,
                     ),
                 ),
@@ -130,7 +149,7 @@ class PluginTask(TaskBase, Generic[P]):
     def summarize(self) -> PluginTaskSummary:
         return PluginTaskSummary(
             id=self.id,
-            plugin_name=self.plugin_name,
+            plugin_id=self.plugin_id,
             method_name=self.method_name,
             state=self.state,
             output=self.result,
@@ -144,22 +163,22 @@ class PluginTask(TaskBase, Generic[P]):
     def create_plugin_task(
         cls,
         session: "Session",
-        plugin_name: str,
+        plugin_id: str,
         method_name: str,
         input: PluginInput,
     ) -> str:
-        key = cls._dedupe_key(plugin_name, method_name, input)
+        key = cls._dedupe_key(plugin_id, method_name, input)
 
         existing_id = session._dedupe_keys.get(key)
         if existing_id and existing_id in session.tasks:
             print(
-                f"[Task: {plugin_name} {method_name}] Skipped (deduplicated) -> {existing_id}"
+                f"[Task: {plugin_id} {method_name}] Skipped (deduplicated) -> {existing_id}"
             )
             return existing_id
 
         task = cls(
             session=session,
-            plugin_name=plugin_name,
+            plugin_id=plugin_id,
             method_name=method_name,
             input=input,
         )

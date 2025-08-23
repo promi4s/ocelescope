@@ -26,10 +26,12 @@ class Arc(BaseModel):
 
 
 class PetriNet(Resource):
+    label = "Petri Net"
+    description = "An object-centric petri net"
+
     places: list[Place]
     transitions: list[Transition]
     arcs: list[Arc]
-    type: Literal["ocpn"] = "ocpn"
 
     def visualize(self):
         # Use your color generator function

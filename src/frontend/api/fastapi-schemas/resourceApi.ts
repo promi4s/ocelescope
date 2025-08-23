@@ -4,10 +4,12 @@
  * OCEAn
  * OpenAPI spec version: 0.1
  */
+import type { ResourceApiSource } from './resourceApiSource';
 
 export interface ResourceApi {
-  id: string;
+  type: string;
   created_at?: string;
   name: string;
-  type_label: string;
+  source: ResourceApiSource;
+  id: string;
 }

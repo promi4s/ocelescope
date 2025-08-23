@@ -20,12 +20,12 @@ from ocel.default_ocel import (
     filter_default_ocels,
     get_default_ocel,
 )
+from registry import registry_manager
 from tasks.ocel import import_ocel_task
 from util.constants import SUPPORTED_FILE_TYPES
 
 from fastapi import APIRouter, File, Query, Response, UploadFile
 
-from registry import extension_registry
 
 ocels_router = APIRouter(prefix="/ocels", tags=["ocels"])
 
@@ -44,7 +44,7 @@ ocels_router = APIRouter(prefix="/ocels", tags=["ocels"])
 def getOcels(
     session: ApiSession, extension_name: Optional[str] = None
 ) -> OcelListResponse:
-    extension_descriptions = extension_registry.get_extension_description()
+    extension_descriptions = registry_manager.get_extension_descriptions()
 
     return OcelListResponse(
         current_ocel_id=session.current_ocel_id,
