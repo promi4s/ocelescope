@@ -1,4 +1,3 @@
-import importlib.util
 from pathlib import Path
 import shutil
 from typing import Any, Optional
@@ -7,22 +6,21 @@ from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
 from uuid import uuid4
 
+from ocelescope import PluginMethod, Resource
+
 from api.websocket import websocket_manager, InvalidationRequest
 from ocelescope.ocel.ocel import OCEL
 
 from api.config import config
 import tempfile
 import zipfile
-import sys
 from api.dependencies import ApiSession
 
 from api.model.plugin import PluginApi
 
 # TODO: Put this in own util function
+from registry import registry_manager
 from tasks.base import _call_with_known_params
-from api.model.resource import Resource
-from registry import plugin_registry
-from registry import extension_registry
 from tasks.plugin import PluginTask
 
 plugin_router = APIRouter(prefix="/plugins", tags=["plugins"])
@@ -30,39 +28,61 @@ plugin_router = APIRouter(prefix="/plugins", tags=["plugins"])
 
 @plugin_router.get("/", operation_id="plugins")
 def get_plugins() -> list[PluginApi]:
-    return plugin_registry.list_plugins()
+    return registry_manager.list_plugins()
 
 
-@plugin_router.post("/{plugin_name}/{method_name}", operation_id="runPlugin")
+@plugin_router.get("/{plugin_id}", operation_id="getPlugin")
+def get_plugin(plugin_id: str) -> PluginApi | None:
+    plugin = registry_manager.get_plugin(plugin_id)
+
+    return (
+        PluginApi(
+            id=plugin_id, meta=plugin.meta(), methods=list(plugin.method_map().values())
+        )
+        if plugin
+        else None
+    )
+
+
+@plugin_router.get("/{plugin_id}/{method_name}", operation_id="getPluginMethod")
+def get_plugin_method(plugin_id: str, method_name: str) -> PluginMethod | None:
+    try:
+        return registry_manager.get_plugin_method(plugin_id, method_name)
+    except Exception:
+        pass
+
+
+@plugin_router.post("/{plugin_id}/{method_name}", operation_id="runPlugin")
 def run_plugin(
     input_ocels: dict[str, str],
     input_resources: dict[str, str],
     session: ApiSession,
-    plugin_name: str,
+    plugin_id: str,
     method_name: str,
     input: dict[str, Any] = {},
 ) -> str:
     return PluginTask.create_plugin_task(
         session,
-        plugin_name=plugin_name,
+        plugin_id=plugin_id,
         method_name=method_name,
         input={"input": input, "ocels": input_ocels, "resources": input_resources},
     )
 
 
 @plugin_router.post(
-    "/{plugin_name}/{method_name}/computed/{provider}", operation_id="getComputedValues"
+    "/{plugin_id}/{method_name}/computed/{provider}", operation_id="getComputedValues"
 )
 def get_computed(
     input_ocels: dict[str, Optional[str]],
     input_resources: dict[str, Optional[str]],
     input: dict[str, Any],
     session: ApiSession,
-    plugin_name: str,
+    plugin_id: str,
     provider: str,
     method_name: str,
 ) -> list[str]:
-    method = plugin_registry.get_method(plugin_name, method_name)
+    method = registry_manager.get_plugin_method(plugin_id, method_name)
+
     input_class = method._input_model
     fn = getattr(input_class, provider, None)
     if fn is None:
@@ -73,11 +93,18 @@ def get_computed(
         for key, ocel_id in input_ocels.items()
         if ocel_id is not None
     }
-    resource_args: dict[str, Resource] = {
-        key: session.get_resource(resource_id)
-        for key, resource_id in input_resources.items()
-        if resource_id is not None
-    }
+
+    resource_args: dict[str, Resource | None] = {}
+
+    for key, resource_id in input_resources.items():
+        if not resource_id:
+            continue
+
+        resource = registry_manager.get_resource_instance(
+            session.get_resource(resource_id), plugin_id=plugin_id
+        )
+
+        resource_args[key] = resource
 
     kwargs = {**ocel_args, **resource_args, "input": input}
 
@@ -93,72 +120,39 @@ def upload_plugin(file: UploadFile, session: ApiSession):
     if not file_name or not file_name.endswith(".zip"):
         raise HTTPException(status_code=400, detail="Only zip files are supported")
 
-    module_name = uuid4().hex
-    plugin_dir = config.PLUGIN_DIR / module_name
-    plugin_dir.mkdir(parents=True, exist_ok=False)
+    added_plugin_ids = []
 
-    try:
-        with tempfile.NamedTemporaryFile(delete=False) as tmp:
-            shutil.copyfileobj(file.file, tmp)
-            tmp_path = Path(tmp.name)
-    except Exception as err:
-        raise HTTPException(status_code=500, detail=f"File save failed: {err}")
-    finally:
-        file.file.close()
+    with tempfile.TemporaryDirectory() as temp_dir:
+        try:
+            with zipfile.ZipFile(file.file, "r") as zip_ref:
+                zip_ref.extractall(temp_dir)
+        except zipfile.BadZipFile:
+            raise HTTPException(status_code=400, detail="Invalid zip file")
 
-    try:
-        with zipfile.ZipFile(tmp_path, "r") as zip_ref:
-            zip_ref.extractall(plugin_dir)
-    except zipfile.BadZipFile:
-        tmp_path.unlink(missing_ok=True)
-        shutil.rmtree(plugin_dir, ignore_errors=True)
-        raise HTTPException(status_code=400, detail="Invalid zip file")
+        temp_path = Path(temp_dir)
 
-    tmp_path.unlink(missing_ok=True)
+        for plugin_candidate in temp_path.iterdir():
+            if (
+                plugin_candidate.is_dir()
+                and (plugin_candidate / "__init__.py").exists()
+            ):
+                plugin_id = f"plugin_{str(uuid4())}"
+                shutil.move(plugin_candidate, config.PLUGIN_DIR / plugin_id)
+                added_plugin_ids.append(plugin_id)
 
-    for item in plugin_dir.iterdir():
-        if item.is_dir() and (item / "__init__.py").exists():
-            plugin_module_path = item / "__init__.py"
-            spec = importlib.util.spec_from_file_location(
-                module_name, plugin_module_path
-            )
-            if spec and spec.loader:
-                module = importlib.util.module_from_spec(spec)
-                sys.modules[module_name] = module
-                spec.loader.exec_module(module)
-                plugin_registry.register(module)
-                extension_registry.register(module)
-                websocket_manager.send_safe(
-                    session_id=session.id,
-                    message=InvalidationRequest(routes=["plugins"]),
-                )
-                return {"status": "success", "module": module_name}
-
-    websocket_manager.send_safe(
-        session_id=session.id, message=InvalidationRequest(routes=["plugins"])
-    )
-    shutil.rmtree(plugin_dir, ignore_errors=True)
-    raise HTTPException(status_code=500, detail="Error loading plugin")
+    registry_manager.load_plugins(added_plugin_ids)
 
 
-@plugin_router.delete("/{module_id}", operation_id="deletePlugin")
-def delete_plugin(module_id: str, session: ApiSession):
-    plugin_path = config.PLUGIN_DIR / module_id
+@plugin_router.delete("/{plugin_id}", operation_id="deletePlugin")
+def delete_plugin(plugin_id: str, session: ApiSession):
+    plugin_path = config.PLUGIN_DIR / plugin_id
 
     if not plugin_path.exists():
         raise HTTPException(status_code=404, detail="Plugin files not found")
 
-    module = sys.modules.get(module_id)
-    if module:
-        plugin_registry.unload_module(module)
-        extension_registry.unload_module(module)
+    registry_manager.unload_plugins([plugin_id])
 
-    try:
-        shutil.rmtree(plugin_path)
-    except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Failed to delete plugin files: {e}"
-        )
+    shutil.rmtree(plugin_path, ignore_errors=True)
 
     websocket_manager.send_safe(
         session.id,
@@ -167,4 +161,4 @@ def delete_plugin(module_id: str, session: ApiSession):
         ),
     )
 
-    return {"status": "deleted", "module": module_id}
+    return {"status": "deleted", "module": plugin_id}

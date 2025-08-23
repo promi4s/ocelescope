@@ -4,11 +4,6 @@
  * OCEAn
  * OpenAPI spec version: 0.1
  */
-import type { PluginMeta } from './pluginMeta';
 import type { PluginMethod } from './pluginMethod';
 
-export interface PluginApi {
-  id: string;
-  meta: PluginMeta;
-  methods: PluginMethod[];
-}
+export type GetPluginMethod200 = PluginMethod | null;

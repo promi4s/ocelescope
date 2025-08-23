@@ -9,8 +9,8 @@ from api.websocket import websocket_manager, InvalidationRequest
 from api.exceptions import NotFound
 from api.model.module import Module
 from api.model.ocel import Filtered_Ocel
-from ocelescope import OCEL, OCELFilter, Resource as ResourceBase
-from api.model.resource import Resource
+from ocelescope import OCEL, OCELFilter
+from api.model.resource import ResourceStore, ResourceApi
 from tasks.base import TaskBase
 
 
@@ -38,7 +38,7 @@ class Session:
         self._module_states: dict[str, Module] = {}
 
         # Resources
-        self._resources: dict[str, Resource] = {}
+        self._resources: dict[str, ResourceStore] = {}
 
         # OCELS
         self.ocels: dict[str, Filtered_Ocel] = {}
@@ -150,16 +150,17 @@ class Session:
         websocket_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
 
     # endregion
-    # region Output management
-    def add_resource(self, output: ResourceBase, name: str) -> str:
-        outputWrapper = Resource(resource=output, name=name)
-        self._resources[outputWrapper.id] = outputWrapper
+    # region Resource management
+    def add_resource(self, resource: ResourceStore) -> str:
+        id = str(uuid.uuid4())
+
+        self._resources[id] = resource
 
         websocket_manager.send_safe(self.id, InvalidationRequest(routes=["resources"]))
 
-        return outputWrapper.id
+        return id
 
-    def get_resource(self, id: str) -> Resource:
+    def get_resource(self, id: str) -> ResourceStore:
         if id not in self._resources:
             raise NotFound(f"Resource with id {id} not found")
         return self._resources[id]
@@ -168,14 +169,17 @@ class Session:
         self._resources.pop(id, None)
         websocket_manager.send_safe(self.id, InvalidationRequest(routes=["resources"]))
 
-    def list_resources(self) -> list[Resource]:
-        return list(self._resources.values())
+    def list_resources(self) -> list[ResourceApi]:
+        return list(
+            ResourceApi(id=id, **resource.model_dump())
+            for id, resource in self._resources.items()
+        )
 
-    def rename_resource(self, output_id: str, new_name: str):
-        if output_id not in self._resources:
-            raise NotFound(f"Output with id {output_id} not found")
+    def rename_resource(self, id: str, new_name: str):
+        if id not in self._resources:
+            raise NotFound(f"Resource with id {id} not found")
 
-        self._resources[output_id].name = new_name
+        self._resources[id].name = new_name
         websocket_manager.send_safe(self.id, InvalidationRequest(routes=["resources"]))
 
     # endregion

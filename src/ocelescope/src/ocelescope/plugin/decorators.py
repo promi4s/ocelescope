@@ -124,17 +124,9 @@ def plugin_method(
                 )
             elif issubclass(base_type, Resource):
                 plugin_method_meta._resource_types.add(base_type)
-                field_info = base_type.model_fields.get("type")
-
-                if field_info is None or field_info.default is None:
-                    raise ValueError(
-                        f"{base_type.__name__} must define `type: Literal[...] = ...` with a default value."
-                    )
-
-                type_value: str = field_info.default
 
                 plugin_method_meta.input_resources[arg_name] = (
-                    type_value,
+                    base_type.get_type(),
                     ResourceAnnotation(**annotation.model_dump())
                     if annotation is not None
                     else ResourceAnnotation(label=arg_name),
@@ -179,11 +171,6 @@ def plugin_method(
                     )
                 elif issubclass(base_type, Resource):
                     plugin_method_meta._resource_types.add(base_type)
-                    resource_type = base_type.model_fields.get("type")
-                    if resource_type is None or resource_type.default is None:
-                        raise ValueError(
-                            f"Resource {base_type.__name__} must define a default `type` field."
-                        )
                     plugin_method_meta.results.append(
                         ResourceResult(
                             type="resource",
@@ -191,7 +178,7 @@ def plugin_method(
                             annotation=ResourceAnnotation(**annotation.model_dump())
                             if annotation is not None
                             else None,
-                            resource_type=resource_type.default,
+                            resource_type=base_type.get_type(),
                         )
                     )
                 else:

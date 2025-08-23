@@ -17,7 +17,7 @@ class ResourceLink(BaseModel):
 
 class PluginLink(BaseModel):
     type: Literal["plugin"] = "plugin"
-    name: str
+    id: str
     method: str
     task_id: str
 

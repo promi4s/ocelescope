@@ -15,12 +15,11 @@ services:
       - PLUGIN_DIR=/plugins 
     develop:
       watch:
-        - action: sync+restart
+        - action: sync
           path: ./src/backend
           target: /app
           ignore:
             - .venv/
-
         - action: rebuild
           path:  ./src/backend/uv.lock
   frontend:

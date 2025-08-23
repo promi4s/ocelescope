@@ -10,7 +10,7 @@ import type { PluginOutput } from './pluginOutput';
 export interface PluginTaskSummary {
   id: string;
   state: TaskState;
-  plugin_name: string;
+  plugin_id: string;
   method_name: string;
   output: PluginOutput;
 }

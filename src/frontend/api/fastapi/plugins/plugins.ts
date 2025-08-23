@@ -27,6 +27,8 @@ import type {
   BodyGetComputedValues,
   BodyRunPlugin,
   BodyUploadPlugin,
+  GetPlugin200,
+  GetPluginMethod200,
   HTTPValidationError,
   PluginApi
 } from '../../fastapi-schemas';
@@ -207,188 +209,90 @@ export const useUploadPlugin = <TError = HTTPValidationError,
       return useMutation(mutationOptions , queryClient);
     }
     /**
- * @summary Run Plugin
+ * @summary Get Plugin
  */
-export const getRunPluginUrl = (pluginName: string,
-    methodName: string,) => {
+export const getGetPluginUrl = (pluginId: string,) => {
 
 
   
 
-  return `http://localhost:8000/plugins/${pluginName}/${methodName}`
+  return `http://localhost:8000/plugins/${pluginId}`
 }
 
-export const runPlugin = async (pluginName: string,
-    methodName: string,
-    bodyRunPlugin: BodyRunPlugin, options?: RequestInit): Promise<string> => {
+export const getPlugin = async (pluginId: string, options?: RequestInit): Promise<GetPlugin200> => {
   
-  return customFetch<string>(getRunPluginUrl(pluginName,methodName),
+  return customFetch<GetPlugin200>(getGetPluginUrl(pluginId),
   {      
     ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      bodyRunPlugin,)
+    method: 'GET'
+    
+    
   }
 );}
 
 
 
-
-export const getRunPluginMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runPlugin>>, TError,{pluginName: string;methodName: string;data: BodyRunPlugin}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof runPlugin>>, TError,{pluginName: string;methodName: string;data: BodyRunPlugin}, TContext> => {
-
-const mutationKey = ['runPlugin'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof runPlugin>>, {pluginName: string;methodName: string;data: BodyRunPlugin}> = (props) => {
-          const {pluginName,methodName,data} = props ?? {};
-
-          return  runPlugin(pluginName,methodName,data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type RunPluginMutationResult = NonNullable<Awaited<ReturnType<typeof runPlugin>>>
-    export type RunPluginMutationBody = BodyRunPlugin
-    export type RunPluginMutationError = HTTPValidationError
-
-    /**
- * @summary Run Plugin
- */
-export const useRunPlugin = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runPlugin>>, TError,{pluginName: string;methodName: string;data: BodyRunPlugin}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof runPlugin>>,
-        TError,
-        {pluginName: string;methodName: string;data: BodyRunPlugin},
-        TContext
-      > => {
-
-      const mutationOptions = getRunPluginMutationOptions(options);
-
-      return useMutation(mutationOptions , queryClient);
-    }
-    /**
- * @summary Get Computed
- */
-export const getGetComputedValuesUrl = (pluginName: string,
-    methodName: string,
-    provider: string,) => {
-
-
-  
-
-  return `http://localhost:8000/plugins/${pluginName}/${methodName}/computed/${provider}`
-}
-
-export const getComputedValues = async (pluginName: string,
-    methodName: string,
-    provider: string,
-    bodyGetComputedValues: BodyGetComputedValues, options?: RequestInit): Promise<string[]> => {
-  
-  return customFetch<string[]>(getGetComputedValuesUrl(pluginName,methodName,provider),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      bodyGetComputedValues,)
-  }
-);}
-
-
-
-export const getGetComputedValuesQueryKey = (pluginName: string,
-    methodName: string,
-    provider: string,
-    bodyGetComputedValues: BodyGetComputedValues,) => {
-    return [`http://localhost:8000/plugins/${pluginName}/${methodName}/computed/${provider}`, bodyGetComputedValues] as const;
+export const getGetPluginQueryKey = (pluginId: string,) => {
+    return [`http://localhost:8000/plugins/${pluginId}`] as const;
     }
 
     
-export const getGetComputedValuesQueryOptions = <TData = Awaited<ReturnType<typeof getComputedValues>>, TError = HTTPValidationError>(pluginName: string,
-    methodName: string,
-    provider: string,
-    bodyGetComputedValues: BodyGetComputedValues, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getComputedValues>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetPluginQueryOptions = <TData = Awaited<ReturnType<typeof getPlugin>>, TError = HTTPValidationError>(pluginId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlugin>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetComputedValuesQueryKey(pluginName,methodName,provider,bodyGetComputedValues);
+  const queryKey =  queryOptions?.queryKey ?? getGetPluginQueryKey(pluginId);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getComputedValues>>> = ({ signal }) => getComputedValues(pluginName,methodName,provider,bodyGetComputedValues, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPlugin>>> = ({ signal }) => getPlugin(pluginId, { signal, ...requestOptions });
 
       
 
       
 
-   return  { queryKey, queryFn, enabled: !!(pluginName && methodName && provider),  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getComputedValues>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, enabled: !!(pluginId),  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPlugin>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetComputedValuesQueryResult = NonNullable<Awaited<ReturnType<typeof getComputedValues>>>
-export type GetComputedValuesQueryError = HTTPValidationError
+export type GetPluginQueryResult = NonNullable<Awaited<ReturnType<typeof getPlugin>>>
+export type GetPluginQueryError = HTTPValidationError
 
 
-export function useGetComputedValues<TData = Awaited<ReturnType<typeof getComputedValues>>, TError = HTTPValidationError>(
- pluginName: string,
-    methodName: string,
-    provider: string,
-    bodyGetComputedValues: BodyGetComputedValues, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getComputedValues>>, TError, TData>> & Pick<
+export function useGetPlugin<TData = Awaited<ReturnType<typeof getPlugin>>, TError = HTTPValidationError>(
+ pluginId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlugin>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getComputedValues>>,
+          Awaited<ReturnType<typeof getPlugin>>,
           TError,
-          Awaited<ReturnType<typeof getComputedValues>>
+          Awaited<ReturnType<typeof getPlugin>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetComputedValues<TData = Awaited<ReturnType<typeof getComputedValues>>, TError = HTTPValidationError>(
- pluginName: string,
-    methodName: string,
-    provider: string,
-    bodyGetComputedValues: BodyGetComputedValues, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getComputedValues>>, TError, TData>> & Pick<
+export function useGetPlugin<TData = Awaited<ReturnType<typeof getPlugin>>, TError = HTTPValidationError>(
+ pluginId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlugin>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getComputedValues>>,
+          Awaited<ReturnType<typeof getPlugin>>,
           TError,
-          Awaited<ReturnType<typeof getComputedValues>>
+          Awaited<ReturnType<typeof getPlugin>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetComputedValues<TData = Awaited<ReturnType<typeof getComputedValues>>, TError = HTTPValidationError>(
- pluginName: string,
-    methodName: string,
-    provider: string,
-    bodyGetComputedValues: BodyGetComputedValues, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getComputedValues>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export function useGetPlugin<TData = Awaited<ReturnType<typeof getPlugin>>, TError = HTTPValidationError>(
+ pluginId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlugin>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary Get Computed
+ * @summary Get Plugin
  */
 
-export function useGetComputedValues<TData = Awaited<ReturnType<typeof getComputedValues>>, TError = HTTPValidationError>(
- pluginName: string,
-    methodName: string,
-    provider: string,
-    bodyGetComputedValues: BodyGetComputedValues, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getComputedValues>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export function useGetPlugin<TData = Awaited<ReturnType<typeof getPlugin>>, TError = HTTPValidationError>(
+ pluginId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlugin>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetComputedValuesQueryOptions(pluginName,methodName,provider,bodyGetComputedValues,options)
+  const queryOptions = getGetPluginQueryOptions(pluginId,options)
 
   const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -402,17 +306,17 @@ export function useGetComputedValues<TData = Awaited<ReturnType<typeof getComput
 /**
  * @summary Delete Plugin
  */
-export const getDeletePluginUrl = (moduleId: string,) => {
+export const getDeletePluginUrl = (pluginId: string,) => {
 
 
   
 
-  return `http://localhost:8000/plugins/${moduleId}`
+  return `http://localhost:8000/plugins/${pluginId}`
 }
 
-export const deletePlugin = async (moduleId: string, options?: RequestInit): Promise<unknown> => {
+export const deletePlugin = async (pluginId: string, options?: RequestInit): Promise<unknown> => {
   
-  return customFetch<unknown>(getDeletePluginUrl(moduleId),
+  return customFetch<unknown>(getDeletePluginUrl(pluginId),
   {      
     ...options,
     method: 'DELETE'
@@ -425,8 +329,8 @@ export const deletePlugin = async (moduleId: string, options?: RequestInit): Pro
 
 
 export const getDeletePluginMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deletePlugin>>, TError,{moduleId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof deletePlugin>>, TError,{moduleId: string}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deletePlugin>>, TError,{pluginId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deletePlugin>>, TError,{pluginId: string}, TContext> => {
 
 const mutationKey = ['deletePlugin'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -438,10 +342,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deletePlugin>>, {moduleId: string}> = (props) => {
-          const {moduleId} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deletePlugin>>, {pluginId: string}> = (props) => {
+          const {pluginId} = props ?? {};
 
-          return  deletePlugin(moduleId,requestOptions)
+          return  deletePlugin(pluginId,requestOptions)
         }
 
         
@@ -457,11 +361,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary Delete Plugin
  */
 export const useDeletePlugin = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deletePlugin>>, TError,{moduleId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deletePlugin>>, TError,{pluginId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof deletePlugin>>,
         TError,
-        {moduleId: string},
+        {pluginId: string},
         TContext
       > => {
 
@@ -469,4 +373,299 @@ export const useDeletePlugin = <TError = HTTPValidationError,
 
       return useMutation(mutationOptions , queryClient);
     }
+    /**
+ * @summary Get Plugin Method
+ */
+export const getGetPluginMethodUrl = (pluginId: string,
+    methodName: string,) => {
+
+
+  
+
+  return `http://localhost:8000/plugins/${pluginId}/${methodName}`
+}
+
+export const getPluginMethod = async (pluginId: string,
+    methodName: string, options?: RequestInit): Promise<GetPluginMethod200> => {
+  
+  return customFetch<GetPluginMethod200>(getGetPluginMethodUrl(pluginId,methodName),
+  {      
+    ...options,
+    method: 'GET'
     
+    
+  }
+);}
+
+
+
+export const getGetPluginMethodQueryKey = (pluginId: string,
+    methodName: string,) => {
+    return [`http://localhost:8000/plugins/${pluginId}/${methodName}`] as const;
+    }
+
+    
+export const getGetPluginMethodQueryOptions = <TData = Awaited<ReturnType<typeof getPluginMethod>>, TError = HTTPValidationError>(pluginId: string,
+    methodName: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPluginMethod>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPluginMethodQueryKey(pluginId,methodName);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPluginMethod>>> = ({ signal }) => getPluginMethod(pluginId,methodName, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(pluginId && methodName),  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPluginMethod>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetPluginMethodQueryResult = NonNullable<Awaited<ReturnType<typeof getPluginMethod>>>
+export type GetPluginMethodQueryError = HTTPValidationError
+
+
+export function useGetPluginMethod<TData = Awaited<ReturnType<typeof getPluginMethod>>, TError = HTTPValidationError>(
+ pluginId: string,
+    methodName: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPluginMethod>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPluginMethod>>,
+          TError,
+          Awaited<ReturnType<typeof getPluginMethod>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPluginMethod<TData = Awaited<ReturnType<typeof getPluginMethod>>, TError = HTTPValidationError>(
+ pluginId: string,
+    methodName: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPluginMethod>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPluginMethod>>,
+          TError,
+          Awaited<ReturnType<typeof getPluginMethod>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPluginMethod<TData = Awaited<ReturnType<typeof getPluginMethod>>, TError = HTTPValidationError>(
+ pluginId: string,
+    methodName: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPluginMethod>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Plugin Method
+ */
+
+export function useGetPluginMethod<TData = Awaited<ReturnType<typeof getPluginMethod>>, TError = HTTPValidationError>(
+ pluginId: string,
+    methodName: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPluginMethod>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetPluginMethodQueryOptions(pluginId,methodName,options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+/**
+ * @summary Run Plugin
+ */
+export const getRunPluginUrl = (pluginId: string,
+    methodName: string,) => {
+
+
+  
+
+  return `http://localhost:8000/plugins/${pluginId}/${methodName}`
+}
+
+export const runPlugin = async (pluginId: string,
+    methodName: string,
+    bodyRunPlugin: BodyRunPlugin, options?: RequestInit): Promise<string> => {
+  
+  return customFetch<string>(getRunPluginUrl(pluginId,methodName),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      bodyRunPlugin,)
+  }
+);}
+
+
+
+
+export const getRunPluginMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runPlugin>>, TError,{pluginId: string;methodName: string;data: BodyRunPlugin}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof runPlugin>>, TError,{pluginId: string;methodName: string;data: BodyRunPlugin}, TContext> => {
+
+const mutationKey = ['runPlugin'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof runPlugin>>, {pluginId: string;methodName: string;data: BodyRunPlugin}> = (props) => {
+          const {pluginId,methodName,data} = props ?? {};
+
+          return  runPlugin(pluginId,methodName,data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RunPluginMutationResult = NonNullable<Awaited<ReturnType<typeof runPlugin>>>
+    export type RunPluginMutationBody = BodyRunPlugin
+    export type RunPluginMutationError = HTTPValidationError
+
+    /**
+ * @summary Run Plugin
+ */
+export const useRunPlugin = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runPlugin>>, TError,{pluginId: string;methodName: string;data: BodyRunPlugin}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof runPlugin>>,
+        TError,
+        {pluginId: string;methodName: string;data: BodyRunPlugin},
+        TContext
+      > => {
+
+      const mutationOptions = getRunPluginMutationOptions(options);
+
+      return useMutation(mutationOptions , queryClient);
+    }
+    /**
+ * @summary Get Computed
+ */
+export const getGetComputedValuesUrl = (pluginId: string,
+    methodName: string,
+    provider: string,) => {
+
+
+  
+
+  return `http://localhost:8000/plugins/${pluginId}/${methodName}/computed/${provider}`
+}
+
+export const getComputedValues = async (pluginId: string,
+    methodName: string,
+    provider: string,
+    bodyGetComputedValues: BodyGetComputedValues, options?: RequestInit): Promise<string[]> => {
+  
+  return customFetch<string[]>(getGetComputedValuesUrl(pluginId,methodName,provider),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      bodyGetComputedValues,)
+  }
+);}
+
+
+
+export const getGetComputedValuesQueryKey = (pluginId: string,
+    methodName: string,
+    provider: string,
+    bodyGetComputedValues: BodyGetComputedValues,) => {
+    return [`http://localhost:8000/plugins/${pluginId}/${methodName}/computed/${provider}`, bodyGetComputedValues] as const;
+    }
+
+    
+export const getGetComputedValuesQueryOptions = <TData = Awaited<ReturnType<typeof getComputedValues>>, TError = HTTPValidationError>(pluginId: string,
+    methodName: string,
+    provider: string,
+    bodyGetComputedValues: BodyGetComputedValues, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getComputedValues>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetComputedValuesQueryKey(pluginId,methodName,provider,bodyGetComputedValues);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getComputedValues>>> = ({ signal }) => getComputedValues(pluginId,methodName,provider,bodyGetComputedValues, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(pluginId && methodName && provider),  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getComputedValues>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetComputedValuesQueryResult = NonNullable<Awaited<ReturnType<typeof getComputedValues>>>
+export type GetComputedValuesQueryError = HTTPValidationError
+
+
+export function useGetComputedValues<TData = Awaited<ReturnType<typeof getComputedValues>>, TError = HTTPValidationError>(
+ pluginId: string,
+    methodName: string,
+    provider: string,
+    bodyGetComputedValues: BodyGetComputedValues, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getComputedValues>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getComputedValues>>,
+          TError,
+          Awaited<ReturnType<typeof getComputedValues>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetComputedValues<TData = Awaited<ReturnType<typeof getComputedValues>>, TError = HTTPValidationError>(
+ pluginId: string,
+    methodName: string,
+    provider: string,
+    bodyGetComputedValues: BodyGetComputedValues, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getComputedValues>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getComputedValues>>,
+          TError,
+          Awaited<ReturnType<typeof getComputedValues>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetComputedValues<TData = Awaited<ReturnType<typeof getComputedValues>>, TError = HTTPValidationError>(
+ pluginId: string,
+    methodName: string,
+    provider: string,
+    bodyGetComputedValues: BodyGetComputedValues, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getComputedValues>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Computed
+ */
+
+export function useGetComputedValues<TData = Awaited<ReturnType<typeof getComputedValues>>, TError = HTTPValidationError>(
+ pluginId: string,
+    methodName: string,
+    provider: string,
+    bodyGetComputedValues: BodyGetComputedValues, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getComputedValues>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetComputedValuesQueryOptions(pluginId,methodName,provider,bodyGetComputedValues,options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+

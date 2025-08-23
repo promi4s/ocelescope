@@ -7,8 +7,7 @@ import { useRunPlugin } from "@/api/fastapi/plugins/plugins";
 import ResourceSelect from "@/components/Resources/ResourceSelect";
 
 type PluginInputProps = {
-  name: string;
-  version: string;
+  pluginId: string;
   method: PluginMethod;
   onSuccess: (taskId: string) => void;
 };
@@ -20,7 +19,7 @@ export type PluginInputType = {
 };
 
 const PluginInput: React.FC<PluginInputProps> = ({
-  name,
+  pluginId,
   method,
   onSuccess,
 }) => {
@@ -89,12 +88,12 @@ const PluginInput: React.FC<PluginInputProps> = ({
           ),
         )}
         <PluginForm
-          pluginName={name}
+          pluginId={pluginId}
           methodName={method.name}
           schema={method.input_schema}
           control={control}
           onSubmit={handleSubmit((data) =>
-            runPlugin({ data, methodName: method.name, pluginName: name }),
+            runPlugin({ data, methodName: method.name, pluginId }),
           )}
         />
       </Stack>

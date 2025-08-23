@@ -28,7 +28,7 @@ const ResourceCard: React.FC<{
       </Card.Section>
       <Group justify="space-between" mt="md" mb="xs">
         <Text fw={500}>{resource?.resource.name}</Text>
-        <Badge color="pink">{resource?.resource.type_label}</Badge>
+        <Badge color="pink">{resource?.resource.type}</Badge>
       </Group>
       <Group align="center" wrap="nowrap" justify="center">
         <Button
