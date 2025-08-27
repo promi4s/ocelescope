@@ -9,23 +9,54 @@ from ocelescope.visualization import generate_color_map
 
 
 class Place(BaseModel):
+    """A place in a Petri net.
+
+    Attributes:
+        id: Unique identifier of the place.
+        object_type: Type of the object associated with this place.
+        place_type: Either "sink", "source", or None.
+    """
+
     id: str
     object_type: str
     place_type: Optional[Literal["sink", "source", None]]
 
 
 class Transition(BaseModel):
+    """A transition in a Petri net.
+
+    Attributes:
+        id: Unique identifier of the transition.
+        label: Optional label describing the transition.
+    """
+
     id: str
     label: Optional[str]
 
 
 class Arc(BaseModel):
+    """An arc connecting places and transitions in a Petri net.
+
+    Attributes:
+        source: ID of the source node (place or transition).
+        target: ID of the target node (place or transition).
+        variable: Whether the arc represents a variable connection.
+    """
+
     source: str
     target: str
     variable: bool = False
 
 
 class PetriNet(Resource):
+    """An object-centric Petri net representation.
+
+    Attributes:
+        places: List of places in the Petri net.
+        transitions: List of transitions in the Petri net.
+        arcs: List of arcs connecting places and transitions.
+    """
+
     label = "Petri Net"
     description = "An object-centric petri net"
 

@@ -1,0 +1,7 @@
+title: "Plugin Development"
+collapse: true
+nav:
+  - index.md
+  - plugin_class.md
+  - resource.md
+  - extension.md
