@@ -1,8 +1,8 @@
 # Getting Started
 
-You can run Ocelescope using the following `docker-compose` configuration:
+To get Ocelescope running docker compose. To run it you have to have docker-compose or docker installed. To run ocelescope you can just use the below docker compose script.
 
-```yaml
+```yaml title="docker-compose.yaml"
 services:
   backend:
     image: grkmr/ocelescope_backend:latest
@@ -10,16 +10,12 @@ services:
       - "8000:8000"
     volumes:
       - plugins_store:/plugins
-    environment:
-      - PLUGIN_DIR=/plugins 
     restart: unless-stopped
 
   frontend:
     image: grkmr/ocelescope_frontend:latest
     ports:
       - "3000:3000"
-    environment:
-      - NODE_ENV=production
     restart: unless-stopped
 
 volumes:
@@ -49,15 +45,6 @@ You can upload plugins directly from the **web interface** at:
 
 Uploaded plugins will be stored in the `plugins_store` volume and made available for execution.
 
-### Example Plugins
-
-Here are some example plugins you can explore and use with Ocelescope:
-
-* [**pm4py-discovery**](https://github.com/Grkmr/pm4py-discovery) – Integrates process discovery algorithms from the PM4Py library.
-* [**TOTeM**](https://github.com/Grkmr/TOTeM) – Provides temporal object-centric model mining capabilities.
-
-These plugins can be uploaded via the web interface and will extend Ocelescope with additional analysis features.
-
 ### Stopping Ocelescope
 
 To stop the services, run:
@@ -65,3 +52,26 @@ To stop the services, run:
 ```bash
 docker compose down
 ```
+
+### Example Plugins
+
+Here are some example plugins you can explore and use with Ocelescope
+
+<div class="grid cards" markdown>
+
+* :simple-github:{ .lg .middle } **PM4PY Discovery**
+
+    ---
+    Discover object-centric process models through the discovery algorithms of the [PM4PY](https://processintelligence.solutions/pm4py) python library
+
+    [:material-download: Download](https://github.com/Grkmr/pm4py-discovery/releases/download/v1.0/pm4py_discovery.zip)
+
+* :simple-github:{ .lg .middle } **TOTeM**
+
+    ---
+
+    Generate Temporal Object Type Models (TOTeM) to uncover type-level temporal and cardinality relations in event logs
+
+    [:material-download: Download](https://github.com/Grkmr/TOTeM/releases/download/v1.0/totem.zip)
+
+</div>
