@@ -1,7 +1,6 @@
-import Form from "@aokiapp/rjsf-mantine-theme";
-import { Box, Button, Group } from "@mantine/core";
+import Form from "@rjsf/mantine";
 import validator from "@rjsf/validator-ajv8";
-import { ComponentProps, useMemo } from "react";
+import { useMemo } from "react";
 import { Control, Controller } from "react-hook-form";
 import { PluginInputType } from ".";
 import { getComputedSelect } from "./Fields/custom";
@@ -14,28 +13,6 @@ type PluginFormProps = {
   onSubmit: () => void;
   pluginId: string;
   methodName: string;
-};
-
-const pluginTemplate: ComponentProps<typeof Form>["templates"] = {
-  ButtonTemplates: {
-    SubmitButton: () => (
-      <Group align="center" justify="center">
-        <Button type="submit" color="green">
-          Run
-        </Button>
-      </Group>
-    ),
-  },
-  ObjectFieldTemplate: ({ properties, description }) => (
-    <Box style={{ padding: 0, border: "none" }}>
-      {description && <p>{description}</p>}
-      {properties.map((prop) => (
-        <Box key={prop.name} mb="sm">
-          {prop.content}
-        </Box>
-      ))}
-    </Box>
-  ),
 };
 
 export function buildOcelUiSchema(
@@ -100,7 +77,7 @@ const PluginForm: React.FC<PluginFormProps> = ({
       render={({ field }) => (
         <>
           <Form
-            schema={schema}
+            schema={{ ...schema, title: "" }}
             formData={field.value}
             validator={validator}
             uiSchema={uiSchema}
@@ -109,7 +86,6 @@ const PluginForm: React.FC<PluginFormProps> = ({
               field.onChange(data.formData);
             }}
             onSubmit={onSubmit}
-            templates={pluginTemplate}
           />
         </>
       )}
