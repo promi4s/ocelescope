@@ -46,10 +46,9 @@ import type {
   ObjectAttributesParams,
   ObjectCount200,
   ObjectCountParams,
-  OcelListResponse,
+  OcelMetadata,
   RelationCountSummary,
   RenameOcelParams,
-  SetCurrentOcelParams,
   SetFilters200,
   SetFiltersBody,
   SetFiltersParams,
@@ -82,9 +81,9 @@ export const getGetOcelsUrl = (params?: GetOcelsParams,) => {
   return stringifiedParams.length > 0 ? `http://localhost:8000/ocels/?${stringifiedParams}` : `http://localhost:8000/ocels/`
 }
 
-export const getOcels = async (params?: GetOcelsParams, options?: RequestInit): Promise<OcelListResponse> => {
+export const getOcels = async (params?: GetOcelsParams, options?: RequestInit): Promise<OcelMetadata[]> => {
   
-  return customFetch<OcelListResponse>(getGetOcelsUrl(params),
+  return customFetch<OcelMetadata[]>(getGetOcelsUrl(params),
   {      
     ...options,
     method: 'GET'
@@ -242,84 +241,6 @@ export const useSetFilters = <TError = HTTPValidationError,
       > => {
 
       const mutationOptions = getSetFiltersMutationOptions(options);
-
-      return useMutation(mutationOptions , queryClient);
-    }
-    /**
- * Sets the active OCEL to the one with the provided `ocel_id`. Subsequent operations may use this as the default OCEL context.
- * @summary Set the current active OCEL
- */
-export const getSetCurrentOcelUrl = (params: SetCurrentOcelParams,) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-    
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
-    }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `http://localhost:8000/ocels/ocel?${stringifiedParams}` : `http://localhost:8000/ocels/ocel`
-}
-
-export const setCurrentOcel = async (params: SetCurrentOcelParams, options?: RequestInit): Promise<unknown> => {
-  
-  return customFetch<unknown>(getSetCurrentOcelUrl(params),
-  {      
-    ...options,
-    method: 'POST'
-    
-    
-  }
-);}
-
-
-
-
-export const getSetCurrentOcelMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setCurrentOcel>>, TError,{params: SetCurrentOcelParams}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof setCurrentOcel>>, TError,{params: SetCurrentOcelParams}, TContext> => {
-
-const mutationKey = ['setCurrentOcel'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof setCurrentOcel>>, {params: SetCurrentOcelParams}> = (props) => {
-          const {params} = props ?? {};
-
-          return  setCurrentOcel(params,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type SetCurrentOcelMutationResult = NonNullable<Awaited<ReturnType<typeof setCurrentOcel>>>
-    
-    export type SetCurrentOcelMutationError = HTTPValidationError
-
-    /**
- * @summary Set the current active OCEL
- */
-export const useSetCurrentOcel = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setCurrentOcel>>, TError,{params: SetCurrentOcelParams}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof setCurrentOcel>>,
-        TError,
-        {params: SetCurrentOcelParams},
-        TContext
-      > => {
-
-      const mutationOptions = getSetCurrentOcelMutationOptions(options);
 
       return useMutation(mutationOptions , queryClient);
     }

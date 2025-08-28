@@ -3,7 +3,6 @@ import {
   useDeleteOcel,
   useGetOcels,
   useRenameOcel,
-  useSetCurrentOcel,
 } from "@/api/fastapi/ocels/ocels";
 import { useGetSystemTasks } from "@/api/fastapi/tasks/tasks";
 import OcelUpload from "@/components/OcelUpload/OcelUpload";
@@ -12,7 +11,6 @@ import {
   Box,
   Button,
   Group,
-  Loader,
   LoadingOverlay,
   Menu,
   Modal,
@@ -30,7 +28,6 @@ import {
   FileUpIcon,
   Filter,
   Pencil,
-  StarIcon,
   Trash,
   X,
 } from "lucide-react";
@@ -65,8 +62,8 @@ const OcelTable = () => {
   );
 
   const isOcel = useCallback(
-    (id: string) => ocels?.ocels.some(({ id: ocelId }) => ocelId === id),
-    [ocels?.ocels],
+    (id: string) => ocels?.some(({ id: ocelId }) => ocelId === id),
+    [ocels],
   );
 
   const { mutate: deleteOcel } = useDeleteOcel({
@@ -83,19 +80,10 @@ const OcelTable = () => {
     { id: string; value: string } | undefined
   >(undefined);
 
-  const { mutate: setCurrentOcel } = useSetCurrentOcel({
-    mutation: {
-      onSuccess: async () => {
-        await queryClient.invalidateQueries({ refetchType: "all" });
-      },
-    },
-  });
-
   const { mutateAsync: renameOcel } = useRenameOcel();
 
   const isOcelUploaded =
-    (uploadingOcel && uploadingOcel.length > 0) ||
-    (ocels && ocels.ocels.length > 0);
+    (uploadingOcel && uploadingOcel.length > 0) || (ocels && ocels.length > 0);
 
   return (
     <>
@@ -156,22 +144,7 @@ const OcelTable = () => {
           withTableBorder
           borderRadius={"md"}
           highlightOnHover
-          onRowClick={({ record: { id } }) => {
-            if (isOcel(id)) setCurrentOcel({ params: { ocel_id: id } });
-          }}
           columns={[
-            {
-              accessor: "selector",
-              title: "",
-              render: ({ id }) => (
-                <Group justify="center" p={4}>
-                  {id === ocels?.current_ocel_id && (
-                    <StarIcon size={14} fill="blue" color="blue" />
-                  )}
-                  {!isOcel(id) && <Loader size={20} />}
-                </Group>
-              ),
-            },
             {
               accessor: "name",
               render: ({ name, id }) => {
@@ -321,7 +294,7 @@ const OcelTable = () => {
           }
           records={
             [
-              ...(ocels?.ocels ?? []),
+              ...(ocels ?? []),
               ...(uploadingOcel ?? []).map(({ id, metadata }) => ({
                 id,
                 name: metadata["fileName"] as string,

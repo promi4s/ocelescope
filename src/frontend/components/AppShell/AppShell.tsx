@@ -29,7 +29,6 @@ import { useLogout } from "@/api/fastapi/session/session";
 import { useQueryClient } from "@tanstack/react-query";
 import { getModuleRoute } from "@/lib/modules";
 import { ModuleName, ModuleRouteName } from "@/types/modules";
-import CurrentOcelMenu from "../CurrentOcelMenu/CurrentOcelMenu";
 import useModulePath from "@/hooks/useModulePath";
 import moduleMap from "@/lib/modules/module-map";
 
@@ -175,7 +174,6 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       </MAppShell.Header>
       <MAppShell.Navbar className={classes.navbar}>
         <Stack justify="space-between" h={"100%"} gap={0}>
-          <CurrentOcelMenu />
           <Divider />
           <UnstyledButton
             component={Link}
