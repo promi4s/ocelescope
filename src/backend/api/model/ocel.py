@@ -19,7 +19,6 @@ class UploadingOcelMetadata(BaseModel):
 
 
 class OcelListResponse(BaseModel):
-    current_ocel_id: Optional[str]
     ocels: list[OcelMetadata]
 
 

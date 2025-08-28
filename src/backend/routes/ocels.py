@@ -43,44 +43,28 @@ ocels_router = APIRouter(prefix="/ocels", tags=["ocels"])
 )
 def getOcels(
     session: ApiSession, extension_name: Optional[str] = None
-) -> OcelListResponse:
+) -> list[OcelMetadata]:
     extension_descriptions = registry_manager.get_extension_descriptions()
 
-    return OcelListResponse(
-        current_ocel_id=session.current_ocel_id,
-        ocels=[
-            OcelMetadata(
-                created_at=value.original.meta["uploadDate"],
-                id=key,
-                name=value.original.meta["fileName"],
-                extensions=[
-                    extension_descriptions[extension.__class__.__name__]
-                    for extension in value.original.get_extensions_list()
-                    if extension.__class__.__name__ in extension_descriptions
-                ],
-            )
-            for key, value in session.ocels.items()
-            if extension_name is None
-            or extension_name
-            in [
-                extension.__class__.__name__
+    return [
+        OcelMetadata(
+            created_at=value.original.meta["uploadDate"],
+            id=key,
+            name=value.original.meta["fileName"],
+            extensions=[
+                extension_descriptions[extension.__class__.__name__]
                 for extension in value.original.get_extensions_list()
-            ]
-        ],
-    )
-
-
-@ocels_router.post(
-    "/ocel",
-    summary="Set the current active OCEL",
-    description=(
-        "Sets the active OCEL to the one with the provided `ocel_id`. "
-        "Subsequent operations may use this as the default OCEL context."
-    ),
-    operation_id="setCurrentOcel",
-)
-def set_current_ocel(session: ApiSession, ocel_id: str):
-    session.set_current_ocel(ocel_id)
+                if extension.__class__.__name__ in extension_descriptions
+            ],
+        )
+        for key, value in session.ocels.items()
+        if extension_name is None
+        or extension_name
+        in [
+            extension.__class__.__name__
+            for extension in value.original.get_extensions_list()
+        ]
+    ]
 
 
 @ocels_router.post(
