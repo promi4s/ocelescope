@@ -7,4 +7,5 @@ export default defineModuleRoute({
   component: ObjectPage,
   label: "Objects",
   name: "objects",
+  requiresOcel: true,
 });

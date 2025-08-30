@@ -29,9 +29,10 @@ import { useLogout } from "@/api/fastapi/session/session";
 import { useQueryClient } from "@tanstack/react-query";
 import { getModuleRoute } from "@/lib/modules";
 import { ModuleName, ModuleRouteName } from "@/types/modules";
-import CurrentOcelMenu from "../CurrentOcelMenu/CurrentOcelMenu";
 import useModulePath from "@/hooks/useModulePath";
 import moduleMap from "@/lib/modules/module-map";
+import CurrentOcelSelect from "../CurrentOcelSelect/CurrentOcelSelect";
+import useClient from "@/hooks/useClient";
 
 const LogoutButton: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -46,6 +47,7 @@ const LogoutButton: React.FC = () => {
       },
     },
   });
+
   return (
     <>
       <Modal
@@ -54,7 +56,7 @@ const LogoutButton: React.FC = () => {
         title="Are you sure?"
       >
         <Text>
-          If you leave now, all your data and progress will be{" "}
+          If you leave now, all your data and progress will be
           <strong>deleted permanently</strong>. This action cannot be undone.
         </Text>
 
@@ -143,7 +145,13 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(false);
 
-  const moduleRoute = useModulePath();
+  const isClient = useClient();
+
+  const modulePath = useModulePath();
+
+  const isOcelRequired = modulePath
+    ? moduleMap[modulePath.name].routes[modulePath.route].requiresOcel
+    : false;
 
   return (
     <MAppShell
@@ -171,11 +179,11 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               size="sm"
             />
           </Group>
+          {isClient && isOcelRequired && <CurrentOcelSelect />}
         </Group>
       </MAppShell.Header>
       <MAppShell.Navbar className={classes.navbar}>
         <Stack justify="space-between" h={"100%"} gap={0}>
-          <CurrentOcelMenu />
           <Divider />
           <UnstyledButton
             component={Link}
@@ -205,10 +213,9 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <ScrollArea className={classes.links} px={"md"}>
             {Object.values(moduleMap).map(
               ({ label, name: moduleName, routes, icon }) => (
-                <div className={classes.linksInner}>
+                <div key={moduleName} className={classes.linksInner}>
                   <LinksGroup
                     label={label}
-                    key={moduleName}
                     links={Object.values(routes).map(({ label, name }) => ({
                       label,
                       link: getModuleRoute({
@@ -217,7 +224,7 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                       }),
                     }))}
                     icon={icon}
-                    initiallyOpened={moduleRoute?.name === moduleName}
+                    initiallyOpened={modulePath?.name === moduleName}
                   />
                 </div>
               ),

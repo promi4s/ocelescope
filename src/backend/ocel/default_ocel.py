@@ -175,7 +175,6 @@ def load_default_ocels() -> list[Session]:
         ocel = getattr(ocel_data, "__ocel")
         session = Session(id=key)
         session.add_ocel(ocel)
-        session.set_current_ocel(session.add_ocel(ocel))
         sessions.append(session)
 
     return sessions

@@ -7,7 +7,7 @@ const OcelSelect: React.FC<
 > = ({ extension, ...props }) => {
   const { data } = useGetOcels({ extension_name: extension });
 
-  const ocels = useMemo(() => data?.ocels ?? [], [data]);
+  const ocels = useMemo(() => data ?? [], [data]);
 
   return (
     <Select

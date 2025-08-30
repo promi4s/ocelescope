@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Literal, Optional
 from pydantic import DirectoryPath, Field
 from pydantic_settings import BaseSettings
@@ -24,13 +25,13 @@ class OceanConfig(BaseSettings):
         description="When set to True, passes details of internal errors via the API. Always set to False in production environment.",
     )
 
-    DATA_DIR: DirectoryPath | None = Field(
-        default="/app/data",
+    DATA_DIR: DirectoryPath = Field(
+        default=Path("/app/data"),
         description="Path to the data directory, relative to `main.py`",
     )
 
-    PLUGIN_DIR: DirectoryPath | None = Field(
-        default="/plugins",
+    PLUGIN_DIR: DirectoryPath = Field(
+        default=Path("/plugins"),
         description="Path to the directory, where plugins are stored",
     )
 

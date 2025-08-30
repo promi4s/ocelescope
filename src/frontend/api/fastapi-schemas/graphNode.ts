@@ -14,6 +14,21 @@ import type { GraphNodeY } from './graphNodeY';
 import type { GraphNodeBorderColor } from './graphNodeBorderColor';
 import type { GraphNodeLabelPos } from './graphNodeLabelPos';
 
+/**
+ * [TODO:description]
+
+Attributes:
+    id: [TODO:attribute]
+    label: [TODO:attribute]
+    shape: [TODO:attribute]
+    width: [TODO:attribute]
+    height: [TODO:attribute]
+    color: [TODO:attribute]
+    x: [TODO:attribute]
+    y: [TODO:attribute]
+    border_color: [TODO:attribute]
+    label_pos: [TODO:attribute]
+ */
 export interface GraphNode {
   id: string;
   label?: GraphNodeLabel;

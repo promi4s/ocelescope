@@ -42,7 +42,6 @@ class Session:
 
         # OCELS
         self.ocels: dict[str, Filtered_Ocel] = {}
-        self.current_ocel_id = None
 
         self.response_cache: dict[str, Any] = {}
         # Set first state to UUID, to be updated on each response
@@ -91,19 +90,13 @@ class Session:
     def add_ocel(self, ocel: OCEL) -> str:
         self.ocels[ocel.id] = Filtered_Ocel(ocel)
 
-        if not self.current_ocel_id:
-            self.current_ocel_id = ocel.id
-
         return ocel.id
 
-    def get_ocel(
-        self, ocel_id: Optional[str] = None, use_original: bool = False
-    ) -> OCEL:
-        id = ocel_id if ocel_id is not None else self.current_ocel_id
-
-        if id not in self.ocels:
+    def get_ocel(self, ocel_id: str, use_original: bool = False) -> OCEL:
+        if ocel_id not in self.ocels:
             raise NotFound(f"OCEL with id {ocel_id} not found")
-        ocel = self.ocels[id]
+
+        ocel = self.ocels[ocel_id]
 
         return (
             ocel.filtered
@@ -111,18 +104,9 @@ class Session:
             else ocel.original
         )
 
-    def set_current_ocel(self, ocel_id: str):
-        if ocel_id not in self.ocels:
-            raise NotFound(f"OCEL with id {ocel_id} not found")
-
-        self.current_ocel_id = ocel_id
-
     def delete_ocel(self, ocel_id: str):
         if ocel_id not in self.ocels:
             return
-
-        if ocel_id == self.current_ocel_id:
-            self.current_ocel_id = None
 
         self.ocels.pop(ocel_id, None)
         websocket_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
@@ -192,7 +176,6 @@ class Session:
             k: v
             for k, v in {
                 "id": self.id,
-                "ocel": str(self.get_ocel()) if self.get_ocel() else None,
             }.items()
             if v is not None
         }

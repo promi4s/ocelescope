@@ -27,6 +27,9 @@ def get_ocel(
     ocel_id: str | None = None,
     ocel_version: Literal["original", "filtered"] | None = "filtered",
 ):
+    # Used so the generated react queries don't required them so they can be injected from the session strorage
+    if not ocel_id:
+        raise HTTPException(status_code=500, detail="Ocel id is requiered")
     try:
         return session.get_ocel(
             ocel_id, use_original=False if ocel_version != "original" else True
