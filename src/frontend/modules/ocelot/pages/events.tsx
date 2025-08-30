@@ -7,4 +7,5 @@ export default defineModuleRoute({
   component: EventPage,
   label: "Events",
   name: "events",
+  requiresOcel: true,
 });

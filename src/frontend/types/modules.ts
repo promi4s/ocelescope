@@ -18,6 +18,7 @@ export type ModuleDefinition = {
 export type ModuleRouteDefinition = {
   name: string;
   label: string;
+  requiresOcel?: boolean;
   component: React.ComponentType;
 };
 

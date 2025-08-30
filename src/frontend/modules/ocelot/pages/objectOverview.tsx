@@ -12,11 +12,13 @@ import EntityOverview from "../components/EntityOverview";
 import { SearchIcon } from "lucide-react";
 import { useDebouncedState } from "@mantine/hooks";
 import { defineModuleRoute } from "@/lib/modules";
+import useCurrentOcel from "@/hooks/useCurrentOcel";
 
 const ObjectGraph = () => {
-  const { data: o2o } = useO2o();
-  const { data: objectAttributes } = useObjectAttributes();
-  const { data: objectCounts } = useObjectCount();
+  const { id: ocelId } = useCurrentOcel();
+  const { data: o2o } = useO2o({ ocel_id: ocelId });
+  const { data: objectAttributes } = useObjectAttributes({ ocel_id: ocelId });
+  const { data: objectCounts } = useObjectCount({ ocel_id: ocelId });
 
   const [searchValue, setSearchValue] = useDebouncedState("", 200);
   const [vizualization, setVizualization] = useState<"graph" | "cards">(
@@ -102,4 +104,5 @@ export default defineModuleRoute({
   component: ObjectGraph,
   label: "Object Overview",
   name: "objectOverview",
+  requiresOcel: true,
 });

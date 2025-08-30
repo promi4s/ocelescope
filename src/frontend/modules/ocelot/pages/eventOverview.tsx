@@ -8,12 +8,17 @@ import { SearchIcon } from "lucide-react";
 import { useDebouncedState } from "@mantine/hooks";
 import EntityOverview from "../components/EntityOverview";
 import { defineModuleRoute } from "@/lib/modules";
+import useCurrentOcel from "@/hooks/useCurrentOcel";
 
 const EventOverview = () => {
-  const { data: eventsAttributes = {} } = useEventAttributes();
-  const { data: e2o = [] } = useE2o();
-  const { data: eventCounts, isLoading: isEventCountsLoading } =
-    useEventCounts();
+  const { id } = useCurrentOcel();
+  const { data: eventsAttributes = {} } = useEventAttributes({
+    ocel_id: id,
+  });
+  const { data: e2o = [] } = useE2o({ ocel_id: id });
+  const { data: eventCounts, isLoading: isEventCountsLoading } = useEventCounts(
+    { ocel_id: id },
+  );
 
   const [searchValue, setSearchValue] = useDebouncedState("", 200);
   return (
@@ -42,4 +47,5 @@ export default defineModuleRoute({
   component: EventOverview,
   label: "Event Overview",
   name: "eventOverview",
+  requiresOcel: true,
 });

@@ -17,21 +17,36 @@ import { useEffect, useMemo, useState } from "react";
 import EntityTable from "./EntityTable";
 import { Flex } from "@mantine/core";
 import { DataTableSortStatus } from "mantine-datatable";
+import useCurrentOcel from "@/hooks/useCurrentOcel";
 
 const EntityPage: React.FC<{ type: "events" | "objects" }> = ({ type }) => {
-  const { data: eventCounts } = useEventCounts(undefined, {
-    query: { enabled: type === "events" },
-  });
-  const { data: objectCounts } = useObjectCount(undefined, {
-    query: { enabled: type === "objects" },
-  });
+  const { id } = useCurrentOcel();
 
-  const { data: eventAttributes } = useEventAttributes(undefined, {
-    query: { enabled: type === "events" },
-  });
-  const { data: objectAttributes } = useObjectAttributes(undefined, {
-    query: { enabled: type === "objects" },
-  });
+  const { data: eventCounts } = useEventCounts(
+    { ocel_id: id },
+    {
+      query: { enabled: type === "events" },
+    },
+  );
+  const { data: objectCounts } = useObjectCount(
+    { ocel_id: id },
+    {
+      query: { enabled: type === "objects" },
+    },
+  );
+
+  const { data: eventAttributes } = useEventAttributes(
+    { ocel_id: id },
+    {
+      query: { enabled: type === "events" },
+    },
+  );
+  const { data: objectAttributes } = useObjectAttributes(
+    { ocel_id: id },
+    {
+      query: { enabled: type === "objects" },
+    },
+  );
 
   const attributes = type === "events" ? eventAttributes : objectAttributes;
 
@@ -59,6 +74,7 @@ const EntityPage: React.FC<{ type: "events" | "objects" }> = ({ type }) => {
 
   const { data: eventEntities } = useOcelotPaginatedEvents(
     {
+      ocel_id: id,
       activity: currentTab,
       page_size: pageSize,
       page,
@@ -77,6 +93,7 @@ const EntityPage: React.FC<{ type: "events" | "objects" }> = ({ type }) => {
   );
   const { data: objectEntities } = useOcelotPaginatedObjects(
     {
+      ocel_id: id,
       object_type: currentTab,
       page_size: pageSize,
       page,
