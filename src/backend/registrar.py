@@ -49,7 +49,7 @@ def register_modules(app: FastAPI):
 
 def register_initial_plugins():
     base = config.PLUGIN_DIR
-    if not base.exists():
+    if not base:
         return
 
     plugin_ids = [

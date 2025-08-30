@@ -51,6 +51,9 @@ class RegistryManager:
         return self._extension_registry.get_loaded_extensions()
 
     def load_plugins(self, plugin_ids: list[str]) -> list[str]:
+        if not config.PLUGIN_DIR:
+            raise RuntimeError("Plugin directory is not set")
+
         loaded_plugins = []
 
         for id in plugin_ids:
