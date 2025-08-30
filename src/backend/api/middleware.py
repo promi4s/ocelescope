@@ -5,14 +5,14 @@ from api.config import config
 from api.session import Session
 
 
-EXCLUDED_PATHS = ["/logout"]
+EXCLUDED_PATHS = ["/logout", "/docs"]
 
 
-async def ocel_access_middleware(request: Request, call_next):
+async def session_access_middleware(request: Request, call_next):
     if request.url.path in EXCLUDED_PATHS:
         return await call_next(request)
 
-    session_id = request.cookies.get(config.SESSION_ID_HEADER)
+    session_id = request.headers.get(config.SESSION_ID_HEADER)
     session = Session.get(session_id) if session_id else None
 
     # Auto-create session if not found
@@ -25,12 +25,6 @@ async def ocel_access_middleware(request: Request, call_next):
     response: Response = await call_next(request)
 
     # Set the session cookie on the response
-    response.set_cookie(
-        key=config.SESSION_ID_HEADER,
-        value=session.id,
-        httponly=True,
-        path="/",
-        max_age=3600 * 24,  # 1 day
-    )
+    response.headers[config.SESSION_ID_HEADER] = session.id
 
     return response

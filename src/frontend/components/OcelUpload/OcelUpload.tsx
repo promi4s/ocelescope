@@ -52,8 +52,8 @@ const OcelUpload: React.FC<{ onUpload: () => void }> = ({ onUpload }) => {
         {defaultOcels?.map((ocel) => (
           <>
             <Button
+              key={`button_${ocel.key}`}
               variant="subtle"
-              key={ocel.key}
               p={0}
               onClick={() => importDefaultOcel({ params: { key: ocel.key } })}
               leftSection={<ContainerIcon />}
@@ -63,7 +63,7 @@ const OcelUpload: React.FC<{ onUpload: () => void }> = ({ onUpload }) => {
             >
               {ocel.name}
             </Button>
-            <Divider />
+            <Divider key={`divider_${ocel.key}`} />
           </>
         ))}
       </Stack>
