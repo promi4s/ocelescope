@@ -34,6 +34,9 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # Place executables in the environment at the front of the path
 ENV PATH="/app/.venv/bin:$PATH"
 
+ENV DATA_DIR="/app/data"
+ENV PLUGIN_DIR="/plugins"
+
 # Reset the entrypoint, don't invoke `uv`
 ENTRYPOINT []
 
@@ -41,4 +44,4 @@ ENTRYPOINT []
 # Uses `fastapi dev` to enable hot-reloading when the `watch` sync occurs
 # Uses `--host 0.0.0.0` to allow access from outside the container
 
-CMD ["fastapi", "run" ,"index.py","--host", "0.0.0.0"]
+CMD ["fastapi", "run" ,"app.py","--host", "0.0.0.0"]

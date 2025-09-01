@@ -10,7 +10,7 @@ from api.session import Session
 from api.websocket import websocket_manager
 from api.config import config
 from api.docs import init_custom_docs
-from api.middleware import ocel_access_middleware
+from api.middleware import session_access_middleware
 from api.utils import (
     custom_snake2camel,
     error_handler_server,
@@ -53,11 +53,12 @@ origins = [config.FRONTEND_URL]  # Frontend origin
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=True,  # enable cookies
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=[config.SESSION_ID_HEADER],
 )
-app.middleware("http")(ocel_access_middleware)
+app.middleware("http")(session_access_middleware)
 
 # Error handler for internal server errors
 app.exception_handler(Exception)(error_handler_server)
@@ -71,7 +72,7 @@ for route in routes:
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    session_id = websocket.cookies.get(config.SESSION_ID_HEADER)
+    session_id = websocket.query_params.get("session_id")
 
     session = Session.get(session_id) if session_id else None
     if session is None:
