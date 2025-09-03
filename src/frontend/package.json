@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@dagrejs/dagre": "^1.1.4",
+    "@mantine/carousel": "8.1.1",
     "@mantine/charts": "^8.1.1",
     "@mantine/core": "^8.1.1",
     "@mantine/dates": "^8.1.1",
@@ -38,6 +39,8 @@
     "dagre": "^0.8.5",
     "dayjs": "^1.11.13",
     "elkjs": "^0.10.0",
+    "embla-carousel": "8.6.0",
+    "embla-carousel-react": "8.6.0",
     "loadash": "^1.0.0",
     "lucide-react": "^0.511.0",
     "mantine-datatable": "^8.1.2",

@@ -12,6 +12,7 @@ import {
   Divider,
   ThemeIcon,
   Collapse,
+  Title,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useRouter } from "next/router";
@@ -23,6 +24,7 @@ import {
   LogOutIcon,
   PackageIcon,
   PuzzleIcon,
+  TelescopeIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useLogout } from "@/api/fastapi/session/session";
@@ -179,6 +181,7 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               size="sm"
             />
           </Group>
+
           {isClient && isOcelRequired && <CurrentOcelSelect />}
         </Group>
       </MAppShell.Header>

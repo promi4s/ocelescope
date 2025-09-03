@@ -1,3 +1,4 @@
+import useInvalidate from "@/hooks/useInvalidateResources";
 import { WebSocketMessage } from "@/lib/websocket/validator";
 import useSessionStore from "@/store/sessionStore";
 import { env } from "@/util/env";
@@ -7,8 +8,9 @@ import { useEffect } from "react";
 import useWebsocket from "react-use-websocket";
 
 const WebsocketWrapper = () => {
-  const queryClient = useQueryClient();
   const { sessionId } = useSessionStore();
+
+  const invalidate = useInvalidate();
 
   const { lastJsonMessage } = useWebsocket(
     env.websocketUrl,
@@ -40,13 +42,7 @@ const WebsocketWrapper = () => {
         });
         break;
       case "invalidation":
-        queryClient.invalidateQueries({
-          predicate: (query) =>
-            typeof query.queryKey[0] === "string" &&
-            message.routes.some((route) =>
-              (query.queryKey[0] as string).includes(`/${route}`),
-            ),
-        });
+        invalidate(message.routes);
     }
   }, [lastJsonMessage]);
 
