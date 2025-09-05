@@ -1,9 +1,17 @@
-import { useEventCounts, useObjectCount } from "@/api/fastapi/ocels/ocels";
-import { Box, MultiSelect, Select } from "@mantine/core";
+import {
+  useEventAttributes,
+  useEventCounts,
+  useEventIds,
+  useObjectAttributes,
+  useObjectCount,
+  useObjectIds,
+} from "@/api/fastapi/ocels/ocels";
+import { MultiSelect, Select } from "@mantine/core";
 import { FieldProps } from "@rjsf/utils";
 import { Control, useWatch } from "react-hook-form";
 import { PluginInputType } from "..";
-import React, { memo } from "react";
+import React, { memo, useState } from "react";
+import { useDebouncedValue } from "@mantine/hooks";
 
 type OcelFieldProps = {
   value: any;
@@ -15,21 +23,43 @@ type OcelFieldProps = {
   requiered?: boolean;
 };
 
-// TODO: Merge EventType and ObjectTypeSelector
-const EventTypeSelector: React.FC<OcelFieldProps> = ({
-  ocelId,
-  onChange,
-  requiered,
-  value,
-  isMulti,
-  label,
-  description,
-}) => {
-  const { data = {} } = useEventCounts({ ocel_id: ocelId });
-  const SelectComponent = isMulti ? MultiSelect : Select;
+const AttributeSelector: (
+  query: typeof useObjectAttributes | typeof useEventAttributes,
+) => React.FC<OcelFieldProps> =
+  (query) =>
+  ({ isMulti, ocelId, onChange, value, label, requiered, description }) => {
+    const { data: attributes = {} } = query({ ocel_id: ocelId });
+    const attributeNames = new Set(
+      Object.values(attributes).flatMap((attributes) =>
+        attributes.map((attribute) => attribute.attribute),
+      ),
+    );
 
-  return (
-    <Box>
+    const SelectComponent = isMulti ? MultiSelect : Select;
+
+    return (
+      <SelectComponent
+        value={value}
+        label={label}
+        onChange={onChange}
+        required={requiered}
+        description={description}
+        clearable
+        data={[...attributeNames]}
+      />
+    );
+  };
+
+const TypeSelector: (
+  query: typeof useEventCounts | typeof useObjectCount,
+) => React.FC<OcelFieldProps> =
+  (query) =>
+  ({ ocelId, onChange, requiered, value, isMulti, label, description }) => {
+    const { data = {} } = query({ ocel_id: ocelId });
+
+    const SelectComponent = isMulti ? MultiSelect : Select;
+
+    return (
       <SelectComponent
         value={value}
         label={label}
@@ -39,35 +69,42 @@ const EventTypeSelector: React.FC<OcelFieldProps> = ({
         onChange={onChange}
         data={Object.keys(data)}
       />
-    </Box>
-  );
-};
+    );
+  };
 
-const ObjectTypeSelector: React.FC<OcelFieldProps> = memo(
-  ({ ocelId, onChange, requiered, value, isMulti, label, description }) => {
-    const { data = {} } = useObjectCount({ ocel_id: ocelId });
+const IdSelect: (
+  query: typeof useEventIds | typeof useObjectIds,
+) => React.FC<OcelFieldProps> =
+  (query) =>
+  ({ ocelId, isMulti, ...rest }) => {
+    const [searchValue, setSearchValue] = useState<undefined | string>();
+    const [debouncedSearch] = useDebouncedValue(searchValue, 300);
+
+    const { data: ids } = query({
+      ocel_id: ocelId,
+      search: debouncedSearch,
+    });
+
     const SelectComponent = isMulti ? MultiSelect : Select;
 
     return (
-      <Box>
-        <SelectComponent
-          value={value}
-          label={label}
-          required={requiered}
-          clearable
-          description={description}
-          onChange={onChange}
-          data={Object.keys(data)}
-          searchable
-        />
-      </Box>
+      <SelectComponent
+        searchable
+        searchValue={searchValue}
+        onSearchChange={(newSearchValue) => setSearchValue(newSearchValue)}
+        data={ids?.response}
+        {...rest}
+      />
     );
-  },
-);
+  };
 
 const ocelFieldMap: Record<string, React.FC<OcelFieldProps>> = {
-  event_type: EventTypeSelector,
-  object_type: ObjectTypeSelector,
+  event_type: TypeSelector(useEventCounts),
+  object_type: TypeSelector(useObjectCount),
+  event_attribute: AttributeSelector(useEventAttributes),
+  object_attribute: AttributeSelector(useObjectAttributes),
+  event_id: IdSelect(useEventIds),
+  object_id: IdSelect(useObjectIds),
 };
 
 export const wrapFieldsWithContext = (control: Control<PluginInputType>) => {
