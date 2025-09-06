@@ -4,13 +4,14 @@ import shutil
 from tempfile import NamedTemporaryFile
 from typing import Annotated, Literal, Optional
 
-from ocelescope.ocel.filter import OCELFilter
+from ocelescope.ocel.filter import OCELFilter, filters
 from ocelescope.ocel.ocel import OCELFileExtensions
 
 from api.dependencies import ApiOcel, ApiSession
 from api.exceptions import BadRequest, NotFound
+from api.model.base import PaginatedResponse
 from api.model.events import Date_Distribution_Item, Entity_Time_Info
-from api.model.ocel import OcelListResponse, OcelMetadata
+from api.model.ocel import OcelMetadata
 from api.model.response import TempFileResponse
 from ocelescope import AttributeSummary, RelationCountSummary
 
@@ -25,6 +26,8 @@ from tasks.ocel import import_ocel_task
 from util.constants import SUPPORTED_FILE_TYPES
 
 from fastapi import APIRouter, File, Query, Response, UploadFile
+
+from util.pandas import search_paginated_dataframe
 
 
 ocels_router = APIRouter(prefix="/ocels", tags=["ocels"])
@@ -198,6 +201,50 @@ def get_object_relations(
     ocel: ApiOcel, direction: Optional[Literal["source", "target"]] = "source"
 ) -> list[RelationCountSummary]:
     return ocel.o2o_summary(direction=direction)
+
+
+@ocels_router.get("/events/ids", operation_id="eventIds")
+def get_event_ids(
+    ocel: ApiOcel,
+    search: str | None = None,
+    size: int = 10,
+    page: int = 1,
+) -> PaginatedResponse[list[str]]:
+    filtered_df = search_paginated_dataframe(
+        df=ocel.events,
+        page=page,
+        page_size=size,
+        query=search,
+        search_column=ocel.ocel.event_id_column,
+    )
+
+    event_ids: list[str] = filtered_df[ocel.ocel.event_id_column].to_list()
+
+    return PaginatedResponse(
+        response=event_ids, page=page, page_size=size, total_items=len(ocel.events)
+    )
+
+
+@ocels_router.get("/objects/ids", operation_id="objectIds")
+def get_object_ids(
+    ocel: ApiOcel,
+    search: str | None = None,
+    size: int = 10,
+    page: int = 1,
+) -> PaginatedResponse[list[str]]:
+    filtered_df = search_paginated_dataframe(
+        df=ocel.objects,
+        page=page,
+        page_size=size,
+        query=search,
+        search_column=ocel.ocel.object_id_column,
+    )
+
+    object_ids: list[str] = filtered_df[ocel.ocel.object_id_column].to_list()
+
+    return PaginatedResponse(
+        response=object_ids, page=page, page_size=size, total_items=len(ocel.objects)
+    )
 
 
 # endregion

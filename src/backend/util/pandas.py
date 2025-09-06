@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Callable, Hashable, Literal, Sequence
+from typing import Callable, Hashable, Literal, Sequence, cast
 
 import numpy as np
 import pandas as pd
@@ -458,3 +458,23 @@ def index_order(order: list[str], subset: list[str] | None = None):
         return [indices.get(k, n) for k in ix]
 
     return sorter
+
+
+def search_paginated_dataframe(
+    df: pd.DataFrame,
+    page_size: int,
+    page: int,
+    search_column: str | None = None,
+    query: str | None = None,
+) -> pd.DataFrame:
+    filtered = cast(
+        pd.DataFrame,
+        df[df[search_column].str.contains(query, case=False, na=False)]
+        if search_column and query
+        else df,
+    )
+
+    start = (page - 1) * page_size
+    end = start + page_size
+
+    return filtered.iloc[start:end]

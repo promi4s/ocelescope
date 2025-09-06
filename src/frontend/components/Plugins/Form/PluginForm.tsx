@@ -1,11 +1,14 @@
 import Form from "@rjsf/mantine";
 import validator from "@rjsf/validator-ajv8";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Control, Controller } from "react-hook-form";
 import { PluginInputType } from ".";
 import { getComputedSelect } from "./Fields/custom";
 import { UiSchema } from "@rjsf/utils";
 import { wrapFieldsWithContext } from "./Fields/ocel";
+import traverse from "json-schema-traverse";
+import RefParser from "@apidevtools/json-schema-ref-parser";
+import { unflatten } from "flat";
 
 type PluginFormProps = {
   schema: { [key: string]: any };
@@ -15,43 +18,58 @@ type PluginFormProps = {
   methodName: string;
 };
 
-export function buildOcelUiSchema(
-  schema: { [key: string]: unknown },
-  ui: UiSchema = {},
-  path: string[] = [],
-): UiSchema {
-  if (!schema || typeof schema !== "object") return ui;
+export const buildUiSchemaV2 = async ({
+  schema,
+}: { schema: { [key: string]: unknown } }) => {
+  const deref = await RefParser.dereference(schema as any, {
+    dereference: { circular: "ignore" },
+  });
 
-  if (schema.type === "object" && schema.properties) {
-    for (const [key, value] of Object.entries(schema.properties)) {
-      const fullPath = [...path, key];
-      const field = value;
+  const uiSchema: UiSchema = {};
 
-      const meta = (field as any)["x-ui-meta"];
+  traverse(deref, {
+    allKeys: true,
+    cb: (subschema, pointer) => {
+      const pointerComponents = pointer.split("/").slice(1);
 
-      if (meta && meta.type) {
-        let pointer = ui;
-        for (let i = 0; i < fullPath.length - 1; i++) {
-          pointer[fullPath[i]] = pointer[fullPath[i]] || {};
-          pointer = pointer[fullPath[i]] as UiSchema;
-        }
-        pointer[fullPath.at(-1)!] = {
-          "ui:field": meta.field_type ?? meta.type,
+      //so only the root is getting skipped
+      if (pointerComponents[0] !== "properties") return;
+
+      console.log(pointerComponents);
+
+      const path = pointerComponents
+        .filter((pathComponent) => !["x-ui-meta"].includes(pathComponent))
+        .join(".");
+
+      switch (pointerComponents.at(-1)) {
+        case "x-ui-meta":
+          uiSchema[path] = {
+            "ui:field": subschema.field_type,
+          };
+          break;
+      }
+
+      if (
+        pointerComponents[0] === "properties" &&
+        pointerComponents.at(-1) === "x-ui-meta"
+      ) {
+        const path = pointerComponents
+          .filter(
+            (pathComponent) =>
+              !["x-ui-meta", "properties"].includes(pathComponent),
+          )
+          .join(".");
+
+        uiSchema[path] = {
+          "ui:field": subschema.field_type,
         };
       }
+    },
+  });
 
-      if (field.type === "object") {
-        buildOcelUiSchema(field, ui, fullPath);
-      }
+  return unflatten(uiSchema);
+};
 
-      if (field.type === "array" && field.items) {
-        buildOcelUiSchema(field.items, ui, [...fullPath, "items"]);
-      }
-    }
-  }
-
-  return ui;
-}
 const PluginForm: React.FC<PluginFormProps> = ({
   schema,
   control,
@@ -59,8 +77,19 @@ const PluginForm: React.FC<PluginFormProps> = ({
   methodName,
   onSubmit,
 }) => {
-  const uiSchema = useMemo(() => {
-    return buildOcelUiSchema(schema, {}, []);
+  const [uiSchema, setUiSchema] = useState<UiSchema | undefined>(undefined);
+
+  console.log(uiSchema);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const ui = await buildUiSchemaV2({ schema });
+      if (!cancelled) setUiSchema(ui as UiSchema);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [schema]);
 
   const fields = useMemo(() => wrapFieldsWithContext(control), [control]);

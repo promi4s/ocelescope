@@ -34,6 +34,7 @@ import type {
   EventAttributesParams,
   EventCounts200,
   EventCountsParams,
+  EventIdsParams,
   GetDefaultOcelParams,
   GetFilters200,
   GetFiltersParams,
@@ -46,7 +47,9 @@ import type {
   ObjectAttributesParams,
   ObjectCount200,
   ObjectCountParams,
+  ObjectIdsParams,
   OcelMetadata,
+  PaginatedResponseListStr,
   RelationCountSummary,
   RenameOcelParams,
   SetFilters200,
@@ -1104,6 +1107,210 @@ export function useO2o<TData = Awaited<ReturnType<typeof o2o>>, TError = HTTPVal
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getO2oQueryOptions(params,options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+/**
+ * @summary Get Event Ids
+ */
+export const getEventIdsUrl = (params?: EventIdsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `http://localhost:8000/ocels/events/ids?${stringifiedParams}` : `http://localhost:8000/ocels/events/ids`
+}
+
+export const eventIds = async (params?: EventIdsParams, options?: RequestInit): Promise<PaginatedResponseListStr> => {
+  
+  return customFetch<PaginatedResponseListStr>(getEventIdsUrl(params),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+export const getEventIdsQueryKey = (params?: EventIdsParams,) => {
+    return [`http://localhost:8000/ocels/events/ids`, ...(params ? [params]: [])] as const;
+    }
+
+    
+export const getEventIdsQueryOptions = <TData = Awaited<ReturnType<typeof eventIds>>, TError = HTTPValidationError>(params?: EventIdsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventIds>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getEventIdsQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof eventIds>>> = ({ signal }) => eventIds(params, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn,   staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof eventIds>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type EventIdsQueryResult = NonNullable<Awaited<ReturnType<typeof eventIds>>>
+export type EventIdsQueryError = HTTPValidationError
+
+
+export function useEventIds<TData = Awaited<ReturnType<typeof eventIds>>, TError = HTTPValidationError>(
+ params: undefined |  EventIdsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventIds>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof eventIds>>,
+          TError,
+          Awaited<ReturnType<typeof eventIds>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useEventIds<TData = Awaited<ReturnType<typeof eventIds>>, TError = HTTPValidationError>(
+ params?: EventIdsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventIds>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof eventIds>>,
+          TError,
+          Awaited<ReturnType<typeof eventIds>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useEventIds<TData = Awaited<ReturnType<typeof eventIds>>, TError = HTTPValidationError>(
+ params?: EventIdsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventIds>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Event Ids
+ */
+
+export function useEventIds<TData = Awaited<ReturnType<typeof eventIds>>, TError = HTTPValidationError>(
+ params?: EventIdsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventIds>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getEventIdsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+/**
+ * @summary Get Object Ids
+ */
+export const getObjectIdsUrl = (params?: ObjectIdsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `http://localhost:8000/ocels/objects/ids?${stringifiedParams}` : `http://localhost:8000/ocels/objects/ids`
+}
+
+export const objectIds = async (params?: ObjectIdsParams, options?: RequestInit): Promise<PaginatedResponseListStr> => {
+  
+  return customFetch<PaginatedResponseListStr>(getObjectIdsUrl(params),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+export const getObjectIdsQueryKey = (params?: ObjectIdsParams,) => {
+    return [`http://localhost:8000/ocels/objects/ids`, ...(params ? [params]: [])] as const;
+    }
+
+    
+export const getObjectIdsQueryOptions = <TData = Awaited<ReturnType<typeof objectIds>>, TError = HTTPValidationError>(params?: ObjectIdsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof objectIds>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getObjectIdsQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof objectIds>>> = ({ signal }) => objectIds(params, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn,   staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof objectIds>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ObjectIdsQueryResult = NonNullable<Awaited<ReturnType<typeof objectIds>>>
+export type ObjectIdsQueryError = HTTPValidationError
+
+
+export function useObjectIds<TData = Awaited<ReturnType<typeof objectIds>>, TError = HTTPValidationError>(
+ params: undefined |  ObjectIdsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof objectIds>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof objectIds>>,
+          TError,
+          Awaited<ReturnType<typeof objectIds>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useObjectIds<TData = Awaited<ReturnType<typeof objectIds>>, TError = HTTPValidationError>(
+ params?: ObjectIdsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof objectIds>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof objectIds>>,
+          TError,
+          Awaited<ReturnType<typeof objectIds>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useObjectIds<TData = Awaited<ReturnType<typeof objectIds>>, TError = HTTPValidationError>(
+ params?: ObjectIdsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof objectIds>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Object Ids
+ */
+
+export function useObjectIds<TData = Awaited<ReturnType<typeof objectIds>>, TError = HTTPValidationError>(
+ params?: ObjectIdsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof objectIds>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getObjectIdsQueryOptions(params,options)
 
   const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

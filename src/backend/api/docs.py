@@ -3,78 +3,11 @@
 # Hide curl commands
 # source: https://github.com/tiangolo/fastapi/discussions/3853#discussioncomment-1388209
 
-import json
-from typing import Any, Literal
+from typing import Literal
 
 from fastapi import FastAPI
-from fastapi.encoders import jsonable_encoder
+from api.config import config
 from starlette.responses import HTMLResponse
-
-
-def get_swagger_ui_html(
-    *,
-    openapi_url: str,
-    title: str,
-    swagger_js_url: str = "https://cdn.jsdelivr.net/npm/swagger-ui-dist@3/swagger-ui-bundle.js",
-    swagger_css_url: str = "https://cdn.jsdelivr.net/npm/swagger-ui-dist@3/swagger-ui.css",
-    swagger_favicon_url: str = "https://fastapi.tiangolo.com/img/favicon.png",
-    oauth2_redirect_url: str | None = None,
-    init_oauth: dict[str, Any] | None = None,
-    omit_curl: bool = False,
-) -> HTMLResponse:
-    js_oauth2_redirect_url = (
-        f"oauth2RedirectUrl: window.location.origin + '{oauth2_redirect_url}',"
-        if oauth2_redirect_url
-        else ""
-    )
-    js_init_oauth = (
-        f"ui.initOAuth({json.dumps(jsonable_encoder(init_oauth))})"
-        if init_oauth
-        else ""
-    )
-
-    html = f"""
-    <!DOCTYPE html>
-    <html>
-        <head>
-            <link type="text/css" rel="stylesheet" href="{swagger_css_url}">
-            <link rel="shortcut icon" href="{swagger_favicon_url}">
-            <title>{title}</title>
-        </head>
-        <body>
-            <div id="swagger-ui">
-            </div>
-            <script src="{swagger_js_url}"></script>
-            <!-- `SwaggerUIBundle` is now available on the page -->
-            <script>
-                const HideCurlPlugin = () => {{
-                    return {{
-                        wrapComponents: {{
-                            curl: () => () => null
-                        }}
-                    }}
-                }}
-                const ui = SwaggerUIBundle({{
-                    url: '{openapi_url}',
-                    plugins: [
-                        {"HideCurlPlugin" if omit_curl else ""}
-                    ],
-                    {js_oauth2_redirect_url}
-                    dom_id: '#swagger-ui',
-                    presets: [
-                    SwaggerUIBundle.presets.apis,
-                    SwaggerUIBundle.SwaggerUIStandalonePreset
-                    ],
-                    layout: "BaseLayout",
-                    deepLinking: true,
-                    showExtensions: true,
-                    showCommonExtensions: true
-                }})
-                {js_init_oauth}
-            </script>
-        </body>
-    </html>"""
-    return HTMLResponse(html)
 
 
 def get_rapidoc_html(
@@ -100,9 +33,11 @@ def get_rapidoc_html(
                 layout="row"
                 render-style="view"
                 allow-server-selection="false"
-                allow-authentication="false"
                 show-header="false"
                 show-components="true"
+                api-key-name="{config.SESSION_ID_HEADER}"
+                api-key-location="header"
+                api-key-value="-"
             ></rapi-doc>
         </body>
     </html>
