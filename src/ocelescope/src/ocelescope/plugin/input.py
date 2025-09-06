@@ -9,7 +9,15 @@ class PluginInput(ABC, BaseModel, frozen=True):
 
 def OCEL_FIELD(
     *,
-    field_type: Literal["object_type", "event_type"],
+    field_type: Literal[
+        "object_type",
+        "event_type",
+        "event_id",
+        "object_id",
+        "event_attribute",
+        "object_attribute",
+        "time_frame",
+    ],
     ocel_id: str,
     default: Any = ...,
     title: Optional[str] = None,
