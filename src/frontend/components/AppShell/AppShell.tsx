@@ -5,14 +5,13 @@ import {
   Text,
   UnstyledButton,
   Box,
-  ScrollArea,
   Button,
   Modal,
   Stack,
   Divider,
   ThemeIcon,
   Collapse,
-  Title,
+  NavLink,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useRouter } from "next/router";
@@ -24,14 +23,17 @@ import {
   LogOutIcon,
   PackageIcon,
   PuzzleIcon,
-  TelescopeIcon,
   UploadIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useLogout } from "@/api/fastapi/session/session";
 import { useQueryClient } from "@tanstack/react-query";
 import { getModuleRoute } from "@/lib/modules";
-import { ModuleName, ModuleRouteName } from "@/types/modules";
+import {
+  ModuleName,
+  ModuleRouteDefinition,
+  ModuleRouteName,
+} from "@/types/modules";
 import useModulePath from "@/hooks/useModulePath";
 import moduleMap from "@/lib/modules/module-map";
 import CurrentOcelSelect from "../CurrentOcelSelect/CurrentOcelSelect";
@@ -149,13 +151,18 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const router = useRouter();
 
   const isClient = useClient();
 
   const modulePath = useModulePath();
 
   const isOcelRequired = modulePath
-    ? moduleMap[modulePath.name].routes[modulePath.route].requiresOcel
+    ? (
+        moduleMap[modulePath.name as ModuleName].routes[
+          modulePath.route as ModuleRouteName<ModuleName>
+        ] as ModuleRouteDefinition
+      ).requiresOcel
     : false;
 
   return (
@@ -202,52 +209,60 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       </MAppShell.Header>
       <MAppShell.Navbar className={classes.navbar}>
         <Stack justify="space-between" h={"100%"} gap={0}>
-          <Divider />
-          <UnstyledButton
-            component={Link}
-            href={"/"}
-            className={classes.control}
-          >
-            <Group>
-              <ThemeIcon variant="transparent" size={30}>
-                <HomeIcon size={18} />
-              </ThemeIcon>
-              Home
-            </Group>
-          </UnstyledButton>
-          <UnstyledButton
-            className={classes.control}
-            component={Link}
-            href={"/plugins"}
-          >
-            <Group>
-              <ThemeIcon variant="transparent" size={30}>
-                <PuzzleIcon size={18} />
-              </ThemeIcon>
-              Plugins
-            </Group>
-          </UnstyledButton>
-
-          <ScrollArea className={classes.links} px={"md"}>
+          <Stack gap={0} flex={1}>
+            <NavLink
+              component={Link}
+              href="/"
+              label="Home"
+              leftSection={<HomeIcon size={16} />}
+              active={router.asPath === "/"}
+            />
+            <NavLink
+              component={Link}
+              href="/plugins"
+              label="Plugins"
+              leftSection={<PuzzleIcon size={16} />}
+              active={router.asPath.split("/")[1] === "plugins"}
+            />
+            <Divider />
             {Object.values(moduleMap).map(
-              ({ label, name: moduleName, routes, icon }) => (
-                <div key={moduleName} className={classes.linksInner}>
-                  <LinksGroup
-                    label={label}
-                    links={Object.values(routes).map(({ label, name }) => ({
-                      label,
-                      link: getModuleRoute({
-                        name: moduleName as ModuleName,
-                        route: name as ModuleRouteName<ModuleName>,
-                      }),
-                    }))}
-                    icon={icon}
-                    initiallyOpened={modulePath?.name === moduleName}
-                  />
-                </div>
+              ({ label, name, icon: Icon = PackageIcon, routes }) => (
+                <NavLink
+                  leftSection={<Icon width={18} height={18} size={18} />}
+                  label={label}
+                  defaultOpened={name === modulePath?.name}
+                  component={Link}
+                  href={getModuleRoute({
+                    name: name as ModuleName,
+                    route: Object.values(routes)[0]
+                      .name as ModuleRouteName<ModuleName>,
+                  })}
+                  active={
+                    Object.keys(routes).length === 1 &&
+                    name === modulePath?.name
+                  }
+                >
+                  {Object.keys(routes).length > 1 &&
+                    Object.values(routes).map(
+                      ({ label: routeLabel, name: routeName }) => (
+                        <NavLink
+                          label={routeLabel}
+                          href={getModuleRoute({
+                            name: name as ModuleName,
+                            route: routeName as ModuleRouteName<ModuleName>,
+                          })}
+                          component={Link}
+                          active={
+                            name === modulePath?.name &&
+                            routeName === modulePath.route
+                          }
+                        />
+                      ),
+                    )}
+                </NavLink>
               ),
             )}
-          </ScrollArea>
+          </Stack>
           <Divider />
           <LogoutButton />
         </Stack>

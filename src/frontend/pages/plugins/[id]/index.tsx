@@ -82,7 +82,7 @@ const PluginPage: React.FC = () => {
 
   const { data: plugin } = useGetPlugin(id as string);
   return (
-    <Container>
+    <Container fluid>
       <Stack>
         <Stack gap={"xs"} align="center">
           <Breadcrumbs>
