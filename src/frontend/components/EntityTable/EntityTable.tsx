@@ -12,7 +12,14 @@ import { formatDateTime } from "@/util/formatters";
 import { DataTable } from "mantine-datatable";
 import { useCallback, useMemo, useState } from "react";
 import UploadSection from "../UploadSection/UploadSection";
-import { ActionIcon, Group, Menu, TextInput, Title } from "@mantine/core";
+import {
+  ActionIcon,
+  Badge,
+  Group,
+  Menu,
+  TextInput,
+  Title,
+} from "@mantine/core";
 import {
   Check,
   Download,
@@ -22,9 +29,11 @@ import {
   X,
 } from "lucide-react";
 import useInvalidate from "@/hooks/useInvalidateResources";
+import dayjs from "dayjs";
 
 type Entity = {
   type: "ocel" | "resource";
+  entityTypes: string[];
   id: string;
   name: string;
   createdAt: string;
@@ -84,12 +93,23 @@ const EntityTable: React.FC = () => {
         id,
         name,
         type: "ocel" as const,
+        entityTypes: extensions.map(({ label }) => label),
         createdAt: formatDateTime(created_at),
         downloadFormats: [".xml", ".json", ".sqlite"],
       }),
     );
 
-    return [...ocelEntities];
+    const resourceEntities = resources.map<Entity>(
+      ({ id, name, type, created_at }) => ({
+        id,
+        name,
+        entityTypes: [type],
+        type: "resource",
+        createdAt: dayjs(created_at).toISOString(),
+      }),
+    );
+
+    return [...ocelEntities, ...resourceEntities];
   }, [ocels, resources]);
 
   return (
@@ -144,7 +164,19 @@ const EntityTable: React.FC = () => {
               ),
             },
             { accessor: "createdAt" },
-            { accessor: "type" },
+            {
+              accessor: "entityTypes",
+              title: "Type",
+              render: ({ type, entityTypes }) => (
+                <Group>
+                  {[...(type === "ocel" ? ["OCEL"] : []), ...entityTypes].map(
+                    (entityType) => (
+                      <Badge>{entityType.toUpperCase()}</Badge>
+                    ),
+                  )}
+                </Group>
+              ),
+            },
             {
               accessor: "",
               textAlign: "right",

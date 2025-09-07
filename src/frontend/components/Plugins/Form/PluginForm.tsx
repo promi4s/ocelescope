@@ -35,20 +35,6 @@ export const buildUiSchemaV2 = async ({
       //so only the root is getting skipped
       if (pointerComponents[0] !== "properties") return;
 
-      console.log(pointerComponents);
-
-      const path = pointerComponents
-        .filter((pathComponent) => !["x-ui-meta"].includes(pathComponent))
-        .join(".");
-
-      switch (pointerComponents.at(-1)) {
-        case "x-ui-meta":
-          uiSchema[path] = {
-            "ui:field": subschema.field_type,
-          };
-          break;
-      }
-
       if (
         pointerComponents[0] === "properties" &&
         pointerComponents.at(-1) === "x-ui-meta"
@@ -61,7 +47,7 @@ export const buildUiSchemaV2 = async ({
           .join(".");
 
         uiSchema[path] = {
-          "ui:field": subschema.field_type,
+          "ui:field": subschema.field_type ?? subschema.type,
         };
       }
     },
@@ -79,7 +65,6 @@ const PluginForm: React.FC<PluginFormProps> = ({
 }) => {
   const [uiSchema, setUiSchema] = useState<UiSchema | undefined>(undefined);
 
-  console.log(uiSchema);
   useEffect(() => {
     let cancelled = false;
     (async () => {
