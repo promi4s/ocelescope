@@ -57,7 +57,7 @@ export const PluginCard: React.FC<{ plugin: PluginApi }> = ({ plugin }) => {
   return (
     <Card
       component={Link}
-      href={"/plugins"}
+      href={`/plugins/${plugin.id}`}
       shadow="sm"
       padding="lg"
       radius="md"

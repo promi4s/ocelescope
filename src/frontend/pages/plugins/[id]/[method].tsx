@@ -1,7 +1,19 @@
-import { useGetPluginMethod } from "@/api/fastapi/plugins/plugins";
+import {
+  useGetPlugin,
+  useGetPluginMethod,
+} from "@/api/fastapi/plugins/plugins";
 import PluginInput from "@/components/Plugins/Form";
 import ResultSection from "@/components/Plugins/ResultSection/ResultSection";
-import { Container, LoadingOverlay, Stack, Text, Title } from "@mantine/core";
+import {
+  Anchor,
+  Breadcrumbs,
+  Container,
+  LoadingOverlay,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
@@ -13,6 +25,8 @@ const PluginPage = () => {
     id as string,
     method as string,
   );
+
+  const { data: plugin } = useGetPlugin(id as string);
 
   useEffect(() => {
     if (!pluginMethod && !isLoading) {
@@ -29,11 +43,26 @@ const PluginPage = () => {
   return (
     <Container>
       <Stack gap={"xl"}>
-        <Stack gap={0}>
-          <Title>{pluginMethod?.label ?? method}</Title>
-          {pluginMethod?.description && (
-            <Text>{pluginMethod?.description}</Text>
-          )}
+        <Stack align="center">
+          <Breadcrumbs>
+            {[
+              <Anchor component={Link} href="/plugins">
+                Plugins
+              </Anchor>,
+              <Anchor component={Link} href={`/plugins/${id}`}>
+                {plugin?.meta.label}
+              </Anchor>,
+              <Anchor component={Link} href={`/plugins/${id}`}>
+                {pluginMethod.label}
+              </Anchor>,
+            ]}
+          </Breadcrumbs>
+          <Stack gap={0}>
+            <Title>{pluginMethod?.label ?? method}</Title>
+            {pluginMethod?.description && (
+              <Text>{pluginMethod?.description}</Text>
+            )}
+          </Stack>
         </Stack>
         <PluginInput
           onSuccess={setCurrentTask}
