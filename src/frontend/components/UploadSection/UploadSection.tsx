@@ -62,7 +62,7 @@ const UploadSection: React.FC<{
           ),
         }}
         accept={{
-          "application/json": [".json", ".jsonocel"],
+          "application/json": [".json", ".jsonocel", ".ocelescope"],
           "application/xml": [".xml", ".xmlocel"],
           "application/vnd.sqlite3": [".sqlite"],
           "application/zip": [".zip"],

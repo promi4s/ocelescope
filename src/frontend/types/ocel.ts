@@ -1,4 +1,5 @@
 import {
+  DownloadOcelOcelsDownloadGetExt,
   EventAttributes200Item,
   GetFiltersParams,
   ObjectAttributes200Item,
@@ -7,3 +8,5 @@ import {
 export type OcelInputType = GetFiltersParams;
 
 export type OcelAttribute = ObjectAttributes200Item | EventAttributes200Item;
+
+export type OCELExtensions = DownloadOcelOcelsDownloadGetExt;

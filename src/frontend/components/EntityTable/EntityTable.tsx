@@ -5,6 +5,7 @@ import {
 } from "@/api/fastapi/ocels/ocels";
 import {
   useDeleteResource,
+  useGetResourceMeta,
   useRenameResource,
   useResources,
 } from "@/api/fastapi/resources/resources";
@@ -31,6 +32,8 @@ import {
 import useInvalidate from "@/hooks/useInvalidateResources";
 import dayjs from "dayjs";
 import uniqolor from "uniqolor";
+import { OCELExtensions } from "@/types/ocel";
+import { useDownloadFile } from "@/hooks/useDownload";
 
 type Entity = {
   type: "ocel" | "resource";
@@ -41,11 +44,15 @@ type Entity = {
   downloadFormats?: string[];
 };
 
+const ocelExtenisions: OCELExtensions[] = [".sqlite", ".xmlocel", ".jsonocel"];
+
 const EntityTable: React.FC = () => {
   const { data: ocels = [] } = useGetOcels();
   const { data: resources = [] } = useResources();
 
   const invalidate = useInvalidate();
+  const downloadFile = useDownloadFile();
+  const { data: resourceMeta = {} } = useGetResourceMeta();
 
   const { mutate: deleteResource } = useDeleteResource({
     mutation: { onSuccess: () => invalidate(["resources"]) },
@@ -104,14 +111,14 @@ const EntityTable: React.FC = () => {
       ({ id, name, type, created_at }) => ({
         id,
         name,
-        entityTypes: [type],
+        entityTypes: [resourceMeta[type].label ?? type],
         type: "resource",
         createdAt: formatDateTime(dayjs(created_at).toISOString()),
       }),
     );
 
     return [...ocelEntities, ...resourceEntities];
-  }, [ocels, resources]);
+  }, [ocels, resources, resourceMeta]);
 
   return (
     <>
@@ -173,7 +180,7 @@ const EntityTable: React.FC = () => {
                   {[...(type === "ocel" ? ["OCEL"] : []), ...entityTypes].map(
                     (entityType) => (
                       <Badge color={uniqolor(entityType).color}>
-                        {entityType.toUpperCase()}
+                        {entityType}
                       </Badge>
                     ),
                   )}
@@ -184,7 +191,7 @@ const EntityTable: React.FC = () => {
               accessor: "",
               textAlign: "right",
               width: "0%",
-              render: ({ type, id, name, downloadFormats }) => (
+              render: ({ type, id, name }) => (
                 <Menu width={200} position="left-start">
                   <Menu.Target>
                     <ActionIcon
@@ -201,16 +208,37 @@ const EntityTable: React.FC = () => {
                     >
                       Rename
                     </Menu.Item>
-
-                    <Menu.Sub>
-                      <Menu.Sub.Target>
-                        <Menu.Sub.Item leftSection={<Download size={16} />}>
-                          Download
-                        </Menu.Sub.Item>
-                      </Menu.Sub.Target>
-
-                      <Menu.Sub.Dropdown></Menu.Sub.Dropdown>
-                    </Menu.Sub>
+                    {type === "ocel" ? (
+                      <Menu.Sub position="right-start">
+                        <Menu.Sub.Target>
+                          <Menu.Sub.Item leftSection={<Download size={16} />}>
+                            Download
+                          </Menu.Sub.Item>
+                        </Menu.Sub.Target>
+                        <Menu.Sub.Dropdown>
+                          {ocelExtenisions.map((extension) => (
+                            <Menu.Item
+                              onClick={() =>
+                                downloadFile(
+                                  `/ocels/download?${new URLSearchParams({ ocel_id: id, ext: extension }).toString()}`,
+                                )
+                              }
+                            >
+                              {extension}
+                            </Menu.Item>
+                          ))}
+                        </Menu.Sub.Dropdown>
+                      </Menu.Sub>
+                    ) : (
+                      <Menu.Item
+                        onClick={() =>
+                          downloadFile(`/resources/resource/${id}/download`)
+                        }
+                        leftSection={<Download size={16} />}
+                      >
+                        Download
+                      </Menu.Item>
+                    )}
                     <Menu.Divider />
                     <Menu.Item
                       leftSection={<Trash size={16} color={"red"} />}

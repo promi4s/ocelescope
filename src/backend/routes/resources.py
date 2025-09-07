@@ -61,8 +61,10 @@ def download_output(session: ApiSession, resource_id: str):
 
     return StreamingResponse(
         content=json_bytes,
-        media_type="application/json",
-        headers={"Content-Disposition": f"attachment; filename={resource.name}.json"},
+        media_type="application/octet-stream",
+        headers={
+            "Content-Disposition": f"attachment; filename={resource.name}.ocelescope"
+        },
     )
 
 
