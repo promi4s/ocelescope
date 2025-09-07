@@ -60,7 +60,7 @@ const LogoutButton: React.FC = () => {
         title="Are you sure?"
       >
         <Text>
-          If you leave now, all your data and progress will be
+          If you leave now, all your data and progress will be{" "}
           <strong>deleted permanently</strong>. This action cannot be undone.
         </Text>
 

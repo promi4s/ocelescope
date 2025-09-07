@@ -12,10 +12,16 @@ import { useNotificationContext } from "../TaskNotification/TaskNotificationProv
 
 type UploadTypes = "ocel" | "resource" | "plugin";
 
+const uploadTypeToString: Record<UploadTypes, string> = {
+  ocel: "OCELs",
+  resource: "Resources",
+  plugin: "Plugins",
+};
+
 const UploadSection: React.FC<{
   acceptedTypes?: UploadTypes[];
   onSuccess?: () => void;
-}> = ({ onSuccess }) => {
+}> = ({ onSuccess, acceptedTypes = ["plugin", "ocel", "resource"] }) => {
   const { data: ocels } = useGetDefaultOcel({ only_latest_versions: true });
 
   const invalidate = useInvalidate();
@@ -51,8 +57,7 @@ const UploadSection: React.FC<{
         content={{
           description: (
             <span>
-              Drag&apos;n&apos;drop your OCELs, Resources and Plugins here to
-              upload.
+              {`Drag'n'drop your ${acceptedTypes.map((type) => uploadTypeToString[type]).join(", ")} here to upload.`}
             </span>
           ),
         }}
@@ -66,33 +71,35 @@ const UploadSection: React.FC<{
           upload({ data: { files } });
         }}
       />
-      <Title size={"h4"}>Default OCELS</Title>
-      {ocels && (
-        <Box flex={1} mih={0}>
-          <DataTable
-            noHeader
-            records={ocels}
-            highlightOnHover
-            withRowBorders={false}
-            onRowClick={({ record }) => mutate({ params: { ...record } })}
-            columns={[
-              {
-                accessor: "",
-                render: () => (
-                  <ThemeIcon variant="transparent">
-                    <ContainerIcon />
-                  </ThemeIcon>
-                ),
-              },
-              { accessor: "name" },
-              {
-                accessor: "version",
-                textAlign: "right",
-                render: ({ version }) => `v${version}`,
-              },
-            ]}
-          />
-        </Box>
+      {ocels && acceptedTypes.includes("ocel") && (
+        <>
+          <Title size={"h4"}>Default OCELS</Title>
+          <Box flex={1} mih={0}>
+            <DataTable
+              noHeader
+              records={ocels}
+              highlightOnHover
+              withRowBorders={false}
+              onRowClick={({ record }) => mutate({ params: { ...record } })}
+              columns={[
+                {
+                  accessor: "",
+                  render: () => (
+                    <ThemeIcon variant="transparent">
+                      <ContainerIcon />
+                    </ThemeIcon>
+                  ),
+                },
+                { accessor: "name" },
+                {
+                  accessor: "version",
+                  textAlign: "right",
+                  render: ({ version }) => `v${version}`,
+                },
+              ]}
+            />
+          </Box>
+        </>
       )}
     </Stack>
   );

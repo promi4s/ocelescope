@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import useInvalidate from "@/hooks/useInvalidateResources";
 import dayjs from "dayjs";
+import uniqolor from "uniqolor";
 
 type Entity = {
   type: "ocel" | "resource";
@@ -105,7 +106,7 @@ const EntityTable: React.FC = () => {
         name,
         entityTypes: [type],
         type: "resource",
-        createdAt: dayjs(created_at).toISOString(),
+        createdAt: formatDateTime(dayjs(created_at).toISOString()),
       }),
     );
 
@@ -168,10 +169,12 @@ const EntityTable: React.FC = () => {
               accessor: "entityTypes",
               title: "Type",
               render: ({ type, entityTypes }) => (
-                <Group>
+                <Group gap={"xs"}>
                   {[...(type === "ocel" ? ["OCEL"] : []), ...entityTypes].map(
                     (entityType) => (
-                      <Badge>{entityType.toUpperCase()}</Badge>
+                      <Badge color={uniqolor(entityType).color}>
+                        {entityType.toUpperCase()}
+                      </Badge>
                     ),
                   )}
                 </Group>

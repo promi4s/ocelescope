@@ -55,6 +55,7 @@
     "react-use-websocket": "^4.13.0",
     "react-zoom-pan-pinch": "^3.7.0",
     "recharts": "^2.15.3",
+    "uniqolor": "^1.1.1",
     "zod": "^4.0.10"
   },
   "devDependencies": {
