@@ -23,6 +23,7 @@ from registry import registry_manager
 
 from fastapi import APIRouter, Query, Response
 
+from registry.registries.extension import OCELExtensionDescription
 from util.pandas import search_paginated_dataframe
 
 
@@ -263,6 +264,15 @@ def set_filter(
     session.filter_ocel(ocel_id=ocel.id, filters=filter)
 
     return session.get_ocel_filters(ocel.id)
+
+
+# endregion
+# region extensions
+
+
+@ocels_router.get("/extension/meta", operation_id="getExtensionMeta")
+def get_extension_meta() -> dict[str, OCELExtensionDescription]:
+    return registry_manager.get_extension_descriptions()
 
 
 # endregion

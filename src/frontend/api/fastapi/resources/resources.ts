@@ -25,6 +25,7 @@ import type {
 
 import type {
   BodyUploadResource,
+  GetResourceMeta200,
   GetResourceResponse,
   HTTPValidationError,
   RenameResourceParams,
@@ -215,19 +216,19 @@ export const useUploadResource = <TError = HTTPValidationError,
       return useMutation(mutationOptions , queryClient);
     }
     /**
- * @summary Download Output
+ * @summary Get Resource Meta
  */
-export const getDownloadOutputResourcesResourceIdDownloadGetUrl = (resourceId: string,) => {
+export const getGetResourceMetaUrl = () => {
 
 
   
 
-  return `http://localhost:8000/resources/${resourceId}/download`
+  return `http://localhost:8000/resources/meta`
 }
 
-export const downloadOutputResourcesResourceIdDownloadGet = async (resourceId: string, options?: RequestInit): Promise<unknown> => {
+export const getResourceMeta = async ( options?: RequestInit): Promise<GetResourceMeta200> => {
   
-  return customFetch<unknown>(getDownloadOutputResourcesResourceIdDownloadGetUrl(resourceId),
+  return customFetch<GetResourceMeta200>(getGetResourceMetaUrl(),
   {      
     ...options,
     method: 'GET'
@@ -238,67 +239,162 @@ export const downloadOutputResourcesResourceIdDownloadGet = async (resourceId: s
 
 
 
-export const getDownloadOutputResourcesResourceIdDownloadGetQueryKey = (resourceId: string,) => {
-    return [`http://localhost:8000/resources/${resourceId}/download`] as const;
+export const getGetResourceMetaQueryKey = () => {
+    return [`http://localhost:8000/resources/meta`] as const;
     }
 
     
-export const getDownloadOutputResourcesResourceIdDownloadGetQueryOptions = <TData = Awaited<ReturnType<typeof downloadOutputResourcesResourceIdDownloadGet>>, TError = HTTPValidationError>(resourceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadOutputResourcesResourceIdDownloadGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetResourceMetaQueryOptions = <TData = Awaited<ReturnType<typeof getResourceMeta>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getResourceMeta>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getDownloadOutputResourcesResourceIdDownloadGetQueryKey(resourceId);
+  const queryKey =  queryOptions?.queryKey ?? getGetResourceMetaQueryKey();
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof downloadOutputResourcesResourceIdDownloadGet>>> = ({ signal }) => downloadOutputResourcesResourceIdDownloadGet(resourceId, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getResourceMeta>>> = ({ signal }) => getResourceMeta({ signal, ...requestOptions });
 
       
 
       
 
-   return  { queryKey, queryFn, enabled: !!(resourceId),  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof downloadOutputResourcesResourceIdDownloadGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn,   staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getResourceMeta>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type DownloadOutputResourcesResourceIdDownloadGetQueryResult = NonNullable<Awaited<ReturnType<typeof downloadOutputResourcesResourceIdDownloadGet>>>
-export type DownloadOutputResourcesResourceIdDownloadGetQueryError = HTTPValidationError
+export type GetResourceMetaQueryResult = NonNullable<Awaited<ReturnType<typeof getResourceMeta>>>
+export type GetResourceMetaQueryError = unknown
 
 
-export function useDownloadOutputResourcesResourceIdDownloadGet<TData = Awaited<ReturnType<typeof downloadOutputResourcesResourceIdDownloadGet>>, TError = HTTPValidationError>(
- resourceId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadOutputResourcesResourceIdDownloadGet>>, TError, TData>> & Pick<
+export function useGetResourceMeta<TData = Awaited<ReturnType<typeof getResourceMeta>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getResourceMeta>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof downloadOutputResourcesResourceIdDownloadGet>>,
+          Awaited<ReturnType<typeof getResourceMeta>>,
           TError,
-          Awaited<ReturnType<typeof downloadOutputResourcesResourceIdDownloadGet>>
+          Awaited<ReturnType<typeof getResourceMeta>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useDownloadOutputResourcesResourceIdDownloadGet<TData = Awaited<ReturnType<typeof downloadOutputResourcesResourceIdDownloadGet>>, TError = HTTPValidationError>(
- resourceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadOutputResourcesResourceIdDownloadGet>>, TError, TData>> & Pick<
+export function useGetResourceMeta<TData = Awaited<ReturnType<typeof getResourceMeta>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getResourceMeta>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof downloadOutputResourcesResourceIdDownloadGet>>,
+          Awaited<ReturnType<typeof getResourceMeta>>,
           TError,
-          Awaited<ReturnType<typeof downloadOutputResourcesResourceIdDownloadGet>>
+          Awaited<ReturnType<typeof getResourceMeta>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useDownloadOutputResourcesResourceIdDownloadGet<TData = Awaited<ReturnType<typeof downloadOutputResourcesResourceIdDownloadGet>>, TError = HTTPValidationError>(
- resourceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadOutputResourcesResourceIdDownloadGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export function useGetResourceMeta<TData = Awaited<ReturnType<typeof getResourceMeta>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getResourceMeta>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Resource Meta
+ */
+
+export function useGetResourceMeta<TData = Awaited<ReturnType<typeof getResourceMeta>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getResourceMeta>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetResourceMetaQueryOptions(options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+/**
+ * @summary Download Output
+ */
+export const getDownloadOutputResourcesResourceResourceIdDownloadGetUrl = (resourceId: string,) => {
+
+
+  
+
+  return `http://localhost:8000/resources/resource/${resourceId}/download`
+}
+
+export const downloadOutputResourcesResourceResourceIdDownloadGet = async (resourceId: string, options?: RequestInit): Promise<unknown> => {
+  
+  return customFetch<unknown>(getDownloadOutputResourcesResourceResourceIdDownloadGetUrl(resourceId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+export const getDownloadOutputResourcesResourceResourceIdDownloadGetQueryKey = (resourceId: string,) => {
+    return [`http://localhost:8000/resources/resource/${resourceId}/download`] as const;
+    }
+
+    
+export const getDownloadOutputResourcesResourceResourceIdDownloadGetQueryOptions = <TData = Awaited<ReturnType<typeof downloadOutputResourcesResourceResourceIdDownloadGet>>, TError = HTTPValidationError>(resourceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadOutputResourcesResourceResourceIdDownloadGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDownloadOutputResourcesResourceResourceIdDownloadGetQueryKey(resourceId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof downloadOutputResourcesResourceResourceIdDownloadGet>>> = ({ signal }) => downloadOutputResourcesResourceResourceIdDownloadGet(resourceId, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(resourceId),  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof downloadOutputResourcesResourceResourceIdDownloadGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DownloadOutputResourcesResourceResourceIdDownloadGetQueryResult = NonNullable<Awaited<ReturnType<typeof downloadOutputResourcesResourceResourceIdDownloadGet>>>
+export type DownloadOutputResourcesResourceResourceIdDownloadGetQueryError = HTTPValidationError
+
+
+export function useDownloadOutputResourcesResourceResourceIdDownloadGet<TData = Awaited<ReturnType<typeof downloadOutputResourcesResourceResourceIdDownloadGet>>, TError = HTTPValidationError>(
+ resourceId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadOutputResourcesResourceResourceIdDownloadGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof downloadOutputResourcesResourceResourceIdDownloadGet>>,
+          TError,
+          Awaited<ReturnType<typeof downloadOutputResourcesResourceResourceIdDownloadGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDownloadOutputResourcesResourceResourceIdDownloadGet<TData = Awaited<ReturnType<typeof downloadOutputResourcesResourceResourceIdDownloadGet>>, TError = HTTPValidationError>(
+ resourceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadOutputResourcesResourceResourceIdDownloadGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof downloadOutputResourcesResourceResourceIdDownloadGet>>,
+          TError,
+          Awaited<ReturnType<typeof downloadOutputResourcesResourceResourceIdDownloadGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDownloadOutputResourcesResourceResourceIdDownloadGet<TData = Awaited<ReturnType<typeof downloadOutputResourcesResourceResourceIdDownloadGet>>, TError = HTTPValidationError>(
+ resourceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadOutputResourcesResourceResourceIdDownloadGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Download Output
  */
 
-export function useDownloadOutputResourcesResourceIdDownloadGet<TData = Awaited<ReturnType<typeof downloadOutputResourcesResourceIdDownloadGet>>, TError = HTTPValidationError>(
- resourceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadOutputResourcesResourceIdDownloadGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export function useDownloadOutputResourcesResourceResourceIdDownloadGet<TData = Awaited<ReturnType<typeof downloadOutputResourcesResourceResourceIdDownloadGet>>, TError = HTTPValidationError>(
+ resourceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadOutputResourcesResourceResourceIdDownloadGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getDownloadOutputResourcesResourceIdDownloadGetQueryOptions(resourceId,options)
+  const queryOptions = getDownloadOutputResourcesResourceResourceIdDownloadGetQueryOptions(resourceId,options)
 
   const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -317,7 +413,7 @@ export const getResourceUrl = (resourceId: string,) => {
 
   
 
-  return `http://localhost:8000/resources/${resourceId}`
+  return `http://localhost:8000/resources/resource/${resourceId}`
 }
 
 export const resource = async (resourceId: string, options?: RequestInit): Promise<GetResourceResponse> => {
@@ -334,7 +430,7 @@ export const resource = async (resourceId: string, options?: RequestInit): Promi
 
 
 export const getResourceQueryKey = (resourceId: string,) => {
-    return [`http://localhost:8000/resources/${resourceId}`] as const;
+    return [`http://localhost:8000/resources/resource/${resourceId}`] as const;
     }
 
     
@@ -412,7 +508,7 @@ export const getDeleteResourceUrl = (resourceId: string,) => {
 
   
 
-  return `http://localhost:8000/resources/${resourceId}`
+  return `http://localhost:8000/resources/resource/${resourceId}`
 }
 
 export const deleteResource = async (resourceId: string, options?: RequestInit): Promise<unknown> => {
@@ -477,7 +573,7 @@ export const useDeleteResource = <TError = HTTPValidationError,
     /**
  * @summary Rename Resource
  */
-export const getRenameResourceUrl = (outputId: string,
+export const getRenameResourceUrl = (resourceId: string,
     params: RenameResourceParams,) => {
   const normalizedParams = new URLSearchParams();
 
@@ -490,13 +586,13 @@ export const getRenameResourceUrl = (outputId: string,
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `http://localhost:8000/resources/${outputId}?${stringifiedParams}` : `http://localhost:8000/resources/${outputId}`
+  return stringifiedParams.length > 0 ? `http://localhost:8000/resources/resource/${resourceId}?${stringifiedParams}` : `http://localhost:8000/resources/resource/${resourceId}`
 }
 
-export const renameResource = async (outputId: string,
+export const renameResource = async (resourceId: string,
     params: RenameResourceParams, options?: RequestInit): Promise<unknown> => {
   
-  return customFetch<unknown>(getRenameResourceUrl(outputId,params),
+  return customFetch<unknown>(getRenameResourceUrl(resourceId,params),
   {      
     ...options,
     method: 'POST'
@@ -509,8 +605,8 @@ export const renameResource = async (outputId: string,
 
 
 export const getRenameResourceMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof renameResource>>, TError,{outputId: string;params: RenameResourceParams}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof renameResource>>, TError,{outputId: string;params: RenameResourceParams}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof renameResource>>, TError,{resourceId: string;params: RenameResourceParams}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof renameResource>>, TError,{resourceId: string;params: RenameResourceParams}, TContext> => {
 
 const mutationKey = ['renameResource'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -522,10 +618,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof renameResource>>, {outputId: string;params: RenameResourceParams}> = (props) => {
-          const {outputId,params} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof renameResource>>, {resourceId: string;params: RenameResourceParams}> = (props) => {
+          const {resourceId,params} = props ?? {};
 
-          return  renameResource(outputId,params,requestOptions)
+          return  renameResource(resourceId,params,requestOptions)
         }
 
         
@@ -541,11 +637,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary Rename Resource
  */
 export const useRenameResource = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof renameResource>>, TError,{outputId: string;params: RenameResourceParams}, TContext>, request?: SecondParameter<typeof customFetch>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof renameResource>>, TError,{resourceId: string;params: RenameResourceParams}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof renameResource>>,
         TError,
-        {outputId: string;params: RenameResourceParams},
+        {resourceId: string;params: RenameResourceParams},
         TContext
       > => {
 

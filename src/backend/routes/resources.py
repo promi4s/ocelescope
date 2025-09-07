@@ -3,7 +3,6 @@ import io
 import json
 from typing import Optional
 
-
 from fastapi.datastructures import UploadFile
 from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
@@ -14,6 +13,8 @@ from api.dependencies import ApiSession
 
 from api.model.resource import ResourceApi, ResourceStore
 from registry import registry_manager
+from registry.registry_manager import ResourceInfo
+
 
 resource_router = APIRouter(prefix="/resources", tags=["resources"])
 
@@ -27,6 +28,11 @@ def get_resources(
         for resource in session.list_resources()
         if resource_type is None or resource.type == resource_type
     ]
+
+
+@resource_router.get(path="/meta", operation_id="getResourceMeta")
+def get_resource_meta() -> dict[str, ResourceInfo]:
+    return registry_manager.get_resource_info()
 
 
 @resource_router.post("/", operation_id="uploadResource")
@@ -46,7 +52,7 @@ async def upload_resource(file: UploadFile, session: ApiSession):
     )
 
 
-@resource_router.get("/{resource_id}/download")
+@resource_router.get("/resource/{resource_id}/download")
 def download_output(session: ApiSession, resource_id: str):
     resource = session.get_resource(id=resource_id)
 
@@ -65,7 +71,7 @@ class GetResourceResponse(BaseModel):
     visualization: Visualization | None
 
 
-@resource_router.get(path="/{resource_id}", operation_id="resource")
+@resource_router.get(path="/resource/{resource_id}", operation_id="resource")
 def get_resource(session: ApiSession, resource_id: str) -> GetResourceResponse:
     resource = session.get_resource(resource_id)
 
@@ -82,11 +88,11 @@ def get_resource(session: ApiSession, resource_id: str) -> GetResourceResponse:
     )
 
 
-@resource_router.delete(path="/{resource_id}", operation_id="deleteResource")
+@resource_router.delete(path="/resource/{resource_id}", operation_id="deleteResource")
 def delete_resource(session: ApiSession, resource_id: str):
     session.delete_resource(resource_id)
 
 
-@resource_router.post(path="/{output_id}", operation_id="renameResource")
-def rename_resource(session: ApiSession, output_id: str, new_name: str):
-    session.rename_resource(output_id, new_name)
+@resource_router.post(path="/resource/{resource_id}", operation_id="renameResource")
+def rename_resource(session: ApiSession, resource_id: str, new_name: str):
+    session.rename_resource(resource_id, new_name)

@@ -35,6 +35,7 @@ import type {
   EventCountsParams,
   EventIdsParams,
   GetDefaultOcelParams,
+  GetExtensionMeta200,
   GetFilters200,
   GetFiltersParams,
   GetOcelsParams,
@@ -1411,6 +1412,101 @@ export function useGetFilters<TData = Awaited<ReturnType<typeof getFilters>>, TE
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetFiltersQueryOptions(params,options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+/**
+ * @summary Get Extension Meta
+ */
+export const getGetExtensionMetaUrl = () => {
+
+
+  
+
+  return `http://localhost:8000/ocels/extension/meta`
+}
+
+export const getExtensionMeta = async ( options?: RequestInit): Promise<GetExtensionMeta200> => {
+  
+  return customFetch<GetExtensionMeta200>(getGetExtensionMetaUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+export const getGetExtensionMetaQueryKey = () => {
+    return [`http://localhost:8000/ocels/extension/meta`] as const;
+    }
+
+    
+export const getGetExtensionMetaQueryOptions = <TData = Awaited<ReturnType<typeof getExtensionMeta>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getExtensionMeta>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetExtensionMetaQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getExtensionMeta>>> = ({ signal }) => getExtensionMeta({ signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn,   staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getExtensionMeta>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetExtensionMetaQueryResult = NonNullable<Awaited<ReturnType<typeof getExtensionMeta>>>
+export type GetExtensionMetaQueryError = unknown
+
+
+export function useGetExtensionMeta<TData = Awaited<ReturnType<typeof getExtensionMeta>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getExtensionMeta>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getExtensionMeta>>,
+          TError,
+          Awaited<ReturnType<typeof getExtensionMeta>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetExtensionMeta<TData = Awaited<ReturnType<typeof getExtensionMeta>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getExtensionMeta>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getExtensionMeta>>,
+          TError,
+          Awaited<ReturnType<typeof getExtensionMeta>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetExtensionMeta<TData = Awaited<ReturnType<typeof getExtensionMeta>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getExtensionMeta>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Extension Meta
+ */
+
+export function useGetExtensionMeta<TData = Awaited<ReturnType<typeof getExtensionMeta>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getExtensionMeta>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetExtensionMetaQueryOptions(options)
 
   const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

@@ -78,7 +78,7 @@ const EntityTable: React.FC = () => {
         case "ocel":
           renameOcel({ params: { ocel_id: id, new_name: newName } });
         case "resource":
-          renameResource({ outputId: id, params: { new_name: newName } });
+          renameResource({ resourceId: id, params: { new_name: newName } });
       }
     },
     [renameOcel, renameResource],
