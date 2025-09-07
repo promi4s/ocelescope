@@ -25,6 +25,7 @@ import {
   PackageIcon,
   PuzzleIcon,
   TelescopeIcon,
+  UploadIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useLogout } from "@/api/fastapi/session/session";
@@ -35,6 +36,7 @@ import useModulePath from "@/hooks/useModulePath";
 import moduleMap from "@/lib/modules/module-map";
 import CurrentOcelSelect from "../CurrentOcelSelect/CurrentOcelSelect";
 import useClient from "@/hooks/useClient";
+import UploadModal from "../UploadModal/UploadModal";
 
 const LogoutButton: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -146,6 +148,7 @@ const LinksGroup: React.FC<LinksGroupProps> = ({
 const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(false);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
   const isClient = useClient();
 
@@ -182,7 +185,19 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             />
           </Group>
 
-          {isClient && isOcelRequired && <CurrentOcelSelect />}
+          <Group>
+            {isClient && isOcelRequired && <CurrentOcelSelect />}
+            <Button
+              leftSection={<UploadIcon size={18} />}
+              onClick={() => setIsUploadModalOpen(true)}
+            >
+              Upload
+            </Button>
+            <UploadModal
+              isOpen={isUploadModalOpen}
+              onClose={() => setIsUploadModalOpen(false)}
+            />
+          </Group>
         </Group>
       </MAppShell.Header>
       <MAppShell.Navbar className={classes.navbar}>

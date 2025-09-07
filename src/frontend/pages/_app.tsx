@@ -24,6 +24,7 @@ import {
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import AppShell from "@/components/AppShell/AppShell";
 import WebsocketWrapper from "@/components/WebsocketWrapper/WebsocketWrapper";
+import { NotificationProvider } from "@/components/TaskNotification/TaskNotificationProvider";
 
 export default function App({ Component, pageProps }: any) {
   const [client] = useState(() => new QueryClient());
@@ -42,9 +43,11 @@ export default function App({ Component, pageProps }: any) {
             <link rel="shortcut icon" href="/favicon.svg" />
           </Head>
           <WebsocketWrapper />
-          <AppShell>
-            <Component {...pageProps} />
-          </AppShell>
+          <NotificationProvider>
+            <AppShell>
+              <Component {...pageProps} />
+            </AppShell>
+          </NotificationProvider>
         </MantineProvider>
       </HydrationBoundary>
       <ReactQueryDevtools />

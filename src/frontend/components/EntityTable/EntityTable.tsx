@@ -12,7 +12,7 @@ import { formatDateTime } from "@/util/formatters";
 import { DataTable } from "mantine-datatable";
 import { useCallback, useMemo, useState } from "react";
 import UploadSection from "../UploadSection/UploadSection";
-import { ActionIcon, Group, Menu, TextInput } from "@mantine/core";
+import { ActionIcon, Group, Menu, TextInput, Title } from "@mantine/core";
 import {
   Check,
   Download,
@@ -193,7 +193,10 @@ const EntityTable: React.FC = () => {
           records={entities}
         />
       ) : (
-        <UploadSection />
+        <>
+          <Title size={"h3"}>Upload</Title>
+          <UploadSection />
+        </>
       )}
     </>
   );

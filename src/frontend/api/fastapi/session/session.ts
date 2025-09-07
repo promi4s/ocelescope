@@ -14,6 +14,11 @@ import type {
   UseMutationResult
 } from '@tanstack/react-query';
 
+import type {
+  BodyUpload,
+  HTTPValidationError
+} from '../../fastapi-schemas';
+
 import { customFetch } from '../../fetcher';
 
 
@@ -22,6 +27,79 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 /**
+ * @summary Upload ocels, resources or tasks
+ */
+export const getUploadUrl = () => {
+
+
+  
+
+  return `http://localhost:8000/session/upload`
+}
+
+export const upload = async (bodyUpload: BodyUpload, options?: RequestInit): Promise<string[]> => {
+    const formData = new FormData();
+bodyUpload.files.forEach(value => formData.append(`files`, value));
+
+  return customFetch<string[]>(getUploadUrl(),
+  {      
+    ...options,
+    method: 'POST'
+    ,
+    body: 
+      formData,
+  }
+);}
+
+
+
+
+export const getUploadMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof upload>>, TError,{data: BodyUpload}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof upload>>, TError,{data: BodyUpload}, TContext> => {
+
+const mutationKey = ['upload'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof upload>>, {data: BodyUpload}> = (props) => {
+          const {data} = props ?? {};
+
+          return  upload(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UploadMutationResult = NonNullable<Awaited<ReturnType<typeof upload>>>
+    export type UploadMutationBody = BodyUpload
+    export type UploadMutationError = HTTPValidationError
+
+    /**
+ * @summary Upload ocels, resources or tasks
+ */
+export const useUpload = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof upload>>, TError,{data: BodyUpload}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof upload>>,
+        TError,
+        {data: BodyUpload},
+        TContext
+      > => {
+
+      const mutationOptions = getUploadMutationOptions(options);
+
+      return useMutation(mutationOptions , queryClient);
+    }
+    /**
  * @summary Deletes the Session
  */
 export const getLogoutUrl = () => {

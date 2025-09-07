@@ -1,14 +1,12 @@
 import datetime
 from pathlib import Path
-import shutil
-from tempfile import NamedTemporaryFile
-from typing import Annotated, Literal, Optional
+from typing import Literal, Optional
 
-from ocelescope.ocel.filter import OCELFilter, filters
+from ocelescope.ocel.filter import OCELFilter
 from ocelescope.ocel.ocel import OCELFileExtensions
 
 from api.dependencies import ApiOcel, ApiSession
-from api.exceptions import BadRequest, NotFound
+from api.exceptions import NotFound
 from api.model.base import PaginatedResponse
 from api.model.events import Date_Distribution_Item, Entity_Time_Info
 from api.model.ocel import OcelMetadata
@@ -22,10 +20,8 @@ from ocel.default_ocel import (
     get_default_ocel,
 )
 from registry import registry_manager
-from tasks.ocel import import_ocel_task
-from util.constants import SUPPORTED_FILE_TYPES
 
-from fastapi import APIRouter, File, Query, Response, UploadFile
+from fastapi import APIRouter, Query, Response
 
 from util.pandas import search_paginated_dataframe
 
@@ -271,71 +267,6 @@ def set_filter(
 
 # endregion
 # region Import/Export
-@ocels_router.post("/import", summary="Import OCEL 2.0", operation_id="importOcel")
-def import_ocel(
-    session: ApiSession,
-    response: Response,
-    file: Annotated[
-        UploadFile,
-        File(description="An OCEL 2.0 event log (.sqlite format)"),
-    ],
-    name: Annotated[
-        str,
-        Query(
-            description="The name of the uploaded file", pattern=r"[\w\-\(\)]+\.[a-z]+"
-        ),
-        # Need original file name because client-side formData creation in generated api wrocels_routerer does not retain it
-    ],
-) -> Response:
-    if file.filename is None or file.filename == "":
-        raise BadRequest("No file uploaded")
-
-    # Save file
-    upload_date = datetime.datetime.now()
-    file_name_path = Path(name)
-    tmp_file_prefix = upload_date.strftime("%Y%m%d-%H%M%S") + "-" + file_name_path.stem
-
-    match file_name_path.suffix.lower():
-        case ".xml":
-            suffix = ".xmlocel"
-        case ".json":
-            suffix = ".jsonocel"
-        case _:
-            suffix = file_name_path.suffix.lower()
-
-    if suffix not in SUPPORTED_FILE_TYPES:
-        raise BadRequest(
-            f"Unsupported file type: {file_name_path.suffix}. Supported types are: {', '.join(SUPPORTED_FILE_TYPES)}"
-        )
-    try:
-        with NamedTemporaryFile(
-            delete=False,
-            prefix=name,
-            suffix=suffix,
-        ) as tmp:
-            shutil.copyfileobj(file.file, tmp)
-            tmp_path = Path(tmp.name)
-    except Exception as err:
-        raise err
-    finally:
-        file.file.close()
-
-    import_ocel_task(
-        session=session,
-        path=tmp_path,
-        upload_date=upload_date,
-        name=tmp_file_prefix,
-        metadata={
-            "fileName": name,
-            "uploaded_at": datetime.datetime.now().isoformat(),
-        },
-    )
-
-    response.status_code = 200
-
-    return response
-
-
 @ocels_router.get(
     "/ocel/default", summary="Get default OCEL metadata", operation_id="getDefaultOcel"
 )

@@ -24,7 +24,6 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  BodyImportOcel,
   DefaultOCEL,
   DeleteOcelParams,
   DownloadOcelOcelsDownloadGetParams,
@@ -41,7 +40,6 @@ import type {
   GetOcelsParams,
   HTTPValidationError,
   ImportDefaultOcelParams,
-  ImportOcelParams,
   O2oParams,
   ObjectAttributes200,
   ObjectAttributesParams,
@@ -1424,87 +1422,6 @@ export function useGetFilters<TData = Awaited<ReturnType<typeof getFilters>>, TE
 
 
 /**
- * @summary Import OCEL 2.0
- */
-export const getImportOcelUrl = (params: ImportOcelParams,) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-    
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
-    }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `http://localhost:8000/ocels/import?${stringifiedParams}` : `http://localhost:8000/ocels/import`
-}
-
-export const importOcel = async (bodyImportOcel: BodyImportOcel,
-    params: ImportOcelParams, options?: RequestInit): Promise<unknown> => {
-    const formData = new FormData();
-formData.append(`file`, bodyImportOcel.file)
-
-  return customFetch<unknown>(getImportOcelUrl(params),
-  {      
-    ...options,
-    method: 'POST'
-    ,
-    body: 
-      formData,
-  }
-);}
-
-
-
-
-export const getImportOcelMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof importOcel>>, TError,{data: BodyImportOcel;params: ImportOcelParams}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof importOcel>>, TError,{data: BodyImportOcel;params: ImportOcelParams}, TContext> => {
-
-const mutationKey = ['importOcel'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof importOcel>>, {data: BodyImportOcel;params: ImportOcelParams}> = (props) => {
-          const {data,params} = props ?? {};
-
-          return  importOcel(data,params,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ImportOcelMutationResult = NonNullable<Awaited<ReturnType<typeof importOcel>>>
-    export type ImportOcelMutationBody = BodyImportOcel
-    export type ImportOcelMutationError = HTTPValidationError
-
-    /**
- * @summary Import OCEL 2.0
- */
-export const useImportOcel = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof importOcel>>, TError,{data: BodyImportOcel;params: ImportOcelParams}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof importOcel>>,
-        TError,
-        {data: BodyImportOcel;params: ImportOcelParams},
-        TContext
-      > => {
-
-      const mutationOptions = getImportOcelMutationOptions(options);
-
-      return useMutation(mutationOptions , queryClient);
-    }
-    /**
  * @summary Get default OCEL metadata
  */
 export const getGetDefaultOcelUrl = (params?: GetDefaultOcelParams,) => {

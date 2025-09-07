@@ -7,5 +7,6 @@
 
 export type GetSystemTasksParams = {
 task_name?: string | null;
+task_ids?: string[] | null;
 only_running?: boolean;
 };

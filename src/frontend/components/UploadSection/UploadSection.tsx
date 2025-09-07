@@ -1,4 +1,4 @@
-import { Box, Stack, ThemeIcon, Title } from "@mantine/core";
+import { Box, LoadingOverlay, Stack, ThemeIcon, Title } from "@mantine/core";
 import FileDropzone from "../Dropzone/Dropzone";
 import {
   useGetDefaultOcel,
@@ -7,10 +7,15 @@ import {
 import { DataTable } from "mantine-datatable";
 import { ContainerIcon } from "lucide-react";
 import useInvalidate from "@/hooks/useInvalidateResources";
+import { useUpload } from "@/api/fastapi/session/session";
+import { useNotificationContext } from "../TaskNotification/TaskNotificationProvider";
 
 type UploadTypes = "ocel" | "resource" | "plugin";
 
-const UploadSection: React.FC<{ acceptedTypes?: UploadTypes[] }> = () => {
+const UploadSection: React.FC<{
+  acceptedTypes?: UploadTypes[];
+  onSuccess?: () => void;
+}> = ({ onSuccess }) => {
   const { data: ocels } = useGetDefaultOcel({ only_latest_versions: true });
 
   const invalidate = useInvalidate();
@@ -19,11 +24,30 @@ const UploadSection: React.FC<{ acceptedTypes?: UploadTypes[] }> = () => {
     mutation: { onSuccess: async () => await invalidate(["ocels"]) },
   });
 
+  const { addNotification } = useNotificationContext();
+  const { mutate: upload, isPending } = useUpload({
+    mutation: {
+      onSuccess: (tasks) => {
+        addNotification({
+          tasks,
+          title: "Uploading",
+          message: "Uploading files!",
+        });
+
+        if (onSuccess) {
+          onSuccess();
+        }
+      },
+    },
+  });
+
   return (
-    <Stack gap={"xs"}>
-      <Title size={"h3"}>Upload</Title>
+    <Stack gap={"xs"} pos="relative">
+      <LoadingOverlay
+        visible={isPending}
+        overlayProps={{ radius: "sm", blur: 2 }}
+      />
       <FileDropzone
-        onUpload={() => {}}
         content={{
           description: (
             <span>
@@ -37,6 +61,9 @@ const UploadSection: React.FC<{ acceptedTypes?: UploadTypes[] }> = () => {
           "application/xml": [".xml", ".xmlocel"],
           "application/vnd.sqlite3": [".sqlite"],
           "application/zip": [".zip"],
+        }}
+        onUpload={async (files: File[]) => {
+          upload({ data: { files } });
         }}
       />
       <Title size={"h4"}>Default OCELS</Title>
