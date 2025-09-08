@@ -12,15 +12,17 @@ const GraphViewer: React.FC<{
 
   return (
     <Box h={"100%"} w={"100%"} pos={"relative"}>
-      <CytoscapeComponent
-        userZoomingEnabled={!isPreview}
-        userPanningEnabled={!isPreview}
-        style={{ width: "100%", height: "100%" }}
-        elements={elements ?? []}
-        layout={{ name: "preset" }}
-      >
-        {!isPreview && <ActionButtons />}
-      </CytoscapeComponent>
+      {elements && (
+        <CytoscapeComponent
+          userZoomingEnabled={!isPreview}
+          userPanningEnabled={!isPreview}
+          style={{ width: "100%", height: "100%" }}
+          elements={elements}
+          layout={{ name: "preset" }}
+        >
+          {!isPreview && <ActionButtons />}
+        </CytoscapeComponent>
+      )}
     </Box>
   );
 };

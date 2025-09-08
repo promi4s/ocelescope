@@ -3,29 +3,13 @@ import type { ElementDefinition } from "cytoscape";
 import type { VisualizationByType } from "@/types/outputs";
 import { Graphviz } from "@hpcc-js/wasm-graphviz";
 
-export type GraphvizEngine =
-  | "dot"
-  | "neato"
-  | "fdp"
-  | "sfdp"
-  | "twopi"
-  | "circo";
-
-export interface UseGraphvizLayoutOpts {
-  engine?: GraphvizEngine;
-  graphAttrs?: Record<string, string | number | boolean>;
-  nodeAttrs?: Record<string, string | number | boolean>;
-  edgeAttrs?: Record<string, string | number | boolean>;
-  shallowDeps?: boolean;
-}
-
 type GraphvizJSON = {
   bb?: string;
   objects?: Array<{
     name?: string;
     _gvid?: number;
     pos?: string;
-    width?: number | string;
+    width?: string;
     height?: number | string;
     label?: string | { text?: string };
   }>;
@@ -57,7 +41,6 @@ function toDot(visualization: VisualizationByType<"graph">): string {
     if (node.label) specific.push(`label="${esc(node.label)}"`);
     if (node.shape) specific.push(`shape=${node.shape}`);
     if (node.color) specific.push(`color="${node.color}"`);
-    // ✅ Convert width/height from px to inches (1in = 72pt)
     if (node.width) specific.push(`width=${(node.width / 72).toFixed(4)}`);
     if (node.height) specific.push(`height=${(node.height / 72).toFixed(4)}`);
     lines.push(
@@ -96,19 +79,16 @@ function parsePos(s?: string): { x: number; y: number } | undefined {
   if (Number.isFinite(x) && Number.isFinite(y)) return { x, y };
 }
 
-export function useGraphvizLayout(
+export const useGraphvizLayout = (
   visualization: VisualizationByType<"graph">,
-  { shallowDeps = false }: UseGraphvizLayoutOpts = {},
-) {
+) => {
   const [elements, setElements] = useState<ElementDefinition[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const cancelRef = useRef({ cancelled: false });
 
   const dot = useMemo(
     () => toDot(visualization),
-    shallowDeps
-      ? [visualization]
-      : [visualization.nodes, visualization.edges, visualization.layout_config],
+    [visualization.nodes, visualization.edges, visualization.layout_config],
   );
 
   useEffect(() => {
@@ -124,23 +104,31 @@ export function useGraphvizLayout(
           visualization.layout_config?.engine ?? "dot",
         );
         const gvJson: GraphvizJSON = JSON.parse(jsonStr);
+        console.log(gvJson);
 
-        const nodePos: Record<string, { x: number; y: number }> = {};
+        const nodePos: Record<
+          string,
+          { x: number; y: number; width?: number }
+        > = {};
         gvJson.objects?.forEach((o) => {
           if (!o.name || !o.pos) return;
           const p = parsePos(o.pos);
           if (!p) return;
-          nodePos[o.name] = p; // raw Graphviz coords (points)
+          nodePos[o.name] = {
+            ...p,
+            width: o.width ? parseFloat(o.width) * 72 : undefined,
+          }; // raw Graphviz coords (points)
         });
 
         const nodes: ElementDefinition[] = visualization.nodes.map((node) => ({
           data: { id: node.id },
           css: {
+            "font-size": 14,
             shape: node.shape,
             label: node.label ?? undefined,
             "text-valign": node.label_pos ?? "center",
             "text-halign": "center",
-            width: node.width ?? undefined,
+            width: node.width ?? nodePos[node.id].width ?? undefined,
             height: node.height ?? undefined,
             "background-color": node.color ?? undefined,
             ...(node.border_color && {
@@ -192,4 +180,4 @@ export function useGraphvizLayout(
   }, [dot, visualization]);
 
   return { elements, error };
-}
+};
