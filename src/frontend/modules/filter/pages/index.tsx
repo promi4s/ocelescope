@@ -43,7 +43,9 @@ const FilterPage = () => {
         <FilterForm
           ocelId={ocelId as string}
           filter={filter ?? {}}
-          onSubmit={(value) => applyFilter({ data: value })}
+          onSubmit={(value) =>
+            applyFilter({ data: value, params: { ocel_id: ocelId } })
+          }
           onResetRef={(fn) => {
             resetFormRef.current = fn;
           }}
