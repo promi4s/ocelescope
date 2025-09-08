@@ -18,6 +18,7 @@ import {
   Badge,
   Group,
   Menu,
+  MenuItem,
   TextInput,
   Title,
 } from "@mantine/core";
@@ -25,6 +26,8 @@ import {
   Check,
   Download,
   EllipsisVerticalIcon,
+  EyeIcon,
+  FilterIcon,
   Pencil,
   Trash,
   X,
@@ -34,6 +37,7 @@ import dayjs from "dayjs";
 import uniqolor from "uniqolor";
 import { OCELExtensions } from "@/types/ocel";
 import { useDownloadFile } from "@/hooks/useDownload";
+import ResourceModal from "../Resources/ResourceModal";
 
 type Entity = {
   type: "ocel" | "resource";
@@ -95,6 +99,8 @@ const EntityTable: React.FC = () => {
     { id: string; value: string } | undefined
   >(undefined);
 
+  const [viewedResouce, setViewedResource] = useState<string | undefined>();
+
   const entities: Entity[] = useMemo(() => {
     const ocelEntities = ocels.map<Entity>(
       ({ name, created_at, id, extensions }) => ({
@@ -120,8 +126,13 @@ const EntityTable: React.FC = () => {
     return [...ocelEntities, ...resourceEntities];
   }, [ocels, resources, resourceMeta]);
 
+  console.log(viewedResouce);
   return (
     <>
+      <ResourceModal
+        id={viewedResouce}
+        onClose={() => setViewedResource(undefined)}
+      />
       {entities.length ? (
         <DataTable<Entity>
           withTableBorder
@@ -208,6 +219,14 @@ const EntityTable: React.FC = () => {
                     >
                       Rename
                     </Menu.Item>
+                    {type == "resource" && (
+                      <MenuItem
+                        leftSection={<EyeIcon size={16} />}
+                        onClick={() => setViewedResource(id)}
+                      >
+                        Inspect
+                      </MenuItem>
+                    )}
                     {type === "ocel" ? (
                       <Menu.Sub position="right-start">
                         <Menu.Sub.Target>

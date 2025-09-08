@@ -112,7 +112,6 @@ class RegistryManager:
             self._resource_registry.unload_module(id)
 
     def get_resource_info(self) -> Dict[str, ResourceInfo]:
-        print(self._resource_registry.resources)
         return {
             key: {"label": resource.label or key, "description": resource.description}
             for key, resource in self._resource_registry.resources.items()
