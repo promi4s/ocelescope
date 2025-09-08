@@ -5,9 +5,4 @@
  * OpenAPI spec version: 0.1
  */
 
-export type ImportOcelParams = {
-/**
- * The name of the uploaded file
- */
-name: string;
-};
+export type ResourceInfoDescription = string | null;

@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Optional, cast
 
 
+from fastapi import Query
 from fastapi.routing import APIRouter
 
 
@@ -18,12 +19,17 @@ tasks_router = APIRouter(prefix="/tasks", tags=["tasks"])
     "/system", summary="returns all tasks of a session", operation_id="getSystemTasks"
 )
 def get_system_tasks(
-    session: ApiSession, task_name: Optional[str] = None, only_running: bool = True
+    session: ApiSession,
+    task_name: str | None = None,
+    task_ids: list[str] | None = Query(default=[]),
+    only_running: bool = True,
 ) -> list[SystemTaskSummary]:
     def filter_tasks(task: SystemTask):
-        return (task_name is None or task.name == task_name) and (
-            not only_running or task.state == TaskState.STARTED
-        )
+        return (
+            task_name is None
+            or task.name == task_name
+            and (not task_ids or task.id in task_ids)
+        ) and (not only_running or task.state == TaskState.STARTED)
 
     return [
         cast(SystemTaskSummary, task_summary)

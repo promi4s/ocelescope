@@ -5,6 +5,7 @@ import { DataTable, type DataTableColumn } from "mantine-datatable";
 import { Group, ThemeIcon } from "@mantine/core";
 import { Table2 } from "lucide-react";
 import dayjs from "dayjs";
+import { formatDate, formatDateTime } from "@/util/formatters";
 
 type Table = VisualizationByType<"table">;
 const formatCell = (
@@ -18,14 +19,10 @@ const formatCell = (
       return value ? "✅" : "❌";
 
     case "date":
-      return dayjs(value).isValid()
-        ? dayjs(value).format("YYYY-MM-DD")
-        : String(value);
+      return dayjs(value).isValid() ? formatDate(value) : String(value);
 
     case "datetime":
-      return dayjs(value).isValid()
-        ? dayjs(value).format("YYYY-MM-DD HH:mm")
-        : String(value);
+      return dayjs(value).isValid() ? formatDateTime(value) : String(value);
 
     default:
       return String(value);

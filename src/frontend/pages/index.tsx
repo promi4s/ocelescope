@@ -1,13 +1,16 @@
-import OcelTable from "@/components/OcelTable/OcelTable";
-import ResourceTable from "@/components/Resources/ResourceTable";
-import { Container, Stack } from "@mantine/core";
+import EntityTable from "@/components/EntityTable/EntityTable";
+import RecentPlugins from "@/components/Plugins/RecentPlugins/RecentPlugins";
+import { Container, Group, Stack, Title } from "@mantine/core";
 
 const Overview = () => {
   return (
-    <Container>
-      <Stack gap={"xl"}>
-        <OcelTable />
-        <ResourceTable />
+    <Container h="100%">
+      <Stack gap={"sm"} h="100%">
+        <EntityTable />
+        <Stack gap={"xs"} flex={1}>
+          <Title size={"h3"}>Plugins</Title>
+          <RecentPlugins />
+        </Stack>
       </Stack>
     </Container>
   );

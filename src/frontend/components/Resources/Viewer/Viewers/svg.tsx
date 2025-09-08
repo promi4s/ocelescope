@@ -1,14 +1,11 @@
 import { Box, Button, ButtonGroup } from "@mantine/core";
-import {
-  TransformComponent,
-  TransformWrapper,
-  useControls,
-} from "react-zoom-pan-pinch";
+import { saveAs } from "file-saver";
+import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
 import { DownloadIcon, MaximizeIcon, MinusIcon, PlusIcon } from "lucide-react";
 import { VisualizationProps } from "..";
 import { Fragment } from "react";
 
-const SvgPanWrapper: React.FC<{
+export const SvgPanWrapper: React.FC<{
   onDownload: () => void;
   children: React.ReactNode;
 }> = ({ children, onDownload }) => {
@@ -70,23 +67,15 @@ const SvgViewer: React.FC<VisualizationProps<"svg">> = ({
     .replace(/<svg(?![^>]*xmlns=)/, '<svg xmlns="http://www.w3.org/2000/svg"');
 
   const Wrapper = isPreview ? Fragment : SvgPanWrapper;
+
   const handleDownload = () => {
-    // add XML prolog (helps some viewers)
-    const content = cleanedSvg.trim().startsWith("<?xml")
-      ? cleanedSvg
-      : `<?xml version="1.0" encoding="UTF-8"?>\n${cleanedSvg}`;
-
-    const blob = new Blob([content], { type: "image/svg+xml;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "test.svg";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
+    if (!cleanedSvg) return;
+    const blob = new Blob([cleanedSvg], {
+      type: "image/svg+xml;charset=utf-8",
+    });
+    saveAs(blob, "resource.svg");
   };
+
   return (
     <Wrapper onDownload={handleDownload}>
       <div

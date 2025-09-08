@@ -5,7 +5,6 @@ const nextConfig: NextConfig = {
 
   reactStrictMode: true,
   transpilePackages: ["@rjsf/mantine", "@rjsf/core", "@rjsf/utils"],
-  ignoreBuildErrors: true,
   eslint: {
     ignoreDuringBuilds: true,
   },

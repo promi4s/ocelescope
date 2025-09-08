@@ -8,7 +8,9 @@ class TempFileResponse(FileResponse):
         self, prefix: str | None = None, suffix: str | None = None, **kwargs
     ) -> None:
         self.tmp_file = NamedTemporaryFile(prefix=prefix, suffix=suffix)
-        super().__init__(path=self.tmp_file.name, **kwargs)
+        super().__init__(
+            path=self.tmp_file.name, **kwargs, media_type="application/octet-stream"
+        )
 
     @property
     def tmp_path(self):

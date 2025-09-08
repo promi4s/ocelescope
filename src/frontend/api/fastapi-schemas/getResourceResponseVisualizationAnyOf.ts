@@ -7,5 +7,6 @@
 import type { Graph } from './graph';
 import type { Table } from './table';
 import type { SVGVis } from './sVGVis';
+import type { DotVis } from './dotVis';
 
-export type GetResourceResponseVisualizationAnyOf = Graph | Table | SVGVis;
+export type GetResourceResponseVisualizationAnyOf = Graph | Table | SVGVis | DotVis;

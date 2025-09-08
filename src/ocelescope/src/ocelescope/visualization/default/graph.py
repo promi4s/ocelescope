@@ -1,8 +1,7 @@
-from typing import Any, Literal, Optional, TypedDict
-from graphviz import Digraph
-from typing import Dict
+from typing import Literal, Optional
 from pydantic import BaseModel
-import json
+
+from ocelescope.visualization.default.dot import GraphVizLayoutingEngine
 
 
 GraphShapes = Literal["circle", "triangle", "rectangle", "diamond", "hexagon"]
@@ -60,67 +59,15 @@ class GraphEdge(BaseModel):
     label: Optional[str] = None
 
 
-class GraphvizLayoutConfig(TypedDict):
-    engine: str
-    dot_attr: Dict[str, Any]
+class GraphvizLayoutConfig(BaseModel):
+    engine: GraphVizLayoutingEngine
+    graphAttrs: dict[str, str | int | float | bool]
+    nodeAttrs: dict[str, str | int | float | bool]
+    edgeAttrs: dict[str, str | int | float | bool]
 
 
 class Graph(BaseModel):
     type: Literal["graph"]
     nodes: list[GraphNode]
     edges: list[GraphEdge]
-
-    def layout_graph(self, layout_config: GraphvizLayoutConfig) -> "Graph":
-        dot = Digraph(
-            engine=layout_config["engine"],
-        )
-
-        dot.attr("graph", **layout_config["dot_attr"])
-
-        for node in self.nodes:
-            node_kwargs = {
-                "label": node.label or node.id,
-                "shape": node.shape,
-                "style": "filled",
-                "fillcolor": node.color,
-            }
-
-            if node.width and node.height:
-                node_kwargs["width"] = str(node.width / 72)
-                node_kwargs["height"] = str(node.height / 72)
-                node_kwargs["fixedsize"] = "true"
-
-            dot.node(node.id, **node_kwargs)
-
-        for edge in self.edges:
-            dot.edge(edge.source, edge.target, label=edge.label)
-
-        dot_output = dot.pipe(format="json").decode("utf-8")
-        dot_json = json.loads(dot_output)
-
-        layout_info: Dict[str, Dict[str, float]] = {}
-
-        for obj in dot_json.get("objects", []):
-            if "pos" in obj:
-                x_str, y_str = obj["pos"].split(",")
-                layout_info[obj["name"]] = {
-                    "x": float(x_str),
-                    "y": float(y_str),
-                    "width": float(obj.get("width", 0)) * 72,
-                    "height": float(obj.get("height", 0)) * 72,
-                }
-
-        updated_nodes = []
-        for node in self.nodes:
-            layout = layout_info.get(node.id, {})
-            updated_nodes.append(
-                GraphNode(
-                    **node.model_dump(exclude={"x", "y", "width", "height"}),
-                    x=layout.get("x", 0),
-                    y=layout.get("y", 0),
-                    width=layout.get("width", node.width),
-                    height=layout.get("height", node.height),
-                )
-            )
-
-        return Graph(type=self.type, nodes=updated_nodes, edges=self.edges)
+    layout_config: GraphvizLayoutConfig | None = None

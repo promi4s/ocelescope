@@ -5,7 +5,6 @@
  * OpenAPI spec version: 0.1
  */
 
-export interface BodyImportOcel {
-  /** An OCEL 2.0 event log (.sqlite format) */
-  file: Blob;
+export interface BodyUpload {
+  files: Blob[];
 }

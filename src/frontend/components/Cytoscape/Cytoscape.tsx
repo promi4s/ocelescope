@@ -1,12 +1,8 @@
 // components/Cytoscape/CytoscapeGraph.tsx
 import React, { ComponentProps, useRef } from "react";
-import cytoscape from "cytoscape";
 import CytoscapeComponent from "react-cytoscapejs";
-import elk from "cytoscape-elk";
 import { Core } from "cytoscape";
 import { CytoscapeContext } from "./CytoscapeContext";
-
-cytoscape.use(elk);
 
 const CytoscapeGraph: React.FC<
   ComponentProps<typeof CytoscapeComponent> & { children?: React.ReactNode }

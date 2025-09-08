@@ -56,7 +56,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=[config.SESSION_ID_HEADER],
+    expose_headers=[config.SESSION_ID_HEADER, "content-disposition"],
 )
 app.middleware("http")(session_access_middleware)
 

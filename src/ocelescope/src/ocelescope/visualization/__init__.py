@@ -11,11 +11,14 @@ from ocelescope.visualization.default.graph import (
 )
 
 from ocelescope.visualization.default.svg import SVGVis
+from ocelescope.visualization.default.dot import DotVis
 
 from ocelescope.visualization.default.table import TableColumn, Table
 from ocelescope.visualization.util.color import generate_color_map
 
-Visualization: TypeAlias = Annotated[Union[Graph, Table, SVGVis], Field(discriminator="type")]
+Visualization: TypeAlias = Annotated[
+    Union[Graph, Table, SVGVis, DotVis], Field(discriminator="type")
+]
 
 __all__ = [
     "Visualization",
@@ -28,4 +31,5 @@ __all__ = [
     "Table",
     "TableColumn",
     "SVGVis",
+    "DotVis",
 ]

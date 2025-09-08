@@ -1,6 +1,7 @@
 import importlib.util
 import shutil
 import sys
+from typing import Dict, TypedDict
 
 from ocelescope import Plugin, Resource
 from api.config import config
@@ -9,6 +10,11 @@ from api.model.resource import ResourceStore
 from registry.registries.extension import ExtensionRegistry
 from registry.registries.plugin import PluginRegistry
 from registry.registries.resource import ResourceRegistry
+
+
+class ResourceInfo(TypedDict):
+    label: str
+    description: str | None
 
 
 class RegistryManager:
@@ -94,7 +100,7 @@ class RegistryManager:
                         raise e
                 else:
                     raise Exception()
-            except Exception as e:
+            except Exception:
                 shutil.rmtree(module_path, ignore_errors=True)
 
         return loaded_plugins
@@ -104,6 +110,12 @@ class RegistryManager:
             self._plugin_registry.unload_module(id)
             self._extension_registry.unload_module(id)
             self._resource_registry.unload_module(id)
+
+    def get_resource_info(self) -> Dict[str, ResourceInfo]:
+        return {
+            key: {"label": resource.label or key, "description": resource.description}
+            for key, resource in self._resource_registry.resources.items()
+        }
 
 
 registry_manager = RegistryManager()

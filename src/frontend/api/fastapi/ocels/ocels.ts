@@ -24,7 +24,6 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  BodyImportOcel,
   DefaultOCEL,
   DeleteOcelParams,
   DownloadOcelOcelsDownloadGetParams,
@@ -36,12 +35,12 @@ import type {
   EventCountsParams,
   EventIdsParams,
   GetDefaultOcelParams,
+  GetExtensionMeta200,
   GetFilters200,
   GetFiltersParams,
   GetOcelsParams,
   HTTPValidationError,
   ImportDefaultOcelParams,
-  ImportOcelParams,
   O2oParams,
   ObjectAttributes200,
   ObjectAttributesParams,
@@ -1424,87 +1423,101 @@ export function useGetFilters<TData = Awaited<ReturnType<typeof getFilters>>, TE
 
 
 /**
- * @summary Import OCEL 2.0
+ * @summary Get Extension Meta
  */
-export const getImportOcelUrl = (params: ImportOcelParams,) => {
-  const normalizedParams = new URLSearchParams();
+export const getGetExtensionMetaUrl = () => {
 
-  Object.entries(params || {}).forEach(([key, value]) => {
-    
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
-    }
-  });
 
-  const stringifiedParams = normalizedParams.toString();
+  
 
-  return stringifiedParams.length > 0 ? `http://localhost:8000/ocels/import?${stringifiedParams}` : `http://localhost:8000/ocels/import`
+  return `http://localhost:8000/ocels/extension/meta`
 }
 
-export const importOcel = async (bodyImportOcel: BodyImportOcel,
-    params: ImportOcelParams, options?: RequestInit): Promise<unknown> => {
-    const formData = new FormData();
-formData.append(`file`, bodyImportOcel.file)
-
-  return customFetch<unknown>(getImportOcelUrl(params),
+export const getExtensionMeta = async ( options?: RequestInit): Promise<GetExtensionMeta200> => {
+  
+  return customFetch<GetExtensionMeta200>(getGetExtensionMetaUrl(),
   {      
     ...options,
-    method: 'POST'
-    ,
-    body: 
-      formData,
+    method: 'GET'
+    
+    
   }
 );}
 
 
 
+export const getGetExtensionMetaQueryKey = () => {
+    return [`http://localhost:8000/ocels/extension/meta`] as const;
+    }
 
-export const getImportOcelMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof importOcel>>, TError,{data: BodyImportOcel;params: ImportOcelParams}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof importOcel>>, TError,{data: BodyImportOcel;params: ImportOcelParams}, TContext> => {
+    
+export const getGetExtensionMetaQueryOptions = <TData = Awaited<ReturnType<typeof getExtensionMeta>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getExtensionMeta>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
 
-const mutationKey = ['importOcel'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetExtensionMetaQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getExtensionMeta>>> = ({ signal }) => getExtensionMeta({ signal, ...requestOptions });
 
       
 
+      
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof importOcel>>, {data: BodyImportOcel;params: ImportOcelParams}> = (props) => {
-          const {data,params} = props ?? {};
+   return  { queryKey, queryFn,   staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getExtensionMeta>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
 
-          return  importOcel(data,params,requestOptions)
-        }
-
-        
+export type GetExtensionMetaQueryResult = NonNullable<Awaited<ReturnType<typeof getExtensionMeta>>>
+export type GetExtensionMetaQueryError = unknown
 
 
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ImportOcelMutationResult = NonNullable<Awaited<ReturnType<typeof importOcel>>>
-    export type ImportOcelMutationBody = BodyImportOcel
-    export type ImportOcelMutationError = HTTPValidationError
-
-    /**
- * @summary Import OCEL 2.0
+export function useGetExtensionMeta<TData = Awaited<ReturnType<typeof getExtensionMeta>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getExtensionMeta>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getExtensionMeta>>,
+          TError,
+          Awaited<ReturnType<typeof getExtensionMeta>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetExtensionMeta<TData = Awaited<ReturnType<typeof getExtensionMeta>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getExtensionMeta>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getExtensionMeta>>,
+          TError,
+          Awaited<ReturnType<typeof getExtensionMeta>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetExtensionMeta<TData = Awaited<ReturnType<typeof getExtensionMeta>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getExtensionMeta>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Extension Meta
  */
-export const useImportOcel = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof importOcel>>, TError,{data: BodyImportOcel;params: ImportOcelParams}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof importOcel>>,
-        TError,
-        {data: BodyImportOcel;params: ImportOcelParams},
-        TContext
-      > => {
 
-      const mutationOptions = getImportOcelMutationOptions(options);
+export function useGetExtensionMeta<TData = Awaited<ReturnType<typeof getExtensionMeta>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getExtensionMeta>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-      return useMutation(mutationOptions , queryClient);
-    }
-    /**
+  const queryOptions = getGetExtensionMetaQueryOptions(options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+/**
  * @summary Get default OCEL metadata
  */
 export const getGetDefaultOcelUrl = (params?: GetDefaultOcelParams,) => {

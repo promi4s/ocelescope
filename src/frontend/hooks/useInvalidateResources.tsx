@@ -1,12 +1,18 @@
 import { useQueryClient } from "@tanstack/react-query";
 
-const useInvalidateResources = () => {
-  const queryclient = useQueryClient();
+type InvalidationRouteName = "ocels" | "resources" | "tasks" | "plugins";
 
-  return async () =>
-    await queryclient.invalidateQueries({
-      predicate: (query) => query.queryHash.includes("resource"),
+const useInvalidate = () => {
+  const queryClient = useQueryClient();
+
+  return async (routeNames: InvalidationRouteName[]) =>
+    await queryClient.invalidateQueries({
+      predicate: (query) =>
+        typeof query.queryKey[0] === "string" &&
+        routeNames.some((route) =>
+          (query.queryKey[0] as string).includes(`/${route}`),
+        ),
     });
 };
 
-export default useInvalidateResources;
+export default useInvalidate;
