@@ -77,8 +77,10 @@ const EntityTable: React.FC = () => {
       switch (entityType) {
         case "ocel":
           deleteOcel({ params: { ocel_id: id } });
+          break;
         case "resource":
           deleteResource({ resourceId: id });
+          break;
       }
     },
     [deleteResource, deleteOcel],
@@ -126,7 +128,6 @@ const EntityTable: React.FC = () => {
     return [...ocelEntities, ...resourceEntities];
   }, [ocels, resources, resourceMeta]);
 
-  console.log(viewedResouce);
   return (
     <>
       <ResourceModal
@@ -137,6 +138,7 @@ const EntityTable: React.FC = () => {
         <DataTable<Entity>
           withTableBorder
           borderRadius={"md"}
+          idAccessor={"id"}
           columns={[
             {
               accessor: "name",
@@ -190,7 +192,10 @@ const EntityTable: React.FC = () => {
                 <Group gap={"xs"}>
                   {[...(type === "ocel" ? ["OCEL"] : []), ...entityTypes].map(
                     (entityType) => (
-                      <Badge color={uniqolor(entityType).color}>
+                      <Badge
+                        key={entityType}
+                        color={uniqolor(entityType).color}
+                      >
                         {entityType}
                       </Badge>
                     ),

@@ -15,7 +15,7 @@ const RecentPlugins: React.FC = () => {
         emblaOptions={{ loop: true, align: "start" }}
       >
         {plugins.map((plugin) => (
-          <Carousel.Slide>
+          <Carousel.Slide key={plugin.id}>
             <PluginCard plugin={plugin} />
           </Carousel.Slide>
         ))}

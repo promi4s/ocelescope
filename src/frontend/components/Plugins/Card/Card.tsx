@@ -99,7 +99,9 @@ export const PluginCard: React.FC<{ plugin: PluginApi }> = ({ plugin }) => {
         </Stack>
         <Group gap={"xs"}>
           {tags.map((tag) => (
-            <Badge color={uniqolor(tag).color}>{tag}</Badge>
+            <Badge key={tag} color={uniqolor(tag).color}>
+              {tag}
+            </Badge>
           ))}
         </Group>
       </Stack>

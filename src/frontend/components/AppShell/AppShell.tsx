@@ -228,6 +228,7 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             {Object.values(moduleMap).map(
               ({ label, name, icon: Icon = PackageIcon, routes }) => (
                 <NavLink
+                  key={name}
                   leftSection={<Icon width={18} height={18} size={18} />}
                   label={label}
                   defaultOpened={name === modulePath?.name}
@@ -246,6 +247,7 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                     Object.values(routes).map(
                       ({ label: routeLabel, name: routeName }) => (
                         <NavLink
+                          key={routeName}
                           label={routeLabel}
                           href={getModuleRoute({
                             name: name as ModuleName,

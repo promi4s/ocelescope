@@ -27,7 +27,12 @@ const UploadSection: React.FC<{
   const invalidate = useInvalidate();
 
   const { mutate } = useImportDefaultOcel({
-    mutation: { onSuccess: async () => await invalidate(["ocels"]) },
+    mutation: {
+      onSuccess: async () => {
+        await invalidate(["ocels"]);
+        onSuccess?.();
+      },
+    },
   });
 
   const { addNotification } = useNotificationContext();
@@ -40,9 +45,7 @@ const UploadSection: React.FC<{
           message: "Uploading files!",
         });
 
-        if (onSuccess) {
-          onSuccess();
-        }
+        onSuccess?.();
       },
     },
   });
@@ -79,6 +82,7 @@ const UploadSection: React.FC<{
               noHeader
               records={ocels}
               highlightOnHover
+              idAccessor={"key"}
               withRowBorders={false}
               onRowClick={({ record }) => mutate({ params: { ...record } })}
               columns={[
