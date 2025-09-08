@@ -1,4 +1,4 @@
-import { Modal, Title } from "@mantine/core";
+import { Modal, Text, Title } from "@mantine/core";
 import UploadSection from "../UploadSection/UploadSection";
 import { ComponentProps } from "react";
 
@@ -10,7 +10,7 @@ const UploadModal: React.FC<
 > = ({ isOpen, onClose, acceptedTypes }) => {
   return (
     <Modal
-      title={<Title size={"h3"}>Upload</Title>}
+      title={<Text size={"h3"}>Upload</Text>}
       opened={!!isOpen}
       onClose={onClose}
       size={"xl"}

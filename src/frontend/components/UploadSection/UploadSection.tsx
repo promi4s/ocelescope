@@ -26,17 +26,18 @@ const UploadSection: React.FC<{
 
   const invalidate = useInvalidate();
 
-  const { mutate } = useImportDefaultOcel({
-    mutation: {
-      onSuccess: async () => {
-        await invalidate(["ocels"]);
-        onSuccess?.();
+  const { mutate: uploadDefault, isPending: isDefaultUploadPending } =
+    useImportDefaultOcel({
+      mutation: {
+        onSuccess: async () => {
+          await invalidate(["ocels"]);
+          onSuccess?.();
+        },
       },
-    },
-  });
+    });
 
   const { addNotification } = useNotificationContext();
-  const { mutate: upload, isPending } = useUpload({
+  const { mutate: upload, isPending: isUploadPending } = useUpload({
     mutation: {
       onSuccess: (tasks) => {
         addNotification({
@@ -53,7 +54,7 @@ const UploadSection: React.FC<{
   return (
     <Stack gap={"xs"} pos="relative">
       <LoadingOverlay
-        visible={isPending}
+        visible={isUploadPending && isDefaultUploadPending}
         overlayProps={{ radius: "sm", blur: 2 }}
       />
       <FileDropzone
@@ -84,7 +85,9 @@ const UploadSection: React.FC<{
               highlightOnHover
               idAccessor={"key"}
               withRowBorders={false}
-              onRowClick={({ record }) => mutate({ params: { ...record } })}
+              onRowClick={({ record }) =>
+                uploadDefault({ params: { ...record } })
+              }
               columns={[
                 {
                   accessor: "",
