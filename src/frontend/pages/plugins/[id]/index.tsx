@@ -98,7 +98,7 @@ const PluginPage: React.FC = () => {
           <Text>{plugin?.meta.description}</Text>
         </Stack>
         <SimpleGrid
-          cols={{ base: 1, sm: 2, lg: 5 }}
+          cols={{ base: 1, sm: 2, lg: 4 }}
           spacing={{ base: 10, sm: "xl" }}
           verticalSpacing={{ base: "md", sm: "xl" }}
         >
