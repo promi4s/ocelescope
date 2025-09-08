@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 
 from ocelescope.resource.resource import Resource
-from ocelescope.visualization.default.graph import Graph, GraphEdge, GraphNode
+from ocelescope.visualization.default.graph import Graph, GraphEdge, GraphNode, GraphvizLayoutConfig
 from ocelescope.visualization import generate_color_map
 
 
@@ -120,13 +120,12 @@ class PetriNet(Resource):
             type="graph",
             nodes=nodes,
             edges=edges,
-        ).layout_graph(
-            {
-                "engine": "dot",
-                "dot_attr": {
+            layout_config=GraphvizLayoutConfig(
+                engine="dot",
+                graphAttrs={
                     "rankdir": "LR",
                     "ranksep": "0.7",
                     "nodesep": "0.7",
                 },
-            },
+            ),
         )

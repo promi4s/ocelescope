@@ -60,10 +60,10 @@ class GraphEdge(BaseModel):
 
 
 class GraphvizLayoutConfig(BaseModel):
-    engine: GraphVizLayoutingEngine
-    graphAttrs: dict[str, str | int | float | bool]
-    nodeAttrs: dict[str, str | int | float | bool]
-    edgeAttrs: dict[str, str | int | float | bool]
+    engine: GraphVizLayoutingEngine = "dot"
+    graphAttrs: dict[str, str | int | float | bool] | None = None
+    nodeAttrs: dict[str, str | int | float | bool] | None = None
+    edgeAttrs: dict[str, str | int | float | bool] | None = None
 
 
 class Graph(BaseModel):

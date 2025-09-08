@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from ocelescope.resource.resource import Resource
 
 from ocelescope.visualization import generate_color_map
-from ocelescope.visualization.default.graph import Graph, GraphEdge, GraphNode
+from ocelescope.visualization.default.graph import Graph, GraphEdge, GraphNode, GraphvizLayoutConfig
 
 
 class Edge(BaseModel):
@@ -108,14 +108,17 @@ class DirectlyFollowsGraph(Resource):
 
         edges: list[GraphEdge] = activity_edges + start_edges + end_edges
 
-        return Graph(type="graph", nodes=nodes, edges=edges).layout_graph(
-            {
-                "engine": "dot",
-                "dot_attr": {
+        return Graph(
+            type="graph",
+            nodes=nodes,
+            edges=edges,
+            layout_config=GraphvizLayoutConfig(
+                engine="dot",
+                graphAttrs={
                     "rankdir": "BT",
                     "splines": "True",
                     "nodesep": "0.8",
                     "ranksep": "0.5",
                 },
-            }
+            ),
         )
