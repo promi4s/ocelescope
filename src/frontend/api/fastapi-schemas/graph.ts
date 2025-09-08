@@ -6,9 +6,11 @@
  */
 import type { GraphNode } from './graphNode';
 import type { GraphEdge } from './graphEdge';
+import type { GraphLayoutConfig } from './graphLayoutConfig';
 
 export interface Graph {
   type: 'graph';
   nodes: GraphNode[];
   edges: GraphEdge[];
+  layout_config?: GraphLayoutConfig;
 }

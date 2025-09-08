@@ -9,7 +9,7 @@ GraphVizLayoutingEngine = Literal[
 ]
 
 
-class DotViz(BaseModel):
+class DotVis(BaseModel):
     type: Literal["dot"]
     dot_str: str
     layout_engine: GraphVizLayoutingEngine
@@ -17,5 +17,5 @@ class DotViz(BaseModel):
     @classmethod
     def from_graphviz(
         cls, graph: Digraph | Graph, layout_engine: GraphVizLayoutingEngine
-    ) -> "DotViz":
-        return DotViz(dot_str=graph.source, type="dot", layout_engine=layout_engine)
+    ) -> "DotVis":
+        return DotVis(dot_str=graph.source, type="dot", layout_engine=layout_engine)
