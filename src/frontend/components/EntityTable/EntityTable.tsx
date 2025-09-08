@@ -111,7 +111,7 @@ const EntityTable: React.FC = () => {
       ({ id, name, type, created_at }) => ({
         id,
         name,
-        entityTypes: [resourceMeta[type].label ?? type],
+        entityTypes: [resourceMeta[type]?.label ?? type],
         type: "resource",
         createdAt: formatDateTime(dayjs(created_at).toISOString()),
       }),
