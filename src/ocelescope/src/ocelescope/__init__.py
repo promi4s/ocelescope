@@ -26,6 +26,9 @@ from ocelescope.plugin import (
     PluginResult,
     plugin_method,
 )
+import matplotlib
+
+matplotlib.use("Agg")
 
 __all__ = [
     "OCEL",
