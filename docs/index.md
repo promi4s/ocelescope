@@ -72,6 +72,6 @@ Here are some example plugins you can explore and use with Ocelescope
 
     Generate Temporal Object Type Models (TOTeM) to uncover type-level temporal and cardinality relations in event logs
 
-    [:material-download: Download](https://github.com/Grkmr/TOTeM/releases/download/v1.0/totem.zip)
+    [:material-download: Download](https://github.com/Grkmr/TOTeM/releases/download/v1.1/totem.zip)
 
 </div>
