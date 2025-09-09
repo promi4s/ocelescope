@@ -3,7 +3,6 @@ import { WebSocketMessage } from "@/lib/websocket/validator";
 import useSessionStore from "@/store/sessionStore";
 import { env } from "@/util/env";
 import { showNotification } from "@mantine/notifications";
-import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import useWebsocket from "react-use-websocket";
 
@@ -13,13 +12,15 @@ const WebsocketWrapper = () => {
   const invalidate = useInvalidate();
 
   const { lastJsonMessage } = useWebsocket(
-    env.websocketUrl,
-    {
-      queryParams: { session_id: sessionId! },
-      retryOnError: true,
-      reconnectInterval: 1000,
-      share: true,
-    },
+    sessionId ? env.websocketUrl : null,
+    sessionId
+      ? {
+          queryParams: { session_id: sessionId! },
+          retryOnError: true,
+          reconnectInterval: 1000,
+          share: true,
+        }
+      : undefined,
     !!sessionId,
   );
 
