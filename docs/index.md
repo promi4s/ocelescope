@@ -1,6 +1,9 @@
 # Getting Started
 
-To get Ocelescope running docker compose. To run it you have to have docker-compose or docker installed. To run ocelescope you can just use the below docker compose script.
+!!! note "System Requirements"
+    To run Ocelescope locally, you must have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your system.
+
+To get Ocelescope running docker compose. To run ocelescope you can just use the below docker compose script.
 
 ```yaml title="docker-compose.yaml"
 services:
