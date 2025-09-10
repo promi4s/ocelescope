@@ -37,13 +37,13 @@ const ResourceCard: React.FC<{
           radius="md"
           onClick={() => onClick(resourceId)}
         >
-          Visualize
+          Inspect
         </Button>
         <ActionIcon
           component={"a"}
           variant="subtle"
           size={34}
-          href={`http://localhost:8000/resources/${resourceId}/download`}
+          href={`http://localhost:8000/resources/resource/${resourceId}/download`}
         >
           <Download />
         </ActionIcon>
