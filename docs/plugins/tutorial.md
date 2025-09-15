@@ -4,7 +4,7 @@ This tutorial provides a general example for developing an Ocelescope plugin fro
 
 In this tutorial, we will build an **OCEL Graph plugin** inspired by the OCELGraph feature of the [OCPQ](https://ocpq.aarkue.eu/) tool.
 
-An **OCEL graph** visualizes how objects and events are related to each other. The plugin lets you choose an object or event ID as the starting point (the root), and then builds a spanning tree from that root based on the connected relationships in the ocel. You can also set how far the graph should expand from the starting point, and filter which objects or events are included.
+An **OCEL graph** visualizes how objects and events are related to each other. The plugin lets you choose an object or event ID as the starting point (the root), and then builds a spanning tree from that root based on the connected relationships in the ocel. You can also set how far the graph should expand from the starting point.
 
 <div class="grid" markdown>
 <figure markdown="span">
@@ -16,6 +16,15 @@ An **OCEL graph** visualizes how objects and events are related to each other. T
   <figcaption align="center">The output of the OCEL Graph</figcaption>
 </figure >
 </div>
+
+!!! tip "Try out OCELGraph"
+
+    You can explore the source code in the repository below, or download the plugin and try it out yourself.
+
+    <div style="display: flex; gap: 1rem; justify-content: start;" markdown>
+    [:material-download: **Download**](https://github.com/Grkmr/OcelGraph/releases/download/v1.0/ocel_graph.zip)
+    [:simple-github: **Source**](https://github.com/Grkmr/ocelgraph)
+    </div>
 
 !!! requirements
     This project requires Python 3.12 to be installed on your system. For easy and reproducible package management, we recommend using [uv]("https://docs.astral.sh/uv/").
@@ -91,14 +100,14 @@ An Ocelescope plugin is defined by its Plugin Class. Let's start by adding some 
 If you created your project using the Cookiecutter template, this should already be set up for you. If not, open ``plugin.py``, find the plugin class, and rename the class and its metadata to something like the following:
 
 ```python
-class OcelGraph(Plugin):
+class OcelGraphDiscovery(Plugin):
     label = "OCEL Graph"
     description = "Generate your own OCEL Graph"
     version = "0.1.0"
     ...
 ```
 
-- The class name (OcelGraph) is the unique name of your plugin and is used to distinguish it from other plugins.
+- The class name (OcelGraphDiscovery) is the unique name of your plugin and is used to distinguish it from other plugins.
 - The label is what will be shown in the UI.
 - The description briefly explains what your plugin does.
 - The version field lets you update your plugin with new features or bug fixes over time.
@@ -110,7 +119,7 @@ Now let’s start writing the actual script that processes an OCEL and generates
 Add a new method to your plugin class called ``mine_ocel_graph``. Every plugin method should be decorated with ``@plugin_method``, where you can specify a label and a description. These will be displayed in the frontend interface.
 
 ```python
-class OcelGraph(Plugin):
+class OcelGraphDiscovery(Plugin):
     @plugin_method(label="Mine OCEL Graph", description="Mines a ocel graph")
     def mine_ocel_graph(
         self,
@@ -468,18 +477,199 @@ With this method, your resource will not only provide the OCEL graph data, but a
 Now let's implement the method which transforms our input (the OCEL and configuration) and returns our resource. For the sake of this tutorial, we won’t discuss the implementation details. Instead, we’ll add the implementation in a utility file to keep the plugin method itself clean and readable.
 
 For example, in your utility file (e.g., `util.py`):
-!!! details "Show mine_ocel_graph Implementation"
+??? details "Show mine_ocel_graph Implementation"
     ```python title="util.py"
+
     from typing import cast
-    from ocelescope import OCEL
+
     import pandas as pd
+    from ocelescope import OCEL
 
     from .inputs.ocelGraph import EventRoot, OCELGraphInput
-    from .resources.ocelGraph import E2ORelation, EventNode, O2ORelation, OCELGraph, ObjectNode, Relation
+    from .resources.ocelGraph import E2ORelation, EventNode, O2ORelation, ObjectNode, OCELGraph
+
+    # Generic function to count neighbours (events or objects)
+
+    def group_relation_entity(
+        df: pd.DataFrame,
+        entity_ids: list[str],
+        id_column: str,
+        type_column: str,
+        target_id_column: str,
+    ):
+        """
+        Count how many 'target' entities are linked to each entity (event or object).
+
+        Returns:
+            DataFrame with columns: id, type, count
+        """
+        return (
+            df[df[id_column].isin(entity_ids)]
+            .groupby([id_column, type_column])[target_id_column]
+            .size()
+            .reset_index()
+            .rename(columns={id_column: "id", type_column: "type", target_id_column: "count"})
+        )
 
 
     def mine_ocel_graph(ocel: OCEL, input: OCELGraphInput):
-        # ...implementation...
+        graph = OCELGraph()
+
+        events_to_visit = []
+        objects_to_visit = []
+
+        if isinstance(input.root, EventRoot):
+            root_id = input.root.event_id
+            root = ocel.events[ocel.events[ocel.ocel.event_id_column] == input.root.event_id].iloc[0]
+            events_to_visit.append(EventNode(id=input.root.event_id, activity_type=root[ocel.ocel.event_activity]))
+        else:
+            root_id = input.root.object_id
+            root = ocel.objects[ocel.objects[ocel.ocel.object_id_column] == input.root.object_id].iloc[0]
+            objects_to_visit.append(ObjectNode(id=input.root.object_id, object_type=root[ocel.ocel.object_type_column]))
+
+        for _ in range(input.depth):
+            # Get current frontier IDs
+            event_ids_to_visit = [event.id for event in events_to_visit]
+            object_ids_to_visit = [obj.id for obj in objects_to_visit]
+
+            # Get event-object relations using XOR and not already in the graph
+            relations: pd.DataFrame = cast(
+                pd.DataFrame,
+                ocel.relations[
+                    (
+                        (ocel.relations[ocel.ocel.event_id_column].isin(event_ids_to_visit))
+                        ^ (ocel.relations[ocel.ocel.object_id_column].isin(object_ids_to_visit))
+                    )
+                    & ~(ocel.relations[ocel.ocel.event_id_column].isin(graph.event_ids))
+                    & ~(ocel.relations[ocel.ocel.object_id_column].isin(graph.object_ids))
+                ],
+            )
+
+            # Count object neighbors per event
+            events = group_relation_entity(
+                df=relations,
+                entity_ids=event_ids_to_visit,
+                id_column=ocel.ocel.event_id_column,
+                type_column=ocel.ocel.event_activity,
+                target_id_column=ocel.ocel.object_id_column,
+            )
+
+            # Count event neighbors per object
+            e2o_objects = group_relation_entity(
+                df=relations,
+                entity_ids=object_ids_to_visit,
+                id_column=ocel.ocel.object_id_column,
+                type_column=ocel.ocel.object_type_column,
+                target_id_column=ocel.ocel.event_id_column,
+            )
+
+            # Get object-object (o2o) relations using XOR
+            o2o = cast(
+                pd.DataFrame,
+                ocel.o2o[
+                    (
+                        (ocel.o2o["ocel:oid_1"].isin(object_ids_to_visit))
+                        ^ (ocel.o2o["ocel:oid_2"].isin(object_ids_to_visit))
+                    )
+                    & ~(ocel.o2o["ocel:oid_1"].isin(graph.object_ids))
+                    & ~(ocel.o2o["ocel:oid_2"].isin(graph.object_ids))
+                ],
+            )
+
+            # Normalize and mirror o2o (treat as undirected)
+            o2o = o2o.rename(
+                columns={"ocel:oid_1": "id", "ocel:type_1": "type", "ocel:oid_2": "target_id", "ocel:type_2": "target_type"}
+            )
+
+            mirrored = o2o.rename(
+                columns={"target_id": "id", "target_type": "type", "id": "target_id", "type": "target_type"}
+            )
+
+            mirrored_o2o = pd.concat([o2o, mirrored], ignore_index=True).rename(columns={"ocel:qualifier": "qualifier"})
+
+            # Count o2o neighbours for each object
+            o2o_objects = group_relation_entity(
+                df=mirrored_o2o,
+                entity_ids=object_ids_to_visit,
+                id_column="id",
+                type_column="type",
+                target_id_column="target_id",
+            )
+
+            # Combine object neighbour counts
+            objects = (
+                pd.concat([o2o_objects, e2o_objects], ignore_index=True)
+                .groupby(["id", "type"], as_index=False)["count"]
+                .sum()
+            )
+
+            # Update graph with this layer
+            graph.objects = graph.objects + objects_to_visit
+            graph.events = graph.events + events_to_visit
+
+            # Prepare for next layer
+            events_to_visit = []
+            objects_to_visit = []
+
+            object_id_with_neighbours = [
+                row["id"] for _, row in objects.iterrows() if row["count"] <= input.max_neighbours or row["id"] == root_id
+            ]
+            event_id_with_neighbours = [
+                row["id"] for _, row in events.iterrows() if row["count"] <= input.max_neighbours or row["id"] == root_id
+            ]
+
+            # Add o2o relations to graph and queue new objects
+            for _, row in (
+                cast(pd.DataFrame, mirrored_o2o[mirrored_o2o["id"].isin(object_id_with_neighbours)])
+                .drop_duplicates(subset=["target_id"], keep="first")
+                .iterrows()
+            ):
+                graph.o2o_relations.append(
+                    O2ORelation(source=str(row["id"]), target=str(row["target_id"]), qualifier=str(row["qualifier"]))
+                )
+                objects_to_visit.append(ObjectNode(id=str(row["target_id"]), object_type=str(row["target_type"])))
+
+            # Add e2o relations (object → event)
+            for _, row in (
+                cast(pd.DataFrame, relations[relations["ocel:oid"].isin(object_id_with_neighbours)])
+                .drop_duplicates(subset=["ocel:eid"], keep="first")
+                .iterrows()
+            ):
+                graph.e2o_relations.append(
+                    E2ORelation(
+                        event_id=str(row["ocel:eid"]),
+                        object_id=str(row["ocel:oid"]),
+                        qualifier=str(row["ocel:qualifier"]),
+                        object_type=str(row["ocel:type"]),
+                    )
+                )
+                events_to_visit.append(EventNode(id=str(row["ocel:eid"]), activity_type=str(row["ocel:activity"])))
+
+            # Add e2o relations (event → object)
+            for _, row in (
+                cast(
+                    pd.DataFrame,
+                    relations[
+                        relations["ocel:eid"].isin(event_id_with_neighbours)
+                        & ~relations["ocel:oid"].isin([obj.id for obj in objects_to_visit])
+                    ],
+                )
+                .drop_duplicates(subset=["ocel:oid"], keep="first")
+                .iterrows()
+            ):
+                graph.e2o_relations.append(
+                    E2ORelation(
+                        event_id=str(row["ocel:eid"]),
+                        object_id=str(row["ocel:oid"]),
+                        qualifier=str(row["ocel:qualifier"]),
+                        object_type=str(row["ocel:type"]),
+                    )
+                )
+                objects_to_visit.append(ObjectNode(id=str(row["ocel:oid"]), object_type=str(row["ocel:type"])))
+
+        graph.objects = graph.objects + objects_to_visit
+        graph.events = graph.events + events_to_visit
+
         return graph
     ```
 
@@ -496,5 +686,50 @@ class OcelGraphDiscovery(Plugin):
 ```
 
 !!! warning
-    If you use the build script provided by the Ocelescope template, **absolute imports will be automatically converted to relative imports** during the build process.
-    If you are building or copying files manually, you will need to change any absolute imports (like `from ocel_graph.util import ...`) to relative imports (like `from .util import ...`) yourself.
+
+    Currently, **Ocelescope plugins only support relative imports**.  
+    This means you must ensure all imports inside your plugin use relative paths.
+
+    ```
+    # ✅ Correct (relative import)
+    from .util import some_function
+
+    # ❌ Incorrect (absolute import)
+    from ocel_graph.util import some_function
+    ```
+
+## Step 3: Build Plugin
+
+Before your plugin can be built, make sure that the top-level `__init__.py` properly exposes your plugin class:
+
+```python title="__init__.py"
+
+from .plugin import OcelGraphDiscovery
+
+__all__ = [
+    "OcelGraphDiscovery",
+]
+```
+
+In ocelescope plugins are basically just the packages zipped so in our case:
+
+```
+ocel_graph/
+  ├── __init__.py
+  └── plugin.py
+```
+
+You can create the zip manually, or use the provided build script from the Ocelescope template by running at the project root:
+
+```sh
+python scripts/build_plugin.py
+```
+
+Or if you are using uv:
+
+```sh
+uv run python scripts/build_plugin.py
+```
+
+The build script also checks for any absolute imports you may have missed and will raise an error if it finds them.
+After running the build, your plugin package will be created in the dist/ folder.
