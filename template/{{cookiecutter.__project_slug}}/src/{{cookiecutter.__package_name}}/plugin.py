@@ -1,10 +1,38 @@
 from typing import Annotated
 
-from ocelescope import OCEL, OCELAnnotation, Plugin, plugin_method
+from ocelescope import OCEL, OCELAnnotation,{% if cookiecutter.include_example_extension == "y" %} OCELExtension,{% endif %} Plugin, PluginInput, Resource, plugin_method
 
-from .inputs.example import ExampleInput
-from .resources.example import ExampleResource
+{% if cookiecutter.include_example_extension == "y" %}
+class MinimalExtension(
+    OCELExtension,
+):
+    name = "Minimal Extension"
+    description = "A minimal extension"
+    version = "1.0"
+    supported_extensions = []
 
+    @staticmethod
+    def has_extension(path):
+        return False
+
+    @classmethod
+    def import_extension(cls, ocel, path):
+        return cls()
+
+    def export_extension(self, path):
+        return
+{% endif %}
+
+class MinimalResource(Resource):
+    label = "Minimal Resource"
+    description = "A minimal resource"
+
+    def visualize(self) -> None:
+        pass
+
+
+class Input(PluginInput, frozen=True):
+    pass
 
 class {{cookiecutter.__plugin_class_name}}(Plugin):
     label = "{{cookiecutter.plugin_name}}"
@@ -15,6 +43,6 @@ class {{cookiecutter.__plugin_class_name}}(Plugin):
     def example(
         self,
         ocel: Annotated[OCEL, OCELAnnotation(label="Event Log")],
-        input: ExampleInput,
-    ) -> ExampleResource:
-        return ExampleResource()
+        input: Input,
+    ) -> MinimalResource:
+        return MinimalResource()
