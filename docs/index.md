@@ -25,6 +25,8 @@ volumes:
   plugins_store:
 ```
 
+[:material-download: Download](./assets/docker-compose.yaml){ .md-button download="docker-compose.yaml" }
+
 ### Starting the Services
 
 Run the following command in the same directory as your `docker-compose.yml`:
