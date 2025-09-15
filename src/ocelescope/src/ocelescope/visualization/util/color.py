@@ -1,24 +1,23 @@
-import hashlib
-import colorsys
+import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 
 
-def string_to_vibrant_color(string: str):
-    # Create a stable hash from the string
-    hash_int = int(hashlib.sha1(string.encode()).hexdigest(), 16)
+def generate_color_map(strings: list[str], scale="Pastel2"):
+    """
+    Assigns each unique string a color from the palette, in sorted order.
+    No hashing → deterministic, order of input list doesn't matter.
 
-    # Use hash to pick a hue on the color wheel
-    hue = (hash_int % 360) / 360.0
+    Args:
+        strings (list[str]): List of strings.
+        scale (str): Matplotlib colormap name.
 
-    # High saturation and medium lightness = vibrant color
-    saturation = 0.95  # close to max
-    lightness = 0.5  # not too light or dark
+    Returns:
+        dict[str, str]: Mapping of strings to hex colors.
+    """
+    unique_strings = sorted(set(strings))  # order independent
 
-    # Convert HSL to RGB
-    r, g, b = colorsys.hls_to_rgb(hue, lightness, saturation)
+    cmap = plt.cm.get_cmap(scale, len(unique_strings))
 
-    # Convert RGB [0–1] to hex
-    return "#{:02x}{:02x}{:02x}".format(int(r * 255), int(g * 255), int(b * 255))
+    palette = [mcolors.to_hex(cmap(i)) for i in range(len(unique_strings))]
 
-
-def generate_color_map(strings: list[str]):
-    return {s: string_to_vibrant_color(s) for s in strings}
+    return {s: c for s, c in zip(unique_strings, palette)}
