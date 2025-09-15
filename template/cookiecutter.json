@@ -1,7 +1,7 @@
 {
 	"author_name": "Dr. Data Scientisimy",
 	"email": "example@example.com",
-	"plugin_name": "Example Plugin Name",
+	"plugin_name": "Minimal Plugin",
 	"plugin_description": "A ocelescope plugin",
 	"first_version": "0.1.0",
 	"include_example_extension": "y",

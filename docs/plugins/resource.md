@@ -45,56 +45,70 @@ To enable visualization for a resource, implement the `visualize()` method in yo
 
 #### Graph
 
-A layouted graph composed of nodes and edges. Commonly used for Petri nets, directly-follows graphs, and other graph-based models.
+A graph composed of nodes and edges. Commonly used for Petri nets, directly-follows graphs, and other graph-based models.
 
-- **Classes**: `Graph`, `GraphNode`, `GraphEdge`
-- **Layout**: Graphviz-based layouts via `.layout_graph()`
+- **Classes**: `Graph`, `GraphNode`, `GraphEdge`, `GraphvizLayoutConfig`
+- **Layout**: Controlled by Graphviz engines and attributes (`GraphvizLayoutConfig`)
 
 ##### GraphNode
 
 Defines a visual node in the graph.
 
-| Field          | Type                                  | Description                                 |
-| ---------------| ------------------------------------- | ------------------------------------------- |
-| `id`            | `str`                                 | Unique node ID                              |
-| `label`         | `Optional[str]`                       | Display label                               |
-| `shape`         | `Literal[...]`                        | Node shape (`circle`, `rectangle`, etc.)    |
-| `width`, `height` | `Optional[float]`                   | Dimensions in pixels                        |
-| `color`         | `Optional[str]`                       | Fill color (hex or named)                   |
-| `x`, `y`        | `Optional[float]`                     | Coordinates after layout (auto-set)         |
-| `border_color`  | `Optional[str]`                       | Border/stroke color                         |
-| `label_pos`     | `Optional["top","center","bottom"]`   | Label position                              |
+| Field             | Type                                                           | Description                         |
+| ----------------- | -------------------------------------------------------------- | ----------------------------------- |
+| `id`              | `str`                                                          | Unique node ID                      |
+| `label`           | `Optional[str]`                                                | Display label                       |
+| `shape`           | `Literal["circle","triangle","rectangle","diamond","hexagon"]` | Node shape                          |
+| `width`, `height` | `Optional[float]`                                              | Dimensions in pixels                |
+| `color`           | `Optional[str]`                                                | Fill color (hex or named)           |
+| `x`, `y`          | `Optional[float]`                                              | Coordinates after layout (auto-set) |
+| `border_color`    | `Optional[str]`                                                | Border/stroke color                 |
+| `label_pos`       | `Optional[Literal["top","center","bottom"]]`                   | Label position                      |
 
 ##### GraphEdge
 
 Represents a directed connection between nodes.
 
-| Field      | Type                                  | Description                                          |
-| -----------| ------------------------------------- | ---------------------------------------------------- |
-| `source`   | `str`                                 | Source node ID                                       |
-| `target`   | `str`                                 | Target node ID                                       |
-| `arrows`   | `tuple[Optional[str], Optional[str]]` | Arrowheads at start/end (e.g., `(None, "triangle")`) |
-| `color`    | `Optional[str]`                       | Edge color                                           |
-| `label`    | `Optional[str]`                       | Label text                                           |
+| Field    | Type                          | Description                                          |
+| -------- | ----------------------------- | ---------------------------------------------------- |
+| `source` | `str`                         | Source node ID                                       |
+| `target` | `str`                         | Target node ID                                       |
+| `arrows` | `tuple[EdgeArrow, EdgeArrow]` | Arrowheads at start/end (e.g., `(None, "triangle")`) |
+| `color`  | `Optional[str]`               | Edge color                                           |
+| `label`  | `Optional[str]`               | Label text                                           |
 
-##### Layout with `.layout_graph()`
+##### GraphvizLayoutConfig
+
+Specifies layout settings passed to Graphviz.
+
+| Field        | Type                      | Description                                           |       |         |                                                                 |
+| ------------ | ------------------------- | ----------------------------------------------------- | ----- | ------- | --------------------------------------------------------------- |
+| `engine`     | `GraphVizLayoutingEngine` | Graphviz engine (`dot`, `neato`, `fdp`, `sfdp`, etc.) |       |         |                                                                 |
+| `graphAttrs` | \`dict\[str, str          | int                                                   | float | bool]\` | Attributes applied to the whole graph (e.g., `rankdir`, `size`) |
+| `nodeAttrs`  | \`dict\[str, str          | int                                                   | float | bool]\` | Default attributes for all nodes (e.g., `shape`, `color`)       |
+| `edgeAttrs`  | \`dict\[str, str          | int                                                   | float | bool]\` | Default attributes for all edges (e.g., `arrowsize`, `color`)   |
+
+##### Example Usage
 
 ```python
 Graph(
     type="graph",
     nodes=[...],
-    edges=[...]
-).layout_graph({
-    "engine": "dot",      # Graphviz engine: dot, neato, etc.
-    "dot_attr": {
-        "rankdir": "LR",   # Layout direction: LR (left-right), TB (top-bottom)
-        "nodesep": "0.5",  # Node spacing
-        "ranksep": "0.5"   # Layer spacing
-    }
-})
+    edges=[...],
+    layout_config=GraphvizLayoutConfig(
+        engine="dot",
+        graphAttrs={
+            "rankdir": "LR",   # Layout direction: LR (left-right), TB (top-bottom)
+            "nodesep": "0.5",  # Node spacing
+            "ranksep": "0.5"   # Layer spacing
+        },
+   )
+)
 ```
 
-The `.layout_graph()` method automatically assigns positions (`x`, `y`) and dimensions (`width`, `height`) using Graphviz layout results.
+Graphviz will apply the chosen engine and attributes to determine positions (`x`, `y`) and dimensions (`width`, `height`) automatically.
+
+---
 
 #### SVG
 
@@ -103,22 +117,7 @@ Use raw SVG markup when a graph-based layout is not appropriate, or when you nee
 - **Class**: `SVGVis`
 - **Use case**: Custom layouts, charts, icons, or any visualization expressible as SVG.
 
-**Example with Graphviz**
-
-```python
-from ocelescope.visualization.default.svg import SVGVis
-from graphviz import Digraph
-
-class MySVGGraphvizResource(Resource):
-    def visualize(self):
-        dot = Digraph(engine="dot")
-        dot.node("A", "Start", shape="circle", style="filled", fillcolor="#ffcc00")
-        dot.node("B", "End", shape="doublecircle", style="filled", fillcolor="#66ccff")
-        dot.edge("A", "B", label="transition")
-        return SVGVis.from_graph(dot)
-```
-
-**Example with Raw SVG String**
+**Example**
 
 ```python
 from ocelescope.visualization.default.svg import SVGVis
@@ -133,6 +132,8 @@ class MyRawSVGResource(Resource):
         """
         return SVGVis(type="svg", svg=svg)
 ```
+
+---
 
 #### Table
 
@@ -164,4 +165,58 @@ class MyTableResource(Resource):
 
 The table supports sorting, hiding, and formatting options for each column.
 
-For advanced use cases, you can contribute your own visualization types to the Ocelescope framework.
+For advanced use cases, you can contribute your own visualization types to the Ocelescope framework
+
+---
+
+#### Dot
+
+A raw Graphviz DOT visualization, preserving the full DOT source string. Useful when you want direct control over Graphviz rendering or need to reuse an existing DOT description.
+
+- **Class**: `DotVis`
+- **Layout**: Explicitly set by Graphviz via a chosen layout engine (`dot`, `neato`, `fdp`, etc.)
+
+##### DotVis
+
+| Field           | Type                      | Description                                                              |
+| --------------- | ------------------------- | ------------------------------------------------------------------------ |
+| `type`          | `Literal["dot"]`          | Identifies the visualization type as DOT                                 |
+| `dot_str`       | `str`                     | The raw DOT source string (as produced by `graphviz.Digraph` or `Graph`) |
+| `layout_engine` | `GraphVizLayoutingEngine` | The Graphviz engine used (`dot`, `neato`, `fdp`, `sfdp`, `circo`, etc.)  |
+
+##### Supported Layout Engines
+
+| Engine        | Description                                                    |
+| ------------- | -------------------------------------------------------------- |
+| `dot`         | Hierarchical layouts, suited for layered graphs and flowcharts |
+| `neato`       | Spring-model layouts, good for undirected graphs               |
+| `fdp`         | Force-directed placement, similar to `neato`                   |
+| `sfdp`        | Scalable force-directed placement for large graphs             |
+| `circo`       | Circular layouts                                               |
+| `twopi`       | Radial layouts (nodes placed in concentric circles)            |
+| `osage`       | Clustered layouts                                              |
+| `patchwork`   | Treemap-style layouts                                          |
+| `nop`, `nop2` | No-op layout engines (use raw input positions if given)        |
+
+##### Constructing from Graphviz
+
+Use `.from_graphviz()` to convert an existing `graphviz.Digraph` or `graphviz.Graph` object into a `DotVis`.
+
+```python
+from graphviz import Digraph
+from ocelescope.visualization.default.dot import DotVis
+
+class MyDotResource(Resource):
+    def visualize(self):
+        dot = Digraph()
+        dot.node("A", "Start")
+        dot.node("B", "End")
+        dot.edge("A", "B")
+
+        return DotVis.from_graphviz(
+            graph=dot,
+            layout_engine="dot"   # or "neato", "circo", etc.
+        )
+```
+
+The resulting `DotVis` object carries both the DOT source (`dot_str`) and the layout engine specification, allowing full control over Graphviz rendering.

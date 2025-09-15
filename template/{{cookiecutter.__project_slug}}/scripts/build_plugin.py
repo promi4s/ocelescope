@@ -7,6 +7,7 @@ import traceback
 import zipfile
 from pathlib import Path
 from types import ModuleType
+import ast
 
 from ocelescope import OCELExtension, Plugin
 
@@ -14,6 +15,44 @@ ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
 DIST = ROOT / "dist"
 DIST.mkdir(exist_ok=True)
+
+
+def find_absolute_imports(package_dir: Path):
+    package_name = package_dir.name
+    absolute_imports = []
+
+    for py_file in package_dir.rglob("*.py"):
+        try:
+            tree = ast.parse(py_file.read_text())
+        except SyntaxError:
+            print(f"⚠️ Skipping {py_file} (could not parse)")
+            continue
+
+        for node in ast.walk(tree):
+            match node:
+                # Case 1: import mypkg...
+                case ast.Import(names=names) if any(
+                    alias.name == package_name or alias.name.startswith(package_name + ".") for alias in names
+                ):
+                    absolute_imports.append(
+                        {
+                            "file": py_file,
+                            "lineno": node.lineno,
+                            "statement": ast.unparse(node),
+                        }
+                    )
+
+                # Case 2: from mypkg... import ...
+                case ast.ImportFrom(module=mod) if mod and mod.startswith(package_name):
+                    absolute_imports.append(
+                        {
+                            "file": py_file,
+                            "lineno": node.lineno,
+                            "statement": ast.unparse(node),
+                        }
+                    )
+
+    return absolute_imports
 
 
 def is_concrete_subclass(obj: object, base: type) -> bool:
@@ -96,6 +135,15 @@ def main() -> int:
             continue
 
         print(f"🔎 Checking {pkg_dir} ...")
+
+        # 🚨 check for absolute imports
+        abs_imports = find_absolute_imports(pkg_dir)
+        if abs_imports:
+            print(f"❌ Skipping {pkg_dir}: found absolute imports:")
+            for imp in abs_imports:
+                print(f"   {imp['file']}:{imp['lineno']} -> {imp['statement']}")
+            continue
+
         module = load_package(pkg_dir)
         if module and module_has_plugin(module):
             zip_package(pkg_dir)
