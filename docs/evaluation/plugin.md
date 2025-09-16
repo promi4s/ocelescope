@@ -226,9 +226,9 @@ You already implemented a helper function (`convert_dfg_to_graphviz`) that creat
           if src is not None and tgt is not None:
               dot.edge(src, tgt, color=color, penwidth="2")
           elif src is None and tgt is not None:
-              dot.edge(inner_sources[x], tgt, color=color, penwidth="2")
+              dot.edge(tgt, inner_sinks[x], color=color, penwidth="2")
           elif src is not None and tgt is None:
-              dot.edge(src, inner_sinks[x], color=color, penwidth="2")
+              dot.edge(src, inner_sources[x], color=color, penwidth="2")
       
       return dot
     ```
