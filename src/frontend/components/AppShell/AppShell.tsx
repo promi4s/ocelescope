@@ -148,8 +148,8 @@ const LinksGroup: React.FC<LinksGroupProps> = ({
 };
 
 const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
-  const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(false);
+  const [mobileOpened, { toggle: toggleMobile }] = useDisclosure(true);
+  const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const router = useRouter();
 
