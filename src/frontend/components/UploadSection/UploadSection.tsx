@@ -54,7 +54,7 @@ const UploadSection: React.FC<{
   return (
     <Stack gap={"xs"} pos="relative">
       <LoadingOverlay
-        visible={isUploadPending && isDefaultUploadPending}
+        visible={isUploadPending || isDefaultUploadPending}
         overlayProps={{ radius: "sm", blur: 2 }}
       />
       <FileDropzone
