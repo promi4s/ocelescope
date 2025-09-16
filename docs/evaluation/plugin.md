@@ -89,7 +89,6 @@ Update the metadata fields `label` and `description`.
 
 ### Step 2.3: Extend the Input Class
 
-Keep the OCEL input parameter as defined in the example method.
 Extend the Input class by adding a new field that captures a list of object types.
 Use the ``OCEL_FIELD`` helper to define this field and link it to the OCEL input.
 
@@ -99,6 +98,9 @@ class Input(PluginInput, frozen=True):
 ```
 
 Refer to the [Plugin Development](../plugins/plugin_class.md#ocel-dependent-selection-fields) Guide for details on defining OCEL-dependent selection fields.
+
+!!! warning
+    Make sure the `ocel_id` in `OCEL_FIELD` matches the `ocel` parameter of the function.
 
 ### Step 2.4: Create a Custom Resource
 
@@ -241,13 +243,13 @@ What to Do (Inside the `visualize` method):
 2. **Convert to DotVis**
    Wrap the resulting `Digraph` in a `DotVis` using `DotVis.from_graphviz(...)`. See [docs](../plugins/resource.md#dot).
 
-   - Choose an appropriate Graphviz layout engine (e.g., `"dot"` or `"neato"`).
+   - Choose an appropriate Graphviz layout engine (e.g., `"dot"` ).
 3. **Return the visualization**
-   Return the `DotVis` object directly from `visualize`.
+  Update visualize to return the `DotVis` object, and change its signature to `-> DotVis`.
 
 ### Step 2.6: Integrate the Implementation
 
-Modify your plugin method so that it calls the provided discovery function to compute the object-centric directly-follows graph (OC-DFG) based on the selected object types.
+Modify your plugin method so that it calls the provided discovery function to compute the object-centric directly-follows graph based on the selected object types.
 
 Then, return an instance of the DFG resource, assigning the discovered edges to its edges field.
 
@@ -256,7 +258,7 @@ Then, return an instance of the DFG resource, assigning the discovered edges to 
     def discover_dfg(ocel: OCEL, used_object_types: list[str]) -> list[tuple[str | None , str, str | None]]:
         import pm4py
 
-        ocel_filtered = pm4py.filter_ocel_object_types(ocel.ocel, ["customers", "employees"], positive=True)
+        ocel_filtered = pm4py.filter_ocel_object_types(ocel.ocel, used_object_types, positive=True)
         ocdfg = pm4py.discover_ocdfg(ocel_filtered)
         edges :list[tuple[str | None , str, str | None]]= []
         for object_type, raw_edges in ocdfg["edges"]["event_couples"].items():
