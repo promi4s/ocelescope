@@ -2,6 +2,7 @@ import { useResource } from "@/api/fastapi/resources/resources";
 import { useGetPluginTask } from "@/api/fastapi/tasks/tasks";
 import ResourceModal from "@/components/Resources/ResourceModal";
 import Viewer from "@/components/Resources/Viewer";
+import { useDownloadFile } from "@/hooks/useDownload";
 import {
   ActionIcon,
   Badge,
@@ -20,6 +21,7 @@ const ResourceCard: React.FC<{
   onClick: (resourceId: string) => void;
 }> = ({ resourceId, onClick }) => {
   const { data: resource } = useResource(resourceId);
+  const downloadFile = useDownloadFile();
 
   return (
     <Card shadow="sm" padding="lg" radius="md" withBorder>
@@ -43,7 +45,9 @@ const ResourceCard: React.FC<{
           component={"a"}
           variant="subtle"
           size={34}
-          href={`http://localhost:8000/resources/resource/${resourceId}/download`}
+          onClick={() =>
+            downloadFile(`/resources/resource/${resourceId}/download`)
+          }
         >
           <Download />
         </ActionIcon>
