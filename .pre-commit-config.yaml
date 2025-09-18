@@ -32,3 +32,11 @@ repos:
       - id: biome-lint
         args: ["--config-path", "src/frontend/"]
         additional_dependencies: ["@biomejs/biome@1.9.4"]
+  - repo: local
+    hooks:
+      - id: generate-api
+        name: Generate Openapi json
+        entry: just api
+        language: system
+        pass_filenames: false
+        files: ^src/backend/

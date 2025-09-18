@@ -25,5 +25,22 @@ up env:
         exit 1; \
     fi
 
+[working-directory:'src/frontend']
+orval: api
+  npm run generate:api 
 
+[working-directory: 'src/backend']
+api:
+  uv run python generate_openapi.py {{justfile_directory()}}/src/frontend/api
   
+[working-directory: 'src/backend']
+init_backend:
+  uv sync
+
+[working-directory: 'src/frontend']
+init_frontend:
+  npm i
+
+sync: init_frontend init_backend orval 
+  uvx pre-commit install
+
