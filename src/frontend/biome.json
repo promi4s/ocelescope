@@ -3,7 +3,12 @@
   "files": {
     "ignoreUnknown": true,
     "maxSize": 2000000,
-    "ignore": ["api/fastapi*", "plugins/pluginMap.ts", "shemas/*"]
+    "ignore": [
+      "api/fastapi*",
+      "api/openapi.json",
+      "plugins/pluginMap.ts",
+      "shemas/*"
+    ]
   },
   "formatter": {
     "indentStyle": "space"

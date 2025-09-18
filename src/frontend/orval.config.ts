@@ -1,7 +1,7 @@
 import { defineConfig } from "orval";
 export default defineConfig({
   fastapi: {
-    input: "http://localhost:8000/openapi.json",
+    input: "./api/openapi.json",
     output: {
       mode: "tags-split",
       target: "./api/fastapi",

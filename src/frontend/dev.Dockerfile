@@ -21,6 +21,8 @@ RUN \
 # Copy source code
 COPY . .
 
+RUN npm run generate:api
+
 # Expose Next.js dev server port
 EXPOSE 3000
 

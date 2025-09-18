@@ -13,6 +13,7 @@ RUN \
 
 # Copy the rest of the app and build it
 COPY . .
+RUN npm run generate:api
 RUN npm run build
 
 # Step 2: Create a lightweight production image
