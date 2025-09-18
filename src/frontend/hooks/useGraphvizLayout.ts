@@ -25,9 +25,15 @@ function esc(val: string) {
 }
 
 function toDot(visualization: VisualizationByType<"graph">): string {
-  const gAttrs = attrsToDot(visualization.layout_config?.graphAttrs);
-  const nAttrs = attrsToDot(visualization.layout_config?.nodeAttrs);
-  const eAttrs = attrsToDot(visualization.layout_config?.edgeAttrs);
+  const gAttrs = attrsToDot(
+    visualization.layout_config?.graphAttrs ?? undefined,
+  );
+  const nAttrs = attrsToDot(
+    visualization.layout_config?.nodeAttrs ?? undefined,
+  );
+  const eAttrs = attrsToDot(
+    visualization.layout_config?.edgeAttrs ?? undefined,
+  );
 
   const lines: string[] = [
     "digraph G {",
