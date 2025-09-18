@@ -40,6 +40,8 @@ services:
               - .next/
           - action: rebuild
             path: ./src/frontend/package-lock.json
+          - action: rebuild
+            path: ./src/frontend/api/openapi.json
 
 volumes:
   plugins_store:
