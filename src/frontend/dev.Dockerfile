@@ -1,6 +1,6 @@
 # syntax=docker.io/docker/dockerfile:1
 
-FROM node:18-alpine
+FROM node:20-alpine
 
 # System dependencies (useful for some packages)
 RUN apk add --no-cache libc6-compat
