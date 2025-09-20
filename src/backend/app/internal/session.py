@@ -4,14 +4,14 @@ import json
 import uuid
 from typing import Any, Callable, Hashable, Optional, Type, TypeVar, cast
 
-from api.websocket import websocket_manager, InvalidationRequest
+from app.websocket import websocket_manager, InvalidationRequest
 
-from api.exceptions import NotFound
-from api.model.module import Module
-from api.model.ocel import Filtered_Ocel
+from app.internal.exceptions import NotFound
+from app.internal.model.module import Module
+from app.internal.model.ocel import Filtered_Ocel
 from ocelescope import OCEL, OCELFilter
-from api.model.resource import ResourceStore, ResourceApi
-from tasks.base import TaskBase
+from app.internal.model.resource import ResourceStore, ResourceApi
+from app.internal.tasks.base import TaskBase
 
 
 T = TypeVar("T", bound=Module)  # Constrain T to CachableObject

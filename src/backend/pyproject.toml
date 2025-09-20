@@ -27,7 +27,6 @@ Repository = "https://github.com/rwth-pads/ocelescope"
 [dependency-groups]
 dev = [
   "jupyterlab>=4.0.7,<5",
-  "dependentspy",
   "iso4>=0.0.2,<0.0.3",
   "seaborn>=0.13.0,<0.14",
   "matplotlib>=3.8.0,<4",
@@ -38,7 +37,6 @@ dev = [
 package = false
 
 [tool.uv.sources]
-dependentspy = { git = "https://github.com/raihensen/dependentspy", branch = "main" }
 ocelescope = { path = "../ocelescope", editable = true }
 
 [build-system]

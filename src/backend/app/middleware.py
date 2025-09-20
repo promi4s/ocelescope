@@ -1,8 +1,8 @@
 from fastapi import Request
 from fastapi.responses import Response
 
-from api.config import config
-from api.session import Session
+from app.internal.config import config
+from app.internal.session import Session
 
 
 EXCLUDED_PATHS = ["/logout", "/docs"]

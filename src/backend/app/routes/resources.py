@@ -9,11 +9,11 @@ from fastapi.routing import APIRouter
 from ocelescope import Visualization
 from pydantic.main import BaseModel
 from starlette.responses import StreamingResponse
-from api.dependencies import ApiSession
+from app.dependencies import ApiSession
 
-from api.model.resource import ResourceApi, ResourceStore
-from registry import registry_manager
-from registry.registry_manager import ResourceInfo
+from app.internal.model.resource import ResourceApi, ResourceStore
+from app.internal.registry import registry_manager
+from app.internal.registry.registry_manager import ResourceInfo
 
 
 resource_router = APIRouter(prefix="/resources", tags=["resources"])

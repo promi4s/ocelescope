@@ -383,15 +383,6 @@ wheels = [
 ]
 
 [[package]]
-name = "dependentspy"
-version = "0.1.1"
-source = { git = "https://github.com/raihensen/dependentspy?branch=main#6d3b72dd71c8db7dcdb3d590dd204d522745dfb0" }
-dependencies = [
-    { name = "graphviz" },
-    { name = "networkx" },
-]
-
-[[package]]
 name = "deprecation"
 version = "2.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1389,7 +1380,6 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "dependentspy" },
     { name = "iso4" },
     { name = "jupyterlab" },
     { name = "matplotlib" },
@@ -1414,7 +1404,6 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "dependentspy", git = "https://github.com/raihensen/dependentspy?branch=main" },
     { name = "iso4", specifier = ">=0.0.2,<0.0.3" },
     { name = "jupyterlab", specifier = ">=4.0.7,<5" },
     { name = "matplotlib", specifier = ">=3.8.0,<4" },

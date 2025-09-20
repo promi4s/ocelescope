@@ -4,12 +4,12 @@ import sys
 from typing import Dict, TypedDict
 
 from ocelescope import Plugin, Resource
-from api.config import config
-from api.model.plugin import PluginApi
-from api.model.resource import ResourceStore
-from registry.registries.extension import ExtensionRegistry
-from registry.registries.plugin import PluginRegistry
-from registry.registries.resource import ResourceRegistry
+from app.internal.config import config
+from app.internal.model.plugin import PluginApi
+from app.internal.model.resource import ResourceStore
+from app.internal.registry.extension import ExtensionRegistry
+from app.internal.registry.plugin import PluginRegistry
+from app.internal.registry.resource import ResourceRegistry
 
 
 class ResourceInfo(TypedDict):

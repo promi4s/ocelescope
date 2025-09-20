@@ -8,20 +8,20 @@ from uuid import uuid4
 
 from ocelescope import PluginMethod, Resource
 
-from api.websocket import websocket_manager, InvalidationRequest
+from app.websocket import websocket_manager, InvalidationRequest
 from ocelescope.ocel.ocel import OCEL
 
-from api.config import config
+from app.internal.config import config
 import tempfile
 import zipfile
-from api.dependencies import ApiSession
+from app.dependencies import ApiSession
 
-from api.model.plugin import PluginApi
+from app.internal.model.plugin import PluginApi
 
 # TODO: Put this in own util function
-from registry import registry_manager
-from tasks.base import _call_with_known_params
-from tasks.plugin import PluginTask
+from app.internal.registry import registry_manager
+from app.internal.tasks.base import _call_with_known_params
+from app.internal.tasks.plugin import PluginTask
 
 plugin_router = APIRouter(prefix="/plugins", tags=["plugins"])
 

@@ -9,15 +9,14 @@ import zipfile
 
 from fastapi import HTTPException
 
-
-from api.config import config
-from api.model.resource import ResourceStore
-from api.session import Session
-from api.websocket import InvalidationRequest, OcelLink, SytemNotificiation
+from app.internal.config import config
+from app.internal.model.resource import ResourceStore
+from app.internal.session import Session
+from app.websocket import InvalidationRequest, OcelLink, SytemNotificiation
 from ocelescope import OCEL
-from registry import registry_manager
-from tasks.system import system_task
-from util.stream_to_tempfile import stream_to_tempfile
+from app.internal.registry import registry_manager
+from app.internal.tasks.system import system_task
+from app.internal.util.stream_to_tempfile import stream_to_tempfile
 
 
 class ImportMetadata(TypedDict):

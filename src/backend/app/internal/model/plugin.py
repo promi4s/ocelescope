@@ -1,5 +1,5 @@
-from pydantic.main import BaseModel
-from ocelescope.plugin import PluginMeta, PluginMethod
+from pydantic import BaseModel
+from ocelescope import PluginMeta, PluginMethod
 
 
 class PluginApi(BaseModel):

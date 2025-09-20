@@ -4,7 +4,6 @@ import sys
 import signal
 import asyncio
 import threading
-import subprocess
 from uvicorn import Config, Server
 
 # Import the FastAPI app

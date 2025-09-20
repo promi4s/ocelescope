@@ -9,10 +9,14 @@ from fastapi.routing import APIRouter
 from fastapi import File, Request, UploadFile
 from fastapi.responses import Response, JSONResponse
 
-from api.config import config
-from api.dependencies import ApiSession
-from api.session import Session
-from tasks.system_tasks import import_ocel_task, import_plugin, import_resource
+from app.internal.config import config
+from app.dependencies import ApiSession
+from app.internal.session import Session
+from app.internal.tasks.system_tasks import (
+    import_ocel_task,
+    import_plugin,
+    import_resource,
+)
 
 
 session_router = APIRouter(prefix="/session", tags=["session"])

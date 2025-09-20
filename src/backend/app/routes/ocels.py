@@ -5,26 +5,26 @@ from typing import Literal, Optional
 from ocelescope.ocel.filter import OCELFilter
 from ocelescope.ocel.ocel import OCELFileExtensions
 
-from api.dependencies import ApiOcel, ApiSession
-from api.exceptions import NotFound
-from api.model.base import PaginatedResponse
-from api.model.events import Date_Distribution_Item, Entity_Time_Info
-from api.model.ocel import OcelMetadata
-from api.model.response import TempFileResponse
+from app.dependencies import ApiOcel, ApiSession
+from app.internal.exceptions import NotFound
+from app.internal.model.base import PaginatedResponse
+from app.internal.model.events import Date_Distribution_Item, Entity_Time_Info
+from app.internal.model.ocel import OcelMetadata
+from app.internal.model.response import TempFileResponse
 from ocelescope import AttributeSummary, RelationCountSummary
 
-from ocel.default_ocel import (
+from app.internal.ocel.default_ocel import (
     DEFAULT_OCEL_KEYS,
     DefaultOCEL,
     filter_default_ocels,
     get_default_ocel,
 )
-from registry import registry_manager
+from app.internal.registry import registry_manager
 
 from fastapi import APIRouter, Query, Response
 
-from registry.registries.extension import OCELExtensionDescription
-from util.pandas import search_paginated_dataframe
+from app.internal.registry.extension import OCELExtensionDescription
+from app.internal.util.pandas import search_paginated_dataframe
 
 
 ocels_router = APIRouter(prefix="/ocels", tags=["ocels"])

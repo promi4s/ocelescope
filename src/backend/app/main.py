@@ -6,26 +6,22 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette import status
 from starlette.websockets import WebSocket
 
-from api.session import Session
-from api.websocket import websocket_manager
-from api.config import config
-from api.docs import init_custom_docs
-from api.middleware import session_access_middleware
-from api.utils import (
+from app.internal.session import Session
+from app.websocket import websocket_manager
+from app.internal.config import config
+from app.internal.docs import init_custom_docs
+from app.middleware import session_access_middleware
+from app.internal.utils import (
     error_handler_server,
 )
-from ocel.default_ocel import (
+from app.internal.ocel.default_ocel import (
     load_default_ocels,
 )
-from registrar import register_modules, register_initial_plugins
+from app.internal.registrar import register_modules, register_initial_plugins
 
 from fastapi import FastAPI
-from routes import routes
+from app.routes import routes
 from version import __version__
-
-"""
-In this file, all API routes of the OCEAn application are defined.
-"""
 
 
 @asynccontextmanager
@@ -37,7 +33,7 @@ async def lifespan(app: FastAPI):
 
 # Initialize FastAPI
 app = FastAPI(
-    title="OCEAn",
+    title="Ocelescope Backend",
     version=__version__,
     docs_url=None,  # disable swagger docs, use rapidoc instead (call to init_custom_docs below)
     redoc_url=None,

@@ -6,8 +6,8 @@ from typing import Callable, Hashable, Iterable, Literal, TypeVar
 import numpy as np
 from pydantic_settings import BaseSettings
 
-from api.logger import logger
-from util.types import PathLike
+from app.internal.logger import logger
+from app.internal.util.types import PathLike
 
 
 def pluralize(

@@ -6,11 +6,11 @@ from typing import Any
 
 from pydantic import Field, FilePath
 
-import util.misc as util
-from api.config import config
-from api.logger import logger
-from api.model.base import ApiBaseModel
-from api.session import Session
+import app.internal.util.misc as util
+from app.internal.config import config
+from app.internal.logger import logger
+from app.internal.model.base import ApiBaseModel
+from app.internal.session import Session
 from ocelescope import OCEL
 
 OCEL_BASE_PATH = None

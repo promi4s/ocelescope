@@ -4,8 +4,8 @@ from typing import Annotated, Literal
 
 from fastapi import Depends
 
-from api.exceptions import NotFound
-from api.session import Session
+from app.internal.exceptions import NotFound
+from app.internal.session import Session
 from ocelescope import OCEL
 
 

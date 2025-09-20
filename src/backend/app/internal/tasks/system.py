@@ -10,12 +10,12 @@ from typing import (
     Sequence,
 )
 
-from api.websocket import (
+from app.websocket import (
     WebsocketMessage,
     websocket_manager,
 )
 
-from tasks.base import (
+from app.internal.tasks.base import (
     TaskBase,
     TaskState,
     TaskSummary,
@@ -24,7 +24,7 @@ from tasks.base import (
 )
 
 if TYPE_CHECKING:
-    from api.session import Session
+    from app.internal.session import Session
 
 P = ParamSpec("P")
 

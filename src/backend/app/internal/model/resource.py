@@ -1,8 +1,6 @@
 from typing import Any, TypedDict
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import datetime
-
-from pydantic.fields import Field
 
 
 class PluginSource(TypedDict):

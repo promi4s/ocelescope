@@ -10,22 +10,22 @@ from typing import (
 from pydantic.fields import Field
 from pydantic.main import BaseModel
 
-from api.model.resource import ResourceStore
-from registry import registry_manager
-from tasks.base import TaskSummary, _call_with_known_params
+from app.internal.model.resource import ResourceStore
+from app.internal.registry import registry_manager
+from app.internal.tasks.base import TaskSummary, _call_with_known_params
 from ocelescope.ocel.ocel import OCEL
 from ocelescope.resource.resource import Resource
 
-from api.websocket import (
+from app.websocket import (
     PluginLink,
     SytemNotificiation,
     websocket_manager,
 )
 
-from tasks.base import TaskBase, TaskState, make_hashable
+from app.internal.tasks.base import TaskBase, TaskState, make_hashable
 
 if TYPE_CHECKING:
-    from api.session import Session
+    from app.internal.session import Session
 
 P = ParamSpec("P")
 

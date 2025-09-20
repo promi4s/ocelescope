@@ -4,7 +4,7 @@ from ocelescope import OCEL
 from ocelescope.ocel.filter import OCELFilter
 from pydantic.main import BaseModel
 
-from registry.registries.extension import OCELExtensionDescription
+from app.internal.registry.extension import OCELExtensionDescription
 
 
 class OcelMetadata(BaseModel):

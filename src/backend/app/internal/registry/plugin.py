@@ -1,7 +1,7 @@
 from types import ModuleType
 from typing import Any, Optional, TypedDict
 from ocelescope import OCEL, Resource, Plugin, PluginMethod
-from api.model.plugin import PluginApi
+from app.internal.model.plugin import PluginApi
 
 
 class PluginInput(TypedDict):

@@ -6,7 +6,7 @@
 from typing import Literal
 
 from fastapi import FastAPI
-from api.config import config
+from app.internal.config import config
 from starlette.responses import HTMLResponse
 
 
