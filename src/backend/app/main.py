@@ -12,9 +12,7 @@ from api.config import config
 from api.docs import init_custom_docs
 from api.middleware import session_access_middleware
 from api.utils import (
-    custom_snake2camel,
     error_handler_server,
-    verify_parameter_alias_consistency,
 )
 from ocel.default_ocel import (
     load_default_ocels,
@@ -91,13 +89,3 @@ async def websocket_endpoint(websocket: WebSocket):
 
 
 init_custom_docs(app)
-
-
-def post_init_tasks():
-    """Non-blocking tasks to be executed after the API has been initialized"""
-
-    # Verify parameter aliases are consistent
-    verify_parameter_alias_consistency(app, custom_snake2camel)
-
-
-post_init_tasks()

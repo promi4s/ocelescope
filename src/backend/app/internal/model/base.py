@@ -4,7 +4,7 @@ from typing import Generic, TypeVar
 
 from pydantic import BaseModel, computed_field
 
-from api.utils import custom_snake2camel
+from ..utils import custom_snake2camel
 
 
 class ApiBaseModel(BaseModel):

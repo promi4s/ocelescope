@@ -1,5 +1,4 @@
 import inspect
-import json
 import re
 from typing import Callable
 
@@ -14,8 +13,6 @@ from starlette.routing import Route
 
 from api.config import config
 from api.logger import logger
-from util.misc import write_file_if_changed
-from util.types import PathLike
 
 
 async def error_handler_server(request: Request, exc: Exception) -> Response:
@@ -32,12 +29,6 @@ async def error_handler_server(request: Request, exc: Exception) -> Response:
         detail = "Internal Server Error"
 
     return JSONResponse({"detail": detail}, status_code=status_code, headers=headers)
-
-
-def export_openapi_schema(app: FastAPI, path: PathLike) -> None:
-    """Export generated OpenAPI schema to file"""
-    if write_file_if_changed(path, json.dumps(app.openapi())):
-        logger.info(f"OpenAPI schema changed - Exported to {path}.")
 
 
 def custom_snake2camel(s: str):
