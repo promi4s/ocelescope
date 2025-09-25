@@ -6,7 +6,7 @@ authors = [
   { name = "Görkem-Emre Öztürk", email = "goerkem.emre.oeztuerk@gmail.com" },
   { name = "Raimund Hensen", email = "raimund.hensen@rwth-aachen.de" },
 ]
-requires-python = "~=3.12"
+requires-python = "~=3.13"
 dependencies = [
   "pm4py~=2.7.15.3",
   "pint>=0.23,<0.24",
@@ -27,7 +27,6 @@ Repository = "https://github.com/rwth-pads/ocelescope"
 [dependency-groups]
 dev = [
   "jupyterlab>=4.0.7,<5",
-  "dependentspy",
   "iso4>=0.0.2,<0.0.3",
   "seaborn>=0.13.0,<0.14",
   "matplotlib>=3.8.0,<4",
@@ -38,7 +37,6 @@ dev = [
 package = false
 
 [tool.uv.sources]
-dependentspy = { git = "https://github.com/raihensen/dependentspy", branch = "main" }
 ocelescope = { path = "../ocelescope", editable = true }
 
 [build-system]

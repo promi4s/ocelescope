@@ -4,8 +4,8 @@ from fastapi import APIRouter
 from fastapi.params import Depends, Query
 from pandas.core.frame import DataFrame
 
-from api.dependencies import ApiOcel, ApiSession
-from api.model.module import Module
+from app.dependencies import ApiOcel, ApiSession
+from app.internal.model.module import Module
 from ocelescope.ocel.util.attributes import get_objects_with_object_changes
 from ocelescope import OCEL
 from modules.ocelot.models import PaginatedResponse
@@ -14,7 +14,8 @@ from modules.ocelot.util import (
     get_paginated_dataframe,
     get_sorted_table,
 )
-from util.cache import instance_lru_cache
+
+from app.internal.util.cache import instance_lru_cache
 
 router = APIRouter()
 

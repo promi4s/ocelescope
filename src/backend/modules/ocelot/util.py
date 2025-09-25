@@ -2,7 +2,7 @@ from math import ceil
 from typing import Literal, Optional, Tuple, cast
 
 import pandas as pd
-from pandas.core.frame import DataFrame
+from pandas import DataFrame
 
 from ocelescope import OCEL
 from modules.ocelot.models import ObjectChange, OcelEntity, PaginatedResponse
