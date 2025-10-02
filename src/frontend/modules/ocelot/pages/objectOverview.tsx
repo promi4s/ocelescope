@@ -70,9 +70,10 @@ const ObjectGraph = () => {
       </Group>
       {vizualization === "graph" && o2o && objectAttributes && (
         <Graph
+          key={ocelId}
           initialNodes={nodes}
           initialEdges={o2o.map(({ source, target, sum, qualifier }) => ({
-            source: source,
+            source,
             target,
             markerEnd: { type: MarkerType.ArrowClosed },
             style: {
