@@ -11,9 +11,7 @@ import { getEdgeParams } from "@/components/Graph/util/getEdgeParams";
 
 export type FloatingEdgeType = Edge<
   {
-    start?: ReactNode;
-    end?: ReactNode;
-    mid?: ReactNode;
+    mid?: string;
     position?: {
       sourceX: number;
       sourceY: number;
@@ -32,9 +30,12 @@ const EdgeLabel: React.FC<{
     <div
       style={{
         position: "absolute",
-        fontSize: 8,
-        fontWeight: 400,
+        fontSize: 10,
+        fontWeight: 600,
+        padding: "0 2px",
         transform,
+        transformOrigin: "center",
+        background: "white",
       }}
       className="nodrag nopan"
     >
@@ -59,7 +60,7 @@ const FloatingEdge = ({
 
   const { sx, sy, tx, ty } = getEdgeParams(sourceNode, targetNode);
 
-  const [edgePath, labelX, labelY] = getStraightPath(
+  const [edgePath, labelX, labelY, offsetX, offsetY] = getStraightPath(
     data?.position ?? {
       sourceX: sx,
       sourceY: sy,
@@ -67,6 +68,9 @@ const FloatingEdge = ({
       targetY: ty,
     },
   );
+
+  const angle =
+    Math.atan2((sy > ty ? -1 : 1) * offsetY, offsetX) * (180 / Math.PI);
 
   return (
     <>
@@ -135,30 +139,9 @@ const FloatingEdge = ({
         {...props}
       />
       <EdgeLabelRenderer>
-        {data?.start && (
-          <EdgeLabel
-            transform={`translate(-50%, 0%) translate(${sx}px,${sy}px)`}
-          >
-            {data?.start}
-          </EdgeLabel>
-        )}
-        {data?.end && (
-          <EdgeLabel
-            transform={`translate(-50%, -100%) translate(${tx}px,${ty}px)`}
-          >
-            {data?.end}
-          </EdgeLabel>
-        )}
-        {data?.end && (
-          <EdgeLabel
-            transform={`translate(-50%, -100%) translate(${tx}px,${ty}px)`}
-          >
-            {data?.end}
-          </EdgeLabel>
-        )}
         {data?.mid && (
           <EdgeLabel
-            transform={`translate(-50%, -50%) translate(${labelX}px,${labelY}px)`}
+            transform={`translate(-50% , -50%) translate(${labelX}px, ${labelY}px) rotate(${angle}deg)`}
           >
             {data?.mid}
           </EdgeLabel>

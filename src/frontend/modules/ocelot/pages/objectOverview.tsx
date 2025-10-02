@@ -4,7 +4,7 @@ import {
   useObjectCount,
 } from "@/api/fastapi/ocels/ocels";
 import Graph, { NodeComponents } from "@/components/Graph";
-import { Group, Input, SegmentedControl, Stack, Text } from "@mantine/core";
+import { Group, Input, SegmentedControl, Stack } from "@mantine/core";
 import { useMemo, useState } from "react";
 import { MarkerType } from "@xyflow/react";
 import EntityCard from "../components/EntityCard";
@@ -71,17 +71,20 @@ const ObjectGraph = () => {
       {vizualization === "graph" && o2o && objectAttributes && (
         <Graph
           initialNodes={nodes}
-          initialEdges={o2o.map(({ source, target, sum }) => ({
+          initialEdges={o2o.map(({ source, target, sum, qualifier }) => ({
             source: source,
             target,
-            markerEnd: { type: MarkerType.Arrow },
-            data: { mid: <Text size="xs">{sum}</Text> },
+            markerEnd: { type: MarkerType.ArrowClosed },
+            style: {
+              strokeWidth: "2px",
+            },
+            data: { mid: `${qualifier} (${sum})` },
           }))}
           layoutOptions={{
             type: "elk",
             options: {
               "elk.algorithm": "layered",
-              "elk.direction": "DOWN",
+              "elk.direction": "RIGHT",
               "elk.spacing.nodeNode": 50,
               "elk.layered.spacing.nodeNodeBetweenLayers": 100,
             },
