@@ -16,15 +16,15 @@ import CircleNode, {
 import RectangleNode, {
   RectangleNodeType,
 } from "@/components/Graph/nodes/RectangleNode";
-import FloatingEdge, {
-  FloatingEdgeType,
-} from "./edges/FloatingEdge/FloatingEdge";
+import FloatingEdge, { FloatingEdgeType } from "./edges/FloatingEdge";
 import { useDagreLayout } from "./layout/dagre";
 import { GraphLabel } from "@dagrejs/dagre";
 import { useElkLayout } from "./layout/elk";
+import LoopingEdge, { LoopingEdgeType } from "./edges/LoopEdge";
 
 const edgeTypes = {
   floating: FloatingEdge,
+  looping: LoopingEdge,
 };
 
 const nodeTypes = {
@@ -37,7 +37,10 @@ export type NodeComponents = Pick<
   "id" | "data"
 >;
 
-export type EdgeComponents = Omit<FloatingEdgeType, "position" | "id">;
+export type EdgeComponents = Omit<
+  FloatingEdgeType | LoopingEdgeType,
+  "position" | "id" | "offset"
+>;
 
 type Layout =
   | {
@@ -75,12 +78,26 @@ const InnerFlow: React.FC<Props> = ({
       },
     })),
   );
+
+  const seenLoops: Record<string, number> = {};
+
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>(
-    initialEdges.map((edge, index) => ({
-      ...edge,
-      id: `edge_${index}`,
-      type: "floating",
-    })),
+    initialEdges.map((edge, index) => {
+      const type = edge.source === edge.target ? "looping" : "floating";
+
+      if (type === "looping") {
+        seenLoops[edge.source] = (seenLoops[edge.source] ?? 0) + 1;
+      }
+
+      return {
+        ...edge,
+        id: `edge_${index}`,
+        type,
+        ...(type === "looping" && {
+          data: { ...edge.data, offset: seenLoops[edge.source] },
+        }),
+      };
+    }),
   );
 
   const onNodesChange = useCallback((changes: NodeChange[]) => {
@@ -125,9 +142,10 @@ const InnerFlow: React.FC<Props> = ({
         edgeTypes={edgeTypes}
         nodeTypes={nodeTypes}
         minZoom={0.1}
+        nodesDraggable={false}
         proOptions={{ hideAttribution: true }}
       >
-        <Controls />
+        <Controls showInteractive={false} />
       </ReactFlow>
     </>
   );
