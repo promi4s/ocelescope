@@ -1,31 +1,10 @@
-import React, { ReactNode } from "react";
-import {
-  BaseEdge,
-  Edge,
-  EdgeLabelRenderer,
-  EdgeProps,
-  getStraightPath,
-  useInternalNode,
-} from "@xyflow/react";
-import { getEdgeParams } from "@/components/Graph/util/getEdgeParams";
+import React, { ComponentProps } from "react";
+import { BaseEdge as FlowBaseEdge, EdgeLabelRenderer } from "@xyflow/react";
 
-export type FloatingEdgeType = Edge<
-  {
-    mid?: string;
-    position?: {
-      sourceX: number;
-      sourceY: number;
-      targetX: number;
-      targetY: number;
-    };
-  },
-  "floating"
->;
-
-const EdgeLabel: React.FC<{
+export const EdgeLabel: React.FC<{
   transform: string;
-  children: ReactNode;
-}> = ({ transform, children }) => {
+  label: string;
+}> = ({ transform, label }) => {
   return (
     <div
       style={{
@@ -39,39 +18,18 @@ const EdgeLabel: React.FC<{
       }}
       className="nodrag nopan"
     >
-      {children}
+      {label}
     </div>
   );
 };
 
 const customMarkes = ["url('#double-rect')", "url('#rect')"];
 
-const FloatingEdge = ({
-  data,
-  source,
-  target,
-  markerEnd,
-  ...props
-}: EdgeProps<FloatingEdgeType>) => {
-  const sourceNode = useInternalNode(source);
-  const targetNode = useInternalNode(target);
-
-  if (!sourceNode || !targetNode) return null;
-
-  const { sx, sy, tx, ty } = getEdgeParams(sourceNode, targetNode);
-
-  const [edgePath, labelX, labelY, offsetX, offsetY] = getStraightPath(
-    data?.position ?? {
-      sourceX: sx,
-      sourceY: sy,
-      targetX: tx,
-      targetY: ty,
-    },
-  );
-
-  const angle =
-    Math.atan2((sy > ty ? -1 : 1) * offsetY, offsetX) * (180 / Math.PI);
-
+const BaseEdge: React.FC<
+  { labels?: ComponentProps<typeof EdgeLabel>[] } & ComponentProps<
+    typeof FlowBaseEdge
+  >
+> = ({ labels = [], markerEnd, path, ...rest }) => {
   return (
     <>
       <svg style={{ position: "absolute", top: 0, left: 0 }}>
@@ -129,26 +87,22 @@ const FloatingEdge = ({
           </marker>
         </defs>
       </svg>
-      <BaseEdge
-        path={edgePath}
+      <FlowBaseEdge
+        path={path}
         markerEnd={
           customMarkes.includes(markerEnd ?? "")
             ? markerEnd?.replace("rect", "rect-end")
             : markerEnd
         }
-        {...props}
+        {...rest}
       />
       <EdgeLabelRenderer>
-        {data?.mid && (
-          <EdgeLabel
-            transform={`translate(-50% , -50%) translate(${labelX}px, ${labelY}px) rotate(${angle}deg)`}
-          >
-            {data?.mid}
-          </EdgeLabel>
-        )}
+        {labels.map((props) => (
+          <EdgeLabel {...props} />
+        ))}
       </EdgeLabelRenderer>
     </>
   );
 };
 
-export default FloatingEdge;
+export default BaseEdge;
