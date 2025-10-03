@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import ClassVar
+from typing import ClassVar, Generic, TypeVar
 from pydantic import BaseModel, computed_field
 
 from ocelescope import Visualization
@@ -43,5 +43,8 @@ class Resource(BaseModel, ABC):
         return
 
 
-class Annotated(BaseModel):
-    annotation: Resource | None = None
+T = TypeVar("T", bound=Resource)
+
+
+class Annotated(BaseModel, Generic[T]):
+    annotation: T | None = None
