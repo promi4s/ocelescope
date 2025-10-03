@@ -21,6 +21,10 @@ import { useDagreLayout } from "./layout/dagre";
 import { GraphLabel } from "@dagrejs/dagre";
 import { useElkLayout } from "./layout/elk";
 import LoopingEdge, { LoopingEdgeType } from "./edges/LoopEdge";
+import { ActionIcon } from "@mantine/core";
+import { DownloadIcon } from "lucide-react";
+import { toPng } from "html-to-image";
+import { saveAs } from "file-saver";
 
 const edgeTypes = {
   floating: FloatingEdge,
@@ -61,6 +65,15 @@ type Props = {
   initialNodes: NodeComponents[];
   initialEdges: EdgeComponents[];
   layoutOptions?: Layout;
+};
+
+const handleDownload = async (fileName: string) => {
+  const flow = document.querySelector(".react-flow__viewport") as HTMLElement;
+  if (!flow) return;
+
+  const dataUrl = await toPng(flow, { backgroundColor: "white" });
+
+  saveAs(dataUrl, `${fileName}.png`);
 };
 
 const InnerFlow: React.FC<Props> = ({
@@ -131,23 +144,31 @@ const InnerFlow: React.FC<Props> = ({
   }, [initialNodes, initialEdges, nodes.some(({ measured }) => !!measured)]);
 
   return (
-    <>
-      <ReactFlow
-        style={{ height: "100%" }}
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        fitView
-        edgeTypes={edgeTypes}
-        nodeTypes={nodeTypes}
-        minZoom={0.1}
-        nodesDraggable={false}
-        proOptions={{ hideAttribution: true }}
-      >
-        <Controls showInteractive={false} />
-      </ReactFlow>
-    </>
+    <ReactFlow
+      style={{ height: "100%" }}
+      nodes={nodes}
+      edges={edges}
+      onNodesChange={onNodesChange}
+      onEdgesChange={onEdgesChange}
+      fitView
+      edgeTypes={edgeTypes}
+      nodeTypes={nodeTypes}
+      minZoom={0.1}
+      nodesDraggable={false}
+      proOptions={{ hideAttribution: true }}
+    >
+      <Controls showInteractive={false}>
+        {
+          //TODO: Make file name actual ocel name
+        }
+        <ActionIcon
+          variant="transparent"
+          onClick={() => handleDownload(`ocelot`)}
+        >
+          <DownloadIcon color={"black"} size={18} />
+        </ActionIcon>
+      </Controls>
+    </ReactFlow>
   );
 };
 
