@@ -97,8 +97,8 @@ const BaseEdge: React.FC<
         {...rest}
       />
       <EdgeLabelRenderer>
-        {labels.map((props) => (
-          <EdgeLabel {...props} />
+        {labels.map((props, index) => (
+          <EdgeLabel key={index} {...props} />
         ))}
       </EdgeLabelRenderer>
     </>
