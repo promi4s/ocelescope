@@ -31,7 +31,14 @@ const EntityCard: React.FC<EntityCardProps> = ({
       </Text>
       <Divider c={"black"} size={"md"} />
       {attributeSummaries.length !== 0 && (
-        <Table withRowBorders={false} captionSide="top">
+        <Table
+          withRowBorders={false}
+          captionSide="top"
+          style={{
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
           <Table.Caption mb={0}>Attributes</Table.Caption>
           <Table.Tbody>
             {attributeSummaries.map((attribute) => (
@@ -45,7 +52,14 @@ const EntityCard: React.FC<EntityCardProps> = ({
       )}
       {relationSummaries.length !== 0 && (
         <>
-          <Table withRowBorders={false} captionSide="top">
+          <Table
+            withRowBorders={false}
+            captionSide="top"
+            style={{
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
             <Table.Caption mb={0}>Relations</Table.Caption>
             <Table.Tbody>
               {relationSummaries.map(
