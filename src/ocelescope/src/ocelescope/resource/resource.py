@@ -1,6 +1,6 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 from typing import ClassVar
-from pydantic import BaseModel
+from pydantic import BaseModel, computed_field
 
 from ocelescope import Visualization
 
@@ -25,7 +25,11 @@ class Resource(BaseModel, ABC):
         """
         return cls.__name__
 
-    @abstractmethod
+    @computed_field
+    @property
+    def _ocelescope_resource_type(self) -> str:
+        return self.get_type()
+
     def visualize(self) -> Visualization | None:
         """Produce a visualization for this resource.
 
@@ -35,4 +39,9 @@ class Resource(BaseModel, ABC):
         Returns:
             Optional[Visualization]: A visualization object or ``None``.
         """
-        pass
+
+        return
+
+
+class Annotated(BaseModel):
+    annotation: Resource | None = None
