@@ -1,6 +1,6 @@
 version = 1
-revision = 2
-requires-python = ">=3.13, <4"
+revision = 3
+requires-python = ">=3.13"
 
 [[package]]
 name = "annotated-types"
@@ -1213,7 +1213,7 @@ wheels = [
 
 [[package]]
 name = "ocelescope"
-version = "0.1.0"
+version = "0.1.1b1"
 source = { editable = "../ocelescope" }
 dependencies = [
     { name = "cachetools" },
