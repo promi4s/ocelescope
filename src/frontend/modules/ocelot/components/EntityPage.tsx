@@ -63,14 +63,17 @@ const EntityPage: React.FC<{ type: "events" | "objects" }> = ({ type }) => {
     [eventCounts, objectCounts],
   );
 
-  const { data: o2o } = useO2o();
-  const { data: e2o } = useE2o();
+  //TODO: Make this in a collapsable table rather then extra collumns
+  const { data: o2o } = useO2o({ ocel_id: id });
+  const { data: e2o } = useE2o({ ocel_id: id });
 
   const relations = useMemo(() => {
     const relations = (type === "events" ? e2o : o2o) ?? [];
 
     return relations.filter(({ source }) => source === currentTab);
   }, [e2o, o2o, currentTab]);
+
+  console.log(relations);
 
   const { data: eventEntities } = useOcelotPaginatedEvents(
     {

@@ -16,15 +16,19 @@ import CircleNode, {
 import RectangleNode, {
   RectangleNodeType,
 } from "@/components/Graph/nodes/RectangleNode";
-import FloatingEdge, {
-  FloatingEdgeType,
-} from "./edges/FloatingEdge/FloatingEdge";
+import FloatingEdge, { FloatingEdgeType } from "./edges/FloatingEdge";
 import { useDagreLayout } from "./layout/dagre";
 import { GraphLabel } from "@dagrejs/dagre";
 import { useElkLayout } from "./layout/elk";
+import LoopingEdge, { LoopingEdgeType } from "./edges/LoopEdge";
+import { ActionIcon } from "@mantine/core";
+import { DownloadIcon } from "lucide-react";
+import { toPng } from "html-to-image";
+import { saveAs } from "file-saver";
 
 const edgeTypes = {
   floating: FloatingEdge,
+  looping: LoopingEdge,
 };
 
 const nodeTypes = {
@@ -37,7 +41,10 @@ export type NodeComponents = Pick<
   "id" | "data"
 >;
 
-export type EdgeComponents = Omit<FloatingEdgeType, "position" | "id">;
+export type EdgeComponents = Omit<
+  FloatingEdgeType | LoopingEdgeType,
+  "position" | "id" | "offset"
+>;
 
 type Layout =
   | {
@@ -60,6 +67,15 @@ type Props = {
   layoutOptions?: Layout;
 };
 
+const handleDownload = async (fileName: string) => {
+  const flow = document.querySelector(".react-flow__viewport") as HTMLElement;
+  if (!flow) return;
+
+  const dataUrl = await toPng(flow, { backgroundColor: "white" });
+
+  saveAs(dataUrl, `${fileName}.png`);
+};
+
 const InnerFlow: React.FC<Props> = ({
   initialNodes,
   initialEdges,
@@ -75,12 +91,26 @@ const InnerFlow: React.FC<Props> = ({
       },
     })),
   );
+
+  const seenLoops: Record<string, number> = {};
+
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>(
-    initialEdges.map((edge, index) => ({
-      ...edge,
-      id: `edge_${index}`,
-      type: "floating",
-    })),
+    initialEdges.map((edge, index) => {
+      const type = edge.source === edge.target ? "looping" : "floating";
+
+      if (type === "looping") {
+        seenLoops[edge.source] = (seenLoops[edge.source] ?? 0) + 1;
+      }
+
+      return {
+        ...edge,
+        id: `edge_${index}`,
+        type,
+        ...(type === "looping" && {
+          data: { ...edge.data, offset: seenLoops[edge.source] },
+        }),
+      };
+    }),
   );
 
   const onNodesChange = useCallback((changes: NodeChange[]) => {
@@ -114,22 +144,31 @@ const InnerFlow: React.FC<Props> = ({
   }, [initialNodes, initialEdges, nodes.some(({ measured }) => !!measured)]);
 
   return (
-    <>
-      <ReactFlow
-        style={{ height: "100%" }}
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        fitView
-        edgeTypes={edgeTypes}
-        nodeTypes={nodeTypes}
-        minZoom={0.1}
-        proOptions={{ hideAttribution: true }}
-      >
-        <Controls />
-      </ReactFlow>
-    </>
+    <ReactFlow
+      style={{ height: "100%" }}
+      nodes={nodes}
+      edges={edges}
+      onNodesChange={onNodesChange}
+      onEdgesChange={onEdgesChange}
+      fitView
+      edgeTypes={edgeTypes}
+      nodeTypes={nodeTypes}
+      minZoom={0.1}
+      nodesDraggable={false}
+      proOptions={{ hideAttribution: true }}
+    >
+      <Controls showInteractive={false}>
+        {
+          //TODO: Make file name actual ocel name
+        }
+        <ActionIcon
+          variant="transparent"
+          onClick={() => handleDownload(`ocelot`)}
+        >
+          <DownloadIcon color={"black"} size={18} />
+        </ActionIcon>
+      </Controls>
+    </ReactFlow>
   );
 };
 

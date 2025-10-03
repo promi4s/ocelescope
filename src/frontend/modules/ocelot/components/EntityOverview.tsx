@@ -49,7 +49,7 @@ const EntityOverview: React.FC<EntityOverviewProps> = ({
   }, [search, relationMap, entityCounts, attributes]);
 
   return (
-    <SimpleGrid cols={{ base: 1, sm: 2, lg: 5 }}>
+    <SimpleGrid cols={{ base: 1, sm: 2, md: 4, lg: 5 }}>
       {filteredEvents.map(([name, count]) => {
         return (
           <EntityCard

@@ -45,6 +45,7 @@
     "embla-carousel-react": "8.6.0",
     "file-saver": "^2.0.5",
     "flat": "^6.0.1",
+    "html-to-image": "1.11.11",
     "json-schema-traverse": "^1.0.0",
     "loadash": "^1.0.0",
     "lucide-react": "^0.511.0",
