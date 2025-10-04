@@ -3080,7 +3080,8 @@
           "type": {
             "type": "string",
             "const": "dot",
-            "title": "Type"
+            "title": "Type",
+            "default": "dot"
           },
           "dot_str": {
             "type": "string",
@@ -3105,7 +3106,6 @@
         },
         "type": "object",
         "required": [
-          "type",
           "dot_str",
           "layout_engine"
         ],
@@ -3416,13 +3416,13 @@
                     "$ref": "#/components/schemas/Graph"
                   },
                   {
-                    "$ref": "#/components/schemas/Table"
-                  },
-                  {
                     "$ref": "#/components/schemas/SVGVis"
                   },
                   {
                     "$ref": "#/components/schemas/DotVis"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Table"
                   }
                 ],
                 "discriminator": {
@@ -3454,7 +3454,8 @@
           "type": {
             "type": "string",
             "const": "graph",
-            "title": "Type"
+            "title": "Type",
+            "default": "graph"
           },
           "nodes": {
             "items": {
@@ -3471,26 +3472,29 @@
             "title": "Edges"
           },
           "layout_config": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/GraphvizLayoutConfig"
-              },
-              {
-                "type": "null"
-              }
-            ]
+            "$ref": "#/components/schemas/GraphvizLayoutConfig"
           }
         },
         "type": "object",
         "required": [
-          "type",
           "nodes",
-          "edges"
+          "edges",
+          "layout_config"
         ],
         "title": "Graph"
       },
       "GraphEdge": {
         "properties": {
+          "annotation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Visualization"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "source": {
             "type": "string",
             "title": "Source"
@@ -3586,6 +3590,16 @@
       },
       "GraphNode": {
         "properties": {
+          "annotation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Visualization"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "id": {
             "type": "string",
             "title": "Id"
@@ -3700,8 +3714,7 @@
           "id",
           "shape"
         ],
-        "title": "GraphNode",
-        "description": "[TODO:description]\n\nAttributes:\n    id: [TODO:attribute]\n    label: [TODO:attribute]\n    shape: [TODO:attribute]\n    width: [TODO:attribute]\n    height: [TODO:attribute]\n    color: [TODO:attribute]\n    x: [TODO:attribute]\n    y: [TODO:attribute]\n    border_color: [TODO:attribute]\n    label_pos: [TODO:attribute]"
+        "title": "GraphNode"
       },
       "GraphvizLayoutConfig": {
         "properties": {
@@ -4787,7 +4800,8 @@
           "type": {
             "type": "string",
             "const": "svg",
-            "title": "Type"
+            "title": "Type",
+            "default": "svg"
           },
           "svg": {
             "type": "string",
@@ -4796,7 +4810,6 @@
         },
         "type": "object",
         "required": [
-          "type",
           "svg"
         ],
         "title": "SVGVis"
@@ -4834,7 +4847,8 @@
           "type": {
             "type": "string",
             "const": "table",
-            "title": "Type"
+            "title": "Type",
+            "default": "table"
           },
           "columns": {
             "items": {
@@ -4854,7 +4868,6 @@
         },
         "type": "object",
         "required": [
-          "type",
           "columns",
           "rows"
         ],
@@ -4996,6 +5009,19 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "Visualization": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "title": "Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "title": "Visualization"
       }
     }
   }

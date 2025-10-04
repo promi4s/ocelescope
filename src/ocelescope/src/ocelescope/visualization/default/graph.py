@@ -1,10 +1,18 @@
-from typing import Literal, Optional
+from typing import Generic, Literal, Optional, TypeVar
 from pydantic import BaseModel
 
 from ocelescope.visualization.default.dot import GraphVizLayoutingEngine
+from ocelescope.visualization.visualization import Visualization
+
+T = TypeVar("T", bound=Visualization)
+
+
+class AnnotatedElement(BaseModel, Generic[T]):
+    annotation: T | None = None
 
 
 GraphShapes = Literal["circle", "triangle", "rectangle", "diamond", "hexagon"]
+
 
 EdgeArrow = Optional[
     Literal[
@@ -23,22 +31,7 @@ EdgeArrow = Optional[
 ]
 
 
-class GraphNode(BaseModel):
-    """[TODO:description]
-
-    Attributes:
-        id: [TODO:attribute]
-        label: [TODO:attribute]
-        shape: [TODO:attribute]
-        width: [TODO:attribute]
-        height: [TODO:attribute]
-        color: [TODO:attribute]
-        x: [TODO:attribute]
-        y: [TODO:attribute]
-        border_color: [TODO:attribute]
-        label_pos: [TODO:attribute]
-    """
-
+class GraphNode(AnnotatedElement):
     id: str
     label: Optional[str] = None
     shape: GraphShapes
@@ -51,7 +44,7 @@ class GraphNode(BaseModel):
     label_pos: Optional[Literal["top", "center", "bottom"]] = None
 
 
-class GraphEdge(BaseModel):
+class GraphEdge(AnnotatedElement):
     source: str
     target: str
     arrows: tuple[EdgeArrow, EdgeArrow]
@@ -66,8 +59,8 @@ class GraphvizLayoutConfig(BaseModel):
     edgeAttrs: dict[str, str | int | float | bool] | None = None
 
 
-class Graph(BaseModel):
-    type: Literal["graph"]
+class Graph(Visualization):
+    type: Literal["graph"] = "graph"
     nodes: list[GraphNode]
     edges: list[GraphEdge]
-    layout_config: GraphvizLayoutConfig | None = None
+    layout_config: GraphvizLayoutConfig

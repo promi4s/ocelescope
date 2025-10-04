@@ -1,6 +1,8 @@
 from typing import Any, List, Literal, Optional
 from pydantic import BaseModel
 
+from ocelescope.visualization.visualization import Visualization
+
 TableDataType = Literal["string", "number", "boolean", "date", "datetime"]
 
 
@@ -12,7 +14,7 @@ class TableColumn(BaseModel):
     visible: bool = True
 
 
-class Table(BaseModel):
-    type: Literal["table"]
+class Table(Visualization):
+    type: Literal["table"] = "table"
     columns: List[TableColumn]
     rows: List[dict[str, Any]]
