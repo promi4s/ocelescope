@@ -45,7 +45,6 @@ class RegistryManager:
                     for k, v in data.items()
                     if k != "type"
                 }
-                print(hydrated)
                 return ResourceClass(**hydrated)
         elif isinstance(data, dict):
             return {k: self._hydrate(v, plugin_id) for k, v in data.items()}

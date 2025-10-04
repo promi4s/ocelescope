@@ -41,7 +41,6 @@ def import_ocel_task(
             suffix = file_path.suffix
 
     with stream_to_tempfile(file_stream, prefix=file_path.stem, suffix=suffix) as path:
-        print(path)
         ocel = OCEL.read_ocel(
             path,
             original_file_name=file_path.stem,
