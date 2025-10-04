@@ -4521,8 +4521,15 @@
             "title": "Results"
           },
           "input_schema": {
-            "additionalProperties": true,
-            "type": "object",
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Input Schema",
             "readOnly": true
           }
