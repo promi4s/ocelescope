@@ -2662,8 +2662,8 @@
         "tags": [
           "resources"
         ],
-        "summary": "Download Output",
-        "operationId": "download_output_resources_resource__resource_id__download_get",
+        "summary": "Download Resource",
+        "operationId": "downloadResource",
         "parameters": [
           {
             "name": "resource_id",
