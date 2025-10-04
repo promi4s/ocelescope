@@ -1,7 +1,12 @@
 import { GetResourceResponse } from "@/api/fastapi-schemas";
+type RequireType<T> = T extends {
+  type?: infer L;
+}
+  ? Omit<T, "type"> & { type: L }
+  : T;
 
-export type VisulizationsType = NonNullable<
-  GetResourceResponse["visualization"]
+export type VisulizationsType = RequireType<
+  NonNullable<GetResourceResponse["visualization"]>
 >;
 export type VisulizationsTypes = NonNullable<VisulizationsType["type"]>;
 

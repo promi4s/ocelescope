@@ -1,4 +1,4 @@
-import { VisualizationByType } from "@/types/outputs";
+import { VisualizationByType } from "@/types/resources";
 
 import React, { useEffect, useMemo, useState } from "react";
 import { DataTable, type DataTableColumn } from "mantine-datatable";

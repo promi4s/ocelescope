@@ -1,4 +1,4 @@
-import { VisualizationByType } from "@/types/outputs";
+import { VisualizationByType } from "@/types/resources";
 import { Box } from "@mantine/core";
 import CytoscapeComponent from "@/components/Cytoscape";
 import ActionButtons from "@/components/Cytoscape/components/ActionButtons";

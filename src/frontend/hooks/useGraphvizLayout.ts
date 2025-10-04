@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ElementDefinition } from "cytoscape";
-import type { VisualizationByType } from "@/types/outputs";
+import type { VisualizationByType } from "@/types/resources";
 import { Graphviz } from "@hpcc-js/wasm-graphviz";
 
 type GraphvizJSON = {
