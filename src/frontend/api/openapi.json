@@ -3101,13 +3101,13 @@
               "nop",
               "nop2"
             ],
-            "title": "Layout Engine"
+            "title": "Layout Engine",
+            "default": "dot"
           }
         },
         "type": "object",
         "required": [
-          "dot_str",
-          "layout_engine"
+          "dot_str"
         ],
         "title": "DotVis"
       },
@@ -3416,13 +3416,13 @@
                     "$ref": "#/components/schemas/Graph"
                   },
                   {
+                    "$ref": "#/components/schemas/Table"
+                  },
+                  {
                     "$ref": "#/components/schemas/SVGVis"
                   },
                   {
                     "$ref": "#/components/schemas/DotVis"
-                  },
-                  {
-                    "$ref": "#/components/schemas/Table"
                   }
                 ],
                 "discriminator": {
@@ -3462,25 +3462,25 @@
               "$ref": "#/components/schemas/GraphNode"
             },
             "type": "array",
-            "title": "Nodes"
+            "title": "Nodes",
+            "default": []
           },
           "edges": {
             "items": {
               "$ref": "#/components/schemas/GraphEdge"
             },
             "type": "array",
-            "title": "Edges"
+            "title": "Edges",
+            "default": []
           },
           "layout_config": {
-            "$ref": "#/components/schemas/GraphvizLayoutConfig"
+            "$ref": "#/components/schemas/GraphvizLayoutConfig",
+            "default": {
+              "engine": "dot"
+            }
           }
         },
         "type": "object",
-        "required": [
-          "nodes",
-          "edges",
-          "layout_config"
-        ],
         "title": "Graph"
       },
       "GraphEdge": {
@@ -3495,6 +3495,10 @@
               }
             ]
           },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
           "source": {
             "type": "string",
             "title": "Source"
@@ -3502,60 +3506,6 @@
           "target": {
             "type": "string",
             "title": "Target"
-          },
-          "arrows": {
-            "prefixItems": [
-              {
-                "anyOf": [
-                  {
-                    "type": "string",
-                    "enum": [
-                      "triangle",
-                      "circle-triangle",
-                      "triangle-backcurve",
-                      "tee",
-                      "circle",
-                      "chevron",
-                      "triangle-tee",
-                      "triangle-cross",
-                      "vee",
-                      "square",
-                      "diamond"
-                    ]
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
-              },
-              {
-                "anyOf": [
-                  {
-                    "type": "string",
-                    "enum": [
-                      "triangle",
-                      "circle-triangle",
-                      "triangle-backcurve",
-                      "tee",
-                      "circle",
-                      "chevron",
-                      "triangle-tee",
-                      "triangle-cross",
-                      "vee",
-                      "square",
-                      "diamond"
-                    ]
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
-              }
-            ],
-            "type": "array",
-            "maxItems": 2,
-            "minItems": 2,
-            "title": "Arrows"
           },
           "color": {
             "anyOf": [
@@ -3578,13 +3528,109 @@
               }
             ],
             "title": "Label"
+          },
+          "start_arrow": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "triangle",
+                  "circle-triangle",
+                  "triangle-backcurve",
+                  "tee",
+                  "circle",
+                  "chevron",
+                  "triangle-tee",
+                  "triangle-cross",
+                  "vee",
+                  "square",
+                  "diamond"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Arrow"
+          },
+          "end_arrow": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "triangle",
+                  "circle-triangle",
+                  "triangle-backcurve",
+                  "tee",
+                  "circle",
+                  "chevron",
+                  "triangle-tee",
+                  "triangle-cross",
+                  "vee",
+                  "square",
+                  "diamond"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Arrow"
+          },
+          "start_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Label"
+          },
+          "end_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Label"
+          },
+          "layout_attrs": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    }
+                  ]
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Layout Attrs"
           }
         },
         "type": "object",
         "required": [
           "source",
-          "target",
-          "arrows"
+          "target"
         ],
         "title": "GraphEdge"
       },
@@ -3707,11 +3753,55 @@
               }
             ],
             "title": "Label Pos"
+          },
+          "rank": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "source",
+                  "sink"
+                ]
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rank"
+          },
+          "layout_attrs": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    }
+                  ]
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Layout Attrs"
           }
         },
         "type": "object",
         "required": [
-          "id",
           "shape"
         ],
         "title": "GraphNode"
