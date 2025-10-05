@@ -18,18 +18,6 @@ class ObjectActivityEdge(BaseModel):
 
 
 class DirectlyFollowsGraph(Resource):
-    """[TODO:description]
-
-    Attributes:
-        label: [TODO:attribute]
-        description: [TODO:attribute]
-        object_types: [TODO:attribute]
-        activities: [TODO:attribute]
-        edges: [TODO:attribute]
-        start_activities: [TODO:attribute]
-        end_activities: [TODO:attribute]
-    """
-
     label = "Directly Follows Graph"
     description = "A object-centric directly follows graph"
 
