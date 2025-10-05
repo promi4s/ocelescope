@@ -14,10 +14,10 @@ class DotVis(Visualization):
     type: Literal["dot"] = "dot"
 
     dot_str: str
-    layout_engine: GraphVizLayoutingEngine
+    layout_engine: GraphVizLayoutingEngine = "dot"
 
     @classmethod
     def from_graphviz(
-        cls, graph: Digraph | Graph, layout_engine: GraphVizLayoutingEngine
+        cls, graph: Digraph | Graph, layout_engine: GraphVizLayoutingEngine = "dot"
     ) -> "DotVis":
         return DotVis(dot_str=graph.source, layout_engine=layout_engine)
