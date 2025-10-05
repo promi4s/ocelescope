@@ -24,6 +24,20 @@ const esc = (val: string) => {
   return val.replaceAll('"', '\\"');
 };
 
+const safeId = (id: string) => id.replace(/[^a-zA-Z0-9_]/g, "_");
+
+const attrsToDot = (
+  obj?: Record<string, string | number | boolean | undefined | null>,
+) => {
+  if (!obj) return "";
+  const kv = Object.entries(obj)
+    .filter(([_, v]) => v !== null && v !== undefined)
+    .map(([k, v]) =>
+      typeof v === "string" ? `${k}="${esc(v)}"` : `${k}=${String(v)}`,
+    );
+  return kv.join(",");
+};
+
 export const toDot = (visualization: VisualizationByType<"graph">) => {
   const gAttrs = attrsToDot(
     visualization.layout_config?.graphAttrs ?? undefined,
@@ -42,39 +56,53 @@ export const toDot = (visualization: VisualizationByType<"graph">) => {
     `edge [${eAttrs}];`,
   ];
 
-  for (const node of visualization.nodes) {
-    const specific: string[] = [];
-    if (node.label) specific.push(`label="${esc(node.label)}"`);
-    if (node.shape) specific.push(`shape=${node.shape}`);
-    if (node.color) specific.push(`color="${node.color}"`);
-    if (node.width) specific.push(`width=${(node.width / 72).toFixed(4)}`);
-    if (node.height) specific.push(`height=${(node.height / 72).toFixed(4)}`);
+  for (const node of visualization.nodes ?? []) {
+    const id = safeId(node.id);
+    const attrs = {
+      ...node.layout_attrs,
+      label: node.label ? esc(node.label) : undefined,
+      shape: node.shape,
+      color: node.color,
+      ...(node.width && { width: (node.width / 72).toFixed(4) }),
+      ...(node.height && { height: (node.height / 72).toFixed(4) }),
+    };
+
+    lines.push(`"${id}" [${attrsToDot(attrs)}];`);
+  }
+
+  for (const edge of visualization.edges ?? []) {
+    const attrs = {
+      ...edge.layout_attrs,
+      label: edge.label ? esc(edge.label) : undefined,
+      color: edge.color,
+    };
+
     lines.push(
-      `"${esc(node.id)}"${specific.length ? " [" + specific.join(",") + "]" : ""};`,
+      `"${esc(safeId(edge.source))}" -> "${esc(safeId(edge.target))}" [${attrsToDot(attrs)}];`,
     );
   }
 
-  for (const edge of visualization.edges) {
-    const specific: string[] = [];
-    if (edge.label) specific.push(`label="${esc(edge.label)}"`);
-    if (edge.color) specific.push(`color="${edge.color}"`);
-    lines.push(
-      `"${esc(edge.source)}" -> "${esc(edge.target)}"${
-        specific.length ? " [" + specific.join(",") + "]" : ""
-      };`,
+  const ranks = (visualization.nodes ?? [])
+    .filter(({ rank }) => rank != null)
+    .reduce<Partial<Record<"source" | "sink" | number, string[]>>>(
+      (acc, current) => {
+        const key = current.rank as "sink" | "source" | number;
+        (acc[key] ??= []).push(esc(safeId(current.id)));
+        return acc;
+      },
+      {},
     );
-  }
+
+  lines.push(
+    ...Object.entries(ranks).map(
+      ([key, value]) =>
+        `{ rank=${["source", "sink"].includes(key) ? key : "same"}; ${(value ?? []).join(" ")} } `,
+    ),
+  );
 
   lines.push("}");
-  return lines.join("\n");
-};
 
-const attrsToDot = (obj?: Record<string, string | number | boolean>) => {
-  if (!obj) return "";
-  const kv = Object.entries(obj).map(([k, v]) =>
-    typeof v === "string" ? `${k}="${esc(v)}"` : `${k}=${String(v)}`,
-  );
-  return kv.join(",");
+  return lines.join("\n");
 };
 
 const parsePos = (s?: string) => {
@@ -110,7 +138,6 @@ export const useGraphvizLayout = (
           visualization.layout_config?.engine ?? "dot",
         );
         const gvJson: GraphvizJSON = JSON.parse(jsonStr);
-        console.log(gvJson);
 
         const nodePos: Record<
           string,
@@ -123,30 +150,32 @@ export const useGraphvizLayout = (
           nodePos[o.name] = {
             ...p,
             width: o.width ? parseFloat(o.width) * 72 : undefined,
-          }; // raw Graphviz coords (points)
+          };
         });
 
-        const nodes: ElementDefinition[] = visualization.nodes.map((node) => ({
-          data: { id: node.id },
-          css: {
-            "font-size": 14,
-            shape: node.shape,
-            label: node.label ?? undefined,
-            "text-valign": node.label_pos ?? "center",
-            "text-halign": "center",
-            width: node.width ?? nodePos[node.id].width ?? undefined,
-            height: node.height ?? undefined,
-            "background-color": node.color ?? undefined,
-            ...(node.border_color && {
-              "border-width": 2,
-              "border-color": node.border_color ?? "#000000",
-              "border-style": "solid",
-            }),
-          },
-          position: nodePos[node.id] ?? { x: 0, y: 0 },
-        }));
+        const nodes: ElementDefinition[] = (visualization.nodes ?? []).map(
+          (node) => ({
+            data: { id: node.id },
+            css: {
+              "font-size": 14,
+              shape: node.shape,
+              label: node.label ?? undefined,
+              "text-valign": node.label_pos ?? "center",
+              "text-halign": "center",
+              width: node.width ?? nodePos[safeId(node.id)].width ?? undefined,
+              height: node.height ?? undefined,
+              "background-color": node.color ?? undefined,
+              ...(node.border_color && {
+                "border-width": 2,
+                "border-color": node.border_color ?? "#000000",
+                "border-style": "solid",
+              }),
+            },
+            position: nodePos[safeId(node.id)] ?? { x: 0, y: 0 },
+          }),
+        );
 
-        const edges: ElementDefinition[] = visualization.edges.map(
+        const edges: ElementDefinition[] = (visualization.edges ?? []).map(
           (edge, i) => ({
             data: {
               id: i.toString(),
@@ -156,15 +185,25 @@ export const useGraphvizLayout = (
             },
             css: {
               "line-color": edge.color ?? "#ccc",
-              "target-arrow-shape": edge.arrows?.[1] ?? undefined,
+              "target-arrow-shape": edge.end_arrow ?? undefined,
               "target-arrow-color": edge.color ?? "#ccc",
-              "source-arrow-shape": edge.arrows?.[0] ?? undefined,
+              "source-arrow-shape": edge.start_arrow ?? undefined,
               "source-arrow-color": edge.color ?? "#ccc",
               "arrow-scale": 1.5,
               "curve-style": "bezier",
               label: edge.label ?? "",
               "text-rotation": "autorotate",
               "font-size": 12,
+              "source-label": edge.start_label ?? undefined,
+              "source-text-rotation": "autorotate",
+              "target-label": edge.end_label ?? undefined,
+              "source-text-offset": 20,
+              "target-text-rotation": "autorotate",
+              "target-text-offset": 20,
+              "text-background-color": edge.color ?? "#ccc",
+              "text-background-opacity": 1,
+              "text-background-shape": "roundrectangle",
+              "text-background-padding": "3px",
             },
           }),
         );
