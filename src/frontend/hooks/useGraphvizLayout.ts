@@ -20,11 +20,11 @@ type GraphvizJSON = {
   }>;
 };
 
-function esc(val: string) {
+const esc = (val: string) => {
   return val.replaceAll('"', '\\"');
-}
+};
 
-function toDot(visualization: VisualizationByType<"graph">): string {
+export const toDot = (visualization: VisualizationByType<"graph">) => {
   const gAttrs = attrsToDot(
     visualization.layout_config?.graphAttrs ?? undefined,
   );
@@ -67,23 +67,23 @@ function toDot(visualization: VisualizationByType<"graph">): string {
 
   lines.push("}");
   return lines.join("\n");
-}
+};
 
-function attrsToDot(obj?: Record<string, string | number | boolean>): string {
+const attrsToDot = (obj?: Record<string, string | number | boolean>) => {
   if (!obj) return "";
   const kv = Object.entries(obj).map(([k, v]) =>
     typeof v === "string" ? `${k}="${esc(v)}"` : `${k}=${String(v)}`,
   );
   return kv.join(",");
-}
+};
 
-function parsePos(s?: string): { x: number; y: number } | undefined {
+const parsePos = (s?: string) => {
   if (!s) return;
   const [xs, ys] = s.split(",");
   const x = parseFloat(xs);
   const y = parseFloat(ys);
   if (Number.isFinite(x) && Number.isFinite(y)) return { x, y };
-}
+};
 
 export const useGraphvizLayout = (
   visualization: VisualizationByType<"graph">,

@@ -1,4 +1,8 @@
-import { VisualizationByType, VisulizationsTypes } from "@/types/resources";
+import {
+  VisualizationByType,
+  VisulizationsType,
+  VisulizationsTypes,
+} from "@/types/resources";
 import { LoadingOverlay, Stack, ThemeIcon } from "@mantine/core";
 import { ComponentProps, ComponentType } from "react";
 import GraphViewer from "./Viewers/graph";
@@ -22,6 +26,25 @@ const visulizationMap: {
   dot: DotToSvgViewer,
 };
 
+export const Visualization: React.FC<{
+  visualization: VisulizationsType;
+  isPreview?: boolean;
+}> = ({ visualization, isPreview = false }) => {
+  //TODO: Fix this stroke of of a typing hell
+  const Component = visulizationMap[visualization.type] as ComponentType<
+    VisualizationProps<typeof visualization.type>
+  >;
+
+  return (
+    <Component
+      visualization={
+        visualization as ComponentProps<typeof Component>["visualization"]
+      }
+      isPreview={isPreview}
+    />
+  );
+};
+
 const Viewer: React.FC<{ id: string; isPreview?: boolean }> = ({
   id,
   isPreview,
@@ -42,16 +65,9 @@ const Viewer: React.FC<{ id: string; isPreview?: boolean }> = ({
     );
   }
 
-  //TODO: Fix this stroke of of a typing hell
-  const Component = visulizationMap[data.visualization.type] as ComponentType<
-    VisualizationProps<typeof data.visualization.type>
-  >;
-
   return (
-    <Component
-      visualization={
-        data.visualization as ComponentProps<typeof Component>["visualization"]
-      }
+    <Visualization
+      visualization={data.visualization as VisulizationsType}
       isPreview={isPreview}
     />
   );
