@@ -114,7 +114,7 @@ class PetriNet(Resource):
                 GraphEdge(
                     source=arc.source,
                     target=arc.target,
-                    arrows=(None, "triangle"),
+                    end_arrow="triangle",
                     color=color_map.get(object_type, "#cccccc"),
                     annotation=arc.annotation.visualize() if arc.annotation is not None else None,
                 )
