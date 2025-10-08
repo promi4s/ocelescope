@@ -13,8 +13,8 @@ class Resource(BaseModel, ABC):
         description: Optional human-readable description for this resource class.
     """
 
-    label: ClassVar[str | None]
-    description: ClassVar[str | None]
+    label: ClassVar[str | None] = None
+    description: ClassVar[str | None] = None
 
     @classmethod
     def get_type(cls):
