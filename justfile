@@ -17,7 +17,7 @@ up env:
         echo "🚀 Starting DEV in watch mode..."; \
         docker compose -f docker-compose.dev.yml up --build --watch; \
     elif [ "{{env}}" = "prod" ]; then \
-        docker compose -f docker-compose.yml up -d; \
+        docker compose -f docker-compose.yml up --build -d; \
     else \
         echo "Invalid environment: {{env}} (use 'dev' or 'prod')"; \
         exit 1; \
