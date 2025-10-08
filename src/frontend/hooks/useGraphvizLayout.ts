@@ -57,7 +57,7 @@ export const toDot = (visualization: VisualizationByType<"graph">) => {
   ];
 
   for (const node of visualization.nodes ?? []) {
-    const id = safeId(node.id);
+    const id = safeId(node?.id ?? "");
     const attrs = {
       ...node.layout_attrs,
       label: node.label ? esc(node.label) : undefined,
@@ -87,7 +87,7 @@ export const toDot = (visualization: VisualizationByType<"graph">) => {
     .reduce<Partial<Record<"source" | "sink" | number, string[]>>>(
       (acc, current) => {
         const key = current.rank as "sink" | "source" | number;
-        (acc[key] ??= []).push(esc(safeId(current.id)));
+        (acc[key] ??= []).push(esc(safeId(current?.id ?? "")));
         return acc;
       },
       {},
@@ -162,7 +162,8 @@ export const useGraphvizLayout = (
               label: node.label ?? undefined,
               "text-valign": node.label_pos ?? "center",
               "text-halign": "center",
-              width: node.width ?? nodePos[safeId(node.id)].width ?? undefined,
+              width:
+                node.width ?? nodePos[safeId(node.id ?? "")].width ?? undefined,
               height: node.height ?? undefined,
               "background-color": node.color ?? undefined,
               ...(node.border_color && {
@@ -171,7 +172,7 @@ export const useGraphvizLayout = (
                 "border-style": "solid",
               }),
             },
-            position: nodePos[safeId(node.id)] ?? { x: 0, y: 0 },
+            position: nodePos[safeId(node.id ?? "")] ?? { x: 0, y: 0 },
           }),
         );
 

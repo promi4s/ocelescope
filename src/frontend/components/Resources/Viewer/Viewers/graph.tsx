@@ -30,7 +30,7 @@ const GraphViewer: React.FC<{
                 {({ entity }) => {
                   const annotation = useMemo(() => {
                     if (entity?.type === "node") {
-                      return visualization.nodes.find(
+                      return (visualization.nodes ?? []).find(
                         ({ id }) => entity.id === id,
                       )?.annotation;
                     }
