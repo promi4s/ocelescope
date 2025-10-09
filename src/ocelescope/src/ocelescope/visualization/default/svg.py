@@ -1,8 +1,9 @@
 from typing import Literal
 
-from pydantic import BaseModel
+
+from ocelescope.visualization.visualization import Visualization
 
 
-class SVGVis(BaseModel):
-    type: Literal["svg"]
+class SVGVis(Visualization):
+    type: Literal["svg"] = "svg"
     svg: str

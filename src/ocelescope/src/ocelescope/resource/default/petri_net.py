@@ -1,14 +1,11 @@
 from typing import Literal, Optional
 
-from pydantic import BaseModel
-
-
-from ocelescope.resource.resource import Resource
+from ocelescope.resource.resource import Annotated, Resource
 from ocelescope.visualization.default.graph import Graph, GraphEdge, GraphNode, GraphvizLayoutConfig
 from ocelescope.visualization import generate_color_map
 
 
-class Place(BaseModel):
+class Place(Annotated):
     """A place in a Petri net.
 
     Attributes:
@@ -19,10 +16,10 @@ class Place(BaseModel):
 
     id: str
     object_type: str
-    place_type: Optional[Literal["sink", "source", None]]
+    place_type: Literal["sink", "source", None] | None
 
 
-class Transition(BaseModel):
+class Transition(Annotated):
     """A transition in a Petri net.
 
     Attributes:
@@ -34,7 +31,7 @@ class Transition(BaseModel):
     label: Optional[str]
 
 
-class Arc(BaseModel):
+class Arc(Annotated):
     """An arc connecting places and transitions in a Petri net.
 
     Attributes:
@@ -82,6 +79,9 @@ class PetriNet(Resource):
                     width=30,
                     label_pos="bottom",
                     height=30,
+                    annotation=place.annotation.visualize()
+                    if place.annotation is not None
+                    else None,
                 )
             )
 
@@ -96,6 +96,9 @@ class PetriNet(Resource):
                     shape="rectangle",
                     color="#ffffff" if label else "#000000",
                     border_color="#000000" if label else None,
+                    annotation=transition.annotation.visualize()
+                    if transition.annotation is not None
+                    else None,
                 )
             )
 
@@ -111,8 +114,9 @@ class PetriNet(Resource):
                 GraphEdge(
                     source=arc.source,
                     target=arc.target,
-                    arrows=(None, "triangle"),
+                    end_arrow="triangle",
                     color=color_map.get(object_type, "#cccccc"),
+                    annotation=arc.annotation.visualize() if arc.annotation is not None else None,
                 )
             )
 

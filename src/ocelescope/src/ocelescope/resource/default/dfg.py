@@ -18,18 +18,6 @@ class ObjectActivityEdge(BaseModel):
 
 
 class DirectlyFollowsGraph(Resource):
-    """[TODO:description]
-
-    Attributes:
-        label: [TODO:attribute]
-        description: [TODO:attribute]
-        object_types: [TODO:attribute]
-        activities: [TODO:attribute]
-        edges: [TODO:attribute]
-        start_activities: [TODO:attribute]
-        end_activities: [TODO:attribute]
-    """
-
     label = "Directly Follows Graph"
     description = "A object-centric directly follows graph"
 
@@ -80,7 +68,7 @@ class DirectlyFollowsGraph(Resource):
             GraphEdge(
                 source=edge.source,
                 target=edge.target,
-                arrows=(None, "triangle"),
+                end_arrow="triangle",
                 color=color_map[edge.object_type],
             )
             for edge in self.edges
@@ -90,7 +78,7 @@ class DirectlyFollowsGraph(Resource):
             GraphEdge(
                 source=f"start_{start_edge.object_type}",
                 target=start_edge.activity,
-                arrows=(None, "triangle"),
+                end_arrow="triangle",
                 color=color_map[start_edge.object_type],
             )
             for start_edge in self.start_activities
@@ -100,7 +88,7 @@ class DirectlyFollowsGraph(Resource):
             GraphEdge(
                 target=f"end_{end_edge.object_type}",
                 source=end_edge.activity,
-                arrows=(None, "triangle"),
+                end_arrow="triangle",
                 color=color_map[end_edge.object_type],
             )
             for end_edge in self.end_activities

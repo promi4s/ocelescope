@@ -1,7 +1,7 @@
 import importlib.util
 import shutil
 import sys
-from typing import Dict, TypedDict
+from typing import Any, Dict, TypedDict
 
 from ocelescope import Plugin, Resource
 from app.internal.config import config
@@ -34,6 +34,25 @@ class RegistryManager:
             plugin_id=plugin_id, method_name=method_name
         )
 
+    def _hydrate(self, data: Any, plugin_id: str | None = None):
+        if isinstance(data, dict) and "_ocelescope_resource_type" in data:
+            ResourceClass = self._resource_registry.get_resource_class(
+                data["_ocelescope_resource_type"], plugin_id=plugin_id
+            )
+            if ResourceClass:
+                hydrated = {
+                    k: self._hydrate(v, plugin_id)
+                    for k, v in data.items()
+                    if k != "type"
+                }
+                return ResourceClass(**hydrated)
+        elif isinstance(data, dict):
+            return {k: self._hydrate(v, plugin_id) for k, v in data.items()}
+        elif isinstance(data, list):
+            return [self._hydrate(item, plugin_id) for item in data]
+        else:
+            return data
+
     def get_resource_instance(
         self, resource: ResourceStore, plugin_id: str | None = None
     ) -> Resource | None:
@@ -44,11 +63,11 @@ class RegistryManager:
             )
             id = plugin[0] if plugin else None
 
-        ResourceClass = self._resource_registry.get_resource_class(
-            resource.type, plugin_id=id
-        )
+        hydrated_resource = self._hydrate(resource.data, id)
 
-        return ResourceClass(**resource.data) if ResourceClass else None
+        assert isinstance(hydrated_resource, Resource)
+
+        return hydrated_resource
 
     def get_extension_descriptions(self):
         return self._extension_registry.get_extension_description()

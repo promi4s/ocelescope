@@ -1,7 +1,8 @@
 from typing import Literal
 
 from graphviz import Digraph, Graph
-from pydantic import BaseModel
+
+from ocelescope.visualization.visualization import Visualization
 
 
 GraphVizLayoutingEngine = Literal[
@@ -9,13 +10,14 @@ GraphVizLayoutingEngine = Literal[
 ]
 
 
-class DotVis(BaseModel):
-    type: Literal["dot"]
+class DotVis(Visualization):
+    type: Literal["dot"] = "dot"
+
     dot_str: str
-    layout_engine: GraphVizLayoutingEngine
+    layout_engine: GraphVizLayoutingEngine = "dot"
 
     @classmethod
     def from_graphviz(
-        cls, graph: Digraph | Graph, layout_engine: GraphVizLayoutingEngine
+        cls, graph: Digraph | Graph, layout_engine: GraphVizLayoutingEngine = "dot"
     ) -> "DotVis":
-        return DotVis(dot_str=graph.source, type="dot", layout_engine=layout_engine)
+        return DotVis(dot_str=graph.source, layout_engine=layout_engine)

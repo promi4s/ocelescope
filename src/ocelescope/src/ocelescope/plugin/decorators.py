@@ -48,7 +48,7 @@ class OCELAnnotation(Annotation):
 
 
 class ResourceAnnotation(Annotation):
-    pass
+    annotation_resources: list[type[Resource]] | None = Field(exclude=True, default=None)
 
 
 class OCELResult(BaseModel):
@@ -86,8 +86,8 @@ class PluginMethod(BaseModel):
 
     @computed_field
     @cached_property
-    def input_schema(self) -> dict[str, Any]:
-        return self._input_model.model_json_schema() if self._input_model is not None else {}
+    def input_schema(self) -> dict[str, Any] | None:
+        return self._input_model.model_json_schema() if self._input_model is not None else None
 
 
 def extract_info(typ) -> tuple[type, Optional[Annotation]]:
@@ -171,13 +171,20 @@ def plugin_method(
                     )
                 elif issubclass(base_type, Resource):
                     plugin_method_meta._resource_types.add(base_type)
+
+                    annotation_obj = (
+                        annotation if isinstance(annotation, ResourceAnnotation) else None
+                    )
+                    if annotation_obj and annotation_obj.annotation_resources:
+                        plugin_method_meta._resource_types.update(
+                            annotation_obj.annotation_resources
+                        )
+
                     plugin_method_meta.results.append(
                         ResourceResult(
                             type="resource",
                             is_list=is_list,
-                            annotation=ResourceAnnotation(**annotation.model_dump())
-                            if annotation is not None
-                            else None,
+                            annotation=annotation_obj,
                             resource_type=base_type.get_type(),
                         )
                     )

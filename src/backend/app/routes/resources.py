@@ -52,8 +52,10 @@ async def upload_resource(file: UploadFile, session: ApiSession):
     )
 
 
-@resource_router.get("/resource/{resource_id}/download")
-def download_output(session: ApiSession, resource_id: str):
+@resource_router.get(
+    "/resource/{resource_id}/download", operation_id="downloadResource"
+)
+def download_resource(session: ApiSession, resource_id: str):
     resource = session.get_resource(id=resource_id)
 
     # Convert to JSON and wrap in a BytesIO stream

@@ -1,4 +1,4 @@
-import { VisualizationByType } from "@/types/outputs";
+import { VisualizationByType } from "@/types/resources";
 
 import React, { useEffect, useMemo, useState } from "react";
 import { DataTable, type DataTableColumn } from "mantine-datatable";
@@ -59,6 +59,18 @@ const TableView: React.FC<{ visualization: Table; isPreview?: boolean }> = ({
     setRecords(visualization.rows.slice(from, to));
   }, [page, pageSize]);
 
+  const paginationProps =
+    visualization.rows.length > PAGE_SIZES[0]
+      ? {
+          totalRecords: visualization.rows.length,
+          recordsPerPage: pageSize,
+          onPageChange: (p: number) => setPage(p),
+          page,
+          recordsPerPageOptions: PAGE_SIZES,
+          onRecordsPerPageChange: setPageSize,
+        }
+      : {};
+
   if (isPreview) {
     return (
       <Group justify="center" align="center" p={"md"} w={"100%"} h={"100%"}>
@@ -73,14 +85,9 @@ const TableView: React.FC<{ visualization: Table; isPreview?: boolean }> = ({
     <DataTable
       records={records}
       columns={columns}
-      totalRecords={visualization.rows.length}
       withColumnBorders
       withRowBorders
-      recordsPerPage={pageSize}
-      page={page}
-      onPageChange={(p) => setPage(p)}
-      recordsPerPageOptions={PAGE_SIZES}
-      onRecordsPerPageChange={setPageSize}
+      {...paginationProps}
     />
   );
 };

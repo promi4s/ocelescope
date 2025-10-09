@@ -33,7 +33,7 @@ class State(Module):
         if sort_by is None:
             sort_by = (ocel.ocel.event_id_column, "asc")
 
-        return get_sorted_table(
+        return get_sorted_table(  # type: ignore
             dataframe=ocel.ocel.events,
             type_field=ocel.ocel.event_activity,
             type_value=activity,
@@ -86,7 +86,7 @@ class State(Module):
         if sort_by is None:
             sort_by = (ocel.ocel.object_id_column, "asc")
 
-        return get_sorted_table(
+        return get_sorted_table(  # type: ignore
             dataframe=get_objects_with_object_changes(ocel.ocel),
             type_field=ocel.ocel.object_type_column,
             type_value=object_type,
