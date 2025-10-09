@@ -32,7 +32,7 @@ class MinimalResource(Resource):
         pass
 
 
-class Input(PluginInput, frozen=True):
+class Input(PluginInput):
     pass
 
 class {{cookiecutter.__plugin_class_name}}(Plugin):
