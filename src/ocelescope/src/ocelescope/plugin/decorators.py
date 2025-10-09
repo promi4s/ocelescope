@@ -1,4 +1,3 @@
-from functools import cached_property
 from typing import (
     Annotated,
     Any,
@@ -85,7 +84,6 @@ class PluginMethod(BaseModel):
     _resource_types: set[type[Resource]] = PrivateAttr(default_factory=set)
 
     @computed_field
-    @cached_property
     def input_schema(self) -> dict[str, Any] | None:
         return self._input_model.model_json_schema() if self._input_model is not None else None
 
