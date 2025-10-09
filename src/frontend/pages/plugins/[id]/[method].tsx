@@ -58,7 +58,7 @@ const PluginPage = () => {
             ]}
           </Breadcrumbs>
           <Stack gap={0}>
-            <Title>{pluginMethod?.label ?? method}</Title>
+            <Title ta={"center"}>{pluginMethod?.label ?? method}</Title>
             {pluginMethod?.description && (
               <Text>{pluginMethod?.description}</Text>
             )}
