@@ -1,20 +1,168 @@
 # Plugin Evaluation
 
-In this evaluation, we implement a new plugin for Ocelescope that discovers object-centric directly-follows graphs. This serves as a test case to assess how easy it is to develop and integrate plugins using the provided system and documentation.
+In this evaluation, you will integrate a process mining implementation to Ocelescope by creating a plugin.  
+The goal is to create a new plugin using the existing Ocelescope system and its documentation.
+
+Let’s say you have already written two Python functions:
+
+1. A **discovery function** that discovers a *object-centric directly-follows graphs (OC-DFGs)* from an Object-Centric Event Log (OCEL).  
+   It returns a list of tuples in the form  
+   `(activity_1, object_type, activity_2)`,  
+   where each tuple means that `activity_2` directly follows `activity_1` for the given `object_type`.  
+   Start and end activities are represented with `None` as one of the activity names.
+
+2. A **visualization function** that creates and returns a Graphviz `Digraph` instance representing the DFG, which can later be used to generate images.
+
+??? "The Discovery and Visualization Functions"
+
+    You don’t need to fully understand the implementation of these functions to complete this evaluation. They are provided as ready-to-use helpers that you will later integrate into your Ocelescope plugin.
+
+    ```python title="util.py"
+    from ocelescope import OCEL
+    from graphviz import Digraph
+
+    def discover_dfg(ocel: OCEL, used_object_types: list[str]) -> list[tuple[str | None , str, str | None]]:
+        import pm4py
+
+        ocel_filtered = pm4py.filter_ocel_object_types(ocel.ocel, used_object_types, positive=True)
+        ocdfg = pm4py.discover_ocdfg(ocel_filtered)
+        edges :list[tuple[str | None , str, str | None]]= []
+        for object_type, raw_edges in ocdfg["edges"]["event_couples"].items():
+            edges = edges + ([(source, object_type, target) for source, target in raw_edges])
+
+            edges += [
+                (activity, object_type, None)
+                for object_type, activities in ocdfg["start_activities"]["events"].items()
+                for activity in activities.keys()
+            ]
+
+            edges += [
+                (None, object_type, activity)
+                for object_type, activities in ocdfg["end_activities"]["events"].items()
+                for activity in activities.keys()
+            ]
+        return edges
+    
+    def convert_dfg_to_graphviz(dfg:list[tuple[str | None,str, str | None]]) -> Digraph:
+        from graphviz import Digraph
+        import itertools
+
+        dot = Digraph("Ugly DFG")
+        dot.attr(rankdir="LR")  
+        
+        outer_nodes = set()
+        inner_sources = {}
+        inner_sinks = {}
+        edges_seen = set()
+        types = set()
+        
+        for src, x, tgt in dfg:
+            if src is not None:
+                outer_nodes.add(src)
+            if tgt is not None:
+                outer_nodes.add(tgt)
+            if x is not None:
+                types.add(x)
+                inner_sources[x] = f"source_{x}"
+                inner_sinks[x] = f"sink_{x}"
+            edges_seen.add((src, x, tgt))
+        
+        # A palette of colors
+        palette = [
+            "red", "blue", "green", "orange", "purple",
+            "brown", "gold", "pink", "cyan", "magenta"
+        ]
+        color_map = {x: c for x, c in zip(sorted(types), itertools.cycle(palette))}
+        
+        # Outer nodes: neutral color
+        for n in outer_nodes:
+            dot.node(n, shape="rectangle", style="filled", fillcolor="lightgray")
+        
+        # Sources and sinks: colored small circles, with xlabel underneath
+        for x in types:
+            color = color_map[x]
+            dot.node(
+                inner_sources[x],
+                shape="circle",
+                style="filled",
+                fillcolor=color,
+                width="1",
+                height="1",
+                fixedsize="true",
+                label="",
+                xlabel=x
+            )
+            dot.node(
+                inner_sinks[x],
+                shape="circle",
+                style="filled",
+                fillcolor=color,
+                width="1",
+                height="1",
+                label="",
+                fixedsize="true",
+                xlabel=x
+            )
+        
+        # Rank groups
+        with dot.subgraph() as s:
+            s.attr(rank="same")
+            for n in inner_sources.values():
+                s.node(n)
+        
+        with dot.subgraph() as s:
+            s.attr(rank="same")
+            for n in inner_sinks.values():
+                s.node(n)
+        
+        # Add edges with thicker lines
+        for src, x, tgt in edges_seen:
+            if x is None:
+                continue
+            color = color_map[x]
+            if src is not None and tgt is not None:
+                dot.edge(src, tgt, color=color, penwidth="2")
+            elif src is None and tgt is not None:
+                dot.edge(tgt, inner_sinks[x], color=color, penwidth="2")
+            elif src is not None and tgt is None:
+                dot.edge(src, inner_sources[x], color=color, penwidth="2")
+        
+        return dot
+    ```
+At the end of this evaluation, you should have a **working plugin** that looks like this:
+
+<figure markdown="span">
+  ![Final DFG discovery Plugin](../assets/evaluation-result.png){width="50%"}
+  <figcaption align="center">Example of a completed OC-DFG discovery plugin in Ocelescope.</figcaption>
+</figure>
+
+For additional context or examples, you can use the [**Plugin Development Guide**](../plugins/index.md){target="_blank"} and the [**tutorial**](../plugins/tutorial.md){target="_blank"}.  
+All the information you need for this evaluation is provided here, but consulting them may help you understand the steps more clearly.
 
 ## Step 1: Setup
 
-To begin evaluating the Ocelescope plugin system, start by setting up your development environment using one of the following methods.
+Let’s start by setting up the minimal Ocelescope plugin template.  
+You can choose one of the following two methods to prepare your project.
 
-### Clone or Scaffold the Minimal Plugin Template
+### Option A — Clone the Template from GitHub
 
-You can either clone the minimal template repository or generate a new project using the cookiecutter template.
+Clone the minimal plugin template directly from [:simple-github: Github](https://github.com/Grkmr/Minimal-Ocelescope-Plugin-Template){target="_blank"}:
 
-```sh
-# Option A: Clone the minimal plugin template
-git clone git@github.com:Grkmr/Minimal-Ocelescope-Plugin-Template.git
+```bash
+git clone https://github.com/Grkmr/Minimal-Ocelescope-Plugin-Template.git
+cd Minimal-Ocelescope-Plugin-Template
+```
 
-# Option B: Use `uvx` and cookiecutter to generate a new plugin project
+### Option B — Generate a New Project with Cookiecutter
+
+Alternatively, you can generate a new plugin project using Cookiecutter through uv:
+
+!!! warning
+
+    When running the Cookiecutter template, always use the default options (press **Enter** for each prompt).
+    This ensures the generated project matches the structure expected in this evaluation.
+
+```bash
 uvx cookiecutter gh:rwth-pads/ocelescope --directory template
 ```
 
