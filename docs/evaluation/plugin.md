@@ -136,7 +136,7 @@ At the end of this evaluation, you should have a **working plugin** that looks l
   <figcaption align="center">Example of a completed OC-DFG discovery plugin in Ocelescope.</figcaption>
 </figure>
 
-For additional context or examples, you can use the [**Plugin Development Guide**](../plugins/index.md){target="_blank"} and the [**tutorial**](../plugins/tutorial.md){target="_blank"}.  
+For additional context or examples, you can use the [**Plugin Development Guide**](../plugins/index.md){target="_blank"} and the [**Tutorial**](../plugins/tutorial.md){target="_blank"}.  
 All the information you need for this evaluation is provided here, but consulting them may help you understand the steps more clearly.
 
 ## Step 1: Setup
@@ -146,7 +146,7 @@ You can choose one of the following two methods to prepare your project.
 
 ### Option A — Clone the Template from GitHub
 
-Clone the minimal plugin template directly from [:simple-github: Github](https://github.com/Grkmr/Minimal-Ocelescope-Plugin-Template){target="_blank"}:
+Clone the minimal plugin template directly from [:simple-github: Github (Link to the Repository)](https://github.com/Grkmr/Minimal-Ocelescope-Plugin-Template){target="_blank"}:
 
 ```bash
 git clone https://github.com/Grkmr/Minimal-Ocelescope-Plugin-Template.git
@@ -166,9 +166,30 @@ Alternatively, you can generate a new plugin project using Cookiecutter through 
 uvx cookiecutter gh:rwth-pads/ocelescope --directory template
 ```
 
+When you’ve completed the setup steps above, your project folder should look similar to this:
+
+```
+minimal-plugin/ <- root
+├─ scripts/
+│  ├─ build_plugin.py
+├─ LICENSE
+├─ README.md
+├─ pyproject.toml
+├─ requirements.txt
+├─ src/
+│  ├─ minimal_plugin/
+│  │  ├─ __init__.py
+│  │  ├─ plugin.py
+```
+
 ### Install Dependencies
 
-Install all required dependencies using your preferred method:
+Navigate to the root of the template and install all dependencies using your preferred package manager.
+
+???+ warning
+
+    This evaluation requires **Python 3.13**. Make sure you have it installed 
+    before continuing.
 
 ```sh
 # With uv
@@ -178,51 +199,87 @@ uv sync
 pip install -r requirements.txt
 ```
 
-### Locate the Plugin Entry Point
+## Step 2: Crash course in Ocelescope
 
-Navigate to the following file, which contains the initial plugin skeleton:
+### Plugin Class
 
-```
-src/minimal_plugin/plugin.py
-```
+An **Ocelescope plugin** is a collection of Python functions grouped inside a class that inherits from the base `Plugin` class provided by the `ocelescope` package.
 
-Below is the content of the minimal plugin template:
+Each plugin includes basic **metadata** — such as its name, version, and description — defined as class variables.  
+Individual functions within the plugin are defined as **plugin methods**, which use the `@plugin_method` decorator to attach their own labels, descriptions.
 
-```python title="src/plugin/plugin.py"
-from typing import Annotated
-from ocelescope import OCEL, OCELAnnotation, Plugin, PluginInput, Resource, plugin_method
+<figure markdown="span">
+  ![An example plugin class](../assets/plugintouimapping.png)
+  <figcaption align="center">Example of an Ocelescope plugin in code and in the app.</figcaption>
+</figure>
 
-class MinimalResource(Resource):
-    def visualize(self) -> None:
-        pass
+### Resources
 
-class Input(PluginInput, frozen=True):
-    pass
+Resources are Python classes that can be used as inputs and outputs of plugin methods.
+They can represent process models, results of performance analyses, or any other structured data.
 
-class MinimalPlugin(Plugin):
-    label = "MinimalPlugin"
-    description = "A minimal plugin template"
-    version = "0.1.0"
+Resources produced by plugin methods are automatically saved and can be reused as inputs for other methods.
+A resource is defined as a Python class that inherits from the Resource base class of Ocelescope.
 
-    @plugin_method(label="Minimal Method", description="A minimal plugin method")
-    def minimal_method(
-        self,
-        ocel: Annotated[OCEL, OCELAnnotation(label="Event Log")],
-        input: Input,
-    ) -> MinimalResource:
-        return MinimalResource()
-```
+Optionally, a resource can also implement a visualization function — a method that returns a instance of one of the predefined visualization types, such as Table, Graph (an interactive graph), or DotVis (a Graphviz-based visualization).
+
+<figure markdown="span">
+  ![Activity Count Resource](../assets/ActivityCountResource.png)
+  <figcaption align="center">A resource used to store activity counts — on the left its Python implementation, on the right its visualization in Ocelescope.</figcaption>
+</figure>
+
+### Plugin Methods
+
+As discussed earlier, plugin methods are functions defined inside a plugin class.
+Their input parameters automatically generate a corresponding form in the Ocelescope frontend.
+
+A plugin method can have any number of parameters of type OCEL or Resource.
+In addition, it can include one PluginInput parameter, defined by inheriting from the PluginInput base class of the Ocelescope package.
+
+The PluginInput class defines configurable parameters as fields (class attributes) of the class.
+These fields can represent text inputs, algorithm variants, or numeric ranges (for example, to define thresholds or filter levels).
+
+You can also define special OCEL-dependent fields within the same class.
+These fields depend on the selected OCEL input and can represent elements such as object types, event types, or attribute names extracted directly from the log.
+
+!!! warning "Match ocel_id with the Method Parameter"
+
+    The ocel_id defined in each OCEL-dependent field must exactly match the name of the OCEL parameter in your plugin method.
+    This ensures the field is correctly linked to the selected OCEL log.
+    ```python title="Example"
+    class ExampleInput(PluginInput):
+        object_types: str = OCEL_FIELD(
+            title="Object Type",
+            description="Select which object types to include",
+            field_type="object_type",
+            ocel_id="ocel"  # Must match the method parameter below
+        )
+
+    class ExamplePlugin(Plugin):
+        @plugin_method(label="Filter by Object Type")
+        def filter_by_object_type(self, ocel: OCEL, input: ExampleInput):
+            ...
+    ```
+
+<figure markdown="span">
+  ![Example o](../assets/DummyDiscovery.png)
+  <figcaption align="center">A resource that can be used to store activity counts</figcaption>
+</figure>
 
 ## Step 2: Implement the Plugin
 
-The goal of this step is to implement a new plugin that discovers an **object-centric directly-follows graph (OC-DFG)**.
+After setting up the project and getting familiar with how Ocelescope plugins work, we will now implement our first real plugin: a **discovery plugin for object-centric directly-follows graphs (OC-DFGs)**, as mentioned at the beginning of this evaluation.
 
-The plugin should:
+The plugin will have the following components:
 
-- Take an **OCEL** as input.
-- Accept a **list of object types** as parameters.
-- Compute the OC-DFG using these parameters.
-- Return the result as a [**Resource**](../plugins/resource.md).
+**Inputs**
+
+- An **OCEL** log  
+- A **list of object types** to include in the discovery  
+
+**Outputs**
+
+- An [**OC-DFG Resource**](../plugins/resource.md) containing the discovered directly-follows graph  
 
 ### Step 2.1: Rename the Plugin Class
 
