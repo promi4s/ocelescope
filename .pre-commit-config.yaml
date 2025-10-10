@@ -4,30 +4,34 @@ repos:
     hooks:
       - id: check-yaml
         files: .*\.py$
+        exclude: ^template/
       - id: end-of-file-fixer
         files: .*\.py$
+        exclude: ^template/
       - id: trailing-whitespace
         files: .*\.py$
+        exclude: ^template/
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
     rev: v0.11.12
     hooks:
       # Run the linter.
       - id: ruff
-        types_or: [ python, pyi ]
-        args: [ --fix ,--config=src/backend/pyproject.toml]
+        types_or: [python, pyi]
+        args: [--fix, --config=src/backend/pyproject.toml]
+        exclude: ^template/
       # Run the formatter.
       - id: ruff-format
-        types_or: [ python, pyi ]
-
+        types_or: [python, pyi]
+        exclude: ^template/
   - repo: https://github.com/biomejs/pre-commit
-    rev: "v0.6.1"  # Use the sha / tag you want to point at
+    rev: "v0.6.1" # Use the sha / tag you want to point at
     hooks:
       - id: biome-format
         args: ["--config-path", "src/frontend/"]
         additional_dependencies: ["@biomejs/biome@1.9.4"]
   - repo: https://github.com/biomejs/pre-commit
-    rev: "v0.6.1"  # Use the sha / tag you want to point at
+    rev: "v0.6.1" # Use the sha / tag you want to point at
     hooks:
       - id: biome-lint
         args: ["--config-path", "src/frontend/"]

@@ -1,8 +1,8 @@
 from typing import Annotated
 
-from ocelescope import OCEL, OCELAnnotation,{% if cookiecutter.include_example_extension == "y" %} OCELExtension,{% endif %} Plugin, PluginInput, Resource, plugin_method
+from ocelescope import OCEL, OCELAnnotation,{% if cookiecutter.include_example_extension == "yes" %} OCELExtension,{% endif %} Plugin, PluginInput, Resource, plugin_method
 
-{% if cookiecutter.include_example_extension == "y" %}
+{% if cookiecutter.include_example_extension == "yes" %}
 
 class MinimalExtension(
     OCELExtension,
