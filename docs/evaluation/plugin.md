@@ -266,7 +266,7 @@ These fields depend on the selected OCEL input and can represent elements such a
   <figcaption align="center">A resource that can be used to store activity counts</figcaption>
 </figure>
 
-## Step 2: Implement the Plugin
+## Step 3: Implement the Plugin
 
 After setting up the project and getting familiar with how Ocelescope plugins work, we will now implement our first real plugin: a **discovery plugin for object-centric directly-follows graphs (OC-DFGs)**, as mentioned at the beginning of this evaluation.
 
@@ -281,185 +281,55 @@ The plugin will have the following components:
 
 - An [**OC-DFG Resource**](../plugins/resource.md) containing the discovered directly-follows graph  
 
-### Step 2.1: Rename the Plugin Class
+### Step 3.1 Prepare the Template
 
-Rename the class `MinimalPlugin` to a meaningful name such as `DiscoverDFG`.  
-Update the label and description accordingly.  
-Adapt the import in `src/minimal_plugin/__init__.py` to reflect the new class name.  
+The plugin template we set up earlier provides a plugin.py file that already includes boilerplate code for a minimal Ocelescope plugin.
+It contains a plugin class, a resource, and an input class.
 
-### Step 2.2: Rename the Plugin Method
+#### Rename the Plugin Class
 
-Rename the method `example` to a descriptive name such as `discover`.  
-Update the metadata fields `label` and `description`.  
+1. Rename the class `MinimalPlugin` to a meaningful name, for example `DiscoverDFG`.  
+2. Update the `label` and `description` fields to describe the new plugin.  
+3. Adapt the import in `__init__.py` to reflect the new class name.  
 
-### Step 2.3: Extend the Input Class
+??? tip
 
-Extend the Input class by adding a new field that captures a list of object types.
-Use the ``OCEL_FIELD`` helper to define this field and link it to the OCEL input.
+    The Ocelescope app looks inside the `__init__.py` file to locate your plugin class.  
+    Make sure to update both the import and the `__all__` list when renaming your plugin.
 
-```
-class Input(PluginInput, frozen=True):
-    pass
-```
+    ```python title="__init__.py"
+    from .plugin import MinimalPlugin  # rename this
 
-Refer to the [Plugin Development](../plugins/plugin_class.md#ocel-dependent-selection-fields) Guide for details on defining OCEL-dependent selection fields.
-
-!!! warning
-    Make sure the `ocel_id` in `OCEL_FIELD` matches the `ocel` parameter of the function.
-
-### Step 2.4: Create a Custom Resource
-
-The discovery method returns the object-centric directly-follows graph (OC-DFG) as a list of triplets:
-
-```
-(event_1, object_type, event_2)
-```
-
-These represent direct-follow relationships between events for a given object type. Start and end edges are represented using ``None``:
-
-- Start edges: ``(None, object_type, event)``
-- End edges: ``(event, object_type, None)``
-
-To integrate this into the plugin system, define a custom resource to hold this data.
-
-- Rename the class MinimalResource to DFG.
-- Update the label and description to reflect that the resource represents an object-centric directly-follows graph.
-
-  ```python
-  class MinimalResource(Resource):
-    label = "Minimal Resource"
-    description = "A minimal resource"
-
-    def visualize(self) -> None:
-        pass
-  ```
-
-- Add a field edges with the following type:
-
-  ```python
-    list[tuple[str | None, str, str | None]]
-  ```
-
-- Update the return type of the plugin method so that it returns the new DFG resource.
-
-Refer to the [Plugin Development Guide](../plugins/resource.md) or the [tutorial](../plugins/tutorial.md) for more details on defining custom resources
-
-### Step 2.5: Add a Visualization
-
-You already implemented a helper function (`convert_dfg_to_graphviz`) that creates a **Graphviz Digraph** representation of your object-centric directly-follows graph (OC-DFG).
-
-??? tip "Visualization Method"
-
-    ```python
-    def convert_dfg_to_graphviz(dfg:list[tuple[str | None,str, str | None]]):
-      from graphviz import Digraph
-      import itertools
-
-      dot = Digraph("Ugly DFG")
-      dot.attr(rankdir="LR")  # Spread things out
-      
-      outer_nodes = set()
-      inner_sources = {}
-      inner_sinks = {}
-      edges_seen = set()
-      types = set()
-      
-      for src, x, tgt in dfg:
-          if src is not None:
-              outer_nodes.add(src)
-          if tgt is not None:
-              outer_nodes.add(tgt)
-          if x is not None:
-              types.add(x)
-              inner_sources[x] = f"source_{x}"
-              inner_sinks[x] = f"sink_{x}"
-          edges_seen.add((src, x, tgt))
-      
-      # A palette of colors
-      palette = [
-          "red", "blue", "green", "orange", "purple",
-          "brown", "gold", "pink", "cyan", "magenta"
-      ]
-      color_map = {x: c for x, c in zip(sorted(types), itertools.cycle(palette))}
-      
-      # Outer nodes: neutral color
-      for n in outer_nodes:
-          dot.node(n, shape="rectangle", style="filled", fillcolor="lightgray")
-      
-      # Sources and sinks: colored small circles, with xlabel underneath
-      for x in types:
-          color = color_map[x]
-          dot.node(
-              inner_sources[x],
-              shape="circle",
-              style="filled",
-              fillcolor=color,
-              width="1",
-              height="1",
-              fixedsize="true",
-              label="",
-              xlabel=x
-          )
-          dot.node(
-              inner_sinks[x],
-              shape="circle",
-              style="filled",
-              fillcolor=color,
-              width="1",
-              height="1",
-              label="",
-              fixedsize="true",
-              xlabel=x
-          )
-      
-      # Rank groups
-      with dot.subgraph() as s:
-          s.attr(rank="same")
-          for n in inner_sources.values():
-              s.node(n)
-      
-      with dot.subgraph() as s:
-          s.attr(rank="same")
-          for n in inner_sinks.values():
-              s.node(n)
-      
-      # Add edges with thicker lines
-      for src, x, tgt in edges_seen:
-          if x is None:
-              continue
-          color = color_map[x]
-          if src is not None and tgt is not None:
-              dot.edge(src, tgt, color=color, penwidth="2")
-          elif src is None and tgt is not None:
-              dot.edge(tgt, inner_sinks[x], color=color, penwidth="2")
-          elif src is not None and tgt is None:
-              dot.edge(src, inner_sources[x], color=color, penwidth="2")
-      
-      return dot
+    __all__ = [
+        "MinimalPlugin",  # rename this
+    ]
     ```
 
-Now, the goal is to **reuse** this function inside your Ocelescope resource so the OC-DFG can be displayed directly in the UI.
+#### Rename the Plugin Method
 
-What to Do (Inside the `visualize` method):
+1. Rename the method `example` to a descriptive name, for example `discover`.  
+2. Update the method’s `label` and `description` fields to describe its purpose.  
 
-1. **Generate the Digraph**
-   Call `convert_dfg_to_graphviz` with your DFG data to produce a `graphviz.Digraph`.
+#### Rename the Resource
 
-2. **Convert to DotVis**
-   Wrap the resulting `Digraph` in a `DotVis` using `DotVis.from_graphviz(...)`. See [docs](../plugins/resource.md#dot).
+1. Rename the class `MinimalResource` to `DFG`.  
+2. Update the `label` and `description` to indicate that the resource represents an object-centric directly-follows graph.
 
-   - Choose an appropriate Graphviz layout engine (e.g., `"dot"` ).
-3. **Return the visualization**
-  Update visualize to return the `DotVis` object, and change its signature to `-> DotVis`.
+#### Add the Utility File
 
-### Step 2.6: Integrate the Implementation
+To keep the plugin code clean and organized, we will place the discovery and visualization functions in a separate file named `util.py`.
 
-Modify your plugin method so that it calls the provided discovery function to compute the object-centric directly-follows graph based on the selected object types.
+You can either **download** the ready-made [:material-download: util.py](../assets/util.py){download="util.py"} file and place it next to your `plugin.py`,  
+or **create** a new `util.py` file in the same directory and **paste** the implementation below.
 
-Then, return an instance of the DFG resource, assigning the discovered edges to its edges field.
+??? "The Discovery and Visualization implementation"
 
-??? tip "Discover Function"
-    ```python
+    You don’t need to fully understand the implementation of these functions to complete this evaluation. They are provided as ready-to-use helpers that you will later integrate into your Ocelescope plugin.
+
+    ```python title="util.py"
+    from ocelescope import OCEL
+    from graphviz import Digraph
+
     def discover_dfg(ocel: OCEL, used_object_types: list[str]) -> list[tuple[str | None , str, str | None]]:
         import pm4py
 
@@ -481,9 +351,159 @@ Then, return an instance of the DFG resource, assigning the discovered edges to 
                 for activity in activities.keys()
             ]
         return edges
+    
+    def convert_dfg_to_graphviz(dfg:list[tuple[str | None,str, str | None]]) -> Digraph:
+        from graphviz import Digraph
+        import itertools
+
+        dot = Digraph("Ugly DFG")
+        dot.attr(rankdir="LR")  
+        
+        outer_nodes = set()
+        inner_sources = {}
+        inner_sinks = {}
+        edges_seen = set()
+        types = set()
+        
+        for src, x, tgt in dfg:
+            if src is not None:
+                outer_nodes.add(src)
+            if tgt is not None:
+                outer_nodes.add(tgt)
+            if x is not None:
+                types.add(x)
+                inner_sources[x] = f"source_{x}"
+                inner_sinks[x] = f"sink_{x}"
+            edges_seen.add((src, x, tgt))
+        
+        # A palette of colors
+        palette = [
+            "red", "blue", "green", "orange", "purple",
+            "brown", "gold", "pink", "cyan", "magenta"
+        ]
+        color_map = {x: c for x, c in zip(sorted(types), itertools.cycle(palette))}
+        
+        # Outer nodes: neutral color
+        for n in outer_nodes:
+            dot.node(n, shape="rectangle", style="filled", fillcolor="lightgray")
+        
+        # Sources and sinks: colored small circles, with xlabel underneath
+        for x in types:
+            color = color_map[x]
+            dot.node(
+                inner_sources[x],
+                shape="circle",
+                style="filled",
+                fillcolor=color,
+                width="1",
+                height="1",
+                fixedsize="true",
+                label="",
+                xlabel=x
+            )
+            dot.node(
+                inner_sinks[x],
+                shape="circle",
+                style="filled",
+                fillcolor=color,
+                width="1",
+                height="1",
+                label="",
+                fixedsize="true",
+                xlabel=x
+            )
+        
+        # Rank groups
+        with dot.subgraph() as s:
+            s.attr(rank="same")
+            for n in inner_sources.values():
+                s.node(n)
+        
+        with dot.subgraph() as s:
+            s.attr(rank="same")
+            for n in inner_sinks.values():
+                s.node(n)
+        
+        # Add edges with thicker lines
+        for src, x, tgt in edges_seen:
+            if x is None:
+                continue
+            color = color_map[x]
+            if src is not None and tgt is not None:
+                dot.edge(src, tgt, color=color, penwidth="2")
+            elif src is None and tgt is not None:
+                dot.edge(tgt, inner_sinks[x], color=color, penwidth="2")
+            elif src is not None and tgt is None:
+                dot.edge(src, inner_sources[x], color=color, penwidth="2")
+        
+        return dot
     ```
 
-### Step 3: Build your plugin
+### Step 3.2 Integrate the Discovery Functions
+
+#### Extend the Input Class
+
+Extend the Input class by adding a new field that captures a list of object types.
+Use the ``OCEL_FIELD`` helper to define this field and link it to the OCEL input.
+
+```
+class Input(PluginInput, frozen=True):
+    pass
+```
+
+Refer to the [Plugin Development](../plugins/plugin_class.md#ocel-dependent-selection-fields) Guide for details on defining OCEL-dependent selection fields.
+
+!!! warning
+    Make sure the `ocel_id` in `OCEL_FIELD` matches the `ocel` parameter of the function.
+
+#### Extend the Resource
+
+The discovery method returns the object-centric directly-follows graph (OC-DFG) as a list of triplets:
+
+```
+(event_1, object_type, event_2)
+```
+
+These represent direct-follow relationships between events for a given object type. Start and end edges are represented using ``None``:
+
+- Start edges: ``(None, object_type, event)``
+- End edges: ``(event, object_type, None)``
+
+To integrate this into the plugin system, define a custom resource to hold this data.
+
+- Add a field edges with the following type:
+
+  ```python
+    list[tuple[str | None, str, str | None]]
+  ```
+
+Refer to the [Plugin Development Guide](../plugins/resource.md) or the [tutorial](../plugins/tutorial.md) for more details on defining custom resources
+
+#### Add a visualization to Resource
+
+You already implemented a helper function (`convert_dfg_to_graphviz`) that creates a **Graphviz Digraph** representation of your object-centric directly-follows graph (OC-DFG).
+
+Now, the goal is to **reuse** this function inside your Ocelescope resource so the OC-DFG can be displayed directly in the UI.
+
+What to Do (Inside the `visualize` method):
+
+1. **Generate the Digraph**
+   Call `convert_dfg_to_graphviz` with your DFG data to produce a `graphviz.Digraph`.
+
+2. **Convert to DotVis**
+   Wrap the resulting `Digraph` in a `DotVis` using `DotVis.from_graphviz(...)`. See [docs](../plugins/resource.md#dot).
+
+   - Choose an appropriate Graphviz layout engine (e.g., `"dot"` ).
+3. **Return the visualization**
+  Update visualize to return the `DotVis` object, and change its signature to `-> DotVis`.
+
+#### Integrate the Implementation
+
+Modify your plugin method so that it calls the provided discovery function to compute the object-centric directly-follows graph based on the selected object types.
+
+Then, return an instance of the DFG resource, assigning the discovered edges to its edges field.
+
+## Step 4: Build your plugin
 
 Use the provided build script to package your plugin so it can be used in Ocelescope.
 
