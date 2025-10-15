@@ -142,7 +142,7 @@ Each plugin method may use **only one** structured input.
 from ocelescope import Plugin, PluginInput, plugin_method, OCEL
 from pydantic import Field
 
-class DiscoverInput(PluginInput, frozen=True):
+class DiscoverInput(PluginInput):
     noise_threshold: float = Field(
         ge=0.0,
         le=1.0,
@@ -190,7 +190,7 @@ The most commonly used types are:
 from ocelescope import PluginInput
 from pydantic import Field
 
-class input(PluginInput, frozen=True):
+class Input(PluginInput):
     algorithm_name: str = Field(
         title="Algorithm Name",
         description="Name of the analysis algorithm to use",
@@ -213,11 +213,10 @@ threshold: float = Field(
 ---
 
 ```python title="Example: Selection from Options "
-method: str = Field(
+method: Literal["average", "sum", "maximum", "minimum"] = Field(
     default="average",
     title="Aggregation Method",
     description="Choose how to aggregate results",
-    enum=["average", "sum", "maximum", "minimum"]
 )
 ```
 
@@ -255,7 +254,7 @@ class ObjectFilterInput(PluginInput, frozen=True):
         title="Object Types",
         description="Select which object types to include in analysis",
         field_type="object_type",
-        ocel_id="log"  # Must match the name of the OCEL method parameter
+        ocel_id="ocel"  # Must match the name of the OCEL method parameter
     )
 
 class ExamplePlugin(Plugin):
@@ -266,7 +265,7 @@ class ExamplePlugin(Plugin):
     )
     def filter_log(
         self,
-        log: OCEL,
+        ocel: OCEL,
         input: ObjectFilterInput
     ):
         ...
@@ -305,7 +304,7 @@ from ocelescope import (
 )
 from typing import Annotated
 
-class AttributeSelectionInput(PluginInput, frozen=True):
+class AttributeSelectionInput(PluginInput):
     activity_types: list[str] = OCEL_FIELD(
         title="Activity Types",
         description="Select activities to analyze",
