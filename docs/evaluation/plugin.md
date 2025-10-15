@@ -137,11 +137,11 @@ At the end of this evaluation, you should have a **working plugin** that looks l
 </figure>
 
 For additional context or examples, you can use the [**Plugin Development Guide**](../plugins/index.md){target="_blank"} and the [**Tutorial**](../plugins/tutorial.md){target="_blank"}.  
-All the information you need for this evaluation is provided here, but consulting them may help you understand the steps more clearly.
+Everything you need to complete this evaluation is included here, but if you're curious and want to explore the topic further, those guides provide a deeper look into plugin development in Ocelescope.
 
 ## Step 1: Setup
 
-Let’s start by setting up the minimal Ocelescope plugin template.  
+Let's start by setting up the minimal Ocelescope plugin template.  
 You can choose one of the following two methods to prepare your project.
 
 ### Option A — Clone the Template from GitHub
@@ -159,7 +159,7 @@ Alternatively, you can generate a new plugin project using Cookiecutter through 
 
 !!! warning
 
-    When running the Cookiecutter template, always use the default options (press **Enter** for each prompt).
+    When running the Cookiecutter template, always use the default options (press **:material-keyboard-return: Enter** for each prompt).
     This ensures the generated project matches the structure expected in this evaluation.
 
 ```bash
@@ -191,21 +191,26 @@ Navigate to the root of the template and install all dependencies using your pre
     This evaluation requires **Python 3.13**. Make sure you have it installed 
     before continuing.
 
-```sh
-# With uv
-uv sync
+!!! example
 
-# Or with pip
-pip install -r requirements.txt
-```
+    ```sh
+    # With uv
+    uv sync
+
+    # Or with pip
+    pip install -r requirements.txt
+    ```
 
 ## Step 2: Crash course in Ocelescope
+
+Before we start building our plugin, let's take a quick look at the main building blocks of an Ocelescope plugin.
+Understanding these core components will make the next implementation steps much easier to follow
 
 ### Plugin Class
 
 An **Ocelescope plugin** is a collection of Python functions grouped inside a class that inherits from the base `Plugin` class provided by the `ocelescope` package.
 
-Each plugin includes basic **metadata** — such as its name, version, and description — defined as class variables.  
+Each plugin includes basic **metadata**, such as its name, version, and description, defined as class variables.
 Individual functions within the plugin are defined as **plugin methods**, which use the `@plugin_method` decorator to attach their own labels, descriptions.
 
 <figure markdown="span">
@@ -218,10 +223,10 @@ Individual functions within the plugin are defined as **plugin methods**, which 
 Resources are Python classes that can be used as inputs and outputs of plugin methods.
 They can represent process models, results of performance analyses, or any other structured data.
 
-Resources produced by plugin methods are automatically saved and can be reused as inputs for other methods.
-A resource is defined as a Python class that inherits from the Resource base class of Ocelescope.
+Resources returned by plugin methods are automatically saved and can be reused as inputs for other methods.
+A resource is defined as a Python class that inherits from the `Resource` base class provided by the `ocelescope` package.
 
-Optionally, a resource can also implement a visualization function — a method that returns a instance of one of the predefined visualization types, such as Table, Graph (an interactive graph), or DotVis (a Graphviz-based visualization).
+Optionally, a resource can also implement a visualization function, which is a method that returns an instance of one of the predefined visualization types, such as Table, Graph (an interactive graph), or DotVis (a Graphviz-based visualization).
 
 <figure markdown="span">
   ![Activity Count Resource](../assets/ActivityCountResource.png)
@@ -233,14 +238,16 @@ Optionally, a resource can also implement a visualization function — a method 
 As discussed earlier, plugin methods are functions defined inside a plugin class.
 Their input parameters automatically generate a corresponding form in the Ocelescope frontend.
 
-A plugin method can have any number of parameters of type OCEL or Resource.
-In addition, it can include one PluginInput parameter, defined by inheriting from the PluginInput base class of the Ocelescope package.
+A plugin method can have any number of parameters of type `OCEL` or `Resource`.
+In addition it can include one `plugin input parameter`, which is defined by creating a custom class that inherits form the `PluginInput` base class provided by the `ocelescope` package.
 
-The PluginInput class defines configurable parameters as fields (class attributes) of the class.
-These fields can represent text inputs, algorithm variants, or numeric ranges (for example, to define thresholds or filter levels).
+You can also define special *OCEL-dependent fields* within the same class.
+These fields are linked to a specific `OCEL` parameter of your plugin method through the `ocel_id` reference in the `OCEL_FIELD` helper.
 
-You can also define special OCEL-dependent fields within the same class.
-These fields depend on the selected OCEL input and can represent elements such as object types, event types, or attribute names extracted directly from the log.
+<figure markdown="span">
+  ![Example o](../assets/DummyDiscovery.png)
+  <figcaption align="center">A resource that can be used to store activity counts</figcaption>
+</figure>
 
 !!! warning "Match ocel_id with the Method Parameter"
 
@@ -261,14 +268,9 @@ These fields depend on the selected OCEL input and can represent elements such a
             ...
     ```
 
-<figure markdown="span">
-  ![Example o](../assets/DummyDiscovery.png)
-  <figcaption align="center">A resource that can be used to store activity counts</figcaption>
-</figure>
-
 ## Step 3: Implement the Plugin
 
-After setting up the project and getting familiar with how Ocelescope plugins work, we will now implement our first real plugin: a **discovery plugin for object-centric directly-follows graphs (OC-DFGs)**, as mentioned at the beginning of this evaluation.
+After setting up the project and getting familiar with how Ocelescope plugins work, we will now implement our first real plugin: a discovery plugin for object-centric directly-follows graphs (OC-DFGs), as mentioned at the beginning of this evaluation.
 
 The plugin will have the following components:
 
@@ -279,12 +281,43 @@ The plugin will have the following components:
 
 **Outputs**
 
-- An [**OC-DFG Resource**](../plugins/resource.md) containing the discovered directly-follows graph  
+- A custom **OC-DFG** [**Resource**](../plugins/resource.md){target="_blank"} containing the discovered directly-follows graph  
 
 ### Step 3.1 Prepare the Template
 
-The plugin template we set up earlier provides a plugin.py file that already includes boilerplate code for a minimal Ocelescope plugin.
+The plugin template we set up earlier provides a `plugin.py` file that already includes boilerplate code for a minimal Ocelescope plugin.
 It contains a plugin class, a resource, and an input class.
+
+!!! note "Initial state of `plugin.py`"
+
+    ```python
+    from typing import Annotated
+
+    from ocelescope import OCEL, OCELAnnotation, Plugin, PluginInput, Resource, plugin_method
+
+    class MinimalResource(Resource):
+        label = "Minimal Resource"
+        description = "A minimal resource"
+
+        def visualize(self) -> None:
+            pass
+
+    class Input(PluginInput):
+        pass
+
+    class MinimalPlugin(Plugin):
+        label = "Minimal Plugin"
+        description = "A ocelescope plugin"
+        version = "0.1.0"
+
+        @plugin_method(label="Example Method", description="An example plugin method")
+        def example(
+            self,
+            ocel: Annotated[OCEL, OCELAnnotation(label="Event Log")],
+            input: Input,
+        ) -> MinimalResource:
+            return MinimalResource()
+    ```
 
 #### Rename the Plugin Class
 
@@ -292,28 +325,28 @@ It contains a plugin class, a resource, and an input class.
 2. Update the `label` and `description` fields to describe the new plugin.  
 3. Adapt the import in `__init__.py` to reflect the new class name.  
 
-??? tip
+???+ tip
 
     The Ocelescope app looks inside the `__init__.py` file to locate your plugin class.  
     Make sure to update both the import and the `__all__` list when renaming your plugin.
 
     ```python title="__init__.py"
-    from .plugin import MinimalPlugin  # rename this
+    from .plugin import MinimalPlugin  # Rename this
 
     __all__ = [
-        "MinimalPlugin",  # rename this
+        "MinimalPlugin",  # Rename this
     ]
     ```
 
 #### Rename the Plugin Method
 
 1. Rename the method `example` to a descriptive name, for example `discover`.  
-2. Update the method’s `label` and `description` fields to describe its purpose.  
+1. Update the method’s `label` and `description` fields to describe its purpose.  
 
 #### Rename the Resource
 
 1. Rename the class `MinimalResource` to `DFG`.  
-2. Update the `label` and `description` to indicate that the resource represents an object-centric directly-follows graph.
+1. Update the `label` and `description` to indicate that the resource represents an object-centric directly-follows graph.
 
 #### Add the Utility File
 
@@ -441,77 +474,92 @@ or **create** a new `util.py` file in the same directory and **paste** the imple
 
 ### Step 3.2 Integrate the Discovery Functions
 
-#### Extend the Input Class
-
-Extend the Input class by adding a new field that captures a list of object types.
-Use the ``OCEL_FIELD`` helper to define this field and link it to the OCEL input.
-
-```
-class Input(PluginInput, frozen=True):
-    pass
-```
-
-Refer to the [Plugin Development](../plugins/plugin_class.md#ocel-dependent-selection-fields) Guide for details on defining OCEL-dependent selection fields.
-
-!!! warning
-    Make sure the `ocel_id` in `OCEL_FIELD` matches the `ocel` parameter of the function.
+Now that the structure is in place, we can integrate the discovery and visualization functions into the plugin to make it functional.
 
 #### Extend the Resource
 
-The discovery method returns the object-centric directly-follows graph (OC-DFG) as a list of triplets:
+Since our plugin returns a directly-follows graph, we should add an `edges` field (class attribute) to our DFG resource to store the discovered relationship.
 
-```
-(event_1, object_type, event_2)
-```
+Tkhe discovery method provided in the utils  returns the object-centric directly-follows graph as a list of triplets ``
+discover_dfg(...) -> list[tuple[str | None , str, str | None]]
+``
 
-These represent direct-follow relationships between events for a given object type. Start and end edges are represented using ``None``:
+!!! example "Example Output of discover_dfg"
 
-- Start edges: ``(None, object_type, event)``
-- End edges: ``(event, object_type, None)``
+    <figure markdown="span">
+      ![Final DFG discovery Plugin](../assets/ExampleDfg.png){width="50%"}
+      <figcaption align="center">
+      Visualization of a possible <code>discover_dfg</code> result:<br>
+    [(None, Order, Create Order), (Create Order, Order, Pack Item), (Pack Item, Order, Ship Order), (Ship Order, Order, None), (None, Item, Pack Item), (Pack Item, Item, None)].
+      </figcaption>
+    </figure>
 
-To integrate this into the plugin system, define a custom resource to hold this data.
+To integrate this into the plugin system, extend your `DFG` to hold this data.
 
-- Add a field edges with the following type:
+- Add a field named `edges` with the following type:
 
   ```python
     list[tuple[str | None, str, str | None]]
   ```
 
-Refer to the [Plugin Development Guide](../plugins/resource.md) or the [tutorial](../plugins/tutorial.md) for more details on defining custom resources
+#### Add a visualization to the Resource
 
-#### Add a visualization to Resource
+Our `DFG` resource can already be used as both input and output, but right now it only stores data without any visual representation.
 
-You already implemented a helper function (`convert_dfg_to_graphviz`) that creates a **Graphviz Digraph** representation of your object-centric directly-follows graph (OC-DFG).
+To add a visualization in the Ocelescope frontend, we can extend its `visualize` method.
 
-Now, the goal is to **reuse** this function inside your Ocelescope resource so the OC-DFG can be displayed directly in the UI.
+The provided `util.py` file already includes a helper function,
+`convert_dfg_to_graphviz`, which takes the edges of our Resource as an argument and returns a `graphviz.Digraph` instance.
 
-What to Do (Inside the `visualize` method):
+Ocelescope has many kinds of visualizations one of which is `DotVis` which is a visualization from dot strings. DotVis can additionally be initialized using `DotVis.from_graphiz` which creates a DotVis instance from a graphviz instance.
 
-1. **Generate the Digraph**
-   Call `convert_dfg_to_graphviz` with your DFG data to produce a `graphviz.Digraph`.
+Inside the `visualize` method of your `DFG` resource:
 
-2. **Convert to DotVis**
-   Wrap the resulting `Digraph` in a `DotVis` using `DotVis.from_graphviz(...)`. See [docs](../plugins/resource.md#dot).
+  1. Import the `convert_dfg_to_graphviz` from the `util.py` as a relative import (`from .util import ...`)
+  1. Call the `convert_dfg_to_graphviz` with the resource's `edges` field.
+  1. Return a `DotVis` instance created with DotVis.from_graphviz(...).
 
-   - Choose an appropriate Graphviz layout engine (e.g., `"dot"` ).
-3. **Return the visualization**
-  Update visualize to return the `DotVis` object, and change its signature to `-> DotVis`.
+#### Extend the Input Class
+
+Now lets define the input of the `discover` function.
+Since we renamed the original example method inside the Plugin class it should already have a OCEL parameter called `ocel`.
+
+Because the discovery function allows filtering by object type, we should also let the user select object types in the plugin. This is done using the `PluginInput` class.
+
+Inside the `Input` class (which inherits from `PluginInput`):
+
+  1. Remove the existing `pass` statement.
+  2. Add a new field (class attribute) called object_types with the type `list[str]`
+  3. Turn it into an OCEL-dependent field using the `OCEL_FIELD` helper, setting the `field_type` to `"object_type"`
 
 #### Integrate the Implementation
 
-Modify your plugin method so that it calls the provided discovery function to compute the object-centric directly-follows graph based on the selected object types.
+After defining the inputs for our discovery and the Resource that will hold the result we can now connect everything in the `discover` method of our plugin class.
 
-Then, return an instance of the DFG resource, assigning the discovered edges to its edges field.
+In the discover method:
+
+  1. Import the `discover_dfg` as a *relative import*.
+  1. Call the `discover_dfg` with the `ocel` parameter and the `object_types` field from the input class, then use its result to create a new instance of the `DFG` resource.
+  1. Return the created `DFG` resource
 
 ## Step 4: Build your plugin
 
-Use the provided build script to package your plugin so it can be used in Ocelescope.
+That's it now the only thing to do is to build your plugin you can do it either by:
 
-From the root of your plugin project, run:
+1. Manually by zipping it:
 
-```sh
-python script/build_plugin.py
-```
+    ```text linenums="0"
+    minimal_plugin.zip/
+    ├─ __init__.py
+    ├─ plugin.py
+    ├─ util.py
+    ```
+
+2. Using the provided build script to package your plugin:
+
+    ```sh linenums="0"
+    ocelescope build
+    ```
 
 This will generate a plugin as a `.zip` in the ``dist/`` directory.
 
