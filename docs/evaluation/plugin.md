@@ -239,14 +239,14 @@ As discussed earlier, plugin methods are functions defined inside a plugin class
 Their input parameters automatically generate a corresponding form in the Ocelescope frontend.
 
 A plugin method can have any number of parameters of type `OCEL` or `Resource`.
-In addition it can include one `plugin input parameter`, which is defined by creating a custom class that inherits form the `PluginInput` base class provided by the `ocelescope` package.
+In addition it can include one plugin input parameter, which is defined by creating a custom class that inherits form the `PluginInput` base class provided by the `ocelescope` package.
 
 You can also define special *OCEL-dependent fields* within the same class.
 These fields are linked to a specific `OCEL` parameter of your plugin method through the `ocel_id` reference in the `OCEL_FIELD` helper.
 
 <figure markdown="span">
   ![Example o](../assets/DummyDiscovery.png)
-  <figcaption align="center">A resource that can be used to store activity counts</figcaption>
+  <figcaption align="center">A plugin method with its custom input class. On the left is the Python code, and on the right is the automatically generated form in Ocelescope.</figcaption>
 </figure>
 
 !!! warning "Match ocel_id with the Method Parameter"
@@ -472,6 +472,29 @@ or **create** a new `util.py` file in the same directory and **paste** the imple
         return dot
     ```
 
+After completing the previous steps, your project structure should look like this:
+
+``` linenums="0"
+minimal-plugin/
+├─ ...
+├─ src/
+│  ├─ minimal_plugin/
+│  │  ├─ __init__.py
+│  │  ├─ plugin.py
+│  │  ├─ util.py
+```
+
+<span id="relative-imports"></span>
+!!! warning "Use only relative imports"
+
+    Ocelescope plugins must use **relative imports** when referencing files within the same package.
+
+    ```python
+    from minimal_plugin.util import discover_dfg  # ❌ Do not use absolute imports
+    from util import discover_dfg                 # ❌ Do not use top-level imports
+    from .util import discover_dfg                # ✅ Use relative imports instead  
+    ```
+    
 ### Step 3.2 Integrate the Discovery Functions
 
 Now that the structure is in place, we can integrate the discovery and visualization functions into the plugin to make it functional.
@@ -480,7 +503,7 @@ Now that the structure is in place, we can integrate the discovery and visualiza
 
 Since our plugin returns a directly-follows graph, we should add an `edges` field (class attribute) to our DFG resource to store the discovered relationship.
 
-Tkhe discovery method provided in the utils  returns the object-centric directly-follows graph as a list of triplets ``
+The discovery method provided in the `utils.py` returns the OC-DFG as a list of triplets ``
 discover_dfg(...) -> list[tuple[str | None , str, str | None]]
 ``
 
@@ -494,9 +517,9 @@ discover_dfg(...) -> list[tuple[str | None , str, str | None]]
       </figcaption>
     </figure>
 
-To integrate this into the plugin system, extend your `DFG` to hold this data.
+To integrate this into our Resource, extend your `DFG` to hold this data.
 
-- Add a field named `edges` with the following type:
+- Add a field (class attribute) named `edges` with the following type:
 
   ```python
     list[tuple[str | None, str, str | None]]
@@ -504,27 +527,33 @@ To integrate this into the plugin system, extend your `DFG` to hold this data.
 
 #### Add a visualization to the Resource
 
-Our `DFG` resource can already be used as both input and output, but right now it only stores data without any visual representation.
+Our `DFG` resource can currently already be used as both input and output, but right now it only stores data without any visual representation.
 
-To add a visualization in the Ocelescope frontend, we can extend its `visualize` method.
+To display it visually in the Ocelescope frontend, we can extend its `visualize` method.
 
 The provided `util.py` file already includes a helper function,
-`convert_dfg_to_graphviz`, which takes the edges of our Resource as an argument and returns a `graphviz.Digraph` instance.
+`convert_dfg_to_graphviz`, which takes the resource's `edges` as input and returns a `graphviz.Digraph` instance.
 
-Ocelescope has many kinds of visualizations one of which is `DotVis` which is a visualization from dot strings. DotVis can additionally be initialized using `DotVis.from_graphiz` which creates a DotVis instance from a graphviz instance.
+Ocelescope supports several visualization types, including DotVis, which renders visualizations from Graphviz DOT strings.
+
+A `DotVis` instance can also be created directly from a `graphviz.Digraph` by using `DotVis.from_graphviz(...)`.
 
 Inside the `visualize` method of your `DFG` resource:
 
-  1. Import the `convert_dfg_to_graphviz` from the `util.py` as a relative import (`from .util import ...`)
+  1. Import the `convert_dfg_to_graphviz` from the `util.py` as a [*relative import*](#relative-imports)
   1. Call the `convert_dfg_to_graphviz` with the resource's `edges` field.
-  1. Return a `DotVis` instance created with DotVis.from_graphviz(...).
+  1. Return a `DotVis` instance created with `DotVis.from_graphviz(...)`.
+
+!!! tip
+  
+    You can access the edges through self.edges, assuming the field in your DFG resource is named edges.
 
 #### Extend the Input Class
 
 Now lets define the input of the `discover` function.
-Since we renamed the original example method inside the Plugin class it should already have a OCEL parameter called `ocel`.
+Since we renamed the original example method inside the plugin class, it should already include an OCEL parameter named `ocel`.
 
-Because the discovery function allows filtering by object type, we should also let the user select object types in the plugin. This is done using the `PluginInput` class.
+Because the discovery function allows filtering by object type, we should also allow the user select which object types to include. This is done extending the `PluginInput` class.
 
 Inside the `Input` class (which inherits from `PluginInput`):
 
@@ -534,19 +563,23 @@ Inside the `Input` class (which inherits from `PluginInput`):
 
 #### Integrate the Implementation
 
-After defining the inputs for our discovery and the Resource that will hold the result we can now connect everything in the `discover` method of our plugin class.
+After defining the inputs for our discovery and the `Resource` that will hold the result, we can now connect everything in the `discover` method of our plugin class.
 
-In the discover method:
+In the `discover` method:
 
-  1. Import the `discover_dfg` as a *relative import*.
+  1. Import the `discover_dfg` function as a [*relative import*](#relative-imports).
   1. Call the `discover_dfg` with the `ocel` parameter and the `object_types` field from the input class, then use its result to create a new instance of the `DFG` resource.
   1. Return the created `DFG` resource
 
+!!! tip
+  
+    You can access the selected object types through `input.object_types`, assuming the field in your Input class is named `object_types`
+
 ## Step 4: Build your plugin
 
-That's it now the only thing to do is to build your plugin you can do it either by:
+That's it! The final step is to build your plugin. You can do this in one of two ways:
 
-1. Manually by zipping it:
+1. **Manually**, by creating a ZIP archive:
 
     ```text linenums="0"
     minimal_plugin.zip/
@@ -555,14 +588,14 @@ That's it now the only thing to do is to build your plugin you can do it either 
     ├─ util.py
     ```
 
-2. Using the provided build script to package your plugin:
+2. **Using the provided build script** to package your plugin:
 
     ```sh linenums="0"
     ocelescope build
     ```
 
-This will generate a plugin as a `.zip` in the ``dist/`` directory.
+After building, you'll find your packaged plugin as a `.zip` file inside the `dist/` directory.
 
-Upload this ZIP file in the Ocelescope interface to test your plugin.
+If you'd like, you can upload the ZIP file in the Ocelescope interface to test your plugin.
 
 You can return to the evaluation form to complete the assessment.

@@ -39,6 +39,7 @@ theme:
 plugins:
   - search
   - awesome-nav
+  - autorefs
   - git-revision-date-localized:
       fallback_to_build_date: true
   - minify:
