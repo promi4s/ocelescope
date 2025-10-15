@@ -6,10 +6,18 @@ The goal is to create a new plugin using the existing Ocelescope system and its 
 Let’s say you have already written two Python functions:
 
 1. A **discovery function** that discovers a *object-centric directly-follows graphs (OC-DFGs)* from an Object-Centric Event Log (OCEL).  
-   It returns a list of tuples in the form  
-   `(activity_1, object_type, activity_2)`,  
-   where each tuple means that `activity_2` directly follows `activity_1` for the given `object_type`.  
+   It returns a list of tuples in the form  `(activity_1, object_type, activity_2)`,  where each tuple means that `activity_2` directly follows `activity_1` for the given `object_type`.  
    Start and end activities are represented with `None` as one of the activity names.
+
+    !!! example "Example Output of discover_dfg"
+
+        <figure markdown="span">
+          ![Final DFG discovery Plugin](../assets/ExampleDfg.png){width="50%"}
+          <figcaption align="center">
+          Visualization of a possible <code>discover_dfg</code> result:<br>
+        [(None, Order, Create Order), (Create Order, Order, Pack Item), (Pack Item, Order, Ship Order), (Ship Order, Order, None), (None, Item, Pack Item), (Pack Item, Item, None)].
+          </figcaption>
+        </figure>
 
 2. A **visualization function** that creates and returns a Graphviz `Digraph` instance representing the DFG, which can later be used to generate images.
 
@@ -505,23 +513,12 @@ Since our plugin returns a directly-follows graph, we should add an `edges` fiel
 
 The discovery method provided in the `utils.py` returns the OC-DFG as a list of triplets ``
 discover_dfg(...) -> list[tuple[str | None , str, str | None]]
-``
-
-!!! example "Example Output of discover_dfg"
-
-    <figure markdown="span">
-      ![Final DFG discovery Plugin](../assets/ExampleDfg.png){width="50%"}
-      <figcaption align="center">
-      Visualization of a possible <code>discover_dfg</code> result:<br>
-    [(None, Order, Create Order), (Create Order, Order, Pack Item), (Pack Item, Order, Ship Order), (Ship Order, Order, None), (None, Item, Pack Item), (Pack Item, Item, None)].
-      </figcaption>
-    </figure>
-
+``.
 To integrate this into our Resource, extend your `DFG` to hold this data.
 
-- Add a field (class attribute) named `edges` with the following type:
+1. Add a field (class attribute) named `edges` with the following type:
 
-  ```python
+  ```python linenums="0"
     list[tuple[str | None, str, str | None]]
   ```
 
@@ -558,7 +555,7 @@ Because the discovery function allows filtering by object type, we should also a
 Inside the `Input` class (which inherits from `PluginInput`):
 
   1. Remove the existing `pass` statement.
-  2. Add a new field (class attribute) called object_types with the type `list[str]`
+  2. Add a new field (class attribute) called `object_types` with the type `list[str]`
   3. Turn it into an OCEL-dependent field using the `OCEL_FIELD` helper, setting the `field_type` to `"object_type"`
 
 #### Integrate the Implementation
