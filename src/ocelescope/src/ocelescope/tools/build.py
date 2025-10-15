@@ -10,7 +10,7 @@ import ast
 
 from ocelescope import OCELExtension, Plugin
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path.cwd()
 SRC = ROOT / "src"
 DIST = ROOT / "dist"
 DIST.mkdir(exist_ok=True)
