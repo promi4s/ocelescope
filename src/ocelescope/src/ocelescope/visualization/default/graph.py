@@ -1,4 +1,4 @@
-from typing import Generic, Literal, Optional, TypeVar
+from typing import Generic, Literal, TypeVar
 from pydantic import BaseModel, Field
 
 from ocelescope.util.pydantic import uuid_str
@@ -35,15 +35,15 @@ EdgeArrow = (
 
 class GraphNode(AnnotatedElement):
     id: str = Field(default_factory=uuid_str)
-    label: Optional[str] = None
+    label: str | None = None
     shape: GraphShapes
-    width: Optional[float] = None
-    height: Optional[float] = None
-    color: Optional[str] = None
-    x: Optional[float] = None
-    y: Optional[float] = None
-    border_color: Optional[str] = None
-    label_pos: Optional[Literal["top", "center", "bottom"]] = None
+    width: float | None = None
+    height: float | None = None
+    color: str | None = None
+    x: float | None = None
+    y: float | None = None
+    border_color: str | None = None
+    label_pos: Literal["top", "center", "bottom"] = "bottom"
 
     rank: Literal["source", "sink"] | int | None = None
     layout_attrs: dict[str, str | int | float | bool] | None = None
@@ -53,12 +53,12 @@ class GraphEdge(AnnotatedElement):
     id: str = Field(default_factory=uuid_str)
     source: str
     target: str
-    color: Optional[str] = None
-    label: Optional[str] = None
+    color: str | None = None
+    label: str | None = None
     start_arrow: EdgeArrow = None
     end_arrow: EdgeArrow = None
-    start_label: Optional[str] = None
-    end_label: Optional[str] = None
+    start_label: str | None = None
+    end_label: str | None = None
 
     layout_attrs: dict[str, str | int | float | bool] | None = None
 
