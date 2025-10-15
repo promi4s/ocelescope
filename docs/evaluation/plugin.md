@@ -170,16 +170,14 @@ Alternatively, you can generate a new plugin project using Cookiecutter through 
     When running the Cookiecutter template, always use the default options (press **:material-keyboard-return: Enter** for each prompt).
     This ensures the generated project matches the structure expected in this evaluation.
 
-```bash
+```bash linenums="0"
 uvx cookiecutter gh:rwth-pads/ocelescope --directory template
 ```
 
 When you’ve completed the setup steps above, your project folder should look similar to this:
 
-```
+```linenums="0"
 minimal-plugin/ <- root
-├─ scripts/
-│  ├─ build_plugin.py
 ├─ LICENSE
 ├─ README.md
 ├─ pyproject.toml
@@ -576,7 +574,7 @@ In the `discover` method:
 
 That's it! The final step is to build your plugin. You can do this in one of two ways:
 
-1. **Manually**, by creating a ZIP archive:
+1. **Manually**, by creating a ZIP archive yourself:
 
     ```text linenums="0"
     minimal_plugin.zip/
@@ -585,11 +583,32 @@ That's it! The final step is to build your plugin. You can do this in one of two
     ├─ util.py
     ```
 
-2. **Using the provided build script** to package your plugin:
+2. **Using the built-in  Ocelescope build command** (recommended):
+
+    Run the build command in the root of your project.
+
+    Make sure to execute it within the same Python environment where you installed your dependencies
 
     ```sh linenums="0"
     ocelescope build
     ```
+
+    Or, depending on how you manage your environment:
+
+    ```sh linenums="0"
+    # If using pipx
+    pipx run ocelescope build
+
+    # If using uvx
+    uvx ocelescope build
+
+    # If using uv
+    uv run ocelescope build
+    ```
+
+    !!! note
+
+        The ocelescope CLI is automatically available if you installed the project dependencies earlier.
 
 After building, you'll find your packaged plugin as a `.zip` file inside the `dist/` directory.
 
