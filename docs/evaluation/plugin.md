@@ -5,7 +5,7 @@ The goal is to create a new plugin using the existing Ocelescope system and its 
 
 Let’s say you have already written two Python functions:
 
-1. A **discovery function** that discovers an *object-centric directly-follows graph (OC-DFG)* from an Object-Centric Event Log (OCEL).  
+1. A **discovery function** (`discover_dfg`) that discovers an *object-centric directly-follows graph (OC-DFG)* from an Object-Centric Event Log (OCEL).  
    It returns a list of tuples in the form  `(activity_1, object_type, activity_2)`,  where each tuple means that `activity_2` directly follows `activity_1`, for the given `object_type`.  
    Start and end activities use `None` to indicate the absence of a preceding or following activity.
 
@@ -19,7 +19,7 @@ Let’s say you have already written two Python functions:
           </figcaption>
         </figure>
 
-2. A **visualization function** that creates and returns a Graphviz `Digraph` instance representing the DFG, which can later be used to generate images.
+2. A **visualization function** (`convert_dfg_to_graphviz`) that creates and returns a Graphviz `Digraph` instance representing the DFG, which can later be used to generate images.
 
 At the end of this evaluation, you should have a **working plugin** that looks like this:
 
@@ -69,7 +69,8 @@ As discussed earlier, plugin methods are functions defined inside a plugin class
 Their input parameters automatically generate a corresponding form in the Ocelescope frontend.
 
 A plugin method can have any number of parameters of type `OCEL` or `Resource`.
-In addition it can include one plugin input parameter, which is defined by creating a custom class that inherits from the `PluginInput` base class provided by the `ocelescope` package.
+In addition, it can include one plugin input parameter, defined by creating a custom class that inherits from the `PluginInput` base class provided by the `ocelescope` package.  
+This custom class, called a *configuration input*, defines the user-configurable parameters for the plugin method.
 
 ???+ example "Example: Defining a Plugin Method with an OCEL and a Custom Input Class"
 
@@ -97,7 +98,8 @@ In addition it can include one plugin input parameter, which is defined by creat
         ) -> OCEL:...
     ```
 
-You can also define special *OCEL-dependent fields* within the same class, using the `OCEL_FIELD` helper, which links a field to the `OCEL` parameter of a plugin method.
+You can also define special *OCEL-dependent fields* within the same class using the `OCEL_FIELD` helper.  
+This helper links a field to the `OCEL` parameter of a plugin method, allowing you to create input fields that are automatically populated with elements such as object types, activities, or attribute names from the referenced OCEL log.
 
 ???+ example "Example: Using OCEL-dependent fields"
     ```python
@@ -241,34 +243,45 @@ It contains a plugin class, a resource, and an input class.
             return MinimalResource()
     ```
 
+#### Rename the Resource
+
+1. Rename the class `MinimalResource` to `DFG`.  
+1. Update the `label` and `description` to indicate that the resource represents an object-centric directly-follows graph.
+
 #### Rename the Plugin Class
 
 1. Rename the class `MinimalPlugin` to a meaningful name, for example `DiscoverDFG`.  
 2. Update the `label` and `description` fields to describe the new plugin.  
 3. Adapt the import in `__init__.py` to reflect the new class name.  
 
-???+ tip
+    ???+ tip
 
-    The Ocelescope app looks inside the `__init__.py` file to locate your plugin class.  
-    Make sure to update both the import and the `__all__` list when renaming your plugin.
+        The Ocelescope app looks inside the `__init__.py` file to locate your plugin class.  
+        Make sure to update both the import and the `__all__` list when renaming your plugin.
 
-    ```python title="__init__.py"
-    from .plugin import MinimalPlugin  # Rename this
+        ```python title="__init__.py"
+        from .plugin import MinimalPlugin  # Rename this
 
-    __all__ = [
-        "MinimalPlugin",  # Rename this
-    ]
-    ```
+        __all__ = [
+            "MinimalPlugin",  # Rename this
+        ]
+        ```
 
 #### Rename the Plugin Method
 
 1. Rename the method `example` to a descriptive name, for example `discover`.  
 1. Update the method’s `label` and `description` fields to describe its purpose.  
+1. Adjust the return type hint of the method to use the renamed resource (for example, change `MinimalResource` to `DFG`).
 
-#### Rename the Resource
+    ??? tip "What is a Type Hint?"
 
-1. Rename the class `MinimalResource` to `DFG`.  
-1. Update the `label` and `description` to indicate that the resource represents an object-centric directly-follows graph.
+        **Type hints** are annotations that specify what type of value a function returns or expects as input.  
+        They are written after a function definition using an arrow (`->`).  
+
+        ```python
+        def discover(...) -> DFG:
+            ...
+        ```
 
 #### Add the Utility File
 
@@ -394,7 +407,7 @@ or **create** a new `util.py` file in the same directory and **paste** the imple
         return dot
     ```
 
-After completing the previous steps, your project structure should look like this:
+After completing the previous steps, your project directory should look like this:
 
 ``` linenums="0"
 minimal-plugin/
@@ -465,10 +478,10 @@ To integrate this into our Resource, extend your `DFG` to hold this data.
 
 1. Add a field (class attribute) named `edges` with the following type:
 
-  ```python linenums="0"
-    list[tuple[str | None, str, str | None]]
+    ```python linenums="0"
+      list[tuple[str | None, str, str | None]]
 
-  ```
+    ```
 
 ??? info "Solution 2"
 
@@ -502,9 +515,9 @@ Inside the `visualize` method of your `DFG` resource:
   1. Call the `convert_dfg_to_graphviz` with the resource's `edges` field.
   1. Return a `DotVis` instance created with `DotVis.from_graphviz(...)`.
 
-!!! tip
-  
-    You can access the edges through `self.edges`, assuming the field in your `DFG` resource is named `edges`.
+    !!! tip
+
+        You can access the edges through `self.edges`, assuming the field in your `DFG` resource is named `edges`.
 
 ??? info "Solution 3"
 
@@ -532,7 +545,7 @@ Inside the `visualize` method of your `DFG` resource:
 Now let's define the input of the `discover` function.
 Since we renamed the original example method inside the plugin class, it should already include an OCEL parameter named `ocel`.
 
-Because the discovery function allows filtering by object type, we should also allow the user to select which object types to include. This is done by extending the `PluginInput` class.
+Because the discovery function allows filtering by object type, we should also allow the user to select which object types to include. This is done by extending the `Input` class.
 
 Inside the `Input` class (which inherits from `PluginInput`):
 
@@ -591,10 +604,13 @@ In the `discover` method:
   1. **Manually**, by creating a ZIP archive yourself:
 
       ```text linenums="0"
-      minimal_plugin.zip/
-      ├─ __init__.py
-      ├─ plugin.py
-      ├─ util.py
+
+      DfgDiscovery.zip/
+      ├─ plugin/
+      │  ├─ plugin.py
+      │  ├─ util.py
+      │  ├─ __init__.py
+
       ```
 
   2. **Using the built-in Ocelescope build command** (recommended):
@@ -619,10 +635,6 @@ In the `discover` method:
     # If using uv
     uv run ocelescope build
     ```
-
-    !!! note
-
-        The Ocelescope CLI is automatically available if you installed the project dependencies earlier.
 
 After building, you'll find your packaged plugin as a `.zip` file inside the `dist/` directory.
 
