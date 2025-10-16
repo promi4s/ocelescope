@@ -12,7 +12,20 @@ from ocelescope.ocel import (
     RelationCountSummary,
     AttributeSummary,
 )
-from ocelescope.visualization import Visualization
+from ocelescope.visualization import (
+    Visualization,
+    DotVis,
+    SVGVis,
+    GraphvizLayoutConfig,
+    Graph,
+    GraphEdge,
+    EdgeArrow,
+    GraphShapes,
+    Table,
+    TableColumn,
+    generate_color_map,
+    GraphNode,
+)
 from ocelescope.resource import PetriNet, Resource, DirectlyFollowsGraph
 from ocelescope.plugin import (
     ResourceAnnotation,
@@ -57,4 +70,22 @@ __all__ = [
     "PluginInput",
     "PluginResult",
     "plugin_method",
+    # Visualization
+    # Util
+    "Visualization",
+    "generate_color_map",
+    # Graph
+    "Graph",
+    "GraphNode",
+    "GraphEdge",
+    "EdgeArrow",
+    "GraphvizLayoutConfig",
+    "GraphShapes",
+    # Table
+    "Table",
+    "TableColumn",
+    # SVG
+    "SVGVis",
+    # Graphviz
+    "DotVis",
 ]

@@ -4,6 +4,7 @@ from pydantic import Field
 
 from ocelescope.visualization.default.graph import (
     Graph,
+    GraphNode,
     GraphEdge,
     EdgeArrow,
     GraphvizLayoutConfig,
@@ -11,6 +12,8 @@ from ocelescope.visualization.default.graph import (
 )
 
 from ocelescope.visualization.default.svg import SVGVis
+
+# TODO: Rename this layouting engine a class
 from ocelescope.visualization.default.dot import DotVis
 
 from ocelescope.visualization.default.table import TableColumn, Table
@@ -21,15 +24,21 @@ Visualization: TypeAlias = Annotated[
 ]
 
 __all__ = [
+    # Util
     "Visualization",
-    "Graph",
     "generate_color_map",
+    # Graph
+    "Graph",
+    "GraphNode",
     "GraphEdge",
     "EdgeArrow",
     "GraphvizLayoutConfig",
     "GraphShapes",
+    # Table
     "Table",
     "TableColumn",
+    # SVG
     "SVGVis",
+    # Graphviz
     "DotVis",
 ]
