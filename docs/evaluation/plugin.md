@@ -50,13 +50,13 @@ Individual functions within the plugin are defined as **plugin methods**, which 
 
 ### Resources
 
-Resources are Python classes that can be used as inputs and outputs of plugin methods.
+[Resources](../plugins/resource.md){target="_blank"} are Python classes that can be used as inputs and outputs of plugin methods.
 They can represent process models, results of performance analyses, or any other structured data.
 
 Resources returned by plugin methods are automatically saved and can be reused as inputs for other methods.
 A resource is defined as a Python class that inherits from the `Resource` base class provided by the `ocelescope` package.
 
-Optionally, a resource can also implement a visualization function, which is a method that returns an instance of one of the predefined visualization types, such as Table, Graph (an interactive graph), or DotVis (a Graphviz-based visualization).
+Optionally, a resource can also implement a [visualization function](../plugins/resource.md#visualization){target="_blank"}, which is a method that returns an instance of one of the predefined visualization types, such as [Table](../plugins/resource.md#table){target="_blank"}, [Graph](../plugins/resource.md#graph){target="_blank"} (an interactive graph), or [DotVis](../plugins/resource.md#dot){target="_blank"} (a Graphviz-based visualization).
 
 <figure markdown="span">
   ![Activity Count Resource](../assets/ActivityCountResource.png)
@@ -65,12 +65,12 @@ Optionally, a resource can also implement a visualization function, which is a m
 
 ### Plugin Methods
 
-As discussed earlier, plugin methods are functions defined inside a plugin class.
+As discussed earlier, [plugin methods](../plugins/plugin_class.md#methods){target="_blank"} are functions defined inside a plugin class.
 Their input parameters automatically generate a corresponding form in the Ocelescope frontend.
 
 A plugin method can have any number of parameters of type `OCEL` or `Resource`.
 In addition, it can include one plugin input parameter, defined by creating a custom class that inherits from the `PluginInput` base class provided by the `ocelescope` package.  
-This custom class, called a *configuration input*, defines the user-configurable parameters for the plugin method.
+This custom class, called a [*configuration input*](../plugins/plugin_class.md#configuration-inputs){target="_blank"}, defines the user-configurable parameters for the plugin method.
 
 ???+ example "Example: Defining a Plugin Method with an OCEL and a Custom Input Class"
 
@@ -98,7 +98,7 @@ This custom class, called a *configuration input*, defines the user-configurable
         ) -> OCEL:...
     ```
 
-You can also define special *OCEL-dependent fields* within the same class using the `OCEL_FIELD` helper.  
+You can also define special [*OCEL-dependent fields*](../plugins/plugin_class.md#ocel-dependent-selection-fields){target="_blank"} within the same class using the `OCEL_FIELD` helper.  
 This helper links a field to the `OCEL` parameter of a plugin method, allowing you to create input fields that are automatically populated with elements such as object types, activities, or attribute names from the referenced OCEL log.
 
 ???+ example "Example: Using OCEL-dependent fields"
@@ -511,7 +511,18 @@ A `DotVis` instance can also be created directly from a `graphviz.Digraph` by us
 
 Inside the `visualize` method of your `DFG` resource:
 
-  1. Import the `convert_dfg_to_graphviz` from the `util.py` as a [*relative import*](#relative-imports)
+  1. Import the `convert_dfg_to_graphviz` from the `util.py` as a *relative import*
+
+    ???+ warning "Use only relative imports"
+
+        Ocelescope plugins must use **relative imports** when referencing files in the same directory.
+
+        ```python
+        from minimal_plugin.util import discover_dfg  # ❌ Do not use absolute imports
+        from util import discover_dfg                 # ❌ Do not use top-level imports
+        from .util import discover_dfg                # ✅ Use relative imports instead
+        ```
+
   1. Call the `convert_dfg_to_graphviz` with the resource's `edges` field.
   1. Return a `DotVis` instance created with `DotVis.from_graphviz(...)`.
 
@@ -551,7 +562,7 @@ Inside the `Input` class (which inherits from `PluginInput`):
 
   1. Remove the existing `pass` statement.
   2. Add a new field (class attribute) called `object_types` with the type `list[str]`
-  3. Turn it into an OCEL-dependent field using the `OCEL_FIELD` helper, setting the `field_type` to `"object_type"`
+  3. Turn it into an [*OCEL-dependent field*](../plugins/plugin_class.md#ocel-dependent-selection-fields){target="_blank"} using the `OCEL_FIELD` helper, setting the `field_type` to `"object_type"`
 
 ??? info "Solution 4"
 
@@ -568,13 +579,20 @@ After defining the inputs for our discovery and the `Resource` that will hold th
 
 In the `discover` method:
 
-  1. Import the `discover_dfg` function as a [*relative import*](#relative-imports).
+  1. Import the `discover_dfg` function as a *relative import*.
+
+    ??? warning "Use only relative imports"
+
+        Ocelescope plugins must use **relative imports** when referencing files in the same directory.
+
+        ```python
+        from minimal_plugin.util import discover_dfg  # ❌ Do not use absolute imports
+        from util import discover_dfg                 # ❌ Do not use top-level imports
+        from .util import discover_dfg                # ✅ Use relative imports instead
+        ```
+
   1. Call the `discover_dfg` with the `ocel` parameter and the `object_types` field from the input class, then use the result to create a new instance of the `DFG` resource.
   1. Return the created `DFG` resource
-
-!!! tip
-  
-    You can access the selected object types through `input.object_types`, assuming the field in your `Input` class is named `object_types`.
 
 ??? info "Solution 5"
 
@@ -638,7 +656,7 @@ In the `discover` method:
 
 After building, you'll find your packaged plugin as a `.zip` file inside the `dist/` directory.
 
-??? note "Solution 6"
+??? info "Solution 6"
 
     [:material-download: Download Plugin](../assets/DiscoverDFG.zip){ .md-button .md-button--primary download="DiscoverDFG.zip" }
 
