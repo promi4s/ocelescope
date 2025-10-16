@@ -79,25 +79,6 @@ These fields are linked to a specific `OCEL` parameter of your plugin method thr
   <figcaption align="center">A plugin method with its custom input class. On the left is the Python code, and on the right is the automatically generated form in Ocelescope.</figcaption>
 </figure>
 
-!!! warning "Match `ocel_id` with the Method Parameter"
-
-    The ocel_id defined in each OCEL-dependent field must exactly match the name of the OCEL parameter in your plugin method.
-    This ensures the field is correctly linked to the selected OCEL log.
-    ```python title="Example"
-    class ExampleInput(PluginInput):
-        object_types: str = OCEL_FIELD(
-            title="Object Type",
-            description="Select which object types to include",
-            field_type="object_type",
-            ocel_id="ocel"  # Must match the method parameter below
-        )
-
-    class ExamplePlugin(Plugin):
-        @plugin_method(label="Filter by Object Type")
-        def filter_by_object_type(self, ocel: OCEL, input: ExampleInput):
-            ...
-    ```
-
 ## Step 2: Setup
 
 Let's start by setting up the minimal Ocelescope plugin template.  
