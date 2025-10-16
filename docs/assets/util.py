@@ -1,12 +1,13 @@
-from ocelescope import OCEL
+import itertools
+
+import pm4py
 from graphviz import Digraph
+from ocelescope import OCEL
 
 
 def discover_dfg(
     ocel: OCEL, used_object_types: list[str]
 ) -> list[tuple[str | None, str, str | None]]:
-    import pm4py
-
     ocel_filtered = pm4py.filter_ocel_object_types(
         ocel.ocel, used_object_types, positive=True
     )
@@ -32,9 +33,6 @@ def discover_dfg(
 
 
 def convert_dfg_to_graphviz(dfg: list[tuple[str | None, str, str | None]]) -> Digraph:
-    from graphviz import Digraph
-    import itertools
-
     dot = Digraph("Ugly DFG")
     dot.attr(rankdir="LR")
 
