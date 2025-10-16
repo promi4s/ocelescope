@@ -2,7 +2,7 @@ from typing import Generic, Literal, TypeVar
 from pydantic import BaseModel, Field
 
 from ocelescope.util.pydantic import uuid_str
-from ocelescope.visualization.default.dot import GraphVizLayoutingEngine
+from ocelescope.visualization.default.dot import GraphvizLayoutEngineName
 from ocelescope.visualization.visualization import Visualization
 
 T = TypeVar("T", bound=Visualization)
@@ -64,7 +64,7 @@ class GraphEdge(AnnotatedElement):
 
 
 class GraphvizLayoutConfig(BaseModel):
-    engine: GraphVizLayoutingEngine = "dot"
+    engine: GraphvizLayoutEngineName = "dot"
     graphAttrs: dict[str, str | int | float | bool] | None = None
     nodeAttrs: dict[str, str | int | float | bool] | None = None
     edgeAttrs: dict[str, str | int | float | bool] | None = None
