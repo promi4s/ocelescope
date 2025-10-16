@@ -71,8 +71,59 @@ Their input parameters automatically generate a corresponding form in the Oceles
 A plugin method can have any number of parameters of type `OCEL` or `Resource`.
 In addition it can include one plugin input parameter, which is defined by creating a custom class that inherits from the `PluginInput` base class provided by the `ocelescope` package.
 
-You can also define special *OCEL-dependent fields* within the same class.
-These fields are linked to a specific `OCEL` parameter of your plugin method through the `ocel_id` reference in the `OCEL_FIELD` helper.
+???+ example "Example: Defining a Plugin Method with an OCEL and a Custom Input Class"
+
+    The following example shows how a plugin method can include both an `OCEL` parameter and a custom input class that inherits from ?`PluginInput`.
+    The input class adds extra configurable parameters, in this case a numeric `frequency` field.
+
+    ```python
+    from ocelescope import OCEL, Plugin, PluginInput, plugin_method
+
+    class FrequencyInput(PluginInput):
+        """Defines the input parameter for the frequency filter plugin."""
+        frequency: int
+
+    class FrequencyFilterPlugin(Plugin):
+        ...
+
+        @plugin_method(
+            label="Filter Infrequent Object Types",
+            description="Removes object types that occur less than the given frequency threshold."
+        )
+        def filter_infrequent(
+            self,
+            ocel: OCEL,
+            input: FrequencyInput,
+        ) -> OCEL:...
+    ```
+
+You can also define special *OCEL-dependent fields* within the same class, using the `OCEL_FIELD` helper, which links a field to the `OCEL` parameter of a plugin method.
+
+???+ example "Example: Using OCEL-dependent fields"
+    ```python
+    from ocelescope import OCEL, Plugin, PluginInput, plugin_method, OCEL_FIELD
+
+    class Input(PluginInput):
+        event_types: list[str] = OCEL_FIELD(
+            ocel_id="ocel",
+            field_type="event_type",
+        )
+
+    class EventTypeFilter(Plugin):
+        label = "Event Type Filter"
+        description = "A plugin that filters out selected event types"
+        version = "0.1.0"
+
+        @plugin_method(label="Filter Events", description="Filters events by type")
+        def filter_out_events(
+            self,
+            ocel: OCEL,
+            input: Input,
+        ) -> OCEL:
+            ...
+    ```
+
+    This example shows how to define OCEL-dependent fields using the `OCEL_FIELD` helper, which links a field (here, `event_types`) to the `OCEL` parameter of the plugin method. The `ocel_id` value must match the name of the corresponding `OCEL` parameter.
 
 <figure markdown="span">
   ![Example o](../assets/DummyDiscovery.png)
