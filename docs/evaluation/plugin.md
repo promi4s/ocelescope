@@ -147,67 +147,7 @@ At the end of this evaluation, you should have a **working plugin** that looks l
 For additional context or examples, you can use the [**Plugin Development Guide**](../plugins/index.md){target="_blank"} and the [**Tutorial**](../plugins/tutorial.md){target="_blank"}.  
 Everything you need to complete this evaluation is included here, but if you're curious and want to explore the topic further, those guides provide a deeper look into plugin development in Ocelescope.
 
-## Step 1: Setup
-
-Let's start by setting up the minimal Ocelescope plugin template.  
-You can choose one of the following two methods to prepare your project.
-
-### Option A - Clone the Template from GitHub
-
-Clone the minimal plugin template directly from [:simple-github: Github (link to the repository)](https://github.com/Grkmr/Minimal-Ocelescope-Plugin-Template){target="_blank"}:
-
-```bash
-git clone https://github.com/Grkmr/Minimal-Ocelescope-Plugin-Template.git
-cd Minimal-Ocelescope-Plugin-Template
-```
-
-### Option B - Generate a New Project with Cookiecutter
-
-Alternatively, you can generate a new plugin project using Cookiecutter through uv:
-
-!!! warning
-
-    When running the Cookiecutter template, always use the default options (press **:material-keyboard-return: Enter** for each prompt).
-    This ensures the generated project matches the structure expected in this evaluation.
-
-```bash linenums="0"
-uvx cookiecutter gh:rwth-pads/ocelescope --directory template
-```
-
-When you’ve completed the setup steps above, your project directory should look similar to this:
-
-```linenums="0"
-minimal-plugin/ <- root
-├─ LICENSE
-├─ README.md
-├─ pyproject.toml
-├─ requirements.txt
-├─ src/
-│  ├─ minimal_plugin/
-│  │  ├─ __init__.py
-│  │  ├─ plugin.py
-```
-
-### Install Dependencies
-
-Navigate to the root of the project and install all dependencies using your preferred package manager.
-
-???+ warning
-
-    This evaluation requires **Python 3.13**. Make sure you have it installed 
-    before continuing.
-
-!!! example
-
-    ```sh
-    # With uv
-    uv sync
-
-    # Or with pip
-    pip install -r requirements.txt
-    ```
-
-## Step 2: Crash course in Ocelescope
+## Step 1: Crash course in Ocelescope
 
 Before we start building our plugin, let's take a quick look at the main building blocks of an Ocelescope plugin.
 Understanding these core components will make the next implementation steps much easier to follow.
@@ -272,6 +212,66 @@ These fields are linked to a specific `OCEL` parameter of your plugin method thr
         @plugin_method(label="Filter by Object Type")
         def filter_by_object_type(self, ocel: OCEL, input: ExampleInput):
             ...
+    ```
+
+## Step 2: Setup
+
+Let's start by setting up the minimal Ocelescope plugin template.  
+You can choose one of the following two methods to prepare your project.
+
+### Option A - Clone the Template from GitHub
+
+Clone the minimal plugin template directly from [:simple-github: Github (link to the repository)](https://github.com/Grkmr/Minimal-Ocelescope-Plugin-Template){target="_blank"}:
+
+```bash
+git clone https://github.com/Grkmr/Minimal-Ocelescope-Plugin-Template.git
+cd Minimal-Ocelescope-Plugin-Template
+```
+
+### Option B - Generate a New Project with Cookiecutter
+
+Alternatively, you can generate a new plugin project using Cookiecutter through uv:
+
+!!! warning
+
+    When running the Cookiecutter template, always use the default options (press **:material-keyboard-return: Enter** for each prompt).
+    This ensures the generated project matches the structure expected in this evaluation.
+
+```bash linenums="0"
+uvx cookiecutter gh:rwth-pads/ocelescope --directory template
+```
+
+When you’ve completed the setup steps above, your project directory should look similar to this:
+
+```linenums="0"
+minimal-plugin/ <- root
+├─ LICENSE
+├─ README.md
+├─ pyproject.toml
+├─ requirements.txt
+├─ src/
+│  ├─ minimal_plugin/
+│  │  ├─ __init__.py
+│  │  ├─ plugin.py
+```
+
+### Install Dependencies
+
+Navigate to the root of the project and install all dependencies using your preferred package manager.
+
+???+ warning
+
+    This evaluation requires **Python 3.13**. Make sure you have it installed 
+    before continuing.
+
+!!! example
+
+    ```sh
+    # With uv
+    uv sync
+
+    # Or with pip
+    pip install -r requirements.txt
     ```
 
 ## Step 3: Implement the Plugin
