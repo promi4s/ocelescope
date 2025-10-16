@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 from __future__ import annotations
 
 import importlib.util
@@ -11,7 +10,7 @@ import ast
 
 from ocelescope import OCELExtension, Plugin
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path.cwd()
 SRC = ROOT / "src"
 DIST = ROOT / "dist"
 DIST.mkdir(exist_ok=True)
@@ -32,7 +31,8 @@ def find_absolute_imports(package_dir: Path):
             match node:
                 # Case 1: import mypkg...
                 case ast.Import(names=names) if any(
-                    alias.name == package_name or alias.name.startswith(package_name + ".") for alias in names
+                    alias.name == package_name or alias.name.startswith(package_name + ".")
+                    for alias in names
                 ):
                     absolute_imports.append(
                         {
@@ -121,7 +121,7 @@ def zip_package(pkg_dir: Path) -> Path:
     return zip_path
 
 
-def main() -> int:
+def build_plugins() -> int:
     if not SRC.exists():
         print(f"❌ Expected src directory at {SRC}")
         return 2
@@ -156,7 +156,3 @@ def main() -> int:
         return 1
 
     return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

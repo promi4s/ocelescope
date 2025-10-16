@@ -45,68 +45,139 @@ To enable visualization for a resource, implement the `visualize()` method in yo
 
 #### Graph
 
-A graph composed of nodes and edges. Commonly used for Petri nets, directly-follows graphs, and other graph-based models.
+A **graph visualization model** composed of nodes and directed edges.
+Commonly used for **Petri nets**, **directly-follows graphs**, and other graph-based models.
+Layout and rendering are powered by **Graphviz**.
 
-- **Classes**: `Graph`, `GraphNode`, `GraphEdge`, `GraphvizLayoutConfig`
-- **Layout**: Controlled by Graphviz engines and attributes (`GraphvizLayoutConfig`)
+---
 
-##### GraphNode
+### **Classes**
 
-Defines a visual node in the graph.
+- `Graph`
+- `GraphNode`
+- `GraphEdge`
+- `GraphvizLayoutConfig`
 
-| Field             | Type                                                           | Description                         |
-| ----------------- | -------------------------------------------------------------- | ----------------------------------- |
-| `id`              | `str`                                                          | Unique node ID                      |
-| `label`           | `Optional[str]`                                                | Display label                       |
-| `shape`           | `Literal["circle","triangle","rectangle","diamond","hexagon"]` | Node shape                          |
-| `width`, `height` | `Optional[float]`                                              | Dimensions in pixels                |
-| `color`           | `Optional[str]`                                                | Fill color (hex or named)           |
-| `x`, `y`          | `Optional[float]`                                              | Coordinates after layout (auto-set) |
-| `border_color`    | `Optional[str]`                                                | Border/stroke color                 |
-| `label_pos`       | `Optional[Literal["top","center","bottom"]]`                   | Label position                      |
+---
 
-##### GraphEdge
+### **GraphNode**
 
-Represents a directed connection between nodes.
+Defines a **visual node** in the graph.
 
-| Field    | Type                          | Description                                          |
-| -------- | ----------------------------- | ---------------------------------------------------- |
-| `source` | `str`                         | Source node ID                                       |
-| `target` | `str`                         | Target node ID                                       |
-| `arrows` | `tuple[EdgeArrow, EdgeArrow]` | Arrowheads at start/end (e.g., `(None, "triangle")`) |
-| `color`  | `Optional[str]`               | Edge color                                           |
-| `label`  | `Optional[str]`               | Label text                                           |
+| Field          | Type                                                               | Description                                                                        |
+| -------------- | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| `id`           | `str`                                                              | Unique node ID (UUID string, auto-generated)                                       |
+| `label`          | `str | None`                                                       | Display label for the node                                                         |
+| `shape`        | `Literal["circle", "triangle", "rectangle", "diamond", "hexagon"]` | Node shape                                                                         |
+| `width`          | `float | None`                                                     | Node width in pixels                                                               |
+| `height`         | `float | None`                                                     | Node height in pixels                                                              |
+| `color`          | `str | None`                                                       | Fill color (hex or named color)                                                    |
+| `x`              | `float | None`                                                     | X-coordinate after layout (auto-set)                                               |
+| `y`              | `float | None`                                                     | Y-coordinate after layout (auto-set)                                               |
+| `border_color`   | `str | None`                                                       | Border (stroke) color                                                              |
+| `label_pos`    | `Literal["top", "center", "bottom"]`                               | Label position relative to node (default: `"bottom"`)                              |
+| `rank`           | `Literal["source", "sink"] | int | None`                             | Optional rank constraint for layout (e.g., `"source"`, `"sink"`, or numeric level) |
+| `layout_attrs` | `dict[str, str | int | float | bool] | None`                   | Additional Graphviz attributes for this node                                       |
 
-##### GraphvizLayoutConfig
+---
 
-Specifies layout settings passed to Graphviz.
+### **GraphEdge**
 
-| Field        | Type                      | Description                                           |       |         |                                                                 |
-| ------------ | ------------------------- | ----------------------------------------------------- | ----- | ------- | --------------------------------------------------------------- |
-| `engine`     | `GraphVizLayoutingEngine` | Graphviz engine (`dot`, `neato`, `fdp`, `sfdp`, etc.) |       |         |                                                                 |
-| `graphAttrs` | \`dict\[str, str          | int                                                   | float | bool]\` | Attributes applied to the whole graph (e.g., `rankdir`, `size`) |
-| `nodeAttrs`  | \`dict\[str, str          | int                                                   | float | bool]\` | Default attributes for all nodes (e.g., `shape`, `color`)       |
-| `edgeAttrs`  | \`dict\[str, str          | int                                                   | float | bool]\` | Default attributes for all edges (e.g., `arrowsize`, `color`)   |
+Represents a **directed connection** between two nodes.
 
-##### Example Usage
+| Field          | Type                                             | Description                                          |
+| -------------- | ------------------------------------------------ | ---------------------------------------------------- |
+| `id`           | `str`                                            | Unique edge ID (UUID string, auto-generated)         |
+| `source`       | `str`                                            | Source node ID                                       |
+| `target`       | `str`                                            | Target node ID                                       |
+| `color`        | `str | None`                                    | Edge color                                           |
+| `label`        | `str | None`                                    | Label text displayed along the edge                  |
+| `start_arrow`  | `EdgeArrow`                                      | Arrowhead at the start of the edge (default: `None`) |
+| `end_arrow`    | `EdgeArrow`                                      | Arrowhead at the end of the edge (default: `None`)   |
+| `start_label`  | `str | None`                                    | Label near the source end                            |
+| `end_label`    | `str | None`                                    | Label near the target end                            |
+| `layout_attrs` | `dict[str, str | int | float | bool] | None` | Additional Graphviz attributes for this edge         |
+| `annotation`   | `Visualization | None`                          | Optional annotation attached to the edge             |
+
+#### **EdgeArrow**
+
+Supported arrowhead styles:
+
+```
+"triangle" | "circle-triangle" | "triangle-backcurve" | "tee" | "circle" |
+"chevron" | "triangle-tee" | "triangle-cross" | "vee" | "square" | "diamond" | None
+```
+
+---
+
+### **GraphvizLayoutConfig**
+
+Specifies **Graphviz layout engine and default attributes** for rendering.
+
+| Field        | Type                                             | Description                                                               |
+| ------------ | ------------------------------------------------ | ------------------------------------------------------------------------- |
+| `engine`     | `GraphVizLayoutingEngine`                        | Graphviz engine (`dot`, `neato`, `fdp`, `sfdp`, etc.)                     |
+| `graphAttrs` | `dict[str, str | int | float | bool] | None` | Global graph attributes (e.g., `rankdir`, `splines`, `size`)              |
+| `nodeAttrs`  | `dict[str, str | int | float | bool] | None` | Default attributes for all nodes (e.g., `shape`, `color`, `fontsize`)     |
+| `edgeAttrs`  | `dict[str, str | int | float | bool] | None` | Default attributes for all edges (e.g., `arrowsize`, `color`, `penwidth`) |
+
+---
+
+### **Graph**
+
+Main graph visualization container.
+
+| Field           | Type                   | Description                   |
+| --------------- | ---------------------- | ----------------------------- |
+| `type`          | `Literal["graph"]`     | Fixed type identifier         |
+| `nodes`         | `list[GraphNode]`      | List of graph nodes           |
+| `edges`         | `list[GraphEdge]`      | List of graph edges           |
+| `layout_config` | `GraphvizLayoutConfig` | Graphviz layout configuration |
+
+---
+
+### **Example Usage**
 
 ```python
-Graph(
-    type="graph",
-    nodes=[...],
-    edges=[...],
+from ocelescope.visualization.graph import (
+    Graph, GraphNode, GraphEdge, GraphvizLayoutConfig
+)
+
+graph = Graph(
+    nodes=[
+        GraphNode(label="Start", shape="circle", color="green", rank="source"),
+        GraphNode(label="End", shape="rectangle", color="red", rank="sink"),
+    ],
+    edges=[
+        GraphEdge(
+            source="n1",
+            target="n2",
+            label="Transition",
+            color="gray",
+            start_arrow=None,
+            end_arrow="triangle"
+        )
+    ],
     layout_config=GraphvizLayoutConfig(
         engine="dot",
         graphAttrs={
-            "rankdir": "LR",   # Layout direction: LR (left-right), TB (top-bottom)
-            "nodesep": "0.5",  # Node spacing
-            "ranksep": "0.5"   # Layer spacing
+            "rankdir": "LR",  # Layout direction: Left to Right
+            "nodesep": 0.5,
+            "ranksep": 0.5
         },
-   )
+        nodeAttrs={
+            "shape": "circle",
+            "fontsize": 12
+        },
+        edgeAttrs={
+            "arrowsize": 0.8,
+            "color": "gray"
+        }
+    )
 )
 ```
 
-Graphviz will apply the chosen engine and attributes to determine positions (`x`, `y`) and dimensions (`width`, `height`) automatically.
+Graphviz automatically determines node coordinates (`x`, `y`) and dimensions (`width`, `height`) based on the chosen layout engine and attributes.
 
 ---
 

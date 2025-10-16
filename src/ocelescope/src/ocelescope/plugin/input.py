@@ -3,7 +3,7 @@ from typing import Any, Optional, Literal
 from pydantic import BaseModel, Field
 
 
-class PluginInput(ABC, BaseModel, frozen=True):
+class PluginInput(ABC, BaseModel):
     pass
 
 
