@@ -21,122 +21,6 @@ Let’s say you have already written two Python functions:
 
 2. A **visualization function** that creates and returns a Graphviz `Digraph` instance representing the DFG, which can later be used to generate images.
 
-??? "The Discovery and Visualization Functions"
-
-    You don’t need to fully understand the implementation of these functions to complete this evaluation. They are provided as ready-to-use helpers that you will later integrate into your Ocelescope plugin.
-
-    ```python title="util.py"
-    from ocelescope import OCEL
-    from graphviz import Digraph
-
-    def discover_dfg(ocel: OCEL, used_object_types: list[str]) -> list[tuple[str | None , str, str | None]]:
-        import pm4py
-
-        ocel_filtered = pm4py.filter_ocel_object_types(ocel.ocel, used_object_types, positive=True)
-        ocdfg = pm4py.discover_ocdfg(ocel_filtered)
-        edges :list[tuple[str | None , str, str | None]]= []
-        for object_type, raw_edges in ocdfg["edges"]["event_couples"].items():
-            edges = edges + ([(source, object_type, target) for source, target in raw_edges])
-
-            edges += [
-                (activity, object_type, None)
-                for object_type, activities in ocdfg["start_activities"]["events"].items()
-                for activity in activities.keys()
-            ]
-
-            edges += [
-                (None, object_type, activity)
-                for object_type, activities in ocdfg["end_activities"]["events"].items()
-                for activity in activities.keys()
-            ]
-        return edges
-    
-    def convert_dfg_to_graphviz(dfg:list[tuple[str | None,str, str | None]]) -> Digraph:
-        from graphviz import Digraph
-        import itertools
-
-        dot = Digraph("Ugly DFG")
-        dot.attr(rankdir="LR")  
-        
-        outer_nodes = set()
-        inner_sources = {}
-        inner_sinks = {}
-        edges_seen = set()
-        types = set()
-        
-        for src, x, tgt in dfg:
-            if src is not None:
-                outer_nodes.add(src)
-            if tgt is not None:
-                outer_nodes.add(tgt)
-            if x is not None:
-                types.add(x)
-                inner_sources[x] = f"source_{x}"
-                inner_sinks[x] = f"sink_{x}"
-            edges_seen.add((src, x, tgt))
-        
-        # A palette of colors
-        palette = [
-            "red", "blue", "green", "orange", "purple",
-            "brown", "gold", "pink", "cyan", "magenta"
-        ]
-        color_map = {x: c for x, c in zip(sorted(types), itertools.cycle(palette))}
-        
-        # Outer nodes: neutral color
-        for n in outer_nodes:
-            dot.node(n, shape="rectangle", style="filled", fillcolor="lightgray")
-        
-        # Sources and sinks: colored small circles, with xlabel underneath
-        for x in types:
-            color = color_map[x]
-            dot.node(
-                inner_sources[x],
-                shape="circle",
-                style="filled",
-                fillcolor=color,
-                width="1",
-                height="1",
-                fixedsize="true",
-                label="",
-                xlabel=x
-            )
-            dot.node(
-                inner_sinks[x],
-                shape="circle",
-                style="filled",
-                fillcolor=color,
-                width="1",
-                height="1",
-                label="",
-                fixedsize="true",
-                xlabel=x
-            )
-        
-        # Rank groups
-        with dot.subgraph() as s:
-            s.attr(rank="same")
-            for n in inner_sources.values():
-                s.node(n)
-        
-        with dot.subgraph() as s:
-            s.attr(rank="same")
-            for n in inner_sinks.values():
-                s.node(n)
-        
-        # Add edges with thicker lines
-        for src, x, tgt in edges_seen:
-            if x is None:
-                continue
-            color = color_map[x]
-            if src is not None and tgt is not None:
-                dot.edge(src, tgt, color=color, penwidth="2")
-            elif src is None and tgt is not None:
-                dot.edge(tgt, inner_sinks[x], color=color, penwidth="2")
-            elif src is not None and tgt is None:
-                dot.edge(src, inner_sources[x], color=color, penwidth="2")
-        
-        return dot
-    ```
 At the end of this evaluation, you should have a **working plugin** that looks like this:
 
 <figure markdown="span">
@@ -150,7 +34,7 @@ Everything you need to complete this evaluation is included here, but if you're 
 ## Step 1: Crash course in Ocelescope
 
 Before we start building our plugin, let's take a quick look at the main building blocks of an Ocelescope plugin.
-Understanding these core components will make the next implementation steps much easier to follow.
+Understanding these core concepts will make it easier to follow the next implementation steps.
 
 ### Plugin Class
 
@@ -490,17 +374,52 @@ minimal-plugin/
 │  │  ├─ util.py
 ```
 
-<span id="relative-imports"></span>
-!!! warning "Use only relative imports"
+??? info "Solution 1"
 
-    Ocelescope plugins must use **relative imports** when referencing files within the same package.
+    ```python title="plugin.py"
+    from typing import Annotated
 
-    ```python
-    from minimal_plugin.util import discover_dfg  # ❌ Do not use absolute imports
-    from util import discover_dfg                 # ❌ Do not use top-level imports
-    from .util import discover_dfg                # ✅ Use relative imports instead  
+    from ocelescope import OCEL, OCELAnnotation, Plugin, PluginInput, Resource, plugin_method
+
+
+    class DFG(Resource):
+        label = "DFG"
+        description = "An object-centric directly follows graph"
+
+        def visualize(self) -> None:
+            pass
+
+
+    class Input(PluginInput):
+        pass
+
+
+    class DiscoverDFG(Plugin):
+        label = "DFG Discovery"
+        description = "A plugin for discovering object-centric directly-follows graphs"
+        version = "0.1.0"
+
+        @plugin_method(label="Discover DFG", description="Discovers an object-centric directly-follows graph")
+        def discover(
+            self,
+            ocel: Annotated[OCEL, OCELAnnotation(label="Event Log")],
+            input: Input,
+        ) -> DFG:
+            return DFG()
     ```
-    
+
+    ```python title="__init__.py"
+    from .plugin import DiscoverDFG
+
+    __author__ = "Dr. Data Scientisimy"
+    __email__ = "example@example.com"
+
+
+    __all__ = [
+        "DiscoverDFG",
+    ]
+    ```
+
 ### Step 3.2 Integrate the Discovery Functions
 
 Now that the structure is in place, we can integrate the discovery and visualization functions into the plugin to make it functional.
@@ -516,7 +435,21 @@ To integrate this into our Resource, extend your `DFG` to hold this data.
 
   ```python linenums="0"
     list[tuple[str | None, str, str | None]]
+
   ```
+
+??? info "Solution 2"
+
+    ```python title="plugin.py"
+    class DFG(Resource):
+        label = "DFG"
+        description = "An object-centric directly follows graph"
+
+        edges: list[tuple[str | None, str, str | None]]
+
+        def visualize(self) -> None:
+            pass
+    ```
 
 #### Add a visualization to the Resource
 
@@ -541,6 +474,27 @@ Inside the `visualize` method of your `DFG` resource:
   
     You can access the edges through `self.edges`, assuming the field in your `DFG` resource is named `edges`.
 
+??? info "Solution 3"
+
+    ```python title="plugin.py"
+
+    from ocelescope import OCEL, DotVis, OCELAnnotation, Plugin, PluginInput, Resource, plugin_method
+
+    from .util import convert_dfg_to_graphviz
+
+
+    class DFG(Resource):
+        label = "DFG"
+        description = "An object-centric directly follows graph"
+
+        edges: list[tuple[str | None, str, str | None]]
+
+        def visualize(self):
+            graphviz_instance = convert_dfg_to_graphviz(self.edges)
+
+            return DotVis.from_graphviz(graphviz_instance)
+    ```
+
 #### Extend the Input Class
 
 Now let's define the input of the `discover` function.
@@ -553,6 +507,15 @@ Inside the `Input` class (which inherits from `PluginInput`):
   1. Remove the existing `pass` statement.
   2. Add a new field (class attribute) called `object_types` with the type `list[str]`
   3. Turn it into an OCEL-dependent field using the `OCEL_FIELD` helper, setting the `field_type` to `"object_type"`
+
+??? info "Solution 4"
+
+    ```python title="plugin.py"
+    from ocelescope import OCEL, OCEL_FIELD, DotVis, OCELAnnotation, Plugin, PluginInput, Resource, plugin_method
+
+    class Input(PluginInput):
+        object_types: list[str] = OCEL_FIELD(field_type="object_type", ocel_id="ocel")
+    ```
 
 #### Integrate the Implementation
 
@@ -568,22 +531,43 @@ In the `discover` method:
   
     You can access the selected object types through `input.object_types`, assuming the field in your `Input` class is named `object_types`.
 
-## Step 4: Build your plugin
+??? info "Solution 5"
 
-That's it! The final step is to build your plugin. You can do this in one of two ways:
+    ```python title="plugin.py"
+    from .util import convert_dfg_to_graphviz, discover_dfg
 
-1. **Manually**, by creating a ZIP archive yourself:
+    class DiscoverDFG(Plugin):
+        label = "DFG Discovery"
+        description = "A plugin for discovering object-centric directly-follows graphs"
+        version = "0.1.0"
 
-    ```text linenums="0"
-    minimal_plugin.zip/
-    ├─ __init__.py
-    ├─ plugin.py
-    ├─ util.py
+        @plugin_method(label="Discover DFG", description="Discovers an object-centric directly-follows graph")
+        def discover(
+            self,
+            ocel: Annotated[OCEL, OCELAnnotation(label="Event Log")],
+            input: Input,
+        ) -> DFG:
+            edges = discover_dfg(ocel=ocel, used_object_types=input.object_types)
+
+            return DFG(edges=edges)
     ```
 
-2. **Using the built-in Ocelescope build command** (recommended):
+## Step 4: Build your plugin
 
-    Run the build command in the root of your project.
+  That's it! The final step is to build your plugin. You can do this in one of two ways:
+
+  1. **Manually**, by creating a ZIP archive yourself:
+
+      ```text linenums="0"
+      minimal_plugin.zip/
+      ├─ __init__.py
+      ├─ plugin.py
+      ├─ util.py
+      ```
+
+  2. **Using the built-in Ocelescope build command** (recommended):
+
+      Run the build command in the root of your project.
 
     Make sure to execute it within the same Python environment where you installed your dependencies.
 
@@ -609,6 +593,54 @@ That's it! The final step is to build your plugin. You can do this in one of two
         The Ocelescope CLI is automatically available if you installed the project dependencies earlier.
 
 After building, you'll find your packaged plugin as a `.zip` file inside the `dist/` directory.
+
+??? note "Solution 6"
+
+    [:material-download: Download Plugin](../assets/DiscoverDFG.zip){ .md-button .md-button--primary download="DiscoverDFG.zip" }
+
+    ```python title="plugin.py"
+    from typing import Annotated
+
+    from ocelescope import OCEL, OCEL_FIELD, DotVis, OCELAnnotation, Plugin, PluginInput, Resource, plugin_method
+
+    from .util import convert_dfg_to_graphviz, discover_dfg
+
+    class DFG(Resource):
+        label = "DFG"
+        description = "An object-centric directly follows graph"
+
+        edges: list[tuple[str | None, str, str | None]]
+
+        def visualize(self):
+            graphviz_instance = convert_dfg_to_graphviz(self.edges)
+
+            return DotVis.from_graphviz(graphviz_instance)
+
+    class Input(PluginInput):
+        object_types: list[str] = OCEL_FIELD(field_type="object_type", ocel_id="ocel")
+
+    class DiscoverDFG(Plugin):
+        label = "DFG Discovery"
+        description = "A plugin for discovering object-centric directly-follows graphs"
+        version = "0.1.0"
+
+        @plugin_method(label="Discover DFG", description="Discovers an object-centric directly-follows graph")
+        def discover(
+            self,
+            ocel: Annotated[OCEL, OCELAnnotation(label="Event Log")],
+            input: Input,
+        ) -> DFG:
+            edges = discover_dfg(ocel=ocel, used_object_types=input.object_types)
+
+            return DFG(edges=edges)
+    ```
+    ```python title="__init__.py"
+    from .plugin import DiscoverDFG
+
+    __all__ = [
+        "DiscoverDFG",
+    ]
+    ```
 
 If you'd like, you can upload the ZIP file in the Ocelescope interface to test your plugin directly.
 
