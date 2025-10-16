@@ -21,7 +21,7 @@ Let’s say you have already written two Python functions:
 
 2. A **visualization function** (`convert_dfg_to_graphviz`) that creates and returns a Graphviz `Digraph` instance representing the DFG, which can later be used to generate images.
 
-At the end of this evaluation, you should have a **working plugin** that looks like this:
+By the end of this evaluation, you will have a **working plugin** that looks like this:
 
 <figure markdown="span">
   ![Final DFG discovery Plugin](../assets/evaluation-result.png){width="50%"}
@@ -41,7 +41,7 @@ Understanding these core concepts will make it easier to follow the next impleme
 An **Ocelescope plugin** is a collection of Python functions grouped inside a class that inherits from the base `Plugin` class provided by the `ocelescope` package.
 
 Each plugin includes basic **metadata**, such as its name, version, and description, defined as class variables.
-Individual functions within the plugin are defined as **plugin methods**, which use the `@plugin_method` decorator to attach their own labels and descriptions.
+Each function inside a plugin class that is decorated with `@plugin_method` becomes a callable action in the Ocelescope interface.
 
 <figure markdown="span">
   ![An example plugin class](../assets/plugintouimapping.png)
@@ -54,9 +54,9 @@ Individual functions within the plugin are defined as **plugin methods**, which 
 They can represent process models, results of performance analyses, or any other structured data.
 
 Resources returned by plugin methods are automatically saved and can be reused as inputs for other methods.
-A resource is defined as a Python class that inherits from the `Resource` base class provided by the `ocelescope` package.
+A resource is a Python class that inherits from `ocelescope.Resource`.
 
-Optionally, a resource can also implement a [visualization function](../plugins/resource.md#visualization){target="_blank"}, which is a method that returns an instance of one of the predefined visualization types, such as [Table](../plugins/resource.md#table){target="_blank"}, [Graph](../plugins/resource.md#graph){target="_blank"} (an interactive graph), or [DotVis](../plugins/resource.md#dot){target="_blank"} (a Graphviz-based visualization).
+A resource can optionally implement a [visualization function](../plugins/resource.md#visualization){target="_blank"}, which returns one of Ocelescope’s built-in visualization types. This allows the resource to be displayed automatically in the frontend.
 
 <figure markdown="span">
   ![Activity Count Resource](../assets/ActivityCountResource.png)
@@ -74,7 +74,7 @@ This custom class, called a [*configuration input*](../plugins/plugin_class.md#c
 
 ???+ example "Example: Defining a Plugin Method with an OCEL and a Custom Input Class"
 
-    The following example shows how a plugin method can include both an `OCEL` parameter and a custom input class that inherits from ?`PluginInput`.
+    The following example shows how a plugin method can include both an `OCEL` parameter and a custom input class that inherits from `PluginInput`.
     The input class adds extra configurable parameters, in this case a numeric `frequency` field.
 
     ```python
@@ -132,7 +132,7 @@ This helper links a field to the `OCEL` parameter of a plugin method, allowing y
   <figcaption align="center">A plugin method with its custom input class. On the left is the Python code, and on the right is the automatically generated form in Ocelescope.</figcaption>
 </figure>
 
-## Step 2: Setup
+## Step 2: Set Up Your Environment
 
 Let's start by setting up the minimal Ocelescope plugin template.  
 You can choose one of the following two methods to prepare your project.
@@ -159,7 +159,7 @@ Alternatively, you can generate a new plugin project using Cookiecutter through 
 uvx cookiecutter gh:rwth-pads/ocelescope --directory template
 ```
 
-When you’ve completed the setup steps above, your project directory should look similar to this:
+When you’ve completed the setup steps above, your project directory should look like this:
 
 ```linenums="0"
 minimal-plugin/ <- root
@@ -194,7 +194,7 @@ Navigate to the root of the project and install all dependencies using your pref
 
 ## Step 3: Implement the Plugin
 
-After setting up the project and becoming familiar with how Ocelescope plugins work, we will now implement our first real plugin: a discovery plugin for object-centric directly-follows graph (OC-DFGs), as introduced earlier.
+After setting up the project and becoming familiar with how Ocelescope plugins work, we'll now implement our first real plugin: a discovery plugin for object-centric directly-follows graph (OC-DFGs), as introduced earlier.
 
 The plugin will have the following components:
 
@@ -456,10 +456,6 @@ minimal-plugin/
     ```python title="__init__.py"
     from .plugin import DiscoverDFG
 
-    __author__ = "Dr. Data Scientisimy"
-    __email__ = "example@example.com"
-
-
     __all__ = [
         "DiscoverDFG",
     ]
@@ -471,10 +467,10 @@ Now that the structure is in place, we can integrate the discovery and visualiza
 
 #### Extend the Resource
 
-Since our plugin returns a directly-follows graph, we should add an `edges` field (class attribute) to our DFG resource to store the discovered relationship.
+Since our plugin returns a directly-follows graph, we should add an `edges` field (class attribute) to our DFG resource to store the discovered relationships.
 
-The discovery method provided in the `util.py` returns the OC-DFG as a list of triplets `discover_dfg(...) -> list[tuple[str | None , str, str | None]]`.
-To integrate this into our Resource, extend your `DFG` to hold this data.
+The discovery method provided in the `util.py` returns the OC-DFG as a list of tuples `discover_dfg(...) -> list[tuple[str | None , str, str | None]]`.
+To integrate this into our Resource, extend your `DFG` class to hold this data.
 
 1. Add a field (class attribute) named `edges` with the following type:
 
@@ -498,7 +494,7 @@ To integrate this into our Resource, extend your `DFG` to hold this data.
 
 #### Add a visualization to the Resource
 
-Our `DFG` resource can already be used as both an input and an output, but right now it only stores data without any visual representation.
+Our `DFG` resource can already be used as both an input and an output, but currently it only stores data without any visual representation.
 
 To display it visually in the Ocelescope frontend, we can extend its `visualize` method.
 
@@ -507,9 +503,9 @@ The provided `util.py` file already includes a helper function,
 
 Ocelescope supports several visualization types, including `DotVis`, which renders Graphviz DOT strings.
 
-A `DotVis` instance can also be created directly from a `graphviz.Digraph` by using `DotVis.from_graphviz(...)`.
+A `DotVis` instance can be created directly from a `graphviz.Digraph` by using `DotVis.from_graphviz(...)`.
 
-Inside the `visualize` method of your `DFG` resource:
+Inside the `visualize` method of your `DFG` class:
 
   1. Import the `convert_dfg_to_graphviz` from the `util.py` as a *relative import*
 
