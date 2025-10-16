@@ -1,12 +1,12 @@
 from __future__ import annotations
 
+import ast
 import importlib.util
 import sys
 import traceback
 import zipfile
 from pathlib import Path
 from types import ModuleType
-import ast
 
 from ocelescope import OCELExtension, Plugin
 
@@ -95,23 +95,21 @@ def load_package(pkg_dir: Path) -> ModuleType | None:
         return None
 
 
-def module_has_plugin(module: ModuleType) -> bool:
+def module_has_plugin(module: ModuleType) -> str | None:
     """Return True if the loaded module defines at least one concrete Plugin subclass."""
-    found = False
     for obj in vars(module).values():
         if is_concrete_subclass(obj, Plugin):
             print(f"✅ Found Plugin: {obj.__name__} (from {module.__name__})")
-            found = True
+            return obj.__name__
     # Optional: show extensions discovered (not required to zip)
     for obj in vars(module).values():
         if is_concrete_subclass(obj, OCELExtension):
             print(f"ℹ️  Found Extension: {obj.__name__} (from {module.__name__})")
-    return found
 
 
-def zip_package(pkg_dir: Path) -> Path:
+def zip_package(pkg_dir: Path, name: str | None) -> Path:
     """Create dist/<pkg>.zip including the package folder at the top level."""
-    zip_path = DIST / f"{pkg_dir.name}.zip"
+    zip_path = DIST / f"{name or pkg_dir.name}.zip"
     base_for_archive = pkg_dir.parent  # include folder name inside zip
     with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
         for path in pkg_dir.rglob("*"):
@@ -145,8 +143,9 @@ def build_plugins() -> int:
             continue
 
         module = load_package(pkg_dir)
-        if module and module_has_plugin(module):
-            zip_package(pkg_dir)
+
+        if module and (plugin_name := module_has_plugin(module)):
+            zip_package(pkg_dir, plugin_name)
             zipped_any = True
         else:
             print(f"⏭️  No valid Plugin found in {pkg_dir}; skipping zip.")

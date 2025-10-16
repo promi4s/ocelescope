@@ -1,6 +1,6 @@
 [project]
 name = "ocelescope"
-version = "0.1.1b1"
+version = "0.1.2"
 description = "General tools for working with Object-Centric Event Logs and building Ocelescope plugins"
 readme = "README.md"
 requires-python = "~=3.13"
