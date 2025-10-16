@@ -43,7 +43,7 @@ class GraphNode(AnnotatedElement):
     x: float | None = None
     y: float | None = None
     border_color: str | None = None
-    label_pos: Literal["top", "center", "bottom"] = "bottom"
+    label_pos: Literal["top", "center", "bottom"] = "center"
 
     rank: Literal["source", "sink"] | int | None = None
     layout_attrs: dict[str, str | int | float | bool] | None = None
