@@ -3739,20 +3739,14 @@
             "title": "Border Color"
           },
           "label_pos": {
-            "anyOf": [
-              {
-                "type": "string",
-                "enum": [
-                  "top",
-                  "center",
-                  "bottom"
-                ]
-              },
-              {
-                "type": "null"
-              }
+            "type": "string",
+            "enum": [
+              "top",
+              "center",
+              "bottom"
             ],
-            "title": "Label Pos"
+            "title": "Label Pos",
+            "default": "center"
           },
           "rank": {
             "anyOf": [
