@@ -9,7 +9,7 @@ In this evaluation, we assess the usability and functionality of Ocelescope by s
 
 The first step is to get Ocelescope up and running on your machine.
 
-Please follow the instructions in the [Getting Started](../index.md) section to set up and launch Ocelescope using Docker.
+Please follow the instructions in the [Getting Started](../index.md){target="_blank"} section to set up and launch Ocelescope using Docker.
 
 !!! info "Ocelescope Frontend"
     After starting the application, access the frontend at [http://localhost:3000](http://localhost:3000).
