@@ -8,7 +8,7 @@ To get Ocelescope running docker compose. To run ocelescope you can just use the
 ```yaml title="docker-compose.yaml"
 services:
   backend:
-    image: ghcr.io/rwth-pads/ocelescope-backend:latest
+    image: grkmr/ocelescope_backend:latest
     ports:
       - "8000:8000"
     volumes:
@@ -16,7 +16,7 @@ services:
     restart: unless-stopped
 
   frontend:
-    image: ghcr.io/rwth-pads/ocelescope-frontend:latest
+    image: grkmr/ocelescope_frontend:latest
     ports:
       - "3000:3000"
     restart: unless-stopped

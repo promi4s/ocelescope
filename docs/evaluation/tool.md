@@ -26,7 +26,7 @@ First, download the TOTeM plugin using the button below:
 
     Generate Temporal Object Type Models (TOTeM) to uncover type-level temporal and cardinality relations in event logs
 
-    [:material-download: Download](https://github.com/Grkmr/TOTeM/releases/download/v1.3/totem.zip)
+    [:material-download: Download](https://github.com/Grkmr/TOTeM/releases/download/v1.1/totem.zip)
 
 </div>
 
