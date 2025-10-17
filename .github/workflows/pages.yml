@@ -35,4 +35,5 @@ jobs:
         env:
           PYTHONPATH: src/ocelescope/src
         run: |
+          echo "www.ocelescope.org" > docs/CNAME
           mkdocs gh-deploy --force
