@@ -3,7 +3,7 @@
 In this evaluation, we assess the usability and functionality of Ocelescope by simulating a common research scenario: trying out the implementation of a tool introduced in a scientific paper. As an example, we use the plugin for TOTeM — a technique proposed for object-centric process mining.
 
 !!! note "System Requirements"
-    To run Ocelescope locally, you must have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your system.
+    To run Ocelescope locally, you must have [Docker](https://docs.docker.com/get-docker/){target="_blank"} and [Docker Compose](https://docs.docker.com/compose/install/){target="_blank"} installed on your system.
 
 ## Step 1: Get Ocelescope Running
 
