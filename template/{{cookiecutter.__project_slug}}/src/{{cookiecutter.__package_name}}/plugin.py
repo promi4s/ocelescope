@@ -28,7 +28,7 @@ class MinimalResource(Resource):
     label = "Minimal Resource"
     description = "A minimal resource"
 
-    def visualize(self) -> None:
+    def visualize(self):
         pass
 
 
