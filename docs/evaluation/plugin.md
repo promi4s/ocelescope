@@ -295,17 +295,26 @@ or **create** a new `util.py` file in the same directory and **paste** the imple
     You don’t need to fully understand the implementation of these functions to complete this evaluation. They are provided as ready-to-use helpers that you will later integrate into your Ocelescope plugin.
 
     ```python title="util.py"
-    from ocelescope import OCEL
+
+    import itertools
+
+    import pm4py
     from graphviz import Digraph
+    from ocelescope import OCEL
 
-    def discover_dfg(ocel: OCEL, used_object_types: list[str]) -> list[tuple[str | None , str, str | None]]:
-        import pm4py
 
-        ocel_filtered = pm4py.filter_ocel_object_types(ocel.ocel, used_object_types, positive=True)
+    def discover_dfg(
+        ocel: OCEL, used_object_types: list[str]
+    ) -> list[tuple[str | None, str, str | None]]:
+        ocel_filtered = pm4py.filter_ocel_object_types(
+            ocel.ocel, used_object_types, positive=True
+        )
         ocdfg = pm4py.discover_ocdfg(ocel_filtered)
-        edges :list[tuple[str | None , str, str | None]]= []
+        edges: list[tuple[str | None, str, str | None]] = []
         for object_type, raw_edges in ocdfg["edges"]["event_couples"].items():
-            edges = edges + ([(source, object_type, target) for source, target in raw_edges])
+            edges = edges + (
+                [(source, object_type, target) for source, target in raw_edges]
+            )
 
             edges += [
                 (activity, object_type, None)
@@ -319,20 +328,18 @@ or **create** a new `util.py` file in the same directory and **paste** the imple
                 for activity in activities.keys()
             ]
         return edges
-    
-    def convert_dfg_to_graphviz(dfg:list[tuple[str | None,str, str | None]]) -> Digraph:
-        from graphviz import Digraph
-        import itertools
 
+
+    def convert_dfg_to_graphviz(dfg: list[tuple[str | None, str, str | None]]) -> Digraph:
         dot = Digraph("Ugly DFG")
-        dot.attr(rankdir="LR")  
-        
+        dot.attr(rankdir="LR")
+
         outer_nodes = set()
         inner_sources = {}
         inner_sinks = {}
         edges_seen = set()
         types = set()
-        
+
         for src, x, tgt in dfg:
             if src is not None:
                 outer_nodes.add(src)
@@ -343,18 +350,26 @@ or **create** a new `util.py` file in the same directory and **paste** the imple
                 inner_sources[x] = f"source_{x}"
                 inner_sinks[x] = f"sink_{x}"
             edges_seen.add((src, x, tgt))
-        
+
         # A palette of colors
         palette = [
-            "red", "blue", "green", "orange", "purple",
-            "brown", "gold", "pink", "cyan", "magenta"
+            "red",
+            "blue",
+            "green",
+            "orange",
+            "purple",
+            "brown",
+            "gold",
+            "pink",
+            "cyan",
+            "magenta",
         ]
         color_map = {x: c for x, c in zip(sorted(types), itertools.cycle(palette))}
-        
+
         # Outer nodes: neutral color
         for n in outer_nodes:
             dot.node(n, shape="rectangle", style="filled", fillcolor="lightgray")
-        
+
         # Sources and sinks: colored small circles, with xlabel underneath
         for x in types:
             color = color_map[x]
@@ -367,7 +382,7 @@ or **create** a new `util.py` file in the same directory and **paste** the imple
                 height="1",
                 fixedsize="true",
                 label="",
-                xlabel=x
+                xlabel=x,
             )
             dot.node(
                 inner_sinks[x],
@@ -378,20 +393,20 @@ or **create** a new `util.py` file in the same directory and **paste** the imple
                 height="1",
                 label="",
                 fixedsize="true",
-                xlabel=x
+                xlabel=x,
             )
-        
+
         # Rank groups
         with dot.subgraph() as s:
             s.attr(rank="same")
             for n in inner_sources.values():
                 s.node(n)
-        
+
         with dot.subgraph() as s:
             s.attr(rank="same")
             for n in inner_sinks.values():
                 s.node(n)
-        
+
         # Add edges with thicker lines
         for src, x, tgt in edges_seen:
             if x is None:
@@ -403,7 +418,7 @@ or **create** a new `util.py` file in the same directory and **paste** the imple
                 dot.edge(tgt, inner_sinks[x], color=color, penwidth="2")
             elif src is not None and tgt is None:
                 dot.edge(src, inner_sources[x], color=color, penwidth="2")
-        
+
         return dot
     ```
 
