@@ -287,8 +287,8 @@ It contains a plugin class, a resource, and an input class.
 
 To keep your plugin code clean and organized, we will place the discovery and visualization functions in a separate file named `util.py`.
 
-You can either **download** the ready-made [:material-download: util.py](../assets/util.py){download="util.py"} file and place it next to your `plugin.py`,  
-or **create** a new `util.py` file in the same directory and **paste** the implementation below.
+You can either **download** the ready-made [:material-download: util.py](../assets/util.py){download="util.py"} file or **create** a new `util.py` file yourself.
+In both cases, place it next to your `plugin.py` (i.e. at `src/minimal_plugin/util.py`).
 
 ??? "The Discovery and Visualization implementation"
 
