@@ -139,11 +139,11 @@ You can choose one of the following two methods to prepare your project.
 
 ### Option A - Clone the Template from GitHub
 
-Clone the minimal plugin template directly from [:simple-github: Github (link to the repository)](https://github.com/Grkmr/Minimal-Ocelescope-Plugin-Template){target="_blank"}:
+Clone the minimal plugin template directly from [:simple-github: Github (link to the repository)](https://github.com/Grkmr/minimal-plugin){target="_blank"}:
 
 ```bash
-git clone https://github.com/Grkmr/Minimal-Ocelescope-Plugin-Template.git
-cd Minimal-Ocelescope-Plugin-Template
+git clone git@github.com:Grkmr/minimal-plugin.git
+cd minimal-plugin
 ```
 
 ### Option B - Generate a New Project with Cookiecutter
@@ -287,8 +287,8 @@ It contains a plugin class, a resource, and an input class.
 
 To keep your plugin code clean and organized, we will place the discovery and visualization functions in a separate file named `util.py`.
 
-You can either **download** the ready-made [:material-download: util.py](../assets/util.py){download="util.py"} file and place it next to your `plugin.py`,  
-or **create** a new `util.py` file in the same directory and **paste** the implementation below.
+You can either **download** the ready-made [:material-download: util.py](../assets/util.py){download="util.py"} file or **create** a new `util.py` file yourself.
+In both cases, place it next to your `plugin.py` (i.e. at `src/minimal_plugin/util.py`).
 
 ??? "The Discovery and Visualization implementation"
 
@@ -417,7 +417,7 @@ or **create** a new `util.py` file in the same directory and **paste** the imple
             elif src is None and tgt is not None:
                 dot.edge(tgt, inner_sinks[x], color=color, penwidth="2")
             elif src is not None and tgt is None:
-                dot.edge(src, inner_sources[x], color=color, penwidth="2")
+                dot.edge(inner_sources[x], src, color=color, penwidth="2")
 
         return dot
     ```
@@ -529,9 +529,9 @@ Inside the `visualize` method of your `DFG` class:
         Ocelescope plugins must use **relative imports** when referencing files in the same directory.
 
         ```python
-        from minimal_plugin.util import discover_dfg  # ❌ Do not use absolute imports
-        from util import discover_dfg                 # ❌ Do not use top-level imports
-        from .util import discover_dfg                # ✅ Use relative imports instead
+        from minimal_plugin.util import convert_dfg_to_graphviz   # ❌ Do not use absolute imports
+        from util import convert_dfg_to_graphviz                  # ❌ Do not use top-level imports
+        from .util import convert_dfg_to_graphviz                 # ✅ Use relative imports instead
         ```
 
   1. Call the `convert_dfg_to_graphviz` with the resource's `edges` field.
@@ -539,7 +539,11 @@ Inside the `visualize` method of your `DFG` class:
 
     !!! tip
 
-        You can access the edges through `self.edges`, assuming the field in your `DFG` resource is named `edges`.
+        - You can access the edges through `self.edges`, assuming the field in your `DFG` resource is named `edges`.
+        - Make sure `DotVis` is imported from the `ocelescope` package before using it:
+          ```python
+          from ocelescope import DotVis
+          ```
 
 ??? info "Solution 3"
 
@@ -603,6 +607,16 @@ In the `discover` method:
         ```
 
   1. Call the `discover_dfg` with the `ocel` parameter and the `object_types` field from the input class, then use the result to create a new instance of the `DFG` resource.
+
+    !!! tip
+
+          Always instantiate the `DFG` resource using **named parameters**.  
+
+          ```python
+          return DFG(edges=discovery_result)   # ✅ Correct — use named parameters
+          return DFG(discovery_result)         # ❌ Incorrect — avoid positional arguments
+          ```
+
   1. Return the created `DFG` resource
 
 ??? info "Solution 5"
