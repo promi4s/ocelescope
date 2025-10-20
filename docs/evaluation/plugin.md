@@ -417,7 +417,7 @@ or **create** a new `util.py` file in the same directory and **paste** the imple
             elif src is None and tgt is not None:
                 dot.edge(tgt, inner_sinks[x], color=color, penwidth="2")
             elif src is not None and tgt is None:
-                dot.edge(src, inner_sources[x], color=color, penwidth="2")
+                dot.edge(inner_sources[x], src, color=color, penwidth="2")
 
         return dot
     ```
