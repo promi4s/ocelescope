@@ -529,9 +529,9 @@ Inside the `visualize` method of your `DFG` class:
         Ocelescope plugins must use **relative imports** when referencing files in the same directory.
 
         ```python
-        from minimal_plugin.util import discover_dfg  # ❌ Do not use absolute imports
-        from util import discover_dfg                 # ❌ Do not use top-level imports
-        from .util import discover_dfg                # ✅ Use relative imports instead
+        from minimal_plugin.util import convert_dfg_to_graphviz   # ❌ Do not use absolute imports
+        from util import convert_dfg_to_graphviz                  # ❌ Do not use top-level imports
+        from .util import convert_dfg_to_graphviz                 # ✅ Use relative imports instead
         ```
 
   1. Call the `convert_dfg_to_graphviz` with the resource's `edges` field.
