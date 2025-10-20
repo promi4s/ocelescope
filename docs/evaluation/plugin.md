@@ -539,7 +539,11 @@ Inside the `visualize` method of your `DFG` class:
 
     !!! tip
 
-        You can access the edges through `self.edges`, assuming the field in your `DFG` resource is named `edges`.
+        - You can access the edges through `self.edges`, assuming the field in your `DFG` resource is named `edges`.
+        - Make sure `DotVis` is imported from the `ocelescope` package before using it:
+          ```python
+          from ocelescope import DotVis
+          ```
 
 ??? info "Solution 3"
 
