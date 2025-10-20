@@ -1,7 +1,7 @@
 # Getting Started
 
 !!! note "System Requirements"
-    To run Ocelescope locally, you must have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your system.
+    To run Ocelescope locally, you must have [Docker](https://docs.docker.com/get-docker/){target="_blank"} and [Docker Compose](https://docs.docker.com/compose/install/){target="_blank"} installed on your system.
 
 To get Ocelescope running docker compose. To run ocelescope you can just use the below docker compose script.
 
