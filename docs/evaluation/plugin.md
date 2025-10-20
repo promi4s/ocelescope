@@ -139,11 +139,11 @@ You can choose one of the following two methods to prepare your project.
 
 ### Option A - Clone the Template from GitHub
 
-Clone the minimal plugin template directly from [:simple-github: Github (link to the repository)](https://github.com/Grkmr/Minimal-Ocelescope-Plugin-Template){target="_blank"}:
+Clone the minimal plugin template directly from [:simple-github: Github (link to the repository)](https://github.com/Grkmr/minimal-plugin){target="_blank"}:
 
 ```bash
-git clone https://github.com/Grkmr/Minimal-Ocelescope-Plugin-Template.git
-cd Minimal-Ocelescope-Plugin-Template
+git clone git@github.com:Grkmr/minimal-plugin.git
+cd minimal-plugin
 ```
 
 ### Option B - Generate a New Project with Cookiecutter
