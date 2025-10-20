@@ -607,6 +607,16 @@ In the `discover` method:
         ```
 
   1. Call the `discover_dfg` with the `ocel` parameter and the `object_types` field from the input class, then use the result to create a new instance of the `DFG` resource.
+
+    !!! tip
+
+          Always instantiate the `DFG` resource using **named parameters**.  
+
+          ```python
+          return DFG(edges=discovery_result)   # ✅ Correct — use named parameters
+          return DFG(discovery_result)         # ❌ Incorrect — avoid positional arguments
+          ```
+
   1. Return the created `DFG` resource
 
 ??? info "Solution 5"
