@@ -142,7 +142,7 @@ You can choose one of the following two methods to prepare your project.
 Clone the minimal plugin template directly from [:simple-github: Github (link to the repository)](https://github.com/Grkmr/minimal-plugin){target="_blank"}:
 
 ```bash
-git clone git@github.com:Grkmr/minimal-plugin.git
+git clone https://github.com/Grkmr/minimal-plugin.git
 cd minimal-plugin
 ```
 
