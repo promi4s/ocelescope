@@ -65,12 +65,6 @@ const UploadSection: React.FC<{
             </span>
           ),
         }}
-        accept={{
-          "application/json": [".json", ".jsonocel", ".ocelescope"],
-          "application/xml": [".xml", ".xmlocel"],
-          "application/vnd.sqlite3": [".sqlite"],
-          "application/zip": [".zip"],
-        }}
         onUpload={async (files: File[]) => {
           upload({ data: { files } });
         }}
