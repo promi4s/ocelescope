@@ -522,7 +522,7 @@ A `DotVis` instance can be created directly from a `graphviz.Digraph` by using `
 
 Inside the `visualize` method of your `DFG` class:
 
-  1. Import the `convert_dfg_to_graphviz` from the `util.py` as a *relative import*
+  1. Import the `convert_dfg_to_graphviz` from the `util.py` as a *relative import*.
 
     ???+ warning "Use only relative imports"
 
