@@ -9,16 +9,13 @@ import {
   Modal,
   Stack,
   Divider,
-  ThemeIcon,
-  Collapse,
   NavLink,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useRouter } from "next/router";
 import classes from "@/components/AppShell/AppShell.module.css";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
-  ChevronRightIcon,
   HomeIcon,
   LogOutIcon,
   PackageIcon,
@@ -39,6 +36,7 @@ import moduleMap from "@/lib/modules/module-map";
 import CurrentOcelSelect from "../CurrentOcelSelect/CurrentOcelSelect";
 import useClient from "@/hooks/useClient";
 import UploadModal from "../UploadModal/UploadModal";
+import { useGetOcels } from "@/api/fastapi/ocels/ocels";
 
 const LogoutButton: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -90,63 +88,6 @@ const LogoutButton: React.FC = () => {
   );
 };
 
-type LinksGroupProps = {
-  label: string;
-  initiallyOpened?: boolean;
-  links?: { label: string; link: string }[];
-  icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
-};
-
-const LinksGroup: React.FC<LinksGroupProps> = ({
-  links,
-  label,
-  icon: Icon,
-  initiallyOpened = false,
-}) => {
-  const hasLinks = Array.isArray(links);
-  const [opened, setOpened] = useState(initiallyOpened || false);
-  const items = (hasLinks ? links : []).map((link) => (
-    <Text
-      component={Link}
-      className={classes.link}
-      href={link.link}
-      key={link.label}
-    >
-      {link.label}
-    </Text>
-  ));
-
-  return (
-    <>
-      <UnstyledButton
-        onClick={() => setOpened((o) => !o)}
-        className={classes.control}
-      >
-        <Group justify="space-between" gap={0} align="center">
-          <Box style={{ display: "flex", alignItems: "center" }}>
-            <ThemeIcon variant="transparent" size={30}>
-              {Icon ? (
-                <Icon width={18} height={18} />
-              ) : (
-                <PackageIcon size={18} />
-              )}
-            </ThemeIcon>
-            <Box ml="md">{label}</Box>
-          </Box>
-          {hasLinks && (
-            <ChevronRightIcon
-              className={classes.chevron}
-              size={16}
-              style={{ transform: opened ? "rotate(90deg)" : "none" }}
-            />
-          )}
-        </Group>
-      </UnstyledButton>
-      {hasLinks ? <Collapse in={opened}>{items}</Collapse> : null}
-    </>
-  );
-};
-
 const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure(true);
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
@@ -164,6 +105,8 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         ] as ModuleRouteDefinition
       ).requiresOcel
     : false;
+
+  const { data: ocels } = useGetOcels();
 
   return (
     <MAppShell
@@ -226,43 +169,60 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             />
             <Divider />
             {Object.values(moduleMap).map(
-              ({ label, name, icon: Icon = PackageIcon, routes }) => (
-                <NavLink
-                  key={name}
-                  leftSection={<Icon width={18} height={18} size={18} />}
-                  label={label}
-                  defaultOpened={name === modulePath?.name}
-                  component={Link}
-                  href={getModuleRoute({
-                    name: name as ModuleName,
-                    route: Object.values(routes)[0]
-                      .name as ModuleRouteName<ModuleName>,
-                  })}
-                  active={
-                    Object.keys(routes).length === 1 &&
-                    name === modulePath?.name
-                  }
-                >
-                  {Object.keys(routes).length > 1 &&
-                    Object.values(routes).map(
-                      ({ label: routeLabel, name: routeName }) => (
-                        <NavLink
-                          key={routeName}
-                          label={routeLabel}
-                          href={getModuleRoute({
-                            name: name as ModuleName,
-                            route: routeName as ModuleRouteName<ModuleName>,
-                          })}
-                          component={Link}
-                          active={
-                            name === modulePath?.name &&
-                            routeName === modulePath.route
-                          }
-                        />
-                      ),
-                    )}
-                </NavLink>
-              ),
+              ({ label, name, icon: Icon = PackageIcon, routes }) => {
+                const isModuleDisabled = useMemo(
+                  () =>
+                    !Object.values(routes).some(
+                      ({ requiresOcel }) => !requiresOcel,
+                    ) && ocels?.length === 0,
+                  [routes, ocels],
+                );
+
+                return (
+                  <NavLink
+                    key={name}
+                    leftSection={<Icon width={18} height={18} size={18} />}
+                    label={label}
+                    defaultOpened={name === modulePath?.name}
+                    component={Link}
+                    href={getModuleRoute({
+                      name: name as ModuleName,
+                      route: Object.values(routes)[0]
+                        .name as ModuleRouteName<ModuleName>,
+                    })}
+                    disabled={isModuleDisabled}
+                    opened={!isModuleDisabled ? undefined : false}
+                    active={
+                      Object.keys(routes).length === 1 &&
+                      name === modulePath?.name
+                    }
+                  >
+                    {Object.keys(routes).length > 1 &&
+                      Object.values(routes).map(
+                        ({
+                          label: routeLabel,
+                          name: routeName,
+                          requiresOcel,
+                        }) => (
+                          <NavLink
+                            key={routeName}
+                            label={routeLabel}
+                            href={getModuleRoute({
+                              name: name as ModuleName,
+                              route: routeName as ModuleRouteName<ModuleName>,
+                            })}
+                            disabled={requiresOcel && ocels?.length === 0}
+                            component={Link}
+                            active={
+                              name === modulePath?.name &&
+                              routeName === modulePath.route
+                            }
+                          />
+                        ),
+                      )}
+                  </NavLink>
+                );
+              },
             )}
           </Stack>
           <Divider />
