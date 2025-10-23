@@ -273,7 +273,7 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         style={{ overflow: "hidden" }}
         h="calc(100dvh - var(--app-shell-header-offset, 0rem) - var(--app-shell-footer-height, 0px) + var(--app-shell-padding, 0))"
       >
-        <Box h={"100%"} style={{ overflow: "scroll" }}>
+        <Box h={"100%"} style={{ overflow: "scroll", position: "relative" }}>
           {children}
         </Box>
       </MAppShell.Main>
