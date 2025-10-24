@@ -7,22 +7,26 @@ from typing import (
     TypedDict,
 )
 
+from ocelescope import OCELFilter
+from ocelescope.ocel.ocel import OCEL
+from ocelescope.resource.resource import Resource
 from pydantic.fields import Field
 from pydantic.main import BaseModel
 
 from app.internal.model.resource import ResourceStore
 from app.internal.registry import registry_manager
-from app.internal.tasks.base import TaskSummary, _call_with_known_params
-from ocelescope.ocel.ocel import OCEL
-from ocelescope.resource.resource import Resource
-
+from app.internal.tasks.base import (
+    TaskBase,
+    TaskState,
+    TaskSummary,
+    _call_with_known_params,
+)
+from app.internal.util.hashing import generate_tuple_hash
 from app.websocket import (
     PluginLink,
     SytemNotificiation,
     websocket_manager,
 )
-
-from app.internal.tasks.base import TaskBase, TaskState, make_hashable
 
 if TYPE_CHECKING:
     from app.internal.session import Session
@@ -156,8 +160,13 @@ class PluginTask(TaskBase, Generic[P]):
         )
 
     @staticmethod
-    def _dedupe_key(plugin_name: str, method_name: str, input: PluginInput) -> Hashable:
-        return ("plugin", plugin_name, method_name, make_hashable(input))
+    def _dedupe_key(
+        plugin_name: str,
+        method_name: str,
+        input: PluginInput,
+        filter: dict[str, OCELFilter | None],
+    ) -> Hashable:
+        return generate_tuple_hash("plugin", plugin_name, method_name, input, filter)
 
     @classmethod
     def create_plugin_task(
@@ -167,7 +176,12 @@ class PluginTask(TaskBase, Generic[P]):
         method_name: str,
         input: PluginInput,
     ) -> str:
-        key = cls._dedupe_key(plugin_id, method_name, input)
+        filters = {
+            ocel_id: session.get_ocel_filters(ocel_id)
+            for ocel_id in input["ocels"].values()
+        }
+
+        key = cls._dedupe_key(plugin_id, method_name, input, filters)
 
         existing_id = session._dedupe_keys.get(key)
         if existing_id and existing_id in session.tasks:
