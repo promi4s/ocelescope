@@ -1110,6 +1110,38 @@
         "operationId": "timeInfo",
         "parameters": [
           {
+            "name": "periods",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Periods"
+            }
+          },
+          {
+            "name": "freq",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Freq"
+            }
+          },
+          {
             "name": "ocel_id",
             "in": "query",
             "required": false,
@@ -3006,9 +3038,13 @@
       },
       "Date_Distribution_Item": {
         "properties": {
-          "date": {
+          "start_timestamp": {
             "type": "string",
-            "title": "Date"
+            "title": "Start Timestamp"
+          },
+          "end_timestamp": {
+            "type": "string",
+            "title": "End Timestamp"
           },
           "entity_count": {
             "additionalProperties": {
@@ -3020,7 +3056,8 @@
         },
         "type": "object",
         "required": [
-          "date",
+          "start_timestamp",
+          "end_timestamp",
           "entity_count"
         ],
         "title": "Date_Distribution_Item"
