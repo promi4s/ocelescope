@@ -54,7 +54,7 @@
     "react": "^19.0.0",
     "react-cytoscapejs": "^2.0.0",
     "react-dom": "^19.0.0",
-    "react-hook-form": "^7.60.0",
+    "react-hook-form": "^7.65.0",
     "react-use-websocket": "^4.13.0",
     "react-zoom-pan-pinch": "^3.7.0",
     "recharts": "^2.15.3",
