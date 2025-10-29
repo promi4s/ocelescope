@@ -197,7 +197,7 @@ const RelationFilter: React.FC<{
                 <RangeSlider
                   py={"md"}
                   minRange={0}
-                  value={[field.value[0] ?? min, field.value[1] ?? max]}
+                  value={[field.value?.[0] ?? min, field.value?.[1] ?? max]}
                   max={max}
                   min={min}
                   onChange={([min, max]) => {

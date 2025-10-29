@@ -164,6 +164,10 @@ const AttributeFilter: React.FC<AttributeFilterProps> = ({
   const value = useWatch({ control, name: `${attributeType}.${index}` });
 
   const { attributeNames, targetNames, currentAttribute } = useMemo(() => {
+    if (!value) {
+      return {};
+    }
+
     const filteredAttributes = Object.entries(attributes ?? {})
       .filter(
         ([entityName, _]) =>
