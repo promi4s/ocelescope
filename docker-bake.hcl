@@ -19,8 +19,8 @@ target "backend" {
   }
 
   tags = [
-    "${REPO}-backend:${VERSION}",
-    "${REPO}-backend:latest",
+    "grkmr/ocelescope_backend:${VERSION}",
+    "grkmr/ocelescope_backend:latest",
   ]
 }
 
@@ -29,8 +29,8 @@ target "frontend" {
   dockerfile = "Dockerfile"
 
   tags = [
-    "${REPO}-frontend:${VERSION}",
-    "${REPO}-frontend:latest",
+    "grkmr/ocelescope_frontend:${VERSION}",
+    "grkmr/ocelescope_frontend:latest",
   ]
 }
 
