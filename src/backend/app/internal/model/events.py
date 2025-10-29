@@ -2,7 +2,8 @@ from pydantic import BaseModel
 
 
 class Date_Distribution_Item(BaseModel):
-    date: str
+    start_timestamp: str
+    end_timestamp: str
     entity_count: dict[str, int]
 
 

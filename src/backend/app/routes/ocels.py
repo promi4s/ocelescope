@@ -2,6 +2,9 @@ import datetime
 from pathlib import Path
 from typing import Literal, Optional
 
+import pandas as pd
+from fastapi import APIRouter, Query, Response
+from ocelescope import AttributeSummary, RelationCountSummary
 from ocelescope.ocel.filter import OCELFilter
 from ocelescope.ocel.ocel import OCELFileExtensions
 
@@ -11,8 +14,6 @@ from app.internal.model.base import PaginatedResponse
 from app.internal.model.events import Date_Distribution_Item, Entity_Time_Info
 from app.internal.model.ocel import OcelMetadata
 from app.internal.model.response import TempFileResponse
-from ocelescope import AttributeSummary, RelationCountSummary
-
 from app.internal.ocel.default_ocel import (
     DEFAULT_OCEL_KEYS,
     DefaultOCEL,
@@ -20,12 +21,8 @@ from app.internal.ocel.default_ocel import (
     get_default_ocel,
 )
 from app.internal.registry import registry_manager
-
-from fastapi import APIRouter, Query, Response
-
 from app.internal.registry.extension import OCELExtensionDescription
 from app.internal.util.pandas import search_paginated_dataframe
-
 
 ocels_router = APIRouter(prefix="/ocels", tags=["ocels"])
 
@@ -134,35 +131,50 @@ def get_event_counts(
     operation_id="timeInfo",
 )
 def get_time_info(
-    ocel: ApiOcel,
+    ocel: ApiOcel, periods: int | None = None, freq: str | None = None
 ) -> Entity_Time_Info:
-    events = ocel.events
-    timestamp_column_name = ocel.ocel.event_timestamp
-    activity_column_name = ocel.ocel.event_activity
+    activity_timestamp = ocel.events[
+        [ocel.ocel.event_timestamp, ocel.ocel.event_activity]
+    ].reset_index(drop=True)
+    timestamps = activity_timestamp[ocel.ocel.event_timestamp]
+    start_time = timestamps.min()
+    end_time = timestamps.max()
 
-    # Group by date and activity, then count
-    time_frame_count = (  # type:ignore
-        events.groupby([events[timestamp_column_name].dt.date, activity_column_name])
-        .size()
-        .reset_index(name="count")
+    bins = pd.date_range(start_time, end_time, periods=periods, freq=freq)
+
+    activity_timestamp["window_id"] = pd.cut(
+        timestamps,
+        bins=bins,
+        labels=False,
+        include_lowest=True,
     )
 
-    # Build distribution per date
-    date_distribution = []
-    for date, group in time_frame_count.groupby(timestamp_column_name):
-        row = {
-            "date": str(date),
-            "entity_count": dict(zip(group[activity_column_name], group["count"])),
-        }
-        date_distribution.append(Date_Distribution_Item(**row))
+    activity_timestamp = (
+        activity_timestamp.groupby(["window_id", ocel.ocel.event_activity])
+        .size()  # type:ignore
+        .reset_index(name="count")
+        .merge(
+            pd.DataFrame(
+                {"window_id": range(len(bins) - 1), "start": bins[:-1], "end": bins[1:]}
+            ),
+            on="window_id",
+            how="left",
+        )
+    )
 
-    # Get start and end time of events
-    start_time = events[timestamp_column_name].min().isoformat(timespec="microseconds")
-    end_time = events[timestamp_column_name].max().isoformat(timespec="microseconds")
+    date_distribution = [
+        Date_Distribution_Item(
+            start_timestamp=row["start"].isoformat(),
+            end_timestamp=row["end"].isoformat(),
+            entity_count=dict(zip(grp[ocel.ocel.event_activity], grp["count"])),
+        )
+        for _, grp in activity_timestamp.groupby("window_id")
+        for row in [grp.iloc[0]]
+    ]
 
     return Entity_Time_Info(
-        end_time=end_time,
-        start_time=start_time,
+        start_time=start_time.isoformat(),
+        end_time=end_time.isoformat(),
         date_distribution=date_distribution,
     )
 

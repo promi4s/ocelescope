@@ -46,6 +46,7 @@ function cleanObject(obj: any): any {
   return obj;
 }
 
+//TODO: End slop this a little
 const FilterForm: React.FC<{
   filter: OCELFilter;
   ocelId: string;
@@ -66,8 +67,20 @@ const FilterForm: React.FC<{
     () => Object.entries(filter).length === 0,
     [filter],
   );
+
   useEffect(() => {
-    onResetRef?.((data) => reset(data ?? {}, { keepDirty: false }));
+    onResetRef?.((data) => {
+      return reset(
+        {
+          event_attributes: [],
+          object_attributes: [],
+          o2o_count: [],
+          e2o_count: [],
+          ...cleanObject(data ?? {}),
+        },
+        { keepDirty: false },
+      );
+    });
   }, [reset, onResetRef]);
 
   return (
