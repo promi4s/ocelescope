@@ -1,10 +1,9 @@
 import { VisualizationByType, VisulizationsType } from "@/types/resources";
-import { Box, Paper } from "@mantine/core";
+import { Box } from "@mantine/core";
 import CytoscapeComponent from "@/components/Cytoscape";
 import ActionButtons from "@/components/Cytoscape/components/ActionButtons";
 import { useGraphvizLayout } from "@/hooks/useGraphvizLayout";
-import EntityAnnotation from "@/components/Cytoscape/components/Annotation";
-import { useMemo } from "react";
+import FloatingAnnotation from "@/components/Cytoscape/components/FloatingAnnotation";
 import { Visualization } from "..";
 
 const GraphViewer: React.FC<{
@@ -26,52 +25,24 @@ const GraphViewer: React.FC<{
           {!isPreview && (
             <>
               <ActionButtons />
-              <EntityAnnotation trigger="leftClick">
-                {({ entity }) => {
-                  const annotation = useMemo(() => {
-                    if (entity?.type === "node") {
-                      return (visualization.nodes ?? []).find(
-                        ({ id }) => entity.id === id,
-                      )?.annotation;
-                    }
-                  }, [entity]);
+              <FloatingAnnotation>
+                {(entity) => {
+                  const visualizationEntity = visualization[
+                    entity.type == "edge" ? "edges" : "nodes"
+                  ]?.find(({ id }) => id === entity.id);
 
-                  const position = useMemo(
-                    () => ({
-                      x:
-                        entity?.type === "node"
-                          ? entity.boundingBox.x2
-                          : entity?.midpoint.x,
-
-                      y:
-                        entity?.type === "node"
-                          ? entity.boundingBox.y1
-                          : entity?.midpoint.y,
-                    }),
-                    [entity],
-                  );
-
-                  if (!entity || !annotation) {
-                    return;
-                  }
+                  if (!visualizationEntity?.annotation) return;
 
                   return (
-                    <Paper
-                      shadow="xs"
-                      p={"md"}
-                      style={{
-                        position: "absolute",
-                        left: position.x,
-                        top: position.y,
-                      }}
-                    >
-                      <Visualization
-                        visualization={annotation as VisulizationsType}
-                      />
-                    </Paper>
+                    <Visualization
+                      visualization={
+                        visualizationEntity.annotation as VisulizationsType
+                      }
+                      isPreview
+                    />
                   );
                 }}
-              </EntityAnnotation>
+              </FloatingAnnotation>
             </>
           )}
         </CytoscapeComponent>

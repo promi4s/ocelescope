@@ -177,9 +177,9 @@ export const useGraphvizLayout = (
         );
 
         const edges: ElementDefinition[] = (visualization.edges ?? []).map(
-          (edge, i) => ({
+          (edge) => ({
             data: {
-              id: i.toString(),
+              id: edge.id!,
               source: edge.source,
               target: edge.target,
               label: edge.label ?? "",
