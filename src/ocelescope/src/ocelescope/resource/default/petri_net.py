@@ -1,8 +1,8 @@
 from typing import Literal, Optional
 
 from ocelescope.resource.resource import Annotated, Resource
-from ocelescope.visualization.default.graph import Graph, GraphEdge, GraphNode, GraphvizLayoutConfig
 from ocelescope.visualization import generate_color_map
+from ocelescope.visualization.default.graph import Graph, GraphEdge, GraphNode, GraphvizLayoutConfig
 
 
 class Place(Annotated):
@@ -57,9 +57,9 @@ class PetriNet(Resource):
     label = "Petri Net"
     description = "An object-centric petri net"
 
-    places: list[Place]
-    transitions: list[Transition]
-    arcs: list[Arc]
+    places: list[Place] = []
+    transitions: list[Transition] = []
+    arcs: list[Arc] = []
 
     def visualize(self):
         # Use your color generator function
