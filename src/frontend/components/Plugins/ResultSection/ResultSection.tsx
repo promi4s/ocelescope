@@ -29,8 +29,12 @@ const ResourceCard: React.FC<{
         <Viewer id={resourceId} isPreview />
       </Card.Section>
       <Group justify="space-between" mt="md" mb="xs">
-        <Text fw={500}>{resource?.resource.name}</Text>
-        <Badge color="pink">{resource?.resource.type}</Badge>
+        <Text fw={500} truncate="end" flex={1} mr={"md"}>
+          {resource?.resource.name}
+        </Text>
+        <Badge color="pink" style={{ flexShrink: 0 }}>
+          {resource?.resource.type}
+        </Badge>
       </Group>
       <Group align="center" wrap="nowrap" justify="center">
         <Button
