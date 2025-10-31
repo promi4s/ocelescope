@@ -68,7 +68,9 @@ const MethodCard: React.FC<{ pluginId: string; method: PluginMethod }> = ({
         </Stack>
         <Group gap={"xs"}>
           {tags.map((tag) => (
-            <Badge color={uniqolor(tag).color}>{tag}</Badge>
+            <Badge key={tag} color={uniqolor(tag).color}>
+              {tag}
+            </Badge>
           ))}
         </Group>
       </Stack>
