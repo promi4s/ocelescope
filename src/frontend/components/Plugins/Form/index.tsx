@@ -58,6 +58,7 @@ const PluginInput: React.FC<PluginInputProps> = ({
         {Object.entries(method.input_ocels ?? {}).map(
           ([name, { label, description, extension }]) => (
             <Controller
+              key={name}
               control={control}
               name={`input_ocels.${name}`}
               rules={{ required: "Please select a value" }}
@@ -78,6 +79,7 @@ const PluginInput: React.FC<PluginInputProps> = ({
         {Object.entries(method.input_resources ?? {}).map(
           ([name, [resource_type, { label, description }]]) => (
             <Controller
+              key={name}
               control={control}
               name={`input_resources.${name}`}
               rules={{ required: "Please select a value" }}
