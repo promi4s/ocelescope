@@ -78,7 +78,11 @@ const ResultSection: React.FC<{ taskId?: string }> = ({ taskId }) => {
       />
       <LoadingOverlay visible={pluginSummary?.state === "STARTED"} />
       {pluginSummary?.output.resource_ids?.map((resourceId) => (
-        <ResourceCard resourceId={resourceId} onClick={setOpenedResource} />
+        <ResourceCard
+          key={resourceId}
+          resourceId={resourceId}
+          onClick={setOpenedResource}
+        />
       ))}
     </SimpleGrid>
   );
