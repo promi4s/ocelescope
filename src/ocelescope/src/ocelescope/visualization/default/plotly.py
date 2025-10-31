@@ -1,5 +1,7 @@
-from typing import Any, Literal
+import json
+from typing import Any, Literal, cast
 
+import plotly.io as pio
 from plotly.graph_objects import Figure
 from pydantic import PrivateAttr, computed_field
 
@@ -24,7 +26,9 @@ class Plotly(Visualization):
     def figure(self, value: Figure):
         self._figure = value
 
+    # TODO: Make this better it crashes with plotly_json_dump
     @computed_field()
     @property
     def data(self) -> dict[str, Any]:
-        return self.figure.to_dict()
+        json_string = cast(str, pio.to_json(self._figure, validate=False))
+        return json.loads(json_string)
