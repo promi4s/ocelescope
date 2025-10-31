@@ -2,8 +2,6 @@ import { VisualizationByType } from "@/types/resources";
 
 import React, { useEffect, useMemo, useState } from "react";
 import { DataTable, type DataTableColumn } from "mantine-datatable";
-import { Group, ThemeIcon } from "@mantine/core";
-import { Table2 } from "lucide-react";
 import dayjs from "dayjs";
 import { formatDate, formatDateTime } from "@/util/formatters";
 
@@ -32,7 +30,6 @@ const PAGE_SIZES = [20, 50, 75];
 // ---------- Component ----------
 const TableView: React.FC<{ visualization: Table; isPreview?: boolean }> = ({
   visualization,
-  isPreview,
 }) => {
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
 
@@ -70,16 +67,6 @@ const TableView: React.FC<{ visualization: Table; isPreview?: boolean }> = ({
           onRecordsPerPageChange: setPageSize,
         }
       : {};
-
-  if (isPreview) {
-    return (
-      <Group justify="center" align="center" p={"md"} w={"100%"} h={"100%"}>
-        <ThemeIcon variant="transparent" size={"xl"}>
-          <Table2 width={"100%"} height={"100%"} />
-        </ThemeIcon>
-      </Group>
-    );
-  }
 
   return (
     <DataTable
