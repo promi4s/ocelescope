@@ -60,7 +60,7 @@ const PluginPage = () => {
           <Stack gap={0}>
             <Title ta={"center"}>{pluginMethod?.label ?? method}</Title>
             {pluginMethod?.description && (
-              <Text>{pluginMethod?.description}</Text>
+              <Text c="dimmed">{pluginMethod?.description}</Text>
             )}
           </Stack>
         </Stack>

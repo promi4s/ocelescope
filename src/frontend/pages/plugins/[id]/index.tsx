@@ -2,13 +2,11 @@ import { PluginMethod } from "@/api/fastapi-schemas";
 import { useGetExtensionMeta } from "@/api/fastapi/ocels/ocels";
 import { useGetPlugin } from "@/api/fastapi/plugins/plugins";
 import { useGetResourceMeta } from "@/api/fastapi/resources/resources";
+import { GenericCard } from "@/components/Cards/GenericCard";
 import {
   Anchor,
-  Badge,
   Breadcrumbs,
-  Card,
   Container,
-  Group,
   SimpleGrid,
   Stack,
   Text,
@@ -17,7 +15,6 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useMemo } from "react";
-import uniqolor from "uniqolor";
 
 const MethodCard: React.FC<{ pluginId: string; method: PluginMethod }> = ({
   method,
@@ -50,33 +47,15 @@ const MethodCard: React.FC<{ pluginId: string; method: PluginMethod }> = ({
   }, [resourceMeta, extensionMeta]);
 
   return (
-    <Card
-      component={Link}
-      href={`/plugins/${pluginId}/${method.name}`}
-      shadow="sm"
-      padding="lg"
-      radius="md"
-      withBorder
-      h={"100%"}
-    >
-      <Stack justify="space-between" h="100%">
-        <Stack gap={"sm"}>
-          <Title size={"h4"}>{method.label}</Title>
-          <Text size="sm" c="dimmed">
-            {method.description}
-          </Text>
-        </Stack>
-        <Group gap={"xs"}>
-          {tags.map((tag) => (
-            <Badge key={tag} color={uniqolor(tag).color}>
-              {tag}
-            </Badge>
-          ))}
-        </Group>
-      </Stack>
-    </Card>
+    <GenericCard
+      title={method.label ?? method.name}
+      description={method.description ?? ""}
+      tags={tags}
+      cta={{ link: `/plugins/${pluginId}/${method.name}`, title: "Run Method" }}
+    />
   );
 };
+
 const PluginPage: React.FC = () => {
   const router = useRouter();
 
@@ -86,7 +65,7 @@ const PluginPage: React.FC = () => {
   return (
     <Container fluid>
       <Stack>
-        <Stack gap={"xs"} align="center">
+        <Stack gap={0} align="center">
           <Breadcrumbs>
             {[
               <Anchor component={Link} href="/plugins">
@@ -97,7 +76,8 @@ const PluginPage: React.FC = () => {
               </Anchor>,
             ]}
           </Breadcrumbs>
-          <Text>{plugin?.meta.description}</Text>
+          <Title mt={"xs"}> {plugin?.meta.label}</Title>
+          <Text c="dimmed">{plugin?.meta.description}</Text>
         </Stack>
         <SimpleGrid
           cols={{ base: 1, sm: 2, lg: 4 }}
