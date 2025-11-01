@@ -115,19 +115,21 @@ export const wrapFieldsWithContext = (control: Control<PluginInputType>) => {
       schema,
       required,
       formData,
+      fieldPathId: { path },
       onChange,
     }) => {
       const ocelRef = schema?.["x-ui-meta"]?.ocel_id;
       const isMulti = schema?.type === "array";
       const ocelId = useWatch({ control, name: `input_ocels.${ocelRef}` });
 
+      console.log(path, name);
       return (
         <Field
           label={schema?.title}
           requiered={required}
           description={schema?.description}
           isMulti={isMulti}
-          onChange={onChange}
+          onChange={(data) => onChange(data, path)}
           value={formData}
           ocelId={ocelId}
         />
