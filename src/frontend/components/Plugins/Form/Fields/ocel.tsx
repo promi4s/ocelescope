@@ -122,7 +122,6 @@ export const wrapFieldsWithContext = (control: Control<PluginInputType>) => {
       const isMulti = schema?.type === "array";
       const ocelId = useWatch({ control, name: `input_ocels.${ocelRef}` });
 
-      console.log(path, name);
       return (
         <Field
           label={schema?.title}
