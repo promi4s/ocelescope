@@ -3460,6 +3460,9 @@
                   },
                   {
                     "$ref": "#/components/schemas/DotVis"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Plotly"
                   }
                 ],
                 "discriminator": {
@@ -3467,6 +3470,7 @@
                   "mapping": {
                     "dot": "#/components/schemas/DotVis",
                     "graph": "#/components/schemas/Graph",
+                    "plotly": "#/components/schemas/Plotly",
                     "svg": "#/components/schemas/SVGVis",
                     "table": "#/components/schemas/Table"
                   }
@@ -4520,6 +4524,27 @@
           "total_pages"
         ],
         "title": "PaginatedResponse[list[str]]"
+      },
+      "Plotly": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "plotly",
+            "title": "Type",
+            "default": "plotly"
+          },
+          "data": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Data",
+            "readOnly": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "Plotly"
       },
       "PluginApi": {
         "properties": {

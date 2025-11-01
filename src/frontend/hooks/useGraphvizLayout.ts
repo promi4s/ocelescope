@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { ElementDefinition } from "cytoscape";
 import type { VisualizationByType } from "@/types/resources";
 import { Graphviz } from "@hpcc-js/wasm-graphviz";
+import { omitBy, isNil } from "lodash";
 
 type GraphvizJSON = {
   bb?: string;
@@ -155,57 +156,20 @@ export const useGraphvizLayout = (
 
         const nodes: ElementDefinition[] = (visualization.nodes ?? []).map(
           (node) => ({
-            data: { id: node.id },
-            css: {
-              "font-size": 14,
-              shape: node.shape,
-              label: node.label ?? undefined,
-              "text-valign": node.label_pos ?? "center",
-              "text-halign": "center",
-              width:
-                node.width ?? nodePos[safeId(node.id ?? "")].width ?? undefined,
-              height: node.height ?? undefined,
-              "background-color": node.color ?? undefined,
-              ...(node.border_color && {
-                "border-width": 2,
-                "border-color": node.border_color ?? "#000000",
-                "border-style": "solid",
-              }),
+            data: {
+              ...omitBy(node, isNil),
+              label: node.label ?? "",
+              shape: node.shape !== "circle" ? node.shape : "ellipse",
+              width: node.width ?? nodePos[safeId(node.id ?? "")].width,
+              height: node.height ?? 30, // ✅ default
             },
             position: nodePos[safeId(node.id ?? "")] ?? { x: 0, y: 0 },
           }),
         );
 
         const edges: ElementDefinition[] = (visualization.edges ?? []).map(
-          (edge, i) => ({
-            data: {
-              id: i.toString(),
-              source: edge.source,
-              target: edge.target,
-              label: edge.label ?? "",
-            },
-            css: {
-              "line-color": edge.color ?? "#ccc",
-              "target-arrow-shape": edge.end_arrow ?? undefined,
-              "target-arrow-color": edge.color ?? "#ccc",
-              "source-arrow-shape": edge.start_arrow ?? undefined,
-              "source-arrow-color": edge.color ?? "#ccc",
-              "arrow-scale": 1.5,
-              "curve-style": "bezier",
-              label: edge.label ?? "",
-              "text-rotation": "autorotate",
-              "font-size": 12,
-              "source-label": edge.start_label ?? undefined,
-              "source-text-rotation": "autorotate",
-              "target-label": edge.end_label ?? undefined,
-              "source-text-offset": 20,
-              "target-text-rotation": "autorotate",
-              "target-text-offset": 20,
-              "text-background-color": edge.color ?? "#ccc",
-              "text-background-opacity": 1,
-              "text-background-shape": "roundrectangle",
-              "text-background-padding": "3px",
-            },
+          (edge) => ({
+            data: omitBy(edge, isNil),
           }),
         );
 

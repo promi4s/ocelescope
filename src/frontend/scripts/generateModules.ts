@@ -48,7 +48,6 @@ for (const folderName of moduleFolders) {
     }
   }
 
-  // Collect route definitions from pages/
   const routeFolder = path.join(MODULES_DIR, folderName, "pages");
   const routeDefs: string[] = [];
 

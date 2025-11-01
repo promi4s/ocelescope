@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCytoscapeContext } from "../CytoscapeContext";
 
 type TriggerType = "hover" | "rightClick" | "leftClick" | "doubleClick";
 
-type Entity =
+export type CytoscapeClickEntity =
   | {
       type: "node";
       id: string;
@@ -22,19 +22,17 @@ const triggerActionToStartEvent = {
   doubleClick: "dbltap",
 };
 
-const EntityAnnotation: React.FC<{
-  trigger: TriggerType;
-  children?: (props: {
-    entity?: Entity;
-    resetEntity: () => void;
-  }) => React.ReactNode;
-}> = ({ trigger, children }) => {
+const useEntityClick = ({ trigger }: { trigger: TriggerType }) => {
   const context = useCytoscapeContext();
-  const [entity, setEntity] = useState<Entity | undefined>();
+  const [entity, setEntity] = useState<CytoscapeClickEntity | undefined>();
+  const containerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const cytoscape = context?.cy.current;
-    if (!cytoscape) return;
+    const container = cytoscape?.container();
+
+    if (!cytoscape || !container) return;
+    containerRef.current = container;
 
     const handleEntitySelect = (event: cytoscape.EventObject) => {
       const target = event.target;
@@ -54,10 +52,14 @@ const EntityAnnotation: React.FC<{
       }
     };
 
+    const handleClickOutside = (e: cytoscape.EventObject) => {
+      if (e.target === context?.cy.current) setEntity(undefined);
+    };
+
     const handleViewChange = () => {
       setEntity((prev) => {
         if (!prev) return prev;
-        const ele = cytoscape.getElementById(prev.id);
+        const ele = context?.cy.current?.getElementById(prev.id);
         if (!ele || ele.empty()) return prev;
 
         if (prev.type === "node") {
@@ -67,10 +69,6 @@ const EntityAnnotation: React.FC<{
           return { ...prev, midpoint };
         }
       });
-    };
-
-    const handleClickOutside = (e: cytoscape.EventObject) => {
-      if (e.target === cytoscape) setEntity(undefined);
     };
 
     cytoscape.on(
@@ -92,7 +90,11 @@ const EntityAnnotation: React.FC<{
     };
   }, [context, trigger]);
 
-  return <>{children?.({ entity, resetEntity: () => setEntity(undefined) })}</>;
+  return {
+    entity,
+    container: containerRef,
+    resetEntity: () => setEntity(undefined),
+  };
 };
 
-export default EntityAnnotation;
+export default useEntityClick;

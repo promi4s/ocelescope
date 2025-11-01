@@ -9,6 +9,7 @@ dependencies = [
   "networkx>=3.5",
   "numpy>=2.3.2",
   "pandas>=2.3.1",
+  "plotly>=6.3.1",
   "pm4py~=2.7.15.3",
   "pydantic>=2.11.7",
 ]

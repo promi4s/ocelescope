@@ -11,6 +11,7 @@ import { useResource } from "@/api/fastapi/resources/resources";
 import TableView from "./Viewers/table";
 import SvgViewer from "./Viewers/svg";
 import DotToSvgViewer from "./Viewers/dot";
+import PlotlyViewer from "./Viewers/plotly";
 
 export type VisualizationProps<T extends VisulizationsTypes> = {
   visualization: VisualizationByType<T>;
@@ -24,6 +25,7 @@ const visulizationMap: {
   svg: SvgViewer,
   graph: GraphViewer,
   dot: DotToSvgViewer,
+  plotly: PlotlyViewer,
 };
 
 export const Visualization: React.FC<{

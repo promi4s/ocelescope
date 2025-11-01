@@ -1,9 +1,9 @@
 import json
-from app import app as fast_app
 from pathlib import Path
 
-
 import typer
+
+from app import app as fast_app
 
 app = typer.Typer()
 

@@ -73,8 +73,6 @@ const EntityPage: React.FC<{ type: "events" | "objects" }> = ({ type }) => {
     return relations.filter(({ source }) => source === currentTab);
   }, [e2o, o2o, currentTab]);
 
-  console.log(relations);
-
   const { data: eventEntities } = useOcelotPaginatedEvents(
     {
       ocel_id: id,

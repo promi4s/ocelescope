@@ -61,7 +61,13 @@ export const getComputedSelect = ({
   control: Control<PluginInputType>;
 }) => ({
   computed_select: memo(
-    ({ schema, required, formData, onChange }: FieldProps) => {
+    ({
+      schema,
+      required,
+      formData,
+      onChange,
+      fieldPathId: { path },
+    }: FieldProps) => {
       const meta = schema?.["x-ui-meta"] as {
         provider: string;
       };
@@ -80,7 +86,7 @@ export const getComputedSelect = ({
           description={schema.description}
           required={required}
           value={formData}
-          onChange={onChange as (value: any) => void}
+          onChange={(value) => onChange(value, path)}
           data={options}
         />
       );

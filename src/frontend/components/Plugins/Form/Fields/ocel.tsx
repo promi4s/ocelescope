@@ -115,6 +115,7 @@ export const wrapFieldsWithContext = (control: Control<PluginInputType>) => {
       schema,
       required,
       formData,
+      fieldPathId: { path },
       onChange,
     }) => {
       const ocelRef = schema?.["x-ui-meta"]?.ocel_id;
@@ -127,7 +128,7 @@ export const wrapFieldsWithContext = (control: Control<PluginInputType>) => {
           requiered={required}
           description={schema?.description}
           isMulti={isMulti}
-          onChange={onChange}
+          onChange={(data) => onChange(data, path)}
           value={formData}
           ocelId={ocelId}
         />
