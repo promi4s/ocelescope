@@ -1,5 +1,5 @@
-from pathlib import Path
 from typing import Literal
+
 from pydantic import DirectoryPath, Field
 from pydantic_settings import BaseSettings
 
@@ -32,10 +32,6 @@ class OceanConfig(BaseSettings):
     PLUGIN_DIR: DirectoryPath | None = Field(
         default=None,
         description="Path to the directory, where plugins are stored",
-    )
-
-    MODULE_PATH: DirectoryPath = Field(
-        default=Path("modules"), description="Path to the module directory"
     )
 
     MODE: Literal["production", "development"] | None = Field(

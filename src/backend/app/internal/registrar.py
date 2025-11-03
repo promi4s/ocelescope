@@ -1,20 +1,20 @@
 import importlib
-from pathlib import Path
 import pkgutil
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.routing import APIRoute, APIRouter
 
+import modules
 from app.internal.config import config
 from app.internal.registry.registry_manager import registry_manager
-
 
 # Use direct path-based loading for safety
 prototyping_path = Path(__file__).parent / "prototype_plugins"
 
 
 def register_modules(app: FastAPI):
-    for _, module_name, _ in pkgutil.iter_modules([config.MODULE_PATH]):
+    for _, module_name, _ in pkgutil.iter_modules(modules.__path__):
         try:
             mod = importlib.import_module(f"modules.{module_name}.module")
         except ModuleNotFoundError as e:
