@@ -2,22 +2,11 @@ import { PluginApi } from "@/api/fastapi-schemas";
 import { useGetExtensionMeta } from "@/api/fastapi/ocels/ocels";
 import { useDeletePlugin } from "@/api/fastapi/plugins/plugins";
 import { useGetResourceMeta } from "@/api/fastapi/resources/resources";
+import { GenericCard } from "@/components/Cards/GenericCard";
 import UploadModal from "@/components/UploadModal/UploadModal";
-import {
-  ActionIcon,
-  Badge,
-  Card,
-  Group,
-  Menu,
-  Stack,
-  Text,
-  ThemeIcon,
-  Title,
-} from "@mantine/core";
-import { EllipsisVerticalIcon, Trash2Icon, UploadIcon } from "lucide-react";
-import Link from "next/link";
+import { Card, Menu, Stack, Text, ThemeIcon } from "@mantine/core";
+import { Trash2Icon, UploadIcon } from "lucide-react";
 import { useMemo, useState } from "react";
-import uniqolor from "uniqolor";
 
 export const PluginCard: React.FC<{ plugin: PluginApi }> = ({ plugin }) => {
   const { description, label, version } = plugin.meta;
@@ -55,57 +44,27 @@ export const PluginCard: React.FC<{ plugin: PluginApi }> = ({ plugin }) => {
   }, [plugin.methods, resourceMeta, extensionMeta]);
 
   return (
-    <Card
-      component={Link}
-      href={`/plugins/${plugin.id}`}
-      shadow="sm"
-      padding="lg"
-      radius="md"
-      withBorder
-      h={"100%"}
-    >
-      <Stack justify="space-between" h="100%">
-        <Stack gap={"sm"}>
-          <Group align="center" justify="space-between">
-            <Title size={"h4"}>{`${label} v${version}`}</Title>
-            <Menu width={200} position="left">
-              <Menu.Target>
-                <ActionIcon
-                  variant="transparent"
-                  onClick={(e) => e.preventDefault()}
-                >
-                  <EllipsisVerticalIcon size={20} />
-                </ActionIcon>
-              </Menu.Target>
-              <Menu.Dropdown>
-                <Menu.Item
-                  leftSection={<Trash2Icon size={18} />}
-                  color="red.6"
-                  fw={"bold"}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    deletePlugin({ pluginId: plugin.id });
-                  }}
-                >
-                  Delete
-                </Menu.Item>
-              </Menu.Dropdown>
-            </Menu>
-          </Group>
-
-          <Text size="sm" c="dimmed">
-            {description}
-          </Text>
-        </Stack>
-        <Group gap={"xs"}>
-          {tags.map((tag) => (
-            <Badge key={tag} color={uniqolor(tag).color}>
-              {tag}
-            </Badge>
-          ))}
-        </Group>
-      </Stack>
-    </Card>
+    <GenericCard
+      title={label}
+      description={description ?? ""}
+      version={version}
+      tags={tags}
+      menuItems={
+        <>
+          <Menu.Item
+            leftSection={<Trash2Icon />}
+            color="red.6"
+            fw="bold"
+            onClick={() => {
+              deletePlugin({ pluginId: plugin.id });
+            }}
+          >
+            Delete
+          </Menu.Item>
+        </>
+      }
+      cta={{ link: `plugins/${plugin.id}`, title: "Go To Plugin" }}
+    />
   );
 };
 
