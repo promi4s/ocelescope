@@ -1,5 +1,4 @@
 import asyncio
-import json
 from typing import Annotated, Literal, Optional, Union
 
 from pydantic import BaseModel, Field
@@ -64,11 +63,12 @@ class SSEManager:
         """Remove session connection."""
         self.connections.pop(session_id, None)
 
+    # Use full SSE api and name events
     async def send(self, session_id: str, message: SSEMessage):
         """Send JSON message to one client (async)."""
         queue = self.connections.get(session_id)
         if queue:
-            await queue.put(json.dumps(message.model_dump()))
+            await queue.put(message.model_dump_json())
 
     async def broadcast(self, message: str):
         """Send plain text to all clients (async)."""

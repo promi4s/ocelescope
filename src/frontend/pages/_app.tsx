@@ -23,8 +23,8 @@ import {
 } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import AppShell from "@/components/AppShell/AppShell";
-import WebsocketWrapper from "@/components/WebsocketWrapper/WebsocketWrapper";
 import { NotificationProvider } from "@/components/TaskNotification/TaskNotificationProvider";
+import SSEWrapper from "@/components/SSEWrapper/SSEWrapper";
 
 export default function App({ Component, pageProps }: any) {
   const [client] = useState(() => new QueryClient());
@@ -42,7 +42,7 @@ export default function App({ Component, pageProps }: any) {
             />
             <link rel="shortcut icon" href="/favicon.svg" />
           </Head>
-          <WebsocketWrapper />
+          <SSEWrapper />
           <NotificationProvider>
             <AppShell>
               <Component {...pageProps} />

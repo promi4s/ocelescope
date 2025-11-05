@@ -9,7 +9,7 @@ export default defineConfig({
       schemas: "./api/fastapi-schemas",
       client: "react-query",
       httpClient: "fetch",
-      baseUrl: "/api",
+      baseUrl: "/api/external",
       clean: true,
       override: {
         mutator: {
