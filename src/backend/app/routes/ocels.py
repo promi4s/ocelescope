@@ -29,7 +29,7 @@ ocels_router = APIRouter(prefix="/ocels", tags=["ocels"])
 
 # region Management
 @ocels_router.get(
-    "/",
+    "",
     summary="List uploaded and uploading OCELs",
     description=(
         "Returns metadata for all uploaded OCELs along with any OCEL files "
@@ -267,7 +267,7 @@ def get_filter(ocel: ApiOcel, session: ApiSession) -> Optional[OCELFilter]:
 
 
 @ocels_router.post(
-    "/",
+    "",
     operation_id="setFilters",
 )
 def set_filter(

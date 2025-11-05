@@ -1,26 +1,26 @@
 from __future__ import annotations
+
 import asyncio
 from contextlib import asynccontextmanager
 
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette import status
 from starlette.websockets import WebSocket
 
-from app.internal.session import Session
-from app.websocket import websocket_manager
 from app.internal.config import config
 from app.internal.docs import init_custom_docs
-from app.middleware import session_access_middleware
-from app.internal.utils import (
-    error_handler_server,
-)
 from app.internal.ocel.default_ocel import (
     load_default_ocels,
 )
-from app.internal.registrar import register_modules, register_initial_plugins
-
-from fastapi import FastAPI
+from app.internal.registrar import register_initial_plugins, register_modules
+from app.internal.session import Session
+from app.internal.utils import (
+    error_handler_server,
+)
+from app.middleware import session_access_middleware
 from app.routes import routes
+from app.websocket import websocket_manager
 from version import __version__
 
 
@@ -39,6 +39,7 @@ app = FastAPI(
     redoc_url=None,
     debug=True,
     lifespan=lifespan,
+    redirect_slashes=False,
 )
 
 

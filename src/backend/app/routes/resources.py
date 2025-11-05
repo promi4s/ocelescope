@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import io
 import json
 from typing import Optional
@@ -9,17 +10,16 @@ from fastapi.routing import APIRouter
 from ocelescope import Visualization
 from pydantic.main import BaseModel
 from starlette.responses import StreamingResponse
-from app.dependencies import ApiSession
 
+from app.dependencies import ApiSession
 from app.internal.model.resource import ResourceApi, ResourceStore
 from app.internal.registry import registry_manager
 from app.internal.registry.registry_manager import ResourceInfo
 
-
 resource_router = APIRouter(prefix="/resources", tags=["resources"])
 
 
-@resource_router.get(path="/", operation_id="resources")
+@resource_router.get(path="", operation_id="resources")
 def get_resources(
     session: ApiSession, resource_type: Optional[str] = None
 ) -> list[ResourceApi]:
@@ -35,7 +35,7 @@ def get_resource_meta() -> dict[str, ResourceInfo]:
     return registry_manager.get_resource_info()
 
 
-@resource_router.post("/", operation_id="uploadResource")
+@resource_router.post("", operation_id="uploadResource")
 async def upload_resource(file: UploadFile, session: ApiSession):
     if file.content_type != "application/json":
         raise HTTPException(status_code=400, detail="Only JSON files are supported.")
