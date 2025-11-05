@@ -19,7 +19,7 @@ from app.internal.model.plugin import PluginApi
 from app.internal.registry import registry_manager
 from app.internal.tasks.base import _call_with_known_params
 from app.internal.tasks.plugin import PluginTask
-from app.websocket import InvalidationRequest, websocket_manager
+from app.sse_manager import InvalidationRequest, sse_manager
 
 plugin_router = APIRouter(prefix="/plugins", tags=["plugins"])
 
@@ -152,7 +152,7 @@ def delete_plugin(plugin_id: str, session: ApiSession):
 
     shutil.rmtree(plugin_path, ignore_errors=True)
 
-    websocket_manager.send_safe(
+    sse_manager.send_safe(
         session.id,
         InvalidationRequest(
             routes=["plugins"],

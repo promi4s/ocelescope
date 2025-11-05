@@ -3,10 +3,9 @@ from __future__ import annotations
 import asyncio
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from starlette import status
-from starlette.websockets import WebSocket
+from fastapi.responses import StreamingResponse
 
 from app.internal.config import config
 from app.internal.docs import init_custom_docs
@@ -14,21 +13,20 @@ from app.internal.ocel.default_ocel import (
     load_default_ocels,
 )
 from app.internal.registrar import register_initial_plugins, register_modules
-from app.internal.session import Session
 from app.internal.utils import (
     error_handler_server,
 )
 from app.middleware import session_access_middleware
 from app.routes import routes
-from app.websocket import websocket_manager
+from app.sse_manager import sse_manager
 from version import __version__
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     load_default_ocels()
-    websocket_manager.set_loop(asyncio.get_running_loop())
-    yield  # ⬅️ this is the key line
+    sse_manager.set_loop(asyncio.get_running_loop())
+    yield
 
 
 # Initialize FastAPI
@@ -65,24 +63,33 @@ for route in routes:
     app.include_router(route)
 
 
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    session_id = websocket.query_params.get("session_id")
+@app.get("/sse")
+async def sse_endpoint(request: Request):
+    session_id = request.query_params.get("session_id")
 
-    session = Session.get(session_id) if session_id else None
-    if session is None:
-        await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
-        return
+    if not session_id:
+        return StreamingResponse(
+            iter(["data: Missing session_id\n\n"]), media_type="text/event-stream"
+        )
 
-    await websocket.accept()
-    websocket_manager.connect(session.id, websocket)
-    print(f"✅ WebSocket connected for session: {session.id}")
+    queue = await sse_manager.connect(session_id)
+    print(f"✅ SSE connected for session: {session_id}")
 
-    try:
-        while True:
-            await websocket.receive_text()  # keep alive
-    except Exception:
-        websocket_manager.disconnect(session.id)
+    async def event_stream():
+        try:
+            while True:
+                if await request.is_disconnected():
+                    print(f"❌ SSE disconnected for session: {session_id}")
+                    sse_manager.disconnect(session_id)
+                    break
+
+                # Wait for next message
+                msg = await queue.get()
+                yield f"data: {msg}\n\n"
+        except asyncio.CancelledError:
+            sse_manager.disconnect(session_id)
+
+    return StreamingResponse(event_stream(), media_type="text/event-stream")
 
 
 init_custom_docs(app)

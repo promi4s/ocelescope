@@ -2855,6 +2855,22 @@
           }
         }
       }
+    },
+    "/sse": {
+      "get": {
+        "summary": "Sse Endpoint",
+        "operationId": "sse_endpoint_sse_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {

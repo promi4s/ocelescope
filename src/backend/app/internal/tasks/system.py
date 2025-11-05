@@ -5,22 +5,21 @@ from typing import (
     Callable,
     Generic,
     Hashable,
-    ParamSpec,
     Optional,
+    ParamSpec,
     Sequence,
-)
-
-from app.websocket import (
-    WebsocketMessage,
-    websocket_manager,
 )
 
 from app.internal.tasks.base import (
     TaskBase,
     TaskState,
     TaskSummary,
-    make_hashable,
     _call_with_known_params,
+    make_hashable,
+)
+from app.sse_manager import (
+    SSEMessage,
+    sse_manager,
 )
 
 if TYPE_CHECKING:
@@ -40,7 +39,7 @@ class SystemTask(TaskBase, Generic[P]):
         *,
         args: tuple[Any, ...],
         kwargs: dict[str, Any],
-        fn: Callable[P, list[WebsocketMessage]],
+        fn: Callable[P, list[SSEMessage]],
         name: str,
         metadata: dict[str, Any] = {},
         session: "Session",
@@ -53,7 +52,7 @@ class SystemTask(TaskBase, Generic[P]):
         self.name = name
         self.session = session
         self.error: Optional[BaseException] = None
-        self.result: Sequence[WebsocketMessage] = []
+        self.result: Sequence[SSEMessage] = []
         self.metadata = metadata
 
     def run(self):
@@ -76,7 +75,7 @@ class SystemTask(TaskBase, Generic[P]):
         finally:
             self.session.running_tasks.pop(self.id, None)
             for result in self.result:
-                websocket_manager.send_safe(self.session.id, result)
+                sse_manager.send_safe(self.session.id, result)
 
     def summarize(self) -> SystemTaskSummary:
         return SystemTaskSummary(
@@ -138,8 +137,8 @@ class SystemTask(TaskBase, Generic[P]):
 
 def system_task(
     name: Optional[str] = None, dedupe: bool = False, run_once: bool = False
-) -> Callable[[Callable[P, Sequence[WebsocketMessage]]], Callable[P, str]]:
-    def decorator(fn: Callable[P, Sequence[WebsocketMessage]]) -> Callable[P, str]:
+) -> Callable[[Callable[P, Sequence[SSEMessage]]], Callable[P, str]]:
+    def decorator(fn: Callable[P, Sequence[SSEMessage]]) -> Callable[P, str]:
         task_name = name or fn.__name__
 
         @functools.wraps(fn)
