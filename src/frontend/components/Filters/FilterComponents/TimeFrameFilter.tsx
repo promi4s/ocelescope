@@ -1,6 +1,6 @@
 import { useTimeInfo } from "@/api/fastapi/ocels/ocels";
 import { Box, Grid, LoadingOverlay, RangeSlider } from "@mantine/core";
-import { memo, useMemo } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { BarChart } from "@mantine/charts";
 import { DateTimePicker } from "@mantine/dates";
 import dayjs from "dayjs";
@@ -41,6 +41,7 @@ const TimeGraph: React.FC<{
 
     return data;
   }, [timeInfo, startDate, endDate]);
+
   return (
     <BarChart
       h={300}
@@ -58,6 +59,59 @@ const TimeGraph: React.FC<{
     />
   );
 });
+
+const TimeFrameSlider: React.FC<{
+  timeInfo: EntityTimeInfo;
+  startTime: string;
+  endTime: string;
+  onChange: (newTimeFrame: [string, string]) => void;
+}> = ({ timeInfo, startTime, endTime, onChange }) => {
+  const startIndex = useMemo(
+    () =>
+      timeInfo.date_distribution.findIndex(({ end_timestamp }) =>
+        dayjs(startTime).isBefore(dayjs(end_timestamp)),
+      ),
+    [startTime, timeInfo.date_distribution],
+  );
+
+  const endIndex = useMemo(
+    () =>
+      timeInfo.date_distribution.findLastIndex(({ start_timestamp }) =>
+        dayjs(endTime).isAfter(dayjs(start_timestamp)),
+      ),
+    [endTime, timeInfo.date_distribution],
+  );
+
+  const [range, setRange] = useState<[number, number]>([startIndex, endIndex]);
+
+  useEffect(() => {
+    setRange([startIndex, endIndex]);
+  }, [startIndex, endIndex]);
+
+  const applyRangeToTime = ([start, end]: [number, number]) =>
+    [
+      dayjs(timeInfo.date_distribution[start].start_timestamp).toString(),
+      dayjs(timeInfo.date_distribution[end].end_timestamp).toString(),
+    ] as [string, string];
+
+  return (
+    <RangeSlider
+      min={0}
+      max={timeInfo.date_distribution.length - 1}
+      minRange={0}
+      value={range}
+      label={(value) =>
+        dayjs(timeInfo.date_distribution[value].start_timestamp).format(
+          "YYYY-MM-DD HH:mm",
+        )
+      }
+      onChange={(newRange) => {
+        setRange(newRange);
+        onChange(applyRangeToTime(newRange));
+      }}
+    />
+  );
+};
 
 const TimeFrameFilter: React.FC<FilterPageComponentProps> = memo(
   ({ ocelParams, control }) => {
@@ -108,40 +162,11 @@ const TimeFrameFilter: React.FC<FilterPageComponentProps> = memo(
                     />
                   </Grid.Col>
                   <Grid.Col span={6}>
-                    <RangeSlider
-                      minRange={0}
-                      min={0}
-                      label={(value) => {
-                        return dayjs(timeInfo.start_time)
-                          .add(value, "day")
-                          .format("YYYY-MM-DD HH:MM");
-                      }}
-                      max={timeInfo.date_distribution.length - 1}
-                      value={[
-                        timeInfo.date_distribution.findIndex(
-                          ({ end_timestamp }) =>
-                            dayjs(field.value?.[0]).isBefore(
-                              dayjs(end_timestamp),
-                            ),
-                        ),
-                        timeInfo.date_distribution.findLastIndex(
-                          ({ start_timestamp }) =>
-                            dayjs(field.value?.[1]).isAfter(
-                              dayjs(start_timestamp),
-                            ),
-                        ),
-                      ]}
-                      onChange={([startDiff, endDiff]) => {
-                        field.onChange([
-                          dayjs(
-                            timeInfo.date_distribution[startDiff]
-                              .start_timestamp,
-                          ).toString(),
-                          dayjs(
-                            timeInfo.date_distribution[endDiff].end_timestamp,
-                          ).toString(),
-                        ]);
-                      }}
+                    <TimeFrameSlider
+                      endTime={timeInfo.end_time}
+                      startTime={timeInfo.start_time}
+                      onChange={field.onChange}
+                      timeInfo={timeInfo}
                     />
                   </Grid.Col>
                   <Grid.Col span={3}>
