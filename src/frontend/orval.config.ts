@@ -2,13 +2,14 @@ import { defineConfig } from "orval";
 export default defineConfig({
   fastapi: {
     input: "./api/openapi.json",
+
     output: {
       mode: "tags-split",
       target: "./api/fastapi",
       schemas: "./api/fastapi-schemas",
       client: "react-query",
       httpClient: "fetch",
-      baseUrl: "http://localhost:8000",
+      baseUrl: "/api/external",
       clean: true,
       override: {
         mutator: {

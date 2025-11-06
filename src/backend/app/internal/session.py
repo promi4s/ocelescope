@@ -4,15 +4,14 @@ import json
 import uuid
 from typing import Any, Callable, Hashable, Optional, Type, TypeVar, cast
 
-from app.websocket import websocket_manager, InvalidationRequest
+from ocelescope import OCEL, OCELFilter
 
 from app.internal.exceptions import NotFound
 from app.internal.model.module import Module
 from app.internal.model.ocel import Filtered_Ocel
-from ocelescope import OCEL, OCELFilter
-from app.internal.model.resource import ResourceStore, ResourceApi
+from app.internal.model.resource import ResourceApi, ResourceStore
 from app.internal.tasks.base import TaskBase
-
+from app.sse_manager import InvalidationRequest, sse_manager
 
 T = TypeVar("T", bound=Module)  # Constrain T to CachableObject
 
@@ -109,7 +108,7 @@ class Session:
             return
 
         self.ocels.pop(ocel_id, None)
-        websocket_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
+        sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
 
     def get_ocel_filters(self, ocel_id: str) -> Optional[OCELFilter]:
         if ocel_id not in self.ocels:
@@ -131,7 +130,7 @@ class Session:
 
         current_ocel.filtered = current_ocel.original.apply_filter(filters)
         current_ocel.filter = filters
-        websocket_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
+        sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
 
     # endregion
     # region Resource management
@@ -140,7 +139,7 @@ class Session:
 
         self._resources[id] = resource
 
-        websocket_manager.send_safe(self.id, InvalidationRequest(routes=["resources"]))
+        sse_manager.send_safe(self.id, InvalidationRequest(routes=["resources"]))
 
         return id
 
@@ -151,7 +150,7 @@ class Session:
 
     def delete_resource(self, id: str):
         self._resources.pop(id, None)
-        websocket_manager.send_safe(self.id, InvalidationRequest(routes=["resources"]))
+        sse_manager.send_safe(self.id, InvalidationRequest(routes=["resources"]))
 
     def list_resources(self) -> list[ResourceApi]:
         return list(
@@ -164,7 +163,7 @@ class Session:
             raise NotFound(f"Resource with id {id} not found")
 
         self._resources[id].name = new_name
-        websocket_manager.send_safe(self.id, InvalidationRequest(routes=["resources"]))
+        sse_manager.send_safe(self.id, InvalidationRequest(routes=["resources"]))
 
     # endregion
     def invalidate_module_states(self):

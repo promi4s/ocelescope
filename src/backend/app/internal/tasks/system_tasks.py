@@ -1,22 +1,26 @@
-from datetime import datetime
 import json
-from pathlib import Path
 import shutil
 import tempfile
+import zipfile
+from datetime import datetime
+from pathlib import Path
 from typing import IO, TypedDict
 from uuid import uuid4
-import zipfile
 
 from fastapi import HTTPException
+from ocelescope import OCEL
 
 from app.internal.config import config
 from app.internal.model.resource import ResourceStore
-from app.internal.session import Session
-from app.websocket import InvalidationRequest, OcelLink, SytemNotificiation
-from ocelescope import OCEL
 from app.internal.registry import registry_manager
+from app.internal.session import Session
 from app.internal.tasks.system import system_task
 from app.internal.util.stream_to_tempfile import stream_to_tempfile
+from app.sse_manager import (
+    InvalidationRequest,
+    OcelLink,
+    SystemNotification,
+)
 
 
 class ImportMetadata(TypedDict):
@@ -52,7 +56,7 @@ def import_ocel_task(
     ocel_id = session.add_ocel(ocel)
 
     return [
-        SytemNotificiation(
+        SystemNotification(
             title="Ocel successfully uploaded",
             message=f"{ocel.meta.get('fileName', None) or 'OCEL '} was uploaded successfully",
             notification_type="info",
@@ -94,7 +98,7 @@ def import_plugin(
     registry_manager.load_plugins(added_plugin_ids)
 
     return [
-        SytemNotificiation(
+        SystemNotification(
             title="Ocel successfully uploaded",
             message="Plugin uploaded successfully",
             notification_type="info",
@@ -122,7 +126,7 @@ def import_resource(
     )
 
     return [
-        SytemNotificiation(
+        SystemNotification(
             title="Resource successfully uploaded",
             message=f"{resource.name} uploaded successfully",
             notification_type="info",

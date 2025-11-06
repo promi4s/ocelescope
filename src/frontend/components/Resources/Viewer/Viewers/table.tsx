@@ -2,7 +2,7 @@ import { VisualizationByType } from "@/types/resources";
 
 import React, { useEffect, useMemo, useState } from "react";
 import { DataTable, type DataTableColumn } from "mantine-datatable";
-import dayjs from "dayjs";
+import dayjs from "@/util/dayjs";
 import { formatDate, formatDateTime } from "@/util/formatters";
 
 type Table = VisualizationByType<"table">;

@@ -1,23 +1,21 @@
 from __future__ import annotations
-from datetime import datetime
+
 import io
+from datetime import datetime
 from pathlib import Path
 
-
+from fastapi import File, Request, UploadFile
+from fastapi.responses import JSONResponse, Response
 from fastapi.routing import APIRouter
 
-from fastapi import File, Request, UploadFile
-from fastapi.responses import Response, JSONResponse
-
-from app.internal.config import config
 from app.dependencies import ApiSession
+from app.internal.config import config
 from app.internal.session import Session
 from app.internal.tasks.system_tasks import (
     import_ocel_task,
     import_plugin,
     import_resource,
 )
-
 
 session_router = APIRouter(prefix="/session", tags=["session"])
 

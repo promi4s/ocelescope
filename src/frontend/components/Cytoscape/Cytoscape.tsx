@@ -57,10 +57,16 @@ const CytoscapeGraph: React.FC<
         "arrow-scale": 1.5,
         "curve-style": "bezier",
         "font-size": 12,
-        "text-background-color": "data(color)",
         "text-background-opacity": 1,
         "text-background-shape": "roundrectangle",
         "text-background-padding": "3px",
+        "text-background-color": "#888",
+      },
+    },
+    {
+      selector: "edge[color]",
+      css: {
+        "text-background-color": "data(color)",
       },
     },
     {

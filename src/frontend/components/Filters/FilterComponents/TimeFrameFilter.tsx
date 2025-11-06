@@ -3,7 +3,7 @@ import { Box, Grid, LoadingOverlay, RangeSlider } from "@mantine/core";
 import { memo, useMemo } from "react";
 import { BarChart } from "@mantine/charts";
 import { DateTimePicker } from "@mantine/dates";
-import dayjs from "dayjs";
+import dayjs from "@/util/dayjs";
 import { EntityTimeInfo } from "@/api/fastapi-schemas";
 import { Controller, Watch } from "react-hook-form";
 import { FilterPageComponentProps } from "..";
@@ -41,6 +41,7 @@ const TimeGraph: React.FC<{
 
     return data;
   }, [timeInfo, startDate, endDate]);
+
   return (
     <BarChart
       h={300}
@@ -58,6 +59,59 @@ const TimeGraph: React.FC<{
     />
   );
 });
+
+const TimeFrameSlider: React.FC<{
+  timeInfo: EntityTimeInfo;
+  startTime: string;
+  endTime: string;
+  onChange: (newTimeFrame: [string, string]) => void;
+}> = ({ timeInfo, startTime, endTime, onChange }) => {
+  const startIndex = useMemo(
+    () =>
+      timeInfo.date_distribution.findIndex(
+        ({ start_timestamp, end_timestamp }) =>
+          dayjs(startTime).isBetween(
+            start_timestamp,
+            end_timestamp,
+            null,
+            "[)",
+          ),
+      ),
+    [startTime, timeInfo.date_distribution],
+  );
+
+  const endIndex = useMemo(
+    () =>
+      timeInfo.date_distribution.findLastIndex(
+        ({ start_timestamp, end_timestamp }) =>
+          dayjs(endTime).isBetween(start_timestamp, end_timestamp, null, "(]"),
+      ),
+    [endTime, timeInfo.date_distribution],
+  );
+
+  return (
+    <RangeSlider
+      min={0}
+      max={timeInfo.date_distribution.length - 1}
+      minRange={0}
+      value={[startIndex, endIndex]}
+      label={(value) =>
+        dayjs(timeInfo.date_distribution[value].start_timestamp).format(
+          "YYYY-MM-DD HH:mm",
+        )
+      }
+      onChange={([start, end]) => {
+        onChange([
+          //TODO: Find out why index shift is happening
+          start === startIndex
+            ? startTime
+            : timeInfo.date_distribution[start].start_timestamp,
+          timeInfo.date_distribution[end].end_timestamp,
+        ]);
+      }}
+    />
+  );
+};
 
 const TimeFrameFilter: React.FC<FilterPageComponentProps> = memo(
   ({ ocelParams, control }) => {
@@ -108,40 +162,11 @@ const TimeFrameFilter: React.FC<FilterPageComponentProps> = memo(
                     />
                   </Grid.Col>
                   <Grid.Col span={6}>
-                    <RangeSlider
-                      minRange={0}
-                      min={0}
-                      label={(value) => {
-                        return dayjs(timeInfo.start_time)
-                          .add(value, "day")
-                          .format("YYYY-MM-DD HH:MM");
-                      }}
-                      max={timeInfo.date_distribution.length - 1}
-                      value={[
-                        timeInfo.date_distribution.findIndex(
-                          ({ end_timestamp }) =>
-                            dayjs(field.value?.[0]).isBefore(
-                              dayjs(end_timestamp),
-                            ),
-                        ),
-                        timeInfo.date_distribution.findLastIndex(
-                          ({ start_timestamp }) =>
-                            dayjs(field.value?.[1]).isAfter(
-                              dayjs(start_timestamp),
-                            ),
-                        ),
-                      ]}
-                      onChange={([startDiff, endDiff]) => {
-                        field.onChange([
-                          dayjs(
-                            timeInfo.date_distribution[startDiff]
-                              .start_timestamp,
-                          ).toString(),
-                          dayjs(
-                            timeInfo.date_distribution[endDiff].end_timestamp,
-                          ).toString(),
-                        ]);
-                      }}
+                    <TimeFrameSlider
+                      onChange={field.onChange}
+                      timeInfo={timeInfo}
+                      startTime={field.value?.[0] ?? timeInfo.start_time}
+                      endTime={field.value?.[1] ?? timeInfo.end_time}
                     />
                   </Grid.Col>
                   <Grid.Col span={3}>

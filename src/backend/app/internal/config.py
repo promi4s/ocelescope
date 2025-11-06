@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Literal
+
 from pydantic import DirectoryPath, Field
 from pydantic_settings import BaseSettings
 
@@ -11,7 +12,7 @@ This file containes a Config class defining all environment parameters, includin
 
 class OceanConfig(BaseSettings):
     FRONTEND_URL: str = Field(
-        default="http://localhost:3000",
+        default="http://frontend:3000",
         description="The frontend URL, relevant for CORS settings",
     )
 

@@ -22,11 +22,7 @@ from app.internal.tasks.base import (
     _call_with_known_params,
 )
 from app.internal.util.hashing import generate_tuple_hash
-from app.websocket import (
-    PluginLink,
-    SytemNotificiation,
-    websocket_manager,
-)
+from app.sse_manager import PluginLink, SystemNotification, sse_manager
 
 if TYPE_CHECKING:
     from app.internal.session import Session
@@ -134,9 +130,9 @@ class PluginTask(TaskBase, Generic[P]):
             raise
         finally:
             self.session.running_tasks.pop(self.id, None)
-            websocket_manager.send_safe(
+            sse_manager.send_safe(
                 session_id=self.session.id,
-                message=SytemNotificiation(
+                message=SystemNotification(
                     type="notification",
                     title="Plugin successfully run",
                     message=f"Successfully run plugin {self.plugin_id} {self.method_name}",

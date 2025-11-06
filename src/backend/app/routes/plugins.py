@@ -1,32 +1,30 @@
-from pathlib import Path
 import shutil
+import tempfile
+import zipfile
+from pathlib import Path
 from typing import Any, Optional
+from uuid import uuid4
+
 from fastapi.datastructures import UploadFile
 from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
-from uuid import uuid4
-
 from ocelescope import PluginMethod, Resource
-
-from app.websocket import websocket_manager, InvalidationRequest
 from ocelescope.ocel.ocel import OCEL
 
-from app.internal.config import config
-import tempfile
-import zipfile
 from app.dependencies import ApiSession
-
+from app.internal.config import config
 from app.internal.model.plugin import PluginApi
 
 # TODO: Put this in own util function
 from app.internal.registry import registry_manager
 from app.internal.tasks.base import _call_with_known_params
 from app.internal.tasks.plugin import PluginTask
+from app.sse_manager import InvalidationRequest, sse_manager
 
 plugin_router = APIRouter(prefix="/plugins", tags=["plugins"])
 
 
-@plugin_router.get("/", operation_id="plugins")
+@plugin_router.get("", operation_id="plugins")
 def get_plugins() -> list[PluginApi]:
     return registry_manager.list_plugins()
 
@@ -114,7 +112,7 @@ def get_computed(
         return []
 
 
-@plugin_router.post("/", operation_id="uploadPlugin")
+@plugin_router.post("", operation_id="uploadPlugin")
 def upload_plugin(file: UploadFile, session: ApiSession):
     file_name = file.filename
     if not file_name or not file_name.endswith(".zip"):
@@ -154,7 +152,7 @@ def delete_plugin(plugin_id: str, session: ApiSession):
 
     shutil.rmtree(plugin_path, ignore_errors=True)
 
-    websocket_manager.send_safe(
+    sse_manager.send_safe(
         session.id,
         InvalidationRequest(
             routes=["plugins"],

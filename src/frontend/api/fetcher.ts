@@ -29,7 +29,7 @@ export const customFetch = async <T>(
   }
 
   const newSessionId = response.headers.get(env.oceanSessionId);
-  if (newSessionId !== sessionId) {
+  if (newSessionId !== sessionId && newSessionId != null) {
     setSessionId(response.headers.get(env.oceanSessionId));
   }
 
