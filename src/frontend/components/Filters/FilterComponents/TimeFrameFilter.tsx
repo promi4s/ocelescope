@@ -1,9 +1,9 @@
 import { useTimeInfo } from "@/api/fastapi/ocels/ocels";
 import { Box, Grid, LoadingOverlay, RangeSlider } from "@mantine/core";
-import { memo, useEffect, useMemo, useState } from "react";
+import { memo, useMemo } from "react";
 import { BarChart } from "@mantine/charts";
 import { DateTimePicker } from "@mantine/dates";
-import dayjs from "dayjs";
+import dayjs from "@/util/dayjs";
 import { EntityTimeInfo } from "@/api/fastapi-schemas";
 import { Controller, Watch } from "react-hook-form";
 import { FilterPageComponentProps } from "..";
@@ -68,46 +68,46 @@ const TimeFrameSlider: React.FC<{
 }> = ({ timeInfo, startTime, endTime, onChange }) => {
   const startIndex = useMemo(
     () =>
-      timeInfo.date_distribution.findIndex(({ end_timestamp }) =>
-        dayjs(startTime).isBefore(dayjs(end_timestamp)),
+      timeInfo.date_distribution.findIndex(
+        ({ start_timestamp, end_timestamp }) =>
+          dayjs(startTime).isBetween(
+            start_timestamp,
+            end_timestamp,
+            null,
+            "[)",
+          ),
       ),
     [startTime, timeInfo.date_distribution],
   );
 
   const endIndex = useMemo(
     () =>
-      timeInfo.date_distribution.findLastIndex(({ start_timestamp }) =>
-        dayjs(endTime).isAfter(dayjs(start_timestamp)),
+      timeInfo.date_distribution.findLastIndex(
+        ({ start_timestamp, end_timestamp }) =>
+          dayjs(endTime).isBetween(start_timestamp, end_timestamp, null, "(]"),
       ),
     [endTime, timeInfo.date_distribution],
   );
-
-  const [range, setRange] = useState<[number, number]>([startIndex, endIndex]);
-
-  useEffect(() => {
-    setRange([startIndex, endIndex]);
-  }, [startIndex, endIndex]);
-
-  const applyRangeToTime = ([start, end]: [number, number]) =>
-    [
-      dayjs(timeInfo.date_distribution[start].start_timestamp).toString(),
-      dayjs(timeInfo.date_distribution[end].end_timestamp).toString(),
-    ] as [string, string];
 
   return (
     <RangeSlider
       min={0}
       max={timeInfo.date_distribution.length - 1}
       minRange={0}
-      value={range}
+      value={[startIndex, endIndex]}
       label={(value) =>
         dayjs(timeInfo.date_distribution[value].start_timestamp).format(
           "YYYY-MM-DD HH:mm",
         )
       }
-      onChange={(newRange) => {
-        setRange(newRange);
-        onChange(applyRangeToTime(newRange));
+      onChange={([start, end]) => {
+        onChange([
+          //TODO: Find out why index shift is happening
+          start === startIndex
+            ? startTime
+            : timeInfo.date_distribution[start].start_timestamp,
+          timeInfo.date_distribution[end].end_timestamp,
+        ]);
       }}
     />
   );
@@ -163,10 +163,10 @@ const TimeFrameFilter: React.FC<FilterPageComponentProps> = memo(
                   </Grid.Col>
                   <Grid.Col span={6}>
                     <TimeFrameSlider
-                      endTime={timeInfo.end_time}
-                      startTime={timeInfo.start_time}
                       onChange={field.onChange}
                       timeInfo={timeInfo}
+                      startTime={field.value?.[0] ?? timeInfo.start_time}
+                      endTime={field.value?.[1] ?? timeInfo.end_time}
                     />
                   </Grid.Col>
                   <Grid.Col span={3}>
