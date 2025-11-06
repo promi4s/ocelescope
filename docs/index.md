@@ -9,8 +9,6 @@ To get Ocelescope running docker compose. To run ocelescope you can just use the
 services:
   backend:
     image: grkmr/ocelescope_backend:latest
-    ports:
-      - "8000:8000"
     volumes:
       - plugins_store:/plugins
     restart: unless-stopped
