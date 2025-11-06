@@ -27,13 +27,12 @@ import {
   Download,
   EllipsisVerticalIcon,
   EyeIcon,
-  FilterIcon,
   Pencil,
   Trash,
   X,
 } from "lucide-react";
 import useInvalidate from "@/hooks/useInvalidateResources";
-import dayjs from "dayjs";
+import dayjs from "@/util/dayjs";
 import uniqolor from "uniqolor";
 import { OCELExtensions } from "@/types/ocel";
 import { useDownloadFile } from "@/hooks/useDownload";
