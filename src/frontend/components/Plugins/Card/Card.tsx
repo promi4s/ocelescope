@@ -29,7 +29,7 @@ export const PluginCard: React.FC<{ plugin: PluginApi }> = ({ plugin }) => {
           </Menu.Item>
         </>
       }
-      cta={{ link: `plugins/${plugin.id}`, title: "Go To Plugin" }}
+      cta={{ link: `plugins/${plugin.id}`, title: "View Plugin" }}
     />
   );
 };
