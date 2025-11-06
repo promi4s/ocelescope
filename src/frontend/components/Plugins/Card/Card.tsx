@@ -1,54 +1,20 @@
 import { PluginApi } from "@/api/fastapi-schemas";
-import { useGetExtensionMeta } from "@/api/fastapi/ocels/ocels";
 import { useDeletePlugin } from "@/api/fastapi/plugins/plugins";
-import { useGetResourceMeta } from "@/api/fastapi/resources/resources";
 import { GenericCard } from "@/components/Cards/GenericCard";
 import UploadModal from "@/components/UploadModal/UploadModal";
 import { Card, Menu, Stack, Text, ThemeIcon } from "@mantine/core";
 import { Trash2Icon, UploadIcon } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 export const PluginCard: React.FC<{ plugin: PluginApi }> = ({ plugin }) => {
   const { description, label, version } = plugin.meta;
 
-  const { data: resourceMeta = {} } = useGetResourceMeta();
-  const { data: extensionMeta = {} } = useGetExtensionMeta();
   const { mutate: deletePlugin } = useDeletePlugin();
-
-  const tags = useMemo(() => {
-    const extensions = plugin.methods.flatMap((method) =>
-      Object.values(method.input_ocels ?? {}).map(({ extension }) =>
-        extension ? extensionMeta[extension]?.label : undefined,
-      ),
-    );
-
-    const inputResoures = plugin.methods.flatMap((method) =>
-      Object.values(method.input_resources ?? {}).map(
-        ([resourceName]) => resourceMeta[resourceName]?.label ?? resourceName,
-      ),
-    );
-
-    const resultNames = plugin.methods.flatMap((method) =>
-      (method.results ?? []).map((result) => {
-        if (result.type === "resource") {
-          return (
-            resourceMeta[result.resource_type]?.label ?? result.resource_type
-          );
-        }
-      }),
-    );
-
-    return Array.from(
-      new Set([...inputResoures, ...resultNames, ...extensions]),
-    ).filter((tag) => !!tag) as string[];
-  }, [plugin.methods, resourceMeta, extensionMeta]);
-
   return (
     <GenericCard
       title={label}
       description={description ?? ""}
       version={version}
-      tags={tags}
       menuItems={
         <>
           <Menu.Item
