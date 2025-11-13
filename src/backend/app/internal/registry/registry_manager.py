@@ -4,12 +4,17 @@ import sys
 from typing import Any, Dict, TypedDict
 
 from ocelescope import Plugin, Resource
+
 from app.internal.config import config
 from app.internal.model.plugin import PluginApi
 from app.internal.model.resource import ResourceStore
 from app.internal.registry.extension import ExtensionRegistry
 from app.internal.registry.plugin import PluginRegistry
 from app.internal.registry.resource import ResourceRegistry
+from app.internal.util.dynamic_import import (
+    import_wheel_dynamically,
+    is_wheel_compatible,
+)
 
 
 class ResourceInfo(TypedDict):
@@ -89,6 +94,17 @@ class RegistryManager:
 
             if id in sys.modules:
                 continue
+
+            # TODO: Put wheels folder into config
+            if (module_path / "wheels").exists():
+                compatible_wheels = [
+                    wheel_file
+                    for wheel_file in (module_path / "wheels").iterdir()
+                    if is_wheel_compatible(wheel_file.name)
+                ]
+
+                for wheel in compatible_wheels:
+                    import_wheel_dynamically(wheel)
 
             spec = importlib.util.spec_from_file_location(
                 id, module_path / "__init__.py"
