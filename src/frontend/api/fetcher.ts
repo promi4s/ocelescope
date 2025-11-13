@@ -12,7 +12,7 @@ export const customFetch = async <T>(
   const headers = new Headers(options.headers || {});
 
   if (sessionId) {
-    headers.set(env.oceanSessionId, sessionId);
+    headers.set(env.NEXT_PUBLIC_OCEAN_SESSION_ID, sessionId);
   }
 
   try {
@@ -28,9 +28,9 @@ export const customFetch = async <T>(
     throw error;
   }
 
-  const newSessionId = response.headers.get(env.oceanSessionId);
+  const newSessionId = response.headers.get(env.NEXT_PUBLIC_OCEAN_SESSION_ID);
   if (newSessionId !== sessionId && newSessionId != null) {
-    setSessionId(response.headers.get(env.oceanSessionId));
+    setSessionId(response.headers.get(env.NEXT_PUBLIC_OCEAN_SESSION_ID));
   }
 
   const contentType = response.headers.get("content-type") || "";

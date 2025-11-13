@@ -1,6 +1,7 @@
 import useInvalidate from "@/hooks/useInvalidateResources";
-import { WebSocketMessage } from "@/lib/websocket/validator";
+import { ServerEventMessage } from "@/lib/websocket/validator";
 import useSessionStore from "@/store/sessionStore";
+import { env } from "@/util/env";
 import { showNotification } from "@mantine/notifications";
 import { useEffect } from "react";
 
@@ -14,11 +15,13 @@ const SSEWrapper = () => {
       return;
     }
 
-    const es = new EventSource(`/api/events?sessionId=${sessionId}`);
+    const es = new EventSource(
+      `${env.NEXT_PUBLIC_EVENTS_URL}?sessionId=${sessionId}`,
+    );
 
     //TODO: Use message names
     es.onmessage = (event) => {
-      const result = WebSocketMessage.safeParse(JSON.parse(event.data));
+      const result = ServerEventMessage.safeParse(JSON.parse(event.data));
 
       if (!result.success) {
         console.warn("Invalid SSE message", result.error);

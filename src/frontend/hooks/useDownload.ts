@@ -7,9 +7,9 @@ export const useDownloadFile = () => {
 
   const downloadFile = async (path: string) => {
     try {
-      const response = await fetch(`${env.backendUrl}${path}`, {
+      const response = await fetch(`${env.NEXT_PUBLIC_BACKEND_URL}${path}`, {
         method: "GET",
-        headers: { [env.oceanSessionId]: sessionId ?? "" },
+        headers: { [env.NEXT_PUBLIC_OCEAN_SESSION_ID]: sessionId ?? "" },
       });
 
       if (!response.ok) {

@@ -36,7 +36,7 @@ const InvalidationRequest = z.object({
   routes: z.array(z.enum(["ocels", "resources", "tasks", "plugins"])),
 });
 
-export const WebSocketMessage = z.discriminatedUnion("type", [
+export const ServerEventMessage = z.discriminatedUnion("type", [
   SystemNotification,
   InvalidationRequest,
 ]);
