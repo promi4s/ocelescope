@@ -40,7 +40,8 @@ const EntityTable: React.FC<{
         sortable: true,
       })),
       ...relations.map(({ qualifier, target }) => ({
-        accessor: qualifier !== "" ? qualifier : target,
+        accessor: `${qualifier}::${target}`,
+        title: `${qualifier} (${target})`,
       })),
     ],
     [withTimestamp, attributes],

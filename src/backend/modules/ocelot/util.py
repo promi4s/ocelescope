@@ -2,9 +2,9 @@ from math import ceil
 from typing import Literal, Optional, Tuple, cast
 
 import pandas as pd
+from ocelescope import OCEL
 from pandas import DataFrame
 
-from ocelescope import OCEL
 from modules.ocelot.models import ObjectChange, OcelEntity, PaginatedResponse
 
 
@@ -39,27 +39,31 @@ def get_paginated_dataframe(
     total_items = len(df)
     total_pages = ceil(total_items / page_size)
 
-    # Only consider relations for this page
     related = relation_table[relation_table[from_field].isin(paginated_df[from_field])]
 
-    # Pivot relation data
     relations = related.pivot_table(
         index=from_field,
-        columns="ocel:qualifier",
+        columns=["ocel:qualifier", "ocel:type"],
         values=to_field,
         aggfunc=lambda x: list(x),
     ).reset_index()
 
-    # Bundle relation columns into one 'relations' dict
+    relations.columns = [
+        col
+        if not isinstance(col, tuple)
+        else f"{col[0]}::{col[1]}"
+        if col[0] != "ocel:eid"
+        else col[0]
+        for col in relations.columns
+    ]
+
     relations["relations"] = relations.drop(columns=[from_field]).to_dict(
         orient="records"
     )
     relations = relations[[from_field, "relations"]]
 
-    # Drop non-informative columns
     paginated_df = paginated_df.dropna(axis=1, how="all")
 
-    # Build attribute dict excluding non-attribute fields
     columns_to_drop = [
         col for col in non_attribute_fields if col in paginated_df.columns
     ]
@@ -70,7 +74,6 @@ def get_paginated_dataframe(
     else:
         paginated_df["attributes"] = attribute_data.to_dict(orient="records")
 
-    # Merge with relation info
     merged = pd.merge(paginated_df, relations, on=from_field, how="left")
 
     merged["relations"] = merged["relations"].apply(
@@ -79,7 +82,7 @@ def get_paginated_dataframe(
             for k, v in (r if isinstance(r, dict) else {}).items()
         }
     )
-    # Convert rows to OcelEntity objects
+
     items = [
         OcelEntity(
             id=row[from_field],  # type:ignore
