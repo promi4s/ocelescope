@@ -83,9 +83,11 @@ async def sse_endpoint(request: Request):
                     sse_manager.disconnect(session_id)
                     break
 
-                # Wait for next message
-                msg = await queue.get()
-                yield f"data: {msg}\n\n"
+                try:
+                    msg = await asyncio.wait_for(queue.get(), timeout=25)
+                    yield f"data: {msg}\n\n"
+                except asyncio.TimeoutError:
+                    yield ": keep-alive\n\n"
         except asyncio.CancelledError:
             sse_manager.disconnect(session_id)
 
