@@ -126,7 +126,7 @@ const RelationFilter: React.FC<{
                   <Select
                     data={[
                       { value: "include", label: "Include" },
-                      { value: "exlude", label: "Exlude" },
+                      { value: "exclude", label: "Exclude" },
                     ]}
                     label={"Mode"}
                     value={field.value ?? "include"}
