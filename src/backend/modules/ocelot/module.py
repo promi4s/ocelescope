@@ -114,7 +114,12 @@ class State(Module):
             ],
             page=page,
             page_size=page_size,
-            relation_table=ocel.ocel.o2o,
+            relation_table=ocel.o2o.rename(
+                columns={
+                    "ocel:oid_1": ocel.ocel.object_id_column,
+                    "ocel:type_2": ocel.ocel.object_type_column,
+                }
+            ),
             from_field=ocel.ocel.object_id_column,
             to_field="ocel:oid_2",
         )

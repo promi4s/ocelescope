@@ -52,7 +52,7 @@ def get_paginated_dataframe(
         col
         if not isinstance(col, tuple)
         else f"{col[0]}::{col[1]}"
-        if col[0] != "ocel:eid"
+        if col[0] != from_field
         else col[0]
         for col in relations.columns
     ]
