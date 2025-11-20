@@ -1,10 +1,10 @@
 import Form from "@rjsf/mantine";
 import validator from "@rjsf/validator-ajv8";
 import { useEffect, useMemo, useState } from "react";
-import { Control, Controller } from "react-hook-form";
-import { PluginInputType } from ".";
+import { type Control, Controller } from "react-hook-form";
+import type { PluginInputType } from ".";
 import { getComputedSelect } from "./Fields/custom";
-import { UiSchema } from "@rjsf/utils";
+import type { UiSchema } from "@rjsf/utils";
 import { wrapFieldsWithContext } from "./Fields/ocel";
 import traverse from "json-schema-traverse";
 import RefParser from "@apidevtools/json-schema-ref-parser";
@@ -81,7 +81,7 @@ const PluginForm: React.FC<PluginFormProps> = ({
 
   const computedFields = useMemo(
     () => getComputedSelect({ methodName, pluginId, control }),
-    [methodName, pluginId],
+    [methodName, pluginId, control],
   );
 
   return (

@@ -1,4 +1,4 @@
-import {
+import type {
   ObjectAttributes200Item,
   RelationCountSummary,
 } from "@/api/fastapi-schemas";
@@ -42,7 +42,7 @@ const EntityCard: React.FC<EntityCardProps> = ({
           <Table.Caption mb={0}>Attributes</Table.Caption>
           <Table.Tbody>
             {attributeSummaries.map((attribute) => (
-              <Table.Tr>
+              <Table.Tr key={attribute.attribute}>
                 <Table.Td> {attribute.attribute}</Table.Td>
                 <Table.Td ta={"end"}>{attribute.type}</Table.Td>
               </Table.Tr>
@@ -51,33 +51,31 @@ const EntityCard: React.FC<EntityCardProps> = ({
         </Table>
       )}
       {relationSummaries.length !== 0 && (
-        <>
-          <Table
-            withRowBorders={false}
-            captionSide="top"
-            style={{
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            <Table.Caption mb={0}>Relations</Table.Caption>
-            <Table.Tbody>
-              {relationSummaries.map(
-                ({ target, qualifier, min_count, max_count }) => (
-                  <Table.Tr>
-                    <Table.Td>{target}</Table.Td>
-                    <Table.Td>{qualifier ?? "None"}</Table.Td>
-                    <Table.Td>
-                      {min_count < max_count
-                        ? `${min_count}-${max_count}`
-                        : min_count}
-                    </Table.Td>
-                  </Table.Tr>
-                ),
-              )}
-            </Table.Tbody>
-          </Table>
-        </>
+        <Table
+          withRowBorders={false}
+          captionSide="top"
+          style={{
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          <Table.Caption mb={0}>Relations</Table.Caption>
+          <Table.Tbody>
+            {relationSummaries.map(
+              ({ target, qualifier, min_count, max_count }) => (
+                <Table.Tr key={`${target}-${qualifier}`}>
+                  <Table.Td>{target}</Table.Td>
+                  <Table.Td>{qualifier ?? "None"}</Table.Td>
+                  <Table.Td>
+                    {min_count < max_count
+                      ? `${min_count}-${max_count}`
+                      : min_count}
+                  </Table.Td>
+                </Table.Tr>
+              ),
+            )}
+          </Table.Tbody>
+        </Table>
       )}
     </Flex>
   );

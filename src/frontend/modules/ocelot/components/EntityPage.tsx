@@ -16,9 +16,10 @@ import { keepPreviousData } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import EntityTable from "./EntityTable";
 import { Flex } from "@mantine/core";
-import { DataTableSortStatus } from "mantine-datatable";
+import type { DataTableSortStatus } from "mantine-datatable";
 import useCurrentOcel from "@/hooks/useCurrentOcel";
 
+//TODO: Overwork this
 const EntityPage: React.FC<{ type: "events" | "objects" }> = ({ type }) => {
   const { id } = useCurrentOcel();
 
@@ -60,7 +61,7 @@ const EntityPage: React.FC<{ type: "events" | "objects" }> = ({ type }) => {
 
   const entityNames = useMemo(
     () => Object.keys((type === "events" ? eventCounts : objectCounts) ?? {}),
-    [eventCounts, objectCounts],
+    [eventCounts, objectCounts, type],
   );
 
   //TODO: Make this in a collapsable table rather then extra collumns
@@ -71,7 +72,7 @@ const EntityPage: React.FC<{ type: "events" | "objects" }> = ({ type }) => {
     const relations = (type === "events" ? e2o : o2o) ?? [];
 
     return relations.filter(({ source }) => source === currentTab);
-  }, [e2o, o2o, currentTab]);
+  }, [type, e2o, o2o, currentTab]);
 
   const { data: eventEntities } = useOcelotPaginatedEvents(
     {

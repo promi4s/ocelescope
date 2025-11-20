@@ -1,6 +1,6 @@
-import { Modal, Text, Title } from "@mantine/core";
+import { Modal, Text } from "@mantine/core";
 import UploadSection from "../UploadSection/UploadSection";
-import { ComponentProps } from "react";
+import type { ComponentProps } from "react";
 
 const UploadModal: React.FC<
   {

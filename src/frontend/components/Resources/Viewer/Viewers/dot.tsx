@@ -1,7 +1,7 @@
 // DotToSvgViewer.tsx
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { Graphviz } from "@hpcc-js/wasm-graphviz";
-import { VisualizationProps } from "..";
+import type { VisualizationProps } from "..";
 import { SvgPanWrapper } from "./svg";
 import { saveAs } from "file-saver";
 

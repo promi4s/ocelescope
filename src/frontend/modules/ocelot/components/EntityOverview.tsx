@@ -1,4 +1,4 @@
-import {
+import type {
   EventAttributes200,
   EventCounts200,
   RelationCountSummary,

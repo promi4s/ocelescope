@@ -1,6 +1,6 @@
-import { OCELFilter } from "@/api/fastapi-schemas";
+import type { OCELFilter } from "@/api/fastapi-schemas";
 import { filterMap } from "@/components/Filters";
-import { FilterType } from "@/types/filters";
+import type { FilterType } from "@/types/filters";
 import { Button, ButtonGroup, Group, Tabs } from "@mantine/core";
 import { CheckIcon, RotateCcwIcon, XIcon } from "lucide-react";
 import { useEffect, useMemo } from "react";
@@ -133,7 +133,7 @@ const FilterForm: React.FC<{
       {Object.entries(filterMap).map(([filterType, { filterPage }]) => {
         const Component = filterPage;
         return (
-          <Tabs.Panel value={filterType} p={"md"}>
+          <Tabs.Panel key={filterType} value={filterType} p={"md"}>
             <Component
               control={control}
               ocelParams={{

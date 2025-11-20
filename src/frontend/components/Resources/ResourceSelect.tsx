@@ -1,6 +1,6 @@
 import { useResources } from "@/api/fastapi/resources/resources";
 import { Select } from "@mantine/core";
-import { ComponentProps } from "react";
+import type { ComponentProps } from "react";
 
 const ResourceSelect: React.FC<
   ComponentProps<typeof Select> & { type?: string }
@@ -12,7 +12,7 @@ const ResourceSelect: React.FC<
       {...props}
       defaultValue={resources[0]?.id}
       data={resources.map(({ name, id }) => ({ value: id, label: name }))}
-    ></Select>
+    />
   );
 };
 

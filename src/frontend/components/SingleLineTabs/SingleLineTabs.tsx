@@ -1,7 +1,7 @@
 import { Button, Flex, ScrollArea, Tabs } from "@mantine/core";
 import { useScrollIntoView } from "@mantine/hooks";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
-import { useEffect, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
 type Tab = {
   label: string;
@@ -23,14 +23,21 @@ const SingleLineTabs: React.FC<{
     HTMLDivElement
   >({ axis: "x", duration: 0 });
 
-  useEffect(() => scrollIntoView({ alignment: "center" }), [currentTab, tabs]);
+  const onChangeCurrentTab = useCallback(
+    (newTab: string) => {
+      setCurrentTab(newTab);
+      scrollIntoView({ alignment: "center" });
+    },
+    [scrollIntoView, setCurrentTab],
+  );
+
   return (
     <>
       <Flex align="center" justify="center">
         <Button
           variant="subtle"
           onClick={() => {
-            setCurrentTab(tabs[Math.max(0, currentTabIndex - 1)].value);
+            onChangeCurrentTab(tabs[Math.max(0, currentTabIndex - 1)].value);
           }}
           disabled={currentTabIndex === 0}
         >
@@ -42,7 +49,7 @@ const SingleLineTabs: React.FC<{
             value={currentTab}
             onChange={(newTab) => {
               if (newTab) {
-                setCurrentTab(newTab);
+                onChangeCurrentTab(newTab);
               }
             }}
           >
@@ -69,7 +76,7 @@ const SingleLineTabs: React.FC<{
         <Button
           variant="subtle"
           onClick={() => {
-            setCurrentTab(
+            onChangeCurrentTab(
               tabs[Math.min(tabs.length - 1, currentTabIndex + 1)].value,
             );
           }}

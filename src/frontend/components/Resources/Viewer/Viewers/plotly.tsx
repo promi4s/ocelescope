@@ -1,5 +1,5 @@
-import { ComponentProps } from "react";
-import { VisualizationProps } from "..";
+import type { ComponentProps } from "react";
+import type { VisualizationProps } from "..";
 import dynamic from "next/dynamic";
 
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });

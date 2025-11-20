@@ -2,7 +2,12 @@ import {
   useEventAttributes,
   useObjectAttributes,
 } from "@/api/fastapi/ocels/ocels";
-import { Control, Controller, useFieldArray, useWatch } from "react-hook-form";
+import {
+  type Control,
+  Controller,
+  useFieldArray,
+  useWatch,
+} from "react-hook-form";
 import {
   Button,
   Grid,
@@ -12,8 +17,8 @@ import {
   Stack,
   TextInput,
 } from "@mantine/core";
-import { memo, ReactNode, useMemo } from "react";
-import {
+import { memo, type ReactNode, useMemo } from "react";
+import type {
   EventAttributes200,
   EventAttributes200Item,
   ObjectAttributes200,
@@ -22,8 +27,8 @@ import {
 } from "@/api/fastapi-schemas";
 import { DatePickerInput } from "@mantine/dates";
 import { XIcon } from "lucide-react";
-import { FilterPageComponentProps } from "..";
-import { FilterType } from "@/types/filters";
+import type { FilterPageComponentProps } from "..";
+import type { FilterType } from "@/types/filters";
 
 type AttributeFilterProps = {
   control: Control<OCELFilter>;
@@ -88,7 +93,7 @@ const attributeTypeToInput: {
               <NumberInput
                 label={"min"}
                 min={min}
-                max={value?.[1] ? parseFloat(`${value[1]}`) : max}
+                max={value?.[1] ? Number.parseFloat(`${value[1]}`) : max}
                 value={value?.[0] ?? min}
                 onChange={(newMin) => onChange([newMin, value?.[1] ?? null])}
               />
@@ -96,7 +101,7 @@ const attributeTypeToInput: {
             <Grid.Col span={3}>
               <NumberInput
                 label={"max"}
-                min={value?.[0] ? parseFloat(`${value[0]}`) : min}
+                min={value?.[0] ? Number.parseFloat(`${value[0]}`) : min}
                 max={max}
                 value={value?.[1] ?? max}
                 onChange={(newMax) => onChange([value?.[0] ?? null, newMax])}
@@ -119,7 +124,7 @@ const attributeTypeToInput: {
               <NumberInput
                 label={"min"}
                 min={min}
-                max={value?.[1] ? parseInt(`${value[1]}`) : max}
+                max={value?.[1] ? Number.parseInt(`${value[1]}`) : max}
                 value={value?.[0] ?? min}
                 onChange={(newMin) => onChange([newMin, value?.[1] ?? null])}
               />
@@ -127,7 +132,7 @@ const attributeTypeToInput: {
             <Grid.Col span={3}>
               <NumberInput
                 label={"max"}
-                min={value?.[0] ? parseInt(`${value[0]}`) : min}
+                min={value?.[0] ? Number.parseInt(`${value[0]}`) : min}
                 max={max}
                 value={value?.[1] ?? max}
                 onChange={(newMax) => onChange([value?.[0] ?? null, newMax])}

@@ -48,7 +48,7 @@ const SSEWrapper = () => {
     };
 
     return () => es.close();
-  }, [sessionId]);
+  }, [sessionId, invalidate]);
   return null;
 };
 

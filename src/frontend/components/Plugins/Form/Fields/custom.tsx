@@ -1,7 +1,7 @@
-import { Control, useWatch } from "react-hook-form";
-import { PluginInputType } from "..";
+import { type Control, useWatch } from "react-hook-form";
+import type { PluginInputType } from "..";
 import { memo } from "react";
-import { FieldProps } from "@rjsf/utils";
+import type { FieldProps } from "@rjsf/utils";
 import { useGetComputedValues } from "@/api/fastapi/plugins/plugins";
 import { keepPreviousData } from "@tanstack/react-query";
 import { MultiSelect, Select } from "@mantine/core";

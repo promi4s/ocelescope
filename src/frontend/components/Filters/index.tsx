@@ -1,7 +1,7 @@
-import { OCELFilter } from "@/api/fastapi-schemas";
-import { FilterType } from "@/types/filters";
-import { OcelInputType } from "@/types/ocel";
-import { Control } from "react-hook-form";
+import type { OCELFilter } from "@/api/fastapi-schemas";
+import type { FilterType } from "@/types/filters";
+import type { OcelInputType } from "@/types/ocel";
+import type { Control } from "react-hook-form";
 import {
   EventTypeFilterInput,
   ObjectTypeFilterInput,

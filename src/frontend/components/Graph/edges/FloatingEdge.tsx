@@ -1,6 +1,6 @@
 import {
-  Edge,
-  EdgeProps,
+  type Edge,
+  type EdgeProps,
   getStraightPath,
   useInternalNode,
 } from "@xyflow/react";

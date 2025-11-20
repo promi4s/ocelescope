@@ -1,6 +1,7 @@
-import { VisualizationByType } from "@/types/resources";
+import type { VisualizationByType } from "@/types/resources";
 
-import React, { useEffect, useMemo, useState } from "react";
+import type React from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DataTable, type DataTableColumn } from "mantine-datatable";
 import dayjs from "@/util/dayjs";
 import { formatDate, formatDateTime } from "@/util/formatters";
@@ -47,14 +48,10 @@ const TableView: React.FC<{ visualization: Table; isPreview?: boolean }> = ({
   const [records, setRecords] = useState(visualization.rows.slice(0, pageSize));
 
   useEffect(() => {
-    setPage(1);
-  }, [pageSize]);
-
-  useEffect(() => {
     const from = (page - 1) * pageSize;
     const to = from + pageSize;
     setRecords(visualization.rows.slice(from, to));
-  }, [page, pageSize]);
+  }, [page, pageSize, visualization]);
 
   const paginationProps =
     visualization.rows.length > PAGE_SIZES[0]
@@ -64,7 +61,10 @@ const TableView: React.FC<{ visualization: Table; isPreview?: boolean }> = ({
           onPageChange: (p: number) => setPage(p),
           page,
           recordsPerPageOptions: PAGE_SIZES,
-          onRecordsPerPageChange: setPageSize,
+          onRecordsPerPageChange: (newPageSize: number) => {
+            setPageSize(newPageSize);
+            setPage(1);
+          },
         }
       : {};
 

@@ -88,7 +88,8 @@ export const toDot = (visualization: VisualizationByType<"graph">) => {
     .reduce<Partial<Record<"source" | "sink" | number, string[]>>>(
       (acc, current) => {
         const key = current.rank as "sink" | "source" | number;
-        (acc[key] ??= []).push(esc(safeId(current?.id ?? "")));
+        acc[key] ??= [];
+        acc[key].push(esc(safeId(current?.id ?? "")));
         return acc;
       },
       {},
@@ -109,8 +110,8 @@ export const toDot = (visualization: VisualizationByType<"graph">) => {
 const parsePos = (s?: string) => {
   if (!s) return;
   const [xs, ys] = s.split(",");
-  const x = parseFloat(xs);
-  const y = parseFloat(ys);
+  const x = Number.parseFloat(xs);
+  const y = Number.parseFloat(ys);
   if (Number.isFinite(x) && Number.isFinite(y)) return { x, y };
 };
 
@@ -121,10 +122,7 @@ export const useGraphvizLayout = (
   const [error, setError] = useState<string | null>(null);
   const cancelRef = useRef({ cancelled: false });
 
-  const dot = useMemo(
-    () => toDot(visualization),
-    [visualization.nodes, visualization.edges, visualization.layout_config],
-  );
+  const dot = useMemo(() => toDot(visualization), [visualization]);
 
   useEffect(() => {
     cancelRef.current.cancelled = false;
@@ -144,15 +142,16 @@ export const useGraphvizLayout = (
           string,
           { x: number; y: number; width?: number }
         > = {};
-        gvJson.objects?.forEach((o) => {
+
+        for (const o of gvJson.objects ?? []) {
           if (!o.name || !o.pos) return;
           const p = parsePos(o.pos);
           if (!p) return;
           nodePos[o.name] = {
             ...p,
-            width: o.width ? parseFloat(o.width) * 72 : undefined,
+            width: o.width ? Number.parseFloat(o.width) * 72 : undefined,
           };
-        });
+        }
 
         const nodes: ElementDefinition[] = (visualization.nodes ?? []).map(
           (node) => ({

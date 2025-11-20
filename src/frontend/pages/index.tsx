@@ -1,6 +1,6 @@
 import EntityTable from "@/components/EntityTable/EntityTable";
 import RecentPlugins from "@/components/Plugins/RecentPlugins/RecentPlugins";
-import { Container, Group, Stack, Title } from "@mantine/core";
+import { Container, Stack, Title } from "@mantine/core";
 
 const Overview = () => {
   return (

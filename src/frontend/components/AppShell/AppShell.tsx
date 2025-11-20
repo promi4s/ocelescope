@@ -26,7 +26,7 @@ import Link from "next/link";
 import { useLogout } from "@/api/fastapi/session/session";
 import { useQueryClient } from "@tanstack/react-query";
 import { getModuleRoute } from "@/lib/modules";
-import {
+import type {
   ModuleName,
   ModuleRouteDefinition,
   ModuleRouteName,
@@ -108,6 +108,8 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   const { data: ocels } = useGetOcels();
 
+  const isOcelAvailable = ocels?.length !== 0;
+
   return (
     <MAppShell
       header={{ height: 60 }}
@@ -174,8 +176,8 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   () =>
                     !Object.values(routes).some(
                       ({ requiresOcel }) => !requiresOcel,
-                    ) && ocels?.length === 0,
-                  [routes, ocels],
+                    ) && !isOcelAvailable,
+                  [routes],
                 );
 
                 return (
@@ -211,7 +213,7 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                               name: name as ModuleName,
                               route: routeName as ModuleRouteName<ModuleName>,
                             })}
-                            disabled={requiresOcel && ocels?.length === 0}
+                            disabled={requiresOcel && !isOcelAvailable}
                             component={Link}
                             active={
                               name === modulePath?.name &&

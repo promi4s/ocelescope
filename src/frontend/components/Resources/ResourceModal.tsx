@@ -3,15 +3,14 @@ import Viewer from "./Viewer";
 import { XIcon } from "lucide-react";
 import { useResource } from "@/api/fastapi/resources/resources";
 
-const ResourceModal: React.FC<{ id?: string; onClose: () => void }> = ({
+const ResourceModal: React.FC<{ id: string; onClose: () => void }> = ({
   id,
   onClose,
 }) => {
-  const { data } = useResource(id!, { query: { enabled: !!id } });
+  const { data } = useResource(id, { query: { enabled: !!id } });
 
   return (
-    data &&
-    data.resource.id && (
+    data?.resource.id && (
       <Modal
         opened={!!data}
         onClose={onClose}

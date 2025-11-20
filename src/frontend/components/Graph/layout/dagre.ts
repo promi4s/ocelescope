@@ -1,5 +1,5 @@
-import dagre, { GraphLabel } from "@dagrejs/dagre";
-import { Node, useReactFlow } from "@xyflow/react";
+import dagre, { type GraphLabel } from "@dagrejs/dagre";
+import { type Node, useReactFlow } from "@xyflow/react";
 import { useCallback } from "react";
 
 export const useDagreLayout = () => {
@@ -13,16 +13,16 @@ export const useDagreLayout = () => {
 
       const nodes = getNodes();
 
-      nodes.forEach((node) => {
+      for (const node of nodes) {
         dagreGraph.setNode(node.id, {
           width: node.measured?.width,
           height: node.measured?.height,
         });
-      });
+      }
 
-      getEdges().forEach((edge) => {
+      for (const edge of getEdges()) {
         dagreGraph.setEdge(edge.source, edge.target);
-      });
+      }
 
       dagre.layout(dagreGraph);
 

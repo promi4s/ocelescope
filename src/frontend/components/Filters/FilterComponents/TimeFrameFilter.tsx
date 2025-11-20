@@ -4,9 +4,9 @@ import { memo, useMemo } from "react";
 import { BarChart } from "@mantine/charts";
 import { DateTimePicker } from "@mantine/dates";
 import dayjs from "@/util/dayjs";
-import { EntityTimeInfo } from "@/api/fastapi-schemas";
+import type { EntityTimeInfo } from "@/api/fastapi-schemas";
 import { Controller, Watch } from "react-hook-form";
-import { FilterPageComponentProps } from "..";
+import type { FilterPageComponentProps } from "..";
 
 const TimeGraph: React.FC<{
   timeInfo: EntityTimeInfo;

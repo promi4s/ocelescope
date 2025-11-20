@@ -1,5 +1,6 @@
-import React, { memo } from "react";
-import { Handle, Node, NodeProps, Position } from "@xyflow/react";
+import type React from "react";
+import { memo } from "react";
+import { Handle, type Node, type NodeProps, Position } from "@xyflow/react";
 import { Box } from "@mantine/core";
 
 export type CircleNodeType = Node<

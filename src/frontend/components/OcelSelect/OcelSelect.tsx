@@ -1,6 +1,6 @@
 import { useGetOcels } from "@/api/fastapi/ocels/ocels";
 import { Select } from "@mantine/core";
-import { ComponentProps, useMemo } from "react";
+import { type ComponentProps, useMemo } from "react";
 
 const OcelSelect: React.FC<
   ComponentProps<typeof Select> & { extension?: string }
@@ -13,7 +13,7 @@ const OcelSelect: React.FC<
     <Select
       {...props}
       data={ocels.map(({ name, id }) => ({ value: id, label: name }))}
-    ></Select>
+    />
   );
 };
 

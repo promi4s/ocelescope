@@ -1,7 +1,7 @@
-import { GetStaticPaths, GetStaticProps, NextPage } from "next";
+import type { GetStaticPaths, GetStaticProps, NextPage } from "next";
 
 import moduleMap from "@/lib/modules/module-map";
-import { ModuleName, ModuleRouteName } from "@/types/modules";
+import type { ModuleName, ModuleRouteName } from "@/types/modules";
 
 type ModulePageProps = {
   module: {

@@ -34,7 +34,7 @@ import {
 import useInvalidate from "@/hooks/useInvalidateResources";
 import dayjs from "@/util/dayjs";
 import uniqolor from "uniqolor";
-import { OCELExtensions } from "@/types/ocel";
+import type { OCELExtensions } from "@/types/ocel";
 import { useDownloadFile } from "@/hooks/useDownload";
 import ResourceModal from "../Resources/ResourceModal";
 
@@ -47,6 +47,7 @@ type Entity = {
   downloadFormats?: string[];
 };
 
+//TODO: sync with api
 const ocelExtenisions: OCELExtensions[] = [".sqlite", ".xmlocel", ".jsonocel"];
 
 const EntityTable: React.FC = () => {
@@ -89,6 +90,7 @@ const EntityTable: React.FC = () => {
       switch (entityType) {
         case "ocel":
           renameOcel({ params: { ocel_id: id, new_name: newName } });
+          break;
         case "resource":
           renameResource({ resourceId: id, params: { new_name: newName } });
       }
@@ -129,10 +131,12 @@ const EntityTable: React.FC = () => {
 
   return (
     <>
-      <ResourceModal
-        id={viewedResouce}
-        onClose={() => setViewedResource(undefined)}
-      />
+      {viewedResouce && (
+        <ResourceModal
+          id={viewedResouce}
+          onClose={() => setViewedResource(undefined)}
+        />
+      )}
       {entities.length ? (
         <DataTable<Entity>
           withTableBorder
@@ -223,7 +227,7 @@ const EntityTable: React.FC = () => {
                     >
                       Rename
                     </Menu.Item>
-                    {type == "resource" && (
+                    {type === "resource" && (
                       <MenuItem
                         leftSection={<EyeIcon size={16} />}
                         onClick={() => setViewedResource(id)}
@@ -241,6 +245,7 @@ const EntityTable: React.FC = () => {
                         <Menu.Sub.Dropdown>
                           {ocelExtenisions.map((extension) => (
                             <Menu.Item
+                              key={extension}
                               onClick={() =>
                                 downloadFile(
                                   `/ocels/download?${new URLSearchParams({ ocel_id: id, ext: extension }).toString()}`,

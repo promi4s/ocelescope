@@ -32,7 +32,7 @@ const PluginPage = () => {
     if (!pluginMethod && !isLoading) {
       router.push("/plugins");
     }
-  }, [isLoading, pluginMethod]);
+  }, [isLoading, pluginMethod, router]);
 
   const [currentTask, setCurrentTask] = useState<string>();
 
@@ -45,17 +45,15 @@ const PluginPage = () => {
       <Stack gap={"xl"}>
         <Stack align="center">
           <Breadcrumbs>
-            {[
-              <Anchor component={Link} href="/plugins">
-                Plugins
-              </Anchor>,
-              <Anchor component={Link} href={`/plugins/${id}`}>
-                {plugin?.meta.label}
-              </Anchor>,
-              <Anchor component={Link} href={`/plugins/${id}`}>
-                {pluginMethod.label}
-              </Anchor>,
-            ]}
+            <Anchor component={Link} href="/plugins">
+              Plugins
+            </Anchor>
+            <Anchor component={Link} href={`/plugins/${id}`}>
+              {plugin?.meta.label}
+            </Anchor>
+            <Anchor component={Link} href={`/plugins/${id}`}>
+              {pluginMethod.label}
+            </Anchor>
           </Breadcrumbs>
           <Stack gap={"sm"}>
             <Title ta={"center"}>{pluginMethod?.label ?? method}</Title>
@@ -69,7 +67,7 @@ const PluginPage = () => {
           pluginId={id as string}
           method={pluginMethod}
         />
-        <ResultSection taskId={currentTask} />
+        {currentTask && <ResultSection taskId={currentTask} />}
       </Stack>
     </Container>
   );

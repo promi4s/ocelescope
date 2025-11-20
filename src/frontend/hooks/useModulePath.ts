@@ -1,5 +1,5 @@
 import moduleMap from "@/lib/modules/module-map";
-import { ModuleName, ModuleRouteName } from "@/types/modules";
+import type { ModuleName, ModuleRouteName } from "@/types/modules";
 import { useRouter } from "next/router";
 
 const useModulePath = () => {

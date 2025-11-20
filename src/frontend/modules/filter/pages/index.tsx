@@ -1,5 +1,5 @@
 import { defineModuleRoute } from "@/lib/modules";
-import { OCELFilter } from "@/api/fastapi-schemas";
+import type { OCELFilter } from "@/api/fastapi-schemas";
 import { useGetFilters, useSetFilters } from "@/api/fastapi/ocels/ocels";
 import { Box, LoadingOverlay } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";

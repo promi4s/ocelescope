@@ -1,4 +1,4 @@
-import { InternalNode, Position } from "@xyflow/react";
+import { type InternalNode, Position } from "@xyflow/react";
 
 // Rectangle intersection helper
 export const getRectangleIntersection = (

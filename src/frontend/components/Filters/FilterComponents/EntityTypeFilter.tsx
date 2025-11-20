@@ -3,7 +3,7 @@ import { MultiSelect, Stack } from "@mantine/core";
 import BarChartSelect from "@/components/Charts/BarChartSelect";
 import { memo, useMemo } from "react";
 import { Controller } from "react-hook-form";
-import { FilterPageComponentProps } from "..";
+import type { FilterPageComponentProps } from "..";
 
 const EntityTypeFilterInput: React.FC<{
   selectedEntityTypes: string[];

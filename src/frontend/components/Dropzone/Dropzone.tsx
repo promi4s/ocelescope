@@ -1,6 +1,6 @@
-import { ComponentProps, useRef } from "react";
+import { type ComponentProps, useRef } from "react";
 import { Button, Group, Text, useMantineTheme } from "@mantine/core";
-import { Dropzone, FileWithPath } from "@mantine/dropzone";
+import { Dropzone, type FileWithPath } from "@mantine/dropzone";
 import classes from "@/components/Dropzone/Dropzone.module.css";
 import { DownloadIcon, Upload, X } from "lucide-react";
 

@@ -1,4 +1,4 @@
-import { PluginMethod } from "@/api/fastapi-schemas";
+import type { PluginMethod } from "@/api/fastapi-schemas";
 import { Button, Stack } from "@mantine/core";
 import OcelSelect from "@/components/OcelSelect/OcelSelect";
 import { Controller, useForm } from "react-hook-form";
@@ -46,10 +46,11 @@ const PluginInput: React.FC<PluginInputProps> = ({
   });
 
   const onSubmit = useCallback(
-    handleSubmit((data) =>
-      runPlugin({ data, methodName: method.name, pluginId }),
-    ),
-    [handleSubmit, pluginId, method.name],
+    () =>
+      handleSubmit((data) =>
+        runPlugin({ data, methodName: method.name, pluginId }),
+      )(),
+    [handleSubmit, pluginId, method, runPlugin],
   );
 
   return (

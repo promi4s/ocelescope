@@ -1,4 +1,4 @@
-import { OCELFilter } from "@/api/fastapi-schemas";
+import type { OCELFilter } from "@/api/fastapi-schemas";
 
 export type Filter = OCELFilter;
 

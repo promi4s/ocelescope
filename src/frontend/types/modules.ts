@@ -1,5 +1,5 @@
-import moduleMap from "@/lib/modules/module-map";
-import { SVGProps } from "react";
+import type moduleMap from "@/lib/modules/module-map";
+import type { SVGProps } from "react";
 
 type Author = {
   name: string;

@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { Readable } from "stream";
-import type { ReadableStream as NodeReadableStream } from "stream/web";
+import { Readable } from "node:stream";
+import type { ReadableStream as NodeReadableStream } from "node:stream/web";
 
 export const config = {
   api: {

@@ -1,4 +1,5 @@
-import React, { ComponentProps } from "react";
+import type React from "react";
+import type { ComponentProps } from "react";
 import { BaseEdge as FlowBaseEdge, EdgeLabelRenderer } from "@xyflow/react";
 
 export const EdgeLabel: React.FC<{

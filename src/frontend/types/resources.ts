@@ -1,4 +1,4 @@
-import { GetResourceResponse } from "@/api/fastapi-schemas";
+import type { GetResourceResponse } from "@/api/fastapi-schemas";
 type RequireType<T> = T extends {
   type?: infer L;
 }

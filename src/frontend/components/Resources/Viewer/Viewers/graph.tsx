@@ -1,4 +1,4 @@
-import { VisualizationByType, VisulizationsType } from "@/types/resources";
+import type { VisualizationByType, VisulizationsType } from "@/types/resources";
 import { Box } from "@mantine/core";
 import CytoscapeComponent from "@/components/Cytoscape";
 import ActionButtons from "@/components/Cytoscape/components/ActionButtons";
@@ -28,7 +28,7 @@ const GraphViewer: React.FC<{
               <FloatingAnnotation>
                 {(entity) => {
                   const visualizationEntity = visualization[
-                    entity.type == "edge" ? "edges" : "nodes"
+                    entity.type === "edge" ? "edges" : "nodes"
                   ]?.find(({ id }) => id === entity.id);
 
                   if (!visualizationEntity?.annotation) return;

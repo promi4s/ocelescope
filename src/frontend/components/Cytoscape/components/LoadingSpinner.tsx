@@ -1,5 +1,5 @@
 import { LoadingOverlay } from "@mantine/core";
-import { ComponentProps } from "react";
+import type { ComponentProps } from "react";
 
 const CytoscapeLoadingSpinner = (
   props: ComponentProps<typeof LoadingOverlay>,

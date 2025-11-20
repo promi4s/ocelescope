@@ -1,5 +1,8 @@
 import { useReactFlow } from "@xyflow/react";
-import ELK, { LayoutOptions, type ElkNode } from "elkjs/lib/elk.bundled.js";
+import ELK, {
+  type LayoutOptions,
+  type ElkNode,
+} from "elkjs/lib/elk.bundled.js";
 import { useCallback } from "react";
 const elk = new ELK();
 
@@ -25,76 +28,80 @@ export const useElkLayout = () => {
     "elk.layered.nodePlacement.strategy": "NETWORK_SIMPLEX",
   };
 
-  const layout = useCallback(async (options?: any) => {
-    const nodes = getNodes();
-    const edges = getEdges();
+  const layout = useCallback(
+    async (options?: any) => {
+      const nodes = getNodes();
+      const edges = getEdges();
 
-    const layoutOptions: LayoutOptions = defaultOptions;
+      const layoutOptions: LayoutOptions = defaultOptions;
 
-    const graph: ElkNode = {
-      id: "root",
-      layoutOptions,
-      children: nodes.map((node) => {
-        return {
-          id: node.id,
-          width: node.measured?.width,
-          height: node.measured?.height,
-          properties: {},
-          layoutOptions: {},
-        };
-      }),
-      edges: getEdges().map((edge) => ({
-        id: edge.id,
-        sources: [edge.source],
-        targets: [edge.target],
-        layoutOptions: edge?.data?.mid
-          ? { "elk.edge.minimalLength": edge.data.mid.toString() }
-          : undefined,
-      })),
-    };
-
-    try {
-      const layoutedGraph = await elk.layout(graph);
-
-      setNodes(
-        nodes.map((node) => {
-          const elkNode = layoutedGraph.children?.find(
-            ({ id }) => id === node.id,
-          );
-
+      const graph: ElkNode = {
+        id: "root",
+        layoutOptions,
+        children: nodes.map((node) => {
           return {
-            ...node,
-            position: {
-              x: elkNode?.x ?? 0,
-              y: elkNode?.y ?? 0,
-            },
+            id: node.id,
+            width: node.measured?.width,
+            height: node.measured?.height,
+            properties: {},
+            layoutOptions: {},
           };
         }),
-      );
-      setEdges(
-        edges.map((edge) => {
-          const elkEdge = layoutedGraph.edges?.find(({ id }) => id === edge.id)
-            ?.sections?.[0];
+        edges: getEdges().map((edge) => ({
+          id: edge.id,
+          sources: [edge.source],
+          targets: [edge.target],
+          layoutOptions: edge?.data?.mid
+            ? { "elk.edge.minimalLength": edge.data.mid.toString() }
+            : undefined,
+        })),
+      };
 
-          return {
-            ...edge,
-            data: {
-              ...edge.data,
-              ...(elkEdge && {
-                position: {
-                  sourceX: elkEdge.startPoint.x,
-                  sourceY: elkEdge.startPoint.y,
-                  targetX: elkEdge.endPoint.x,
-                  targetY: elkEdge.endPoint.y,
-                },
-              }),
-            },
-          };
-        }),
-      );
-      fitView();
-    } catch (error) {}
-  }, []);
+      try {
+        const layoutedGraph = await elk.layout(graph);
+
+        setNodes(
+          nodes.map((node) => {
+            const elkNode = layoutedGraph.children?.find(
+              ({ id }) => id === node.id,
+            );
+
+            return {
+              ...node,
+              position: {
+                x: elkNode?.x ?? 0,
+                y: elkNode?.y ?? 0,
+              },
+            };
+          }),
+        );
+        setEdges(
+          edges.map((edge) => {
+            const elkEdge = layoutedGraph.edges?.find(
+              ({ id }) => id === edge.id,
+            )?.sections?.[0];
+
+            return {
+              ...edge,
+              data: {
+                ...edge.data,
+                ...(elkEdge && {
+                  position: {
+                    sourceX: elkEdge.startPoint.x,
+                    sourceY: elkEdge.startPoint.y,
+                    targetX: elkEdge.endPoint.x,
+                    targetY: elkEdge.endPoint.y,
+                  },
+                }),
+              },
+            };
+          }),
+        );
+        fitView();
+      } catch (error) {}
+    },
+    [setEdges, setNodes, getNodes, getEdges, fitView],
+  );
 
   return { layout };
 };

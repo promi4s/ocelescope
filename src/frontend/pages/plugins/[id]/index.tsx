@@ -1,4 +1,4 @@
-import { PluginMethod } from "@/api/fastapi-schemas";
+import type { PluginMethod } from "@/api/fastapi-schemas";
 import { useGetExtensionMeta } from "@/api/fastapi/ocels/ocels";
 import { useGetPlugin } from "@/api/fastapi/plugins/plugins";
 import { useGetResourceMeta } from "@/api/fastapi/resources/resources";
@@ -44,7 +44,7 @@ const MethodCard: React.FC<{ pluginId: string; method: PluginMethod }> = ({
     return Array.from(
       new Set([...inputResoures, ...resultNames, ...extensions]),
     ).filter((tag) => !!tag) as string[];
-  }, [resourceMeta, extensionMeta]);
+  }, [resourceMeta, extensionMeta, method]);
 
   return (
     <GenericCard
@@ -67,14 +67,12 @@ const PluginPage: React.FC = () => {
       <Stack>
         <Stack gap={0} align="center">
           <Breadcrumbs>
-            {[
-              <Anchor component={Link} href="/plugins">
-                Plugins
-              </Anchor>,
-              <Anchor component={Link} href={`/plugins/${plugin?.id}`}>
-                {plugin?.meta.label}
-              </Anchor>,
-            ]}
+            <Anchor component={Link} href="/plugins">
+              Plugins
+            </Anchor>
+            <Anchor component={Link} href={`/plugins/${plugin?.id}`}>
+              {plugin?.meta.label}
+            </Anchor>
           </Breadcrumbs>
           <Title mt={"xs"}> {plugin?.meta.label}</Title>
           <Text c="dimmed">{plugin?.meta.description}</Text>

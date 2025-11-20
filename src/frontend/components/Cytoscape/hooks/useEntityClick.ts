@@ -64,10 +64,10 @@ const useEntityClick = ({ trigger }: { trigger: TriggerType }) => {
 
         if (prev.type === "node") {
           return { ...prev, boundingBox: ele.renderedBoundingBox() };
-        } else {
-          const midpoint = ele.renderedMidpoint();
-          return { ...prev, midpoint };
         }
+
+        const midpoint = ele.renderedMidpoint();
+        return { ...prev, midpoint };
       });
     };
 

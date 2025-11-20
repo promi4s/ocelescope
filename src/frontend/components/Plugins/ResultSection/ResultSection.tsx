@@ -60,8 +60,8 @@ const ResourceCard: React.FC<{
   );
 };
 
-const ResultSection: React.FC<{ taskId?: string }> = ({ taskId }) => {
-  const { data: pluginSummary } = useGetPluginTask(taskId!, {
+const ResultSection: React.FC<{ taskId: string }> = ({ taskId }) => {
+  const { data: pluginSummary } = useGetPluginTask(taskId, {
     query: {
       refetchInterval: ({ state }) => {
         if (state.data?.state === "STARTED") {
@@ -76,10 +76,12 @@ const ResultSection: React.FC<{ taskId?: string }> = ({ taskId }) => {
 
   return (
     <SimpleGrid pos={"relative"} mih={200} cols={2}>
-      <ResourceModal
-        id={openedResource}
-        onClose={() => setOpenedResource(undefined)}
-      />
+      {openedResource && (
+        <ResourceModal
+          id={openedResource}
+          onClose={() => setOpenedResource(undefined)}
+        />
+      )}
       <LoadingOverlay visible={pluginSummary?.state === "STARTED"} />
       {pluginSummary?.output.resource_ids?.map((resourceId) => (
         <ResourceCard

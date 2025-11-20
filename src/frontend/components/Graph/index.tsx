@@ -1,26 +1,27 @@
-import React, { ComponentProps, useCallback, useEffect, useState } from "react";
+import type React from "react";
+import { type ComponentProps, useCallback, useEffect, useState } from "react";
 import {
   ReactFlow,
   useEdgesState,
-  Node,
-  Edge,
+  type Node,
+  type Edge,
   ReactFlowProvider,
   Controls,
-  NodeChange,
+  type NodeChange,
   applyNodeChanges,
 } from "@xyflow/react";
 
 import CircleNode, {
-  CircleNodeType,
+  type CircleNodeType,
 } from "@/components/Graph/nodes/CircleNode";
 import RectangleNode, {
-  RectangleNodeType,
+  type RectangleNodeType,
 } from "@/components/Graph/nodes/RectangleNode";
-import FloatingEdge, { FloatingEdgeType } from "./edges/FloatingEdge";
+import FloatingEdge, { type FloatingEdgeType } from "./edges/FloatingEdge";
 import { useDagreLayout } from "./layout/dagre";
-import { GraphLabel } from "@dagrejs/dagre";
+import type { GraphLabel } from "@dagrejs/dagre";
 import { useElkLayout } from "./layout/elk";
-import LoopingEdge, { LoopingEdgeType } from "./edges/LoopEdge";
+import LoopingEdge, { type LoopingEdgeType } from "./edges/LoopEdge";
 import { ActionIcon } from "@mantine/core";
 import { DownloadIcon } from "lucide-react";
 import { toPng } from "html-to-image";
@@ -113,35 +114,42 @@ const InnerFlow: React.FC<Props> = ({
     }),
   );
 
-  const onNodesChange = useCallback((changes: NodeChange[]) => {
-    const positionChange = changes.filter(
-      (change) => change.type === "position",
-    );
-    if (positionChange.length > 0) {
-      const movedNodes = positionChange.map((change) => change.id);
-      setEdges((edges) =>
-        edges.map((edge) => ({
-          ...edge,
-          data: {
-            ...edge.data,
-            position:
-              movedNodes.includes(edge.target) ||
-              movedNodes.includes(edge.source)
-                ? undefined
-                : edge.data!.position!,
-          },
-        })),
+  const onNodesChange = useCallback(
+    (changes: NodeChange[]) => {
+      const positionChange = changes.filter(
+        (change) => change.type === "position",
       );
-    }
+      if (positionChange.length > 0) {
+        const movedNodes = positionChange.map((change) => change.id);
+        setEdges((edges) =>
+          edges.map((edge) => ({
+            ...edge,
+            data: {
+              ...edge.data,
+              position:
+                movedNodes.includes(edge.target) ||
+                movedNodes.includes(edge.source)
+                  ? undefined
+                  : edge.data?.position,
+            },
+          })),
+        );
+      }
 
-    setNodes((nds) => applyNodeChanges(changes, nds));
-  }, []);
+      setNodes((nds) => applyNodeChanges(changes, nds));
+    },
+    [setEdges],
+  );
 
   const { layout } = layoutToHook[layoutOptions.type]();
 
+  const hasMeasuredNodes = nodes.some(({ measured }) => !!measured);
+
   useEffect(() => {
-    void layout(layoutOptions?.options);
-  }, [initialNodes, initialEdges, nodes.some(({ measured }) => !!measured)]);
+    if (hasMeasuredNodes) {
+      void layout(layoutOptions?.options);
+    }
+  }, [layout, layoutOptions, hasMeasuredNodes]);
 
   return (
     <ReactFlow
@@ -163,7 +171,7 @@ const InnerFlow: React.FC<Props> = ({
         }
         <ActionIcon
           variant="transparent"
-          onClick={() => handleDownload(`ocelot`)}
+          onClick={() => handleDownload("ocelot")}
         >
           <DownloadIcon color={"black"} size={18} />
         </ActionIcon>

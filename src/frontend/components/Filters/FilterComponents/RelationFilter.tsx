@@ -9,11 +9,16 @@ import {
 } from "@mantine/core";
 import { memo, useMemo } from "react";
 import { PlusIcon, X } from "lucide-react";
-import { OCELFilter, RelationCountSummary } from "@/api/fastapi-schemas";
+import type { OCELFilter, RelationCountSummary } from "@/api/fastapi-schemas";
 import { useE2o, useO2o } from "@/api/fastapi/ocels/ocels";
-import { Control, Controller, useFieldArray, useWatch } from "react-hook-form";
-import { FilterType } from "@/types/filters";
-import { FilterPageComponentProps } from "..";
+import {
+  type Control,
+  Controller,
+  useFieldArray,
+  useWatch,
+} from "react-hook-form";
+import type { FilterType } from "@/types/filters";
+import type { FilterPageComponentProps } from "..";
 
 const RelationFilter: React.FC<{
   soureRelations?: RelationCountSummary[];
@@ -59,11 +64,12 @@ const RelationFilter: React.FC<{
         const filteredRelations = relations.filter(
           ({ source, target, qualifier, max_count, min_count }) =>
             min_count < max_count &&
-            (relationConfig?.source == "" ||
-              relationConfig?.source == source) &&
+            (relationConfig?.source === "" ||
+              relationConfig?.source === source) &&
             (!relationConfig?.qualifier ||
-              relationConfig?.qualifier == qualifier) &&
-            (relationConfig?.target == "" || relationConfig?.target == target),
+              relationConfig?.qualifier === qualifier) &&
+            (relationConfig?.target === "" ||
+              relationConfig?.target === target),
         );
 
         const sourceNames = Array.from(
@@ -212,6 +218,7 @@ const RelationFilter: React.FC<{
     );
   },
 );
+
 const filterRelation = (relationSummary: RelationCountSummary) =>
   relationSummary.min_count < relationSummary.max_count;
 
@@ -229,8 +236,6 @@ export const E2OCountFilter: React.FC<FilterPageComponentProps> = ({
     direction: "target",
   });
 
-  const currentFilters = useWatch({ control });
-
   // #TODO: Fix allowing duplicate relation filters
   const { filterableE2ORelation, filterableO2ERelation } = useMemo(() => {
     const filterableE2ORelation = e2o.filter(filterRelation);
@@ -238,7 +243,7 @@ export const E2OCountFilter: React.FC<FilterPageComponentProps> = ({
     const filterableO2ERelation = o2e.filter(filterRelation);
 
     return { filterableE2ORelation, filterableO2ERelation };
-  }, [e2o, o2e, currentFilters]);
+  }, [e2o, o2e]);
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -287,19 +292,17 @@ export const O2OCountFilter: React.FC<FilterPageComponentProps> = ({
     direction: "target",
   });
 
-  const currentFilters = useWatch({ control });
-
   const { filterableO2ORelation, filterableO2OReverseRelation } =
     useMemo(() => {
       const filterableO2ORelation = o2o.filter(filterRelation);
 
-      const filterableO2OReverseRelation = o2o.filter(filterRelation);
+      const filterableO2OReverseRelation = o2oReverse.filter(filterRelation);
 
       return {
         filterableO2ORelation,
         filterableO2OReverseRelation,
       };
-    }, [o2o, o2oReverse, currentFilters]);
+    }, [o2o, o2oReverse]);
 
   const { fields, append, remove } = useFieldArray({
     control,

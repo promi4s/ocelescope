@@ -2,7 +2,7 @@ import { Box, Button, ButtonGroup } from "@mantine/core";
 import { saveAs } from "file-saver";
 import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
 import { DownloadIcon, MaximizeIcon, MinusIcon, PlusIcon } from "lucide-react";
-import { VisualizationProps } from "..";
+import type { VisualizationProps } from "..";
 import { Fragment } from "react";
 
 export const SvgPanWrapper: React.FC<{

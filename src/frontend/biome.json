@@ -38,9 +38,19 @@
   },
   "linter": {
     "rules": {
-      "recommended": false,
+      "recommended": true,
       "correctness": {
         "noUnusedImports": "error"
+      },
+      "suspicious": {
+        "noExplicitAny": "off",
+        "noArrayIndexKey": "off"
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": "off"
+      },
+      "a11y": {
+        "noSvgWithoutTitle": "off"
       }
     }
   },

@@ -1,6 +1,6 @@
 import {
-  Edge,
-  EdgeProps,
+  type Edge,
+  type EdgeProps,
   getSmoothStepPath,
   Position,
   useInternalNode,

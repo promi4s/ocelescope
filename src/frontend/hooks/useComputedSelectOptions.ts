@@ -1,7 +1,7 @@
 import { useGetComputedValues } from "@/api/fastapi/plugins/plugins";
-import { PluginInputType } from "@/components/Plugins/Form";
+import type { PluginInputType } from "@/components/Plugins/Form";
 import { keepPreviousData } from "@tanstack/react-query";
-import { useWatch, Control } from "react-hook-form";
+import { useWatch, type Control } from "react-hook-form";
 
 type useSelectOptionsProps = {
   pluginName: string;

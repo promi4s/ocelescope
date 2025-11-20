@@ -1,4 +1,4 @@
-import { Core } from "cytoscape";
+import type { Core } from "cytoscape";
 import { createContext, useContext } from "react";
 
 export type CytoscapeContextType = {

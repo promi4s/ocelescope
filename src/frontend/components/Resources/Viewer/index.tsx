@@ -1,10 +1,10 @@
-import {
+import type {
   VisualizationByType,
   VisulizationsType,
   VisulizationsTypes,
 } from "@/types/resources";
 import { LoadingOverlay, Stack, ThemeIcon } from "@mantine/core";
-import { ComponentProps, ComponentType } from "react";
+import type { ComponentProps, ComponentType } from "react";
 import GraphViewer from "./Viewers/graph";
 import { EyeOffIcon } from "lucide-react";
 import { useResource } from "@/api/fastapi/resources/resources";
