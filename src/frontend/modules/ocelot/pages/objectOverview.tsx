@@ -1,7 +1,7 @@
 import {
   useO2o,
   useObjectAttributes,
-  useObjectCount,
+  useObjectCounts,
 } from "@/api/fastapi/ocels/ocels";
 import Graph, { type NodeComponents } from "@/components/Graph";
 import { Group, Input, SegmentedControl, Stack } from "@mantine/core";
@@ -18,7 +18,7 @@ const ObjectGraph = () => {
   const { id: ocelId } = useCurrentOcel();
   const { data: o2o } = useO2o({ ocel_id: ocelId });
   const { data: objectAttributes } = useObjectAttributes({ ocel_id: ocelId });
-  const { data: objectCounts } = useObjectCount({ ocel_id: ocelId });
+  const { data: objectCounts } = useObjectCounts({ ocel_id: ocelId });
 
   const [searchValue, setSearchValue] = useDebouncedState("", 200);
   const [vizualization, setVizualization] = useState<"graph" | "cards">(

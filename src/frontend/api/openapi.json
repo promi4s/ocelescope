@@ -1209,7 +1209,7 @@
           "ocels"
         ],
         "summary": "Get Object Counts",
-        "operationId": "objectCount",
+        "operationId": "objectCounts",
         "parameters": [
           {
             "name": "ocel_id",
@@ -1259,7 +1259,7 @@
                   "additionalProperties": {
                     "type": "integer"
                   },
-                  "title": "Response Objectcount"
+                  "title": "Response Objectcounts"
                 }
               }
             }

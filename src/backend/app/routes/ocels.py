@@ -182,7 +182,7 @@ def get_time_info(
 @ocels_router.get(
     "/objects/counts",
     response_model=dict[str, int],
-    operation_id="objectCount",
+    operation_id="objectCounts",
 )
 def get_object_counts(
     ocel: ApiOcel,

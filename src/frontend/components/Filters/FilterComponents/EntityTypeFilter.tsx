@@ -1,4 +1,4 @@
-import { useEventCounts, useObjectCount } from "@/api/fastapi/ocels/ocels";
+import { useEventCounts, useObjectCounts } from "@/api/fastapi/ocels/ocels";
 import { MultiSelect, Stack } from "@mantine/core";
 import BarChartSelect from "@/components/Charts/BarChartSelect";
 import { memo, useMemo } from "react";
@@ -75,7 +75,7 @@ export const EventTypeFilterInput: React.FC<FilterPageComponentProps> = memo(
 
 export const ObjectTypeFilterInput: React.FC<FilterPageComponentProps> = memo(
   ({ ocelParams, control }) => {
-    const { data: objectCounts = {} } = useObjectCount({
+    const { data: objectCounts = {} } = useObjectCounts({
       ...ocelParams,
     });
 

@@ -3,7 +3,7 @@ import {
   useEventCounts,
   useEventIds,
   useObjectAttributes,
-  useObjectCount,
+  type useObjectCounts,
   useObjectIds,
 } from "@/api/fastapi/ocels/ocels";
 import { MultiSelect, Select } from "@mantine/core";
@@ -52,7 +52,7 @@ const AttributeSelector: (
   };
 
 const TypeSelector: (
-  query: typeof useEventCounts | typeof useObjectCount,
+  query: typeof useEventCounts | typeof useObjectCounts,
 ) => React.FC<OcelFieldProps> =
   (query) =>
   ({ ocelId, onChange, requiered, value, isMulti, label, description }) => {
