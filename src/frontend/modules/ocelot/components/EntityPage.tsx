@@ -4,7 +4,7 @@ import {
   useEventCounts,
   useO2o,
   useObjectAttributes,
-  useObjectCount,
+  useObjectCounts,
 } from "@/api/fastapi/ocels/ocels";
 import {
   useOcelotPaginatedEvents,
@@ -19,37 +19,22 @@ import { Flex } from "@mantine/core";
 import type { DataTableSortStatus } from "mantine-datatable";
 import useCurrentOcel from "@/hooks/useCurrentOcel";
 
-//TODO: Overwork this
 const EntityPage: React.FC<{ type: "events" | "objects" }> = ({ type }) => {
   const { id } = useCurrentOcel();
 
-  const { data: eventCounts } = useEventCounts(
-    { ocel_id: id },
-    {
-      query: { enabled: type === "events" },
-    },
-  );
-  const { data: objectCounts } = useObjectCount(
-    { ocel_id: id },
-    {
-      query: { enabled: type === "objects" },
-    },
-  );
+  const areEntitiesEvents = type === "events";
 
-  const { data: eventAttributes } = useEventAttributes(
-    { ocel_id: id },
-    {
-      query: { enabled: type === "events" },
-    },
-  );
-  const { data: objectAttributes } = useObjectAttributes(
-    { ocel_id: id },
-    {
-      query: { enabled: type === "objects" },
-    },
-  );
+  const { data: entityCounts } = (
+    areEntitiesEvents ? useEventCounts : useObjectCounts
+  )({
+    ocel_id: id,
+  });
 
-  const attributes = type === "events" ? eventAttributes : objectAttributes;
+  const { data: attributes } = (
+    areEntitiesEvents ? useEventAttributes : useObjectAttributes
+  )({
+    ocel_id: id,
+  });
 
   const [currentTab, setCurrentTab] = useState("");
   const [page, setPage] = useState(1);
@@ -57,27 +42,28 @@ const EntityPage: React.FC<{ type: "events" | "objects" }> = ({ type }) => {
 
   const [pageSize, setPageSize] = useState(20);
 
-  const entityCounts = type === "events" ? eventCounts : objectCounts;
-
   const entityNames = useMemo(
-    () => Object.keys((type === "events" ? eventCounts : objectCounts) ?? {}),
-    [eventCounts, objectCounts, type],
+    () => Object.keys(entityCounts ?? {}),
+    [entityCounts],
   );
 
   //TODO: Make this in a collapsable table rather then extra collumns
-  const { data: o2o } = useO2o({ ocel_id: id });
-  const { data: e2o } = useE2o({ ocel_id: id });
+  const { data: unfilteredRelations = [] } = (
+    areEntitiesEvents ? useE2o : useO2o
+  )({
+    ocel_id: id,
+  });
 
   const relations = useMemo(() => {
-    const relations = (type === "events" ? e2o : o2o) ?? [];
+    return unfilteredRelations.filter(({ source }) => source === currentTab);
+  }, [unfilteredRelations, currentTab]);
 
-    return relations.filter(({ source }) => source === currentTab);
-  }, [type, e2o, o2o, currentTab]);
-
-  const { data: eventEntities } = useOcelotPaginatedEvents(
+  const { data: entities } = (
+    areEntitiesEvents ? useOcelotPaginatedEvents : useOcelotPaginatedObjects
+  )(
     {
       ocel_id: id,
-      activity: currentTab,
+      type: currentTab,
       page_size: pageSize,
       page,
       ...(sort && {
@@ -87,33 +73,11 @@ const EntityPage: React.FC<{ type: "events" | "objects" }> = ({ type }) => {
     },
     {
       query: {
-        enabled: type === "events" && !!currentTab,
         placeholderData: keepPreviousData,
         staleTime: 5000,
       },
     },
   );
-  const { data: objectEntities } = useOcelotPaginatedObjects(
-    {
-      ocel_id: id,
-      object_type: currentTab,
-      page_size: pageSize,
-      page,
-      ...(sort && {
-        sort_by: sort.columnAccessor,
-        ascending: sort.direction === "asc",
-      }),
-    },
-    {
-      query: {
-        enabled: type === "objects" && !!currentTab,
-        placeholderData: keepPreviousData,
-        staleTime: 5000,
-      },
-    },
-  );
-
-  const entities = type === "events" ? eventEntities : objectEntities;
 
   useEffect(() => {
     if (!currentTab && entityNames.length > 0) {

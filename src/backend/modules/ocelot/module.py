@@ -144,7 +144,7 @@ meta = {
 def get_events(
     state: StateDep,
     ocel: ApiOcel,
-    activity: Annotated[str, Query(description="Activity name")],
+    type: Annotated[str, Query(description="Activity name")],
     page: Annotated[int, Query(ge=1)] = 1,
     page_size: Annotated[int, Query(ge=1, le=100)] = 10,
     sort_by: Annotated[Optional[str], Query()] = None,
@@ -152,7 +152,7 @@ def get_events(
 ):
     return state.get_paginated_event_table(
         ocel=ocel,
-        activity=activity,
+        activity=type,
         page=page,
         page_size=page_size,
         sort_by=None if sort_by is None else (sort_by, "asc" if ascending else "desc"),
@@ -165,7 +165,7 @@ def get_events(
 def get_objects(
     state: StateDep,
     ocel: ApiOcel,
-    object_type: Annotated[str, Query(description="Object type name")],
+    type: Annotated[str, Query(description="Object type name")],
     page: Annotated[int, Query(ge=1)] = 1,
     page_size: Annotated[int, Query(ge=1, le=100)] = 10,
     sort_by: Annotated[Optional[str], Query()] = None,
@@ -173,7 +173,7 @@ def get_objects(
 ):
     return state.get_paginated_object_table(
         ocel=ocel,
-        object_type=object_type,
+        object_type=type,
         page=page,
         page_size=page_size,
         sort_by=None if sort_by is None else (sort_by, "asc" if ascending else "desc"),

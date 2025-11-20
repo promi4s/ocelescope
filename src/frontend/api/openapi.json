@@ -14,13 +14,13 @@
         "operationId": "ocelot_paginatedEvents",
         "parameters": [
           {
-            "name": "activity",
+            "name": "type",
             "in": "query",
             "required": true,
             "schema": {
               "type": "string",
               "description": "Activity name",
-              "title": "Activity"
+              "title": "Type"
             },
             "description": "Activity name"
           },
@@ -144,13 +144,13 @@
         "operationId": "ocelot_paginatedObjects",
         "parameters": [
           {
-            "name": "object_type",
+            "name": "type",
             "in": "query",
             "required": true,
             "schema": {
               "type": "string",
               "description": "Object type name",
-              "title": "Object Type"
+              "title": "Type"
             },
             "description": "Object type name"
           },
