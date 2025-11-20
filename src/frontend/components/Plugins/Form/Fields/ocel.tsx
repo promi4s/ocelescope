@@ -3,7 +3,7 @@ import {
   useEventCounts,
   useEventIds,
   useObjectAttributes,
-  type useObjectCounts,
+  useObjectCounts,
   useObjectIds,
 } from "@/api/fastapi/ocels/ocels";
 import { MultiSelect, Select } from "@mantine/core";
@@ -101,7 +101,7 @@ const IdSelect: (
 
 const ocelFieldMap: Record<string, React.FC<OcelFieldProps>> = {
   event_type: TypeSelector(useEventCounts),
-  object_type: TypeSelector(useObjectCount),
+  object_type: TypeSelector(useObjectCounts),
   event_attribute: AttributeSelector(useEventAttributes),
   object_attribute: AttributeSelector(useObjectAttributes),
   event_id: IdSelect(useEventIds),
