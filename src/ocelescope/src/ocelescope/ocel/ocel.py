@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import platform
 import warnings
 from copy import deepcopy
@@ -11,25 +12,21 @@ from uuid import uuid4
 import networkx as nx
 import numpy as np
 import pandas as pd
-from cachetools import LRUCache
 import pm4py
+from cachetools import LRUCache
 from pm4py.objects.ocel.obj import OCEL as PM4PYOCEL
 
 from ocelescope.ocel.constants import OCELFileExtensions
-from ocelescope.util.cache import instance_lru_cache
-from ocelescope.util.pandas import mmmm
-
 from ocelescope.ocel.extension import OCELExtension
-
 from ocelescope.ocel.filter import OCELFilter
-
 from ocelescope.ocel.util.attributes import (
     AttributeSummary,
     summarize_event_attributes,
     summarize_object_attributes,
 )
 from ocelescope.ocel.util.relations import summarize_e2o_counts, summarize_o2o_counts
-
+from ocelescope.util.cache import instance_lru_cache
+from ocelescope.util.pandas import mmmm
 
 T = TypeVar("T", bound="OCELExtension")
 
@@ -42,9 +39,6 @@ class OCEL:
         # Metadata, to be set manually after creating the instance
         self.meta: dict[str, Any] = {}
         self._cache_info = {}
-
-        # Used to distinguish multiple ocels with the same id but one is filtered form
-        self.state_id = str(uuid4())
 
         # extensions
         self._extensions: dict[type[OCELExtension], OCELExtension] = {}
