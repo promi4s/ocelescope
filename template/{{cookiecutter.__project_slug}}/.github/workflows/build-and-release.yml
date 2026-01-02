@@ -22,9 +22,8 @@ jobs:
 
       - name: Build ZIPs
         run: |
-          uv run python scripts/build_plugin.py   # make sure this writes to ./dist
+          uv run ocelescope build
           ls -lah dist || (echo "No dist/ directory found" && exit 1)
-
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
