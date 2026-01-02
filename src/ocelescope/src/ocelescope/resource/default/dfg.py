@@ -35,13 +35,14 @@ class DirectlyFollowsGraph(Resource):
                 shape="rectangle",
                 annotation=activity.get_annotation_visualization(),
                 color="#ffffff",
+                border_color="#000000",
             )
             for activity in self.activities
         ]
 
         start_nodes = [
             GraphNode(
-                id=f"start_{object_type}",
+                id=f"start_{object_type.name}",
                 label=object_type.name,
                 shape="circle",
                 color=color_map[object_type.name],
@@ -55,7 +56,7 @@ class DirectlyFollowsGraph(Resource):
 
         end_nodes = [
             GraphNode(
-                id=f"end_{object_type}",
+                id=f"end_{object_type.name}",
                 label=object_type.name,
                 shape="circle",
                 color=color_map[object_type.name],
