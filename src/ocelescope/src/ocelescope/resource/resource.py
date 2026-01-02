@@ -1,5 +1,6 @@
 from abc import ABC
 from typing import ClassVar, Generic, TypeVar
+
 from pydantic import BaseModel, computed_field
 
 from ocelescope import Visualization
@@ -47,4 +48,10 @@ T = TypeVar("T", bound=Resource)
 
 
 class Annotated(BaseModel, Generic[T]):
-    annotation: T | None = None
+    annotation: T | str | None = None
+
+    def get_annotation_str(self):
+        return self.annotation if type(self.annotation) is str else None
+
+    def get_annotation_visualization(self):
+        return self.annotation.visualize() if isinstance(self.annotation, Resource) else None

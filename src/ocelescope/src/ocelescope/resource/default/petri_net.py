@@ -42,7 +42,6 @@ class Arc(Annotated):
 
     source: str
     target: str
-    variable: bool = False
 
 
 class PetriNet(Resource):
@@ -79,9 +78,7 @@ class PetriNet(Resource):
                     width=30,
                     label_pos="bottom",
                     height=30,
-                    annotation=place.annotation.visualize()
-                    if place.annotation is not None
-                    else None,
+                    annotation=place.get_annotation_visualization(),
                 )
             )
 
@@ -96,9 +93,7 @@ class PetriNet(Resource):
                     shape="rectangle",
                     color="#ffffff" if label else "#000000",
                     border_color="#000000" if label else None,
-                    annotation=transition.annotation.visualize()
-                    if transition.annotation is not None
-                    else None,
+                    annotation=transition.get_annotation_visualization(),
                 )
             )
 
@@ -116,7 +111,8 @@ class PetriNet(Resource):
                     target=arc.target,
                     end_arrow="triangle",
                     color=color_map.get(object_type, "#cccccc"),
-                    annotation=arc.annotation.visualize() if arc.annotation is not None else None,
+                    annotation=arc.get_annotation_visualization(),
+                    label=arc.get_annotation_str(),
                 )
             )
 
