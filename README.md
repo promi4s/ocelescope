@@ -12,19 +12,38 @@
 
 ## ⚙️ Installation & Usage
 
+This are the setup instructions for developing Ocelescope.
+If you want to only run Ocelescope please use the installation instructions of the Documentation.
+
 ### 🧱 Prerequisites
 
 Ensure you have the following installed:
 
 - [Docker](https://docs.docker.com/get-docker/)
-- [Docker Compose](https://docs.docker.com/compose/) (built-in with Docker Desktop ≥ v2.0)
-- Unix shell (Linux/macOS/WSL)
+- [uv](https://docs.astral.sh/uv/)
+- [npm](https://www.npmjs.com/package/npm)
+- [just](https://github.com/casey/just)
 
----
+To first setup the project you should run
 
-### ▶️ Running the Application
+```sh
+just sync
+```
 
-Use the provided `run.sh` script to start or stop the application in development or production mode:
-```./run.sh [dev|prod] [up|down] [--detached]```
-or just
-```docker compose up --build```
+### ▶️ Development Scripts
+
+The Ocelescope project uses [just](https://github.com/casey/just) as a task runner. It allows you to run any commands from any point in the project.
+
+| Command          | Description                                                       |
+|------------------|-------------------------------------------------------------------|
+| ``just docs``    | Locally launch documentation at <http://localhost:8000/ocelescope/> |
+| ``just orval``   | Update API client of frontend                                     |
+| ``just sync``    | Install backend and frontend packages, syncs API clients          |
+| ``just up dev``  | Runs Ocelescope in dev mode at <http://localhost:3000>              |
+| ``just up prod`` | Builds and runs Ocelescope at <http://localhost:3000>               |
+
+To get a list of all available commands you can use the command:
+
+```sh
+just
+```
