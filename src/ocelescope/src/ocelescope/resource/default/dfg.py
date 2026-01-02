@@ -3,17 +3,17 @@ from ocelescope.visualization import generate_color_map
 from ocelescope.visualization.default.graph import Graph, GraphEdge, GraphNode, GraphvizLayoutConfig
 
 
-class Edge(Annotated):
-    source: str | None
-    target: str | None
+class DFGEdge(Annotated):
+    source: str | None = None
+    target: str | None = None
     object_type: str
 
 
-class ObjectType(Annotated):
+class DFGObject(Annotated):
     name: str
 
 
-class Activity(Annotated):
+class DFGActivity(Annotated):
     name: str
 
 
@@ -21,9 +21,9 @@ class DirectlyFollowsGraph(Resource):
     label = "Directly Follows Graph"
     description = "A object-centric directly follows graph"
 
-    object_types: list[ObjectType]
-    activities: list[Activity]
-    edges: list[Edge]
+    object_types: list[DFGObject]
+    activities: list[DFGActivity]
+    edges: list[DFGEdge]
 
     def visualize(self):
         color_map = generate_color_map([object_type.name for object_type in self.object_types])
