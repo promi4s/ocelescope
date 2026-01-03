@@ -12,7 +12,6 @@ const ResourceLink = z.object({
 
 const PluginLink = z.object({
   type: z.literal("plugin"),
-  name: z.string(),
   method: z.string(),
   task_id: z.string(),
 });

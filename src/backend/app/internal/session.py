@@ -13,7 +13,7 @@ from app.internal.model.resource import ResourceApi, ResourceStore
 from app.internal.tasks.base import TaskBase
 from app.sse_manager import InvalidationRequest, sse_manager
 
-T = TypeVar("T", bound=Module)  # Constrain T to CachableObject
+T = TypeVar("T", bound=Module)
 
 
 S = TypeVar("S", bound=TaskBase)
@@ -182,11 +182,3 @@ class Session:
 
     def __repr__(self):
         return str(self)
-
-
-def save_response_to_cache(route: str):
-    return route != "task-status"
-
-
-def add_from_response_cache(route: str):
-    return route == "load"
