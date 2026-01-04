@@ -5,14 +5,12 @@ services:
       dockerfile: dev.Dockerfile
       additional_contexts:
         ocelescope: ./src/ocelescope
-    ports:
-      - "8000:8000"
     volumes:
       - ./data:/app/data
       - plugins_store:/plugins
     environment:
       - DATA_DIR=/app/data
-      - PLUGIN_DIR=/plugins 
+      - PLUGIN_DIR=/plugins
     develop:
       watch:
         - action: sync
@@ -21,27 +19,27 @@ services:
           ignore:
             - .venv/
         - action: rebuild
-          path:  ./src/backend/uv.lock
+          path: ./src/backend/uv.lock
   frontend:
-      build:
-        context: ./src/frontend
-        dockerfile: dev.Dockerfile  
-      ports:
-        - "3000:3000"
-      environment:
-        - NODE_ENV=development
-      develop:
-        watch:
-          - action: sync
-            path: ./src/frontend
-            target: /app
-            ignore:
-              - node_modules/
-              - .next/
-          - action: rebuild
-            path: ./src/frontend/package-lock.json
-          - action: rebuild
-            path: ./src/frontend/api/openapi.json
+    build:
+      context: ./src/frontend
+      dockerfile: dev.Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+    develop:
+      watch:
+        - action: sync
+          path: ./src/frontend
+          target: /app
+          ignore:
+            - node_modules/
+            - .next/
+        - action: rebuild
+          path: ./src/frontend/package-lock.json
+        - action: rebuild
+          path: ./src/frontend/api/openapi.json
 
 volumes:
   plugins_store:

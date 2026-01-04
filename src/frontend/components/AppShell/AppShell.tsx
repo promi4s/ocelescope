@@ -14,7 +14,7 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { useRouter } from "next/router";
 import classes from "@/components/AppShell/AppShell.module.css";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   HomeIcon,
   LogOutIcon,
@@ -172,13 +172,10 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <Divider />
             {Object.values(moduleMap).map(
               ({ label, name, icon: Icon = PackageIcon, routes }) => {
-                const isModuleDisabled = useMemo(
-                  () =>
-                    !Object.values(routes).some(
-                      ({ requiresOcel }) => !requiresOcel,
-                    ) && !isOcelAvailable,
-                  [routes],
-                );
+                const isModuleDisabled =
+                  !Object.values(routes).some(
+                    ({ requiresOcel }) => !requiresOcel,
+                  ) && !isOcelAvailable;
 
                 return (
                   <NavLink

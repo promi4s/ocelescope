@@ -35,11 +35,6 @@ docker compose up -d
 
 This will start both the **backend** (API) and **frontend** (web interface).
 
-### Accessing Ocelescope
-
-* **Frontend (Web UI):** [http://localhost:3000](http://localhost:3000)
-* **Backend (API):** [http://localhost:8000](http://localhost:8000)
-
 ### Uploading Plugins
 
 You can upload plugins directly from the **web interface** at:
@@ -62,19 +57,40 @@ Here are some example plugins you can explore and use with Ocelescope
 
 <div class="grid cards" markdown>
 
-* :simple-github:{ .lg .middle } **PM4PY Discovery**
+* :simple-github:{ .lg .middle } **[PM4PY Discovery](https://github.com/Grkmr/pm4py-discovery)**
 
     ---
     Discover object-centric process models through the discovery algorithms of the [PM4PY](https://processintelligence.solutions/pm4py) python library
 
-    [:material-download: Download](https://github.com/Grkmr/pm4py-discovery/releases/download/v1.0/pm4py_discovery.zip)
+    [:material-download: Download](https://github.com/Grkmr/pm4py-discovery/releases/download/v1.0.2/Pm4pyDiscovery.zip){ .md-button }
 
-* :simple-github:{ .lg .middle } **TOTeM**
+* :simple-github:{ .lg .middle } **[TOTeM](https://github.com/Grkmr/TOTeM)**
 
     ---
 
-    Generate Temporal Object Type Models (TOTeM) to uncover type-level temporal and cardinality relations in event logs
+    Generate Temporal Object Type Models ([:material-book-open-variant: TOTeM](https://doi.org/10.1007/978-3-031-70418-5_7)) to uncover type-level temporal and cardinality relations in event logs
 
-    [:material-download: Download](https://github.com/Grkmr/TOTeM/releases/download/v1.3/totem.zip)
+    [:material-download: Download](https://github.com/Grkmr/TOTeM/releases/download/v1.5/Totem.zip){ .md-button }
+
+* :simple-github:{ .lg .middle } **[OC-DECLARE](https://github.com/Grkmr/OC-Declare)**
+
+    ---
+    Discover and check **object-centric declarative process constraints** ([:material-book-open-variant: OC-DECLARE](https://doi.org/10.1007/978-3-032-02867-9_11)) from object-centric event logs. Proof of concept for using **Rust via Python bindings** in Ocelescope plugins.
+
+    [:material-download: Download](https://github.com/Grkmr/OC-Declare/releases/download/v1.0.3/OcDeclare.zip){ .md-button }
+
+* :simple-github:{ .lg .middle } **[Discqvery](https://github.com/Grkmr/qnets)**
+
+    ---
+    Proof of concept for **extended OCELs** with [:material-book-open-variant: **quantity states**](https://doi.org/10.1007/978-3-031-82225-4_25) to better model logistics processes. An example extended log is available [here](./assets/QEL_Inventory_Management_extended.xml){download="discqverylog.xml" }.
+
+    [:material-download: Download](https://github.com/Grkmr/qnets/releases/download/v1.0.4/Discqvery.zip){ .md-button }
+
+* :simple-github:{ .lg .middle } **[OCEL Graph](https://github.com/Grkmr/OcelGraph)**
+
+    ---
+    Result of the **plugin development tutorial**: generates an **OCEL Graph** (spanning tree) from a selected object/event root to visualize relationships in an event log. Follow the tutorial [here](./plugins/tutorial.md).
+
+    [:material-download: Download](https://github.com/Grkmr/OcelGraph/releases/download/v1.0.1/OcelGraphDiscovery.zip){ .md-button }
 
 </div>

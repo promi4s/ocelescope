@@ -2,12 +2,10 @@ services:
   backend:
     build:
       context: ./src/backend
-      dockerfile: Dockerfile  
+      dockerfile: Dockerfile
       additional_contexts:
         ocelescope: ./src/ocelescope
         data: ./data
-    ports:
-      - "8000:8000"
     volumes:
       - plugins_store:/plugins
     restart: unless-stopped
@@ -15,7 +13,7 @@ services:
   frontend:
     build:
       context: ./src/frontend
-      dockerfile: Dockerfile  
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     restart: unless-stopped

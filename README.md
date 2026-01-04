@@ -1,48 +1,59 @@
 # Ocelescope
 
-🔗 **Documentation:** [rwth-pads.github.io/ocelescope](https://rwth-pads.github.io/ocelescope)
+🔗 **Documentation:** <https://rwth-pads.github.io/ocelescope>
 
->
 > ⚠️ **Project Status: Under Construction**
 >
-> This repository is actively being developed and is **not yet production-ready**.
+> This repository is under active development and is **not production-ready** yet.
 > Expect frequent changes, incomplete features, and potential bugs.
-> Contributions, feedback, and testing are welcome!
 >
+> Contributions, feedback, and testing are welcome!
+
+---
 
 ## ⚙️ Installation & Usage
 
-This are the setup instructions for developing Ocelescope.
-If you want to only run Ocelescope please use the installation instructions of the Documentation.
+These instructions are intended for **developing** Ocelescope locally.  
+If you only want to **run** Ocelescope, please follow the installation steps in the documentation linked above.
 
-### 🧱 Prerequisites
+---
 
-Ensure you have the following installed:
+## 🧱 Prerequisites
+
+Make sure you have the following tools installed:
 
 - [Docker](https://docs.docker.com/get-docker/)
 - [uv](https://docs.astral.sh/uv/)
 - [npm](https://www.npmjs.com/package/npm)
 - [just](https://github.com/casey/just)
 
-To first setup the project you should run
+---
+
+## 🚀 Getting Started
+
+To set up the project for the first time, run:
 
 ```sh
 just sync
 ```
 
-### ▶️ Development Scripts
+This installs backend and frontend dependencies and synchronizes API clients.
 
-The Ocelescope project uses [just](https://github.com/casey/just) as a task runner. It allows you to run any commands from any point in the project.
+---
 
-| Command          | Description                                                       |
-|------------------|-------------------------------------------------------------------|
-| ``just docs``    | Locally launch documentation at <http://localhost:8000/ocelescope/> |
-| ``just orval``   | Update API client of frontend                                     |
-| ``just sync``    | Install backend and frontend packages, syncs API clients          |
-| ``just up dev``  | Runs Ocelescope in dev mode at <http://localhost:3000>              |
-| ``just up prod`` | Builds and runs Ocelescope at <http://localhost:3000>               |
+## ▶️ Development Scripts
 
-To get a list of all available commands you can use the command:
+Ocelescope uses [`just`](https://github.com/casey/just) as a task runner, so you can execute commands from anywhere in the repository.
+
+| Command          | Description                                                                 |
+|------------------|-----------------------------------------------------------------------------|
+| `just docs`      | Launch documentation locally at <http://localhost:8000/ocelescope/>         |
+| `just orval`     | Update the frontend API client                                              |
+| `just sync`      | Install backend and frontend packages, then sync API clients                |
+| `just up dev`    | Run Ocelescope in development mode at <http://localhost:3000>               |
+| `just up prod`   | Build and run Ocelescope (production) at <http://localhost:3000>            |
+
+To list all available commands:
 
 ```sh
 just
