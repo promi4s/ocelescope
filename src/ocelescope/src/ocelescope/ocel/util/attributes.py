@@ -1,65 +1,17 @@
 import warnings
-from typing import Annotated, List, Literal, Union
 
 import pandas as pd
 import pm4py
 from pm4py.objects.ocel.obj import OCEL
-from pydantic.dataclasses import dataclass
-from pydantic.fields import Field
 
-
-# --- Attribute Type Models ---
-@dataclass
-class IntegerAttribute:
-    attribute: str
-    type: Literal["integer"]
-    min: int
-    max: int
-
-
-@dataclass
-class FloatAttribute:
-    attribute: str
-    type: Literal["float"]
-    min: float
-    max: float
-
-
-@dataclass
-class BooleanAttribute:
-    attribute: str
-    type: Literal["boolean"]
-    true_count: int
-    false_count: int
-
-
-@dataclass
-class DateAttribute:
-    attribute: str
-    type: Literal["date"]
-    min: str
-    max: str
-
-
-@dataclass
-class NominalAttribute:
-    attribute: str
-    type: Literal["nominal"]
-    num_unique: int
-
-
-AttributeSummary = Annotated[
-    Union[
-        IntegerAttribute,
-        FloatAttribute,
-        BooleanAttribute,
-        DateAttribute,
-        NominalAttribute,
-    ],
-    Field(discriminator="type"),
-]
-
-# --- Utility Functions ---
+from ocelescope.ocel.models.attributes import (
+    AttributeSummary,
+    BooleanAttribute,
+    DateAttribute,
+    FloatAttribute,
+    IntegerAttribute,
+    NominalAttribute,
+)
 
 
 def melt_df(df: pd.DataFrame, type_col: str, cols: list[str]) -> pd.DataFrame:
@@ -75,11 +27,8 @@ def is_boolean_series_fast(lower_vals: pd.Series) -> bool:
     return set(lower_vals.unique()).issubset(valid) and lower_vals.nunique() <= 2
 
 
-# --- Main Attribute Summary Logic ---
-
-
-def summarize_attributes(df: pd.DataFrame, type_column: str) -> dict[str, List[AttributeSummary]]:
-    summary_by_type: dict[str, List[AttributeSummary]] = {}
+def summarize_attributes(df: pd.DataFrame, type_column: str) -> dict[str, list[AttributeSummary]]:
+    summary_by_type: dict[str, list[AttributeSummary]] = {}
 
     grouped = df.groupby([type_column, "attribute"])
 
@@ -92,11 +41,9 @@ def summarize_attributes(df: pd.DataFrame, type_column: str) -> dict[str, List[A
         numeric_values = None
         date_values = None
 
-        # Try boolean
         if is_boolean_series_fast(lower_vals):
             attribute_type = "boolean"
 
-        # Try numeric
         if attribute_type == "unknown":
             try:
                 numeric_values = pd.to_numeric(values, errors="raise")
@@ -108,7 +55,6 @@ def summarize_attributes(df: pd.DataFrame, type_column: str) -> dict[str, List[A
             except Exception:
                 pass
 
-        # Try date
         if attribute_type == "unknown":
             try:
                 with warnings.catch_warnings():
@@ -119,11 +65,9 @@ def summarize_attributes(df: pd.DataFrame, type_column: str) -> dict[str, List[A
             except Exception:
                 pass
 
-        # Fallback to nominal
         if attribute_type == "unknown":
             attribute_type = "nominal"
 
-        # Create summary
         match attribute_type:
             case "integer":
                 summary = IntegerAttribute(

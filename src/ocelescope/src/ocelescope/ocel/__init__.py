@@ -1,19 +1,17 @@
-from ocelescope.ocel.ocel import OCEL
-
-from ocelescope.ocel.extension import OCELExtension
+from ocelescope.ocel.core import OCEL
+from ocelescope.ocel.extensions.base_extension import OCELExtension
 from ocelescope.ocel.filter import (
+    BaseFilter,
     E2OCountFilter,
     EventAttributeFilter,
     EventTypeFilter,
+    FilterResult,
     O2OCountFilter,
     ObjectAttributeFilter,
-    TimeFrameFilter,
-    OCELFilter,
     ObjectTypeFilter,
+    TimeFrameFilter,
 )
-from ocelescope.ocel.util import AttributeSummary, RelationCountSummary
-
-from ocelescope.ocel.constants import OCELFileExtensions
+from ocelescope.ocel.models import AttributeSummary, RelationCountSummary
 
 __all__ = [
     "OCEL",
@@ -25,8 +23,8 @@ __all__ = [
     "ObjectTypeFilter",
     "ObjectAttributeFilter",
     "TimeFrameFilter",
+    "BaseFilter",
+    "FilterResult",
     "AttributeSummary",
     "RelationCountSummary",
-    "OCELFilter",
-    "OCELFileExtensions",
 ]

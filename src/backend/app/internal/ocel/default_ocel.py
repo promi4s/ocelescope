@@ -4,6 +4,7 @@ from copy import deepcopy
 from functools import cached_property
 from typing import Any
 
+from ocelescope import OCEL
 from pydantic import Field, FilePath
 
 import app.internal.util.misc as util
@@ -11,7 +12,6 @@ from app.internal.config import config
 from app.internal.logger import logger
 from app.internal.model.base import ApiBaseModel
 from app.internal.session import Session
-from ocelescope import OCEL
 
 OCEL_BASE_PATH = None
 DEFAULT_OCELS: list["DefaultOCEL"] = []
@@ -59,7 +59,7 @@ class DefaultOCEL(ApiBaseModel):
         if hasattr(self, "__ocel"):
             return
         logger.info('Reading OCEL 2.0 "%s" ...', self.name)
-        ocel = OCEL.read_ocel(
+        ocel = OCEL.read(
             self.path,
         )
         object.__setattr__(self, "__ocel", ocel)

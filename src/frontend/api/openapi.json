@@ -1290,18 +1290,11 @@
             "in": "query",
             "required": false,
             "schema": {
-              "anyOf": [
-                {
-                  "enum": [
-                    "source",
-                    "target"
-                  ],
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
+              "enum": [
+                "source",
+                "target"
               ],
+              "type": "string",
               "default": "source",
               "title": "Direction"
             }
@@ -1385,18 +1378,11 @@
             "in": "query",
             "required": false,
             "schema": {
-              "anyOf": [
-                {
-                  "enum": [
-                    "source",
-                    "target"
-                  ],
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
+              "enum": [
+                "source",
+                "target"
               ],
+              "type": "string",
               "default": "source",
               "title": "Direction"
             }

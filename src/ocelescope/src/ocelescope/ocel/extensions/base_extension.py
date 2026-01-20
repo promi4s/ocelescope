@@ -2,10 +2,10 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import TYPE_CHECKING, TypeVar
 
-from ocelescope.ocel.constants import OCELFileExtensions
+from ocelescope.ocel.constants.misc import OCELFileExtensions
 
 if TYPE_CHECKING:
-    from ocelescope.ocel.ocel import OCEL
+    from ocelescope.ocel.core.ocel import OCEL
 
 T = TypeVar("T", bound="OCELExtension")
 

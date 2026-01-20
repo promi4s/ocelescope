@@ -26,7 +26,7 @@ import type {
   OCELFilter,
 } from "@/api/fastapi-schemas";
 import { DatePickerInput } from "@mantine/dates";
-import { XIcon } from "lucide-react";
+import { PlusIcon, XIcon } from "lucide-react";
 import type { FilterPageComponentProps } from "..";
 import type { FilterType } from "@/types/filters";
 
@@ -289,7 +289,10 @@ export const EventAttributeFilter: React.FC<FilterPageComponentProps> = memo(
             </Grid>
           </Paper>
         ))}
-        <Button onClick={() => append({ attribute: "", target_type: "" })}>
+        <Button
+          onClick={() => append({ attribute: "", target_type: "" })}
+          leftSection={<PlusIcon height={30} />}
+        >
           Add Filter
         </Button>
       </Stack>
@@ -335,7 +338,10 @@ export const ObjectAttributeFilter: React.FC<FilterPageComponentProps> = memo(
             </Grid>
           </Paper>
         ))}
-        <Button onClick={() => append({ attribute: "", target_type: "" })}>
+        <Button
+          onClick={() => append({ attribute: "", target_type: "" })}
+          leftSection={<PlusIcon height={30} />}
+        >
           Add Filter
         </Button>
       </Stack>

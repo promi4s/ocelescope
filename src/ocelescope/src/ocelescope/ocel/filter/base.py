@@ -1,13 +1,12 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from pandas import Series
 from pydantic import BaseModel
 
-
 if TYPE_CHECKING:
-    from ocelescope import OCEL
+    from ocelescope.ocel.core.ocel import OCEL
 
 
 @dataclass()

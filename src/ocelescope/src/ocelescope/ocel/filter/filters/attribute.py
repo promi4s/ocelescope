@@ -75,7 +75,7 @@ class EventAttributeFilter(BaseFilter, AttributeFilterConfig):
     def filter(self, ocel):
         return FilterResult(
             events=filter_by_attribute(
-                ocel.events,
+                ocel.events.df,
                 ocel.ocel.event_activity,
                 config=AttributeFilterConfig(**self.model_dump()),
             )

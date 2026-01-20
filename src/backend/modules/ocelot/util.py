@@ -103,11 +103,13 @@ def get_paginated_dataframe(
 
 
 def get_object_history(ocel: OCEL, object_id: str):
-    object_changes = ocel.object_changes
+    object_changes = ocel.objects.changes
     object_changes = object_changes[
         object_changes[ocel.ocel.object_id_column] == object_id
     ]
-    object_changes = object_changes[[ocel.ocel.event_timestamp] + ocel.oattr_names]
+    object_changes = object_changes[
+        [ocel.ocel.event_timestamp] + ocel.objects.attribute_names
+    ]
 
     return [
         ObjectChange(

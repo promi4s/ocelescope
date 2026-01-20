@@ -95,30 +95,6 @@ def key_decorator_add_func_name(func: Callable):
     return decorator
 
 
-def key_decorator_add_ocelwrapper_state_id():
-    """Adds `stateId` of the first OcelWrapper argument to the cache key."""
-
-    def decorator(key):
-        def key_wrapper(self, *args, **kwargs):
-            from ocel.ocel import OCEL
-
-            value = ""
-            for arg in args:
-                if isinstance(arg, OCEL):
-                    value = getattr(arg, "state_id", "")
-                    break
-            if not value:
-                for v in kwargs.values():
-                    if isinstance(v, OCEL):
-                        value = getattr(v, "state_id", "")
-                        break
-            return key(self, value, *args, **kwargs)
-
-        return key_wrapper
-
-    return decorator
-
-
 # from: https://cachetools.readthedocs.io/en/latest/#cachetools.cachedmethod
 # "The key function will be called as key(self, *args, **kwargs) to retrieve a suitable cache key.
 # Note that the default key function, cachetools.keys.methodkey(), ignores its first argument, i.e. self.

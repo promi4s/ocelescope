@@ -45,20 +45,21 @@ def import_ocel_task(
             suffix = file_path.suffix
 
     with stream_to_tempfile(file_stream, prefix=file_path.stem, suffix=suffix) as path:
-        ocel = OCEL.read_ocel(
+        ocel = OCEL.read(
             path,
-            original_file_name=file_path.stem,
-            version_info=True,
-            upload_date=datetime.now(),
+            meta={
+                "name": file_path.stem,
+                "upload_date": datetime.now().isoformat(),
+            },
         )
-        ocel.load_extension(registry_manager.get_loaded_extensions())
+        ocel.extensions.load(registry_manager.get_loaded_extensions())
 
     ocel_id = session.add_ocel(ocel)
 
     return [
         SystemNotification(
             title="Ocel successfully uploaded",
-            message=f"{ocel.meta.get('fileName', None) or 'OCEL '} was uploaded successfully",
+            message=f"{ocel.meta.extra.get('name', None) or 'OCEL '} was uploaded successfully",
             notification_type="info",
             link=OcelLink(ocel_id=ocel_id),
         ),

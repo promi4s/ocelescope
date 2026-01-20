@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import json
 import uuid
-from typing import Any, Callable, Hashable, Optional, Type, TypeVar, cast
+from typing import Any, Callable, Hashable, Type, TypeVar, cast
 
-from ocelescope import OCEL, OCELFilter
+from ocelescope import OCEL, BaseFilter
 
 from app.internal.exceptions import NotFound
 from app.internal.model.module import Module
-from app.internal.model.ocel import Filtered_Ocel
+from app.internal.model.ocel import SessionOCEL
 from app.internal.model.resource import ResourceApi, ResourceStore
 from app.internal.tasks.base import TaskBase
 from app.sse_manager import InvalidationRequest, sse_manager
@@ -40,7 +40,7 @@ class Session:
         self._resources: dict[str, ResourceStore] = {}
 
         # OCELS
-        self.ocels: dict[str, Filtered_Ocel] = {}
+        self.ocels: dict[str, SessionOCEL] = {}
 
         self.response_cache: dict[str, Any] = {}
         # Set first state to UUID, to be updated on each response
@@ -87,20 +87,16 @@ class Session:
 
     # region OCEL management
     def add_ocel(self, ocel: OCEL) -> str:
-        self.ocels[ocel.id] = Filtered_Ocel(ocel)
+        self.ocels[ocel.meta.id] = SessionOCEL(ocel)
 
-        return ocel.id
+        return ocel.meta.id
 
     def get_ocel(self, ocel_id: str, use_original: bool = False) -> OCEL:
         if ocel_id not in self.ocels:
             raise NotFound(f"OCEL with id {ocel_id} not found")
 
-        ocel = self.ocels[ocel_id]
-
         return (
-            ocel.filtered
-            if (ocel.filtered is not None and not use_original)
-            else ocel.original
+            self.ocels[ocel_id].ocel if not use_original else self.ocels[ocel_id].origin
         )
 
     def delete_ocel(self, ocel_id: str):
@@ -110,27 +106,21 @@ class Session:
         self.ocels.pop(ocel_id, None)
         sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
 
-    def get_ocel_filters(self, ocel_id: str) -> Optional[OCELFilter]:
+    def get_ocel_filters(self, ocel_id: str) -> list[BaseFilter]:
         if ocel_id not in self.ocels:
             raise NotFound(f"OCEL with id {ocel_id} not found")
 
-        return self.ocels[ocel_id].filter or None
+        return self.ocels[ocel_id].applied_filter
 
-    def filter_ocel(
-        self, ocel_id: str, filters: Optional[OCELFilter]
-    ) -> Optional[OCELFilter]:
+    def filter_ocel(self, ocel_id: str, pipeline: list[BaseFilter]) -> list[BaseFilter]:
         if ocel_id not in self.ocels:
             raise NotFound(f"OCEL with id {ocel_id} not found")
 
-        current_ocel = self.ocels[ocel_id]
-        if filters is None:
-            current_ocel.filtered = None
-            current_ocel.filter = None
-            return
+        self.ocels[ocel_id].apply_filter(pipeline)
 
-        current_ocel.filtered = current_ocel.original.apply_filter(filters)
-        current_ocel.filter = filters
         sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
+
+        return self.ocels[ocel_id].applied_filter
 
     # endregion
     # region Resource management

@@ -1,45 +1,46 @@
+import matplotlib
+
 from ocelescope.ocel import (
+    OCEL,
+    AttributeSummary,
+    BaseFilter,
     E2OCountFilter,
     EventAttributeFilter,
     EventTypeFilter,
     O2OCountFilter,
     ObjectAttributeFilter,
-    TimeFrameFilter,
-    OCELFilter,
-    OCELExtension,
     ObjectTypeFilter,
-    OCEL,
+    OCELExtension,
     RelationCountSummary,
-    AttributeSummary,
+    TimeFrameFilter,
 )
-from ocelescope.visualization import (
-    Visualization,
-    DotVis,
-    SVGVis,
-    GraphvizLayoutConfig,
-    Graph,
-    GraphEdge,
-    EdgeArrow,
-    GraphShapes,
-    Table,
-    TableColumn,
-    generate_color_map,
-    GraphNode,
-)
-from ocelescope.resource import PetriNet, Resource, DirectlyFollowsGraph
 from ocelescope.plugin import (
-    ResourceAnnotation,
-    OCELAnnotation,
-    Plugin,
-    PluginMeta,
-    PluginMethod,
     COMPUTED_SELECTION,
     OCEL_FIELD,
+    OCELAnnotation,
+    Plugin,
     PluginInput,
+    PluginMeta,
+    PluginMethod,
     PluginResult,
+    ResourceAnnotation,
     plugin_method,
 )
-import matplotlib
+from ocelescope.resource import DirectlyFollowsGraph, PetriNet, Resource
+from ocelescope.visualization import (
+    DotVis,
+    EdgeArrow,
+    Graph,
+    GraphEdge,
+    GraphNode,
+    GraphShapes,
+    GraphvizLayoutConfig,
+    SVGVis,
+    Table,
+    TableColumn,
+    Visualization,
+    generate_color_map,
+)
 
 matplotlib.use("Agg")
 
@@ -53,7 +54,6 @@ __all__ = [
     "ObjectAttributeFilter",
     "ObjectTypeFilter",
     "TimeFrameFilter",
-    "OCELFilter",
     "RelationCountSummary",
     "AttributeSummary",
     "Visualization",
@@ -70,6 +70,7 @@ __all__ = [
     "PluginInput",
     "PluginResult",
     "plugin_method",
+    "BaseFilter",
     # Visualization
     # Util
     "Visualization",

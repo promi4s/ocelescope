@@ -2,7 +2,7 @@ from typing import Literal, cast
 
 import pandas as pd
 
-
+from ocelescope.ocel.constants.pm4py import ACTIVITY_COL, OTYPE_COL
 from ocelescope.ocel.filter.base import BaseFilter, FilterResult
 
 
@@ -11,7 +11,7 @@ class EventTypeFilter(BaseFilter):
     mode: Literal["exclude", "include"] = "include"
 
     def filter(self, ocel):
-        mask = cast(pd.Series, ocel.events["ocel:activity"].isin(self.event_types))
+        mask = cast(pd.Series, ocel.events.df[ACTIVITY_COL].isin(self.event_types))
         if self.mode == "exclude":
             mask = ~mask
 
@@ -23,7 +23,7 @@ class ObjectTypeFilter(BaseFilter):
     mode: Literal["exclude", "include"] = "include"
 
     def filter(self, ocel):
-        mask = cast(pd.Series, ocel.objects["ocel:type"].isin(self.object_types))
+        mask = cast(pd.Series, ocel.objects.df[OTYPE_COL].isin(self.object_types))
 
         if self.mode == "exclude":
             mask = ~mask

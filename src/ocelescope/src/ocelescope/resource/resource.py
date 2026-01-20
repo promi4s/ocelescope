@@ -3,7 +3,7 @@ from typing import ClassVar, Generic, TypeVar
 
 from pydantic import BaseModel, computed_field
 
-from ocelescope import Visualization
+from ocelescope.visualization.visualization import Visualization
 
 
 class Resource(BaseModel, ABC):

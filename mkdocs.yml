@@ -13,6 +13,7 @@ theme:
     - navigation.sections
     - navigation.expand
     - navigation.footer
+    - navigation.indexes
     - toc.integrate
     - content.code.copy
     - content.code.annotate
@@ -55,8 +56,14 @@ plugins:
             parameter_headings: false
             show_if_no_docstring: false
             show_source: true
-            members_order: source
             separate_signature: true
+            show_root_toc_entry: false
+            show_symbol_type_toc: true
+            type_parameter_headings: true
+            show_symbol_type_heading: true
+            backlinks: "flat"
+            members_order: [__all__, source]
+            show_bases: true
 markdown_extensions:
   - admonition
   - attr_list

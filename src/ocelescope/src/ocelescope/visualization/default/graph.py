@@ -1,7 +1,8 @@
 from typing import Generic, Literal, TypeVar
+
 from pydantic import BaseModel, Field
 
-from ocelescope.util.pydantic import uuid_str
+from ocelescope.util.pydantic import uuid_factory
 from ocelescope.visualization.default.dot import GraphvizLayoutEngineName
 from ocelescope.visualization.visualization import Visualization
 
@@ -34,7 +35,7 @@ EdgeArrow = (
 
 
 class GraphNode(AnnotatedElement):
-    id: str = Field(default_factory=uuid_str)
+    id: str = Field(default_factory=uuid_factory)
     label: str | None = None
     shape: GraphShapes
     width: float | None = None
@@ -50,7 +51,7 @@ class GraphNode(AnnotatedElement):
 
 
 class GraphEdge(AnnotatedElement):
-    id: str = Field(default_factory=uuid_str)
+    id: str = Field(default_factory=uuid_factory)
     source: str
     target: str
     color: str | None = None

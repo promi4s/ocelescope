@@ -8,8 +8,7 @@ from uuid import uuid4
 from fastapi.datastructures import UploadFile
 from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
-from ocelescope import PluginMethod, Resource
-from ocelescope.ocel.ocel import OCEL
+from ocelescope import OCEL, PluginMethod, Resource
 
 from app.dependencies import ApiSession
 from app.internal.config import config

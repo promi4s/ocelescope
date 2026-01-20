@@ -17,7 +17,7 @@ class TimeFrameFilter(BaseFilter):
         if end_time is not None:
             end_time = pd.Timestamp(end_time, tz="UTC")
 
-        events_df = ocel.events
+        events_df = ocel.events.df
 
         mask = pd.Series([True] * len(events_df), index=events_df.index)
         if start_time is not None:

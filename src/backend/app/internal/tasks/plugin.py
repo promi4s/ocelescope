@@ -7,9 +7,7 @@ from typing import (
     TypedDict,
 )
 
-from ocelescope import OCELFilter
-from ocelescope.ocel.ocel import OCEL
-from ocelescope.resource.resource import Resource
+from ocelescope import OCEL, BaseFilter, Resource
 from pydantic.fields import Field
 from pydantic.main import BaseModel
 
@@ -160,7 +158,7 @@ class PluginTask(TaskBase, Generic[P]):
         plugin_name: str,
         method_name: str,
         input: PluginInput,
-        filter: dict[str, OCELFilter | None],
+        filter: dict[str, list[BaseFilter]],
     ) -> Hashable:
         return generate_tuple_hash("plugin", plugin_name, method_name, input, filter)
 

@@ -1,18 +1,17 @@
-import datetime
+from datetime import datetime
 from pathlib import Path
 from typing import Literal, Optional
 
 import pandas as pd
 from fastapi import APIRouter, Query, Response
 from ocelescope import AttributeSummary, RelationCountSummary
-from ocelescope.ocel.filter import OCELFilter
-from ocelescope.ocel.ocel import OCELFileExtensions
+from ocelescope.ocel.constants.misc import OCELFileExtensions
 
 from app.dependencies import ApiOcel, ApiSession
 from app.internal.exceptions import NotFound
 from app.internal.model.base import PaginatedResponse
 from app.internal.model.events import Date_Distribution_Item, Entity_Time_Info
-from app.internal.model.ocel import OcelMetadata
+from app.internal.model.ocel import OCELFilter, OcelMetadata
 from app.internal.model.response import TempFileResponse
 from app.internal.ocel.default_ocel import (
     DEFAULT_OCEL_KEYS,
@@ -22,6 +21,7 @@ from app.internal.ocel.default_ocel import (
 )
 from app.internal.registry import registry_manager
 from app.internal.registry.extension import OCELExtensionDescription
+from app.internal.util.filters import merge_filters, unmerge_filter
 from app.internal.util.pandas import search_paginated_dataframe
 
 ocels_router = APIRouter(prefix="/ocels", tags=["ocels"])
@@ -45,22 +45,19 @@ def getOcels(
 
     return [
         OcelMetadata(
-            created_at=value.original.meta["uploadDate"],
+            created_at=value.ocel.meta.extra["upload_date"],
             id=key,
-            name=value.original.meta["fileName"],
+            name=value.ocel.meta.extra["name"],
             extensions=[
                 extension_descriptions[extension.__class__.__name__]
-                for extension in value.original.get_extensions_list()
+                for extension in value.ocel.extensions.all()
                 if extension.__class__.__name__ in extension_descriptions
             ],
         )
         for key, value in session.ocels.items()
         if extension_name is None
         or extension_name
-        in [
-            extension.__class__.__name__
-            for extension in value.original.get_extensions_list()
-        ]
+        in [extension.__class__.__name__ for extension in value.ocel.extensions.all()]
     ]
 
 
@@ -87,7 +84,7 @@ def delete_ocel(session: ApiSession, ocel_id: str):
     operation_id="renameOcel",
 )
 def rename_ocel(ocel: ApiOcel, new_name: str):
-    ocel.rename(new_name)
+    ocel.meta.extra["name"] = new_name
 
 
 # endregion
@@ -100,7 +97,7 @@ def rename_ocel(ocel: ApiOcel, new_name: str):
 def get_object_attributes(
     ocel: ApiOcel,
 ):
-    return ocel.object_attribute_summary
+    return ocel.objects.attribute_summary
 
 
 @ocels_router.get(
@@ -111,7 +108,7 @@ def get_object_attributes(
 def get_event_attributes(
     ocel: ApiOcel,
 ):
-    return ocel.event_attribute_summary
+    return ocel.events.attribute_summary
 
 
 @ocels_router.get(
@@ -122,7 +119,7 @@ def get_event_attributes(
 def get_event_counts(
     ocel: ApiOcel,
 ) -> dict[str, int]:
-    return ocel.activity_counts.to_dict()
+    return ocel.events.activity_counts.to_dict()
 
 
 @ocels_router.get(
@@ -133,7 +130,7 @@ def get_event_counts(
 def get_time_info(
     ocel: ApiOcel, periods: int | None = None, freq: str | None = None
 ) -> Entity_Time_Info:
-    activity_timestamp = ocel.events[
+    activity_timestamp = ocel.events.df[
         [ocel.ocel.event_timestamp, ocel.ocel.event_activity]
     ].reset_index(drop=True)
     timestamps = activity_timestamp[ocel.ocel.event_timestamp]
@@ -187,7 +184,7 @@ def get_time_info(
 def get_object_counts(
     ocel: ApiOcel,
 ) -> dict[str, int]:
-    return ocel.otype_counts.to_dict()
+    return ocel.objects.counts.to_dict()
 
 
 @ocels_router.get(
@@ -196,9 +193,9 @@ def get_object_counts(
     operation_id="e2o",
 )
 def get_e2o(
-    ocel: ApiOcel, direction: Optional[Literal["source", "target"]] = "source"
+    ocel: ApiOcel, direction: Literal["source", "target"] = "source"
 ) -> list[RelationCountSummary]:
-    return ocel.e2o_summary(direction=direction)
+    return ocel.e2o.summary(direction=direction)
 
 
 @ocels_router.get(
@@ -207,9 +204,9 @@ def get_e2o(
     operation_id="o2o",
 )
 def get_object_relations(
-    ocel: ApiOcel, direction: Optional[Literal["source", "target"]] = "source"
+    ocel: ApiOcel, direction: Literal["source", "target"] = "source"
 ) -> list[RelationCountSummary]:
-    return ocel.o2o_summary(direction=direction)
+    return ocel.o2o.summary(direction=direction)
 
 
 @ocels_router.get("/events/ids", operation_id="eventIds")
@@ -220,7 +217,7 @@ def get_event_ids(
     page: int = 1,
 ) -> PaginatedResponse[list[str]]:
     filtered_df = search_paginated_dataframe(
-        df=ocel.events,
+        df=ocel.events.df,
         page=page,
         page_size=size,
         query=search,
@@ -230,7 +227,7 @@ def get_event_ids(
     event_ids: list[str] = filtered_df[ocel.ocel.event_id_column].to_list()
 
     return PaginatedResponse(
-        response=event_ids, page=page, page_size=size, total_items=len(ocel.events)
+        response=event_ids, page=page, page_size=size, total_items=len(ocel.events.df)
     )
 
 
@@ -242,7 +239,7 @@ def get_object_ids(
     page: int = 1,
 ) -> PaginatedResponse[list[str]]:
     filtered_df = search_paginated_dataframe(
-        df=ocel.objects,
+        df=ocel.objects.df,
         page=page,
         page_size=size,
         query=search,
@@ -252,7 +249,7 @@ def get_object_ids(
     object_ids: list[str] = filtered_df[ocel.ocel.object_id_column].to_list()
 
     return PaginatedResponse(
-        response=object_ids, page=page, page_size=size, total_items=len(ocel.objects)
+        response=object_ids, page=page, page_size=size, total_items=len(ocel.objects.df)
     )
 
 
@@ -263,7 +260,7 @@ def get_object_ids(
     operation_id="getFilters",
 )
 def get_filter(ocel: ApiOcel, session: ApiSession) -> Optional[OCELFilter]:
-    return session.get_ocel_filters(ocel.id)
+    return merge_filters(session.get_ocel_filters(ocel.meta.id))
 
 
 @ocels_router.post(
@@ -273,9 +270,9 @@ def get_filter(ocel: ApiOcel, session: ApiSession) -> Optional[OCELFilter]:
 def set_filter(
     ocel: ApiOcel, session: ApiSession, filter: Optional[OCELFilter]
 ) -> Optional[OCELFilter]:
-    session.filter_ocel(ocel_id=ocel.id, filters=filter)
+    session.filter_ocel(ocel.meta.id, unmerge_filter(filter or {}))
 
-    return session.get_ocel_filters(ocel.id)
+    return merge_filters(session.get_ocel_filters(ocel.meta.id))
 
 
 # endregion
@@ -327,6 +324,8 @@ def import_default_ocel(
     # Load OCEL
     ocel = default_ocel.get_ocel_copy(use_abbreviations=False)
 
+    ocel.meta.extra = {"name": default_ocel.name, "upload_date": str(datetime.now())}
+
     session.add_ocel(ocel)
     response.status_code = 200
 
@@ -338,14 +337,14 @@ def download_ocel(
     ocel: ApiOcel,
     ext: OCELFileExtensions,
 ) -> TempFileResponse:
-    name = ocel.meta["fileName"]
-    tmp_file_prefix = datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + "-" + name
+    name = ocel.meta.extra["name"]
+    tmp_file_prefix = datetime.now().strftime("%Y%m%d-%H%M%S") + "-" + name
 
     file_response = TempFileResponse(
         prefix=tmp_file_prefix, suffix=ext, filename=name + ext
     )
 
-    ocel.write_ocel(Path(file_response.tmp_path), ext)
+    ocel.write(Path(file_response.tmp_path))
 
     return file_response
 

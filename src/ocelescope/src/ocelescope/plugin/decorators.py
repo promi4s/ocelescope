@@ -14,8 +14,7 @@ from typing import (
 
 from pydantic import BaseModel, Field, PrivateAttr, computed_field
 
-from ocelescope.ocel.extension import OCELExtension
-from ocelescope.ocel.ocel import OCEL
+from ocelescope import OCEL, OCELExtension
 from ocelescope.plugin.input import PluginInput
 from ocelescope.resource.resource import Resource
 

@@ -5,9 +5,9 @@ from pandas.core.frame import DataFrame
 from pandas.core.series import Series
 from pydantic import BaseModel
 
-from ocelescope.ocel.util.relations import getO2OWithTypes
-
+from ocelescope.ocel.constants.pm4py import OID_COL
 from ocelescope.ocel.filter.base import BaseFilter, FilterResult
+from ocelescope.ocel.util.relations import getO2OWithTypes
 
 
 class RelationCountFilterConfig(BaseModel):
@@ -104,14 +104,14 @@ class E2OCountFilter(BaseFilter, RelationCountFilterConfig):
         entity_type_column = source_column
 
         mask = filter_by_relation_counts(
-            relation_table=ocel.relations,
+            relation_table=ocel.e2o,
             source_column=source_column,
             target_column=target_column,
             source_id_column=source_id_column,
             qualifier_column=qualifier_column,
             entity_id_column=entity_id_column,
             entity_type_column=entity_type_column,
-            source_df=ocel.events if self.direction == "source" else ocel.objects,
+            source_df=ocel.events.df if self.direction == "source" else ocel.objects.df,
             config=RelationCountFilterConfig(**self.model_dump()),
         )
 
@@ -133,9 +133,9 @@ class O2OCountFilter(BaseFilter, RelationCountFilterConfig):
             target_column="target_type",
             source_id_column="source",
             qualifier_column="qualifier",
-            entity_id_column=ocel.ocel.object_id_column,
-            entity_type_column=ocel.ocel.object_type_column,
-            source_df=ocel.objects,
+            entity_id_column=OID_COL,
+            entity_type_column=OID_COL,
+            source_df=ocel.objects.df,
             config=RelationCountFilterConfig(**self.model_dump()),
         )
 
