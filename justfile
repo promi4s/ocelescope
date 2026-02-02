@@ -10,7 +10,7 @@ docs $PYTHONPATH="src/ocelescope/src":
   --with mkdocs-minify-plugin \
   --with mkdocstrings-python \
   --with mkdocs-autorefs \
-  mkdocs serve
+  mkdocs serve --livereload
 
 
 up env:
