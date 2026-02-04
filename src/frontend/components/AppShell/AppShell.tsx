@@ -25,18 +25,13 @@ import {
 import Link from "next/link";
 import { useLogout } from "@/api/fastapi/session/session";
 import { useQueryClient } from "@tanstack/react-query";
-import { getModuleRoute } from "@/lib/modules";
-import type {
-  ModuleName,
-  ModuleRouteDefinition,
-  ModuleRouteName,
-} from "@/types/modules";
-import useModulePath from "@/hooks/useModulePath";
-import moduleMap from "@/lib/modules/module-map";
 import CurrentOcelSelect from "../CurrentOcelSelect/CurrentOcelSelect";
 import useClient from "@/hooks/useClient";
 import UploadModal from "../UploadModal/UploadModal";
 import { useGetOcels } from "@/api/fastapi/ocels/ocels";
+import config from "@/ocelescope.config";
+import getModuleRoute from "@/lib/modules/getModuleRoute";
+import useModulePath from "@/hooks/useModulePath";
 
 const LogoutButton: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -97,15 +92,6 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const isClient = useClient();
 
   const modulePath = useModulePath();
-
-  const isOcelRequired = modulePath
-    ? (
-        moduleMap[modulePath.name as ModuleName].routes[
-          modulePath.route as ModuleRouteName<ModuleName>
-        ] as ModuleRouteDefinition
-      ).requiresOcel
-    : false;
-
   const { data: ocels } = useGetOcels();
 
   const isOcelAvailable = ocels?.length !== 0;
@@ -138,7 +124,7 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           </Group>
 
           <Group>
-            {isClient && isOcelRequired && <CurrentOcelSelect />}
+            {isClient && <CurrentOcelSelect />}
             <Button
               leftSection={<UploadIcon size={18} />}
               onClick={() => setIsUploadModalOpen(true)}
@@ -170,7 +156,8 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               active={router.asPath.split("/")[1] === "plugins"}
             />
             <Divider />
-            {Object.values(moduleMap).map(
+
+            {config.modules.map(
               ({ label, name, icon: Icon = PackageIcon, routes }) => {
                 const isModuleDisabled =
                   !Object.values(routes).some(
@@ -182,18 +169,17 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                     key={name}
                     leftSection={<Icon width={18} height={18} size={18} />}
                     label={label}
-                    defaultOpened={name === modulePath?.name}
+                    defaultOpened={name === modulePath?.moduleName}
                     component={Link}
                     href={getModuleRoute({
-                      name: name as ModuleName,
-                      route: Object.values(routes)[0]
-                        .name as ModuleRouteName<ModuleName>,
+                      moduleName: name,
+                      routeName: routes[0].name,
                     })}
                     disabled={isModuleDisabled}
                     opened={!isModuleDisabled ? undefined : false}
                     active={
                       Object.keys(routes).length === 1 &&
-                      name === modulePath?.name
+                      name === modulePath?.moduleName
                     }
                   >
                     {Object.keys(routes).length > 1 &&
@@ -207,14 +193,14 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                             key={routeName}
                             label={routeLabel}
                             href={getModuleRoute({
-                              name: name as ModuleName,
-                              route: routeName as ModuleRouteName<ModuleName>,
+                              moduleName: name,
+                              routeName: routeName,
                             })}
                             disabled={requiresOcel && !isOcelAvailable}
                             component={Link}
                             active={
-                              name === modulePath?.name &&
-                              routeName === modulePath.route
+                              name === modulePath?.moduleName &&
+                              routeName === modulePath.moduleName
                             }
                           />
                         ),

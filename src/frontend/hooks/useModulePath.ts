@@ -1,22 +1,25 @@
-import moduleMap from "@/lib/modules/module-map";
-import type { ModuleName, ModuleRouteName } from "@/types/modules";
+import config from "@/ocelescope.config";
 import { useRouter } from "next/router";
+import { useMemo } from "react";
 
 const useModulePath = () => {
   const router = useRouter();
   const { slug } = router.query;
-  const name = slug?.[0];
+  const [moduleName, routeName] = [slug?.[0], slug?.[1]];
 
-  if (!name || !(name in moduleMap)) return;
+  const modulePath = useMemo(() => {
+    const moduleConfig = config.modules.find(({ name }) => name === moduleName);
+    const routeConfig = moduleConfig?.routes.find(
+      ({ name }) => name === routeName,
+    );
 
-  const moduleEntry = moduleMap[name as ModuleName];
+    return {
+      moduleName: moduleConfig?.name,
+      routeName: routeConfig?.name,
+    };
+  }, [moduleName, routeName]);
 
-  return {
-    name: moduleEntry.name as ModuleName,
-    route: Object.values(moduleEntry.routes).find(
-      ({ name }) => name === slug?.[1],
-    )?.name as ModuleRouteName<ModuleName>,
-  };
+  return modulePath;
 };
 
 export default useModulePath;

@@ -1,4 +1,3 @@
-import type moduleMap from "@/lib/modules/module-map";
 import type { SVGProps } from "react";
 
 type Author = {
@@ -21,11 +20,3 @@ export type ModuleRouteDefinition = {
   requiresOcel?: boolean;
   component: React.ComponentType;
 };
-
-export type ModuleName = keyof typeof moduleMap;
-
-export type RoutesByModule = {
-  [K in ModuleName]: (typeof moduleMap)[K]["routes"];
-};
-export type ModuleRouteName<K extends ModuleName> = keyof RoutesByModule[K] &
-  string;

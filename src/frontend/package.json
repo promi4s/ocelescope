@@ -7,10 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "biome lint . --write",
-    "generate:modules": "tsx scripts/generateModules.ts",
-    "generate:resources": "tsx scripts/generateResources.ts",
     "generate:api": "npx orval",
-    "generate": "npm run generate:plugins && npm run generate:api",
     "format": "biome format . --write"
   },
   "dependencies": {
