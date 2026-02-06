@@ -15,13 +15,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { useRouter } from "next/router";
 import classes from "@/components/AppShell/AppShell.module.css";
 import { useState } from "react";
-import {
-  HomeIcon,
-  LogOutIcon,
-  PackageIcon,
-  PuzzleIcon,
-  UploadIcon,
-} from "lucide-react";
+import { HomeIcon, LogOutIcon, PackageIcon, UploadIcon } from "lucide-react";
 import Link from "next/link";
 import { useLogout } from "@/api/fastapi/session/session";
 import { useQueryClient } from "@tanstack/react-query";
@@ -148,15 +142,7 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               leftSection={<HomeIcon size={16} />}
               active={router.asPath === "/"}
             />
-            <NavLink
-              component={Link}
-              href="/plugins"
-              label="Plugins"
-              leftSection={<PuzzleIcon size={16} />}
-              active={router.asPath.split("/")[1] === "plugins"}
-            />
             <Divider />
-
             {config.modules.map(
               ({ label, name, icon: Icon = PackageIcon, routes }) => {
                 const isModuleDisabled =

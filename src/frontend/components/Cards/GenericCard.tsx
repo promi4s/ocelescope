@@ -11,19 +11,17 @@ import {
 import { EllipsisVertical } from "lucide-react";
 import Link from "next/link";
 import type React from "react";
+import type { ComponentProps } from "react";
 import uniqolor from "uniqolor";
 
 export const GenericCard: React.FC<{
   title: string;
   description: string;
   version?: string;
-  cta?: {
-    title: React.ReactNode;
-    link: string;
-  };
   tags?: string[];
   menuItems?: React.ReactNode;
-}> = ({ menuItems, title, description, cta, tags, version }) => {
+  link?: ComponentProps<typeof Link>;
+}> = ({ menuItems, title, description, link, tags, version }) => {
   return (
     <Card shadow="sm" padding="sm" radius="md" withBorder h={"100%"}>
       <Group justify="space-between" align="start" wrap="nowrap">
@@ -61,10 +59,8 @@ export const GenericCard: React.FC<{
       <Text size="sm" mb="xs" c="dimmed">
         {description}
       </Text>
-      {cta && (
-        <Button mt="auto" component={Link} variant="outline" href={cta.link}>
-          {cta.title}
-        </Button>
+      {link && (
+        <Button mt="auto" component={Link} variant="outline" {...link} />
       )}
     </Card>
   );

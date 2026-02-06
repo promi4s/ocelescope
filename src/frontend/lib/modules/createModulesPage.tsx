@@ -2,15 +2,17 @@ import type OcelescopeConfig from "@/types/ocelescope";
 import type { GetStaticPaths, GetStaticProps, NextPage } from "next";
 
 type ModulePageProps = {
-  moduleName: string;
-  routeName: string;
+  moduleProps?: {
+    moduleName: string;
+    routeName: string;
+  };
 };
 
 const createModulesPage = (config: OcelescopeConfig) => {
   const getStaticPaths: GetStaticPaths = async () => {
     const paths = config.modules.flatMap(({ name: moduleName, routes }) =>
       routes.map(({ name: routeName }) => ({
-        params: { slug: [moduleName, routeName] },
+        params: { slug: ["modules", moduleName, routeName] },
       })),
     );
 
@@ -19,38 +21,32 @@ const createModulesPage = (config: OcelescopeConfig) => {
       fallback: false,
     };
   };
+
   const getStaticProps: GetStaticProps<ModulePageProps> = async ({
     params,
   }) => {
-    const slugs = params?.slug ?? [];
+    const slugs: string[] = (params?.slug as string[]) ?? [];
 
-    const moduleConfig = config.modules.find(({ name }) => name === slugs[0]);
+    const moduleConfig = config.modules.find(({ name }) => name === slugs[1]);
     const routeName = moduleConfig?.routes.find(
-      ({ name }) => name === slugs[1],
+      ({ name }) => name === slugs[2],
     )?.name;
 
-    if (!(moduleConfig && routeName)) {
-      return {
-        notFound: true,
-      };
-    }
-
-    return {
-      props: {
-        moduleName: moduleConfig.name,
-        routeName,
-      },
-    };
+    return moduleConfig && routeName
+      ? { props: { moduleProps: { moduleName: moduleConfig.name, routeName } } }
+      : { props: {} };
   };
 
-  const ModulePage: NextPage<ModulePageProps> = ({ moduleName, routeName }) => {
-    const moduleConfig = config.modules.find(({ name }) => name === moduleName);
+  const ModulePage: NextPage<ModulePageProps> = ({ moduleProps }) => {
+    const moduleConfig = config.modules.find(
+      ({ name }) => name === moduleProps?.moduleName,
+    );
 
     const RouteComponent = moduleConfig?.routes.find(
-      ({ name }) => name === routeName,
+      ({ name }) => name === moduleProps?.routeName,
     )?.component;
 
-    return RouteComponent ? <RouteComponent /> : <div>Module not found</div>;
+    return RouteComponent ? <RouteComponent /> : <config.homePage />;
   };
 
   return { getStaticPaths, getStaticProps, ModulePage };

@@ -1,8 +1,11 @@
 import { usePlugins } from "@/api/fastapi/plugins/plugins";
-import { PluginCard, UploadPluginCard } from "@/components/Plugins/Card/Card";
 import { SimpleGrid } from "@mantine/core";
+import {
+  PluginCard,
+  UploadPluginCard,
+} from "../components/PluginCard/PluginCard";
 
-const PluginOverview: React.FC = () => {
+const PluginsOverview: React.FC = () => {
   const { data: plugins = [] } = usePlugins();
 
   return (
@@ -19,4 +22,4 @@ const PluginOverview: React.FC = () => {
   );
 };
 
-export default PluginOverview;
+export default PluginsOverview;

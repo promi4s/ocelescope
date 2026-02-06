@@ -2,7 +2,7 @@ import EntityTable from "@/components/EntityTable/EntityTable";
 import RecentPlugins from "@/components/Plugins/RecentPlugins/RecentPlugins";
 import { Container, Stack, Title } from "@mantine/core";
 
-const Overview = () => {
+const PluginHomePage: React.FC = () => {
   return (
     <Container h="100%">
       <Stack gap={"sm"} h="100%">
@@ -16,4 +16,4 @@ const Overview = () => {
   );
 };
 
-export default Overview;
+export default PluginHomePage;

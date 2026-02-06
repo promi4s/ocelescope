@@ -1,5 +1,8 @@
 import { usePlugins } from "@/api/fastapi/plugins/plugins";
-import { PluginCard, UploadPluginCard } from "../Card/Card";
+import {
+  PluginCard,
+  UploadPluginCard,
+} from "@/modules/plugins/components/PluginCard/PluginCard";
 import { Carousel } from "@mantine/carousel";
 
 const RecentPlugins: React.FC = () => {
