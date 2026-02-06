@@ -1,9 +1,9 @@
 import { useEventCounts, useObjectCounts } from "@/api/fastapi/ocels/ocels";
 import { MultiSelect, Stack } from "@mantine/core";
-import BarChartSelect from "@/components/Charts/BarChartSelect";
 import { memo, useMemo } from "react";
 import { Controller } from "react-hook-form";
 import type { FilterPageComponentProps } from "..";
+import BarChartSelect from "@/modules/filter/components/BarChartSelect";
 
 const EntityTypeFilterInput: React.FC<{
   selectedEntityTypes: string[];

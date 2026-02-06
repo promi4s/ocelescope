@@ -1,5 +1,5 @@
 import type { OCELFilter } from "@/api/fastapi-schemas";
-import { filterMap } from "@/components/Filters";
+import { filterMap } from "@/modules/filter/components/Filters";
 import type { FilterType } from "@/types/filters";
 import { Button, ButtonGroup, Group, Tabs } from "@mantine/core";
 import { CheckIcon, RotateCcwIcon, XIcon } from "lucide-react";

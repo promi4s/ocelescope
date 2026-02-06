@@ -3,7 +3,7 @@ import {
   useObjectAttributes,
   useObjectCounts,
 } from "@/api/fastapi/ocels/ocels";
-import Graph, { type NodeComponents } from "@/components/Graph";
+import Graph, { type NodeComponents } from "@/modules/ocelot/components/Graph";
 import { Group, Input, SegmentedControl, Stack } from "@mantine/core";
 import { useMemo, useState } from "react";
 import { MarkerType } from "@xyflow/react";

@@ -10,7 +10,7 @@ import {
   useOcelotPaginatedEvents,
   useOcelotPaginatedObjects,
 } from "@/api/fastapi/ocelot/ocelot";
-import SingleLineTabs from "@/components/SingleLineTabs/SingleLineTabs";
+import SingleLineTabs from "@/modules/ocelot/components/SingleLineTabs/SingleLineTabs";
 import { keepPreviousData } from "@tanstack/react-query";
 
 import { useEffect, useMemo, useState } from "react";

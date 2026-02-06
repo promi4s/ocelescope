@@ -4,8 +4,8 @@ import {
   getStraightPath,
   useInternalNode,
 } from "@xyflow/react";
-import { getEdgeParams } from "@/components/Graph/util/getEdgeParams";
 import BaseEdge from "./BaseEdge";
+import { getEdgeParams } from "../util/getEdgeParams";
 
 export type FloatingEdgeType = Edge<
   {

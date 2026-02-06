@@ -1,19 +1,17 @@
 import type { PluginApi } from "@/api/fastapi-schemas";
 import { useDeletePlugin } from "@/api/fastapi/plugins/plugins";
-import { GenericCard } from "@/components/Cards/GenericCard";
 import UploadModal from "@/components/UploadModal/UploadModal";
 import getModuleRoute from "@/lib/modules/getModuleRoute";
 import { Card, Menu, Stack, Text, ThemeIcon } from "@mantine/core";
 import { Trash2Icon, UploadIcon } from "lucide-react";
-import { useRouter } from "next/router";
 import { useState } from "react";
+import { GenericCard } from "./GenericCard";
 
 export const PluginCard: React.FC<{ plugin: PluginApi }> = ({ plugin }) => {
   const { description, label, version } = plugin.meta;
 
-  const { query } = useRouter();
-
   const { mutate: deletePlugin } = useDeletePlugin();
+
   return (
     <GenericCard
       title={label}

@@ -11,12 +11,6 @@ import {
   applyNodeChanges,
 } from "@xyflow/react";
 
-import CircleNode, {
-  type CircleNodeType,
-} from "@/components/Graph/nodes/CircleNode";
-import RectangleNode, {
-  type RectangleNodeType,
-} from "@/components/Graph/nodes/RectangleNode";
 import FloatingEdge, { type FloatingEdgeType } from "./edges/FloatingEdge";
 import { useDagreLayout } from "./layout/dagre";
 import type { GraphLabel } from "@dagrejs/dagre";
@@ -26,6 +20,8 @@ import { ActionIcon } from "@mantine/core";
 import { DownloadIcon } from "lucide-react";
 import { toPng } from "html-to-image";
 import { saveAs } from "file-saver";
+import CircleNode, { type CircleNodeType } from "./nodes/CircleNode";
+import RectangleNode, { type RectangleNodeType } from "./nodes/RectangleNode";
 
 const edgeTypes = {
   floating: FloatingEdge,

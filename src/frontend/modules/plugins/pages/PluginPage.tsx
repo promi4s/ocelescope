@@ -2,11 +2,11 @@ import type { PluginMethod } from "@/api/fastapi-schemas";
 import { useGetExtensionMeta } from "@/api/fastapi/ocels/ocels";
 import { useGetPlugin } from "@/api/fastapi/plugins/plugins";
 import { useGetResourceMeta } from "@/api/fastapi/resources/resources";
-import { GenericCard } from "@/components/Cards/GenericCard";
 import { Container, SimpleGrid, Stack, Text, Title } from "@mantine/core";
 import { useRouter } from "next/router";
 import { useMemo } from "react";
 import PluginBreadcrumbs from "../components/PluginBreadcrumbs/PluginBreadcrumbs";
+import { GenericCard } from "../components/PluginCard/GenericCard";
 
 const MethodCard: React.FC<{ pluginId: string; method: PluginMethod }> = ({
   method,
