@@ -2,5 +2,7 @@
   "name": "ocelescope-workspace",
   "private": "true",
   "workspaces": ["app", "packages/*"],
-  "scripts": {}
+  "scripts": {
+    "dev": "npm run dev -w @ocelescope/web"
+  }
 }
