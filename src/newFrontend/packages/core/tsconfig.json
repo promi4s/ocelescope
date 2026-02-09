@@ -11,7 +11,10 @@
     "types": [],
     "declaration": true,
     "emitDeclarationOnly": true,
-    "verbatimModuleSyntax": true
+    "verbatimModuleSyntax": true,
+    "paths": {
+      "lucide-react": ["./node_modules/lucide-react/dist/lucide-react.suffixed"]
+    }
   },
   "include": ["src"]
 }

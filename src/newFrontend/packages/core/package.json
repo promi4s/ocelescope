@@ -15,7 +15,8 @@
   },
   "exports": {
     ".": "./dist/index.js",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./styles": "./dist/styles/styles.js"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -26,12 +27,16 @@
   },
   "scripts": {
     "build": "tsdown",
-    "dev": "tsdown --watch"
+    "dev": "tsdown --watch ./src"
   },
   "peerDependencies": {
+    "@mantine/core": "^8.3.14",
+    "@mantine/hooks": "^8.3.14",
+    "@tanstack/react-query": "^5.90.20",
     "next": "^16.1.6",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "zustand": "^5.0.11"
   },
   "devDependencies": {
     "@tsconfig/strictest": "^2.0.8",
@@ -49,6 +54,6 @@
     "vitest-browser-react": "^2.0.2"
   },
   "dependencies": {
-    "@tanstack/react-query": "^5.90.20"
+    "lucide-react": "^0.563.0"
   }
 }

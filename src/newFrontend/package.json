@@ -3,6 +3,6 @@
   "private": "true",
   "workspaces": ["app", "packages/*"],
   "scripts": {
-    "dev": "npm run dev -w @ocelescope/web"
+    "dev": "npm run dev -w @ocelescope/app & npm run dev -w @ocelescope/core"
   }
 }
