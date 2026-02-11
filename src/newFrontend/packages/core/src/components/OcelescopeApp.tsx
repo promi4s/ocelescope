@@ -6,6 +6,7 @@ import {
 } from "@tanstack/react-query";
 import { useState } from "react";
 import { AppShell } from "./AppShell/AppShell";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 export const OcelescopeApp: React.FC<any> = ({ Component, pageProps }) => {
   const [client] = useState(() => new QueryClient());
@@ -19,6 +20,7 @@ export const OcelescopeApp: React.FC<any> = ({ Component, pageProps }) => {
           </AppShell>
         </MantineProvider>
       </HydrationBoundary>
+      <ReactQueryDevtools />
     </QueryClientProvider>
   );
 };
