@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { env } from "../lib/env";
 
 type CurrentOcelStore = {
   ocelId: string | null;
@@ -15,7 +16,7 @@ const useCurrentOcelStore = create<CurrentOcelStore>()(
       clearOcel: () => set({ ocelId: null }),
     }),
     // TODO: Get this from the enviroment varibales
-    { name: "current-ocel-id" },
+    { name: env.current_ocel_id },
   ),
 );
 
