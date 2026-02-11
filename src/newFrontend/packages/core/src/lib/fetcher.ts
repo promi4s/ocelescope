@@ -22,7 +22,6 @@ export const customFetch = async <T>(
     });
   } catch (error: any) {
     if (error.name === "AbortError") {
-      console.warn("Request aborted");
       return Promise.reject(error);
     }
     throw error;
