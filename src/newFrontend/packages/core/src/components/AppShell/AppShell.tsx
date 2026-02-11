@@ -6,12 +6,16 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { UploadIcon } from "lucide-react";
+import UploadModal from "../UploadModal/UploadModal";
+import { useState } from "react";
 
 export const AppShell: React.FC<{ children?: React.ReactNode }> = ({
   children,
 }) => {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure(true);
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
+
+  const [isUploadModalVisible, setIsUploadModalVisible] = useState(false);
 
   return (
     <MantineAppShell
@@ -41,7 +45,16 @@ export const AppShell: React.FC<{ children?: React.ReactNode }> = ({
           </Group>
 
           <Group>
-            <Button leftSection={<UploadIcon size={18} />}>Upload</Button>
+            <Button
+              leftSection={<UploadIcon size={18} />}
+              onClick={() => setIsUploadModalVisible(true)}
+            >
+              Upload
+            </Button>
+            <UploadModal
+              visible={isUploadModalVisible}
+              onClose={() => setIsUploadModalVisible(false)}
+            />
           </Group>
         </Group>
       </MantineAppShell.Header>
