@@ -9,7 +9,7 @@ const schema = z
   })
   .transform(
     ({ NEXT_PUBLIC_OCELESCOPE_SESSION_ID, NEXT_PUBLIC_BACKEND_URL }) => ({
-      session_id: NEXT_PUBLIC_BACKEND_URL,
+      session_id: NEXT_PUBLIC_OCELESCOPE_SESSION_ID,
       backend_url: NEXT_PUBLIC_BACKEND_URL,
     }),
   );
