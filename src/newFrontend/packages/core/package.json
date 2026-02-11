@@ -54,6 +54,7 @@
     "vitest-browser-react": "^2.0.2"
   },
   "dependencies": {
-    "lucide-react": "^0.563.0"
+    "lucide-react": "^0.563.0",
+    "zod": "^4.3.6"
   }
 }
