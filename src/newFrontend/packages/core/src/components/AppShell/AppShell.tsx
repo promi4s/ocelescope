@@ -8,6 +8,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { UploadIcon } from "lucide-react";
 import UploadModal from "../UploadModal/UploadModal";
 import { useState } from "react";
+import { CurrentOcelSelect } from "../OcelSelect/OcelSelect";
 
 export const AppShell: React.FC<{ children?: React.ReactNode }> = ({
   children,
@@ -45,6 +46,7 @@ export const AppShell: React.FC<{ children?: React.ReactNode }> = ({
           </Group>
 
           <Group>
+            <CurrentOcelSelect />
             <Button
               leftSection={<UploadIcon size={18} />}
               onClick={() => setIsUploadModalVisible(true)}

@@ -1,0 +1,22 @@
+import { useEffect } from "react";
+import { useGetOcels } from "../api/coreApi";
+import useCurrentOcelStore from "../store/currentOcelStore";
+
+const useCurrentOcel = () => {
+  const { data: ocels = [] } = useGetOcels();
+  const { ocelId, setOcel, clearOcel } = useCurrentOcelStore();
+
+  useEffect(() => {
+    if (ocelId && !ocels?.some(({ id }) => id === ocelId)) {
+      clearOcel();
+    }
+
+    if (!ocelId && ocels[0]) {
+      setOcel(ocels[0].id);
+    }
+  }, [clearOcel, setOcel, ocels, ocelId]);
+
+  return { id: ocelId, setCurrentOcel: setOcel };
+};
+
+export default useCurrentOcel;
