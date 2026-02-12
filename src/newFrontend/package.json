@@ -4,5 +4,9 @@
   "workspaces": ["app", "packages/*"],
   "scripts": {
     "dev": "npm run dev -w @ocelescope/app & npm run dev -w @ocelescope/core"
+  },
+  "devDependencies": {
+    "@bosh-code/tsdown-plugin-inject-css": "^2.0.0",
+    "unplugin-lightningcss": "^0.4.5"
   }
 }
