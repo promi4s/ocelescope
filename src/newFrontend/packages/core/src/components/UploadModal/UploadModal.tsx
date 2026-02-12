@@ -12,7 +12,7 @@ const UploadModal: React.FC<{ visible: boolean; onClose: () => void }> = ({
       onClose={onClose}
       size={"xl"}
     >
-      <UploadSection />
+      <UploadSection onSuccess={onClose} />
     </Modal>
   );
 };

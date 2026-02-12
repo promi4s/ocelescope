@@ -4,6 +4,10 @@ const nextConfig: NextConfig = {
   /* config options here */
   reactStrictMode: true,
   transpilePackages: ["@ocelescope/core"],
+  //TODO: Find another way of doing this
+  experimental: {
+    proxyClientMaxBodySize: "1000gb",
+  },
   rewrites: async () => {
     return [
       {
