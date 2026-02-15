@@ -60,5 +60,9 @@
     "vite": "^7.3.0",
     "vitest": "^4.0.16",
     "vitest-browser-react": "^2.0.2"
+  },
+  "dependencies": {
+    "@marko19907/string-to-color": "^1.0.2",
+    "dayjs": "^1.11.19"
   }
 }
