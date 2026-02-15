@@ -87,12 +87,12 @@ const FileUploadZone: React.FC<{
   );
 };
 
-const UploadSection: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
+const UploadSection: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }) => {
   const [isPending, setIsPending] = useState(false);
 
   const onUploadSuccess = useCallback(() => {
     setIsPending(false);
-    onSuccess();
+    onSuccess?.();
   }, [onSuccess]);
 
   return (

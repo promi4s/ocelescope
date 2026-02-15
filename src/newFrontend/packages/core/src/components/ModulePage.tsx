@@ -1,5 +1,6 @@
 import type { GetStaticPaths, GetStaticProps, NextPage } from "next";
 import type { OcelescopeConfig } from "../lib/config";
+import DefaultHomePage from "./DefaultHomePage/DefaultHomePage";
 
 type ModulePageProps = {
   moduleProps?: {
@@ -9,7 +10,7 @@ type ModulePageProps = {
 };
 
 export const createModulesPage = (config: OcelescopeConfig) => {
-  const { modules = [], homePage: HomePage = () => <></> } = config;
+  const { modules = [], homePage: HomePage = DefaultHomePage } = config;
 
   const getStaticPaths: GetStaticPaths = async () => {
     const paths = modules.flatMap(({ name: moduleName, routes }) =>
