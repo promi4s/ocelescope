@@ -1,6 +1,6 @@
+import { env } from "@ocelescope/api-client";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { env } from "../lib/env";
 
 type CurrentOcelStore = {
   ocelId: string | null;

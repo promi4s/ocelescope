@@ -7,7 +7,7 @@ type SessionState = {
   setSessionId: (id: string | null) => void;
 };
 
-const useSessionStore = create<SessionState>()(
+export const useSessionStore = create<SessionState>()(
   persist(
     (set) => ({
       sessionId: null,
@@ -16,5 +16,3 @@ const useSessionStore = create<SessionState>()(
     { name: env.session_id },
   ),
 );
-
-export default useSessionStore;

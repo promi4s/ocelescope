@@ -1,6 +1,5 @@
 import { saveAs } from "file-saver";
-import { env } from "../lib/env";
-import useSessionStore from "../store/sessionStore";
+import { env, useSessionStore } from "@ocelescope/api-client";
 
 export const useDownloadFile = () => {
   const { sessionId } = useSessionStore();
