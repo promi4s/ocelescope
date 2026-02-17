@@ -6,6 +6,7 @@
     "dev": "npm run dev -w @ocelescope/app & npm run dev -w @ocelescope/core"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.4.2",
     "@bosh-code/tsdown-plugin-inject-css": "^2.0.0",
     "unplugin-lightningcss": "^0.4.5"
   }
