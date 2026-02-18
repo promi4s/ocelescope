@@ -19,6 +19,11 @@ import {
   Trash,
   X,
 } from "lucide-react";
+
+import useInvalidate from "../../hooks/useInvalidate";
+import { useDownloadFile } from "../../hooks/useDownload";
+import dayjs, { formatDateTime } from "../../lib/dayjs";
+import { generateColor } from "@marko19907/string-to-color";
 import {
   useDeleteOcel,
   useDeleteResource,
@@ -27,11 +32,7 @@ import {
   useRenameOcel,
   useRenameResource,
   useResources,
-} from "../../api/coreApi";
-import useInvalidate from "../../hooks/useInvalidate";
-import { useDownloadFile } from "../../hooks/useDownload";
-import dayjs, { formatDateTime } from "../../lib/dayjs";
-import { generateColor } from "@marko19907/string-to-color";
+} from "@ocelescope/api-base";
 
 type Entity = {
   type: "ocel" | "resource";

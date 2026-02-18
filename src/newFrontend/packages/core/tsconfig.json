@@ -16,5 +16,5 @@
       "lucide-react": ["./node_modules/lucide-react/dist/lucide-react.suffixed"]
     }
   },
-  "include": ["src", "../../@types"]
+  "include": ["src"]
 }

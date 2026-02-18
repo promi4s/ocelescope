@@ -1,14 +1,15 @@
 import { DataTable } from "mantine-datatable";
-import {
-  useGetDefaultOcel,
-  useImportDefaultOcel,
-  useUpload,
-} from "../../api/coreApi";
+
 import { LoadingOverlay, Stack, ThemeIcon } from "@mantine/core";
 import { ContainerIcon } from "lucide-react";
 import useInvalidate from "../../hooks/useInvalidate";
 import FileDropzone from "../Dropzone/Dropzone";
 import { useCallback, useState } from "react";
+import {
+  useGetDefaultOcel,
+  useImportDefaultOcel,
+  useUpload,
+} from "@ocelescope/api-base";
 
 const DefaultOcels: React.FC<{
   onSuccess: () => void;
