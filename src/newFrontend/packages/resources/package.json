@@ -32,9 +32,15 @@
     "prepublishOnly": "pnpm run build"
   },
   "peerDependencies": {
+    "@mantine/core": "^8.3.14",
+    "mantine-datatable": "^8.3.13",
+    "@ocelescope/api-base": "*",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "@ocelescope/api-base": "*"
+    "file-saver": "^2.0.5",
+    "lucide-react": "^0.563.0",
+    "react-zoom-pan-pinch": "^3.7.0",
+    "dayjs": "^1.11.19"
   },
   "devDependencies": {
     "@tsconfig/strictest": "^2.0.8",
