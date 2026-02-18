@@ -44,7 +44,9 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "zod": "^4.3.6",
-    "zustand": "^5.0.11"
+    "zustand": "^5.0.11",
+    "@marko19907/string-to-color": "^1.0.2",
+    "dayjs": "^1.11.19"
   },
   "devDependencies": {
     "@tsconfig/strictest": "^2.0.8",
@@ -56,9 +58,5 @@
     "bumpp": "^10.3.2",
     "tsdown": "^0.18.1",
     "typescript": "^5.9.3"
-  },
-  "dependencies": {
-    "@marko19907/string-to-color": "^1.0.2",
-    "dayjs": "^1.11.19"
   }
 }
