@@ -1,5 +1,5 @@
 {
-  "name": "@ocelescope/resource",
+  "name": "@ocelescope/resources",
   "type": "module",
   "version": "0.0.0",
   "description": "A starter for creating a React component library.",
@@ -33,7 +33,8 @@
   },
   "peerDependencies": {
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "@ocelescope/api-base": "*"
   },
   "devDependencies": {
     "@tsconfig/strictest": "^2.0.8",
