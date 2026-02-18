@@ -1,4 +1,4 @@
-import type { defineConfig as defineOrvalConfig, Options } from "orval";
+import { defineConfig as defineOrvalConfig, type Options } from "orval";
 
 const generateOptions = (options: Options) =>
   ({
@@ -33,7 +33,7 @@ const generateOptions = (options: Options) =>
   }) satisfies Options;
 
 export const defineConfig: typeof defineOrvalConfig = (config) => {
-  return defineConfig(
+  return defineOrvalConfig(
     Object.fromEntries(
       Object.entries(config).map(([name, config]) => [
         name,
