@@ -1,6 +1,6 @@
 site_name: Ocelescope
-site_url: https://rwth-pads.github.io/ocelescope
-repo_url: https://github.com/rwth-pads/ocelescope
+site_url: https://www.ocelscope.org
+repo_url: https://github.com/promi4s/ocelescope
 repo_name: Ocelescope
 
 theme:
