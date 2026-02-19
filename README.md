@@ -1,6 +1,6 @@
 # Ocelescope
 
-🔗 **Documentation:** <https://rwth-pads.github.io/ocelescope>
+🔗 **Documentation:** <https://www.ocelescope.org>
 
 > ⚠️ **Project Status: Under Construction**
 >
