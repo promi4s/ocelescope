@@ -48,7 +48,7 @@ type Entity = {
 };
 
 //TODO: sync with api
-const ocelExtenisions: OCELExtensions[] = [".sqlite", ".xmlocel", ".jsonocel"];
+const ocelExtenisions: OCELExtensions[] = [".sqlite", ".xml", ".json"];
 
 const EntityTable: React.FC = () => {
   const { data: ocels = [] } = useGetOcels();

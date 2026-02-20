@@ -12,6 +12,7 @@ dependencies = [
   "plotly>=6.3.1",
   "pm4py~=2.7.15.3",
   "pydantic>=2.11.7",
+  "r4pm[polars]>=0.5.1",
 ]
 
 
