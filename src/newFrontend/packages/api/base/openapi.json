@@ -1793,7 +1793,7 @@
             "in": "query",
             "required": true,
             "schema": {
-              "enum": [".xmlocel", ".jsonocel", ".sqlite"],
+              "enum": [".xml", ".json", ".sqlite"],
               "type": "string",
               "title": "Ext"
             }

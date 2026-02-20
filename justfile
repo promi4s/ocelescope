@@ -28,9 +28,13 @@ up env:
 orval: api
   npm run generate:api 
 
+[working-directory:'src/newFrontend']
+build: 
+  npm run build --ws
+
 [working-directory: 'src/backend']
 api:
-  uv run python generate_openapi.py {{justfile_directory()}}/src/frontend/api
+  uv run python generate_openapi.py {{justfile_directory()}}/src/newFrontend/packages/api/base
   
 [working-directory: 'src/backend']
 init_backend:

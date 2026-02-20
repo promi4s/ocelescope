@@ -1,9 +1,11 @@
 {
   "name": "ocelescope-workspace",
   "private": "true",
-  "workspaces": ["app", "packages/*", "packages/api/*"],
+  "packageManager": "pnpm@10.30.1",
   "scripts": {
-    "dev": "npm run dev -w @ocelescope/app & npm run dev -w @ocelescope/core"
+    "dev": "pnpm -r --parallel --filter \"!@ocelescope/app\" run dev",
+    "dev:app": "pnpm -r --parallel --filter \"@ocelescope/app\" run dev",
+    "build": "pnpm -r --filter \"!@ocelescope/app\" run build"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.2",

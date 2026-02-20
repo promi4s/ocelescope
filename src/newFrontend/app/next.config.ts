@@ -3,7 +3,12 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   reactStrictMode: true,
-  transpilePackages: ["@ocelescope/core"],
+  transpilePackages: [
+    "@ocelescope/core",
+    "@ocelescope/api-base",
+    "@ocelescope/api-client",
+    "@ocelescope/api-config",
+  ],
   //TODO: Find another way of doing this
   experimental: {
     proxyClientMaxBodySize: "1000gb",

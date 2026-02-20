@@ -13,7 +13,7 @@ services:
       - PLUGIN_DIR=/plugins
     develop:
       watch:
-        - action: sync
+        - action: sync+restart
           path: ./src/backend
           target: /app
           ignore:

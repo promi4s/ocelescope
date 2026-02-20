@@ -6,7 +6,3 @@ README.md
 .next
 .git
 
-api/*
-
-!api/fetcher.ts
-!api/openapi.json

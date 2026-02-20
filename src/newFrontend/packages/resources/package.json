@@ -34,7 +34,7 @@
   "peerDependencies": {
     "@mantine/core": "^8.3.14",
     "mantine-datatable": "^8.3.13",
-    "@ocelescope/api-base": "*",
+    "@ocelescope/api-base": "workspace:*",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "file-saver": "^2.0.5",
