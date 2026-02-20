@@ -4,9 +4,14 @@ import CytoscapeComponent from "react-cytoscapejs";
 import type { Core } from "cytoscape";
 import { CytoscapeContext } from "./CytoscapeContext";
 
-const CytoscapeGraph: React.FC<
-  ComponentProps<typeof CytoscapeComponent> & { children?: React.ReactNode }
-> = ({ children, ...props }) => {
+export type CytoscapeGraphProps = ComponentProps<typeof CytoscapeComponent> & {
+  children?: React.ReactNode;
+};
+
+const CytoscapeGraph: React.FC<CytoscapeGraphProps> = ({
+  children,
+  ...props
+}) => {
   const cytoscapeRef = useRef<Core | null>(null);
 
   useEffect(() => {
