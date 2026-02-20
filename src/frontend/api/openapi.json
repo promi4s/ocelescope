@@ -1903,8 +1903,8 @@
             "required": true,
             "schema": {
               "enum": [
-                ".xmlocel",
-                ".jsonocel",
+                ".xml",
+                ".json",
                 ".sqlite"
               ],
               "type": "string",
