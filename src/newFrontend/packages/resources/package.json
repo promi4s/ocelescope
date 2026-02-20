@@ -33,17 +33,18 @@
   },
   "peerDependencies": {
     "@mantine/core": "^8.3.14",
-    "mantine-datatable": "^8.3.13",
     "@ocelescope/api-base": "workspace:*",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
+    "dayjs": "^1.11.19",
     "file-saver": "^2.0.5",
     "lucide-react": "^0.563.0",
-    "react-zoom-pan-pinch": "^3.7.0",
-    "dayjs": "^1.11.19"
+    "mantine-datatable": "^8.3.13",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-zoom-pan-pinch": "^3.7.0"
   },
   "devDependencies": {
     "@tsconfig/strictest": "^2.0.8",
+    "@types/file-saver": "^2.0.7",
     "@types/node": "^25.0.3",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
