@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 
 import pm4py
+import r4pm
 from pm4py.objects.ocel.obj import OCEL as PM4PYOCEL
 from pm4py.objects.ocel.obj import deepcopy
 
@@ -100,9 +101,9 @@ class OCEL:
             match path.suffix:
                 case ".sqlite":
                     pm4py_ocel = pm4py.read.read_ocel2_sqlite(str(path))
-                case ".xmlocel":
+                case ".xmlocel" | ".xml":
                     pm4py_ocel = pm4py.read.read_ocel2_xml(str(path))
-                case ".jsonocel":
+                case ".jsonocel" | ".json":
                     pm4py_ocel = pm4py.read.read_ocel2_json(str(path))
                 case _:
                     raise ValueError(f"Unsupported extension: {path.suffix}")
@@ -129,10 +130,10 @@ class OCEL:
         path = Path(path)
 
         match path.suffix:
-            case ".xmlocel":
-                pm4py.write_ocel2_xml(self.ocel, str(path))
-            case ".jsonocel":
-                pm4py.write_ocel2_json(self.ocel, str(path))
+            case ".xmlocel" | ".xml":
+                r4pm.df.export_ocel_pm4py(self.ocel, str(path.with_suffix(".xml")))
+            case ".jsonocel" | ".json":
+                r4pm.df.export_ocel_pm4py(self.ocel, str(path.with_suffix(".json")))
             case ".sqlite":
                 pm4py.write_ocel2_sqlite(self.ocel, str(path))
             case _:
