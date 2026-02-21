@@ -40,6 +40,7 @@
     "mantine-datatable": "^8.3.13",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "next": "16.1.6",
     "react-zoom-pan-pinch": "^3.7.0"
   },
   "devDependencies": {
@@ -50,6 +51,7 @@
     "@types/react": "^19.2.7",
     "@types/react-cytoscapejs": "^1.2.6",
     "@types/react-dom": "^19.2.3",
+    "@types/react-plotly.js": "^2.6.4",
     "bumpp": "^10.3.2",
     "tsdown": "^0.18.1",
     "typescript": "^5.9.3"
@@ -58,6 +60,7 @@
     "@hpcc-js/wasm-graphviz": "^1.21.0",
     "cytoscape": "^3.33.1",
     "lodash": "^4.17.23",
-    "react-cytoscapejs": "^2.0.0"
+    "react-cytoscapejs": "^2.0.0",
+    "react-plotly.js": "^2.6.0"
   }
 }
