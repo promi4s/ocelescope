@@ -1,5 +1,6 @@
 import { saveAs } from "file-saver";
-import { env, useSessionStore } from "@ocelescope/api-client";
+import { useSessionStore, env } from "@ocelescope/api-client";
+import { parse } from "content-disposition-attachment";
 
 export const useDownloadFile = () => {
   const { sessionId } = useSessionStore();
@@ -16,17 +17,16 @@ export const useDownloadFile = () => {
       }
 
       const blob = await response.blob();
-      const contentDisposition = response.headers.get("Content-Disposition");
-      let filename = "downloaded-file";
 
-      if (contentDisposition) {
-        const match = contentDisposition.match(/filename="?([^"]+)"?/);
-        if (match?.[1]) {
-          filename = match[1];
-        }
-      }
+      const contentDisposition = parse(
+        response.headers.get("Content-Disposition") ?? "",
+      );
 
-      saveAs(blob, filename);
+      const fileName = contentDisposition.attachment
+        ? contentDisposition.filename
+        : "fileName";
+
+      saveAs(blob, fileName);
     } catch (err) {
       console.error("Download error:", err);
     }
