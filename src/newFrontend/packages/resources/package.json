@@ -2,16 +2,16 @@
   "name": "@ocelescope/resources",
   "type": "module",
   "version": "0.0.0",
-  "description": "A starter for creating a React component library.",
-  "author": "Author Name <author.name@mail.com>",
+  "description": "Ocelescope resources: helpers and UI components for rendering and exporting data.",
+  "author": "Görkem-Emre Öztürk <goerkem.oeztuerk@rwth-aachen.de>",
   "license": "MIT",
-  "homepage": "https://github.com/author/library#readme",
+  "homepage": "https://www.ocelescope.org",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/author/library.git"
+    "url": "git+https://github.com/promi4s/ocelescope.git"
   },
   "bugs": {
-    "url": "https://github.com/author/library/issues"
+    "url": "git+https://github.com/promi4s/ocelescope.git"
   },
   "exports": {
     ".": "./dist/index.js",
@@ -32,16 +32,22 @@
     "prepublishOnly": "pnpm run build"
   },
   "peerDependencies": {
+    "@hpcc-js/wasm-graphviz": "^1.21.0",
     "@mantine/core": "^8.3.14",
     "@ocelescope/api-base": "workspace:*",
+    "cytoscape": "^3.33.1",
     "dayjs": "^1.11.19",
     "file-saver": "^2.0.5",
+    "lodash": "^4.17.23",
     "lucide-react": "^0.563.0",
     "mantine-datatable": "^8.3.13",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
     "next": "16.1.6",
-    "react-zoom-pan-pinch": "^3.7.0"
+    "react": "^19.2.0",
+    "react-cytoscapejs": "^2.0.0",
+    "react-dom": "^19.2.0",
+    "react-plotly.js": "^2.6.0",
+    "react-zoom-pan-pinch": "^3.7.0",
+    "@floating-ui/react": "^0.27.18"
   },
   "devDependencies": {
     "@tsconfig/strictest": "^2.0.8",
@@ -55,12 +61,5 @@
     "bumpp": "^10.3.2",
     "tsdown": "^0.18.1",
     "typescript": "^5.9.3"
-  },
-  "dependencies": {
-    "@hpcc-js/wasm-graphviz": "^1.21.0",
-    "cytoscape": "^3.33.1",
-    "lodash": "^4.17.23",
-    "react-cytoscapejs": "^2.0.0",
-    "react-plotly.js": "^2.6.0"
   }
 }
