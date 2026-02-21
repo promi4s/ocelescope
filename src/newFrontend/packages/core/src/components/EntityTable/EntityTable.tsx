@@ -11,15 +11,15 @@ import {
   Title,
 } from "@mantine/core";
 import {
-  Check,
-  Download,
+  CheckIcon,
+  DownloadIcon,
   EllipsisVerticalIcon,
   EyeIcon,
-  Pencil,
-  Trash,
-  X,
+  PencilIcon,
+  TrashIcon,
+  XIcon,
 } from "lucide-react";
-
+import { ResourceModal } from "@ocelescope/resources";
 import useInvalidate from "../../hooks/useInvalidate";
 import { useDownloadFile } from "../../hooks/useDownload";
 import dayjs, { formatDateTime } from "../../lib/dayjs";
@@ -127,6 +127,12 @@ const EntityTable: React.FC = () => {
 
   return (
     <>
+      {viewedResouce && (
+        <ResourceModal
+          id={viewedResouce}
+          onClose={() => setViewedResource(undefined)}
+        />
+      )}
       {entities.length ? (
         <DataTable<Entity>
           withTableBorder
@@ -158,7 +164,7 @@ const EntityTable: React.FC = () => {
                             setRenamedEntitiy(undefined);
                           }}
                         >
-                          <Check size={16} />
+                          <CheckIcon size={16} />
                         </ActionIcon>
                         <ActionIcon
                           color="red"
@@ -167,7 +173,7 @@ const EntityTable: React.FC = () => {
                             setRenamedEntitiy(undefined);
                           }}
                         >
-                          <X size={16} />
+                          <XIcon size={16} />
                         </ActionIcon>
                       </Group>
                     </Group>
@@ -209,7 +215,7 @@ const EntityTable: React.FC = () => {
                   </Menu.Target>
                   <Menu.Dropdown onClick={(e) => e.stopPropagation()}>
                     <Menu.Item
-                      leftSection={<Pencil size={16} />}
+                      leftSection={<PencilIcon size={16} />}
                       onClick={() => setRenamedEntitiy({ id, value: name })}
                     >
                       Rename
@@ -225,7 +231,9 @@ const EntityTable: React.FC = () => {
                     {type === "ocel" ? (
                       <Menu.Sub position="right-start">
                         <Menu.Sub.Target>
-                          <Menu.Sub.Item leftSection={<Download size={16} />}>
+                          <Menu.Sub.Item
+                            leftSection={<DownloadIcon size={16} />}
+                          >
                             Download
                           </Menu.Sub.Item>
                         </Menu.Sub.Target>
@@ -249,14 +257,14 @@ const EntityTable: React.FC = () => {
                         onClick={() =>
                           downloadFile(`/resources/resource/${id}/download`)
                         }
-                        leftSection={<Download size={16} />}
+                        leftSection={<DownloadIcon size={16} />}
                       >
                         Download
                       </Menu.Item>
                     )}
                     <Menu.Divider />
                     <Menu.Item
-                      leftSection={<Trash size={16} color={"red"} />}
+                      leftSection={<TrashIcon size={16} color={"red"} />}
                       color="red"
                       fw="bold"
                       onClick={() => deleteEntity(id, type)}

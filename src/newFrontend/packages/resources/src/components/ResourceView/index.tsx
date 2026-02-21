@@ -47,7 +47,7 @@ export const Visualization: React.FC<{
   );
 };
 
-const Viewer: React.FC<{ id: string; isPreview?: boolean }> = ({
+export const ResourceViewer: React.FC<{ id: string; isPreview?: boolean }> = ({
   id,
   isPreview = false,
 }) => {
@@ -74,5 +74,3 @@ const Viewer: React.FC<{ id: string; isPreview?: boolean }> = ({
     />
   );
 };
-
-export default Viewer;
