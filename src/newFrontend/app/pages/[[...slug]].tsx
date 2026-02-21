@@ -1,5 +1,5 @@
-import config from "../ocelescope.config";
 import { createModulesPage } from "@ocelescope/core";
+import config from "../ocelescope.config";
 
 const page = createModulesPage(config);
 

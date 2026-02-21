@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import type { ElementDefinition } from "cytoscape";
 import { Graphviz } from "@hpcc-js/wasm-graphviz";
-import { omitBy, isNil } from "lodash";
+import type { ElementDefinition } from "cytoscape";
+import { isNil, omitBy } from "lodash";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { VisualizationByType } from "../types";
 
 type GraphvizJSON = {

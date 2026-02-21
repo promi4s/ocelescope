@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "pnpm -r --parallel --filter \"!@ocelescope/app\" run dev",
     "dev:app": "pnpm -r --parallel --filter \"@ocelescope/app\" run dev",
-    "build": "pnpm -r --filter \"!@ocelescope/app\" run build"
+    "build": "pnpm -r --filter \"!@ocelescope/app\" run build",
+    "lint": "npx @biomejs/biome check --write"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.2",

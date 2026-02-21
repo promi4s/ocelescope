@@ -1,6 +1,6 @@
+import { useGetOcels } from "@ocelescope/api-base";
 import { useEffect } from "react";
 import useCurrentOcelStore from "../store/currentOcelStore";
-import { useGetOcels } from "@ocelescope/api-base";
 
 const useCurrentOcel = () => {
   const { data: ocels = [] } = useGetOcels();

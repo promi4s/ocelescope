@@ -6,9 +6,9 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { UploadIcon } from "lucide-react";
-import UploadModal from "../UploadModal/UploadModal";
 import { useState } from "react";
 import { CurrentOcelSelect } from "../OcelSelect/OcelSelect";
+import UploadModal from "../UploadModal/UploadModal";
 
 export const AppShell: React.FC<{ children?: React.ReactNode }> = ({
   children,

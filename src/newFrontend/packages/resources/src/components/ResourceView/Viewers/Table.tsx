@@ -1,8 +1,8 @@
+import { DataTable, type DataTableColumn } from "mantine-datatable";
 import type React from "react";
 import { useEffect, useMemo, useState } from "react";
-import { DataTable, type DataTableColumn } from "mantine-datatable";
-import dayjs, { formatDate, formatDateTime } from "../../../util/dayjs";
 import type { VisualizationByType } from "../../../types";
+import dayjs, { formatDate, formatDateTime } from "../../../util/dayjs";
 
 type Table = VisualizationByType<"table">;
 

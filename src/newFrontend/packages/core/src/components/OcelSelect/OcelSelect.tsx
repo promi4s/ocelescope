@@ -1,7 +1,7 @@
 import { Select } from "@mantine/core";
+import { useGetOcels } from "@ocelescope/api-base";
 import { type ComponentProps, useMemo } from "react";
 import useCurrentOcel from "../../hooks/useCurrentOCEL";
-import { useGetOcels } from "@ocelescope/api-base";
 
 const OcelSelect: React.FC<
   ComponentProps<typeof Select> & { extension?: string }

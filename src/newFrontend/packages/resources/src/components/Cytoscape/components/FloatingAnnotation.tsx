@@ -1,10 +1,9 @@
+import { arrow, flip, offset, shift, useFloating } from "@floating-ui/react";
+import { Paper } from "@mantine/core";
 import { type ReactNode, useEffect, useMemo, useRef } from "react";
 import useEntityClick, {
   type CytoscapeClickEntity,
 } from "../hooks/useEntityClick";
-
-import { useFloating, flip, shift, offset, arrow } from "@floating-ui/react";
-import { Paper } from "@mantine/core";
 
 const FloatingAnnotation: React.FC<{
   trigger?: "leftClick" | "rightClick";

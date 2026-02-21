@@ -1,10 +1,10 @@
+import { Box } from "@mantine/core";
 import CytoscapeComponent from "../../../components/Cytoscape";
 import ActionButtons from "../../../components/Cytoscape/components/ActionButtons";
 import FloatingAnnotation from "../../../components/Cytoscape/components/FloatingAnnotation";
-import type { VisualizationByType, VisulizationsType } from "../../../types";
-import { Box } from "@mantine/core";
-import { Visualization } from "..";
 import { useGraphvizLayout } from "../../../hooks/useGraphvizLayout";
+import type { VisualizationByType, VisulizationsType } from "../../../types";
+import { Visualization } from "..";
 
 const GraphViewer: React.FC<{
   visualization: VisualizationByType<"graph">;

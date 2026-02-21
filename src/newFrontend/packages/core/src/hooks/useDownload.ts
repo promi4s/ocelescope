@@ -1,6 +1,6 @@
-import { saveAs } from "file-saver";
-import { useSessionStore, env } from "@ocelescope/api-client";
+import { env, useSessionStore } from "@ocelescope/api-client";
 import { parse } from "content-disposition-attachment";
+import { saveAs } from "file-saver";
 
 export const useDownloadFile = () => {
   const { sessionId } = useSessionStore();

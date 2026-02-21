@@ -1,17 +1,17 @@
+import { LoadingOverlay, Stack, ThemeIcon } from "@mantine/core";
+import { useResource } from "@ocelescope/api-base";
+import { EyeOffIcon } from "lucide-react";
+import type { ComponentProps, ComponentType } from "react";
 import type {
   VisualizationByType,
   VisulizationsType,
   VisulizationsTypes,
 } from "../../types";
-import { LoadingOverlay, Stack, ThemeIcon } from "@mantine/core";
-import type { ComponentProps, ComponentType } from "react";
-import GraphViewer from "./Viewers/Graph";
-import { EyeOffIcon } from "lucide-react";
-import TableView from "./Viewers/Table";
-import SvgViewer from "./Viewers/SVG";
 import DotToSvgViewer from "./Viewers/Dot";
+import GraphViewer from "./Viewers/Graph";
 import PlotlyViewer from "./Viewers/Plotly";
-import { useResource } from "@ocelescope/api-base";
+import SvgViewer from "./Viewers/SVG";
+import TableView from "./Viewers/Table";
 
 export type VisualizationProps<T extends VisulizationsTypes> = {
   visualization: VisualizationByType<T>;

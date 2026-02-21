@@ -38,29 +38,27 @@ const ActionButtons: React.FC<{
       bottom={0}
       left={0}
     >
-      <>
-        <Button
-          disabled={!context}
-          px={"xs"}
-          variant="default"
-          onClick={
-            context &&
-            (() => {
-              if (context.cy.current) context.cy.current.fit();
-            })
-          }
-        >
-          <Maximize size={18} />
-        </Button>
-        <Button
-          disabled={!context}
-          onClick={downloadGraphAsPng}
-          px={"xs"}
-          variant="default"
-        >
-          <DownloadIcon size={18} />
-        </Button>
-      </>
+      <Button
+        disabled={!context}
+        px={"xs"}
+        variant="default"
+        onClick={
+          context &&
+          (() => {
+            if (context.cy.current) context.cy.current.fit();
+          })
+        }
+      >
+        <Maximize size={18} />
+      </Button>
+      <Button
+        disabled={!context}
+        onClick={downloadGraphAsPng}
+        px={"xs"}
+        variant="default"
+      >
+        <DownloadIcon size={18} />
+      </Button>
       {toggleOptions && (
         <Button onClick={toggleOptions} px={"xs"} variant="default">
           <Settings size={18} />

@@ -1,6 +1,3 @@
-import { DataTable } from "mantine-datatable";
-import { useCallback, useMemo, useState } from "react";
-import UploadSection from "../UploadSection/UploadSection";
 import {
   ActionIcon,
   Badge,
@@ -10,19 +7,6 @@ import {
   TextInput,
   Title,
 } from "@mantine/core";
-import {
-  CheckIcon,
-  DownloadIcon,
-  EllipsisVerticalIcon,
-  EyeIcon,
-  PencilIcon,
-  TrashIcon,
-  XIcon,
-} from "lucide-react";
-import { ResourceModal } from "@ocelescope/resources";
-import useInvalidate from "../../hooks/useInvalidate";
-import { useDownloadFile } from "../../hooks/useDownload";
-import dayjs, { formatDateTime } from "../../lib/dayjs";
 import { generateColor } from "@marko19907/string-to-color";
 import {
   useDeleteOcel,
@@ -33,6 +17,22 @@ import {
   useRenameResource,
   useResources,
 } from "@ocelescope/api-base";
+import { ResourceModal } from "@ocelescope/resources";
+import {
+  CheckIcon,
+  DownloadIcon,
+  EllipsisVerticalIcon,
+  EyeIcon,
+  PencilIcon,
+  TrashIcon,
+  XIcon,
+} from "lucide-react";
+import { DataTable } from "mantine-datatable";
+import { useCallback, useMemo, useState } from "react";
+import { useDownloadFile } from "../../hooks/useDownload";
+import useInvalidate from "../../hooks/useInvalidate";
+import dayjs, { formatDateTime } from "../../lib/dayjs";
+import UploadSection from "../UploadSection/UploadSection";
 
 type Entity = {
   type: "ocel" | "resource";
