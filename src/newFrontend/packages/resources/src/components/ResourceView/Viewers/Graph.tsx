@@ -3,7 +3,7 @@ import ActionButtons from "../../../components/Cytoscape/components/ActionButton
 import FloatingAnnotation from "../../../components/Cytoscape/components/FloatingAnnotation";
 import type { VisualizationByType, VisulizationsType } from "../../../types";
 import { Box } from "@mantine/core";
-import VisualizationViewer from "..";
+import { Visualization } from "..";
 import { useGraphvizLayout } from "../../../hooks/useGraphvizLayout";
 
 const GraphViewer: React.FC<{
@@ -34,7 +34,7 @@ const GraphViewer: React.FC<{
                   if (!visualizationEntity?.annotation) return;
 
                   return (
-                    <VisualizationViewer
+                    <Visualization
                       visualization={
                         visualizationEntity.annotation as VisulizationsType
                       }
