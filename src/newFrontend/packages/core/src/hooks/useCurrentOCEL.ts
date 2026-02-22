@@ -2,7 +2,7 @@ import { useGetOcels } from "@ocelescope/api-base";
 import { useEffect } from "react";
 import useCurrentOcelStore from "../store/currentOcelStore";
 
-const useCurrentOcel = () => {
+export const useCurrentOcel = () => {
   const { data: ocels = [] } = useGetOcels();
   const { ocelId, setOcel, clearOcel } = useCurrentOcelStore();
 
@@ -18,5 +18,3 @@ const useCurrentOcel = () => {
 
   return { id: ocelId, setCurrentOcel: setOcel };
 };
-
-export default useCurrentOcel;
