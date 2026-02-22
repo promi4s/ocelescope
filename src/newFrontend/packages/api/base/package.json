@@ -20,7 +20,9 @@
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "publishConfig": {
     "access": "public"
   },
@@ -32,10 +34,10 @@
     "prepublishOnly": "pnpm run build"
   },
   "peerDependencies": {
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
+    "react": "catalog:",
+    "react-dom": "catalog:",
     "@ocelescope/api-client": "workspace:*",
-    "@tanstack/react-query": "^5.90.20"
+    "@tanstack/react-query": "catalog:"
   },
   "devDependencies": {
     "@ocelescope/api-config": "workspace:*",

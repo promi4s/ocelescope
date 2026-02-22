@@ -21,7 +21,9 @@
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "publishConfig": {
     "access": "public"
   },
@@ -30,26 +32,26 @@
     "dev": "tsdown --watch ./src"
   },
   "peerDependencies": {
-    "@mantine/core": "^8.3.14",
-    "@mantine/dropzone": "^8.3.14",
-    "@mantine/hooks": "^8.3.14",
+    "@mantine/core": "catalog:",
+    "@mantine/dropzone": "catalog:",
+    "@mantine/hooks": "catalog:",
     "@ocelescope/api-base": "workspace:*",
     "@ocelescope/api-client": "workspace:*",
     "@ocelescope/resources": "workspace:*",
-    "@tanstack/react-query": "^5.90.20",
+    "@tanstack/react-query": "catalog:",
     "@tanstack/react-query-devtools": "^5.91.3",
-    "content-disposition-attachment": "^0.3.1",
-    "clsx": "^2.1.1",
-    "file-saver": "^2.0.5",
-    "lucide-react": "^0.563.0",
-    "mantine-datatable": "^8.3.13",
-    "next": "^16.1.6",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "zod": "^4.3.6",
-    "zustand": "^5.0.11",
-    "@marko19907/string-to-color": "^1.0.2",
-    "dayjs": "^1.11.19"
+    "content-disposition-attachment": "catalog:",
+    "clsx": "catalog:",
+    "file-saver": "catalog:",
+    "lucide-react": "catalog:",
+    "mantine-datatable": "catalog:",
+    "next": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "zod": "catalog:",
+    "zustand": "catalog:",
+    "@marko19907/string-to-color": "catalog:",
+    "dayjs": "catalog:"
   },
   "devDependencies": {
     "@tsconfig/strictest": "^2.0.8",

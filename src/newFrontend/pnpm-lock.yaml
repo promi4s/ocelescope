@@ -4,6 +4,57 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    '@mantine/core':
+      specifier: ^8.3.14
+      version: 8.3.15
+    '@mantine/dropzone':
+      specifier: ^8.3.14
+      version: 8.3.15
+    '@mantine/hooks':
+      specifier: ^8.3.14
+      version: 8.3.15
+    '@marko19907/string-to-color':
+      specifier: ^1.0.2
+      version: 1.0.2
+    '@tanstack/react-query':
+      specifier: ^5.90.21
+      version: 5.90.21
+    clsx:
+      specifier: ^2.1.1
+      version: 2.1.1
+    content-disposition-attachment:
+      specifier: ^0.3.1
+      version: 0.3.1
+    dayjs:
+      specifier: ^1.11.19
+      version: 1.11.19
+    file-saver:
+      specifier: ^2.0.5
+      version: 2.0.5
+    lucide-react:
+      specifier: ^0.563.0
+      version: 0.563.0
+    mantine-datatable:
+      specifier: ^8.3.13
+      version: 8.3.13
+    next:
+      specifier: ^16.1.6
+      version: 16.1.6
+    react:
+      specifier: ^19.2.0
+      version: 19.2.3
+    react-dom:
+      specifier: ^19.2.0
+      version: 19.2.3
+    zod:
+      specifier: ^4.3.6
+      version: 4.3.6
+    zustand:
+      specifier: ^5.0.11
+      version: 5.0.11
+
 importers:
 
   .:
@@ -49,19 +100,68 @@ importers:
         specifier: ^5
         version: 5.9.3
 
+  modules/ocelot:
+    dependencies:
+      '@mantine/core':
+        specifier: 'catalog:'
+        version: 8.3.15(@mantine/hooks@8.3.15(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@mantine/hooks':
+        specifier: 'catalog:'
+        version: 8.3.15(react@19.2.3)
+      '@ocelescope/api-base':
+        specifier: workspace:*
+        version: link:../../packages/api/base
+      '@ocelescope/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@tanstack/react-query':
+        specifier: 'catalog:'
+        version: 5.90.21(react@19.2.3)
+      lucide-react:
+        specifier: 'catalog:'
+        version: 0.563.0(react@19.2.3)
+      mantine-datatable:
+        specifier: 'catalog:'
+        version: 8.3.13(@mantine/core@8.3.15(@mantine/hooks@8.3.15(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/hooks@8.3.15(react@19.2.3))(clsx@2.1.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      react:
+        specifier: 'catalog:'
+        version: 19.2.3
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.2.3(react@19.2.3)
+    devDependencies:
+      '@tsconfig/strictest':
+        specifier: ^2.0.8
+        version: 2.0.8
+      '@types/node':
+        specifier: ^25.0.3
+        version: 25.3.0
+      '@types/react':
+        specifier: ^19.2.7
+        version: 19.2.14
+      '@types/react-dom':
+        specifier: ^19.2.3
+        version: 19.2.3(@types/react@19.2.14)
+      tsdown:
+        specifier: ^0.18.1
+        version: 0.18.4(typescript@5.9.3)(unplugin-lightningcss@0.4.5)
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+
   packages/api/base:
     dependencies:
       '@ocelescope/api-client':
         specifier: workspace:*
         version: link:../client
       '@tanstack/react-query':
-        specifier: ^5.90.20
+        specifier: 'catalog:'
         version: 5.90.21(react@19.2.3)
       react:
-        specifier: ^19.2.0
+        specifier: 'catalog:'
         version: 19.2.3
       react-dom:
-        specifier: ^19.2.0
+        specifier: 'catalog:'
         version: 19.2.3(react@19.2.3)
     devDependencies:
       '@ocelescope/api-config':
@@ -92,16 +192,16 @@ importers:
   packages/api/client:
     dependencies:
       react:
-        specifier: ^19.2.0
+        specifier: 'catalog:'
         version: 19.2.3
       react-dom:
-        specifier: ^19.2.0
+        specifier: 'catalog:'
         version: 19.2.3(react@19.2.3)
       zod:
-        specifier: ^4.3.6
+        specifier: 'catalog:'
         version: 4.3.6
       zustand:
-        specifier: ^5.0.11
+        specifier: 'catalog:'
         version: 5.0.11(@types/react@19.2.14)(react@19.2.3)
     devDependencies:
       '@tsconfig/strictest':
@@ -132,10 +232,10 @@ importers:
         specifier: ^8.4.0
         version: 8.4.1(typescript@5.9.3)
       react:
-        specifier: ^19.2.0
+        specifier: 'catalog:'
         version: 19.2.3
       react-dom:
-        specifier: ^19.2.0
+        specifier: 'catalog:'
         version: 19.2.3(react@19.2.3)
     devDependencies:
       '@tsconfig/strictest':
@@ -163,16 +263,16 @@ importers:
   packages/core:
     dependencies:
       '@mantine/core':
-        specifier: ^8.3.14
+        specifier: 'catalog:'
         version: 8.3.15(@mantine/hooks@8.3.15(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@mantine/dropzone':
-        specifier: ^8.3.14
+        specifier: 'catalog:'
         version: 8.3.15(@mantine/core@8.3.15(@mantine/hooks@8.3.15(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/hooks@8.3.15(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@mantine/hooks':
-        specifier: ^8.3.14
+        specifier: 'catalog:'
         version: 8.3.15(react@19.2.3)
       '@marko19907/string-to-color':
-        specifier: ^1.0.2
+        specifier: 'catalog:'
         version: 1.0.2
       '@ocelescope/api-base':
         specifier: workspace:*
@@ -184,43 +284,43 @@ importers:
         specifier: workspace:*
         version: link:../resources
       '@tanstack/react-query':
-        specifier: ^5.90.20
+        specifier: 'catalog:'
         version: 5.90.21(react@19.2.3)
       '@tanstack/react-query-devtools':
         specifier: ^5.91.3
         version: 5.91.3(@tanstack/react-query@5.90.21(react@19.2.3))(react@19.2.3)
       clsx:
-        specifier: ^2.1.1
+        specifier: 'catalog:'
         version: 2.1.1
       content-disposition-attachment:
-        specifier: ^0.3.1
+        specifier: 'catalog:'
         version: 0.3.1
       dayjs:
-        specifier: ^1.11.19
+        specifier: 'catalog:'
         version: 1.11.19
       file-saver:
-        specifier: ^2.0.5
+        specifier: 'catalog:'
         version: 2.0.5
       lucide-react:
-        specifier: ^0.563.0
+        specifier: 'catalog:'
         version: 0.563.0(react@19.2.3)
       mantine-datatable:
-        specifier: ^8.3.13
+        specifier: 'catalog:'
         version: 8.3.13(@mantine/core@8.3.15(@mantine/hooks@8.3.15(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/hooks@8.3.15(react@19.2.3))(clsx@2.1.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       next:
-        specifier: ^16.1.6
+        specifier: 'catalog:'
         version: 16.1.6(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       react:
-        specifier: ^19.2.0
+        specifier: 'catalog:'
         version: 19.2.3
       react-dom:
-        specifier: ^19.2.0
+        specifier: 'catalog:'
         version: 19.2.3(react@19.2.3)
       zod:
-        specifier: ^4.3.6
+        specifier: 'catalog:'
         version: 4.3.6
       zustand:
-        specifier: ^5.0.11
+        specifier: 'catalog:'
         version: 5.0.11(@types/react@19.2.14)(react@19.2.3)
     devDependencies:
       '@tsconfig/strictest':
@@ -260,7 +360,7 @@ importers:
         specifier: ^1.21.0
         version: 1.21.0
       '@mantine/core':
-        specifier: ^8.3.14
+        specifier: 'catalog:'
         version: 8.3.15(@mantine/hooks@8.3.15(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@ocelescope/api-base':
         specifier: workspace:*
@@ -269,31 +369,31 @@ importers:
         specifier: ^3.33.1
         version: 3.33.1
       dayjs:
-        specifier: ^1.11.19
+        specifier: 'catalog:'
         version: 1.11.19
       file-saver:
-        specifier: ^2.0.5
+        specifier: 'catalog:'
         version: 2.0.5
       lodash:
         specifier: ^4.17.23
         version: 4.17.23
       lucide-react:
-        specifier: ^0.563.0
+        specifier: 'catalog:'
         version: 0.563.0(react@19.2.3)
       mantine-datatable:
-        specifier: ^8.3.13
+        specifier: 'catalog:'
         version: 8.3.13(@mantine/core@8.3.15(@mantine/hooks@8.3.15(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/hooks@8.3.15(react@19.2.3))(clsx@2.1.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       next:
-        specifier: 16.1.6
+        specifier: 'catalog:'
         version: 16.1.6(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       react:
-        specifier: ^19.2.0
+        specifier: 'catalog:'
         version: 19.2.3
       react-cytoscapejs:
         specifier: ^2.0.0
         version: 2.0.0(cytoscape@3.33.1)(react@19.2.3)
       react-dom:
-        specifier: ^19.2.0
+        specifier: 'catalog:'
         version: 19.2.3(react@19.2.3)
       react-plotly.js:
         specifier: ^2.6.0
