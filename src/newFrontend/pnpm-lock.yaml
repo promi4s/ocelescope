@@ -6,6 +6,9 @@ settings:
 
 catalogs:
   default:
+    '@dagrejs/dagre':
+      specifier: ^2.0.4
+      version: 2.0.4
     '@mantine/core':
       specifier: ^8.3.14
       version: 8.3.15
@@ -24,6 +27,9 @@ catalogs:
     '@types/file-saver':
       specifier: ^2.0.7
       version: 2.0.7
+    '@xyflow/react':
+      specifier: ^12.10.1
+      version: 12.10.1
     clsx:
       specifier: ^2.1.1
       version: 2.1.1
@@ -39,6 +45,9 @@ catalogs:
     file-saver:
       specifier: ^2.0.5
       version: 2.0.5
+    html-to-image:
+      specifier: ^1.11.13
+      version: 1.11.13
     lucide-react:
       specifier: ^0.563.0
       version: 0.563.0
@@ -80,6 +89,9 @@ importers:
       '@ocelescope/core':
         specifier: workspace:*
         version: link:../packages/core
+      '@ocelescope/ocelot':
+        specifier: workspace:*
+        version: link:../modules/ocelot
       next:
         specifier: 16.1.6
         version: 16.1.6(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
