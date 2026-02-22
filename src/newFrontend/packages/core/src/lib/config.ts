@@ -25,3 +25,7 @@ export type OcelescopeConfig = {
   homePage?: React.FC;
   modules?: readonly ModuleDefinition[];
 };
+
+export const defineModule = (def: ModuleDefinition) => def;
+
+export const defineModuleRoute = (def: ModuleRouteDefinition) => def;
