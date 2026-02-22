@@ -13,7 +13,7 @@ services:
       - PLUGIN_DIR=/plugins
     develop:
       watch:
-        - action: sync
+        - action: sync+restart
           path: ./src/backend
           target: /app
           ignore:
@@ -22,7 +22,7 @@ services:
           path: ./src/backend/uv.lock
   frontend:
     build:
-      context: ./src/frontend
+      context: ./src/newFrontend/
       dockerfile: dev.Dockerfile
     ports:
       - "3000:3000"
@@ -31,15 +31,13 @@ services:
     develop:
       watch:
         - action: sync
-          path: ./src/frontend
+          path: ./src/newFrontend/
           target: /app
           ignore:
             - node_modules/
             - .next/
         - action: rebuild
-          path: ./src/frontend/package-lock.json
-        - action: rebuild
-          path: ./src/frontend/api/openapi.json
+          path: ./src/newFrontend/package-lock.json
 
 volumes:
   plugins_store:

@@ -1,0 +1,67 @@
+{
+  "name": "@ocelescope/core",
+  "type": "module",
+  "version": "0.0.0",
+  "description": "Core React component and style library for Ocelescope (Mantine + React Query).",
+  "author": "Görkem-Emre Öztürk <goerkem.oeztuerk@rwth-aachen.de>",
+  "license": "MIT",
+  "homepage": "https://www.ocelescope.org",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/promi4s/ocelescope.git"
+  },
+  "bugs": {
+    "url": "https://github.com/promi4s/ocelescope/issues"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json",
+    "./styles": "./dist/styles/styles.js"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch ./src"
+  },
+  "peerDependencies": {
+    "@mantine/core": "catalog:",
+    "@mantine/dropzone": "catalog:",
+    "@mantine/hooks": "catalog:",
+    "@ocelescope/api-base": "workspace:*",
+    "@ocelescope/api-client": "workspace:*",
+    "@ocelescope/resources": "workspace:*",
+    "@tanstack/react-query": "catalog:",
+    "@tanstack/react-query-devtools": "^5.91.3",
+    "content-disposition-attachment": "catalog:",
+    "clsx": "catalog:",
+    "file-saver": "catalog:",
+    "lucide-react": "catalog:",
+    "mantine-datatable": "catalog:",
+    "next": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "zod": "catalog:",
+    "zustand": "catalog:",
+    "@marko19907/string-to-color": "catalog:",
+    "dayjs": "catalog:"
+  },
+  "devDependencies": {
+    "@tsconfig/strictest": "^2.0.8",
+    "@types/css-modules": "^1.0.5",
+    "@types/file-saver": "^2.0.7",
+    "@types/node": "^25.0.3",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "bumpp": "^10.3.2",
+    "tsdown": "^0.18.1",
+    "typescript": "^5.9.3"
+  }
+}

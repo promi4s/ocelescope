@@ -1,0 +1,16 @@
+{
+  "name": "ocelescope-workspace",
+  "private": "true",
+  "packageManager": "pnpm@10.30.1",
+  "scripts": {
+    "dev": "pnpm -r --parallel --filter \"!@ocelescope/app\" run dev",
+    "dev:app": "pnpm -r --parallel --filter \"@ocelescope/app\" run dev",
+    "build": "pnpm -r --filter \"!@ocelescope/app\" run build",
+    "lint": "npx @biomejs/biome check --write"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.4.2",
+    "@bosh-code/tsdown-plugin-inject-css": "^2.0.0",
+    "unplugin-lightningcss": "^0.4.5"
+  }
+}

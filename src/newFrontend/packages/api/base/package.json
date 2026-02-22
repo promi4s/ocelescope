@@ -1,0 +1,52 @@
+{
+  "name": "@ocelescope/api-base",
+  "type": "module",
+  "version": "0.0.0",
+  "description": "Generated, type-safe client + hooks for the Ocelescope Base backend.",
+  "author": "Görkem-Emre Öztürk <goerkem.oeztuerk@rwth-aachen.de>",
+  "license": "MIT",
+  "homepage": "https://www.ocelescope.org",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/promi4s/ocelescope.git"
+  },
+  "bugs": {
+    "url": "https://github.com/promi4s/ocelescope/issues"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "pnpx orval && tsdown",
+    "dev": "tsdown --watch",
+    "typecheck": "tsc --noEmit",
+    "release": "bumpp && pnpm publish",
+    "prepublishOnly": "pnpm run build"
+  },
+  "peerDependencies": {
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "@ocelescope/api-client": "workspace:*",
+    "@tanstack/react-query": "catalog:"
+  },
+  "devDependencies": {
+    "@ocelescope/api-config": "workspace:*",
+    "@tsconfig/strictest": "^2.0.8",
+    "@types/node": "^25.0.3",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "bumpp": "^10.3.2",
+    "tsdown": "^0.18.1",
+    "typescript": "^5.9.3"
+  }
+}
