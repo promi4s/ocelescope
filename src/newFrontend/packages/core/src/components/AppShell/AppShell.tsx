@@ -9,10 +9,13 @@ import { UploadIcon } from "lucide-react";
 import { useState } from "react";
 import { CurrentOcelSelect } from "../OcelSelect/OcelSelect";
 import UploadModal from "../UploadModal/UploadModal";
+import NavBar from "./components/Header";
+import type { OcelescopeConfig } from "../../lib/config";
 
-export const AppShell: React.FC<{ children?: React.ReactNode }> = ({
-  children,
-}) => {
+export const AppShell: React.FC<{
+  config: OcelescopeConfig;
+  children?: React.ReactNode;
+}> = ({ config, children }) => {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure(true);
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
 
@@ -60,7 +63,7 @@ export const AppShell: React.FC<{ children?: React.ReactNode }> = ({
           </Group>
         </Group>
       </MantineAppShell.Header>
-      <MantineAppShell.Navbar />
+      <NavBar config={config} />
       <MantineAppShell.Main>{children}</MantineAppShell.Main>
     </MantineAppShell>
   );
