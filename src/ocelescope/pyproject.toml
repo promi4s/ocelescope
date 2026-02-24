@@ -23,7 +23,12 @@ ocelescope = "ocelescope.tools.cli:main"
 package = true
 
 [dependency-groups]
-dev = ["black>=25.1.0", "pre-commit>=4.2.0", "ruff>=0.12.7"]
+dev = [
+    "black>=25.1.0",
+    "pandas-stubs>=3.0.0.260204",
+    "pre-commit>=4.2.0",
+    "ruff>=0.12.7",
+]
 
 [build-system]
 requires = ["uv_build>=0.8.4,<0.9.0"]
