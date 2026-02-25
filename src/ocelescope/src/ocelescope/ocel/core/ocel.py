@@ -102,9 +102,9 @@ class OCEL:
                 case ".sqlite":
                     pm4py_ocel = pm4py.read.read_ocel2_sqlite(str(path))
                 case ".xmlocel" | ".xml":
-                    pm4py_ocel = pm4py.read.read_ocel2_xml(str(path))
+                    pm4py_ocel = r4pm.df.import_ocel_xml_pm4py(str(path))
                 case ".jsonocel" | ".json":
-                    pm4py_ocel = pm4py.read.read_ocel2_json(str(path))
+                    pm4py_ocel = r4pm.df.import_ocel_json_pm4py(str(path))
                 case _:
                     raise ValueError(f"Unsupported extension: {path.suffix}")
 
