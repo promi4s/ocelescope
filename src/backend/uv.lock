@@ -1553,7 +1553,7 @@ requires-dist = [
     { name = "plotly", specifier = ">=6.3.1" },
     { name = "pm4py", specifier = "~=2.7.15.3" },
     { name = "pydantic", specifier = ">=2.11.7" },
-    { name = "r4pm", extras = ["polars"], specifier = ">=0.5.1" },
+    { name = "r4pm", extras = ["polars"], specifier = ">=0.5.2" },
 ]
 
 [package.metadata.requires-dev]
@@ -2293,6 +2293,16 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/88/a3/fbd35356ec439df562282e22d65346d92c5a9e638d7196e0c495cbd874b7/r4pm-0.5.2-cp313-cp313t-macosx_11_0_arm64.whl", hash = "sha256:d2d9e2b7d0ae655f394b93fccca983498217c0d57fde086720b331abb7b2d9e6", size = 7746082, upload-time = "2026-02-20T11:48:46.171Z" },
     { url = "https://files.pythonhosted.org/packages/08/e8/8fd86cde5f90153787426b23103ef19accc9112d5dfa23b0e3ec176aa294/r4pm-0.5.2-cp313-cp313t-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:4b67ca1eb1b477b631d73d566ac3f073420fb623505cabeabd642992dc3ecf85", size = 9682646, upload-time = "2026-02-20T11:48:37.403Z" },
     { url = "https://files.pythonhosted.org/packages/89/8d/ff7a59ad09d3321143cb9d3ae21600cf532e7d0cf4bbe29d4757e28420b6/r4pm-0.5.2-cp313-cp313t-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1bf4093f296c4617e074cff331ce3f42ec2a8b66ecce62e2ee547ee796aca84c", size = 8710174, upload-time = "2026-02-20T11:48:42.35Z" },
+    { url = "https://files.pythonhosted.org/packages/6a/8e/0bd6f2090f59a96307fe78b73e50859d077c87af377654009d7a61faacb1/r4pm-0.5.2-cp314-cp314-macosx_10_12_x86_64.whl", hash = "sha256:6e0d1544851da09d23c02fe641c53896cd2b61d320727288554b91f27c54dc5a", size = 8222497, upload-time = "2026-02-20T12:11:55.586Z" },
+    { url = "https://files.pythonhosted.org/packages/50/6f/0ba2d699bf0ece014e67f486314d0ec8ddf44c49cefc4f4809784e9c837e/r4pm-0.5.2-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:c786861fbc139c15c85549caa9fea57cdcdfd5a0b56dd37b139f02f5fce2bccc", size = 7745868, upload-time = "2026-02-20T12:11:51.184Z" },
+    { url = "https://files.pythonhosted.org/packages/69/57/58e1f008846b671e4207e3c9f8301046cacc767ceb01019a34411ec50f5f/r4pm-0.5.2-cp314-cp314-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:229274433bc93b32b967e32ac691d068bada325b326482d2dd8f2b2b91acdb7d", size = 9680100, upload-time = "2026-02-20T12:11:40.373Z" },
+    { url = "https://files.pythonhosted.org/packages/be/e3/406c57dff298561210846bfa138cd7f3ff84e6b5e2d51d4be2e879856185/r4pm-0.5.2-cp314-cp314-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:fe6c07c40ba8efbacc91d3706c11cbeab08d498fdf135072f00a6cf02d9b16a7", size = 8709792, upload-time = "2026-02-20T12:11:46.196Z" },
+    { url = "https://files.pythonhosted.org/packages/bb/14/67fc05b29dbe12bc0c3d7158e38182bfda7dc3230e0bf923f962d9e3a3e2/r4pm-0.5.2-cp314-cp314-win32.whl", hash = "sha256:331635ec42e1d6a86845a6692cb5ba979ba49835a0da92a84cf1b645d8bc64b6", size = 6828252, upload-time = "2026-02-20T12:12:03.289Z" },
+    { url = "https://files.pythonhosted.org/packages/4b/07/114d594eae3d0368d8f1fa539a73933bb71f6b0f9ec971b0fa8512a70fa3/r4pm-0.5.2-cp314-cp314-win_amd64.whl", hash = "sha256:41ca248ad3be59f43bd7c80a9aab28f570545a63cd38c6ef157d21ec5380961f", size = 7869822, upload-time = "2026-02-20T12:12:00.871Z" },
+    { url = "https://files.pythonhosted.org/packages/81/6e/670e42009d46f5ae64e463e1d39eab79d472d178f43ce704c53fab21361f/r4pm-0.5.2-cp314-cp314t-macosx_10_12_x86_64.whl", hash = "sha256:4900f85548e08cc135579f811c804fa9719d4e0de5f76d754cff49d609cd3724", size = 8221640, upload-time = "2026-02-20T12:11:58.012Z" },
+    { url = "https://files.pythonhosted.org/packages/fd/6f/1df34ff0c98f71c2be8c7884176399f1b095cfc100e1093d1dfa6d922c98/r4pm-0.5.2-cp314-cp314t-macosx_11_0_arm64.whl", hash = "sha256:6046332f7c0293780a7a7c271bd2b609691411e1aa164291c8c71eb37f3061c0", size = 7746036, upload-time = "2026-02-20T12:11:53.393Z" },
+    { url = "https://files.pythonhosted.org/packages/35/a3/0e26677e1048e097fcc2bf8ab0dc1dd1a3f2d89fab265b5850c3d4d14a61/r4pm-0.5.2-cp314-cp314t-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:510123cf598dddacbe3568d30df7c5e25ff015974ee198f1159a668204aa1f94", size = 9682004, upload-time = "2026-02-20T12:11:43.382Z" },
+    { url = "https://files.pythonhosted.org/packages/e0/c1/c9a851b183b9f78c3505da4411315cf1e9e5c892267e2b7e3fd0d4ce62e1/r4pm-0.5.2-cp314-cp314t-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:414672664d3352d7e97e3173c7b0f9981b6af86055236fedb36165340eb36f6e", size = 8710245, upload-time = "2026-02-20T12:11:48.67Z" },
 ]
 
 [package.optional-dependencies]
