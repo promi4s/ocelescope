@@ -19,7 +19,7 @@ export const OcelescopeApp: (config: OcelescopeConfig) => React.FC<any> =
         <HydrationBoundary state={pageProps.dehydratedState}>
           <MantineProvider>
             <AppShell config={config}>
-              <Component />
+              <Component {...pageProps} />
             </AppShell>
           </MantineProvider>
         </HydrationBoundary>
