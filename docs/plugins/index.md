@@ -1,15 +1,19 @@
 # Overview
 
-Plugins are the primary way to extend Ocelescope with custom functionality — and they are designed to be easy to write, distribute, and use.
+Plugins in **Ocelescope** are collections of object-centric process mining functions and artifacts.  
+They are designed to wrap research prototypes and provide them with a unified environment.  
+The plugin system aims to require as little additional knowledge as possible, making it easy to integrate new ideas and tools.
 
-- **No frontend knowledge required** – Create plugins entirely in Python; the frontend UI is generated automatically.
-- **Simple packaging** – Bundle your plugin as a single ZIP file and upload it at runtime.
+Using the Ocelescope plugin system has several advantages:
 
-An Ocelescope plugin is built from four main components:
+- **Resource definitions** automatically generate a JSON-based exchange format for the artifacts they describe.
+- **Built-in visualization support** allows resources to be rendered using a variety of visualization data structures.
+- **Process mining functions** define their inputs declaratively, which enables automatic generation of user input forms.
 
-1. **Resource Definitions** – Describe the plugin’s inputs and outputs.
-2. **OCEL Extensions** – Extend the OCEL 2.0 event log structure in a standardized way.
-3. **Input Schemas** – Python classes that define user-configurable parameters and generate the UI form.
-4. **Plugin Class** – Implements the plugin’s methods, metadata, and execution logic.
+<figure markdown="span">
+  ![An example plugin class](../assets/PluginOverview.png){width="600"}
+  <figcaption align="center">Overview of Plugins in Ocelescope</figcaption>
+</figure>
 
-This guide walks you through each component step by step, followed by a tutorial to help you build a complete plugin from scratch.
+This guide introduces all the concepts you need to write plugins for Ocelescope.  
+For a hands-on walkthrough, see the [**Tutorial**](tutorial.md).
