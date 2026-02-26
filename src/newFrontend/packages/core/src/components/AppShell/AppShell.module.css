@@ -1,16 +1,14 @@
 .navbar {
-  background-color: light-dark(
-    var(--mantine-color-white),
-    var(--mantine-color-dark-6)
-  );
+  background-color: var(--mantine-color-white);
   width: 300px;
   display: flex;
   flex-direction: column;
-  border-right: 1px solid
-    light-dark(
-      var(--mantine-color-gray-3),
-      var(--mantine-color-dark-4)
-    );
+  border-right: 1px solid var(--mantine-color-gray-3);
+}
+
+:global([data-mantine-color-scheme="dark"]) .navbar {
+  background-color: var(--mantine-color-dark-6);
+  border-right-color: var(--mantine-color-dark-4);
 }
 
 .header {
@@ -18,15 +16,13 @@
   padding-top: 0;
   margin-left: calc(var(--mantine-spacing-md) * -1);
   margin-right: calc(var(--mantine-spacing-md) * -1);
-  color: light-dark(
-    var(--mantine-color-black),
-    var(--mantine-color-white)
-  );
-  border-bottom: 1px solid
-    light-dark(
-      var(--mantine-color-gray-3),
-      var(--mantine-color-dark-4)
-    );
+  color: var(--mantine-color-black);
+  border-bottom: 1px solid var(--mantine-color-gray-3);
+}
+
+:global([data-mantine-color-scheme="dark"]) .header {
+  color: var(--mantine-color-white);
+  border-bottom-color: var(--mantine-color-dark-4);
 }
 
 .links {
@@ -38,11 +34,11 @@
 .footer {
   margin-left: calc(var(--mantine-spacing-md) * -1);
   margin-right: calc(var(--mantine-spacing-md) * -1);
-  border-top: 1px solid
-    light-dark(
-      var(--mantine-color-gray-3),
-      var(--mantine-color-dark-4)
-    );
+  border-top: 1px solid var(--mantine-color-gray-3);
+}
+
+:global([data-mantine-color-scheme="dark"]) .footer {
+  border-top-color: var(--mantine-color-dark-4);
 }
 
 .control {
@@ -53,17 +49,16 @@
     var(--mantine-spacing-md);
   color: var(--mantine-color-text);
   font-size: var(--mantine-font-size-sm);
+}
 
-  @mixin hover {
-    background-color: light-dark(
-      var(--mantine-color-gray-0),
-      var(--mantine-color-dark-7)
-    );
-    color: light-dark(
-      var(--mantine-color-black),
-      var(--mantine-color-dark-0)
-    );
-  }
+.control:hover {
+  background-color: var(--mantine-color-gray-0);
+  color: var(--mantine-color-black);
+}
+
+:global([data-mantine-color-scheme="dark"]) .control:hover {
+  background-color: var(--mantine-color-dark-7);
+  color: var(--mantine-color-dark-0);
 }
 
 .link {
@@ -75,26 +70,23 @@
   padding-left: var(--mantine-spacing-md);
   margin-left: var(--mantine-spacing-xl);
   font-size: var(--mantine-font-size-sm);
-  color: light-dark(
-    var(--mantine-color-gray-7),
-    var(--mantine-color-dark-0)
-  );
-  border-left: 1px solid
-    light-dark(
-      var(--mantine-color-gray-3),
-      var(--mantine-color-dark-4)
-    );
+  color: var(--mantine-color-gray-7);
+  border-left: 1px solid var(--mantine-color-gray-3);
+}
 
-  @mixin hover {
-    background-color: light-dark(
-      var(--mantine-color-gray-0),
-      var(--mantine-color-dark-7)
-    );
-    color: light-dark(
-      var(--mantine-color-black),
-      var(--mantine-color-dark-0)
-    );
-  }
+:global([data-mantine-color-scheme="dark"]) .link {
+  color: var(--mantine-color-dark-0);
+  border-left-color: var(--mantine-color-dark-4);
+}
+
+.link:hover {
+  background-color: var(--mantine-color-gray-0);
+  color: var(--mantine-color-black);
+}
+
+:global([data-mantine-color-scheme="dark"]) .link:hover {
+  background-color: var(--mantine-color-dark-7);
+  color: var(--mantine-color-dark-0);
 }
 
 .chevron {
@@ -104,51 +96,54 @@
 .button {
   text-decoration: none;
   font-size: var(--mantine-font-size-sm);
-  color: light-dark(
-    var(--mantine-color-gray-7),
-    var(--mantine-color-dark-1)
-  );
+  color: var(--mantine-color-gray-7);
   padding: var(--mantine-spacing-xs)
     var(--mantine-spacing-sm);
   border-radius: var(--mantine-radius-sm);
   font-weight: 500;
+}
 
-  &:hover {
-    background-color: light-dark(
-      var(--mantine-color-gray-0),
-      var(--mantine-color-dark-6)
-    );
-    color: light-dark(
-      var(--mantine-color-black),
-      var(--mantine-color-white)
-    );
+:global([data-mantine-color-scheme="dark"]) .button {
+  color: var(--mantine-color-dark-1);
+}
 
-    & .linkIcon {
-      color: light-dark(
-        var(--mantine-color-black),
-        var(--mantine-color-white)
-      );
-    }
-  }
+.button:hover {
+  background-color: var(--mantine-color-gray-0);
+  color: var(--mantine-color-black);
+}
 
-  &[data-active] {
-    &,
-    &:hover {
-      background-color: var(--mantine-color-blue-light);
-      color: var(--mantine-color-blue-light-color);
+:global([data-mantine-color-scheme="dark"]) .button:hover {
+  background-color: var(--mantine-color-dark-6);
+  color: var(--mantine-color-white);
+}
 
-      & .linkIcon {
-        color: var(--mantine-color-blue-light-color);
-      }
-    }
-  }
+.button:hover .linkIcon {
+  color: var(--mantine-color-black);
+}
+
+:global([data-mantine-color-scheme="dark"])
+  .button:hover
+  .linkIcon {
+  color: var(--mantine-color-white);
+}
+
+.button[data-active],
+.button[data-active]:hover {
+  background-color: var(--mantine-color-blue-light);
+  color: var(--mantine-color-blue-light-color);
+}
+
+.button[data-active] .linkIcon,
+.button[data-active]:hover .linkIcon {
+  color: var(--mantine-color-blue-light-color);
 }
 
 .buttonIcon {
-  color: light-dark(
-    var(--mantine-color-gray-6),
-    var(--mantine-color-dark-2)
-  );
+  color: var(--mantine-color-gray-6);
   width: 25px;
   height: 25px;
+}
+
+:global([data-mantine-color-scheme="dark"]) .buttonIcon {
+  color: var(--mantine-color-dark-2);
 }
