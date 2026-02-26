@@ -18,7 +18,7 @@ const NavBar: React.FC<{ config: OcelescopeConfig }> = ({ config }) => {
   const isOcelAvailable = ocels?.length !== 0;
 
   return (
-    <AppShell.Navbar className={classes["navbar"]}>
+    <AppShell.Navbar className={classes["navbar"] ?? ""}>
       <Stack justify="space-between" h={"100%"} gap={0}>
         <Stack gap={0} flex={1}>
           <NavLink
@@ -44,10 +44,10 @@ const NavBar: React.FC<{ config: OcelescopeConfig }> = ({ config }) => {
                 component={Link}
                 href={getModuleRoute({
                   moduleName: name,
-                  routeName: routes[0]?.name,
+                  routeName: routes[0]?.name ?? "",
                 })}
                 disabled={isModuleDisabled}
-                opened={!isModuleDisabled ? undefined : false}
+                {...(isModuleDisabled ? { opened: false } : {})}
                 active={
                   Object.keys(routes).length === 1 &&
                   name === modulePath?.moduleName
@@ -63,7 +63,7 @@ const NavBar: React.FC<{ config: OcelescopeConfig }> = ({ config }) => {
                           moduleName: name,
                           routeName: routeName,
                         })}
-                        disabled={requiresOcel && !isOcelAvailable}
+                        disabled={!!requiresOcel && !isOcelAvailable}
                         component={Link}
                         active={
                           name === modulePath?.moduleName &&
