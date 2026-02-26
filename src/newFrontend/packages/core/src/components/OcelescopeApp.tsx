@@ -7,20 +7,23 @@ import {
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useState } from "react";
 import { AppShell } from "./AppShell/AppShell";
+import type { OcelescopeConfig } from "../lib/config";
 
-export const OcelescopeApp: React.FC<any> = ({ Component, pageProps }) => {
-  const [client] = useState(() => new QueryClient());
+export const OcelescopeApp: (config: OcelescopeConfig) => React.FC<any> =
+  (config) =>
+  ({ Component, pageProps }) => {
+    const [client] = useState(() => new QueryClient());
 
-  return (
-    <QueryClientProvider client={client}>
-      <HydrationBoundary state={pageProps.dehydratedState}>
-        <MantineProvider>
-          <AppShell>
-            <Component />
-          </AppShell>
-        </MantineProvider>
-      </HydrationBoundary>
-      <ReactQueryDevtools />
-    </QueryClientProvider>
-  );
-};
+    return (
+      <QueryClientProvider client={client}>
+        <HydrationBoundary state={pageProps.dehydratedState}>
+          <MantineProvider>
+            <AppShell config={config}>
+              <Component />
+            </AppShell>
+          </MantineProvider>
+        </HydrationBoundary>
+        <ReactQueryDevtools />
+      </QueryClientProvider>
+    );
+  };
