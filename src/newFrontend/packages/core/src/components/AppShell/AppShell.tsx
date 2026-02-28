@@ -1,4 +1,5 @@
 import {
+  Box,
   Burger,
   Button,
   Group,
@@ -64,7 +65,14 @@ export const AppShell: React.FC<{
         </Group>
       </MantineAppShell.Header>
       <NavBar config={config} />
-      <MantineAppShell.Main>{children}</MantineAppShell.Main>
+      <MantineAppShell.Main
+        style={{ overflow: "hidden" }}
+        h="calc(100dvh - var(--app-shell-header-offset, 0rem) - var(--app-shell-footer-height, 0px) + var(--app-shell-padding, 0))"
+      >
+        <Box h={"100%"} style={{ overflow: "scroll", position: "relative" }}>
+          {children}
+        </Box>
+      </MantineAppShell.Main>
     </MantineAppShell>
   );
 };
