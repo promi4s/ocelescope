@@ -1,7 +1,7 @@
 {
   "name": "@ocelescope/core",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Core React component and style library for Ocelescope (Mantine + React Query).",
   "author": "Görkem-Emre Öztürk <goerkem.oeztuerk@rwth-aachen.de>",
   "license": "MIT",
