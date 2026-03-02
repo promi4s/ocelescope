@@ -1,4 +1,5 @@
 import os
+import sqlite3
 import xml.etree.ElementTree as etree
 from pathlib import Path
 
@@ -14,6 +15,9 @@ from .constants import (
     JSON_QUANTITY_EXTENSION,
     QEL_ITEM_TYPE,
     QEL_QUANTITY,
+    SQL_KEYMAP,
+    SQL_OPERATIONS,
+    SQL_QUANTITIES,
     XML_EVENT_ID,
     XML_ITEM,
     XML_ITEM_TYPE,
@@ -153,3 +157,27 @@ def write_extension_to_json(path: Path, oqty: pd.DataFrame, qop: pd.DataFrame):
     tmp = path.with_suffix(path.suffix + ".tmp")
     tmp.write_bytes(data)
     os.replace(tmp, path)
+
+
+def write_extension_to_sqlite(path: Path, oqty: pd.DataFrame, qop: pd.DataFrame):
+    with sqlite3.connect(path) as conn:
+        oqty.rename(columns=SQL_KEYMAP).to_sql(SQL_QUANTITIES, conn, index=False)
+        qop.rename(columns=SQL_KEYMAP).to_sql(SQL_OPERATIONS, conn, index=False)
+
+
+def read_extension_from_sqlite(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
+    with sqlite3.connect(path) as conn:
+        query_string = "SELECT * FROM {table_name}"
+
+        oqty = pd.read_sql_query(
+            query_string.format(table_name=SQL_QUANTITIES),
+            conn,
+        ).rename(columns=inverse_keymap(SQL_KEYMAP))
+
+        qop = (
+            pd.read_sql_query(query_string.format(table_name=SQL_OPERATIONS), conn)
+            .rename(columns=inverse_keymap(SQL_KEYMAP))
+            .reset_index()
+        )
+
+    return oqty, qop
