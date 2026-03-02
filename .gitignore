@@ -1,4 +1,6 @@
 *.drawio.bkp
 *.dtmp
+.vscode
 submission-info.md
 run-ocean.bat
+mise.toml
