@@ -1,5 +1,5 @@
 # Use a Python image with uv pre-installed
-FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim
+FROM astral/uv:python3.13-alpine
 
 # Install the project into `/app`
 WORKDIR /app
@@ -10,7 +10,8 @@ ENV UV_COMPILE_BYTECODE=1
 # Copy from the cache instead of linking since it's a mounted volume
 ENV UV_LINK_MODE=copy
 
-RUN apt-get update && apt-get install -y --no-install-recommends \ 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  build-essential \
   git \
   graphviz \
   && rm -rf /var/lib/apt/lists/*

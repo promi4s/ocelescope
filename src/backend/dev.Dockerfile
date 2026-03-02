@@ -10,8 +10,9 @@ ENV UV_COMPILE_BYTECODE=1
 # Copy from the cache instead of linking since it's a mounted volume
 ENV UV_LINK_MODE=copy
 
-# Install Graphviz and other required system tools
+# Install Graphviz and the native build toolchain required by Rust/PyO3 deps.
 RUN apt-get update && apt-get install -y --no-install-recommends \
+  build-essential \
   git \
   graphviz \
   && rm -rf /var/lib/apt/lists/*
