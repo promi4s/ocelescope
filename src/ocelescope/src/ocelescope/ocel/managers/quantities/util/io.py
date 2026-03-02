@@ -8,12 +8,9 @@ import pandas as pd
 from ocelescope.ocel.constants.pm4py import EID_COL, OID_COL
 
 from .constants import (
-    JSON_EVENT_ID,
-    JSON_ITEM_TYPE,
-    JSON_OBJECT_ID,
+    JSON_KEYMAP,
     JSON_OPERATIONS,
     JSON_QUANTITIES,
-    JSON_QUANTITY,
     JSON_QUANTITY_EXTENSION,
     QEL_ITEM_TYPE,
     QEL_QUANTITY,
@@ -27,6 +24,7 @@ from .constants import (
     XML_QUANTITY,
     XML_QUANTITY_EXTENSION,
     XML_QUANTITY_TYPE,
+    inverse_keymap,
 )
 
 
@@ -122,18 +120,16 @@ def read_extension_from_json(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
 
         oqty: pd.DataFrame = pd.DataFrame.from_records(
             data=quantityExtension[JSON_QUANTITIES],
-            columns=[JSON_OBJECT_ID, JSON_ITEM_TYPE, JSON_QUANTITY],
-        ).rename(
-            {JSON_OBJECT_ID: OID_COL, JSON_ITEM_TYPE: QEL_ITEM_TYPE, JSON_QUANTITY: QEL_QUANTITY}
-        )
+            columns=[JSON_KEYMAP[OID_COL], JSON_KEYMAP[QEL_ITEM_TYPE], JSON_KEYMAP[QEL_QUANTITY]],
+        ).rename(inverse_keymap(JSON_KEYMAP))
 
         qop: pd.DataFrame = pd.DataFrame.from_records(
             data=quantityExtension[JSON_OPERATIONS],
             columns=[
-                JSON_EVENT_ID,
-                JSON_OBJECT_ID,
-                JSON_ITEM_TYPE,
-                JSON_QUANTITY,
+                JSON_KEYMAP[EID_COL],
+                JSON_KEYMAP[OID_COL],
+                JSON_KEYMAP[QEL_ITEM_TYPE],
+                JSON_KEYMAP[QEL_QUANTITY],
             ],
         )
 
@@ -143,22 +139,9 @@ def read_extension_from_json(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
 def write_extension_to_json(path: Path, oqty: pd.DataFrame, qop: pd.DataFrame):
     ocel = orjson.loads(path.read_bytes())
 
-    renamed_oqty = oqty.rename(
-        columns={
-            OID_COL: JSON_OBJECT_ID,
-            QEL_ITEM_TYPE: JSON_ITEM_TYPE,
-            QEL_QUANTITY: JSON_QUANTITY,
-        }
-    )
+    renamed_oqty = oqty.rename(columns=JSON_KEYMAP)
 
-    renamed_qop = qop.rename(
-        columns={
-            EID_COL: JSON_EVENT_ID,
-            OID_COL: JSON_OBJECT_ID,
-            QEL_ITEM_TYPE: JSON_ITEM_TYPE,
-            QEL_QUANTITY: JSON_QUANTITY,
-        }
-    )
+    renamed_qop = qop.rename(columns=JSON_KEYMAP)
 
     ocel[JSON_QUANTITY_EXTENSION] = {
         JSON_QUANTITIES: renamed_oqty.to_dict(orient="records"),
