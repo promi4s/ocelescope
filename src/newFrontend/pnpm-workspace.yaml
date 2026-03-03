@@ -1,7 +1,7 @@
 packages:
   - app
   - packages/**/*
-  - modules/*
+  - modules/**/*
 
 catalog:
   '@dagrejs/dagre': ^2.0.4
@@ -23,6 +23,7 @@ catalog:
   next: ^16.1.6
   react: ^19.2.0
   react-dom: ^19.2.0
+  rolldown: 1.0.0-rc.6
   zod: ^4.3.6
   zustand: ^5.0.11
 
