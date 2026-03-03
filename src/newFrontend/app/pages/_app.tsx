@@ -1,5 +1,5 @@
-import "@ocelescope/core/styles";
-import "@ocelescope/ocelot/styles";
+import "@ocelescope/core/styles.css";
+import "@ocelescope/ocelot/styles.css";
 
 import config from "../ocelescope.config";
 

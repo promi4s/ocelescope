@@ -2,10 +2,8 @@
 
 FROM node:20-alpine
 
-# System dependencies (useful for some packages)
 RUN apk add --no-cache libc6-compat
 
-# Set working directory
 WORKDIR /app
 
 COPY . .
@@ -17,9 +15,7 @@ RUN \
   else echo "No lockfile found." && exit 1; \
   fi
 
-# Expose Next.js dev server port
 EXPOSE 3000
 
-# Run the development server
 CMD [ "npm", "run", "dev:app" ]
 
