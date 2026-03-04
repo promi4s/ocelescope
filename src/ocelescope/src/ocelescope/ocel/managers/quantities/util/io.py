@@ -181,3 +181,27 @@ def read_extension_from_sqlite(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
         )
 
     return oqty, qop
+
+
+def read_quantity_extension(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
+    match path.suffix:
+        case ".xmlocel" | ".xml":
+            return read_extension_from_xml(path)
+        case ".jsonocel" | ".json":
+            return read_extension_from_json(path)
+        case ".sqlite":
+            return read_extension_from_sqlite(path)
+        case _:
+            raise ValueError(f"Unsupported extension: {path.suffix}")
+
+
+def write_quantity_extension(path: Path, oqty: pd.DataFrame, qop: pd.DataFrame):
+    match path.suffix:
+        case ".xmlocel" | ".xml":
+            return write_extension_to_xml(path, oqty=oqty, qop=qop)
+        case ".jsonocel" | ".json":
+            return write_extension_to_json(path, oqty=oqty, qop=qop)
+        case ".sqlite":
+            return write_extension_to_sqlite(path, oqty=oqty, qop=qop)
+        case _:
+            raise ValueError(f"Unsupported extension: {path.suffix}")
