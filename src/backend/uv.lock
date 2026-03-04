@@ -1537,6 +1537,7 @@ dependencies = [
     { name = "cachetools" },
     { name = "networkx" },
     { name = "numpy" },
+    { name = "orjson" },
     { name = "pandas" },
     { name = "plotly" },
     { name = "pm4py" },
@@ -1549,6 +1550,7 @@ requires-dist = [
     { name = "cachetools", specifier = ">=6.1.0" },
     { name = "networkx", specifier = ">=3.5" },
     { name = "numpy", specifier = ">=2.3.2" },
+    { name = "orjson", specifier = ">=3.11.7" },
     { name = "pandas", specifier = ">=2.3.1" },
     { name = "plotly", specifier = ">=6.3.1" },
     { name = "pm4py", specifier = "~=2.7.15.3" },
@@ -1559,6 +1561,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "black", specifier = ">=25.1.0" },
+    { name = "pandas-stubs", specifier = ">=3.0.0.260204" },
     { name = "pre-commit", specifier = ">=4.2.0" },
     { name = "ruff", specifier = ">=0.12.7" },
 ]
