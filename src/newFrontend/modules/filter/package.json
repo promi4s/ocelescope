@@ -41,6 +41,7 @@
     "@ocelescope/api-base": "workspace:*",
     "@ocelescope/core": "workspace:*",
     "@tanstack/react-query": "catalog:",
+    "dayjs": "catalog:",
     "lucide-react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",

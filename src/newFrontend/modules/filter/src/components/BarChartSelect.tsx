@@ -46,7 +46,7 @@ const BarChartSelect: React.FC<BarChartSelectProps> = memo(
         barChartProps={{
           onClick: ({ activeLabel }) => {
             if (!activeLabel) return;
-            onSelect(activeLabel.toString());
+            onSelect(activeLabel);
           },
         }}
       />
