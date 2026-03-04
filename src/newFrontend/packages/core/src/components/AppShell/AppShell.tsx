@@ -9,7 +9,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { UploadIcon } from "lucide-react";
 import { useState } from "react";
 import { CurrentOcelSelect } from "../OcelSelect/OcelSelect";
-import UploadModal from "../UploadModal/UploadModal";
+import { UploadModal } from "../UploadModal/UploadModal";
 import NavBar from "./components/Header";
 import type { OcelescopeConfig } from "../../lib/config";
 

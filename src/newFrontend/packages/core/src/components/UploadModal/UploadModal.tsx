@@ -1,10 +1,10 @@
 import { Modal, Text } from "@mantine/core";
 import UploadSection from "../UploadSection/UploadSection";
 
-const UploadModal: React.FC<{ visible: boolean; onClose: () => void }> = ({
-  visible,
-  onClose,
-}) => {
+export const UploadModal: React.FC<{
+  visible: boolean;
+  onClose: () => void;
+}> = ({ visible, onClose }) => {
   return (
     <Modal
       title={<Text size={"h3"}>Upload</Text>}
@@ -16,5 +16,3 @@ const UploadModal: React.FC<{ visible: boolean; onClose: () => void }> = ({
     </Modal>
   );
 };
-
-export default UploadModal;
