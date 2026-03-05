@@ -16,7 +16,7 @@ class OceanConfig(BaseSettings):
     )
 
     SESSION_ID_HEADER: str = Field(
-        default="Ocean-Session-Id",
+        default="ocelescope-session-id",
         description="The HTTP header name containing the session ID.",
     )
 

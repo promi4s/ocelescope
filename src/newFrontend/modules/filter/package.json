@@ -1,0 +1,62 @@
+{
+  "name": "@ocelescope/filter",
+  "type": "module",
+  "version": "0.0.0",
+  "description": "A module for basic filtering of OCELs",
+  "author": "Görkem-Emre Öztürk <goerkem.oeztuerk@rwth-aachen.de>",
+  "license": "MIT",
+  "homepage": "https://www.ocelescope.org",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/promi4s/ocelescope.git"
+  },
+  "bugs": {
+    "url": "https://github.com/promi4s/ocelescope/issues"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json",
+    "./styles.css": "./dist/styles.css"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@dagrejs/dagre": "catalog:",
+    "@mantine/charts": "catalog:",
+    "@mantine/core": "catalog:",
+    "@mantine/hooks": "catalog:",
+    "@mantine/notifications": "catalog:",
+    "@ocelescope/api-base": "workspace:*",
+    "@ocelescope/core": "workspace:*",
+    "@tanstack/react-query": "catalog:",
+    "dayjs": "catalog:",
+    "lucide-react": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "react-hook-form": "catalog:",
+    "recharts": "catalog:"
+  },
+  "devDependencies": {
+    "@mantine/charts": "catalog:",
+    "@mantine/dates": "catalog:",
+    "@mantine/notifications": "catalog:",
+    "@ocelescope/merge-css-plugin": "workspace:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "tsdown": "catalog:",
+    "typescript": "catalog:"
+  }
+}

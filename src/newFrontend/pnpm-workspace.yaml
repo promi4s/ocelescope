@@ -1,0 +1,65 @@
+packages:
+  - app
+  - packages/**/*
+  - modules/**/*
+
+catalog:
+  '@apidevtools/json-schema-ref-parser': ^15.3.1
+  '@dagrejs/dagre': ^2.0.4
+  '@mantine/carousel': ^8.3.15
+  '@mantine/charts': ^8.1.1
+  '@mantine/core': ^8.3.14
+  '@mantine/dates': ^8.3.15
+  '@mantine/dropzone': ^8.3.14
+  '@mantine/hooks': ^8.3.14
+  '@mantine/notifications': ^8.3.15
+  '@marko19907/string-to-color': ^1.0.2
+  '@rjsf/core': ^6.3.1
+  '@rjsf/mantine': ^6.3.1
+  '@rjsf/utils': ^6.3.1
+  '@rjsf/validator-ajv8': ^6.3.1
+  '@tanstack/react-query': ^5.90.21
+  '@types/file-saver': ^2.0.7
+  '@xyflow/react': ^12.10.1
+  clsx: ^2.1.1
+  content-disposition-attachment: ^0.3.1
+  dayjs: ^1.11.19
+  elkjs: ^0.11.0
+  embla-carousel: ^8.6.0
+  embla-carousel-react: ^8.6.0
+  file-saver: ^2.0.5
+  flat: ^6.0.1
+  html-to-image: ^1.11.13
+  json-schema-traverse: ^1.0.0
+  lucide-react: ^0.563.0
+  mantine-datatable: ^8.3.13
+  next: ^16.1.6
+  react: ^19.2.0
+  react-dom: ^19.2.0
+  react-hook-form: ^7.71.2
+  recharts: ^2.15.3
+  rolldown: 1.0.0-rc.6
+  uniqolor: ^1.1.1
+  zod: ^4.3.6
+  zustand: ^5.0.11
+  '@types/node': ^25.0.3
+  '@types/react': ^19.2.7
+  '@types/react-dom': ^19.2.3
+  bumpp: ^10.3.2
+  tsdown: ^0.18.1
+  typescript: ^5.9.3
+  '@hpcc-js/wasm-graphviz': ^1.21.0
+  cytoscape: ^3.33.1
+  lodash: ^4.17.23
+  react-cytoscapejs: ^2.0.0
+  react-plotly.js: ^2.6.0
+  react-zoom-pan-pinch: ^3.7.0
+  "@floating-ui/react": ^0.27.18
+  "@types/lodash": ^4.17.23
+  "@types/react-cytoscapejs": ^1.2.6
+  "@types/react-plotly.js": ^2.6.4
+  "@types/css-modules": ^1.0.5
+  "@tanstack/react-query-devtools": ^5.91.3
+
+
+catalogMode: prefer
