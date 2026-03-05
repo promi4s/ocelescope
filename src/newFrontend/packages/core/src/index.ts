@@ -7,3 +7,4 @@ export { getModuleRoute } from "./lib/getModuleRoute";
 export { useDownloadFile } from "./hooks/useDownload";
 export { OcelSelect } from "./components/OcelSelect/OcelSelect";
 export * from "./lib/config";
+export { sseHandler } from "./components/EventHandler";

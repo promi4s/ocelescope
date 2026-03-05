@@ -24,18 +24,12 @@ catalogs:
     '@mantine/dates':
       specifier: ^8.3.15
       version: 8.3.16
-    '@mantine/dropzone':
-      specifier: ^8.3.14
-      version: 8.3.16
     '@mantine/hooks':
       specifier: ^8.3.14
       version: 8.3.16
     '@mantine/notifications':
       specifier: ^8.3.15
       version: 8.3.16
-    '@marko19907/string-to-color':
-      specifier: ^1.0.2
-      version: 1.0.2
     '@rjsf/core':
       specifier: ^6.3.1
       version: 6.3.1
@@ -57,12 +51,6 @@ catalogs:
     '@xyflow/react':
       specifier: ^12.10.1
       version: 12.10.1
-    clsx:
-      specifier: ^2.1.1
-      version: 2.1.1
-    content-disposition-attachment:
-      specifier: ^0.3.1
-      version: 0.3.1
     dayjs:
       specifier: ^1.11.19
       version: 1.11.19
@@ -581,7 +569,7 @@ importers:
         version: 5.0.11(@types/react@19.2.14)(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
     devDependencies:
       '@mantine/notifications':
-        specifier: ^8.3.15
+        specifier: 'catalog:'
         version: 8.3.16(@mantine/core@8.3.16(@mantine/hooks@8.3.16(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/hooks@8.3.16(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@ocelescope/merge-css-plugin':
         specifier: workspace:*
