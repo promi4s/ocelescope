@@ -1,5 +1,5 @@
-import { usePlugins } from "@ocelescope/api-base";
 import { SimpleGrid } from "@mantine/core";
+import { usePlugins } from "@ocelescope/api-base";
 import {
   PluginCard,
   UploadPluginCard,

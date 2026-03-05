@@ -1,8 +1,8 @@
 import { defineModuleRoute } from "@ocelescope/core";
 import { useRouter } from "next/router";
-import PluginsOverview from "./PluginsOverview";
-import PluginPage from "./PluginPage";
 import MethodPage from "./MethodPage";
+import PluginPage from "./PluginPage";
+import PluginsOverview from "./PluginsOverview";
 
 const PluginRoute = () => {
   const { query } = useRouter();

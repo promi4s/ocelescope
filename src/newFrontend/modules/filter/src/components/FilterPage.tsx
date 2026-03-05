@@ -1,11 +1,10 @@
-import { defineModuleRoute } from "@ocelescope/core";
-import type { OCELFilter } from "@ocelescope/api-base";
-import { useGetFilters, useSetFilters } from "@ocelescope/api-base";
 import { Box, LoadingOverlay } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
+import type { OCELFilter } from "@ocelescope/api-base";
+import { useGetFilters, useSetFilters } from "@ocelescope/api-base";
+import { defineModuleRoute, useCurrentOcel } from "@ocelescope/core";
 import { useRef } from "react";
 import FilterForm from "../components/FilterForm";
-import { useCurrentOcel } from "@ocelescope/core";
 
 const FilterPage = () => {
   const { id: ocelId } = useCurrentOcel();

@@ -8,10 +8,10 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { UploadIcon } from "lucide-react";
 import { useState } from "react";
+import type { OcelescopeConfig } from "../../lib/config";
 import { CurrentOcelSelect } from "../OcelSelect/OcelSelect";
 import { UploadModal } from "../UploadModal/UploadModal";
 import NavBar from "./components/Header";
-import type { OcelescopeConfig } from "../../lib/config";
 
 export const AppShell: React.FC<{
   config: OcelescopeConfig;

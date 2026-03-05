@@ -1,10 +1,3 @@
-import { useEventAttributes, useObjectAttributes } from "@ocelescope/api-base";
-import {
-  type Control,
-  Controller,
-  useFieldArray,
-  useWatch,
-} from "react-hook-form";
 import {
   Button,
   Grid,
@@ -14,17 +7,24 @@ import {
   Stack,
   TextInput,
 } from "@mantine/core";
-import { memo, type ReactNode, useMemo } from "react";
+import { DatePickerInput } from "@mantine/dates";
 import type {
   AttributeSummary,
   EventAttributes200,
   ObjectAttributes200,
   OCELFilter,
 } from "@ocelescope/api-base";
-import { DatePickerInput } from "@mantine/dates";
+import { useEventAttributes, useObjectAttributes } from "@ocelescope/api-base";
 import { PlusIcon, XIcon } from "lucide-react";
-import type { FilterPageComponentProps } from "..";
+import { memo, type ReactNode, useMemo } from "react";
+import {
+  type Control,
+  Controller,
+  useFieldArray,
+  useWatch,
+} from "react-hook-form";
 import type { FilterType } from "../../../types/filter";
+import type { FilterPageComponentProps } from "..";
 
 type AttributeFilterProps = {
   control: Control<OCELFilter>;

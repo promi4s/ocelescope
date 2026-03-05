@@ -1,7 +1,7 @@
+import { Card, Menu, Stack, Text, ThemeIcon } from "@mantine/core";
 import type { PluginApi } from "@ocelescope/api-base";
 import { useDeletePlugin } from "@ocelescope/api-base";
-import { UploadModal, getModuleRoute } from "@ocelescope/core";
-import { Card, Menu, Stack, Text, ThemeIcon } from "@mantine/core";
+import { getModuleRoute, UploadModal } from "@ocelescope/core";
 import { Trash2Icon, UploadIcon } from "lucide-react";
 import { useState } from "react";
 import { GenericCard } from "./GenericCard";

@@ -1,6 +1,6 @@
-import type { NextApiRequest, NextApiResponse } from "next";
 import { Readable } from "node:stream";
 import type { ReadableStream as NodeReadableStream } from "node:stream/web";
+import type { NextApiRequest, NextApiResponse } from "next";
 
 export const sseHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   const session_id = req.query["sessionId"] as string;

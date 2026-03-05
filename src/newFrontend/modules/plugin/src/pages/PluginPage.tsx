@@ -1,8 +1,10 @@
-import type { PluginMethod, ResourceResult } from "@ocelescope/api-base";
-import { useGetExtensionMeta } from "@ocelescope/api-base";
-import { useGetPlugin } from "@ocelescope/api-base";
-import { useGetResourceMeta } from "@ocelescope/api-base";
 import { Container, SimpleGrid, Stack, Text, Title } from "@mantine/core";
+import type { PluginMethod, ResourceResult } from "@ocelescope/api-base";
+import {
+  useGetExtensionMeta,
+  useGetPlugin,
+  useGetResourceMeta,
+} from "@ocelescope/api-base";
 import { useRouter } from "next/router";
 import { useMemo } from "react";
 import PluginBreadcrumbs from "../components/PluginBreadcrumbs/PluginBreadcrumbs";

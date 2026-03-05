@@ -1,16 +1,16 @@
+import { Group, Input, SegmentedControl, Stack } from "@mantine/core";
+import { useDebouncedState } from "@mantine/hooks";
 import {
   useO2o,
   useObjectAttributes,
   useObjectCounts,
 } from "@ocelescope/api-base";
-import { Group, Input, SegmentedControl, Stack } from "@mantine/core";
-import { useMemo, useState } from "react";
+import { defineModuleRoute, useCurrentOcel } from "@ocelescope/core";
 import { MarkerType } from "@xyflow/react";
+import { SearchIcon } from "lucide-react";
+import { useMemo, useState } from "react";
 import EntityCard from "../components/EntityCard";
 import EntityOverview from "../components/EntityOverview";
-import { SearchIcon } from "lucide-react";
-import { useDebouncedState } from "@mantine/hooks";
-import { defineModuleRoute, useCurrentOcel } from "@ocelescope/core";
 import Graph, { type NodeComponents } from "../components/Graph";
 
 const ObjectGraph = () => {

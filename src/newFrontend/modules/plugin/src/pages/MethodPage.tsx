@@ -1,9 +1,9 @@
-import { useGetPluginMethod } from "@ocelescope/api-base";
-import PluginInput from "../components/Form";
-import ResultSection from "../components/ResultSection/ResultSection";
 import { Container, LoadingOverlay, Stack, Text, Title } from "@mantine/core";
+import { useGetPluginMethod } from "@ocelescope/api-base";
 import { useState } from "react";
+import PluginInput from "../components/Form";
 import PluginBreadcrumbs from "../components/PluginBreadcrumbs/PluginBreadcrumbs";
+import ResultSection from "../components/ResultSection/ResultSection";
 
 const MethodPage: React.FC<{ pluginId: string; methodName: string }> = ({
   pluginId,

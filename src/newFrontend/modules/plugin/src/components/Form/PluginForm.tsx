@@ -1,14 +1,14 @@
-import { Form } from "./MantineForm";
+import RefParser from "@apidevtools/json-schema-ref-parser";
+import type { UiSchema } from "@rjsf/utils";
 import validator from "@rjsf/validator-ajv8";
+import { unflatten } from "flat";
+import traverse from "json-schema-traverse";
 import { useEffect, useMemo, useState } from "react";
 import { type Control, Controller } from "react-hook-form";
 import type { PluginInputType } from ".";
 import { getComputedSelect } from "./Fields/custom";
-import type { UiSchema } from "@rjsf/utils";
 import { wrapFieldsWithContext } from "./Fields/ocel";
-import traverse from "json-schema-traverse";
-import RefParser from "@apidevtools/json-schema-ref-parser";
-import { unflatten } from "flat";
+import { Form } from "./MantineForm";
 
 type PluginFormProps = {
   schema: { [key: string]: any };

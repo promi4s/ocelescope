@@ -57,14 +57,13 @@
   "devDependencies": {
     "@mantine/notifications": "catalog:",
     "@ocelescope/merge-css-plugin": "workspace:*",
-    "@tsconfig/strictest": "^2.0.8",
-    "@types/css-modules": "^1.0.5",
-    "@types/file-saver": "^2.0.7",
-    "@types/node": "^25.0.3",
-    "@types/react": "^19.2.7",
-    "@types/react-dom": "^19.2.3",
-    "bumpp": "^10.3.2",
-    "tsdown": "^0.18.1",
-    "typescript": "^5.9.3"
+    "@types/css-modules": "catalog:",
+    "@types/file-saver": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "bumpp": "catalog:",
+    "tsdown": "catalog:",
+    "typescript": "catalog:"
   }
 }

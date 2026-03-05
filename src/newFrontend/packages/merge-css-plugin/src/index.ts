@@ -1,4 +1,4 @@
-import type { Plugin, OutputAsset, OutputChunk } from "rolldown";
+import type { OutputAsset, OutputChunk, Plugin } from "rolldown";
 
 function isCssAsset(x: OutputAsset | OutputChunk): x is OutputAsset {
   return (

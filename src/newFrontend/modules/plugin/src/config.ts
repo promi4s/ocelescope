@@ -1,6 +1,6 @@
 import { defineModule } from "@ocelescope/core";
-import pluginRoute from "./pages";
 import { PuzzleIcon } from "lucide-react";
+import pluginRoute from "./pages";
 
 export default defineModule({
   name: "plugins",

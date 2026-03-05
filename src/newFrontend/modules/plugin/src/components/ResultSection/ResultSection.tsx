@@ -1,7 +1,3 @@
-import { useResource } from "@ocelescope/api-base";
-import { useGetPluginTask } from "@ocelescope/api-base";
-import { ResourceViewer, ResourceModal } from "@ocelescope/resources";
-import { useDownloadFile } from "@ocelescope/core";
 import {
   ActionIcon,
   Badge,
@@ -12,6 +8,9 @@ import {
   SimpleGrid,
   Text,
 } from "@mantine/core";
+import { useGetPluginTask, useResource } from "@ocelescope/api-base";
+import { useDownloadFile } from "@ocelescope/core";
+import { ResourceModal, ResourceViewer } from "@ocelescope/resources";
 import { Download } from "lucide-react";
 import { useState } from "react";
 

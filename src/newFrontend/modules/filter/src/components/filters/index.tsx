@@ -1,20 +1,20 @@
+import type { Control } from "react-hook-form";
 import type { OCELFilter } from "@/api/fastapi-schemas";
 import type { FilterType } from "@/types/filters";
 import type { OcelInputType } from "@/types/ocel";
-import type { Control } from "react-hook-form";
-import {
-  EventTypeFilterInput,
-  ObjectTypeFilterInput,
-} from "./FilterComponents/EntityTypeFilter";
-import TimeFrameFilter from "./FilterComponents/TimeFrameFilter";
 import {
   EventAttributeFilter,
   ObjectAttributeFilter,
 } from "./FilterComponents/AttributeFilter";
 import {
+  EventTypeFilterInput,
+  ObjectTypeFilterInput,
+} from "./FilterComponents/EntityTypeFilter";
+import {
   E2OCountFilter,
   O2OCountFilter,
 } from "./FilterComponents/RelationFilter";
+import TimeFrameFilter from "./FilterComponents/TimeFrameFilter";
 
 export type FilterPageComponentProps = {
   control: Control<OCELFilter>;

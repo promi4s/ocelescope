@@ -1,6 +1,6 @@
+import { Carousel } from "@mantine/carousel";
 import { usePlugins } from "@ocelescope/api-base";
 import { PluginCard, UploadPluginCard } from "../PluginCard/PluginCard";
-import { Carousel } from "@mantine/carousel";
 
 const RecentPlugins: React.FC = () => {
   const { data: plugins } = usePlugins();

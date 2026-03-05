@@ -1,10 +1,10 @@
-import type { OCELFilter } from "@ocelescope/api-base";
-import { filterMap } from "./filters";
 import { Button, ButtonGroup, Group, Tabs } from "@mantine/core";
+import type { OCELFilter } from "@ocelescope/api-base";
 import { CheckIcon, RotateCcwIcon, XIcon } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import type { FilterType } from "../types/filter";
+import { filterMap } from "./filters";
 
 function cleanObject(obj: any): any {
   if (Array.isArray(obj)) {

@@ -1,3 +1,5 @@
+import { MultiSelect, Select } from "@mantine/core";
+import { useDebouncedValue } from "@mantine/hooks";
 import {
   useEventAttributes,
   useEventCounts,
@@ -6,13 +8,11 @@ import {
   useObjectCounts,
   useObjectIds,
 } from "@ocelescope/api-base";
-import { MultiSelect, Select } from "@mantine/core";
 import type { FieldProps } from "@rjsf/utils";
-import { type Control, useWatch } from "react-hook-form";
-import type { PluginInputType } from "..";
 import type React from "react";
 import { memo, useState } from "react";
-import { useDebouncedValue } from "@mantine/hooks";
+import { type Control, useWatch } from "react-hook-form";
+import type { PluginInputType } from "..";
 
 type OcelFieldProps = {
   value: any;

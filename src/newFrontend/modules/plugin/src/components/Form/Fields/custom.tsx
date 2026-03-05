@@ -1,10 +1,10 @@
+import { MultiSelect, Select } from "@mantine/core";
+import { useGetComputedValues } from "@ocelescope/api-base";
+import type { FieldProps } from "@rjsf/utils";
+import { keepPreviousData } from "@tanstack/react-query";
+import { memo } from "react";
 import { type Control, useWatch } from "react-hook-form";
 import type { PluginInputType } from "..";
-import { memo } from "react";
-import type { FieldProps } from "@rjsf/utils";
-import { useGetComputedValues } from "@ocelescope/api-base";
-import { keepPreviousData } from "@tanstack/react-query";
-import { MultiSelect, Select } from "@mantine/core";
 
 type useSelectOptionsProps = {
   pluginId: string;

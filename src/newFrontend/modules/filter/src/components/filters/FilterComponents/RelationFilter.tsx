@@ -7,10 +7,10 @@ import {
   Select,
   Stack,
 } from "@mantine/core";
-import { memo, useMemo } from "react";
-import { PlusIcon, X } from "lucide-react";
 import type { OCELFilter, RelationCountSummary } from "@ocelescope/api-base";
 import { useE2o, useO2o } from "@ocelescope/api-base";
+import { PlusIcon, X } from "lucide-react";
+import { memo, useMemo } from "react";
 import {
   type Control,
   Controller,

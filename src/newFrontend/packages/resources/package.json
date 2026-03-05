@@ -34,34 +34,33 @@
     "prepublishOnly": "pnpm run build"
   },
   "peerDependencies": {
-    "@hpcc-js/wasm-graphviz": "^1.21.0",
+    "@hpcc-js/wasm-graphviz": "catalog:",
     "@mantine/core": "catalog:",
     "@ocelescope/api-base": "workspace:*",
-    "cytoscape": "^3.33.1",
+    "cytoscape": "catalog:",
     "dayjs": "catalog:",
     "file-saver": "catalog:",
-    "lodash": "^4.17.23",
+    "lodash": "catalog:",
     "lucide-react": "catalog:",
     "mantine-datatable": "catalog:",
     "next": "catalog:",
     "react": "catalog:",
-    "react-cytoscapejs": "^2.0.0",
+    "react-cytoscapejs": "catalog:",
     "react-dom": "catalog:",
-    "react-plotly.js": "^2.6.0",
-    "react-zoom-pan-pinch": "^3.7.0",
-    "@floating-ui/react": "^0.27.18"
+    "react-plotly.js": "catalog:",
+    "react-zoom-pan-pinch": "catalog:",
+    "@floating-ui/react": "catalog:"
   },
   "devDependencies": {
-    "@tsconfig/strictest": "^2.0.8",
-    "@types/file-saver": "^2.0.7",
-    "@types/lodash": "^4.17.23",
-    "@types/node": "^25.0.3",
-    "@types/react": "^19.2.7",
-    "@types/react-cytoscapejs": "^1.2.6",
-    "@types/react-dom": "^19.2.3",
-    "@types/react-plotly.js": "^2.6.4",
-    "bumpp": "^10.3.2",
-    "tsdown": "^0.18.1",
-    "typescript": "^5.9.3"
+    "@types/file-saver": "catalog:",
+    "@types/lodash": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-cytoscapejs": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@types/react-plotly.js": "catalog:",
+    "bumpp": "catalog:",
+    "tsdown": "catalog:",
+    "typescript": "catalog:"
   }
 }

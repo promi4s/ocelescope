@@ -1,11 +1,11 @@
-import type { PluginMethod } from "@ocelescope/api-base";
 import { Button, Stack } from "@mantine/core";
+import type { PluginMethod } from "@ocelescope/api-base";
+import { useRunPlugin } from "@ocelescope/api-base";
 import { OcelSelect } from "@ocelescope/core";
+import { ResourceSelect } from "@ocelescope/resources";
+import { useCallback } from "react";
 import { Controller, useForm } from "react-hook-form";
 import PluginForm from "./PluginForm";
-import { useRunPlugin } from "@ocelescope/api-base";
-import { useCallback } from "react";
-import { ResourceSelect } from "@ocelescope/resources";
 
 type PluginInputProps = {
   pluginId: string;

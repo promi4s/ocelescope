@@ -1,4 +1,5 @@
 import { MantineProvider } from "@mantine/core";
+import { Notifications } from "@mantine/notifications";
 import {
   HydrationBoundary,
   QueryClient,
@@ -6,10 +7,9 @@ import {
 } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useState } from "react";
-import { AppShell } from "./AppShell/AppShell";
 import type { OcelescopeConfig } from "../lib/config";
+import { AppShell } from "./AppShell/AppShell";
 import SSEWrapper from "./SSEWrapper";
-import { Notifications } from "@mantine/notifications";
 
 export const OcelescopeApp: (config: OcelescopeConfig) => React.FC<any> =
   (config) =>

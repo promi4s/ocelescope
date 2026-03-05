@@ -1,8 +1,8 @@
+import { showNotification } from "@mantine/notifications";
+import { env, useSessionStore } from "@ocelescope/api-client";
+import { useEffect } from "react";
 import useInvalidate from "../hooks/useInvalidate";
 import { ServerEventMessage } from "../lib/sse";
-import { useSessionStore, env } from "@ocelescope/api-client";
-import { showNotification } from "@mantine/notifications";
-import { useEffect } from "react";
 
 const SSEWrapper = () => {
   const { sessionId } = useSessionStore();

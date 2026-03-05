@@ -1,11 +1,11 @@
-import { useTimeInfo } from "@ocelescope/api-base";
-import { Box, Grid, LoadingOverlay, RangeSlider } from "@mantine/core";
-import { memo, useMemo } from "react";
 import { BarChart } from "@mantine/charts";
+import { Box, Grid, LoadingOverlay, RangeSlider } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
-import dayjs from "../../../util/dayjs";
 import type { EntityTimeInfo } from "@ocelescope/api-base";
+import { useTimeInfo } from "@ocelescope/api-base";
+import { memo, useMemo } from "react";
 import { Controller, Watch } from "react-hook-form";
+import dayjs from "../../../util/dayjs";
 import type { FilterPageComponentProps } from "..";
 
 const TimeGraph: React.FC<{

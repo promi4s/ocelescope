@@ -1,13 +1,13 @@
+import { Input, LoadingOverlay, Stack } from "@mantine/core";
+import { useDebouncedState } from "@mantine/hooks";
 import {
   useE2o,
   useEventAttributes,
   useEventCounts,
 } from "@ocelescope/api-base";
-import { Input, LoadingOverlay, Stack } from "@mantine/core";
-import { SearchIcon } from "lucide-react";
-import { useDebouncedState } from "@mantine/hooks";
-import EntityOverview from "../components/EntityOverview";
 import { defineModuleRoute, useCurrentOcel } from "@ocelescope/core";
+import { SearchIcon } from "lucide-react";
+import EntityOverview from "../components/EntityOverview";
 
 const EventOverview = () => {
   const { id } = useCurrentOcel();

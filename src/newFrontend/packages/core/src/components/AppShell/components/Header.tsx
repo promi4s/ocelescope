@@ -1,12 +1,12 @@
 import { AppShell, Divider, NavLink, Stack } from "@mantine/core";
-import classes from "../AppShell.module.css";
+import { useGetOcels } from "@ocelescope/api-base";
 import { HomeIcon, PackageIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import useModulePath from "../../../hooks/useModulePath";
 import type { OcelescopeConfig } from "../../../lib/config";
 import { getModuleRoute } from "../../../lib/getModuleRoute";
-import useModulePath from "../../../hooks/useModulePath";
-import { useGetOcels } from "@ocelescope/api-base";
+import classes from "../AppShell.module.css";
 
 const NavBar: React.FC<{ config: OcelescopeConfig }> = ({ config }) => {
   const { modules = [] } = config;

@@ -1,5 +1,5 @@
-import EntityPage from "../components/EntityPage";
 import { defineModuleRoute } from "@ocelescope/core";
+import EntityPage from "../components/EntityPage";
 
 const ObjectPage = () => <EntityPage type="objects" />;
 
