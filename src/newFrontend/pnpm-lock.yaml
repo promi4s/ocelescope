@@ -6,9 +6,15 @@ settings:
 
 catalogs:
   default:
+    '@apidevtools/json-schema-ref-parser':
+      specifier: ^15.3.1
+      version: 15.3.1
     '@dagrejs/dagre':
       specifier: ^2.0.4
       version: 2.0.4
+    '@mantine/carousel':
+      specifier: ^8.3.15
+      version: 8.3.15
     '@mantine/charts':
       specifier: ^8.1.1
       version: 8.3.15
@@ -30,6 +36,18 @@ catalogs:
     '@marko19907/string-to-color':
       specifier: ^1.0.2
       version: 1.0.2
+    '@rjsf/core':
+      specifier: ^6.3.1
+      version: 6.3.1
+    '@rjsf/mantine':
+      specifier: ^6.3.1
+      version: 6.3.1
+    '@rjsf/utils':
+      specifier: ^6.3.1
+      version: 6.3.1
+    '@rjsf/validator-ajv8':
+      specifier: ^6.3.1
+      version: 6.3.1
     '@tanstack/react-query':
       specifier: ^5.90.21
       version: 5.90.21
@@ -51,12 +69,24 @@ catalogs:
     elkjs:
       specifier: ^0.11.0
       version: 0.11.0
+    embla-carousel:
+      specifier: ^8.6.0
+      version: 8.6.0
+    embla-carousel-react:
+      specifier: ^8.6.0
+      version: 8.6.0
     file-saver:
       specifier: ^2.0.5
       version: 2.0.5
+    flat:
+      specifier: ^6.0.1
+      version: 6.0.1
     html-to-image:
       specifier: ^1.11.13
       version: 1.11.13
+    json-schema-traverse:
+      specifier: ^1.0.0
+      version: 1.0.0
     lucide-react:
       specifier: ^0.563.0
       version: 0.563.0
@@ -81,6 +111,9 @@ catalogs:
     rolldown:
       specifier: 1.0.0-rc.6
       version: 1.0.0-rc.6
+    uniqolor:
+      specifier: ^1.1.1
+      version: 1.1.1
     zod:
       specifier: ^4.3.6
       version: 4.3.6
@@ -269,6 +302,100 @@ importers:
       '@types/react-dom':
         specifier: ^19.2.3
         version: 19.2.3(@types/react@19.2.14)
+      tsdown:
+        specifier: ^0.18.1
+        version: 0.18.4(typescript@5.9.3)(unplugin-lightningcss@0.4.5)
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+
+  modules/plugin:
+    dependencies:
+      '@mantine/carousel':
+        specifier: 'catalog:'
+        version: 8.3.15(@mantine/core@8.3.15(@mantine/hooks@8.3.15(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/hooks@8.3.15(react@19.2.3))(embla-carousel-react@8.6.0(react@19.2.3))(embla-carousel@8.6.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@mantine/core':
+        specifier: 'catalog:'
+        version: 8.3.15(@mantine/hooks@8.3.15(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@mantine/hooks':
+        specifier: 'catalog:'
+        version: 8.3.15(react@19.2.3)
+      '@ocelescope/api-base':
+        specifier: workspace:*
+        version: 0.0.0(@ocelescope/api-client@0.0.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(zod@4.3.6)(zustand@5.0.11(@types/react@19.2.14)(immer@11.1.4)(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))))(@tanstack/react-query@5.90.21(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@ocelescope/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@ocelescope/resources':
+        specifier: workspace:*
+        version: link:../../packages/resources
+      '@rjsf/core':
+        specifier: 'catalog:'
+        version: 6.3.1(@rjsf/utils@6.3.1(react@19.2.3))(react@19.2.3)
+      '@rjsf/utils':
+        specifier: 'catalog:'
+        version: 6.3.1(react@19.2.3)
+      '@rjsf/validator-ajv8':
+        specifier: 'catalog:'
+        version: 6.3.1(@rjsf/utils@6.3.1(react@19.2.3))
+      '@tanstack/react-query':
+        specifier: 'catalog:'
+        version: 5.90.21(react@19.2.3)
+      embla-carousel:
+        specifier: 'catalog:'
+        version: 8.6.0
+      embla-carousel-react:
+        specifier: 'catalog:'
+        version: 8.6.0(react@19.2.3)
+      lucide-react:
+        specifier: 'catalog:'
+        version: 0.563.0(react@19.2.3)
+      next:
+        specifier: 'catalog:'
+        version: 16.1.6(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      react:
+        specifier: 'catalog:'
+        version: 19.2.3
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.2.3(react@19.2.3)
+      react-hook-form:
+        specifier: 'catalog:'
+        version: 7.71.2(react@19.2.3)
+      uniqolor:
+        specifier: 'catalog:'
+        version: 1.1.1
+    devDependencies:
+      '@apidevtools/json-schema-ref-parser':
+        specifier: 'catalog:'
+        version: 15.3.1(@types/json-schema@7.0.15)
+      '@ocelescope/merge-css-plugin':
+        specifier: 'workspace:'
+        version: link:../../packages/merge-css-plugin
+      '@rjsf/mantine':
+        specifier: 'catalog:'
+        version: 6.3.1(@mantine/core@8.3.15(@mantine/hooks@8.3.15(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/dates@8.3.15(@mantine/core@8.3.15(@mantine/hooks@8.3.15(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/hooks@8.3.15(react@19.2.3))(dayjs@1.11.19)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/hooks@8.3.15(react@19.2.3))(@rjsf/core@6.3.1(@rjsf/utils@6.3.1(react@19.2.3))(react@19.2.3))(@rjsf/utils@6.3.1(react@19.2.3))(react@19.2.3)
+      '@tsconfig/strictest':
+        specifier: ^2.0.8
+        version: 2.0.8
+      '@types/file-saver':
+        specifier: 'catalog:'
+        version: 2.0.7
+      '@types/node':
+        specifier: ^25.0.3
+        version: 25.3.0
+      '@types/react':
+        specifier: ^19.2.7
+        version: 19.2.14
+      '@types/react-dom':
+        specifier: ^19.2.3
+        version: 19.2.3(@types/react@19.2.14)
+      flat:
+        specifier: 'catalog:'
+        version: 6.0.1
+      json-schema-traverse:
+        specifier: 'catalog:'
+        version: 1.0.0
       tsdown:
         specifier: ^0.18.1
         version: 0.18.4(typescript@5.9.3)(unplugin-lightningcss@0.4.5)
@@ -591,6 +718,12 @@ importers:
         version: 5.9.3
 
 packages:
+
+  '@apidevtools/json-schema-ref-parser@15.3.1':
+    resolution: {integrity: sha512-FIweGOR9zrNuskfDXn8dfsA4eJEe8LmmGsGSDikEZvgYm36SO36yMhasXSOX7/OTGZ3b7I9iPhOxB24D8xL5uQ==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      '@types/json-schema': ^7.0.15
 
   '@babel/generator@7.29.1':
     resolution: {integrity: sha512-qsaF+9Qcm2Qv8SRIMMscAvG4O3lJ0F1GuMo5HR/Bp02LopNgnZBC/EkbevHFeGs4ls/oPz9v+Bsmzbkbe+0dUw==}
@@ -1107,6 +1240,16 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
+  '@mantine/carousel@8.3.15':
+    resolution: {integrity: sha512-RKL0uHNj4bmirh0Hob/DWEPx2IIvB91VhW7TxIXfCnPEUnxTDNsrkR8eWKox8/kgGcKRnLUqjC1Zy+bX0PZrEA==}
+    peerDependencies:
+      '@mantine/core': 8.3.15
+      '@mantine/hooks': 8.3.15
+      embla-carousel: '>=8.0.0'
+      embla-carousel-react: '>=8.0.0'
+      react: ^18.x || ^19.x
+      react-dom: ^18.x || ^19.x
+
   '@mantine/charts@8.3.15':
     resolution: {integrity: sha512-dXn7tymDhsXezKmFu5IV2It2zb0aXGS167T0EPTthVXGBPJfb6VRaFLrq0Diyc5hLJ+q1JK9GSVuR50DSH+xyA==}
     peerDependencies:
@@ -1273,6 +1416,22 @@ packages:
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
 
+  '@ocelescope/api-base@0.0.0':
+    resolution: {integrity: sha512-k4UXZf+faJxBMopbNoxjSFzfbaWpK7DJ9tEzmhAmCqxDBTirMshqXodpqobhNIfNGsJWC9tWc/3nV5iG+exGsQ==}
+    peerDependencies:
+      '@ocelescope/api-client': 0.0.0
+      '@tanstack/react-query': ^5.90.20
+      react: ^19.2.0
+      react-dom: ^19.2.0
+
+  '@ocelescope/api-client@0.0.0':
+    resolution: {integrity: sha512-jsc4fH8SfrzGf60KBnQveEaJugYw4RDy8oyj3Cxk/mgBU/qAeci7hHYmnx9BSrItgBlDmovWXh5uPqYDIgtxCg==}
+    peerDependencies:
+      react: ^19.2.0
+      react-dom: ^19.2.0
+      zod: ^4.3.6
+      zustand: ^5.0.11
+
   '@orval/angular@8.4.1':
     resolution: {integrity: sha512-HPn4y6T0xWiR+GgKo354lBzoijIyjH01T6PUOd4L/zKVXHfU8J5TaRXgO9ZB2EKxwegEuTSuIRbiA9Vv3sSpBw==}
 
@@ -1336,6 +1495,36 @@ packages:
 
   '@quansync/fs@1.0.0':
     resolution: {integrity: sha512-4TJ3DFtlf1L5LDMaM6CanJ/0lckGNtJcMjQ1NAV6zDmA0tEHKZtxNKin8EgPaVX1YzljbxckyT2tJrpQKAtngQ==}
+
+  '@rjsf/core@6.3.1':
+    resolution: {integrity: sha512-LTjFz5Fk3FlbgFPJ+OJi1JdWJyiap9dSpx8W6u7JHNB7K5VbwzJe8gIU45XWLHzWFGDHKPm89VrUzjOs07TPtg==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      '@rjsf/utils': ^6.3.x
+      react: '>=18'
+
+  '@rjsf/mantine@6.3.1':
+    resolution: {integrity: sha512-cuTh3XtmYrNfwq4EVfRrMYGvTdEq+vcQsJfDmznTaFk6iEq3AQApBn179wSuMX3mqNk/p5Xy31Uqj/SV8W+QsQ==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      '@mantine/core': '>=8'
+      '@mantine/dates': '>=8'
+      '@mantine/hooks': '>=8'
+      '@rjsf/core': ^6.3.x
+      '@rjsf/utils': ^6.3.x
+      react: '>=18'
+
+  '@rjsf/utils@6.3.1':
+    resolution: {integrity: sha512-ve2KHl1ITYG8QIonnuK83/T1k/5NuxP4D1egVqP9Hz2ub28kgl0rNMwmRSxXs3WIbCcMW9g3ox+daVrbSNc4Mw==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      react: '>=18'
+
+  '@rjsf/validator-ajv8@6.3.1':
+    resolution: {integrity: sha512-2RHDxBc0gBplPniau5UZj7aznpTelSBm1b3DNybok8L0NuIfmndbp9kNXgFuRvlyfsQSyYmZSBjbzeYqr0Hpcw==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      '@rjsf/utils': ^6.3.x
 
   '@rolldown/binding-android-arm64@1.0.0-beta.57':
     resolution: {integrity: sha512-GoOVDy8bjw9z1K30Oo803nSzXJS/vWhFijFsW3kzvZCO8IZwFnNa6pGctmbbJstKl3Fv6UBwyjJQN6msejW0IQ==}
@@ -1884,6 +2073,9 @@ packages:
   '@types/hast@3.0.4':
     resolution: {integrity: sha512-WPs+bbQw5aCj+x6laNGWLH3wviHtoCv/P3+otBhbOhJgG8qtpdAMlTCxLtsTWA7LH1Oh/bFCHsBn0TPS5m30EQ==}
 
+  '@types/json-schema@7.0.15':
+    resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
+
   '@types/lodash@4.17.23':
     resolution: {integrity: sha512-RDvF6wTulMPjrNdCoYRC8gNR880JNGT8uB+REUpC2Ns4pRqQJhGz90wh7rgdXDPpCczF3VGktDuFGVnz8zP7HA==}
 
@@ -1954,6 +2146,9 @@ packages:
   '@vitest/utils@4.0.18':
     resolution: {integrity: sha512-msMRKLMVLWygpK3u2Hybgi4MNjcYJvwTb0Ru09+fOyCXIgT5raYP041DRRdiJiI3k/2U6SEbAETB3YtBrUkCFA==}
 
+  '@x0k/json-schema-merge@1.0.2':
+    resolution: {integrity: sha512-1734qiJHNX3+cJGDMMw2yz7R+7kpbAtl5NdPs1c/0gO5kYT6s4dMbLXiIfpZNsOYhGZI3aH7FWrj4Zxz7epXNg==}
+
   '@xyflow/react@12.10.1':
     resolution: {integrity: sha512-5eSWtIK/+rkldOuFbOOz44CRgQRjtS9v5nufk77DV+XBnfCGL9HAQ8PG00o2ZYKqkEU/Ak6wrKC95Tu+2zuK3Q==}
     peerDependencies:
@@ -1980,6 +2175,14 @@ packages:
     resolution: {integrity: sha512-mv00Te6nmYbRp5DCwclxtt7yV/joXJPGS7nM+97GdxvuttCOfgI3K4U25zboyeX0O+myI8ERluxQe5wljMmVIw==}
     peerDependencies:
       ajv: ^8.5.0
+    peerDependenciesMeta:
+      ajv:
+        optional: true
+
+  ajv-formats@2.1.1:
+    resolution: {integrity: sha512-Wx0Kx52hxE7C18hkMEggYlEifqWZtYaRgouJor+WMdPnQyEK13vgEWyVNup7SoeeoLMsr4kf5h6dOW11I15MUA==}
+    peerDependencies:
+      ajv: ^8.0.0
     peerDependenciesMeta:
       ajv:
         optional: true
@@ -2419,6 +2622,19 @@ packages:
   elkjs@0.11.0:
     resolution: {integrity: sha512-u4J8h9mwEDaYMqo0RYJpqNMFDoMK7f+pu4GjcV+N8jIC7TRdORgzkfSjTJemhqONFfH6fBI3wpysgWbhgVWIXw==}
 
+  embla-carousel-react@8.6.0:
+    resolution: {integrity: sha512-0/PjqU7geVmo6F734pmPqpyHqiM99olvyecY7zdweCw+6tKEXnrE90pBiBbMMU8s5tICemzpQ3hi5EpxzGW+JA==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.1 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+
+  embla-carousel-reactive-utils@8.6.0:
+    resolution: {integrity: sha512-fMVUDUEx0/uIEDM0Mz3dHznDhfX+znCCDCeIophYb1QGVM7YThSWX+wz11zlYwWFOr74b4QLGg0hrGPJeG2s4A==}
+    peerDependencies:
+      embla-carousel: 8.6.0
+
+  embla-carousel@8.6.0:
+    resolution: {integrity: sha512-SjWyZBHJPbqxHOzckOfo8lHisEaJWmwd23XppYFYVh10bU66/Pn5tkVkbkCMZVdbUE5eTCI2nD8OyIP4Z+uwkA==}
+
   empathic@2.0.0:
     resolution: {integrity: sha512-i6UzDscO/XfAcNYD75CfICkmfLedpyPDdozrLMmQc5ORaQcdMoc21OnlEylMIqI7U8eniKrPMxxtj8k0vhmJhA==}
     engines: {node: '>=14'}
@@ -2563,6 +2779,11 @@ packages:
   find-up@8.0.0:
     resolution: {integrity: sha512-JGG8pvDi2C+JxidYdIwQDyS/CgcrIdh18cvgxcBge3wSHRQOrooMD3GlFBcmMJAN9M42SAZjDp5zv1dglJjwww==}
     engines: {node: '>=20'}
+
+  flat@6.0.1:
+    resolution: {integrity: sha512-/3FfIa8mbrg3xE7+wAhWeV+bd7L2Mof+xtZb5dRDKZ+wDvYJK4WDYeIOuOhre5Yv5aQObZrlbRmk3RTSiuQBtw==}
+    engines: {node: '>=18'}
+    hasBin: true
 
   flatten-vertex-data@1.0.2:
     resolution: {integrity: sha512-BvCBFK2NZqerFTdMDgqfHBwxYWnxeCkwONsw6PvBMcUXqo8U/KDWwmXhqx1x2kLIg7DqIsJfOaJFOmlua3Lxuw==}
@@ -2948,6 +3169,9 @@ packages:
     resolution: {integrity: sha512-XT9ewWAC43tiAV7xDAPflMkG0qOPn2QjHqlgX8FOqmWa/rxnyYDulF9T0F7tRy1u+TVTmK/M//6VIOye+2zDXg==}
     engines: {node: '>=20'}
 
+  lodash-es@4.17.23:
+    resolution: {integrity: sha512-kVI48u3PZr38HdYz98UmfPnXl2DXrpdctLrFLCd3kOx1xUkOmpFPx7gCWWM5MPkL/fD8zb+Ph0QzjGFs4+hHWg==}
+
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
 
@@ -2992,6 +3216,15 @@ packages:
   markdown-it@14.1.1:
     resolution: {integrity: sha512-BuU2qnTti9YKgK5N+IeMubp14ZUKUUw7yeJbkjtosvHiP0AZ5c8IAgEMk79D0eC8F23r4Ac/q8cAIFdm2FtyoA==}
     hasBin: true
+
+  markdown-to-jsx@8.0.0:
+    resolution: {integrity: sha512-hWEaRxeCDjes1CVUQqU+Ov0mCqBqkGhLKjL98KdbwHSgEWZZSJQeGlJQatVfeZ3RaxrfTrZZ3eczl2dhp5c/pA==}
+    engines: {node: '>= 10'}
+    peerDependencies:
+      react: '>= 0.14.0'
+    peerDependenciesMeta:
+      react:
+        optional: true
 
   math-log2@1.0.1:
     resolution: {integrity: sha512-9W0yGtkaMAkf74XGYVy4Dqw3YUMnTNB2eeiw9aQbUl4A3KmuCEHTt2DgAB07ENzOYAjsYSAYufkAq0Zd+jU7zA==}
@@ -3743,6 +3976,9 @@ packages:
     resolution: {integrity: sha512-wH590V9VNgYH9g3lH9wWjTrUoKsjLF6sGLjhR4sH1LWpLmCOH0Zf7PukhDA8BiS7KHe4oPNkcTHqYkj7SOGUOw==}
     engines: {node: '>=20'}
 
+  uniqolor@1.1.1:
+    resolution: {integrity: sha512-HUwezlXCwm5bzsEXW7AP7ybezH13uWENRgYT+3dOdhJPvpYucSqvIGckMiLn+Uy2j0NVf3fPp43uZ4aun3t4Ww==}
+
   universalify@2.0.1:
     resolution: {integrity: sha512-gptHNQghINnc/vTGIk0SOFGFNXw7JVrlRUtConJRlvaw6DuX0wO5Jeko9sWrMBhh+PsYAZ7oXAiOnf/UKogyiw==}
     engines: {node: '>= 10.0.0'}
@@ -3994,6 +4230,11 @@ packages:
         optional: true
 
 snapshots:
+
+  '@apidevtools/json-schema-ref-parser@15.3.1(@types/json-schema@7.0.15)':
+    dependencies:
+      '@types/json-schema': 7.0.15
+      js-yaml: 4.1.1
 
   '@babel/generator@7.29.1':
     dependencies:
@@ -4347,6 +4588,15 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
+  '@mantine/carousel@8.3.15(@mantine/core@8.3.15(@mantine/hooks@8.3.15(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/hooks@8.3.15(react@19.2.3))(embla-carousel-react@8.6.0(react@19.2.3))(embla-carousel@8.6.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
+    dependencies:
+      '@mantine/core': 8.3.15(@mantine/hooks@8.3.15(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@mantine/hooks': 8.3.15(react@19.2.3)
+      embla-carousel: 8.6.0
+      embla-carousel-react: 8.6.0(react@19.2.3)
+      react: 19.2.3
+      react-dom: 19.2.3(react@19.2.3)
+
   '@mantine/charts@8.3.15(@mantine/core@8.3.15(@mantine/hooks@8.3.15(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/hooks@8.3.15(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(recharts@2.15.4(react-dom@19.2.3(react@19.2.3))(react@19.2.3))':
     dependencies:
       '@mantine/core': 8.3.15(@mantine/hooks@8.3.15(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -4490,6 +4740,20 @@ snapshots:
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.20.1
+
+  '@ocelescope/api-base@0.0.0(@ocelescope/api-client@0.0.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(zod@4.3.6)(zustand@5.0.11(@types/react@19.2.14)(immer@11.1.4)(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))))(@tanstack/react-query@5.90.21(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
+    dependencies:
+      '@ocelescope/api-client': 0.0.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(zod@4.3.6)(zustand@5.0.11(@types/react@19.2.14)(immer@11.1.4)(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3)))
+      '@tanstack/react-query': 5.90.21(react@19.2.3)
+      react: 19.2.3
+      react-dom: 19.2.3(react@19.2.3)
+
+  '@ocelescope/api-client@0.0.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(zod@4.3.6)(zustand@5.0.11(@types/react@19.2.14)(immer@11.1.4)(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3)))':
+    dependencies:
+      react: 19.2.3
+      react-dom: 19.2.3(react@19.2.3)
+      zod: 4.3.6
+      zustand: 5.0.11(@types/react@19.2.14)(immer@11.1.4)(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
 
   '@orval/angular@8.4.1(typescript@5.9.3)':
     dependencies:
@@ -4655,6 +4919,42 @@ snapshots:
   '@quansync/fs@1.0.0':
     dependencies:
       quansync: 1.0.0
+
+  '@rjsf/core@6.3.1(@rjsf/utils@6.3.1(react@19.2.3))(react@19.2.3)':
+    dependencies:
+      '@rjsf/utils': 6.3.1(react@19.2.3)
+      lodash: 4.17.23
+      lodash-es: 4.17.23
+      markdown-to-jsx: 8.0.0(react@19.2.3)
+      prop-types: 15.8.1
+      react: 19.2.3
+
+  '@rjsf/mantine@6.3.1(@mantine/core@8.3.15(@mantine/hooks@8.3.15(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/dates@8.3.15(@mantine/core@8.3.15(@mantine/hooks@8.3.15(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/hooks@8.3.15(react@19.2.3))(dayjs@1.11.19)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/hooks@8.3.15(react@19.2.3))(@rjsf/core@6.3.1(@rjsf/utils@6.3.1(react@19.2.3))(react@19.2.3))(@rjsf/utils@6.3.1(react@19.2.3))(react@19.2.3)':
+    dependencies:
+      '@mantine/core': 8.3.15(@mantine/hooks@8.3.15(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@mantine/dates': 8.3.15(@mantine/core@8.3.15(@mantine/hooks@8.3.15(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/hooks@8.3.15(react@19.2.3))(dayjs@1.11.19)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@mantine/hooks': 8.3.15(react@19.2.3)
+      '@rjsf/core': 6.3.1(@rjsf/utils@6.3.1(react@19.2.3))(react@19.2.3)
+      '@rjsf/utils': 6.3.1(react@19.2.3)
+      react: 19.2.3
+
+  '@rjsf/utils@6.3.1(react@19.2.3)':
+    dependencies:
+      '@x0k/json-schema-merge': 1.0.2
+      fast-uri: 3.1.0
+      jsonpointer: 5.0.1
+      lodash: 4.17.23
+      lodash-es: 4.17.23
+      react: 19.2.3
+      react-is: 18.3.1
+
+  '@rjsf/validator-ajv8@6.3.1(@rjsf/utils@6.3.1(react@19.2.3))':
+    dependencies:
+      '@rjsf/utils': 6.3.1(react@19.2.3)
+      ajv: 8.18.0
+      ajv-formats: 2.1.1(ajv@8.18.0)
+      lodash: 4.17.23
+      lodash-es: 4.17.23
 
   '@rolldown/binding-android-arm64@1.0.0-beta.57':
     optional: true
@@ -5040,6 +5340,8 @@ snapshots:
     dependencies:
       '@types/unist': 3.0.3
 
+  '@types/json-schema@7.0.15': {}
+
   '@types/lodash@4.17.23': {}
 
   '@types/mapbox__point-geometry@0.1.4': {}
@@ -5125,6 +5427,10 @@ snapshots:
       '@vitest/pretty-format': 4.0.18
       tinyrainbow: 3.0.3
 
+  '@x0k/json-schema-merge@1.0.2':
+    dependencies:
+      '@types/json-schema': 7.0.15
+
   '@xyflow/react@12.10.1(@types/react@19.2.14)(immer@11.1.4)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
     dependencies:
       '@xyflow/system': 0.0.75
@@ -5155,6 +5461,10 @@ snapshots:
   acorn@8.16.0: {}
 
   ajv-draft-04@1.0.0(ajv@8.18.0):
+    optionalDependencies:
+      ajv: 8.18.0
+
+  ajv-formats@2.1.1(ajv@8.18.0):
     optionalDependencies:
       ajv: 8.18.0
 
@@ -5555,6 +5865,18 @@ snapshots:
 
   elkjs@0.11.0: {}
 
+  embla-carousel-react@8.6.0(react@19.2.3):
+    dependencies:
+      embla-carousel: 8.6.0
+      embla-carousel-reactive-utils: 8.6.0(embla-carousel@8.6.0)
+      react: 19.2.3
+
+  embla-carousel-reactive-utils@8.6.0(embla-carousel@8.6.0):
+    dependencies:
+      embla-carousel: 8.6.0
+
+  embla-carousel@8.6.0: {}
+
   empathic@2.0.0: {}
 
   end-of-stream@1.4.5:
@@ -5734,6 +6056,8 @@ snapshots:
     dependencies:
       locate-path: 8.0.0
       unicorn-magic: 0.3.0
+
+  flat@6.0.1: {}
 
   flatten-vertex-data@1.0.2:
     dependencies:
@@ -6104,6 +6428,8 @@ snapshots:
     dependencies:
       p-locate: 6.0.0
 
+  lodash-es@4.17.23: {}
+
   lodash.merge@4.6.2: {}
 
   lodash@4.17.23: {}
@@ -6196,6 +6522,10 @@ snapshots:
       mdurl: 2.0.0
       punycode.js: 2.3.1
       uc.micro: 2.1.0
+
+  markdown-to-jsx@8.0.0(react@19.2.3):
+    optionalDependencies:
+      react: 19.2.3
 
   math-log2@1.0.1: {}
 
@@ -7097,6 +7427,8 @@ snapshots:
   unicorn-magic@0.3.0: {}
 
   unicorn-magic@0.4.0: {}
+
+  uniqolor@1.1.1: {}
 
   universalify@2.0.1: {}
 

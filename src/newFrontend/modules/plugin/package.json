@@ -1,0 +1,75 @@
+{
+  "name": "@ocelescope/plugin",
+  "type": "module",
+  "version": "0.0.0",
+  "description": "A module for inspections of OCELs",
+  "author": "Görkem-Emre Öztürk <goerkem.oeztuerk@rwth-aachen.de>",
+  "license": "MIT",
+  "homepage": "https://www.ocelescope.org",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/promi4s/ocelescope.git"
+  },
+  "bugs": {
+    "url": "https://github.com/promi4s/ocelescope/issues"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json",
+    "./styles.css": "./dist/styles.css"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@apidevtools/json-schema-ref-parser": "catalog:",
+    "@mantine/carousel": "catalog:",
+    "@mantine/core": "catalog:",
+    "@mantine/hooks": "catalog:",
+    "@ocelescope/api-base": "workspace:*",
+    "@ocelescope/core": "workspace:*",
+    "@ocelescope/resources": "workspace:*",
+    "@rjsf/core": "catalog:",
+    "@rjsf/mantine": "catalog:",
+    "@rjsf/utils": "catalog:",
+    "@rjsf/validator-ajv8": "catalog:",
+    "@tanstack/react-query": "catalog:",
+    "embla-carousel": "catalog:",
+    "embla-carousel-react": "catalog:",
+    "flat": "catalog:",
+    "json-schema-traverse": "catalog:",
+    "lucide-react": "catalog:",
+    "next": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "react-hook-form": "catalog:"
+  },
+  "devDependencies": {
+    "@apidevtools/json-schema-ref-parser": "catalog:",
+    "@ocelescope/merge-css-plugin": "workspace:",
+    "@rjsf/mantine": "catalog:",
+    "@tsconfig/strictest": "^2.0.8",
+    "@types/file-saver": "catalog:",
+    "@types/node": "^25.0.3",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "flat": "catalog:",
+    "json-schema-traverse": "catalog:",
+    "tsdown": "^0.18.1",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "uniqolor": "catalog:"
+  }
+}
