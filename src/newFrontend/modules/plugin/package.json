@@ -53,11 +53,12 @@
     "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "react-hook-form": "catalog:"
+    "react-hook-form": "catalog:",
+    "uniqolor": "catalog:"
   },
   "devDependencies": {
     "@apidevtools/json-schema-ref-parser": "catalog:",
-    "@ocelescope/merge-css-plugin": "workspace:",
+    "@ocelescope/merge-css-plugin": "workspace:*",
     "@rjsf/mantine": "catalog:",
     "@tsconfig/strictest": "^2.0.8",
     "@types/file-saver": "catalog:",
@@ -68,8 +69,5 @@
     "json-schema-traverse": "catalog:",
     "tsdown": "^0.18.1",
     "typescript": "^5.9.3"
-  },
-  "dependencies": {
-    "uniqolor": "catalog:"
   }
 }

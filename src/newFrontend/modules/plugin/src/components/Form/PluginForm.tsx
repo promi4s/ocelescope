@@ -1,4 +1,4 @@
-import Form from "@rjsf/mantine";
+import { Form } from "./MantineForm";
 import validator from "@rjsf/validator-ajv8";
 import { useEffect, useMemo, useState } from "react";
 import { type Control, Controller } from "react-hook-form";
