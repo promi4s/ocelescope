@@ -3,7 +3,7 @@ import { useGetOcels } from "@ocelescope/api-base";
 import { type ComponentProps, useMemo } from "react";
 import { useCurrentOcel } from "../../hooks/useCurrentOCEL";
 
-const OcelSelect: React.FC<
+export const OcelSelect: React.FC<
   ComponentProps<typeof Select> & { extension?: string }
 > = ({ extension, ...props }) => {
   const { data } = useGetOcels(extension ? { extension_name: extension } : {});
@@ -33,5 +33,3 @@ export const CurrentOcelSelect: React.FC = () => {
     />
   );
 };
-
-export default OcelSelect;
