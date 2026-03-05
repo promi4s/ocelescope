@@ -2,7 +2,7 @@ import { Select } from "@mantine/core";
 import { useResources } from "@ocelescope/api-base";
 import type { ComponentProps } from "react";
 
-const ResourceSelect: React.FC<
+export const ResourceSelect: React.FC<
   ComponentProps<typeof Select> & { type: string }
 > = ({ type, ...props }) => {
   const { data: resources = [] } = useResources({ resource_type: type });
@@ -15,5 +15,3 @@ const ResourceSelect: React.FC<
     />
   );
 };
-
-export default ResourceSelect;
