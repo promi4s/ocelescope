@@ -5,6 +5,9 @@ QEL_QUANTITY = "qel:quantity"
 QEL_QUANTITY_UPDATE = "qel:quantity_update"
 QEL_ILVL = "qel:itlvl"
 
+OQTY_COLUMNS = [OID_COL, QEL_ITEM_TYPE, QEL_QUANTITY]
+QOP_COLUMNS = [OID_COL, EID_COL, QEL_ITEM_TYPE, QEL_QUANTITY]
+
 XML_QUANTITY_EXTENSION = "quantity-extension"
 XML_OPERATIONS = "operations"
 XML_OPERATION = "operation"
