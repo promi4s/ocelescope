@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING, cast
 
 import pandas as pd
 
-from ocelescope.ocel.constants.pm4py import ACTIVITY_COL, EID_COL
+from ocelescope.ocel.constants.pm4py import ACTIVITY_COL, EID_COL, TIMESTAMP_COL
 from ocelescope.ocel.managers.base import BaseManager
 from ocelescope.ocel.managers.objects import AttributeSummary
 from ocelescope.ocel.util.attributes import summarize_event_attributes
@@ -94,3 +94,9 @@ class EventsManager(BaseManager):
             lists of structured attribute summaries.
         """
         return summarize_event_attributes(self._ocel.ocel)
+
+    def get_event_timestamp(self, event_id: str):
+        """
+        Returns the timestamp of the passed event.
+        """
+        return str(self.df.loc[self.df[EID_COL].eq(event_id), TIMESTAMP_COL].iloc[0])
