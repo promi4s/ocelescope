@@ -11,8 +11,13 @@ from pm4py.objects.ocel.obj import deepcopy
 
 from ocelescope.ocel.extensions.manager import ExtensionManager
 from ocelescope.ocel.filter.base import BaseFilter
-from ocelescope.ocel.managers import E2OManager, EventsManager, O2OManager, ObjectsManager
-from ocelescope.ocel.managers.quantities.quantity import QuantityManager
+from ocelescope.ocel.managers import (
+    E2OManager,
+    EventsManager,
+    O2OManager,
+    ObjectsManager,
+    QuantityManager,
+)
 from ocelescope.ocel.models.meta import OCELMeta
 
 

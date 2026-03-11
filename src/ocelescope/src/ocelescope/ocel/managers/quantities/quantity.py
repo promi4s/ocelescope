@@ -4,13 +4,13 @@ from typing import TYPE_CHECKING
 import pandas as pd
 
 from ocelescope.ocel.constants.pm4py import EID_COL, OID_COL, OTYPE_COL, TIMESTAMP_COL
-from ocelescope.ocel.managers.base import BaseManager
-from ocelescope.ocel.managers.quantities.util.constants import (
+from ocelescope.ocel.constants.quantity import (
     OQTY_COLUMNS,
     QEL_ITEM_TYPE,
     QEL_QUANTITY,
     QOP_COLUMNS,
 )
+from ocelescope.ocel.managers.base import BaseManager
 from ocelescope.ocel.managers.quantities.util.io import (
     read_quantity_extension,
     write_quantity_extension,
