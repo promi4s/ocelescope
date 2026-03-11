@@ -11,7 +11,13 @@ from pm4py.objects.ocel.obj import deepcopy
 
 from ocelescope.ocel.extensions.manager import ExtensionManager
 from ocelescope.ocel.filter.base import BaseFilter
-from ocelescope.ocel.managers import E2OManager, EventsManager, O2OManager, ObjectsManager
+from ocelescope.ocel.managers import (
+    E2OManager,
+    EventsManager,
+    O2OManager,
+    ObjectsManager,
+    QuantityManager,
+)
 from ocelescope.ocel.models.meta import OCELMeta
 
 
@@ -54,6 +60,7 @@ class OCEL:
         self.extensions = ExtensionManager(self)
         self.objects = ObjectsManager(self)
         self.events = EventsManager(self)
+        self.quantities = QuantityManager(self)
         self.e2o = E2OManager(self)
         self.o2o = O2OManager(self)
 
@@ -139,6 +146,7 @@ class OCEL:
             case _:
                 raise ValueError(f"Unsupported extension: {path.suffix}")
 
+        self.quantities.write_quantities(path)
         self.extensions.export_all(path)
 
     def __deepcopy__(self, memo: dict[int, Any]):
