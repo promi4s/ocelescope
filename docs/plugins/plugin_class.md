@@ -45,7 +45,7 @@ Functions in Ocelescope are **object-centric process mining (OCPM)** operations.
 - **OCELs** (`OCEL`), and/or  
 - **OCPM artifacts**, exposed in Ocelescope as **resources** (e.g., `PetriNet`, custom resource types).
 
-Functions are defined as **methods on the plugin class** and must be decorated with `@plugin_method`.  
+Functions are defined as **methods on the plugin class** and must be decorated with [`@plugin_method`](../../references/plugins/#ocelescope.plugin.plugin_method).  
 The **function signature** defines the interface:
 
 - **Inputs** are derived from the method parameters (type annotations determine expected resource types).
@@ -87,7 +87,7 @@ The function definitions (decorator metadata, parameter types, and return types)
 
 !!! tip "Metadata"
     In addition to the `@plugin_method` metadata, you can annotate input parameters with
-    `ResourceAnnotation` and `OCELAnnotation` from the Ocelescope package to provide extra context—such as a **human-readable title** or **description**—for the function and its inputs.
+    [`ResourceAnnotation`](../../references/plugins/#ocelescope.plugin.ResourceAnnotation) and [`OCELAnnotation`](../../references/plugins/#ocelescope.plugin.OCELAnnotation) from the Ocelescope package to provide extra context—such as a **human-readable title** or **description**—for the function and its inputs.
 
     <figure markdown="span">
       ![An example plugin usage of adding metadata](../assets/functionMetadata.png)
@@ -119,7 +119,7 @@ You do this with Pydantic’s [`Field`](https://docs.pydantic.dev/latest/concept
   ![An example plugin input and its resulting form](../assets/ExamplePluginInput.png)
 </figure>
 
-!!! example "An Example PluginInput"
+??? example "An Example PluginInput"
 
     ```py
     from typing import Annotated, Literal
