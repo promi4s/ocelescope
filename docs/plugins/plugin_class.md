@@ -169,3 +169,91 @@ You do this with Pydantic’s [`Field`](https://docs.pydantic.dev/latest/concept
         ) -> OCEL:
             ...
     ```
+
+#### OCEL Fields
+
+OCEL fields let you populate configuration inputs with values taken directly from the selected OCEL log—for example:
+
+- available **object types**
+- available **event types / activities**
+- **event IDs** and **object IDs**
+- available **event/object attribute names**
+
+You define these fields with [`OCEL_FIELD`](../../references/plugins/#ocelescope.plugin.OCEL_FIELD). It works similarly to Pydantic’s `Field`, but instead of only validating user input, it **connects the input to the OCEL** so the UI can offer dropdowns/autocomplete based on the log.
+
+**Important:** The `ocel_id` must match the name of the `OCEL` parameter in your plugin method (usually `ocel`). Otherwise, the field cannot be linked to the selected log.
+
+<figure markdown="span">
+  ![An example for using OCEL Field](../assets/OCEL_FIELD.png)
+</figure>
+
+??? example "Using `OCEL_FIELD`"
+
+    ```python
+    from typing import Annotated
+
+    from ocelescope import OCEL, OCEL_FIELD, OCELAnnotation, Plugin, PluginInput, plugin_method
+
+    class Input(PluginInput):
+        object_type_field: str = OCEL_FIELD(field_type="object_type", ocel_id="ocel")
+        object_type_list_field: list[str] = OCEL_FIELD(field_type="object_type", ocel_id="ocel")
+
+        event_type_field: str = OCEL_FIELD(field_type="event_type", ocel_id="ocel")
+
+        event_id_field: str = OCEL_FIELD(field_type="event_id", ocel_id="ocel")
+        object_id_field: str = OCEL_FIELD(field_type="object_id", ocel_id="ocel")
+
+        object_attribute_field: str = OCEL_FIELD(field_type="object_attribute", ocel_id="ocel")
+        event_attribute_field: str = OCEL_FIELD(field_type="event_attribute", ocel_id="ocel")
+
+    class MinimalPlugin(Plugin):
+        label = "Minimal Plugin"
+        description = "An Ocelescope plugin"
+        version = "0.1.0"
+
+        @plugin_method(label="Example Method", description="An example plugin method")
+        def example(
+            self,
+            ocel: Annotated[OCEL, OCELAnnotation(label="Event Log")],
+            input: Input,  # must be named `input`
+        ) -> OCEL:
+            ...
+    ```
+
+#### Computed Inputs
+
+Computed inputs are fields whose available values are generated dynamically from the **current state of the input form**.
+
+They are useful when the options depend on what the user has already entered—for example, generating a list of values based on a prefix, or filtering choices based on earlier selections.
+
+Computed inputs are defined with [`COMPUTED_SELECTION`](../../references/plugins/#ocelescope.plugin.COMPUTED_SELECTION). You provide the name of a **provider function** (as a string). Ocelescope calls that function whenever the user changes the form, and uses the returned list as the selectable values.
+
+<figure markdown="span">
+  ![An example for using a Computed Field](../assets/Computed_Field.png)
+</figure>
+
+??? example "Using a `COMPUTED_SELECTION`"
+
+    ```python
+    from typing import Any
+
+    from ocelescope import COMPUTED_SELECTION, OCEL, Plugin, PluginInput, plugin_method
+
+    class Input(PluginInput):
+        prefix: str
+
+        prefixed_object_type: str = COMPUTED_SELECTION(provider="computed_input")
+
+        @staticmethod
+        def computed_input(ocel: OCEL, input: dict[str, Any]):
+            return [f"{input['prefix']}_{object_type}" for object_type in ocel.objects.types]
+
+    class MinimalPlugin(Plugin):
+        label = "Minimal Plugin"
+        description = "An Ocelescope plugin"
+        version = "0.1.0"
+
+        @plugin_method(label="Example Method", description="An example plugin method")
+        def example(self, ocel: OCEL, input: Input) -> OCEL:
+            ...
+    ```
