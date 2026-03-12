@@ -26,6 +26,21 @@ class Annotation(BaseModel):
 
 
 class OCELAnnotation(Annotation):
+    """UI annotation metadata for an `OCEL`-typed parameter or result.
+
+    In addition to the base `Annotation` fields, this annotation may specify an
+    OCEL extension. To keep the annotation JSON-serializable and stable for
+    frontend consumption, the constructor accepts an `OCELExtension` class and
+    coerces it to its class name (a string).
+
+    Attributes:
+        label: Human-readable label to display in the UI.
+        description: Optional longer text shown in the UI to explain the OCEL.
+        extension: Optional extension identifier. If constructed with an
+            `OCELExtension` class, it is coerced to that class' name.
+
+    """
+
     extension: Optional[str] = None
 
     @overload
@@ -46,6 +61,16 @@ class OCELAnnotation(Annotation):
 
 
 class ResourceAnnotation(Annotation):
+    """UI annotation metadata for a `Resource`-typed parameter or result.
+
+    This annotation is used to provide frontend-facing text (label/description)
+    for resources.
+
+    Attributes:
+        label: Human-readable label to display in the UI.
+        description: Optional longer text shown in the UI to explain the resource.
+    """
+
     annotation_resources: list[type[Resource]] | None = Field(exclude=True, default=None)
 
 
@@ -101,6 +126,15 @@ def plugin_method(
     label: Optional[str] = None,
     description: Optional[str] = None,
 ):
+    """Decorator that marks a plugin class method as an Ocelescope runnable function.
+
+    Args:
+        label: Human-readable label shown in the UI for the method. If not provided,
+            the UI may fall back to the Python method name.
+        description: Human-readable description shown in the UI for the method.
+
+    """
+
     def decorator(func: Callable[..., PluginReturnType]):
         plugin_method_meta = PluginMethod(name=func.__name__, label=label, description=description)
         method_hints = get_type_hints(func, include_extras=True)
