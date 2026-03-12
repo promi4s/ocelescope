@@ -1,13 +1,16 @@
 nav:
   - OCEL:
-      - core.md
+      - ocel/core.md
       - Managers:
-          - managers/objects.md
-          - managers/events.md
-          - managers/e2o.md
-          - managers/o2o.md
-      - extensions.md
-      - filters.md
+          - ocel/managers/objects.md
+          - ocel/managers/events.md
+          - ocel/managers/e2o.md
+          - ocel/managers/o2o.md
+      - ocel/extensions.md
+      - ocel/filters.md
       - Models:
-          - models/attributes.md
-          - models/relations.md
+          - ocel/models/attributes.md
+          - ocel/models/relations.md
+
+  - Plugins:
+      - plugins/index.md 
