@@ -10,6 +10,7 @@ COPY packages ./packages
 COPY modules ./modules
 
 RUN corepack enable && corepack prepare pnpm@10.30.1 --activate
+
 RUN pnpm install --frozen-lockfile
 
 FROM node:${NODE_VERSION} AS builder
@@ -25,6 +26,7 @@ COPY app ./app
 COPY packages ./packages
 COPY modules ./modules
 
+RUN pnpm install --frozen-lockfile
 RUN pnpm --filter "@ocelescope/app..." build
 
 FROM node:${NODE_VERSION} AS runner
