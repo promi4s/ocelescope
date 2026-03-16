@@ -1,0 +1,69 @@
+{
+  "name": "@ocelescope/core",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "Core React component and style library for Ocelescope (Mantine + React Query).",
+  "author": "Görkem-Emre Öztürk <goerkem.oeztuerk@rwth-aachen.de>",
+  "license": "MIT",
+  "homepage": "https://www.ocelescope.org",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/promi4s/ocelescope.git"
+  },
+  "bugs": {
+    "url": "https://github.com/promi4s/ocelescope/issues"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json",
+    "./styles.css": "./dist/styles.css"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch ./src"
+  },
+  "peerDependencies": {
+    "@mantine/core": "catalog:",
+    "@mantine/dropzone": "catalog:",
+    "@mantine/hooks": "catalog:",
+    "@mantine/notifications": "catalog:",
+    "@marko19907/string-to-color": "catalog:",
+    "@ocelescope/api-base": "workspace:*",
+    "@ocelescope/api-client": "workspace:*",
+    "@ocelescope/resources": "workspace:*",
+    "@tanstack/react-query": "catalog:",
+    "@tanstack/react-query-devtools": "^5.91.3",
+    "clsx": "catalog:",
+    "content-disposition-attachment": "catalog:",
+    "dayjs": "catalog:",
+    "file-saver": "catalog:",
+    "lucide-react": "catalog:",
+    "mantine-datatable": "catalog:",
+    "next": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "zod": "catalog:",
+    "zustand": "catalog:"
+  },
+  "devDependencies": {
+    "@mantine/notifications": "catalog:",
+    "@ocelescope/merge-css-plugin": "workspace:*",
+    "@types/css-modules": "catalog:",
+    "@types/file-saver": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "bumpp": "catalog:",
+    "tsdown": "catalog:",
+    "typescript": "catalog:"
+  }
+}

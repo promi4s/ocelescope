@@ -12,8 +12,7 @@ services:
 
   frontend:
     build:
-      context: ./src/frontend
-      dockerfile: Dockerfile
+      context: ./src/frontend/
     ports:
       - "3000:3000"
     restart: unless-stopped

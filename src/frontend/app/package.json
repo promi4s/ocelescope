@@ -1,0 +1,27 @@
+{
+  "name": "@ocelescope/app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "biome check",
+    "format": "biome format --write"
+  },
+  "dependencies": {
+    "@ocelescope/core": "workspace:*",
+    "@ocelescope/ocelot": "workspace:*",
+    "@ocelescope/filter": "workspace:*",
+    "@ocelescope/plugin": "workspace:*",
+    "next": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "typescript": "catalog:"
+  }
+}
