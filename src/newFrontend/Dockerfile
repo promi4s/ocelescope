@@ -1,20 +1,20 @@
 # syntax=docker/dockerfile:1.6
-FROM node:22-alpine AS deps
+ARG NODE_VERSION=22-slim
+
+FROM node:${NODE_VERSION} AS deps
 WORKDIR /repo
-RUN apk add --no-cache libc6-compat
 
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY app ./app
 COPY packages ./packages
 COPY modules ./modules
 
-RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
+RUN corepack enable && corepack prepare pnpm@10.30.1 --activate
 RUN pnpm install --frozen-lockfile
 
-FROM node:22-alpine AS builder
+FROM node:${NODE_VERSION} AS builder
 WORKDIR /repo
-RUN apk add --no-cache libc6-compat
-RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
+RUN corepack enable && corepack prepare pnpm@10.30.1 --activate
 
 COPY --from=deps /repo/node_modules ./node_modules
 COPY --from=deps /repo/pnpm-lock.yaml ./pnpm-lock.yaml
@@ -27,18 +27,23 @@ COPY modules ./modules
 
 RUN pnpm --filter "@ocelescope/app..." build
 
-FROM node:22-alpine AS runner
+FROM node:${NODE_VERSION} AS runner
+
 WORKDIR /app
+
 ENV NODE_ENV=production
 ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
-RUN addgroup -S nodejs && adduser -S nextjs -G nodejs
+COPY --from=builder --chown=node:node repo/app/public ./public
+
+RUN mkdir .next
+RUN chown node:node .next
 
 COPY --from=builder /repo/app/.next/standalone ./
 COPY --from=builder /repo/app/.next/static ./app/.next/static
-COPY --from=builder /repo/app/public ./app/public
 
-USER nextjs
+USER node
 EXPOSE 3000
 
 CMD ["node", "app/server.js"]
