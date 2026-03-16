@@ -63,3 +63,8 @@ catalog:
   zustand: ^5.0.11
 
 catalogMode: prefer
+
+ignoredBuiltDependencies:
+  - es5-ext
+  - esbuild
+  - sharp
