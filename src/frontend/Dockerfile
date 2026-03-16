@@ -1,37 +1,49 @@
-# Step 1: Build the application
-FROM node:20-alpine AS builder
+# syntax=docker/dockerfile:1.6
+ARG NODE_VERSION=22-slim
 
-# Set working directory
+FROM node:${NODE_VERSION} AS deps
+WORKDIR /repo
+
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
+COPY app ./app
+COPY packages ./packages
+COPY modules ./modules
+
+RUN corepack enable && corepack prepare pnpm@10.30.1 --activate
+RUN pnpm install --frozen-lockfile
+
+FROM node:${NODE_VERSION} AS builder
+WORKDIR /repo
+RUN corepack enable && corepack prepare pnpm@10.30.1 --activate
+
+COPY --from=deps /repo/node_modules ./node_modules
+COPY --from=deps /repo/pnpm-lock.yaml ./pnpm-lock.yaml
+COPY --from=deps /repo/pnpm-workspace.yaml ./pnpm-workspace.yaml
+COPY --from=deps /repo/package.json ./package.json
+
+COPY app ./app
+COPY packages ./packages
+COPY modules ./modules
+
+RUN pnpm --filter "@ocelescope/app..." build
+
+FROM node:${NODE_VERSION} AS runner
+
 WORKDIR /app
 
-# Install dependencies
-COPY package.json package-lock.json* pnpm-lock.yaml* ./
-RUN \
-  if [ -f pnpm-lock.yaml ]; then npm install -g pnpm && pnpm install; \
-  elif [ -f package-lock.json ]; then npm ci; \
-  else echo "No lock file found!" && exit 1; fi
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
-# Copy the rest of the app and build it
-COPY . .
-RUN npm run generate:api
-RUN npm run build
+COPY --from=builder --chown=node:node /repo/app/public ./public
 
-# Step 2: Create a lightweight production image
-FROM node:20-alpine AS runner
+RUN mkdir .next
+RUN chown node:node .next
 
-WORKDIR /app
+COPY --from=builder /repo/app/.next/standalone ./
+COPY --from=builder /repo/app/.next/static ./app/.next/static
 
-# Only copy necessary files
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
-
-# Set environment variables
-ENV NODE_ENV production
-
-# Expose Next.js port
+USER node
 EXPOSE 3000
 
-# Start the app
-CMD ["node_modules/.bin/next", "start"]
+CMD ["node", "app/server.js"]

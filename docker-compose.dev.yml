@@ -22,7 +22,7 @@ services:
           path: ./src/backend/uv.lock
   frontend:
     build:
-      context: ./src/newFrontend/
+      context: ./src/frontend/
       dockerfile: dev.Dockerfile
     ports:
       - "3000:3000"
@@ -31,13 +31,13 @@ services:
     develop:
       watch:
         - action: sync
-          path: ./src/newFrontend/
+          path: ./src/frontend/
           target: /app
           ignore:
             - node_modules/
             - .next/
         - action: rebuild
-          path: ./src/newFrontend/package-lock.json
+          path: ./src/frontend/package-lock.json
 
 volumes:
   plugins_store:

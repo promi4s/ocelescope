@@ -1,9 +1,0 @@
-.floating-edges {
-  width: 100%;
-  height: 100vh;
-  margin: 1rem;
-}
-
-.react-flow__handle {
-  opacity: 0;
-}

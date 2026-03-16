@@ -28,13 +28,13 @@ up env:
 orval: api
   npm run generate:api 
 
-[working-directory:'src/newFrontend']
+[working-directory:'src/frontend']
 build: 
-  npm run build --ws
+  pnpm run build:all 
 
 [working-directory: 'src/backend']
 api:
-  uv run python generate_openapi.py {{justfile_directory()}}/src/newFrontend/packages/api/base
+  uv run python generate_openapi.py {{justfile_directory()}}/src/frontend/packages/api/base
   
 [working-directory: 'src/backend']
 init_backend:
@@ -42,7 +42,7 @@ init_backend:
 
 [working-directory: 'src/frontend']
 init_frontend:
-  npm i
+  pnpm i
 
 sync: init_frontend init_backend orval 
   uvx pre-commit install

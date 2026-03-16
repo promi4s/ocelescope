@@ -12,7 +12,7 @@ services:
 
   frontend:
     build:
-      context: ./src/newFrontend
+      context: ./src/frontend/
     ports:
       - "3000:3000"
     restart: unless-stopped

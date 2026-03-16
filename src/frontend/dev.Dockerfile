@@ -1,31 +1,19 @@
-# syntax=docker.io/docker/dockerfile:1
+# syntax=docker/dockerfile:1.6
+ARG NODE_VERSION=22-slim
+ARG PNPM_VERSION=10.30.1
 
-FROM node:20-alpine
-
-# System dependencies (useful for some packages)
-RUN apk add --no-cache libc6-compat
-
-# Set working directory
+FROM node:${NODE_VERSION}
 WORKDIR /app
 
-# Install dependencies based on existing lockfiles
-COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* .npmrc* ./
+ENV PNPM_HOME="/pnpm"
+ENV PATH="${PNPM_HOME}:${PATH}"
 
-RUN \
-  if [ -f yarn.lock ]; then yarn install; \
-  elif [ -f package-lock.json ]; then npm install; \
-  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm install; \
-  else echo "No lockfile found." && exit 1; \
-  fi
+RUN corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate
 
-# Copy source code
 COPY . .
 
-RUN npm run generate:api
+RUN pnpm install --frozen-lockfile
+RUN pnpm run build
 
-# Expose Next.js dev server port
 EXPOSE 3000
-
-# Run the development server
-CMD [ "npm", "run", "dev" ]
-
+CMD ["pnpm", "run", "dev:all"]
