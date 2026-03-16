@@ -2,6 +2,7 @@ OTYPE_COL = "ocel:type"
 OID_COL = "ocel:oid"
 ACTIVITY_COL = "ocel:activity"
 EID_COL = "ocel:eid"
+TIMESTAMP_COL = "ocel:timestamp"
 
 O2O_SOURCE_ID = "ocel:oid_1"
 O2O_TARGET_ID = "ocel:oid_2"

@@ -7,6 +7,9 @@ from ocelescope.ocel.constants.pm4py import (
     E2O_EVENT_ID,
     E2O_OBJECT_ID,
     E2O_OBJECT_TYPE,
+    EID_COL,
+    OID_COL,
+    TIMESTAMP_COL,
 )
 from ocelescope.ocel.managers.base import BaseManager
 from ocelescope.ocel.models.relations import RelationCountSummary
@@ -123,3 +126,27 @@ class E2OManager(BaseManager):
                 A list of structured summaries of E2O relations.
         """
         return summarize_e2o_counts(self._ocel.ocel, direction)
+
+    def get_events_of_object(self, object_id: str):
+        return self.df.loc[self.df[OID_COL].eq(object_id), EID_COL].dropna().unique()
+
+    def __get_event_timestamps_of_object(self, object_id: str):
+        events = self._ocel.events.df
+
+        return events.loc[
+            events[EID_COL].isin(self.get_events_of_object(object_id)), [EID_COL, TIMESTAMP_COL]
+        ].set_index(EID_COL)[TIMESTAMP_COL]
+
+    def get_first_event_of_object(self, object_id: str) -> str | None:
+        return str(
+            self.__get_event_timestamps_of_object(
+                object_id,
+            ).idxmin()
+        )
+
+    def get_last_event_of_object(self, object_id: str) -> str | None:
+        return str(
+            self.__get_event_timestamps_of_object(
+                object_id,
+            ).idxmax()
+        )
