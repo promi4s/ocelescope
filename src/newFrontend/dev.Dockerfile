@@ -1,21 +1,21 @@
-# syntax=docker.io/docker/dockerfile:1
-
-FROM node:20-alpine
-
+FROM node:20-slim AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 RUN apk add --no-cache libc6-compat
 
+COPY . /app
 WORKDIR /app
 
-COPY . .
+FROM base AS prod-deps
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
 
-RUN \
-  if [ -f yarn.lock ]; then yarn install; \
-  elif [ -f package-lock.json ]; then npm install; \
-  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm install; \
-  else echo "No lockfile found." && exit 1; \
-  fi
+FROM base AS build
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN pnpm run build
 
-EXPOSE 3000
-
-CMD [ "npm", "run", "dev:app" ]
-
+FROM base
+COPY --from=prod-deps /app/node_modules /app/node_modules
+COPY --from=build /app/dist /app/dist
+EXPOSE 8000
+CMD [ "pnpm", "start" ]

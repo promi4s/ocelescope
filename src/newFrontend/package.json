@@ -10,6 +10,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.2",
+    "@tsconfig/strictest": "catalog:",
     "unplugin-lightningcss": "^0.4.5"
   }
 }
