@@ -52,7 +52,7 @@
     "@mantine/charts": "catalog:",
     "@mantine/dates": "catalog:",
     "@mantine/notifications": "catalog:",
-    "@ocelescope/merge-css-plugin": "workspace:",
+    "@ocelescope/merge-css-plugin": "workspace:*",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
