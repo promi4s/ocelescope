@@ -15,9 +15,9 @@ import Graph, { type NodeComponents } from "../components/Graph";
 
 const ObjectGraph = () => {
   const { id: ocelId } = useCurrentOcel();
-  const { data: o2o } = useO2o({ ocel_id: ocelId });
-  const { data: objectAttributes } = useObjectAttributes({ ocel_id: ocelId });
-  const { data: objectCounts } = useObjectCounts({ ocel_id: ocelId });
+  const { data: o2o } = useO2o(ocelId);
+  const { data: objectAttributes } = useObjectAttributes(ocelId);
+  const { data: objectCounts } = useObjectCounts(ocelId);
 
   const [searchValue, setSearchValue] = useDebouncedState("", 200);
   const [vizualization, setVizualization] = useState<"graph" | "cards">(
