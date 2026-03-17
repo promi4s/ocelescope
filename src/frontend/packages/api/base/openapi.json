@@ -7,7 +7,9 @@
   "paths": {
     "/ocelot/events": {
       "get": {
-        "tags": ["ocelot"],
+        "tags": [
+          "ocelot"
+        ],
         "summary": "Get Events",
         "operationId": "ocelot_paginatedEvents",
         "parameters": [
@@ -94,7 +96,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -132,7 +137,9 @@
     },
     "/ocelot/objects": {
       "get": {
-        "tags": ["ocelot"],
+        "tags": [
+          "ocelot"
+        ],
         "summary": "Get Objects",
         "operationId": "ocelot_paginatedObjects",
         "parameters": [
@@ -219,7 +226,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -257,7 +267,9 @@
     },
     "/ocelot/objects/changes/{object_id}": {
       "get": {
-        "tags": ["ocelot"],
+        "tags": [
+          "ocelot"
+        ],
         "summary": "Get Object Changes",
         "operationId": "ocelot_getObjectChanges",
         "parameters": [
@@ -293,7 +305,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -329,7 +344,9 @@
     },
     "/ocelot/objectInfo": {
       "get": {
-        "tags": ["ocelot"],
+        "tags": [
+          "ocelot"
+        ],
         "summary": "Get Objects Info",
         "operationId": "ocelot_objectInfo",
         "parameters": [
@@ -356,7 +373,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -398,7 +418,9 @@
     },
     "/ocelot/eventInfo": {
       "get": {
-        "tags": ["ocelot"],
+        "tags": [
+          "ocelot"
+        ],
         "summary": "Get Event Info",
         "operationId": "ocelot_eventInfo",
         "parameters": [
@@ -425,7 +447,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -467,7 +492,9 @@
     },
     "/session/upload": {
       "post": {
-        "tags": ["session"],
+        "tags": [
+          "session"
+        ],
         "summary": "Upload ocels, resources or tasks",
         "operationId": "upload",
         "requestBody": {
@@ -510,7 +537,9 @@
     },
     "/session/logout": {
       "post": {
-        "tags": ["session"],
+        "tags": [
+          "session"
+        ],
         "summary": "Deletes the Session",
         "operationId": "logout",
         "responses": {
@@ -527,7 +556,9 @@
     },
     "/ocels": {
       "get": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "List uploaded and uploading OCELs",
         "description": "Returns metadata for all uploaded OCELs along with any OCEL files currently being imported. Includes the ID of the currently active OCEL, if one is selected.",
         "operationId": "getOcels",
@@ -575,81 +606,111 @@
             }
           }
         }
-      },
-      "post": {
-        "tags": ["ocels"],
-        "summary": "Set Filter",
-        "operationId": "setFilters",
+      }
+    },
+    "/ocels/default": {
+      "get": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Get default OCEL metadata",
+        "operationId": "getDefaultOcel",
         "parameters": [
           {
-            "name": "ocel_id",
+            "name": "only_latest_versions",
             "in": "query",
             "required": false,
             "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Ocel Id"
+              "type": "boolean",
+              "default": true,
+              "title": "Only Latest Versions"
             }
           },
           {
-            "name": "ocel_version",
+            "name": "only_preloaded",
             "in": "query",
             "required": false,
             "schema": {
-              "anyOf": [
-                {
-                  "enum": ["original", "filtered"],
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "default": "filtered",
-              "title": "Ocel Version"
+              "type": "boolean",
+              "default": false,
+              "title": "Only Preloaded"
             }
           }
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "anyOf": [
-                  {
-                    "$ref": "#/components/schemas/OCELFilter"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "title": "Filter"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/OCELFilter"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "title": "Response Setfilters"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DefaultOCEL"
+                  },
+                  "title": "Response Getdefaultocel"
                 }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Import default OCEL",
+        "operationId": "importDefaultOcel",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Default OCEL key",
+              "examples": [],
+              "title": "Key"
+            },
+            "description": "Default OCEL key"
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Dataset version (optional)",
+              "examples": [
+                "1.0"
+              ],
+              "title": "Version"
+            },
+            "description": "Dataset version (optional)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
               }
             }
           },
@@ -666,16 +727,43 @@
         }
       }
     },
-    "/ocels/ocel/delete": {
+    "/ocels/extension/meta": {
+      "get": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Get Extension Meta",
+        "operationId": "getExtensionMeta",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/OCELExtensionDescription"
+                  },
+                  "type": "object",
+                  "title": "Response Getextensionmeta"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ocels/{ocel_id}/delete": {
       "post": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Delete an uploaded OCEL",
         "description": "Deletes the uploaded OCEL with the given `ocel_id`. This action is irreversible and removes the OCEL from the session.",
         "operationId": "deleteOcel",
         "parameters": [
           {
             "name": "ocel_id",
-            "in": "query",
+            "in": "path",
             "required": true,
             "schema": {
               "type": "string",
@@ -705,13 +793,31 @@
         }
       }
     },
-    "/ocels/ocel/rename": {
+    "/ocels/{ocel_id}/rename": {
       "post": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Rename an uploaded OCEL",
         "description": "Renames the OCEL represented by the given `ApiOcel` object to `new_name`. This updates the display name used in the UI and metadata.",
         "operationId": "renameOcel",
         "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
           {
             "name": "new_name",
             "in": "query",
@@ -722,29 +828,16 @@
             }
           },
           {
-            "name": "ocel_id",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Ocel Id"
-            }
-          },
-          {
             "name": "ocel_version",
             "in": "query",
             "required": false,
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -778,16 +871,18 @@
         }
       }
     },
-    "/ocels/objects/attributes": {
+    "/ocels/{ocel_id}/objects/attributes": {
       "get": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Get Object Attributes",
         "operationId": "objectAttributes",
         "parameters": [
           {
             "name": "ocel_id",
-            "in": "query",
-            "required": false,
+            "in": "path",
+            "required": true,
             "schema": {
               "anyOf": [
                 {
@@ -807,7 +902,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -876,16 +974,18 @@
         }
       }
     },
-    "/ocels/events/attributes": {
+    "/ocels/{ocel_id}/events/attributes": {
       "get": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Get Event Attributes",
         "operationId": "eventAttributes",
         "parameters": [
           {
             "name": "ocel_id",
-            "in": "query",
-            "required": false,
+            "in": "path",
+            "required": true,
             "schema": {
               "anyOf": [
                 {
@@ -905,7 +1005,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -974,16 +1077,18 @@
         }
       }
     },
-    "/ocels/events/counts": {
+    "/ocels/{ocel_id}/events/counts": {
       "get": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Get Event Counts",
         "operationId": "eventCounts",
         "parameters": [
           {
             "name": "ocel_id",
-            "in": "query",
-            "required": false,
+            "in": "path",
+            "required": true,
             "schema": {
               "anyOf": [
                 {
@@ -1003,7 +1108,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1043,12 +1151,30 @@
         }
       }
     },
-    "/ocels/events/time": {
+    "/ocels/{ocel_id}/events/time": {
       "get": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Get Time Info",
         "operationId": "timeInfo",
         "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
           {
             "name": "periods",
             "in": "query",
@@ -1082,29 +1208,16 @@
             }
           },
           {
-            "name": "ocel_id",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Ocel Id"
-            }
-          },
-          {
             "name": "ocel_version",
             "in": "query",
             "required": false,
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1140,16 +1253,18 @@
         }
       }
     },
-    "/ocels/objects/counts": {
+    "/ocels/{ocel_id}/objects/counts": {
       "get": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Get Object Counts",
         "operationId": "objectCounts",
         "parameters": [
           {
             "name": "ocel_id",
-            "in": "query",
-            "required": false,
+            "in": "path",
+            "required": true,
             "schema": {
               "anyOf": [
                 {
@@ -1169,7 +1284,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1209,27 +1327,18 @@
         }
       }
     },
-    "/ocels/relations/e2o": {
+    "/ocels/{ocel_id}/relations/e2o": {
       "get": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Get E2O",
         "operationId": "e2o",
         "parameters": [
           {
-            "name": "direction",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "enum": ["source", "target"],
-              "type": "string",
-              "default": "source",
-              "title": "Direction"
-            }
-          },
-          {
             "name": "ocel_id",
-            "in": "query",
-            "required": false,
+            "in": "path",
+            "required": true,
             "schema": {
               "anyOf": [
                 {
@@ -1243,13 +1352,30 @@
             }
           },
           {
+            "name": "direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "source",
+                "target"
+              ],
+              "type": "string",
+              "default": "source",
+              "title": "Direction"
+            }
+          },
+          {
             "name": "ocel_version",
             "in": "query",
             "required": false,
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1289,27 +1415,18 @@
         }
       }
     },
-    "/ocels/relations/o2o": {
+    "/ocels/{ocel_id}/relations/o2o": {
       "get": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Get Object Relations",
         "operationId": "o2o",
         "parameters": [
           {
-            "name": "direction",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "enum": ["source", "target"],
-              "type": "string",
-              "default": "source",
-              "title": "Direction"
-            }
-          },
-          {
             "name": "ocel_id",
-            "in": "query",
-            "required": false,
+            "in": "path",
+            "required": true,
             "schema": {
               "anyOf": [
                 {
@@ -1323,13 +1440,30 @@
             }
           },
           {
+            "name": "direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "source",
+                "target"
+              ],
+              "type": "string",
+              "default": "source",
+              "title": "Direction"
+            }
+          },
+          {
             "name": "ocel_version",
             "in": "query",
             "required": false,
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1369,13 +1503,31 @@
         }
       }
     },
-    "/ocels/events/ids": {
+    "/ocels/{ocel_id}/events/ids": {
       "get": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Get Event Ids",
         "operationId": "eventIds",
         "parameters": [
           {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
             "name": "search",
             "in": "query",
             "required": false,
@@ -1412,29 +1564,16 @@
             }
           },
           {
-            "name": "ocel_id",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Ocel Id"
-            }
-          },
-          {
             "name": "ocel_version",
             "in": "query",
             "required": false,
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1470,13 +1609,31 @@
         }
       }
     },
-    "/ocels/objects/ids": {
+    "/ocels/{ocel_id}/objects/ids": {
       "get": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Get Object Ids",
         "operationId": "objectIds",
         "parameters": [
           {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
             "name": "search",
             "in": "query",
             "required": false,
@@ -1513,29 +1670,16 @@
             }
           },
           {
-            "name": "ocel_id",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Ocel Id"
-            }
-          },
-          {
             "name": "ocel_version",
             "in": "query",
             "required": false,
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1571,16 +1715,18 @@
         }
       }
     },
-    "/ocels/filter": {
+    "/ocels/{ocel_id}/filter": {
       "get": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Get Filter",
         "operationId": "getFilters",
         "parameters": [
           {
             "name": "ocel_id",
-            "in": "query",
-            "required": false,
+            "in": "path",
+            "required": true,
             "schema": {
               "anyOf": [
                 {
@@ -1600,7 +1746,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1642,166 +1791,18 @@
             }
           }
         }
-      }
-    },
-    "/ocels/extension/meta": {
-      "get": {
-        "tags": ["ocels"],
-        "summary": "Get Extension Meta",
-        "operationId": "getExtensionMeta",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": {
-                    "$ref": "#/components/schemas/OCELExtensionDescription"
-                  },
-                  "type": "object",
-                  "title": "Response Getextensionmeta"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/ocels/ocel/default": {
-      "get": {
-        "tags": ["ocels"],
-        "summary": "Get default OCEL metadata",
-        "operationId": "getDefaultOcel",
-        "parameters": [
-          {
-            "name": "only_latest_versions",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "boolean",
-              "default": true,
-              "title": "Only Latest Versions"
-            }
-          },
-          {
-            "name": "only_preloaded",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "boolean",
-              "default": false,
-              "title": "Only Preloaded"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/DefaultOCEL"
-                  },
-                  "title": "Response Getdefaultocel"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/ocels/import-default": {
+      },
       "post": {
-        "tags": ["ocels"],
-        "summary": "Import default OCEL",
-        "operationId": "importDefaultOcel",
-        "parameters": [
-          {
-            "name": "key",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "description": "Default OCEL key",
-              "examples": [],
-              "title": "Key"
-            },
-            "description": "Default OCEL key"
-          },
-          {
-            "name": "version",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "Dataset version (optional)",
-              "examples": ["1.0"],
-              "title": "Version"
-            },
-            "description": "Dataset version (optional)"
-          }
+        "tags": [
+          "ocels"
         ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/ocels/download": {
-      "get": {
-        "tags": ["ocels"],
-        "summary": "Download OCEL including app state",
-        "operationId": "download_ocel_ocels_download_get",
+        "summary": "Set Filter",
+        "operationId": "setFilters",
         "parameters": [
-          {
-            "name": "ext",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "enum": [".xml", ".json", ".sqlite"],
-              "type": "string",
-              "title": "Ext"
-            }
-          },
           {
             "name": "ocel_id",
-            "in": "query",
-            "required": false,
+            "in": "path",
+            "required": true,
             "schema": {
               "anyOf": [
                 {
@@ -1821,7 +1822,120 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/OCELFilter"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Filter"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/OCELFilter"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Setfilters"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ocels/{ocel_id}/download": {
+      "get": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Download OCEL including app state",
+        "operationId": "download_ocel_ocels__ocel_id__download_get",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "ext",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                ".xml",
+                ".json",
+                ".sqlite"
+              ],
+              "type": "string",
+              "title": "Ext"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1857,7 +1971,9 @@
     },
     "/tasks/system": {
       "get": {
-        "tags": ["tasks"],
+        "tags": [
+          "tasks"
+        ],
         "summary": "returns all tasks of a session",
         "operationId": "getSystemTasks",
         "parameters": [
@@ -1938,7 +2054,9 @@
     },
     "/tasks/system/{task_id}": {
       "get": {
-        "tags": ["tasks"],
+        "tags": [
+          "tasks"
+        ],
         "summary": "returns the task of a given taskId",
         "operationId": "getSystemTask",
         "parameters": [
@@ -1978,7 +2096,9 @@
     },
     "/tasks/plugin": {
       "get": {
-        "tags": ["tasks"],
+        "tags": [
+          "tasks"
+        ],
         "summary": "returns all tasks of a session",
         "operationId": "getPluginTasks",
         "parameters": [
@@ -2055,7 +2175,9 @@
     },
     "/tasks/plugin/{task_id}": {
       "get": {
-        "tags": ["tasks"],
+        "tags": [
+          "tasks"
+        ],
         "summary": "returns the task of a given taskId",
         "operationId": "getPluginTask",
         "parameters": [
@@ -2095,7 +2217,9 @@
     },
     "/plugins": {
       "get": {
-        "tags": ["plugins"],
+        "tags": [
+          "plugins"
+        ],
         "summary": "Get Plugins",
         "operationId": "plugins",
         "responses": {
@@ -2116,7 +2240,9 @@
         }
       },
       "post": {
-        "tags": ["plugins"],
+        "tags": [
+          "plugins"
+        ],
         "summary": "Upload Plugin",
         "operationId": "uploadPlugin",
         "requestBody": {
@@ -2153,7 +2279,9 @@
     },
     "/plugins/{plugin_id}": {
       "get": {
-        "tags": ["plugins"],
+        "tags": [
+          "plugins"
+        ],
         "summary": "Get Plugin",
         "operationId": "getPlugin",
         "parameters": [
@@ -2199,7 +2327,9 @@
         }
       },
       "delete": {
-        "tags": ["plugins"],
+        "tags": [
+          "plugins"
+        ],
         "summary": "Delete Plugin",
         "operationId": "deletePlugin",
         "parameters": [
@@ -2237,7 +2367,9 @@
     },
     "/plugins/{plugin_id}/{method_name}": {
       "get": {
-        "tags": ["plugins"],
+        "tags": [
+          "plugins"
+        ],
         "summary": "Get Plugin Method",
         "operationId": "getPluginMethod",
         "parameters": [
@@ -2292,7 +2424,9 @@
         }
       },
       "post": {
-        "tags": ["plugins"],
+        "tags": [
+          "plugins"
+        ],
         "summary": "Run Plugin",
         "operationId": "runPlugin",
         "parameters": [
@@ -2352,7 +2486,9 @@
     },
     "/plugins/{plugin_id}/{method_name}/computed/{provider}": {
       "post": {
-        "tags": ["plugins"],
+        "tags": [
+          "plugins"
+        ],
         "summary": "Get Computed",
         "operationId": "getComputedValues",
         "parameters": [
@@ -2424,7 +2560,9 @@
     },
     "/resources": {
       "get": {
-        "tags": ["resources"],
+        "tags": [
+          "resources"
+        ],
         "summary": "Get Resources",
         "operationId": "resources",
         "parameters": [
@@ -2473,7 +2611,9 @@
         }
       },
       "post": {
-        "tags": ["resources"],
+        "tags": [
+          "resources"
+        ],
         "summary": "Upload Resource",
         "operationId": "uploadResource",
         "requestBody": {
@@ -2510,7 +2650,9 @@
     },
     "/resources/meta": {
       "get": {
-        "tags": ["resources"],
+        "tags": [
+          "resources"
+        ],
         "summary": "Get Resource Meta",
         "operationId": "getResourceMeta",
         "responses": {
@@ -2533,7 +2675,9 @@
     },
     "/resources/resource/{resource_id}/download": {
       "get": {
-        "tags": ["resources"],
+        "tags": [
+          "resources"
+        ],
         "summary": "Download Resource",
         "operationId": "downloadResource",
         "parameters": [
@@ -2571,7 +2715,9 @@
     },
     "/resources/resource/{resource_id}": {
       "get": {
-        "tags": ["resources"],
+        "tags": [
+          "resources"
+        ],
         "summary": "Get Resource",
         "operationId": "resource",
         "parameters": [
@@ -2609,7 +2755,9 @@
         }
       },
       "delete": {
-        "tags": ["resources"],
+        "tags": [
+          "resources"
+        ],
         "summary": "Delete Resource",
         "operationId": "deleteResource",
         "parameters": [
@@ -2645,7 +2793,9 @@
         }
       },
       "post": {
-        "tags": ["resources"],
+        "tags": [
+          "resources"
+        ],
         "summary": "Rename Resource",
         "operationId": "renameResource",
         "parameters": [
@@ -2746,7 +2896,11 @@
           }
         },
         "type": "object",
-        "required": ["input_ocels", "input_resources", "input"],
+        "required": [
+          "input_ocels",
+          "input_resources",
+          "input"
+        ],
         "title": "Body_getComputedValues"
       },
       "Body_runPlugin": {
@@ -2773,7 +2927,10 @@
           }
         },
         "type": "object",
-        "required": ["input_ocels", "input_resources"],
+        "required": [
+          "input_ocels",
+          "input_resources"
+        ],
         "title": "Body_runPlugin"
       },
       "Body_upload": {
@@ -2788,7 +2945,9 @@
           }
         },
         "type": "object",
-        "required": ["files"],
+        "required": [
+          "files"
+        ],
         "title": "Body_upload"
       },
       "Body_uploadPlugin": {
@@ -2800,7 +2959,9 @@
           }
         },
         "type": "object",
-        "required": ["file"],
+        "required": [
+          "file"
+        ],
         "title": "Body_uploadPlugin"
       },
       "Body_uploadResource": {
@@ -2812,7 +2973,9 @@
           }
         },
         "type": "object",
-        "required": ["file"],
+        "required": [
+          "file"
+        ],
         "title": "Body_uploadResource"
       },
       "BooleanAttribute": {
@@ -2836,7 +2999,12 @@
           }
         },
         "type": "object",
-        "required": ["attribute", "type", "true_count", "false_count"],
+        "required": [
+          "attribute",
+          "type",
+          "true_count",
+          "false_count"
+        ],
         "title": "BooleanAttribute"
       },
       "DateAttribute": {
@@ -2860,7 +3028,12 @@
           }
         },
         "type": "object",
-        "required": ["attribute", "type", "min", "max"],
+        "required": [
+          "attribute",
+          "type",
+          "min",
+          "max"
+        ],
         "title": "DateAttribute"
       },
       "Date_Distribution_Item": {
@@ -2882,7 +3055,11 @@
           }
         },
         "type": "object",
-        "required": ["start_timestamp", "end_timestamp", "entity_count"],
+        "required": [
+          "start_timestamp",
+          "end_timestamp",
+          "entity_count"
+        ],
         "title": "Date_Distribution_Item"
       },
       "DefaultOCEL": {
@@ -2926,7 +3103,12 @@
           }
         },
         "type": "object",
-        "required": ["key", "name", "version", "file"],
+        "required": [
+          "key",
+          "name",
+          "version",
+          "file"
+        ],
         "title": "DefaultOCEL",
         "description": "Definition of a default OCEL on the server, for quick access. Supports pre-loading the OCEL on backend init."
       },
@@ -2961,7 +3143,9 @@
           }
         },
         "type": "object",
-        "required": ["dot_str"],
+        "required": [
+          "dot_str"
+        ],
         "title": "DotVis"
       },
       "E2OCountFilter": {
@@ -2978,7 +3162,10 @@
             "anyOf": [
               {
                 "type": "string",
-                "enum": ["include", "exclude"]
+                "enum": [
+                  "include",
+                  "exclude"
+                ]
               },
               {
                 "type": "null"
@@ -3028,13 +3215,20 @@
           },
           "direction": {
             "type": "string",
-            "enum": ["source", "target"],
+            "enum": [
+              "source",
+              "target"
+            ],
             "title": "Direction",
             "default": "source"
           }
         },
         "type": "object",
-        "required": ["source", "target", "range"],
+        "required": [
+          "source",
+          "target",
+          "range"
+        ],
         "title": "E2OCountFilter"
       },
       "Entity_Time_Info": {
@@ -3056,7 +3250,11 @@
           }
         },
         "type": "object",
-        "required": ["start_time", "end_time", "date_distribution"],
+        "required": [
+          "start_time",
+          "end_time",
+          "date_distribution"
+        ],
         "title": "Entity_Time_Info"
       },
       "EventAttributeFilter": {
@@ -3182,7 +3380,10 @@
           }
         },
         "type": "object",
-        "required": ["target_type", "attribute"],
+        "required": [
+          "target_type",
+          "attribute"
+        ],
         "title": "EventAttributeFilter"
       },
       "EventTypeFilter": {
@@ -3196,13 +3397,18 @@
           },
           "mode": {
             "type": "string",
-            "enum": ["exclude", "include"],
+            "enum": [
+              "exclude",
+              "include"
+            ],
             "title": "Mode",
             "default": "include"
           }
         },
         "type": "object",
-        "required": ["event_types"],
+        "required": [
+          "event_types"
+        ],
         "title": "EventTypeFilter"
       },
       "FloatAttribute": {
@@ -3226,7 +3432,12 @@
           }
         },
         "type": "object",
-        "required": ["attribute", "type", "min", "max"],
+        "required": [
+          "attribute",
+          "type",
+          "min",
+          "max"
+        ],
         "title": "FloatAttribute"
       },
       "GetResourceResponse": {
@@ -3273,7 +3484,10 @@
           }
         },
         "type": "object",
-        "required": ["resource", "visualization"],
+        "required": [
+          "resource",
+          "visualization"
+        ],
         "title": "GetResourceResponse"
       },
       "Graph": {
@@ -3455,7 +3669,10 @@
           }
         },
         "type": "object",
-        "required": ["source", "target"],
+        "required": [
+          "source",
+          "target"
+        ],
         "title": "GraphEdge"
       },
       "GraphNode": {
@@ -3487,7 +3704,13 @@
           },
           "shape": {
             "type": "string",
-            "enum": ["circle", "triangle", "rectangle", "diamond", "hexagon"],
+            "enum": [
+              "circle",
+              "triangle",
+              "rectangle",
+              "diamond",
+              "hexagon"
+            ],
             "title": "Shape"
           },
           "width": {
@@ -3558,7 +3781,11 @@
           },
           "label_pos": {
             "type": "string",
-            "enum": ["top", "center", "bottom"],
+            "enum": [
+              "top",
+              "center",
+              "bottom"
+            ],
             "title": "Label Pos",
             "default": "center"
           },
@@ -3566,7 +3793,10 @@
             "anyOf": [
               {
                 "type": "string",
-                "enum": ["source", "sink"]
+                "enum": [
+                  "source",
+                  "sink"
+                ]
               },
               {
                 "type": "integer"
@@ -3606,7 +3836,9 @@
           }
         },
         "type": "object",
-        "required": ["shape"],
+        "required": [
+          "shape"
+        ],
         "title": "GraphNode"
       },
       "GraphvizLayoutConfig": {
@@ -3747,7 +3979,12 @@
           }
         },
         "type": "object",
-        "required": ["attribute", "type", "min", "max"],
+        "required": [
+          "attribute",
+          "type",
+          "min",
+          "max"
+        ],
         "title": "IntegerAttribute"
       },
       "NominalAttribute": {
@@ -3767,7 +4004,11 @@
           }
         },
         "type": "object",
-        "required": ["attribute", "type", "num_unique"],
+        "required": [
+          "attribute",
+          "type",
+          "num_unique"
+        ],
         "title": "NominalAttribute"
       },
       "O2OCountFilter": {
@@ -3784,7 +4025,10 @@
             "anyOf": [
               {
                 "type": "string",
-                "enum": ["include", "exclude"]
+                "enum": [
+                  "include",
+                  "exclude"
+                ]
               },
               {
                 "type": "null"
@@ -3834,13 +4078,20 @@
           },
           "direction": {
             "type": "string",
-            "enum": ["source", "target"],
+            "enum": [
+              "source",
+              "target"
+            ],
             "title": "Direction",
             "default": "source"
           }
         },
         "type": "object",
-        "required": ["source", "target", "range"],
+        "required": [
+          "source",
+          "target",
+          "range"
+        ],
         "title": "O2OCountFilter"
       },
       "OCELAnnotation": {
@@ -3873,7 +4124,9 @@
           }
         },
         "type": "object",
-        "required": ["label"],
+        "required": [
+          "label"
+        ],
         "title": "OCELAnnotation"
       },
       "OCELExtensionDescription": {
@@ -3892,7 +4145,11 @@
           }
         },
         "type": "object",
-        "required": ["name", "label", "description"],
+        "required": [
+          "name",
+          "label",
+          "description"
+        ],
         "title": "OCELExtensionDescription"
       },
       "OCELFilter": {
@@ -3962,7 +4219,10 @@
           }
         },
         "type": "object",
-        "required": ["is_list", "annotation"],
+        "required": [
+          "is_list",
+          "annotation"
+        ],
         "title": "OCELResult"
       },
       "ObjectAttributeFilter": {
@@ -4088,7 +4348,10 @@
           }
         },
         "type": "object",
-        "required": ["target_type", "attribute"],
+        "required": [
+          "target_type",
+          "attribute"
+        ],
         "title": "ObjectAttributeFilter"
       },
       "ObjectTypeFilter": {
@@ -4102,13 +4365,18 @@
           },
           "mode": {
             "type": "string",
-            "enum": ["exclude", "include"],
+            "enum": [
+              "exclude",
+              "include"
+            ],
             "title": "Mode",
             "default": "include"
           }
         },
         "type": "object",
-        "required": ["object_types"],
+        "required": [
+          "object_types"
+        ],
         "title": "ObjectTypeFilter"
       },
       "OcelEntity": {
@@ -4146,7 +4414,11 @@
           }
         },
         "type": "object",
-        "required": ["id", "attributes", "relations"],
+        "required": [
+          "id",
+          "attributes",
+          "relations"
+        ],
         "title": "OcelEntity"
       },
       "OcelMetadata": {
@@ -4172,7 +4444,12 @@
           }
         },
         "type": "object",
-        "required": ["id", "name", "created_at", "extensions"],
+        "required": [
+          "id",
+          "name",
+          "created_at",
+          "extensions"
+        ],
         "title": "OcelMetadata"
       },
       "PaginatedResponse": {
@@ -4264,7 +4541,9 @@
           }
         },
         "type": "object",
-        "required": ["data"],
+        "required": [
+          "data"
+        ],
         "title": "Plotly"
       },
       "PluginApi": {
@@ -4285,7 +4564,11 @@
           }
         },
         "type": "object",
-        "required": ["id", "meta", "methods"],
+        "required": [
+          "id",
+          "meta",
+          "methods"
+        ],
         "title": "PluginApi"
       },
       "PluginMeta": {
@@ -4315,7 +4598,12 @@
           }
         },
         "type": "object",
-        "required": ["name", "version", "label", "description"],
+        "required": [
+          "name",
+          "version",
+          "label",
+          "description"
+        ],
         "title": "PluginMeta"
       },
       "PluginMethod": {
@@ -4406,7 +4694,10 @@
           }
         },
         "type": "object",
-        "required": ["name", "input_schema"],
+        "required": [
+          "name",
+          "input_schema"
+        ],
         "title": "PluginMethod"
       },
       "PluginOutput": {
@@ -4451,7 +4742,12 @@
           }
         },
         "type": "object",
-        "required": ["task_id", "plugin_name", "method_name", "version"],
+        "required": [
+          "task_id",
+          "plugin_name",
+          "method_name",
+          "version"
+        ],
         "title": "PluginSource"
       },
       "PluginTaskSummary": {
@@ -4476,7 +4772,13 @@
           }
         },
         "type": "object",
-        "required": ["id", "state", "plugin_id", "method_name", "output"],
+        "required": [
+          "id",
+          "state",
+          "plugin_id",
+          "method_name",
+          "output"
+        ],
         "title": "PluginTaskSummary"
       },
       "RelationCountSummary": {
@@ -4536,7 +4838,9 @@
           }
         },
         "type": "object",
-        "required": ["label"],
+        "required": [
+          "label"
+        ],
         "title": "ResourceAnnotation"
       },
       "ResourceApi": {
@@ -4569,7 +4873,12 @@
           }
         },
         "type": "object",
-        "required": ["type", "name", "source", "id"],
+        "required": [
+          "type",
+          "name",
+          "source",
+          "id"
+        ],
         "title": "ResourceApi"
       },
       "ResourceInfo": {
@@ -4591,7 +4900,10 @@
           }
         },
         "type": "object",
-        "required": ["label", "description"],
+        "required": [
+          "label",
+          "description"
+        ],
         "title": "ResourceInfo"
       },
       "ResourceResult": {
@@ -4622,7 +4934,11 @@
           }
         },
         "type": "object",
-        "required": ["resource_type", "is_list", "annotation"],
+        "required": [
+          "resource_type",
+          "is_list",
+          "annotation"
+        ],
         "title": "ResourceResult"
       },
       "SVGVis": {
@@ -4639,7 +4955,9 @@
           }
         },
         "type": "object",
-        "required": ["svg"],
+        "required": [
+          "svg"
+        ],
         "title": "SVGVis"
       },
       "SystemTaskSummary": {
@@ -4662,7 +4980,12 @@
           }
         },
         "type": "object",
-        "required": ["id", "state", "name", "metadata"],
+        "required": [
+          "id",
+          "state",
+          "name",
+          "metadata"
+        ],
         "title": "SystemTaskSummary"
       },
       "Table": {
@@ -4690,7 +5013,10 @@
           }
         },
         "type": "object",
-        "required": ["columns", "rows"],
+        "required": [
+          "columns",
+          "rows"
+        ],
         "title": "Table"
       },
       "TableColumn": {
@@ -4712,7 +5038,13 @@
           },
           "data_type": {
             "type": "string",
-            "enum": ["string", "number", "boolean", "date", "datetime"],
+            "enum": [
+              "string",
+              "number",
+              "boolean",
+              "date",
+              "datetime"
+            ],
             "title": "Data Type",
             "default": "string"
           },
@@ -4728,7 +5060,9 @@
           }
         },
         "type": "object",
-        "required": ["id"],
+        "required": [
+          "id"
+        ],
         "title": "TableColumn"
       },
       "TaskState": {
@@ -4775,13 +5109,18 @@
           },
           "mode": {
             "type": "string",
-            "enum": ["exclude", "include"],
+            "enum": [
+              "exclude",
+              "include"
+            ],
             "title": "Mode",
             "default": "include"
           }
         },
         "type": "object",
-        "required": ["time_range"],
+        "required": [
+          "time_range"
+        ],
         "title": "TimeFrameFilter"
       },
       "ValidationError": {
@@ -4810,7 +5149,11 @@
           }
         },
         "type": "object",
-        "required": ["loc", "msg", "type"],
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
         "title": "ValidationError"
       },
       "Visualization": {
@@ -4821,7 +5164,9 @@
           }
         },
         "type": "object",
-        "required": ["type"],
+        "required": [
+          "type"
+        ],
         "title": "Visualization"
       }
     }
