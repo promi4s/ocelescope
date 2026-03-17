@@ -7,6 +7,7 @@ import orjson
 import pandas as pd
 
 from ocelescope.ocel.constants.pm4py import EID_COL, OID_COL
+from ocelescope.ocel.constants.quantity import OQTY_COLUMNS, QOP_COLUMNS
 
 from .constants import (
     JSON_KEYMAP,
@@ -70,9 +71,8 @@ def read_extension_from_xml(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
 
     quantity_ext = root.find(XML_QUANTITY_EXTENSION)
     if quantity_ext is None:
-        raise ValueError(f"No <{XML_QUANTITY_EXTENSION}> element found in XML.")
+        return pd.DataFrame(columns=OQTY_COLUMNS), pd.DataFrame(columns=QOP_COLUMNS)
 
-    # Read operations
     operations_data = []
     operations_elem = quantity_ext.find(XML_OPERATIONS)
     if operations_elem is not None:
@@ -108,8 +108,8 @@ def read_extension_from_xml(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
                 }
             )
 
-    oqty_df = pd.DataFrame(quantities_data)
-    qop_df = pd.DataFrame(operations_data)
+    oqty_df = pd.DataFrame(quantities_data, columns=[OQTY_COLUMNS])
+    qop_df = pd.DataFrame(operations_data, columns=[QOP_COLUMNS])
     return oqty_df, qop_df
 
 
@@ -123,12 +123,12 @@ def read_extension_from_json(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
         }
 
         oqty: pd.DataFrame = pd.DataFrame.from_records(
-            data=quantityExtension[JSON_QUANTITIES],
+            data=quantityExtension.get(JSON_QUANTITIES, []),
             columns=[JSON_KEYMAP[OID_COL], JSON_KEYMAP[QEL_ITEM_TYPE], JSON_KEYMAP[QEL_QUANTITY]],
         ).rename(inverse_keymap(JSON_KEYMAP))
 
         qop: pd.DataFrame = pd.DataFrame.from_records(
-            data=quantityExtension[JSON_OPERATIONS],
+            data=quantityExtension.get(JSON_OPERATIONS, []),
             columns=[
                 JSON_KEYMAP[EID_COL],
                 JSON_KEYMAP[OID_COL],
@@ -169,16 +169,22 @@ def read_extension_from_sqlite(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
     with sqlite3.connect(path) as conn:
         query_string = "SELECT * FROM {table_name}"
 
-        oqty = pd.read_sql_query(
-            query_string.format(table_name=SQL_QUANTITIES),
-            conn,
-        ).rename(columns=inverse_keymap(SQL_KEYMAP))
+        try:
+            oqty = pd.read_sql_query(
+                query_string.format(table_name=SQL_QUANTITIES),
+                conn,
+            ).rename(columns=inverse_keymap(SQL_KEYMAP))
+        except Exception:
+            oqty = pd.DataFrame(columns=OQTY_COLUMNS)
 
-        qop = (
-            pd.read_sql_query(query_string.format(table_name=SQL_OPERATIONS), conn)
-            .rename(columns=inverse_keymap(SQL_KEYMAP))
-            .reset_index()
-        )
+        try:
+            qop = (
+                pd.read_sql_query(query_string.format(table_name=SQL_OPERATIONS), conn)
+                .rename(columns=inverse_keymap(SQL_KEYMAP))
+                .reset_index()
+            )
+        except Exception:
+            qop = pd.DataFrame(columns=QOP_COLUMNS)
 
     return oqty, qop
 
