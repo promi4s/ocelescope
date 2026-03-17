@@ -8,7 +8,7 @@
     "dev:bootstrap": "pnpm --filter @ocelescope/merge-css-plugin build",
     "dev:deps": "pnpm -r --parallel --filter \"!@ocelescope/app\" run dev",
     "dev:app": "pnpm -r --parallel --filter \"@ocelescope/app\" run dev",
-    "dev:all": "pnpm dev:bootstrap && (pnpm dev:deps & pnpm dev:app)"
+    "dev:all": "pnpm dev:deps & pnpm dev:app"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.2",
