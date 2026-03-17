@@ -23,15 +23,11 @@ const EntityPage: React.FC<{ type: "events" | "objects" }> = ({ type }) => {
 
   const { data: entityCounts } = (
     areEntitiesEvents ? useEventCounts : useObjectCounts
-  )({
-    ocel_id: id,
-  });
+  )(id);
 
   const { data: attributes } = (
     areEntitiesEvents ? useEventAttributes : useObjectAttributes
-  )({
-    ocel_id: id,
-  });
+  )(id);
 
   const [currentTab, setCurrentTab] = useState("");
   const [page, setPage] = useState(1);
@@ -47,9 +43,7 @@ const EntityPage: React.FC<{ type: "events" | "objects" }> = ({ type }) => {
   //TODO: Make this in a collapsable table rather then extra collumns
   const { data: unfilteredRelations = [] } = (
     areEntitiesEvents ? useE2o : useO2o
-  )({
-    ocel_id: id,
-  });
+  )(id);
 
   const relations = useMemo(() => {
     return unfilteredRelations.filter(({ source }) => source === currentTab);

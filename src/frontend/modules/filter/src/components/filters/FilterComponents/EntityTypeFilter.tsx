@@ -44,9 +44,9 @@ const EntityTypeFilterInput: React.FC<{
 };
 
 export const EventTypeFilterInput: React.FC<FilterPageComponentProps> = memo(
-  ({ ocelParams, control }) => {
-    const { data: eventCounts = {} } = useEventCounts({
-      ...ocelParams,
+  ({ ocelId, control }) => {
+    const { data: eventCounts = {} } = useEventCounts(ocelId, {
+      ocel_version: "original",
     });
 
     const values = useMemo(() => {
@@ -74,9 +74,9 @@ export const EventTypeFilterInput: React.FC<FilterPageComponentProps> = memo(
 );
 
 export const ObjectTypeFilterInput: React.FC<FilterPageComponentProps> = memo(
-  ({ ocelParams, control }) => {
-    const { data: objectCounts = {} } = useObjectCounts({
-      ...ocelParams,
+  ({ ocelId, control }) => {
+    const { data: objectCounts = {} } = useObjectCounts(ocelId, {
+      ocel_version: "original",
     });
 
     const values = useMemo(() => {

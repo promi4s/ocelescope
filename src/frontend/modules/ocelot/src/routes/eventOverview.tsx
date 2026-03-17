@@ -11,13 +11,10 @@ import EntityOverview from "../components/EntityOverview";
 
 const EventOverview = () => {
   const { id } = useCurrentOcel();
-  const { data: eventsAttributes = {} } = useEventAttributes({
-    ocel_id: id,
-  });
-  const { data: e2o = [] } = useE2o({ ocel_id: id });
-  const { data: eventCounts, isLoading: isEventCountsLoading } = useEventCounts(
-    { ocel_id: id },
-  );
+  const { data: eventsAttributes = {} } = useEventAttributes(id);
+  const { data: e2o = [] } = useE2o(id);
+  const { data: eventCounts, isLoading: isEventCountsLoading } =
+    useEventCounts(id);
 
   const [searchValue, setSearchValue] = useDebouncedState("", 200);
   return (

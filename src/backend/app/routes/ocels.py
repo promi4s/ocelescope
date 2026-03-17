@@ -61,8 +61,67 @@ def getOcels(
     ]
 
 
+@ocels_router.get(
+    "/default", summary="Get default OCEL metadata", operation_id="getDefaultOcel"
+)
+def default_ocels(
+    only_latest_versions: bool = True,
+    only_preloaded: bool = False,
+) -> list[DefaultOCEL]:
+    filtered = filter_default_ocels(
+        exclude_hidden=True,
+        only_latest_versions=only_latest_versions,
+        only_preloaded=only_preloaded,
+    )
+    return filtered
+
+
 @ocels_router.post(
-    "/ocel/delete",
+    "/default", summary="Import default OCEL", operation_id="importDefaultOcel"
+)
+def import_default_ocel(
+    response: Response,
+    session: ApiSession,
+    key: str = Query(
+        description="Default OCEL key",
+        examples=DEFAULT_OCEL_KEYS,
+    ),
+    version: str | None = Query(
+        default=None,
+        description="Dataset version (optional)",
+        examples=["1.0"],
+    ),
+) -> Response:
+    default_ocel = get_default_ocel(key=key, version=version)
+    if default_ocel is None:
+        raise NotFound("The given default OCEL was not found")
+
+    # Load OCEL
+    ocel = default_ocel.get_ocel_copy(use_abbreviations=False)
+
+    ocel.meta.extra = {"name": default_ocel.name, "upload_date": str(datetime.now())}
+
+    session.add_ocel(ocel)
+    response.status_code = 200
+
+    return response
+
+
+# endregion
+
+
+# region Extension
+@ocels_router.get("/extension/meta", operation_id="getExtensionMeta")
+def get_extension_meta() -> dict[str, OCELExtensionDescription]:
+    return registry_manager.get_extension_descriptions()
+
+
+# endregion
+
+
+# region Management
+@ocels_router.post(
+    "/{ocel_id}/delete",
     summary="Delete an uploaded OCEL",
     description=(
         "Deletes the uploaded OCEL with the given `ocel_id`. "
@@ -75,7 +134,7 @@ def delete_ocel(session: ApiSession, ocel_id: str):
 
 
 @ocels_router.post(
-    "/ocel/rename",
+    "/{ocel_id}/rename",
     summary="Rename an uploaded OCEL",
     description=(
         "Renames the OCEL represented by the given `ApiOcel` object to `new_name`. "
@@ -90,7 +149,7 @@ def rename_ocel(ocel: ApiOcel, new_name: str):
 # endregion
 # region Info
 @ocels_router.get(
-    "/objects/attributes",
+    "/{ocel_id}/objects/attributes",
     response_model=dict[str, list[AttributeSummary]],
     operation_id="objectAttributes",
 )
@@ -101,7 +160,7 @@ def get_object_attributes(
 
 
 @ocels_router.get(
-    "/events/attributes",
+    "/{ocel_id}/events/attributes",
     response_model=dict[str, list[AttributeSummary]],
     operation_id="eventAttributes",
 )
@@ -112,7 +171,7 @@ def get_event_attributes(
 
 
 @ocels_router.get(
-    "/events/counts",
+    "/{ocel_id}/events/counts",
     response_model=dict[str, int],
     operation_id="eventCounts",
 )
@@ -123,7 +182,7 @@ def get_event_counts(
 
 
 @ocels_router.get(
-    "/events/time",
+    "/{ocel_id}/events/time",
     response_model=Entity_Time_Info,
     operation_id="timeInfo",
 )
@@ -177,7 +236,7 @@ def get_time_info(
 
 
 @ocels_router.get(
-    "/objects/counts",
+    "/{ocel_id}/objects/counts",
     response_model=dict[str, int],
     operation_id="objectCounts",
 )
@@ -188,7 +247,7 @@ def get_object_counts(
 
 
 @ocels_router.get(
-    "/relations/e2o",
+    "/{ocel_id}/relations/e2o",
     response_model=list[RelationCountSummary],
     operation_id="e2o",
 )
@@ -199,7 +258,7 @@ def get_e2o(
 
 
 @ocels_router.get(
-    "/relations/o2o",
+    "/{ocel_id}/relations/o2o",
     response_model=list[RelationCountSummary],
     operation_id="o2o",
 )
@@ -209,7 +268,7 @@ def get_object_relations(
     return ocel.o2o.summary(direction=direction)
 
 
-@ocels_router.get("/events/ids", operation_id="eventIds")
+@ocels_router.get("/{ocel_id}/events/ids", operation_id="eventIds")
 def get_event_ids(
     ocel: ApiOcel,
     search: str | None = None,
@@ -231,7 +290,7 @@ def get_event_ids(
     )
 
 
-@ocels_router.get("/objects/ids", operation_id="objectIds")
+@ocels_router.get("/{ocel_id}/objects/ids", operation_id="objectIds")
 def get_object_ids(
     ocel: ApiOcel,
     search: str | None = None,
@@ -256,7 +315,7 @@ def get_object_ids(
 # endregion
 # region Filters
 @ocels_router.get(
-    "/filter",
+    "/{ocel_id}/filter",
     operation_id="getFilters",
 )
 def get_filter(ocel: ApiOcel, session: ApiSession) -> Optional[OCELFilter]:
@@ -264,7 +323,7 @@ def get_filter(ocel: ApiOcel, session: ApiSession) -> Optional[OCELFilter]:
 
 
 @ocels_router.post(
-    "",
+    "/{ocel_id}/filter",
     operation_id="setFilters",
 )
 def set_filter(
@@ -276,63 +335,10 @@ def set_filter(
 
 
 # endregion
-# region extensions
 
 
-@ocels_router.get("/extension/meta", operation_id="getExtensionMeta")
-def get_extension_meta() -> dict[str, OCELExtensionDescription]:
-    return registry_manager.get_extension_descriptions()
-
-
-# endregion
-# region Import/Export
-@ocels_router.get(
-    "/ocel/default", summary="Get default OCEL metadata", operation_id="getDefaultOcel"
-)
-def default_ocels(
-    only_latest_versions: bool = True,
-    only_preloaded: bool = False,
-) -> list[DefaultOCEL]:
-    filtered = filter_default_ocels(
-        exclude_hidden=True,
-        only_latest_versions=only_latest_versions,
-        only_preloaded=only_preloaded,
-    )
-    return filtered
-
-
-@ocels_router.post(
-    "/import-default", summary="Import default OCEL", operation_id="importDefaultOcel"
-)
-def import_default_ocel(
-    response: Response,
-    session: ApiSession,
-    key: str = Query(
-        description="Default OCEL key",
-        examples=DEFAULT_OCEL_KEYS,
-    ),
-    version: str | None = Query(
-        default=None,
-        description="Dataset version (optional)",
-        examples=["1.0"],
-    ),
-) -> Response:
-    default_ocel = get_default_ocel(key=key, version=version)
-    if default_ocel is None:
-        raise NotFound("The given default OCEL was not found")
-
-    # Load OCEL
-    ocel = default_ocel.get_ocel_copy(use_abbreviations=False)
-
-    ocel.meta.extra = {"name": default_ocel.name, "upload_date": str(datetime.now())}
-
-    session.add_ocel(ocel)
-    response.status_code = 200
-
-    return response
-
-
-@ocels_router.get("/download", summary="Download OCEL including app state")
+# region Export
+@ocels_router.get("/{ocel_id}/download", summary="Download OCEL including app state")
 def download_ocel(
     ocel: ApiOcel,
     ext: OCELFileExtensions,

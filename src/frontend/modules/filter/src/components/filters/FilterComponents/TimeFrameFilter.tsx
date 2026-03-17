@@ -114,10 +114,10 @@ const TimeFrameSlider: React.FC<{
 };
 
 const TimeFrameFilter: React.FC<FilterPageComponentProps> = memo(
-  ({ ocelParams, control }) => {
-    const { data: timeInfo, isLoading } = useTimeInfo({
+  ({ ocelId, control }) => {
+    const { data: timeInfo, isLoading } = useTimeInfo(ocelId, {
       periods: 100,
-      ...ocelParams,
+      ocel_version: "original",
     });
 
     return (

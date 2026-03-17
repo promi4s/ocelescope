@@ -1,7 +1,6 @@
+import type { OCELFilter } from "@ocelescope/api-base";
 import type { Control } from "react-hook-form";
-import type { OCELFilter } from "@/api/fastapi-schemas";
-import type { FilterType } from "@/types/filters";
-import type { OcelInputType } from "@/types/ocel";
+import type { FilterType } from "../../types/filter";
 import {
   EventAttributeFilter,
   ObjectAttributeFilter,
@@ -18,8 +17,9 @@ import TimeFrameFilter from "./FilterComponents/TimeFrameFilter";
 
 export type FilterPageComponentProps = {
   control: Control<OCELFilter>;
-  ocelParams: OcelInputType;
+  ocelId: string;
 };
+
 export const filterMap: {
   [K in FilterType]: {
     label: string;

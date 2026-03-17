@@ -133,13 +133,7 @@ const FilterForm: React.FC<{
         const Component = filterPage;
         return (
           <Tabs.Panel key={filterType} value={filterType} p={"md"}>
-            <Component
-              control={control}
-              ocelParams={{
-                ocel_id: ocelId as string,
-                ocel_version: "original",
-              }}
-            />
+            <Component control={control} ocelId={ocelId as string} />
           </Tabs.Panel>
         );
       })}

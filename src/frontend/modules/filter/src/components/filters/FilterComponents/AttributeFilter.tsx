@@ -241,8 +241,10 @@ const AttributeFilter: React.FC<AttributeFilterProps> = ({
 };
 
 export const EventAttributeFilter: React.FC<FilterPageComponentProps> = memo(
-  ({ ocelParams, control }) => {
-    const { data: attributes = {} } = useEventAttributes({ ...ocelParams });
+  ({ ocelId, control }) => {
+    const { data: attributes = {} } = useEventAttributes(ocelId, {
+      ocel_version: "original",
+    });
 
     const { fields, append, remove } = useFieldArray({
       control,
@@ -290,8 +292,10 @@ export const EventAttributeFilter: React.FC<FilterPageComponentProps> = memo(
   },
 );
 export const ObjectAttributeFilter: React.FC<FilterPageComponentProps> = memo(
-  ({ ocelParams, control }) => {
-    const { data: attributes = {} } = useObjectAttributes({ ...ocelParams });
+  ({ ocelId, control }) => {
+    const { data: attributes = {} } = useObjectAttributes(ocelId, {
+      ocel_version: "original",
+    });
 
     const { fields, append, remove } = useFieldArray({
       name: "object_attributes",

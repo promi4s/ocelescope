@@ -72,7 +72,7 @@ const EntityTable: React.FC = () => {
     (id: string, entityType: Entity["type"]) => {
       switch (entityType) {
         case "ocel":
-          deleteOcel({ params: { ocel_id: id } });
+          deleteOcel({ ocelId: id });
           break;
         case "resource":
           deleteResource({ resourceId: id });
@@ -85,7 +85,7 @@ const EntityTable: React.FC = () => {
     (id: string, entityType: Entity["type"], newName: string) => {
       switch (entityType) {
         case "ocel":
-          renameOcel({ params: { ocel_id: id, new_name: newName } });
+          renameOcel({ ocelId: id, params: { new_name: newName } });
           break;
         case "resource":
           renameResource({ resourceId: id, params: { new_name: newName } });

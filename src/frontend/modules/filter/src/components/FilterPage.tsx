@@ -13,12 +13,7 @@ const FilterPage = () => {
     data: filter,
     isLoading: isFilterLoading,
     refetch,
-  } = useGetFilters(
-    {
-      ocel_id: ocelId as string,
-    },
-    { query: { enabled: !!ocelId } },
-  );
+  } = useGetFilters(ocelId, undefined, { query: { enabled: !!ocelId } });
 
   const resetFormRef = useRef<(filter: OCELFilter) => void>(() => {});
 
@@ -43,7 +38,10 @@ const FilterPage = () => {
           ocelId={ocelId as string}
           filter={filter ?? {}}
           onSubmit={(value) =>
-            applyFilter({ data: value, params: { ocel_id: ocelId } })
+            applyFilter({
+              ocelId: ocelId,
+              data: value,
+            })
           }
           onResetRef={(fn) => {
             resetFormRef.current = fn;

@@ -575,81 +575,105 @@
             }
           }
         }
-      },
-      "post": {
+      }
+    },
+    "/ocels/default": {
+      "get": {
         "tags": ["ocels"],
-        "summary": "Set Filter",
-        "operationId": "setFilters",
+        "summary": "Get default OCEL metadata",
+        "operationId": "getDefaultOcel",
         "parameters": [
           {
-            "name": "ocel_id",
+            "name": "only_latest_versions",
             "in": "query",
             "required": false,
             "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Ocel Id"
+              "type": "boolean",
+              "default": true,
+              "title": "Only Latest Versions"
             }
           },
           {
-            "name": "ocel_version",
+            "name": "only_preloaded",
             "in": "query",
             "required": false,
             "schema": {
-              "anyOf": [
-                {
-                  "enum": ["original", "filtered"],
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "default": "filtered",
-              "title": "Ocel Version"
+              "type": "boolean",
+              "default": false,
+              "title": "Only Preloaded"
             }
           }
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "anyOf": [
-                  {
-                    "$ref": "#/components/schemas/OCELFilter"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "title": "Filter"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/OCELFilter"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "title": "Response Setfilters"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DefaultOCEL"
+                  },
+                  "title": "Response Getdefaultocel"
                 }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["ocels"],
+        "summary": "Import default OCEL",
+        "operationId": "importDefaultOcel",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Default OCEL key",
+              "examples": [],
+              "title": "Key"
+            },
+            "description": "Default OCEL key"
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Dataset version (optional)",
+              "examples": ["1.0"],
+              "title": "Version"
+            },
+            "description": "Dataset version (optional)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
               }
             }
           },
@@ -666,7 +690,30 @@
         }
       }
     },
-    "/ocels/ocel/delete": {
+    "/ocels/extension/meta": {
+      "get": {
+        "tags": ["ocels"],
+        "summary": "Get Extension Meta",
+        "operationId": "getExtensionMeta",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/OCELExtensionDescription"
+                  },
+                  "type": "object",
+                  "title": "Response Getextensionmeta"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ocels/{ocel_id}/delete": {
       "post": {
         "tags": ["ocels"],
         "summary": "Delete an uploaded OCEL",
@@ -675,7 +722,7 @@
         "parameters": [
           {
             "name": "ocel_id",
-            "in": "query",
+            "in": "path",
             "required": true,
             "schema": {
               "type": "string",
@@ -705,13 +752,29 @@
         }
       }
     },
-    "/ocels/ocel/rename": {
+    "/ocels/{ocel_id}/rename": {
       "post": {
         "tags": ["ocels"],
         "summary": "Rename an uploaded OCEL",
         "description": "Renames the OCEL represented by the given `ApiOcel` object to `new_name`. This updates the display name used in the UI and metadata.",
         "operationId": "renameOcel",
         "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
           {
             "name": "new_name",
             "in": "query",
@@ -722,22 +785,6 @@
             }
           },
           {
-            "name": "ocel_id",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Ocel Id"
-            }
-          },
-          {
             "name": "ocel_version",
             "in": "query",
             "required": false,
@@ -778,7 +825,7 @@
         }
       }
     },
-    "/ocels/objects/attributes": {
+    "/ocels/{ocel_id}/objects/attributes": {
       "get": {
         "tags": ["ocels"],
         "summary": "Get Object Attributes",
@@ -786,8 +833,8 @@
         "parameters": [
           {
             "name": "ocel_id",
-            "in": "query",
-            "required": false,
+            "in": "path",
+            "required": true,
             "schema": {
               "anyOf": [
                 {
@@ -876,7 +923,7 @@
         }
       }
     },
-    "/ocels/events/attributes": {
+    "/ocels/{ocel_id}/events/attributes": {
       "get": {
         "tags": ["ocels"],
         "summary": "Get Event Attributes",
@@ -884,8 +931,8 @@
         "parameters": [
           {
             "name": "ocel_id",
-            "in": "query",
-            "required": false,
+            "in": "path",
+            "required": true,
             "schema": {
               "anyOf": [
                 {
@@ -974,7 +1021,7 @@
         }
       }
     },
-    "/ocels/events/counts": {
+    "/ocels/{ocel_id}/events/counts": {
       "get": {
         "tags": ["ocels"],
         "summary": "Get Event Counts",
@@ -982,8 +1029,8 @@
         "parameters": [
           {
             "name": "ocel_id",
-            "in": "query",
-            "required": false,
+            "in": "path",
+            "required": true,
             "schema": {
               "anyOf": [
                 {
@@ -1043,12 +1090,28 @@
         }
       }
     },
-    "/ocels/events/time": {
+    "/ocels/{ocel_id}/events/time": {
       "get": {
         "tags": ["ocels"],
         "summary": "Get Time Info",
         "operationId": "timeInfo",
         "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
           {
             "name": "periods",
             "in": "query",
@@ -1079,22 +1142,6 @@
                 }
               ],
               "title": "Freq"
-            }
-          },
-          {
-            "name": "ocel_id",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Ocel Id"
             }
           },
           {
@@ -1140,7 +1187,7 @@
         }
       }
     },
-    "/ocels/objects/counts": {
+    "/ocels/{ocel_id}/objects/counts": {
       "get": {
         "tags": ["ocels"],
         "summary": "Get Object Counts",
@@ -1148,8 +1195,8 @@
         "parameters": [
           {
             "name": "ocel_id",
-            "in": "query",
-            "required": false,
+            "in": "path",
+            "required": true,
             "schema": {
               "anyOf": [
                 {
@@ -1209,27 +1256,16 @@
         }
       }
     },
-    "/ocels/relations/e2o": {
+    "/ocels/{ocel_id}/relations/e2o": {
       "get": {
         "tags": ["ocels"],
         "summary": "Get E2O",
         "operationId": "e2o",
         "parameters": [
           {
-            "name": "direction",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "enum": ["source", "target"],
-              "type": "string",
-              "default": "source",
-              "title": "Direction"
-            }
-          },
-          {
             "name": "ocel_id",
-            "in": "query",
-            "required": false,
+            "in": "path",
+            "required": true,
             "schema": {
               "anyOf": [
                 {
@@ -1240,6 +1276,17 @@
                 }
               ],
               "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": ["source", "target"],
+              "type": "string",
+              "default": "source",
+              "title": "Direction"
             }
           },
           {
@@ -1289,27 +1336,16 @@
         }
       }
     },
-    "/ocels/relations/o2o": {
+    "/ocels/{ocel_id}/relations/o2o": {
       "get": {
         "tags": ["ocels"],
         "summary": "Get Object Relations",
         "operationId": "o2o",
         "parameters": [
           {
-            "name": "direction",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "enum": ["source", "target"],
-              "type": "string",
-              "default": "source",
-              "title": "Direction"
-            }
-          },
-          {
             "name": "ocel_id",
-            "in": "query",
-            "required": false,
+            "in": "path",
+            "required": true,
             "schema": {
               "anyOf": [
                 {
@@ -1320,6 +1356,17 @@
                 }
               ],
               "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": ["source", "target"],
+              "type": "string",
+              "default": "source",
+              "title": "Direction"
             }
           },
           {
@@ -1369,13 +1416,29 @@
         }
       }
     },
-    "/ocels/events/ids": {
+    "/ocels/{ocel_id}/events/ids": {
       "get": {
         "tags": ["ocels"],
         "summary": "Get Event Ids",
         "operationId": "eventIds",
         "parameters": [
           {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
             "name": "search",
             "in": "query",
             "required": false,
@@ -1409,22 +1472,6 @@
               "type": "integer",
               "default": 1,
               "title": "Page"
-            }
-          },
-          {
-            "name": "ocel_id",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Ocel Id"
             }
           },
           {
@@ -1470,13 +1517,29 @@
         }
       }
     },
-    "/ocels/objects/ids": {
+    "/ocels/{ocel_id}/objects/ids": {
       "get": {
         "tags": ["ocels"],
         "summary": "Get Object Ids",
         "operationId": "objectIds",
         "parameters": [
           {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
             "name": "search",
             "in": "query",
             "required": false,
@@ -1510,22 +1573,6 @@
               "type": "integer",
               "default": 1,
               "title": "Page"
-            }
-          },
-          {
-            "name": "ocel_id",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Ocel Id"
             }
           },
           {
@@ -1571,7 +1618,7 @@
         }
       }
     },
-    "/ocels/filter": {
+    "/ocels/{ocel_id}/filter": {
       "get": {
         "tags": ["ocels"],
         "summary": "Get Filter",
@@ -1579,8 +1626,8 @@
         "parameters": [
           {
             "name": "ocel_id",
-            "in": "query",
-            "required": false,
+            "in": "path",
+            "required": true,
             "schema": {
               "anyOf": [
                 {
@@ -1642,166 +1689,16 @@
             }
           }
         }
-      }
-    },
-    "/ocels/extension/meta": {
-      "get": {
-        "tags": ["ocels"],
-        "summary": "Get Extension Meta",
-        "operationId": "getExtensionMeta",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": {
-                    "$ref": "#/components/schemas/OCELExtensionDescription"
-                  },
-                  "type": "object",
-                  "title": "Response Getextensionmeta"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/ocels/ocel/default": {
-      "get": {
-        "tags": ["ocels"],
-        "summary": "Get default OCEL metadata",
-        "operationId": "getDefaultOcel",
-        "parameters": [
-          {
-            "name": "only_latest_versions",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "boolean",
-              "default": true,
-              "title": "Only Latest Versions"
-            }
-          },
-          {
-            "name": "only_preloaded",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "boolean",
-              "default": false,
-              "title": "Only Preloaded"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/DefaultOCEL"
-                  },
-                  "title": "Response Getdefaultocel"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/ocels/import-default": {
+      },
       "post": {
         "tags": ["ocels"],
-        "summary": "Import default OCEL",
-        "operationId": "importDefaultOcel",
+        "summary": "Set Filter",
+        "operationId": "setFilters",
         "parameters": [
-          {
-            "name": "key",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "description": "Default OCEL key",
-              "examples": [],
-              "title": "Key"
-            },
-            "description": "Default OCEL key"
-          },
-          {
-            "name": "version",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "Dataset version (optional)",
-              "examples": ["1.0"],
-              "title": "Version"
-            },
-            "description": "Dataset version (optional)"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/ocels/download": {
-      "get": {
-        "tags": ["ocels"],
-        "summary": "Download OCEL including app state",
-        "operationId": "download_ocel_ocels_download_get",
-        "parameters": [
-          {
-            "name": "ext",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "enum": [".xml", ".json", ".sqlite"],
-              "type": "string",
-              "title": "Ext"
-            }
-          },
           {
             "name": "ocel_id",
-            "in": "query",
-            "required": false,
+            "in": "path",
+            "required": true,
             "schema": {
               "anyOf": [
                 {
@@ -1812,6 +1709,107 @@
                 }
               ],
               "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": ["original", "filtered"],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/OCELFilter"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Filter"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/OCELFilter"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Setfilters"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ocels/{ocel_id}/download": {
+      "get": {
+        "tags": ["ocels"],
+        "summary": "Download OCEL including app state",
+        "operationId": "download_ocel_ocels__ocel_id__download_get",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "ext",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [".xml", ".json", ".sqlite"],
+              "type": "string",
+              "title": "Ext"
             }
           },
           {
