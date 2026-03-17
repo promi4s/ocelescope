@@ -71,9 +71,8 @@ def read_extension_from_xml(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
 
     quantity_ext = root.find(XML_QUANTITY_EXTENSION)
     if quantity_ext is None:
-        raise ValueError(f"No <{XML_QUANTITY_EXTENSION}> element found in XML.")
+        return pd.DataFrame(columns=OQTY_COLUMNS), pd.DataFrame(columns=QOP_COLUMNS)
 
-    # Read operations
     operations_data = []
     operations_elem = quantity_ext.find(XML_OPERATIONS)
     if operations_elem is not None:
