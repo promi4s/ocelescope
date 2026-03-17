@@ -223,17 +223,17 @@ const filterRelation = (relationSummary: RelationCountSummary) =>
   relationSummary.min_count < relationSummary.max_count;
 
 export const E2OCountFilter: React.FC<FilterPageComponentProps> = ({
-  ocelParams,
+  ocelId,
   control,
 }) => {
-  const { data: e2o = [] } = useE2o({
-    ...ocelParams,
+  const { data: e2o = [] } = useE2o(ocelId, {
     direction: "source",
+    ocel_version: "original",
   });
 
-  const { data: o2e = [] } = useE2o({
-    ...ocelParams,
+  const { data: o2e = [] } = useE2o(ocelId, {
     direction: "target",
+    ocel_version: "original",
   });
 
   // #TODO: Fix allowing duplicate relation filters
@@ -279,17 +279,17 @@ export const E2OCountFilter: React.FC<FilterPageComponentProps> = ({
   );
 };
 export const O2OCountFilter: React.FC<FilterPageComponentProps> = ({
-  ocelParams,
+  ocelId,
   control,
 }) => {
-  const { data: o2o = [] } = useO2o({
-    ...ocelParams,
+  const { data: o2o = [] } = useO2o(ocelId, {
     direction: "source",
+    ocel_version: "original",
   });
 
-  const { data: o2oReverse = [] } = useO2o({
-    ...ocelParams,
+  const { data: o2oReverse = [] } = useO2o(ocelId, {
     direction: "target",
+    ocel_version: "original",
   });
 
   const { filterableO2ORelation, filterableO2OReverseRelation } =
