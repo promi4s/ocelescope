@@ -29,7 +29,7 @@ const AttributeSelector: (
 ) => React.FC<OcelFieldProps> =
   (query) =>
   ({ isMulti, ocelId, onChange, value, label, requiered, description }) => {
-    const { data: attributes = {} } = query({ ocel_id: ocelId });
+    const { data: attributes = {} } = query(ocelId);
     const attributeNames = new Set(
       Object.values(attributes).flatMap((attributes) =>
         attributes.map((attribute) => attribute.attribute),
@@ -56,7 +56,7 @@ const TypeSelector: (
 ) => React.FC<OcelFieldProps> =
   (query) =>
   ({ ocelId, onChange, requiered, value, isMulti, label, description }) => {
-    const { data = {} } = query({ ocel_id: ocelId });
+    const { data = {} } = query(ocelId);
 
     const SelectComponent = isMulti ? MultiSelect : Select;
 
@@ -81,8 +81,7 @@ const IdSelect: (
     const [searchValue, setSearchValue] = useState<undefined | string>();
     const [debouncedSearch] = useDebouncedValue(searchValue, 300);
 
-    const { data: ids } = query({
-      ocel_id: ocelId,
+    const { data: ids } = query(ocelId, {
       search: debouncedSearch,
     });
 
