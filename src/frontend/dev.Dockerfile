@@ -13,7 +13,7 @@ RUN corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate
 COPY . .
 
 RUN pnpm install --frozen-lockfile
-RUN pnpm run build
+RUN pnpm run dev:bootstrap
 
 EXPOSE 3000
 CMD ["pnpm", "run", "dev:all"]

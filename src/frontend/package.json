@@ -6,8 +6,8 @@
     "build": "pnpm -r --filter \"!@ocelescope/app\" run build",
     "lint": "npx @biomejs/biome check --write",
     "dev:bootstrap": "pnpm --filter @ocelescope/merge-css-plugin build",
-    "dev:deps": "pnpm -r --parallel --filter \"!@ocelescope/app\" run dev",
     "dev:app": "pnpm -r --parallel --filter \"@ocelescope/app\" run dev",
+    "dev:deps": "pnpm -r --parallel --filter \"!@ocelescope/app\" --filter \"!@ocelescope/merge-css-plugin\" run dev",
     "dev:all": "pnpm dev:deps & pnpm dev:app"
   },
   "devDependencies": {
