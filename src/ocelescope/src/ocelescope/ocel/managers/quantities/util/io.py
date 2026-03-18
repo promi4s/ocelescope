@@ -108,8 +108,9 @@ def read_extension_from_xml(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
                 }
             )
 
-    oqty_df = pd.DataFrame(quantities_data, columns=[OQTY_COLUMNS])
-    qop_df = pd.DataFrame(operations_data, columns=[QOP_COLUMNS])
+    print(quantities_data)
+    oqty_df = pd.DataFrame(quantities_data, columns=OQTY_COLUMNS)
+    qop_df = pd.DataFrame(operations_data, columns=QOP_COLUMNS)
     return oqty_df, qop_df
 
 
@@ -117,18 +118,17 @@ def read_extension_from_json(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
     with open(path, "rb") as f:
         json = orjson.loads(f.read())
 
-        quantityExtension = json[JSON_QUANTITY_EXTENSION] or {
-            JSON_OPERATIONS: [],
-            JSON_QUANTITIES: [],
-        }
+        quantityExtension = json.get(
+            JSON_QUANTITY_EXTENSION, {JSON_OPERATIONS: [], JSON_QUANTITIES: []}
+        )
 
         oqty: pd.DataFrame = pd.DataFrame.from_records(
-            data=quantityExtension.get(JSON_QUANTITIES, []),
+            data=quantityExtension[JSON_QUANTITIES],
             columns=[JSON_KEYMAP[OID_COL], JSON_KEYMAP[QEL_ITEM_TYPE], JSON_KEYMAP[QEL_QUANTITY]],
         ).rename(inverse_keymap(JSON_KEYMAP))
 
         qop: pd.DataFrame = pd.DataFrame.from_records(
-            data=quantityExtension.get(JSON_OPERATIONS, []),
+            data=quantityExtension[JSON_OPERATIONS],
             columns=[
                 JSON_KEYMAP[EID_COL],
                 JSON_KEYMAP[OID_COL],
