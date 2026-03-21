@@ -3,7 +3,8 @@
   "root": false,
   "files": {
     "ignoreUnknown": true,
-    "maxSize": 2000000
+    "maxSize": 2000000,
+    "includes": ["**", "!**/openapi.json"]
   },
   "formatter": {
     "indentStyle": "space"
