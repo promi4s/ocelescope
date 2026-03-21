@@ -3,10 +3,6 @@ name: "Publish"
 on:
   workflow_dispatch:
 
-defaults:
-  run:
-    working-directory: src/ocelescope
-
 jobs:
   run:
     runs-on: ubuntu-latest
@@ -23,6 +19,6 @@ jobs:
       - name: Install Python 3.13
         run: uv python install 3.13
       - name: Build
-        run: uv build
+        run: uv build --package ocelescope
       - name: Publish
-        run: uv publish
+        run: uv publish --package ocelescope
