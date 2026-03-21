@@ -1,48 +1,52 @@
-# Use a Python image with uv pre-installed
-FROM astral/uv:python3.13-alpine
+# syntax=docker/dockerfile:1.7
 
-# Install the project into `/app`
+FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim AS builder
+
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_NO_DEV=1 \
+    UV_PYTHON_DOWNLOADS=0
+
 WORKDIR /app
 
-# Enable bytecode compilation
-ENV UV_COMPILE_BYTECODE=1
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      build-essential \
+      git \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy from the cache instead of linking since it's a mounted volume
-ENV UV_LINK_MODE=copy
+
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --frozen --no-install-workspace
+
+COPY pyproject.toml uv.lock /app/
+
+COPY src/backend /app/src/backend
+COPY src/ocelescope /app/src/ocelescope
+
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --package ocelescope-backend
+
+FROM python:3.13-slim-bookworm AS runtime
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-  build-essential \
-  git \
-  graphviz \
-  && rm -rf /var/lib/apt/lists/*
+      graphviz \
+    && rm -rf /var/lib/apt/lists/*
 
-COPY --from=ocelescope / /ocelescope
+RUN groupadd --system --gid 999 nonroot \
+ && useradd  --system --uid 999 --gid 999 --create-home nonroot
 
-# Install the project's dependencies using the lockfile and settings
-RUN --mount=type=cache,target=/root/.cache/uv \
-  --mount=type=bind,source=uv.lock,target=uv.lock \
-  --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-  uv sync --locked --no-install-project --no-dev
+WORKDIR /app
 
-# Then, add the rest of the project source code and install it
-# Installing separately from its dependencies allows optimal layer caching
-COPY . /app
-COPY --from=data / /app/data
+COPY --from=builder --chown=nonroot:nonroot /app /app
 
-RUN --mount=type=cache,target=/root/.cache/uv \
-  uv sync --locked --no-dev
-
-# Place executables in the environment at the front of the path
 ENV PATH="/app/.venv/bin:$PATH"
-
-ENV DATA_DIR="/app/data"
+ENV DATA_DIR="/data"
 ENV PLUGIN_DIR="/plugins"
 
-# Reset the entrypoint, don't invoke `uv`
-ENTRYPOINT []
+USER nonroot
 
-# Run the FastAPI application by default
-# Uses `fastapi dev` to enable hot-reloading when the `watch` sync occurs
-# Uses `--host 0.0.0.0` to allow access from outside the container
+WORKDIR /app/src/backend/
 
-CMD ["fastapi", "run" ,"app","--host", "0.0.0.0"]
+CMD ["fastapi", "run", "app", "--host", "0.0.0.0"]
