@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --frozen --no-install-workspace
+    uv sync --frozen --no-install-workspace --no-dev
 
 COPY pyproject.toml uv.lock /app/
 
@@ -24,7 +24,7 @@ COPY src/backend /app/src/backend
 COPY src/ocelescope /app/src/ocelescope
 
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --package ocelescope-backend
+    uv sync --frozen --no-dev --package ocelescope-backend
 
 FROM python:3.13-slim-bookworm AS runtime
 

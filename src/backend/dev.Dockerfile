@@ -1,4 +1,3 @@
-# syntax=docker/dockerfile:1.7
 FROM python:3.13-slim-bookworm
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -23,7 +22,7 @@ COPY pyproject.toml uv.lock ./
 
 # Install all locked deps without workspace code
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --no-install-workspace
+    uv sync --frozen --no-install-workspace --no-dev
 
 # Now bring in the workspace packages
 COPY src/backend /app/src/backend
