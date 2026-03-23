@@ -1,25 +1,23 @@
 services:
   backend:
     build:
-      context: ./src/backend/
-      dockerfile: dev.Dockerfile
-      additional_contexts:
-        ocelescope: ./src/ocelescope
+      dockerfile: ./src/backend/dev.Dockerfile
     volumes:
-      - ./data:/app/data
+      - ./data:/data
       - plugins_store:/plugins
     environment:
-      - DATA_DIR=/app/data
+      - DATA_DIR=/data
       - PLUGIN_DIR=/plugins
     develop:
       watch:
         - action: sync+restart
           path: ./src/backend
           target: /app
-          ignore:
-            - .venv/
+        - action: sync+restart
+          path: ./src/ocelescope
+          target: /app
         - action: rebuild
-          path: ./src/backend/uv.lock
+          path: ./uv.lock
   frontend:
     build:
       context: ./src/frontend/
