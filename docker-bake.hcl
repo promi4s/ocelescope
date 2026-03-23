@@ -11,10 +11,8 @@ group "default" {
 }
 
 target "backend" {
-  context = "./src/backend"
-  dockerfile = "Dockerfile"
+  dockerfile = "./src/backend/Dockerfile"
   contexts = {
-    ocelescope = "./src/ocelescope"
     data       = "./data"
   }
 
