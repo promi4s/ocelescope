@@ -23,6 +23,7 @@ catalog:
   '@tanstack/react-query': ^5.90.21
   '@tanstack/react-query-devtools': ^5.91.3
   '@tsconfig/strictest': ^2.0.8
+  '@tsdown/css': ^0.21.4
   '@types/css-modules': ^1.0.5
   '@types/file-saver': ^2.0.7
   '@types/lodash': ^4.17.23
@@ -48,6 +49,7 @@ catalog:
   lucide-react: ^0.563.0
   mantine-datatable: ^8.3.13
   next: ^16.1.6
+  orval: ^8.5.2
   react: ^19.2.0
   react-cytoscapejs: ^2.0.0
   react-dom: ^19.2.0
@@ -56,7 +58,7 @@ catalog:
   react-zoom-pan-pinch: ^3.7.0
   recharts: ^2.15.3
   rolldown: 1.0.0-rc.6
-  tsdown: ^0.18.1
+  tsdown: ^0.21.4
   typescript: ^5.9.3
   uniqolor: ^1.1.1
   zod: ^4.3.6

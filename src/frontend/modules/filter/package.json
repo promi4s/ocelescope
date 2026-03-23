@@ -16,7 +16,7 @@
   "exports": {
     ".": "./dist/index.js",
     "./package.json": "./package.json",
-    "./styles.css": "./dist/styles.css"
+    "./styles.css": "./dist/style.css"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -52,7 +52,6 @@
     "@mantine/charts": "catalog:",
     "@mantine/dates": "catalog:",
     "@mantine/notifications": "catalog:",
-    "@ocelescope/merge-css-plugin": "workspace:*",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",

@@ -12,8 +12,7 @@ RUN corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate
 
 COPY . .
 
-RUN pnpm install --frozen-lockfile
-RUN pnpm run dev:bootstrap
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 EXPOSE 3000
-CMD ["pnpm", "run", "dev:app"]
+CMD ["pnpm", "run", "dev:all"]
