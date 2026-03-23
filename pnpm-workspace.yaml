@@ -1,7 +1,7 @@
 packages:
-  - app
-  - packages/**/*
-  - modules/**/*
+  - src/frontend/app
+  - src/frontend/packages/**/*
+  - src/frontend/modules/**/*
 
 catalog:
   '@apidevtools/json-schema-ref-parser': ^15.3.1

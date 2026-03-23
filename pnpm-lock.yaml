@@ -189,7 +189,7 @@ importers:
         specifier: ^0.4.5
         version: 0.4.5
 
-  app:
+  src/frontend/app:
     dependencies:
       '@ocelescope/core':
         specifier: workspace:*
@@ -226,7 +226,7 @@ importers:
         specifier: 'catalog:'
         version: 5.9.3
 
-  modules/filter:
+  src/frontend/modules/filter:
     dependencies:
       '@dagrejs/dagre':
         specifier: 'catalog:'
@@ -293,7 +293,7 @@ importers:
         specifier: 'catalog:'
         version: 5.9.3
 
-  modules/ocelot:
+  src/frontend/modules/ocelot:
     dependencies:
       '@dagrejs/dagre':
         specifier: 'catalog:'
@@ -360,7 +360,7 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
-  modules/plugin:
+  src/frontend/modules/plugin:
     dependencies:
       '@mantine/carousel':
         specifier: 'catalog:'
@@ -451,7 +451,7 @@ importers:
         specifier: 'catalog:'
         version: 5.9.3
 
-  packages/api/base:
+  src/frontend/packages/api/base:
     dependencies:
       '@ocelescope/api-client':
         specifier: workspace:*
@@ -488,7 +488,7 @@ importers:
         specifier: 'catalog:'
         version: 5.9.3
 
-  packages/api/client:
+  src/frontend/packages/api/client:
     dependencies:
       react:
         specifier: 'catalog:'
@@ -522,7 +522,7 @@ importers:
         specifier: 'catalog:'
         version: 5.9.3
 
-  packages/api/config:
+  src/frontend/packages/api/config:
     dependencies:
       orval:
         specifier: ^8.4.0
@@ -553,7 +553,7 @@ importers:
         specifier: 'catalog:'
         version: 5.9.3
 
-  packages/core:
+  src/frontend/packages/core:
     dependencies:
       '@mantine/core':
         specifier: 'catalog:'
@@ -647,7 +647,7 @@ importers:
         specifier: 'catalog:'
         version: 5.9.3
 
-  packages/merge-css-plugin:
+  src/frontend/packages/merge-css-plugin:
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -665,7 +665,7 @@ importers:
         specifier: 'catalog:'
         version: 5.9.3
 
-  packages/resources:
+  src/frontend/packages/resources:
     dependencies:
       '@floating-ui/react':
         specifier: 'catalog:'
