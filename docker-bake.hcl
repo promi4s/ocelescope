@@ -23,8 +23,7 @@ target "backend" {
 }
 
 target "frontend" {
-  context = "./src/frontend"
-  dockerfile = "Dockerfile"
+  dockerfile = "./src/frontend/Dockerfile"
 
   tags = [
     "grkmr/ocelescope_frontend:${VERSION}",

@@ -29,12 +29,12 @@ services:
       watch:
         - action: sync
           path: ./src/frontend/
-          target: /app
+          target: /app/src/frontend
           ignore:
             - node_modules/
             - .next/
         - action: rebuild
-          path: ./src/frontend/package-lock.json
+          path: ./pnpm-lock.yaml
 
 volumes:
   plugins_store:
