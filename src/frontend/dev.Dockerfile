@@ -16,4 +16,4 @@ RUN pnpm install --frozen-lockfile
 RUN pnpm run dev:bootstrap
 
 EXPOSE 3000
-CMD ["pnpm", "run", "dev:all"]
+CMD ["pnpm", "run", "dev:app"]

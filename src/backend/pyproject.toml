@@ -38,13 +38,9 @@ dev = [
 package = false
 
 [tool.uv.sources]
-ocelescope = { path = "../ocelescope", editable = true }
+ocelescope = { workspace = true }
 
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
 
 [tool.ruff]
 fix = true
 lint.ignore = ["E731"]
-exclude = ["*filters/config_union.py", "*resources/__init__.py"]
