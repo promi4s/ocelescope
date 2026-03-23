@@ -108,7 +108,6 @@ def read_extension_from_xml(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
                 }
             )
 
-    print(quantities_data)
     oqty_df = pd.DataFrame(quantities_data, columns=OQTY_COLUMNS)
     qop_df = pd.DataFrame(operations_data, columns=QOP_COLUMNS)
     return oqty_df, qop_df
@@ -125,7 +124,7 @@ def read_extension_from_json(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
         oqty: pd.DataFrame = pd.DataFrame.from_records(
             data=quantityExtension[JSON_QUANTITIES],
             columns=[JSON_KEYMAP[OID_COL], JSON_KEYMAP[QEL_ITEM_TYPE], JSON_KEYMAP[QEL_QUANTITY]],
-        ).rename(inverse_keymap(JSON_KEYMAP))
+        ).rename(columns=inverse_keymap(JSON_KEYMAP))
 
         qop: pd.DataFrame = pd.DataFrame.from_records(
             data=quantityExtension[JSON_OPERATIONS],
@@ -135,7 +134,7 @@ def read_extension_from_json(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
                 JSON_KEYMAP[QEL_ITEM_TYPE],
                 JSON_KEYMAP[QEL_QUANTITY],
             ],
-        )
+        ).rename(columns=inverse_keymap(JSON_KEYMAP))
 
     return (oqty, qop)
 
@@ -171,18 +170,15 @@ def read_extension_from_sqlite(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
 
         try:
             oqty = pd.read_sql_query(
-                query_string.format(table_name=SQL_QUANTITIES),
-                conn,
+                query_string.format(table_name=SQL_QUANTITIES), conn, index_col=None
             ).rename(columns=inverse_keymap(SQL_KEYMAP))
         except Exception:
             oqty = pd.DataFrame(columns=OQTY_COLUMNS)
 
         try:
-            qop = (
-                pd.read_sql_query(query_string.format(table_name=SQL_OPERATIONS), conn)
-                .rename(columns=inverse_keymap(SQL_KEYMAP))
-                .reset_index()
-            )
+            qop = pd.read_sql_query(
+                query_string.format(table_name=SQL_OPERATIONS), conn, index_col=None
+            ).rename(columns=inverse_keymap(SQL_KEYMAP))
         except Exception:
             qop = pd.DataFrame(columns=QOP_COLUMNS)
 
