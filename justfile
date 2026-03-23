@@ -36,9 +36,8 @@ build:
 api:
   uv run python generate_openapi.py {{justfile_directory()}}/src/frontend/packages/api/base
   
-[working-directory: 'src/backend']
 init_backend:
-  uv sync
+  uv sync --all-packages
 
 [working-directory: 'src/frontend']
 init_frontend:
