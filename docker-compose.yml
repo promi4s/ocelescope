@@ -1,10 +1,8 @@
 services:
   backend:
     build:
-      context: ./src/backend
-      dockerfile: Dockerfile
+      dockerfile: ./src/backend/Dockerfile
       additional_contexts:
-        ocelescope: ./src/ocelescope
         data: ./data
     volumes:
       - plugins_store:/plugins

@@ -39,6 +39,9 @@ WORKDIR /app
 
 COPY --from=builder --chown=nonroot:nonroot /app /app
 
+RUN mkdir -p /data
+COPY --from=data / /data/
+
 ENV PATH="/app/.venv/bin:$PATH"
 ENV DATA_DIR="/data"
 ENV PLUGIN_DIR="/plugins"
