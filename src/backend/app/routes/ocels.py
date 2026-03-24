@@ -110,6 +110,13 @@ def get_extension_meta() -> dict[str, OCELExtensionDescription]:
 
 
 # region Management
+@ocels_router.get(
+    "/{ocel_id}", summary="Get general information about a OCEL", operation_id="getOcel"
+)
+def get_ocel(ocel: ApiOcel) -> OcelMetadata:
+    return OcelMetadata.from_ocel(ocel)
+
+
 @ocels_router.post(
     "/{ocel_id}/delete",
     summary="Delete an uploaded OCEL",
