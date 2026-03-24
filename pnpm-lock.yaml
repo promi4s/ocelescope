@@ -87,9 +87,6 @@ catalogs:
     '@types/react-plotly.js':
       specifier: ^2.6.4
       version: 2.6.4
-    '@xyflow/react':
-      specifier: ^12.10.1
-      version: 12.10.1
     bumpp:
       specifier: ^10.3.2
       version: 10.4.1
@@ -105,9 +102,6 @@ catalogs:
     dayjs:
       specifier: ^1.11.19
       version: 1.11.19
-    elkjs:
-      specifier: ^0.11.0
-      version: 0.11.1
     embla-carousel:
       specifier: ^8.6.0
       version: 8.6.0
@@ -120,9 +114,6 @@ catalogs:
     flat:
       specifier: ^6.0.1
       version: 6.0.1
-    html-to-image:
-      specifier: ^1.11.13
-      version: 1.11.13
     json-schema-traverse:
       specifier: ^1.0.0
       version: 1.0.0
@@ -319,6 +310,9 @@ importers:
       '@xyflow/react':
         specifier: 'catalog:'
         version: 12.10.1(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      dayjs:
+        specifier: 'catalog:'
+        version: 1.11.19
       elkjs:
         specifier: 'catalog:'
         version: 0.11.1

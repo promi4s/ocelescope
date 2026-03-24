@@ -57,6 +57,7 @@
   },
   "dependencies": {
     "@tsdown/css": "catalog:",
+    "dayjs": "catalog:",
     "tsdown": "catalog:"
   }
 }
