@@ -2,7 +2,6 @@ import { defineModule } from "@ocelescope/core";
 import OcelotIcon from "./components/OcelotIcon";
 import eventOverviewRoute from "./routes/eventOverview";
 import eventRoute from "./routes/events";
-import logOverviewRoute from "./routes/logOverview";
 import objectsOverviewRoute from "./routes/objectOverview";
 import objectsRoute from "./routes/objects";
 
@@ -12,12 +11,6 @@ export default defineModule({
     "A tool for exploring object-centric event logs, allowing yout to search events and objects and visualize their relationships and attributes.",
   label: "Ocelot",
   authors: [{ name: "Öztürk, Görkem-Emre" }],
-  routes: [
-    logOverviewRoute,
-    eventRoute,
-    objectsRoute,
-    eventOverviewRoute,
-    objectsOverviewRoute,
-  ],
+  routes: [eventRoute, objectsRoute, eventOverviewRoute, objectsOverviewRoute],
   icon: OcelotIcon,
 });
