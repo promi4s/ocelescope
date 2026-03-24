@@ -1702,6 +1702,16 @@ name = "ocelescope-workspace"
 version = "0.1.0"
 source = { virtual = "." }
 
+[package.dev-dependencies]
+dev = [
+    { name = "ruff" },
+]
+
+[package.metadata]
+
+[package.metadata.requires-dev]
+dev = [{ name = "ruff", specifier = ">=0.15.7" }]
+
 [[package]]
 name = "orjson"
 version = "3.11.7"

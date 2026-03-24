@@ -3,11 +3,18 @@
   "private": "true",
   "packageManager": "pnpm@10.30.1",
   "scripts": {
-    "build": "pnpm -r --filter \"!@ocelescope/app\" run build",
-    "lint": "npx @biomejs/biome check --write",
-    "dev:bootstrap": "pnpm --filter @ocelescope/merge-css-plugin build",
+    "init:backend": "uv sync --all-packages",
+    "init:frontend": "pnpm i && pnpm run build:frontend",
+    "dev:frontend": "pnpm -r --parallel --filter \"!@ocelescope/app\" run dev",
+    "build:frontend": "pnpm -r --filter \"!@ocelescope/app\" run build",
+    "lint:frontend": "biome check .",
+    "lint:backend": "uv run ruff check ./src/",
+    "lint": "pnpm run lint:backend && pnpm run lint:frontend",
+    "format:frontend": "biome format .",
+    "format:backend": "uv run ruff format ./src/",
+    "format": "pnpm run format:frontend && format:backend",
     "dev:app": "pnpm -r --parallel --filter \"@ocelescope/app\" run dev",
-    "dev:deps": "pnpm -r --parallel --filter \"!@ocelescope/app\" --filter \"!@ocelescope/merge-css-plugin\" run dev",
+    "dev:deps": "pnpm -r --parallel --filter \"!@ocelescope/app\" --filter run dev",
     "dev:all": "pnpm dev:deps & pnpm dev:app"
   },
   "devDependencies": {
