@@ -1944,6 +1944,7 @@ dev = [
     { name = "matplotlib" },
     { name = "pre-commit" },
     { name = "seaborn" },
+    { name = "typer" },
 ]
 
 [package.metadata]
@@ -1969,6 +1970,7 @@ dev = [
     { name = "matplotlib", specifier = ">=3.8.0,<4" },
     { name = "pre-commit", specifier = ">=4.2.0,<5" },
     { name = "seaborn", specifier = ">=0.13.0,<0.14" },
+    { name = "typer", specifier = ">=0.24.1" },
 ]
 
 [[package]]
