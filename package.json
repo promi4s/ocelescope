@@ -13,6 +13,7 @@
     "format:frontend": "biome format .",
     "format:backend": "uv run ruff format ./src/",
     "format": "pnpm run format:frontend && format:backend",
+    "dev:docs": "uv sync --group docs && uv run mkdocs serve --livereload",
     "dev:app": "pnpm -r --parallel --filter \"@ocelescope/app\" run dev",
     "dev:deps": "pnpm -r --parallel --filter \"!@ocelescope/app\" --filter run dev",
     "dev:all": "pnpm dev:deps & pnpm dev:app"
