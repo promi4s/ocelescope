@@ -61,6 +61,7 @@
     "@types/react-plotly.js": "catalog:",
     "bumpp": "catalog:",
     "tsdown": "catalog:",
+    "@tsdown/css": "catalog:",
     "typescript": "catalog:"
   }
 }

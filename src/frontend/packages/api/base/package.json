@@ -27,17 +27,17 @@
     "access": "public"
   },
   "scripts": {
-    "build": "pnpx orval && tsdown",
+    "build": "orval && tsdown",
     "dev": "tsdown --watch",
     "typecheck": "tsc --noEmit",
     "release": "bumpp && pnpm publish",
     "prepublishOnly": "pnpm run build"
   },
   "peerDependencies": {
-    "react": "catalog:",
-    "react-dom": "catalog:",
     "@ocelescope/api-client": "workspace:*",
-    "@tanstack/react-query": "catalog:"
+    "@tanstack/react-query": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
   },
   "devDependencies": {
     "@ocelescope/api-config": "workspace:*",
