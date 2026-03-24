@@ -49,7 +49,7 @@ plugins:
       handlers:
         python:
           paths:
-            - "src/ocelescope"
+            - "src/ocelescope/src"
           options:
             docstring_style: google
             show_root_heading: false
