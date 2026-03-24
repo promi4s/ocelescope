@@ -34,7 +34,7 @@ repos:
     hooks:
       - id: generate-api
         name: Generate Openapi json
-        entry: just api
+        entry: pnpm run apiggenerate
         language: system
         pass_filenames: false
         files: ^src/backend/
