@@ -25,14 +25,6 @@ class OcelMetadata(BaseModel):
     extensions: list[OCELExtensionDescription]
 
 
-class UploadingOcelMetadata(BaseModel):
-    task_id: str
-
-
-class OcelListResponse(BaseModel):
-    ocels: list[OcelMetadata]
-
-
 # TODO: Remove this concept completly
 class OCELFilter(TypedDict, total=False):
     object_types: ObjectTypeFilter
