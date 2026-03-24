@@ -5,7 +5,7 @@
   "scripts": {
     "init:backend": "uv sync --all-packages",
     "init:frontend": "pnpm i && pnpm run build:frontend",
-    "init": "init:backend && init:frontend",
+    "init": "pnpm run init:backend && pnpm run init:frontend",
     "dev:frontend": "pnpm -r --parallel --filter \"!@ocelescope/app\" run dev",
     "build:frontend": "pnpm -r --filter \"!@ocelescope/app\" run build",
     "lint:frontend": "biome check .",
