@@ -13,6 +13,7 @@ RUN corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate
 COPY . .
 
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN pnpm run init:frontend
 
 EXPOSE 3000
 CMD ["pnpm", "run", "dev:all"]

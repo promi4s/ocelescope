@@ -32,6 +32,7 @@ dev = [
   "seaborn>=0.13.0,<0.14",
   "matplotlib>=3.8.0,<4",
   "pre-commit>=4.2.0,<5",
+  "typer>=0.24.1",
 ]
 
 [tool.uv]
