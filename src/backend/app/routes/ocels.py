@@ -41,20 +41,10 @@ ocels_router = APIRouter(prefix="/ocels", tags=["ocels"])
 def getOcels(
     session: ApiSession, extension_name: Optional[str] = None
 ) -> list[OcelMetadata]:
-    extension_descriptions = registry_manager.get_extension_descriptions()
 
     return [
-        OcelMetadata(
-            created_at=value.ocel.meta.extra["upload_date"],
-            id=key,
-            name=value.ocel.meta.extra["name"],
-            extensions=[
-                extension_descriptions[extension.__class__.__name__]
-                for extension in value.ocel.extensions.all()
-                if extension.__class__.__name__ in extension_descriptions
-            ],
-        )
-        for key, value in session.ocels.items()
+        OcelMetadata.from_ocel(value.ocel)
+        for value in session.ocels.values()
         if extension_name is None
         or extension_name
         in [extension.__class__.__name__ for extension in value.ocel.extensions.all()]
