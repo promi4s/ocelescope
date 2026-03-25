@@ -18,6 +18,7 @@ from ocelescope.ocel.managers import (
     ObjectsManager,
     QuantityManager,
 )
+from ocelescope.ocel.managers.attributes import AttributeManager
 from ocelescope.ocel.models.meta import OCELMeta
 
 
@@ -63,6 +64,7 @@ class OCEL:
         self.quantities = QuantityManager(self)
         self.e2o = E2OManager(self)
         self.o2o = O2OManager(self)
+        self.attributes = AttributeManager(self)
 
     def filter(self, pipeline: list[BaseFilter]) -> OCEL:
         """
