@@ -55,9 +55,9 @@ Common tasks are exposed as `pnpm` scripts at the repository root.
 |---|---|
 | `pnpm run dev:docs` | Launch documentation locally (MkDocs) with live reload |
 | `pnpm run api:sync` | Generate OpenAPI spec and rebuild the frontend API client |
-| `pnpm run dev` | Run the Docker-based development stack (`docker-compose.dev.yml`) |
-| `pnpm run prod` | Build and run the production stack (`docker-compose.yml`) |
-| `pnpm run down` | Stop containers (`docker compose down`) |
+| `pnpm run docker:dev` | Run the Docker-based development stack (`docker-compose.dev.yml`) |
+| `pnpm run docker:prod` | Build and run the production stack (`docker-compose.yml`) |
+| `pnpm run docker:down` | Stop containers (`docker compose down`) |
 | `pnpm run lint` | Lint backend (ruff) + frontend (biome) |
 | `pnpm run format` | Format backend (ruff) + frontend (biome) |
 
