@@ -98,3 +98,31 @@ class AttributeManager(BaseManager):
         )
 
         return attribute_table.drop(columns=["min_str", "max_str", "min_num", "max_num"])
+
+    @property
+    def object_summary(self):
+        """Return an attribute summary for objects, grouped by object type.
+
+        RETURNS:
+            A pandas DataFrame indexed by (ATTRIBUTE_COL, OTYPE_COL) containing the
+            summary statistics produced by `get_summary`.
+        """
+
+        return self.get_summary(group_by_entity_type=True, include_events=False).droplevel(
+            "ocel:entity_type"
+        )
+
+    @property
+    def event_summary(self):
+        """Return an attribute summary for events, grouped by activity.
+
+        RETURNS:
+            A pandas DataFrame indexed by (ATTRIBUTE_COL, ACTIVITY_COL) containing
+            the summary statistics produced by `get_summary`.
+        """
+
+        return (
+            self.get_summary(group_by_entity_type=True, include_objects=False)
+            .droplevel("ocel:entity_type")
+            .rename_axis(index={OTYPE_COL: ACTIVITY_COL})
+        )
