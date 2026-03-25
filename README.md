@@ -60,6 +60,7 @@ Common tasks are exposed as `pnpm` scripts at the repository root.
 | `pnpm run docker:down` | Stop containers (`docker compose down`) |
 | `pnpm run lint` | Lint backend (ruff) + frontend (biome) |
 | `pnpm run format` | Format backend (ruff) + frontend (biome) |
+| `pnpm run notebook` | Launch JupyterLab in `notebooks/` (via `uv`) with `jupyter-ruff` |
 
 ### Frontend-only
 
