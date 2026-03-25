@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Iterable, cast
+from typing import Iterable, cast
 
 import pandas as pd
 
@@ -7,9 +7,6 @@ from ocelescope.ocel.managers.base import BaseManager
 from ocelescope.ocel.models.attributes import AttributeSummary
 from ocelescope.ocel.util.attributes import summarize_object_attributes
 from ocelescope.util.cache import instance_lru_cache
-
-if TYPE_CHECKING:
-    from ocelescope.ocel.core.ocel import OCEL
 
 
 class ObjectsManager(BaseManager):
@@ -25,10 +22,6 @@ class ObjectsManager(BaseManager):
 
     Acts as a facade over the underlying PM4PY OCEL object.
     """
-
-    def __init__(self, ocel: "OCEL"):
-        super().__init__()
-        self._ocel = ocel
 
     @property
     def df(self) -> pd.DataFrame:

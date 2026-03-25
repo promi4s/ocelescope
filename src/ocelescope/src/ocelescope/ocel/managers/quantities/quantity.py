@@ -38,8 +38,7 @@ class QuantityManager(BaseManager):
         self,
         ocel: "OCEL",
     ):
-        super().__init__()
-        self._ocel = ocel
+        super().__init__(ocel)
 
         self.oqty, self.qop = (
             read_quantity_extension(ocel.meta.path)
