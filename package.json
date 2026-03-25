@@ -21,9 +21,10 @@
     "dev:app": "pnpm -r --parallel --filter \"@ocelescope/app\" run dev",
     "dev:deps": "pnpm -r --parallel --filter \"!@ocelescope/app\" run dev",
     "dev:all": "pnpm dev:deps & pnpm dev:app",
-    "dev": "docker compose -f docker-compose.dev.yml up --build --watch",
-    "prod": "docker compose -f docker-compose.yml up --build",
-    "down": "docker compose down"
+    "docker:dev": "docker compose -f docker-compose.dev.yml up --build --watch",
+    "docker:prod": "docker compose -f docker-compose.yml up --build",
+    "docker:down": "docker compose down",
+    "notebook": "uv run --with jupyterlab --with jupyter-ruff jupyter lab notebooks/"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.2",
