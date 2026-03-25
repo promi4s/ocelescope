@@ -23,7 +23,8 @@
     "dev:all": "pnpm dev:deps & pnpm dev:app",
     "docker:dev": "docker compose -f docker-compose.dev.yml up --build --watch",
     "docker:prod": "docker compose -f docker-compose.yml up --build",
-    "docker:down": "docker compose down"
+    "docker:down": "docker compose down",
+    "notebook": "uv run --with jupyterlab --with jupyter-ruff jupyter lab notebooks/"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.2",
