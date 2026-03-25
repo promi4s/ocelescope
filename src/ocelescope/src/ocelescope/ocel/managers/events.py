@@ -4,8 +4,6 @@ import pandas as pd
 
 from ocelescope.ocel.constants.pm4py import ACTIVITY_COL, EID_COL, TIMESTAMP_COL
 from ocelescope.ocel.managers.base import BaseManager
-from ocelescope.ocel.managers.objects import AttributeSummary
-from ocelescope.ocel.util.attributes import summarize_event_attributes
 from ocelescope.util.cache import instance_lru_cache
 
 
@@ -78,7 +76,7 @@ class EventsManager(BaseManager):
 
     @property
     @instance_lru_cache()
-    def attribute_summary(self) -> dict[str, list[AttributeSummary]]:
+    def attribute_summary(self) -> pd.DataFrame:
         """
         Summarize all event attributes grouped by activity.
 
@@ -86,7 +84,7 @@ class EventsManager(BaseManager):
             dict[str, list[AttributeSummary]]: Mapping of activities to
             lists of structured attribute summaries.
         """
-        return summarize_event_attributes(self._ocel.ocel)
+        return self._ocel.attributes.event_summary
 
     def get_event_timestamp(self, event_id: str):
         """
