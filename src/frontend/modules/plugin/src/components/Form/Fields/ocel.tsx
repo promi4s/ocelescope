@@ -29,12 +29,8 @@ const AttributeSelector: (
 ) => React.FC<OcelFieldProps> =
   (query) =>
   ({ isMulti, ocelId, onChange, value, label, requiered, description }) => {
-    const { data: attributes = {} } = query(ocelId);
-    const attributeNames = new Set(
-      Object.values(attributes).flatMap((attributes) =>
-        attributes.map((attribute) => attribute.attribute),
-      ),
-    );
+    const { data: attributes = [] } = query(ocelId);
+    const attributeNames = new Set(attributes.map(({ name }) => name));
 
     const SelectComponent = isMulti ? MultiSelect : Select;
 
