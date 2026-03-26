@@ -157,20 +157,26 @@ const AttributeFilter: React.FC<AttributeFilterProps> = ({
       return {};
     }
 
-    const filterdAttributes = attributes.filter(
-      ({ entity_type, name }) =>
-        (!value.target_type || entity_type === value.target_type) &&
-        (!value.attribute || value.attribute === name),
-    );
     const attributeNames = Array.from(
-      new Set(filterdAttributes.map(({ name }) => name)),
+      new Set(
+        attributes
+          .filter(
+            ({ entity_type }) =>
+              !value.target_type || value.target_type === entity_type,
+          )
+          .map(({ name }) => name),
+      ),
     );
 
-    const targetNames = filterdAttributes
-      .filter(({ name }) => attributeNames.includes(name))
-      .map(({ entity_type }) => entity_type);
+    const targetNames = Array.from(
+      new Set(
+        attributes
+          .filter(({ name }) => !value.attribute || value.attribute === name)
+          .map(({ entity_type }) => entity_type),
+      ),
+    );
 
-    const currentAttribute = filterdAttributes.find(
+    const currentAttribute = attributes.find(
       ({ entity_type, name }) =>
         entity_type === value.target_type && value.attribute === name,
     );
