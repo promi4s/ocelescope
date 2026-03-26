@@ -941,6 +941,80 @@
         }
       }
     },
+    "/ocels/{ocel_id}/attributes": {
+      "get": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Get Attributes",
+        "operationId": "attributes",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Attribute"
+                  },
+                  "title": "Response Attributes"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/ocels/{ocel_id}/objects/attributes": {
       "get": {
         "tags": [
@@ -2871,6 +2945,63 @@
   },
   "components": {
     "schemas": {
+      "Attribute": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "min": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Min"
+          },
+          "max": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Max"
+          },
+          "distinct_values": {
+            "type": "integer",
+            "title": "Distinct Values"
+          },
+          "total_values": {
+            "type": "integer",
+            "title": "Total Values"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ValueType"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "min",
+          "max",
+          "distinct_values",
+          "total_values",
+          "type"
+        ],
+        "title": "Attribute"
+      },
       "Body_getComputedValues": {
         "properties": {
           "input_ocels": {
