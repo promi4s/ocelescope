@@ -16,7 +16,7 @@ import Graph, { type NodeComponents } from "../components/Graph";
 const ObjectGraph = () => {
   const { id: ocelId } = useCurrentOcel();
   const { data: o2o } = useO2o(ocelId);
-  const { data: objectAttributes } = useObjectAttributes(ocelId);
+  const { data: objectAttributes = [] } = useObjectAttributes(ocelId);
   const { data: objectCounts } = useObjectCounts(ocelId);
 
   const [searchValue, setSearchValue] = useDebouncedState("", 200);
@@ -38,7 +38,9 @@ const ObjectGraph = () => {
                 key={objectName}
                 count={count}
                 name={objectName}
-                attributeSummaries={objectAttributes[objectName]}
+                attributeSummaries={objectAttributes.filter(
+                  ({ entity_type }) => entity_type === objectName,
+                )}
               />
             ),
           },
@@ -94,7 +96,7 @@ const ObjectGraph = () => {
       {vizualization === "cards" && objectCounts && (
         <EntityOverview
           entityCounts={objectCounts}
-          attributes={objectAttributes ?? {}}
+          attributes={objectAttributes}
           relations={o2o ?? []}
           search={searchValue}
         />
