@@ -1,10 +1,6 @@
 from typing import Hashable, Self, TypedDict, cast
 
 import pandas as pd
-from ocelescope.ocel.constants import ValueType
-from pydantic.main import BaseModel
-
-from app.internal.registry.extension import OCELExtensionDescription
 from ocelescope import (
     OCEL,
     BaseFilter,
@@ -16,6 +12,11 @@ from ocelescope import (
     ObjectTypeFilter,
     TimeFrameFilter,
 )
+from ocelescope.ocel.constants import ValueType
+from pydantic.main import BaseModel
+
+from app.internal.registry import registry_manager
+from app.internal.registry.extension import OCELExtensionDescription
 
 
 class OcelMetadata(BaseModel):
@@ -23,6 +24,21 @@ class OcelMetadata(BaseModel):
     name: str
     created_at: str
     extensions: list[OCELExtensionDescription]
+
+    @classmethod
+    def from_ocel(cls, ocel: OCEL):
+        extension_descriptions = registry_manager.get_extension_descriptions()
+
+        return cls(
+            id=ocel.meta.id,
+            created_at=ocel.meta.extra["upload_date"],
+            name=ocel.meta.extra["name"],
+            extensions=[
+                extension_descriptions[extension.__class__.__name__]
+                for extension in ocel.extensions.all()
+                if extension.__class__.__name__ in extension_descriptions
+            ],
+        )
 
 
 # TODO: Remove this concept completly
