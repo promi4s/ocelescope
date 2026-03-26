@@ -1,15 +1,10 @@
-from typing import TYPE_CHECKING, Iterable, cast
+from typing import Iterable, cast
 
 import pandas as pd
 
 from ocelescope.ocel.constants.pm4py import OID_COL, OTYPE_COL
 from ocelescope.ocel.managers.base import BaseManager
-from ocelescope.ocel.models.attributes import AttributeSummary
-from ocelescope.ocel.util.attributes import summarize_object_attributes
 from ocelescope.util.cache import instance_lru_cache
-
-if TYPE_CHECKING:
-    from ocelescope.ocel.core.ocel import OCEL
 
 
 class ObjectsManager(BaseManager):
@@ -25,10 +20,6 @@ class ObjectsManager(BaseManager):
 
     Acts as a facade over the underlying PM4PY OCEL object.
     """
-
-    def __init__(self, ocel: "OCEL"):
-        super().__init__()
-        self._ocel = ocel
 
     @property
     def df(self) -> pd.DataFrame:
@@ -143,15 +134,12 @@ class ObjectsManager(BaseManager):
 
     @property
     @instance_lru_cache()
-    def attribute_summary(self) -> dict[str, list[AttributeSummary]]:
-        """
-        Summarize all object attributes grouped by object type.
+    def attribute_summary(self) -> pd.DataFrame:
+        """Return an attribute summary for objects, grouped by object type.
 
-        Summaries include inferred attribute data types, ranges,
-        value distributions, and other type-specific metadata.
-
-        Returns:
-            dict[str, list[AttributeSummary]]: Mapping of object types to
-            lists of structured attribute summaries.
+        RETURNS:
+            A pandas DataFrame indexed by (ATTRIBUTE_COL, OTYPE_COL) containing the
+            summary statistics produced by `get_summary`.
         """
-        return summarize_object_attributes(self._ocel.ocel)
+
+        return self._ocel.attributes.object_summary

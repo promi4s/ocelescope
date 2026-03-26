@@ -4,14 +4,14 @@ from typing import Literal, Optional
 
 import pandas as pd
 from fastapi import APIRouter, Query, Response
-from ocelescope import AttributeSummary, RelationCountSummary
+from ocelescope import RelationCountSummary
 from ocelescope.ocel.constants.misc import OCELFileExtensions
 
 from app.dependencies import ApiOcel, ApiSession
 from app.internal.exceptions import NotFound
 from app.internal.model.base import PaginatedResponse
 from app.internal.model.events import Date_Distribution_Item, Entity_Time_Info
-from app.internal.model.ocel import OCELFilter, OcelMetadata
+from app.internal.model.ocel import OCELFilter, OcelMetadata, TypedAttribute
 from app.internal.model.response import TempFileResponse
 from app.internal.ocel.default_ocel import (
     DEFAULT_OCEL_KEYS,
@@ -150,24 +150,24 @@ def rename_ocel(ocel: ApiOcel, new_name: str):
 # region Info
 @ocels_router.get(
     "/{ocel_id}/objects/attributes",
-    response_model=dict[str, list[AttributeSummary]],
+    response_model=list[TypedAttribute],
     operation_id="objectAttributes",
 )
 def get_object_attributes(
     ocel: ApiOcel,
 ):
-    return ocel.objects.attribute_summary
+    return TypedAttribute.from_df(ocel.objects.attribute_summary)
 
 
 @ocels_router.get(
     "/{ocel_id}/events/attributes",
-    response_model=dict[str, list[AttributeSummary]],
+    response_model=list[TypedAttribute],
     operation_id="eventAttributes",
 )
 def get_event_attributes(
     ocel: ApiOcel,
 ):
-    return ocel.events.attribute_summary
+    return TypedAttribute.from_df(ocel.events.attribute_summary)
 
 
 @ocels_router.get(

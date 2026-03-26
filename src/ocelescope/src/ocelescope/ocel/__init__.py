@@ -11,7 +11,7 @@ from ocelescope.ocel.filter import (
     ObjectTypeFilter,
     TimeFrameFilter,
 )
-from ocelescope.ocel.models import AttributeSummary, RelationCountSummary
+from ocelescope.ocel.models import RelationCountSummary
 
 __all__ = [
     "OCEL",
@@ -25,6 +25,5 @@ __all__ = [
     "TimeFrameFilter",
     "BaseFilter",
     "FilterResult",
-    "AttributeSummary",
     "RelationCountSummary",
 ]

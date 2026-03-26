@@ -1,14 +1,14 @@
 import type {
-  AttributeSummary,
   PaginatedResponse,
   RelationCountSummary,
+  TypedAttribute,
 } from "@ocelescope/api-base";
 import { DataTable, type DataTableSortStatus } from "mantine-datatable";
 import { useMemo } from "react";
 
 const EntityTable: React.FC<{
   entities: PaginatedResponse;
-  attributes?: AttributeSummary[];
+  attributes?: TypedAttribute[];
   relations?: RelationCountSummary[];
   withTimestamp?: boolean;
   onPageChange: (nextPage: number) => void;
@@ -35,8 +35,8 @@ const EntityTable: React.FC<{
       ...(withTimestamp
         ? [{ accessor: "timestamp", title: "date", sortable: true }]
         : []),
-      ...attributes.map(({ attribute }) => ({
-        accessor: attribute,
+      ...attributes.map(({ name }) => ({
+        accessor: name,
         sortable: true,
       })),
       ...relations.map(({ qualifier, target }) => ({

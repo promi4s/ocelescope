@@ -1,3 +1,4 @@
+//TODO: Refactor this whole file :(
 import {
   Button,
   Grid,
@@ -8,12 +9,7 @@ import {
   TextInput,
 } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
-import type {
-  AttributeSummary,
-  EventAttributes200,
-  ObjectAttributes200,
-  OCELFilter,
-} from "@ocelescope/api-base";
+import type { OCELFilter, TypedAttribute } from "@ocelescope/api-base";
 import { useEventAttributes, useObjectAttributes } from "@ocelescope/api-base";
 import { PlusIcon, XIcon } from "lucide-react";
 import { memo, type ReactNode, useMemo } from "react";
@@ -28,30 +24,28 @@ import type { FilterPageComponentProps } from "..";
 
 type AttributeFilterProps = {
   control: Control<OCELFilter>;
-  attributes: EventAttributes200 | ObjectAttributes200;
+  attributes: TypedAttribute[];
   index: number;
   attributeType: Extract<FilterType, "event_attributes" | "object_attributes">;
 };
 
-type AttributeTypes = AttributeSummary["type"];
-
-type AttirbuteByType<K extends AttributeTypes> = Extract<
-  AttributeTypes,
-  { type: K }
->;
-
 type AttributeTypeInput = (
   props: Omit<AttributeFilterProps, "attributes"> & {
-    attribute: AttributeSummary;
+    attribute: TypedAttribute;
   },
 ) => ReactNode;
 
 const attributeTypeToInput: {
-  [K in AttributeTypes]: AttributeTypeInput;
+  [K in TypedAttribute["type"]]: AttributeTypeInput;
 } = {
-  boolean: () => <Grid.Col span={6}>{"Not Implemented"}</Grid.Col>,
+  bool: () => <Grid.Col span={6}>{"Not Implemented"}</Grid.Col>,
+  date_mixed: () => <Grid.Col span={6}>{"Not Implemented"}</Grid.Col>,
+  empty: () => <Grid.Col span={6}>{"Not Implemented"}</Grid.Col>,
+  mixed: () => <Grid.Col span={6}>{"Not Implemented"}</Grid.Col>,
+  object: () => <Grid.Col span={6}>{"Not Implemented"}</Grid.Col>,
+  numeric: () => <Grid.Col span={6}>{"Not Implemented"}</Grid.Col>,
   date: ({ control, index, attribute, attributeType }) => {
-    const { min, max } = attribute as AttirbuteByType<"date">;
+    const { min, max } = attribute as { min: string; max: string };
     return (
       <Grid.Col span={6}>
         <Controller
@@ -72,7 +66,7 @@ const attributeTypeToInput: {
     );
   },
   float: ({ attribute, attributeType, index, control }) => {
-    const { min, max } = attribute as AttirbuteByType<"float">;
+    const { min, max } = attribute as { min: number; max: number };
     return (
       <Controller
         control={control}
@@ -102,8 +96,8 @@ const attributeTypeToInput: {
       />
     );
   },
-  integer: ({ attribute, attributeType, control, index }) => {
-    const { min, max } = attribute as AttirbuteByType<"integer">;
+  int: ({ attribute, attributeType, control, index }) => {
+    const { min, max } = attribute as { min: number; max: number };
     return (
       <Controller
         control={control}
@@ -114,7 +108,7 @@ const attributeTypeToInput: {
               <NumberInput
                 label={"min"}
                 min={min}
-                max={value?.[1] ? Number.parseInt(`${value[1]}`) : max}
+                max={value?.[1] ? Number.parseInt(`${value[1]}`, 10) : max}
                 value={value?.[0] ?? min}
                 onChange={(newMin) => onChange([newMin, value?.[1] ?? null])}
               />
@@ -122,7 +116,7 @@ const attributeTypeToInput: {
             <Grid.Col span={3}>
               <NumberInput
                 label={"max"}
-                min={value?.[0] ? Number.parseInt(`${value[0]}`) : min}
+                min={value?.[0] ? Number.parseInt(`${value[0]}`, 10) : min}
                 max={max}
                 value={value?.[1] ?? max}
                 onChange={(newMax) => onChange([value?.[0] ?? null, newMax])}
@@ -133,7 +127,7 @@ const attributeTypeToInput: {
       />
     );
   },
-  nominal: ({ index, attributeType, control }) => (
+  string: ({ index, attributeType, control }) => (
     <Controller
       control={control}
       name={`${attributeType}.${index}.regex`}
@@ -163,35 +157,28 @@ const AttributeFilter: React.FC<AttributeFilterProps> = ({
       return {};
     }
 
-    const filteredAttributes = Object.entries(attributes ?? {})
-      .filter(
-        ([entityName, _]) =>
-          !value.target_type ||
-          value.target_type === "" ||
-          !value.target_type ||
-          entityName === value.target_type,
-      )
-      .flatMap(([_, attributes]) =>
-        attributes.filter(
-          ({ attribute }) =>
-            !value.attribute ||
-            value.attribute === "" ||
-            attribute === value.attribute,
-        ),
-      );
-
     const attributeNames = Array.from(
-      new Set(filteredAttributes.map(({ attribute }) => attribute)),
+      new Set(
+        attributes
+          .filter(
+            ({ entity_type }) =>
+              !value.target_type || value.target_type === entity_type,
+          )
+          .map(({ name }) => name),
+      ),
     );
 
-    const targetNames = Object.entries(attributes)
-      .filter(([_, attributes]) =>
-        attributes.some(({ attribute }) => attributeNames.includes(attribute)),
-      )
-      .map(([targetName, _]) => targetName);
+    const targetNames = Array.from(
+      new Set(
+        attributes
+          .filter(({ name }) => !value.attribute || value.attribute === name)
+          .map(({ entity_type }) => entity_type),
+      ),
+    );
 
-    const currentAttribute = attributes[value.target_type]?.find(
-      ({ attribute }) => attribute === value.attribute,
+    const currentAttribute = attributes.find(
+      ({ entity_type, name }) =>
+        entity_type === value.target_type && value.attribute === name,
     );
 
     return { attributeNames, targetNames, currentAttribute };
@@ -242,7 +229,7 @@ const AttributeFilter: React.FC<AttributeFilterProps> = ({
 
 export const EventAttributeFilter: React.FC<FilterPageComponentProps> = memo(
   ({ ocelId, control }) => {
-    const { data: attributes = {} } = useEventAttributes(ocelId, {
+    const { data: attributes = [] } = useEventAttributes(ocelId, {
       ocel_version: "original",
     });
 
@@ -293,7 +280,7 @@ export const EventAttributeFilter: React.FC<FilterPageComponentProps> = memo(
 );
 export const ObjectAttributeFilter: React.FC<FilterPageComponentProps> = memo(
   ({ ocelId, control }) => {
-    const { data: attributes = {} } = useObjectAttributes(ocelId, {
+    const { data: attributes = [] } = useObjectAttributes(ocelId, {
       ocel_version: "original",
     });
 

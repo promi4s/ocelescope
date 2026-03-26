@@ -1,15 +1,10 @@
-from typing import TYPE_CHECKING, cast
+from typing import cast
 
 import pandas as pd
 
 from ocelescope.ocel.constants.pm4py import ACTIVITY_COL, EID_COL, TIMESTAMP_COL
 from ocelescope.ocel.managers.base import BaseManager
-from ocelescope.ocel.managers.objects import AttributeSummary
-from ocelescope.ocel.util.attributes import summarize_event_attributes
 from ocelescope.util.cache import instance_lru_cache
-
-if TYPE_CHECKING:
-    from ocelescope.ocel.core.ocel import OCEL
 
 
 class EventsManager(BaseManager):
@@ -25,10 +20,6 @@ class EventsManager(BaseManager):
 
     Acts as a facade over the underlying PM4PY OCEL object.
     """
-
-    def __init__(self, ocel: "OCEL"):
-        super().__init__()
-        self._ocel = ocel
 
     @property
     def df(self) -> pd.DataFrame:
@@ -85,15 +76,15 @@ class EventsManager(BaseManager):
 
     @property
     @instance_lru_cache()
-    def attribute_summary(self) -> dict[str, list[AttributeSummary]]:
-        """
-        Summarize all event attributes grouped by activity.
+    def attribute_summary(self) -> pd.DataFrame:
+        """Return an attribute summary for events, grouped by activity.
 
-        Returns:
-            dict[str, list[AttributeSummary]]: Mapping of activities to
-            lists of structured attribute summaries.
+        RETURNS:
+            A pandas DataFrame indexed by (ATTRIBUTE_COL, ACTIVITY_COL) containing
+            the summary statistics produced by `get_summary`.
         """
-        return summarize_event_attributes(self._ocel.ocel)
+
+        return self._ocel.attributes.event_summary
 
     def get_event_timestamp(self, event_id: str):
         """

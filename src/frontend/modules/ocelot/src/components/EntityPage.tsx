@@ -70,6 +70,14 @@ const EntityPage: React.FC<{ type: "events" | "objects" }> = ({ type }) => {
     },
   );
 
+  const entityAttributes = useMemo(
+    () =>
+      attributes?.filter(
+        ({ entity_type }) => entity_type === (currentTab ?? entityNames[0]),
+      ),
+    [currentTab, entityNames],
+  );
+
   useEffect(() => {
     if (!currentTab && entityNames.length > 0) {
       setCurrentTab(entityNames[0]!);
@@ -95,7 +103,7 @@ const EntityPage: React.FC<{ type: "events" | "objects" }> = ({ type }) => {
       {entities && (
         <EntityTable
           entities={entities}
-          attributes={attributes?.[currentTab ?? entityNames[0]]}
+          attributes={entityAttributes}
           withTimestamp={type === "events"}
           onPageChange={(newPage) => setPage(newPage)}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}

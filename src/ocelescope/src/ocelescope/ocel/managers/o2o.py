@@ -1,5 +1,3 @@
-from typing import TYPE_CHECKING
-
 import pandas as pd
 
 from ocelescope.ocel.constants.pm4py import (
@@ -12,9 +10,6 @@ from ocelescope.ocel.managers.base import BaseManager
 from ocelescope.ocel.models.relations import RelationCountSummary
 from ocelescope.ocel.util.relations import SUMMARY_DIRECTION, summarize_o2o_counts
 from ocelescope.util.cache import instance_lru_cache
-
-if TYPE_CHECKING:
-    from ocelescope.ocel.core.ocel import OCEL
 
 
 class O2OManager(BaseManager):
@@ -30,10 +25,6 @@ class O2OManager(BaseManager):
     This manager acts as a typed and normalized facade over the
     PM4PY O2O relation table.
     """
-
-    def __init__(self, ocel: "OCEL"):
-        super().__init__()
-        self._ocel = ocel
 
     @property
     def df(self) -> pd.DataFrame:
