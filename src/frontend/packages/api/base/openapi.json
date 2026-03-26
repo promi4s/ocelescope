@@ -923,38 +923,9 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "array",
-                    "items": {
-                      "oneOf": [
-                        {
-                          "$ref": "#/components/schemas/IntegerAttribute"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FloatAttribute"
-                        },
-                        {
-                          "$ref": "#/components/schemas/BooleanAttribute"
-                        },
-                        {
-                          "$ref": "#/components/schemas/DateAttribute"
-                        },
-                        {
-                          "$ref": "#/components/schemas/NominalAttribute"
-                        }
-                      ],
-                      "discriminator": {
-                        "propertyName": "type",
-                        "mapping": {
-                          "integer": "#/components/schemas/IntegerAttribute",
-                          "float": "#/components/schemas/FloatAttribute",
-                          "boolean": "#/components/schemas/BooleanAttribute",
-                          "date": "#/components/schemas/DateAttribute",
-                          "nominal": "#/components/schemas/NominalAttribute"
-                        }
-                      }
-                    }
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TypedAttribute"
                   },
                   "title": "Response Objectattributes"
                 }
@@ -1026,38 +997,9 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "array",
-                    "items": {
-                      "oneOf": [
-                        {
-                          "$ref": "#/components/schemas/IntegerAttribute"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FloatAttribute"
-                        },
-                        {
-                          "$ref": "#/components/schemas/BooleanAttribute"
-                        },
-                        {
-                          "$ref": "#/components/schemas/DateAttribute"
-                        },
-                        {
-                          "$ref": "#/components/schemas/NominalAttribute"
-                        }
-                      ],
-                      "discriminator": {
-                        "propertyName": "type",
-                        "mapping": {
-                          "integer": "#/components/schemas/IntegerAttribute",
-                          "float": "#/components/schemas/FloatAttribute",
-                          "boolean": "#/components/schemas/BooleanAttribute",
-                          "date": "#/components/schemas/DateAttribute",
-                          "nominal": "#/components/schemas/NominalAttribute"
-                        }
-                      }
-                    }
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TypedAttribute"
                   },
                   "title": "Response Eventattributes"
                 }
@@ -2978,64 +2920,6 @@
         ],
         "title": "Body_uploadResource"
       },
-      "BooleanAttribute": {
-        "properties": {
-          "attribute": {
-            "type": "string",
-            "title": "Attribute"
-          },
-          "type": {
-            "type": "string",
-            "const": "boolean",
-            "title": "Type"
-          },
-          "true_count": {
-            "type": "integer",
-            "title": "True Count"
-          },
-          "false_count": {
-            "type": "integer",
-            "title": "False Count"
-          }
-        },
-        "type": "object",
-        "required": [
-          "attribute",
-          "type",
-          "true_count",
-          "false_count"
-        ],
-        "title": "BooleanAttribute"
-      },
-      "DateAttribute": {
-        "properties": {
-          "attribute": {
-            "type": "string",
-            "title": "Attribute"
-          },
-          "type": {
-            "type": "string",
-            "const": "date",
-            "title": "Type"
-          },
-          "min": {
-            "type": "string",
-            "title": "Min"
-          },
-          "max": {
-            "type": "string",
-            "title": "Max"
-          }
-        },
-        "type": "object",
-        "required": [
-          "attribute",
-          "type",
-          "min",
-          "max"
-        ],
-        "title": "DateAttribute"
-      },
       "Date_Distribution_Item": {
         "properties": {
           "start_timestamp": {
@@ -3410,35 +3294,6 @@
           "event_types"
         ],
         "title": "EventTypeFilter"
-      },
-      "FloatAttribute": {
-        "properties": {
-          "attribute": {
-            "type": "string",
-            "title": "Attribute"
-          },
-          "type": {
-            "type": "string",
-            "const": "float",
-            "title": "Type"
-          },
-          "min": {
-            "type": "number",
-            "title": "Min"
-          },
-          "max": {
-            "type": "number",
-            "title": "Max"
-          }
-        },
-        "type": "object",
-        "required": [
-          "attribute",
-          "type",
-          "min",
-          "max"
-        ],
-        "title": "FloatAttribute"
       },
       "GetResourceResponse": {
         "properties": {
@@ -3957,59 +3812,6 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
-      },
-      "IntegerAttribute": {
-        "properties": {
-          "attribute": {
-            "type": "string",
-            "title": "Attribute"
-          },
-          "type": {
-            "type": "string",
-            "const": "integer",
-            "title": "Type"
-          },
-          "min": {
-            "type": "integer",
-            "title": "Min"
-          },
-          "max": {
-            "type": "integer",
-            "title": "Max"
-          }
-        },
-        "type": "object",
-        "required": [
-          "attribute",
-          "type",
-          "min",
-          "max"
-        ],
-        "title": "IntegerAttribute"
-      },
-      "NominalAttribute": {
-        "properties": {
-          "attribute": {
-            "type": "string",
-            "title": "Attribute"
-          },
-          "type": {
-            "type": "string",
-            "const": "nominal",
-            "title": "Type"
-          },
-          "num_unique": {
-            "type": "integer",
-            "title": "Num Unique"
-          }
-        },
-        "type": "object",
-        "required": [
-          "attribute",
-          "type",
-          "num_unique"
-        ],
-        "title": "NominalAttribute"
       },
       "O2OCountFilter": {
         "properties": {
@@ -5123,6 +4925,68 @@
         ],
         "title": "TimeFrameFilter"
       },
+      "TypedAttribute": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "min": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Min"
+          },
+          "max": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Max"
+          },
+          "distinct_values": {
+            "type": "integer",
+            "title": "Distinct Values"
+          },
+          "total_values": {
+            "type": "integer",
+            "title": "Total Values"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ValueType"
+          },
+          "entity_type": {
+            "type": "string",
+            "title": "Entity Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "min",
+          "max",
+          "distinct_values",
+          "total_values",
+          "type",
+          "entity_type"
+        ],
+        "title": "TypedAttribute"
+      },
       "ValidationError": {
         "properties": {
           "loc": {
@@ -5155,6 +5019,22 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "ValueType": {
+        "type": "string",
+        "enum": [
+          "empty",
+          "object",
+          "string",
+          "bool",
+          "int",
+          "float",
+          "date",
+          "numeric",
+          "date_mixed",
+          "mixed"
+        ],
+        "title": "ValueType"
       },
       "Visualization": {
         "properties": {

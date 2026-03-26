@@ -1,5 +1,10 @@
-from typing import TypedDict
+from typing import Hashable, Self, TypedDict, cast
 
+import pandas as pd
+from ocelescope.ocel.constants import ValueType
+from pydantic.main import BaseModel
+
+from app.internal.registry.extension import OCELExtensionDescription
 from ocelescope import (
     OCEL,
     BaseFilter,
@@ -11,9 +16,6 @@ from ocelescope import (
     ObjectTypeFilter,
     TimeFrameFilter,
 )
-from pydantic.main import BaseModel
-
-from app.internal.registry.extension import OCELExtensionDescription
 
 
 class OcelMetadata(BaseModel):
@@ -59,3 +61,42 @@ class SessionOCEL:
             if len(self.applied_filter) >= 0
             else self.origin
         )
+
+
+class Attribute(BaseModel):
+    name: str
+    min: str | int | float
+    max: str | int | float
+    distinct_values: int
+    total_values: int
+    type: ValueType
+
+    @classmethod
+    def from_df_row(cls, row: tuple[Hashable, pd.Series]) -> Self:
+
+        attribute_name = cast(tuple[str, ...], row[0])[0]
+        series = row[1]
+
+        return cls(
+            name=attribute_name,
+            min=series["min"],
+            max=series["max"],
+            distinct_values=series["distinct_values"],
+            total_values=series["total"],
+            type=series["type"],
+        )
+
+    @classmethod
+    def from_df(cls, df: pd.DataFrame) -> list[Self]:
+        return [cls.from_df_row(row) for row in df.iterrows()]
+
+
+class TypedAttribute(Attribute):
+    entity_type: str
+
+    @classmethod
+    def from_df_row(cls, row: tuple[Hashable, pd.Series]) -> "TypedAttribute":
+        entity_type = cast(tuple[str, str], row[0])[1]
+        base = Attribute.from_df_row(row)
+
+        return cls(entity_type=entity_type, **base.model_dump())
