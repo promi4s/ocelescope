@@ -77,13 +77,13 @@ class EventsManager(BaseManager):
     @property
     @instance_lru_cache()
     def attribute_summary(self) -> pd.DataFrame:
-        """
-        Summarize all event attributes grouped by activity.
+        """Return an attribute summary for events, grouped by activity.
 
-        Returns:
-            dict[str, list[AttributeSummary]]: Mapping of activities to
-            lists of structured attribute summaries.
+        RETURNS:
+            A pandas DataFrame indexed by (ATTRIBUTE_COL, ACTIVITY_COL) containing
+            the summary statistics produced by `get_summary`.
         """
+
         return self._ocel.attributes.event_summary
 
     def get_event_timestamp(self, event_id: str):
