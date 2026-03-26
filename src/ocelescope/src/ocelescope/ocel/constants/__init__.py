@@ -15,6 +15,7 @@ from ocelescope.ocel.constants.pm4py import (
     TIMESTAMP_COL,
 )
 from ocelescope.ocel.constants.quantity import QEL_ITEM_TYPE, QEL_QUANTITY, QEL_QUANTITY_UPDATE
+from ocelescope.util.pandas import ValueType
 
 __all__ = [
     "ACTIVITY_COL",
@@ -34,4 +35,5 @@ __all__ = [
     "QEL_QUANTITY",
     "QEL_QUANTITY_UPDATE",
     "ATTRIBUTE_COL",
+    "ValueType",
 ]

@@ -2,7 +2,6 @@ import matplotlib
 
 from ocelescope.ocel import (
     OCEL,
-    AttributeSummary,
     BaseFilter,
     E2OCountFilter,
     EventAttributeFilter,
@@ -55,7 +54,6 @@ __all__ = [
     "ObjectTypeFilter",
     "TimeFrameFilter",
     "RelationCountSummary",
-    "AttributeSummary",
     "Visualization",
     "PetriNet",
     "DirectlyFollowsGraph",
