@@ -1,13 +1,13 @@
 import { Divider, Flex, Table, Text } from "@mantine/core";
 import type {
-  AttributeSummary,
   RelationCountSummary,
+  TypedAttribute,
 } from "@ocelescope/api-base";
 
 type EntityCardProps = {
   name: string;
   count: number;
-  attributeSummaries?: AttributeSummary[];
+  attributeSummaries?: TypedAttribute[];
   relationSummaries?: RelationCountSummary[];
 };
 
@@ -42,8 +42,8 @@ const EntityCard: React.FC<EntityCardProps> = ({
           <Table.Caption mb={0}>Attributes</Table.Caption>
           <Table.Tbody>
             {attributeSummaries.map((attribute) => (
-              <Table.Tr key={attribute.attribute}>
-                <Table.Td> {attribute.attribute}</Table.Td>
+              <Table.Tr key={attribute.name}>
+                <Table.Td> {attribute.name}</Table.Td>
                 <Table.Td ta={"end"}>{attribute.type}</Table.Td>
               </Table.Tr>
             ))}
