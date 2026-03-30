@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from enum import StrEnum
 
 import numpy as np
@@ -8,44 +9,49 @@ import pandas as pd
 
 class ValueType(StrEnum):
     EMPTY = "empty"
-    OBJECT = "object"
     STRING = "string"
     BOOL = "bool"
     INT = "int"
     FLOAT = "float"
     DATE = "date"
-    NUMERIC = "numeric"
-    DATE_MIXED = "date_mixed"
-    MIXED = "mixed"
 
 
-def infer_value_type(s: pd.Series) -> ValueType:
-    s = s.dropna()
-    if s.empty:
-        return ValueType.EMPTY
+def infer_column_dtype(series: pd.Series) -> ValueType:
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore",
+            message="Could not infer format",
+            category=UserWarning,
+        )
 
-    sample = s.head(200).to_list()
+        s = series.dropna()
 
-    if all(isinstance(x, str) for x in sample):
-        return ValueType.STRING
-    if all(isinstance(x, (bool, np.bool_)) for x in sample):
-        return ValueType.BOOL
-    if all(isinstance(x, (pd.Timestamp, np.datetime64)) for x in sample):
-        return ValueType.DATE
+        if s.empty:
+            return ValueType.EMPTY
 
-    if all(isinstance(x, (int, float, np.integer, np.floating)) for x in sample):
-        if all(
-            isinstance(x, (int, np.integer)) and not isinstance(x, (bool, np.bool_)) for x in sample
-        ):
-            return ValueType.INT
-        if all(isinstance(x, (float, np.floating)) for x in sample):
+        if s.isin([True, False, "True", "False", "true", "false", 0, 1]).all():
+            return ValueType.BOOL
+
+        try:
+            s_int = pd.to_numeric(s, errors="raise")
+            if (s_int % 1 == 0).all():
+                return ValueType.INT
+        except Exception:
+            pass
+
+        try:
+            pd.to_numeric(s, errors="raise")
             return ValueType.FLOAT
-        return ValueType.NUMERIC
+        except Exception:
+            pass
 
-    if any(isinstance(x, (pd.Timestamp, np.datetime64)) for x in sample):
-        return ValueType.DATE_MIXED
+        try:
+            pd.to_datetime(s, errors="raise")
+            return ValueType.DATE
+        except Exception:
+            pass
 
-    return ValueType.MIXED
+        return ValueType.STRING
 
 
 def str_min(s: pd.Series):
@@ -70,3 +76,26 @@ def num_min(s: pd.Series):
 def num_max(s: pd.Series):
     x = pd.to_numeric(s, errors="coerce")
     return x.max(skipna=True)
+
+
+def select_min_max_by_type(
+    df: pd.DataFrame,
+    type_col: str,
+    str_cols: tuple[str, str] = ("min_str", "max_str"),
+    number_cols: tuple[str, str] = ("min_num", "max_num"),
+):
+    num_mask = df[type_col].isin([ValueType.FLOAT, ValueType.INT])
+
+    df["min"] = np.where(
+        num_mask,
+        df[number_cols[0]],
+        df[str_cols[0]],
+    )
+
+    df["max"] = np.where(
+        num_mask,
+        df["max_num"],
+        df["max_str"],
+    )
+
+    return df.drop(columns=[*str_cols, *number_cols])

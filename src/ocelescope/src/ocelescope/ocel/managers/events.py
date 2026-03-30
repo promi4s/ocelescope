@@ -84,7 +84,7 @@ class EventsManager(BaseManager):
             the summary statistics produced by `get_summary`.
         """
 
-        return self._ocel.attributes.event_summary
+        return self._ocel.attributes.get_activity_summary()
 
     def get_event_timestamp(self, event_id: str):
         """

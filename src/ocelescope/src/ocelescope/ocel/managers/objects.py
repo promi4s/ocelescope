@@ -142,4 +142,4 @@ class ObjectsManager(BaseManager):
             summary statistics produced by `get_summary`.
         """
 
-        return self._ocel.attributes.object_summary
+        return self._ocel.attributes.object_summary()
