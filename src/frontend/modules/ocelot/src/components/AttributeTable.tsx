@@ -1,11 +1,47 @@
-import { useAggregatedAttributes } from "@ocelescope/api-base";
+import {
+  useAggregatedAttributes,
+  useEventAttributes,
+  useObjectAttributes,
+} from "@ocelescope/api-base";
 import { DataTable } from "mantine-datatable";
 import { formatAttributeValue } from "../util/attributes";
+import { useState } from "react";
 
 const AttributeTable: React.FC<{
   ocelId: string;
+  attribute: string;
+}> = ({ ocelId }) => {
+  const { data: objectAttributes = [], isLoading: isObjectLoading } =
+    useObjectAttributes(ocelId);
+  const { data: eventAttributes = [], isLoading: isEventLoading } =
+    useEventAttributes(ocelId);
+
+  return (
+    <DataTable
+      noHeader
+      minHeight={100}
+      withColumnBorders
+      columns={[
+        { accessor: "entity_type", title: "Attribute Name" },
+        { accessor: "type", title: "Type" },
+        {
+          accessor: "range",
+          render: ({ type, min, max }) =>
+            `${formatAttributeValue(type, min)} - ${formatAttributeValue(type, max)}`,
+        },
+        { accessor: "distinct_values", title: "Values" },
+      ]}
+      records={[...objectAttributes, ...eventAttributes]}
+      fetching={isObjectLoading || isEventLoading}
+    />
+  );
+};
+
+const AttributesTable: React.FC<{
+  ocelId: string;
 }> = ({ ocelId }) => {
   const { data: attributes = [] } = useAggregatedAttributes(ocelId);
+  const [expandedRecordIds, setExpandedRecordIds] = useState<string[]>([]);
 
   return (
     <DataTable
@@ -33,8 +69,16 @@ const AttributeTable: React.FC<{
         { accessor: "distinct_values", title: "Values" },
       ]}
       records={attributes}
+      rowExpansion={{
+        allowMultiple: true,
+        expanded: {
+          recordIds: expandedRecordIds,
+          onRecordIdsChange: setExpandedRecordIds,
+        },
+        content: ({ record }) => <AttributesTable ocelId={ocelId} />,
+      }}
     />
   );
 };
 
-export default AttributeTable;
+export default AttributesTable;
