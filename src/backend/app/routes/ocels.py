@@ -167,7 +167,7 @@ def get_attributes(ocel: ApiOcel):
 def get_object_attributes(
     ocel: ApiOcel,
 ):
-    return TypedAttribute.from_df(ocel.objects.attribute_summary)
+    return TypedAttribute.from_df(ocel.attributes.get_object_summary())
 
 
 @ocels_router.get(
@@ -178,7 +178,7 @@ def get_object_attributes(
 def get_event_attributes(
     ocel: ApiOcel,
 ):
-    return TypedAttribute.from_df(ocel.events.attribute_summary)
+    return TypedAttribute.from_df(ocel.attributes.get_activity_summary())
 
 
 @ocels_router.get(

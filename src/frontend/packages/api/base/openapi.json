@@ -5189,15 +5189,7 @@
           },
           "entity_type": {
             "type": "string",
-            "enum": [
-              "event",
-              "object"
-            ],
             "title": "Entity Type"
-          },
-          "entity_type_name": {
-            "type": "string",
-            "title": "Entity Type Name"
           }
         },
         "type": "object",
@@ -5208,8 +5200,7 @@
           "distinct_values",
           "total_values",
           "type",
-          "entity_type",
-          "entity_type_name"
+          "entity_type"
         ],
         "title": "TypedAttribute"
       },

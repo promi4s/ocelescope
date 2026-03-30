@@ -230,7 +230,7 @@ class AttributeManager(BaseManager):
 
         return select_min_max_by_type(attribute_table, "type")
 
-    def object_summary(
+    def get_object_summary(
         self, attributes: list[str] | None = None, object_types: list[str] | None = None
     ):
         """Summarize attributes for objects, grouped by object type.
