@@ -995,7 +995,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Attribute"
+                    "$ref": "#/components/schemas/AggregatedAttribute"
                   },
                   "title": "Response Attributes"
                 }
@@ -2945,7 +2945,7 @@
   },
   "components": {
     "schemas": {
-      "Attribute": {
+      "AggregatedAttribute": {
         "properties": {
           "name": {
             "type": "string",
@@ -2989,6 +2989,20 @@
           },
           "type": {
             "$ref": "#/components/schemas/ValueType"
+          },
+          "object_types": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Object Types"
+          },
+          "actitvities": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Actitvities"
           }
         },
         "type": "object",
@@ -2998,9 +3012,11 @@
           "max",
           "distinct_values",
           "total_values",
-          "type"
+          "type",
+          "object_types",
+          "actitvities"
         ],
-        "title": "Attribute"
+        "title": "AggregatedAttribute"
       },
       "Body_getComputedValues": {
         "properties": {
@@ -5173,7 +5189,15 @@
           },
           "entity_type": {
             "type": "string",
+            "enum": [
+              "event",
+              "object"
+            ],
             "title": "Entity Type"
+          },
+          "entity_type_name": {
+            "type": "string",
+            "title": "Entity Type Name"
           }
         },
         "type": "object",
@@ -5184,7 +5208,8 @@
           "distinct_values",
           "total_values",
           "type",
-          "entity_type"
+          "entity_type",
+          "entity_type_name"
         ],
         "title": "TypedAttribute"
       },
@@ -5225,15 +5250,11 @@
         "type": "string",
         "enum": [
           "empty",
-          "object",
           "string",
           "bool",
           "int",
           "float",
-          "date",
-          "numeric",
-          "date_mixed",
-          "mixed"
+          "date"
         ],
         "title": "ValueType"
       },

@@ -1,4 +1,4 @@
-from typing import Hashable, Self, TypedDict, cast
+from typing import Hashable, Literal, Self, TypedDict, cast
 
 import pandas as pd
 from ocelescope import (
@@ -99,13 +99,35 @@ class Attribute(BaseModel):
         return [cls.from_df_row(row) for row in df.iterrows()]
 
 
+class AggregatedAttribute(Attribute):
+    object_types: list[str]
+    actitvities: list[str]
+
+    @classmethod
+    def from_df_row(cls, row: tuple[Hashable, pd.Series]) -> Self:
+
+        base = Attribute.from_df_row(row)
+
+        return cls(
+            object_types=row[1]["object_types"],
+            actitvities=row[1]["activities"],
+            **base.model_dump(),
+        )
+
+
 class TypedAttribute(Attribute):
-    entity_type: str
+    entity_type: Literal["event", "object"]
+    entity_type_name: str
 
     @classmethod
     def from_df_row(cls, row: tuple[Hashable, pd.Series]) -> "TypedAttribute":
-        index = cast(tuple[str, str], row[0])
+        index = cast(tuple[str, str, str], row[0])
         entity_type = index[1]
+        entity_type_name = index[2]
         base = Attribute.from_df_row((index[0], row[1]))
 
-        return cls(entity_type=entity_type, **base.model_dump())
+        return cls(
+            entity_type=cast(Literal["event", "object"], entity_type),
+            entity_type_name=entity_type_name,
+            **base.model_dump(),
+        )

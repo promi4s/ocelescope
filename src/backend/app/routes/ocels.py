@@ -11,7 +11,12 @@ from app.dependencies import ApiOcel, ApiSession
 from app.internal.exceptions import NotFound
 from app.internal.model.base import PaginatedResponse
 from app.internal.model.events import Date_Distribution_Item, Entity_Time_Info
-from app.internal.model.ocel import Attribute, OCELFilter, OcelMetadata, TypedAttribute
+from app.internal.model.ocel import (
+    AggregatedAttribute,
+    OCELFilter,
+    OcelMetadata,
+    TypedAttribute,
+)
 from app.internal.model.response import TempFileResponse
 from app.internal.ocel.default_ocel import (
     DEFAULT_OCEL_KEYS,
@@ -146,10 +151,12 @@ def rename_ocel(ocel: ApiOcel, new_name: str):
 # endregion
 # region Info
 @ocels_router.get(
-    "/{ocel_id}/attributes", response_model=list[Attribute], operation_id="attributes"
+    "/{ocel_id}/attributes",
+    response_model=list[AggregatedAttribute],
+    operation_id="attributes",
 )
 def get_attributes(ocel: ApiOcel):
-    return Attribute.from_df(ocel.attributes.get_summary())
+    return AggregatedAttribute.from_df(ocel.attributes.get_summary())
 
 
 @ocels_router.get(
