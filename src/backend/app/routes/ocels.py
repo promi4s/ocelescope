@@ -153,10 +153,10 @@ def rename_ocel(ocel: ApiOcel, new_name: str):
 @ocels_router.get(
     "/{ocel_id}/attributes",
     response_model=list[AggregatedAttribute],
-    operation_id="attributes",
+    operation_id="AggregatedAttributes",
 )
-def get_attributes(ocel: ApiOcel):
-    return AggregatedAttribute.from_df(ocel.attributes.get_summary())
+def get_aggr_attributes(ocel: ApiOcel):
+    return AggregatedAttribute.from_df(ocel.attributes.get_aggr_summary())
 
 
 @ocels_router.get(

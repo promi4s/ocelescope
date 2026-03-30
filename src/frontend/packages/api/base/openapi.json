@@ -946,8 +946,8 @@
         "tags": [
           "ocels"
         ],
-        "summary": "Get Attributes",
-        "operationId": "attributes",
+        "summary": "Get Aggr Attributes",
+        "operationId": "AggregatedAttributes",
         "parameters": [
           {
             "name": "ocel_id",
@@ -997,7 +997,7 @@
                   "items": {
                     "$ref": "#/components/schemas/AggregatedAttribute"
                   },
-                  "title": "Response Attributes"
+                  "title": "Response Aggregatedattributes"
                 }
               }
             }

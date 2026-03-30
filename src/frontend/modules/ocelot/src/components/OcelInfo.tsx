@@ -1,12 +1,12 @@
-import { Badge, LoadingOverlay, Stack, Table, Title } from "@mantine/core";
+import { Badge, LoadingOverlay, Table } from "@mantine/core";
 import {
   useEventCounts,
   useGetOcel,
   useObjectCounts,
   useTimeInfo,
 } from "@ocelescope/api-base";
-import dayjs from "dayjs";
 import { useMemo } from "react";
+import { formatTime } from "../util/dayjs";
 
 const OCELInfo: React.FC<{ ocelId: string }> = ({ ocelId }) => {
   const { data: ocel } = useGetOcel(ocelId);
@@ -29,41 +29,38 @@ const OCELInfo: React.FC<{ ocelId: string }> = ({ ocelId }) => {
   }
 
   return (
-    <Stack>
-      <Title order={2}>Overview</Title>
-      <Table>
-        <Table.Tbody>
+    <Table>
+      <Table.Tbody>
+        <Table.Tr>
+          <Table.Td>Name:</Table.Td>
+          <Table.Td>{ocel.name}</Table.Td>
+        </Table.Tr>
+        <Table.Tr>
+          <Table.Td>Events:</Table.Td>
+          <Table.Td>{`${totalEventCount} of ${Object.keys(eventCounts ?? {}).length} activities`}</Table.Td>
+        </Table.Tr>
+        <Table.Tr>
+          <Table.Td>Objects:</Table.Td>
+          <Table.Td>{`${totalObjectCount} of ${Object.keys(objectCount ?? {}).length} activities`}</Table.Td>
+        </Table.Tr>
+        <Table.Tr>
+          <Table.Td>Timeframe:</Table.Td>
+          <Table.Td>
+            {`${formatTime(timeInfo?.start_time)} - ${formatTime(timeInfo?.end_time)}`}
+          </Table.Td>
+        </Table.Tr>
+        {ocel.extensions.length > 0 && (
           <Table.Tr>
-            <Table.Td>Name:</Table.Td>
-            <Table.Td>{ocel.name}</Table.Td>
-          </Table.Tr>
-          <Table.Tr>
-            <Table.Td>Events:</Table.Td>
-            <Table.Td>{`${totalEventCount} of ${Object.keys(eventCounts ?? {}).length} activities`}</Table.Td>
-          </Table.Tr>
-          <Table.Tr>
-            <Table.Td>Objects:</Table.Td>
-            <Table.Td>{`${totalObjectCount} of ${Object.keys(objectCount ?? {}).length} activities`}</Table.Td>
-          </Table.Tr>
-          <Table.Tr>
-            <Table.Td>Timeframe:</Table.Td>
+            <Table.Td>Extensions:</Table.Td>
             <Table.Td>
-              {`${dayjs(timeInfo?.start_time).format("YYYY-MM-DD HH:mm")} - ${dayjs(timeInfo?.end_time).format("YYYY-MM-DD HH:mm")}`}
+              {ocel.extensions.map(({ label }) => (
+                <Badge>{label}</Badge>
+              ))}
             </Table.Td>
           </Table.Tr>
-          {ocel.extensions.length > 0 && (
-            <Table.Tr>
-              <Table.Td>Extensions:</Table.Td>
-              <Table.Td>
-                {ocel.extensions.map(({ label }) => (
-                  <Badge>{label}</Badge>
-                ))}
-              </Table.Td>
-            </Table.Tr>
-          )}
-        </Table.Tbody>
-      </Table>
-    </Stack>
+        )}
+      </Table.Tbody>
+    </Table>
   );
 };
 

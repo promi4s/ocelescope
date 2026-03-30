@@ -1,6 +1,7 @@
 import { LoadingOverlay } from "@mantine/core";
 import { defineModuleRoute, useCurrentOcel } from "@ocelescope/core";
 import OCELInfo from "../components/OcelInfo";
+import AttributeTable from "../components/AttributeTable";
 
 const LogOverviewPage = () => {
   const { id } = useCurrentOcel();
@@ -10,6 +11,7 @@ const LogOverviewPage = () => {
   return (
     <>
       <OCELInfo ocelId={id} />
+      <AttributeTable ocelId={id} />
     </>
   );
 };
