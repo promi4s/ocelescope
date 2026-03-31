@@ -29,7 +29,7 @@
   },
   "scripts": {
     "build": "tsdown",
-    "dev": "tsdown --watch",
+    "dev": "tsdown --watch ./src",
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
@@ -40,24 +40,26 @@
     "@ocelescope/core": "workspace:*",
     "@tanstack/react-query": "catalog:",
     "@xyflow/react": "catalog:",
+    "dayjs": "catalog:",
     "elkjs": "catalog:",
     "file-saver": "catalog:",
     "html-to-image": "catalog:",
     "lucide-react": "catalog:",
     "mantine-datatable": "catalog:",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "@mantine/charts": "catalog:",
+    "recharts": "catalog:"
   },
   "devDependencies": {
+    "@tsdown/css": "catalog:",
+    "@types/css-modules": "catalog:",
     "@types/file-saver": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+
+    "tsdown": "catalog:",
     "typescript": "catalog:"
-  },
-  "dependencies": {
-    "@tsdown/css": "catalog:",
-    "dayjs": "catalog:",
-    "tsdown": "catalog:"
   }
 }

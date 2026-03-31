@@ -34,6 +34,7 @@ services:
             - node_modules/
             - .next/
         - action: rebuild
+
           path: ./pnpm-lock.yaml
 
 volumes:

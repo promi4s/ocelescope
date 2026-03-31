@@ -87,6 +87,9 @@ catalogs:
     '@types/react-plotly.js':
       specifier: ^2.6.4
       version: 2.6.4
+    '@xyflow/react':
+      specifier: ^12.10.1
+      version: 12.10.1
     bumpp:
       specifier: ^10.3.2
       version: 10.4.1
@@ -102,6 +105,9 @@ catalogs:
     dayjs:
       specifier: ^1.11.19
       version: 1.11.19
+    elkjs:
+      specifier: ^0.11.0
+      version: 0.11.1
     embla-carousel:
       specifier: ^8.6.0
       version: 8.6.0
@@ -114,6 +120,9 @@ catalogs:
     flat:
       specifier: ^6.0.1
       version: 6.0.1
+    html-to-image:
+      specifier: ^1.11.13
+      version: 1.11.13
     json-schema-traverse:
       specifier: ^1.0.0
       version: 1.0.0
@@ -289,6 +298,9 @@ importers:
       '@dagrejs/dagre':
         specifier: 'catalog:'
         version: 2.0.4
+      '@mantine/charts':
+        specifier: 'catalog:'
+        version: 8.3.16(@mantine/core@8.3.16(@mantine/hooks@8.3.16(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/hooks@8.3.16(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(recharts@2.15.4(react-dom@19.2.3(react@19.2.3))(react@19.2.3))
       '@mantine/core':
         specifier: 'catalog:'
         version: 8.3.16(@mantine/hooks@8.3.16(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -304,9 +316,6 @@ importers:
       '@tanstack/react-query':
         specifier: 'catalog:'
         version: 5.90.21(react@19.2.3)
-      '@tsdown/css':
-        specifier: 'catalog:'
-        version: 0.21.4(jiti@2.6.1)(postcss@8.4.31)(tsdown@0.21.4)(yaml@2.8.2)
       '@xyflow/react':
         specifier: 'catalog:'
         version: 12.10.1(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -334,10 +343,16 @@ importers:
       react-dom:
         specifier: 'catalog:'
         version: 19.2.3(react@19.2.3)
-      tsdown:
+      recharts:
         specifier: 'catalog:'
-        version: 0.21.4(@tsdown/css@0.21.4)(typescript@5.9.3)
+        version: 2.15.4(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
     devDependencies:
+      '@tsdown/css':
+        specifier: 'catalog:'
+        version: 0.21.4(jiti@2.6.1)(postcss@8.4.31)(tsdown@0.21.4)(yaml@2.8.2)
+      '@types/css-modules':
+        specifier: 'catalog:'
+        version: 1.0.5
       '@types/file-saver':
         specifier: 'catalog:'
         version: 2.0.7
@@ -350,6 +365,9 @@ importers:
       '@types/react-dom':
         specifier: 'catalog:'
         version: 19.2.3(@types/react@19.2.14)
+      tsdown:
+        specifier: 'catalog:'
+        version: 0.21.4(@tsdown/css@0.21.4)(typescript@5.9.3)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3

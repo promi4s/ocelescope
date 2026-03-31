@@ -1,6 +1,7 @@
 {
   "extends": "@tsconfig/strictest/tsconfig.json",
   "compilerOptions": {
+    "noPropertyAccessFromIndexSignature": false,
     "target": "esnext",
     "jsx": "react-jsx",
     "exactOptionalPropertyTypes": false,

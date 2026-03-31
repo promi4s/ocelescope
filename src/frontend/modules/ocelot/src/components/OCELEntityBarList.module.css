@@ -1,0 +1,58 @@
+.barCell {
+}
+
+/* The bar itself */
+.bar {
+  background: red;
+  height: 1.2em;
+  border-radius: 4px;
+
+  /* Important: create a clipping window */
+  overflow: hidden;
+
+  /* IMPORTANT for the trick: inline formatting context */
+  white-space: nowrap;
+  line-height: 1.2em;
+
+  /* some padding so inside text isn't glued to the edge */
+  padding-right: 0.5em;
+  box-sizing: border-box;
+
+  position: relative;
+}
+
+/* Oriol trick container */
+.outer-wrapper {
+  overflow: hidden;
+  height: 1.2em;
+  line-height: 1.2em;
+}
+
+.outer-wrapper::before {
+  content: "";
+  display: inline-block;
+}
+
+/* This element contains BOTH "inside" and "outside" labels */
+.inner-wrapper {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+/* Inside label: sits at the end of the visible bar area */
+.label-inside {
+  display: inline-block;
+  padding: 0 0.4em;
+  color: white;
+  font-weight: 600;
+  font-size: 0.9em;
+}
+
+/* Outside label: same text, but styled for outside */
+.label-outside {
+  display: inline-block;
+  margin-left: 0.5em;
+  color: #111;
+  font-weight: 600;
+  font-size: 0.9em;
+}

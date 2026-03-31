@@ -38,6 +38,7 @@
     "@mantine/core": "catalog:",
     "@mantine/hooks": "catalog:",
     "@mantine/notifications": "catalog:",
+    "@mantine/dates": "catalog:",
     "@ocelescope/api-base": "workspace:*",
     "@ocelescope/core": "workspace:*",
     "@tanstack/react-query": "catalog:",
@@ -49,8 +50,6 @@
     "recharts": "catalog:"
   },
   "devDependencies": {
-    "@mantine/charts": "catalog:",
-    "@mantine/dates": "catalog:",
     "@mantine/notifications": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
