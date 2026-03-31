@@ -10,16 +10,15 @@ import { useState } from "react";
 const AttributeTable: React.FC<{
   ocelId: string;
   attribute: string;
-}> = ({ ocelId }) => {
+}> = ({ ocelId, attribute }) => {
   const { data: objectAttributes = [], isLoading: isObjectLoading } =
-    useObjectAttributes(ocelId);
+    useObjectAttributes(ocelId, { attribute_names: [attribute] });
   const { data: eventAttributes = [], isLoading: isEventLoading } =
-    useEventAttributes(ocelId);
+    useEventAttributes(ocelId, { attribute_names: [attribute] });
 
   return (
     <DataTable
       noHeader
-      minHeight={100}
       withColumnBorders
       columns={[
         { accessor: "entity_type", title: "Attribute Name" },
@@ -75,8 +74,11 @@ const AttributesTable: React.FC<{
           recordIds: expandedRecordIds,
           onRecordIdsChange: setExpandedRecordIds,
         },
-        content: ({ record }) => <AttributesTable ocelId={ocelId} />,
+        content: ({ record }) => (
+          <AttributeTable ocelId={ocelId} attribute={record.name} />
+        ),
       }}
+      idAccessor={"name"}
     />
   );
 };
