@@ -1040,6 +1040,19 @@
             }
           },
           {
+            "name": "attribute_names",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "title": "Attribute Names"
+            }
+          },
+          {
             "name": "ocel_version",
             "in": "query",
             "required": false,
@@ -1111,6 +1124,19 @@
                 }
               ],
               "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "attribute_names",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "title": "Attribute Names"
             }
           },
           {

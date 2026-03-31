@@ -1,6 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Literal, Optional
+from typing import Annotated, Literal, Optional
 
 import pandas as pd
 from fastapi import APIRouter, Query, Response
@@ -165,9 +165,13 @@ def get_aggr_attributes(ocel: ApiOcel):
     operation_id="objectAttributes",
 )
 def get_object_attributes(
-    ocel: ApiOcel,
+    ocel: ApiOcel, attribute_names: Annotated[list[str], Query()] = []
 ):
-    return TypedAttribute.from_df(ocel.attributes.get_object_summary())
+    return TypedAttribute.from_df(
+        ocel.attributes.get_object_summary(
+            attributes=None if len(attribute_names) == 0 else attribute_names
+        )
+    )
 
 
 @ocels_router.get(
@@ -176,9 +180,13 @@ def get_object_attributes(
     operation_id="eventAttributes",
 )
 def get_event_attributes(
-    ocel: ApiOcel,
+    ocel: ApiOcel, attribute_names: Annotated[list[str], Query()] = []
 ):
-    return TypedAttribute.from_df(ocel.attributes.get_activity_summary())
+    return TypedAttribute.from_df(
+        ocel.attributes.get_activity_summary(
+            attributes=None if len(attribute_names) == 0 else attribute_names
+        )
+    )
 
 
 @ocels_router.get(
