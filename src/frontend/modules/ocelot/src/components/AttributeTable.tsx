@@ -7,103 +7,146 @@ import {
 } from "@ocelescope/api-base";
 import { DataTable } from "mantine-datatable";
 import { formatAttributeValue } from "../util/attributes";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   BoxIcon,
   Calendar1Icon,
   ChevronDown,
   ChevronRight,
 } from "lucide-react";
-import { useSelection } from "@mantine/hooks";
-import { Group, ThemeIcon, Tooltip } from "@mantine/core";
 
-type Attribtue = Pick<
-  TypedAttribute,
-  Extract<keyof TypedAttribute, keyof AggregatedAttribute>
-> & {
-  entityType: "aggr" | "event" | "object";
-  entityTypeField: string;
-  collapsible?: boolean;
-};
+import { Group, Radio, ThemeIcon, Tooltip } from "@mantine/core";
 
 const entityMap = {
-  event: Calendar1Icon,
+  activity: Calendar1Icon,
   object: BoxIcon,
+};
+
+type Attribute =
+  | (AggregatedAttribute & { discriminator: "aggr" })
+  | (TypedAttribute & { discriminator: "activity" | "object" });
+
+export const isAggregatedAttribute = (
+  attribute: Attribute,
+): attribute is AggregatedAttribute & { discriminator: "aggr" } => {
+  return attribute.discriminator === "aggr";
 };
 
 const AttributesTable: React.FC<{
   ocelId: string;
 }> = ({ ocelId }) => {
-  const { data: attributes = [] } = useAggregatedAttributes(ocelId);
+  const { data: attributes, isLoading: isAttributesLoading } =
+    useAggregatedAttributes(ocelId);
 
-  const { data: objectAttributes = [] } = useObjectAttributes(ocelId);
-  const { data: eventAttributes = [] } = useEventAttributes(ocelId);
+  const { data: objectAttributes, isLoading: isObjectAttributesLoading } =
+    useObjectAttributes(ocelId);
+  const { data: eventAttributes, isLoading: isActivityAttributesLoading } =
+    useEventAttributes(ocelId);
 
-  const [selection, handlers] = useSelection({
-    data: attributes.map(({ name }) => name),
-  });
+  const [selection, setSelection] = useState<string[]>([]);
 
-  const records = useMemo(
-    () =>
-      [
-        ...attributes.map<Attribtue>((attribute) => {
-          const collapsible =
-            attribute.object_types.length + attribute.actitvities.length > 1;
+  const [selectedEntityType, setSelectedEntityType] =
+    useState<Attribute["discriminator"]>("aggr");
 
-          return {
-            ...attribute,
-            entityType: collapsible
-              ? "aggr"
-              : attribute.object_types.length > 0
-                ? "object"
-                : "event",
-            collapsible,
-            entityTypeField: !collapsible
-              ? ([...attribute.object_types, ...attribute.actitvities][0] ?? "")
-              : [
-                  ...(attribute.actitvities.length > 0
-                    ? [`${attribute.actitvities.length} Activities`]
-                    : []),
-                  ...(attribute.object_types.length > 0
-                    ? [`${attribute.object_types.length} Object Types`]
-                    : []),
-                ].join(", "),
-          };
-        }),
-        ...objectAttributes
-          .map<Attribtue>((attribute) => ({
-            ...attribute,
-            entityType: "object",
-            entityTypeField: attribute.entity_type,
-          }))
-          .filter(({ name }) => selection.includes(name)),
-        ...eventAttributes
-          .map<Attribtue>((attribute) => ({
-            ...attribute,
-            entityType: "event",
-            entityTypeField: attribute.entity_type,
-          }))
-          .filter(({ name }) => selection.includes(name)),
-      ].sort((a, b) => {
-        const byName = a.name.localeCompare(b.name, undefined, {
-          sensitivity: "base",
-        });
-        if (byName !== 0) return byName;
+  const { records } = useMemo(() => {
+    if (!attributes || !objectAttributes || !eventAttributes) {
+      return { records: [] };
+    }
 
-        return a.entityTypeField.localeCompare(b.entityTypeField, undefined, {
-          sensitivity: "base",
-        });
-      }),
-    [attributes, objectAttributes, eventAttributes, selection],
-  );
+    const filteredAggregatedAttributes = attributes
+      .map<Extract<Attribute, { discriminator: "aggr" }>>((attribute) => ({
+        ...attribute,
+        discriminator: "aggr",
+        object_types:
+          selectedEntityType === "activity" ? [] : attribute.object_types,
+        actitvities:
+          selectedEntityType === "object" ? [] : attribute.actitvities,
+      }))
+      .filter(({ actitvities, object_types }) => {
+        const count =
+          (selectedEntityType === "object" ? 0 : actitvities.length) +
+          (selectedEntityType === "activity" ? 0 : object_types.length);
+
+        return count > 1;
+      });
+
+    const uniqueAttributes = attributes
+      .filter(
+        ({ name }) =>
+          !filteredAggregatedAttributes.some(
+            ({ name: filteredName }) => name === filteredName,
+          ),
+      )
+      .map(({ name }) => name);
+
+    const filteredObjectAttributes = (
+      selectedEntityType !== "activity" ? objectAttributes : []
+    )
+      .map<Attribute>((attribute) => ({
+        ...attribute,
+        discriminator: "object",
+      }))
+      .filter(
+        ({ name }) =>
+          uniqueAttributes.includes(name) || selection.includes(name),
+      );
+
+    const filteredActivityAttributes = (
+      selectedEntityType !== "object" ? eventAttributes : []
+    )
+      .map<Attribute>((attribute) => ({
+        ...attribute,
+        discriminator: "activity",
+      }))
+      .filter(
+        ({ name }) =>
+          uniqueAttributes.includes(name) || selection.includes(name),
+      );
+
+    const records = [
+      ...filteredAggregatedAttributes,
+      ...filteredObjectAttributes,
+      ...filteredActivityAttributes,
+    ].sort((attribute1, attribute2) => {
+      const byAttributeName = attribute1.name.localeCompare(attribute2.name);
+
+      if (byAttributeName !== 0) return byAttributeName;
+
+      if (
+        isAggregatedAttribute(attribute1) ||
+        isAggregatedAttribute(attribute2)
+      )
+        return isAggregatedAttribute(attribute1) ? -1 : 1;
+
+      const byEntityType = attribute1.entity_type.localeCompare(
+        attribute2.entity_type,
+      );
+
+      if (byEntityType !== 0) return byEntityType;
+
+      return 0;
+    });
+
+    return { records };
+  }, [
+    attributes,
+    objectAttributes,
+    eventAttributes,
+    selection,
+    selectedEntityType,
+  ]);
 
   return (
     <DataTable
+      minHeight={150}
       columns={[
         {
           accessor: "selector",
           title: "",
-          render: ({ collapsible, name }) => {
+          render: (attribute) => {
+            const collapsible = isAggregatedAttribute(attribute)
+              ? attribute.object_types.length + attribute.actitvities.length > 1
+              : false;
             return (
               <>
                 {collapsible && (
@@ -115,7 +158,7 @@ const AttributesTable: React.FC<{
                     }}
                   >
                     <ThemeIcon size={"xs"} variant="subtle">
-                      {selection.includes(name) ? (
+                      {selection.includes(attribute.name) ? (
                         <ChevronDown />
                       ) : (
                         <ChevronRight />
@@ -135,24 +178,47 @@ const AttributesTable: React.FC<{
         {
           accessor: "entityTypeField",
           title: "Type",
-          render: ({ entityTypeField, entityType }) => {
-            if (entityType === "aggr") {
-              return entityTypeField;
+          render: (attribute) => {
+            if (isAggregatedAttribute(attribute)) {
+              return [
+                ...(attribute.actitvities.length > 0
+                  ? [`${attribute.actitvities.length} Activities`]
+                  : []),
+                ...(attribute.object_types.length > 0
+                  ? [`${attribute.object_types.length} Object Types`]
+                  : []),
+              ].join(", ");
             }
 
-            const Icon = entityMap[entityType];
+            const Icon = entityMap[attribute.discriminator];
 
             return (
               <Group>
-                <Tooltip label={entityType}>
+                <Tooltip label={attribute.discriminator}>
                   <ThemeIcon size={"xs"} variant="subtle">
                     <Icon />
                   </ThemeIcon>
                 </Tooltip>
-                {entityTypeField}
+                {attribute.entity_type}
               </Group>
             );
           },
+          filter: () => (
+            <Radio.Group
+              value={selectedEntityType}
+              label="Visible Types"
+              onChange={(newValue) =>
+                setSelectedEntityType(newValue as Attribute["discriminator"])
+              }
+            >
+              <Group mt="xs">
+                <Radio value={"aggr"} label="All" />
+                <Radio value={"activity"} label="Events" />
+                <Radio value={"object"} label="Objects" />
+              </Group>
+            </Radio.Group>
+          ),
+          filtering: selectedEntityType !== "aggr",
         },
         {
           accessor: "range",
@@ -162,10 +228,21 @@ const AttributesTable: React.FC<{
         { accessor: "distinct_values", title: "Values" },
       ]}
       records={records}
-      onRowClick={({ record }) => {
-        if (record.collapsible) handlers.toggle(record.name);
-      }}
       highlightOnHover
+      onRowClick={({ record }) => {
+        if (isAggregatedAttribute(record)) {
+          setSelection((prev) =>
+            prev.includes(record.name)
+              ? prev.filter((attrName) => attrName !== record.name)
+              : [...prev, record.name],
+          );
+        }
+      }}
+      fetching={
+        isActivityAttributesLoading ||
+        isObjectAttributesLoading ||
+        isAttributesLoading
+      }
     />
   );
 };
