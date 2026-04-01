@@ -48,7 +48,6 @@
     "mantine-datatable": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "@mantine/charts": "catalog:",
     "recharts": "catalog:"
   },
   "devDependencies": {
