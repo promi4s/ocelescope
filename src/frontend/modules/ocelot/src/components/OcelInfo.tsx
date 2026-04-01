@@ -41,7 +41,7 @@ const OCELInfo: React.FC<{ ocelId: string }> = ({ ocelId }) => {
         </Table.Tr>
         <Table.Tr>
           <Table.Td>Objects:</Table.Td>
-          <Table.Td>{`${totalObjectCount} of ${Object.keys(objectCount ?? {}).length} activities`}</Table.Td>
+          <Table.Td>{`${totalObjectCount} of ${Object.keys(objectCount ?? {}).length} object types`}</Table.Td>
         </Table.Tr>
         <Table.Tr>
           <Table.Td>Timeframe:</Table.Td>
