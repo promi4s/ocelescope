@@ -1,8 +1,8 @@
-import { Grid, LoadingOverlay } from "@mantine/core";
+import { Container, Grid, LoadingOverlay, Stack, Title } from "@mantine/core";
 import { defineModuleRoute, useCurrentOcel } from "@ocelescope/core";
 import OCELInfo from "../components/OcelInfo";
 import AttributeTable from "../components/AttributeTable";
-import { OCELEntityBarList } from "../components/OCELEntityBarList";
+import { EntityBarList } from "../components/EntityBarList/EntityBarList";
 
 const LogOverviewPage = () => {
   const { id } = useCurrentOcel();
@@ -10,17 +10,34 @@ const LogOverviewPage = () => {
     return <LoadingOverlay />;
   }
   return (
-    <Grid>
-      <Grid.Col span={12}>
-        <OCELInfo ocelId={id} />
-      </Grid.Col>
-      <Grid.Col span={12}>
-        <AttributeTable ocelId={id} />
-      </Grid.Col>
-      <Grid.Col span={6}>
-        <OCELEntityBarList type="events" ocelId={id} />
-      </Grid.Col>
-    </Grid>
+    <Container fluid>
+      <Grid>
+        <Grid.Col span={12}>
+          <Stack>
+            <Title order={2}>Overview</Title>
+            <OCELInfo ocelId={id} />
+          </Stack>
+        </Grid.Col>
+        <Grid.Col span={12}>
+          <Stack>
+            <Title order={2}>Attribute Info</Title>
+            <AttributeTable ocelId={id} />
+          </Stack>
+        </Grid.Col>
+        <Grid.Col span={6}>
+          <Stack>
+            <Title order={2}>Actitvity</Title>
+            <EntityBarList type="events" ocelId={id} />
+          </Stack>
+        </Grid.Col>
+        <Grid.Col span={6}>
+          <Stack>
+            <Title order={2}>Objects</Title>
+            <EntityBarList type="objects" ocelId={id} />
+          </Stack>
+        </Grid.Col>
+      </Grid>
+    </Container>
   );
 };
 
