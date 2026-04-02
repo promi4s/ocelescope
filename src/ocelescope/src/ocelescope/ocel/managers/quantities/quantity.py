@@ -1,9 +1,9 @@
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 import pandas as pd
 
-from ocelescope.ocel.constants.pm4py import EID_COL, OID_COL, OTYPE_COL, TIMESTAMP_COL
+from ocelescope.ocel.constants.pm4py import ACTIVITY_COL, EID_COL, OID_COL, OTYPE_COL, TIMESTAMP_COL
 from ocelescope.ocel.constants.quantity import (
     OQTY_COLUMNS,
     QEL_ITEM_TYPE,
@@ -288,3 +288,71 @@ class QuantityManager(BaseManager):
             if include_oqty
             else object_item_level
         )
+
+    def get_item_level_development(
+        self,
+        object_id: str,
+        item_types: list[str] | None = None,
+        include_events: Literal["all", "involved", "changed"] = "changed",
+    ) -> pd.DataFrame:
+        """Get item-level development for an object as a per-event DataFrame.
+
+        The returned DataFrame is ordered by time and contains event metadata along
+        with one column per selected item type (tracked over the included events).
+
+        Args:
+            object_id: The object id to compute development for.
+            item_types: Optional list of item type names to include. If None, all
+                item types available for the given object are included.
+            include_events: Which events to include in the output:
+                "all" (all events), "involved" (events involving the object), or
+                "changed" (only events where at least one selected item type changes).
+
+        Returns:
+            A pandas DataFrame with columns `[EID_COL, TIMESTAMP_COL, ACTIVITY_COL]`
+            plus one column per selected item type.
+        """
+
+        item_level_development = self.wide_qop
+
+        object_item_types = [
+            item_type
+            for item_type in self.get_object_item_types(object_id)
+            if item_type in item_level_development.columns
+            and (item_types is None or item_type in item_types)
+        ]
+
+        item_level_development = item_level_development.loc[
+            item_level_development[OID_COL].eq(object_id), [EID_COL, *object_item_types]
+        ]
+
+        events_df = self._ocel.events.df[[EID_COL, ACTIVITY_COL, TIMESTAMP_COL]]
+
+        if include_events != "all":
+            events_df = events_df.loc[
+                events_df[EID_COL].isin(self._ocel.e2o.get_events_of_object(object_id))
+            ]
+
+        item_level_development = pd.merge(
+            item_level_development,
+            events_df,
+            on=EID_COL,
+            how="left" if include_events == "changed" else "right",
+        )
+
+        item_level_development[object_item_types] = item_level_development[
+            object_item_types
+        ].fillna(0)
+
+        if include_events == "changed":
+            item_level_development = item_level_development.loc[
+                ~item_level_development[object_item_types].eq(0).all(axis=1)
+            ]
+
+        item_level_development = item_level_development.sort_values(TIMESTAMP_COL, ascending=True)
+
+        item_level_development[object_item_types] = item_level_development[
+            object_item_types
+        ].cumsum()
+
+        return item_level_development.reset_index(drop=True)
