@@ -223,55 +223,68 @@ class QuantityManager(BaseManager):
 
         return self.oqty.loc[self.oqty[OID_COL].eq(object_id)]
 
-    def get_aggr_object_item_levels(
-        self, object_id: str, timestamp: str | None = None, event_id: str | None = None
+    def get_object_item_level(
+        self,
+        object_id: str,
+        timestamp: str | None = None,
+        event_id: str | None = None,
+        include_oqty: bool = True,
+        include_cutoff: bool = False,
     ):
-        """Aggregate item-level quantities for an object up to a given time/event.
+        """Return item-level quantity for an object up to a cutoff.
 
-        Computes the cumulative sum of quantity operations for the given object,
-        optionally restricted to:
-          - all operations with timestamps <= `timestamp`, and/or
-          - all operations up to (and including) the timestamp of `event_id`.
+        Sums the object's quantity operations (qop) up to a cutoff timestamp and,
+        optionally, adds the object's initial quantities (oqty).
 
-        The result is the sum of:
-          - initial quantities for the object (from `oqty`, wide/pivoted), and
-          - summed quantity operations up to the selected cutoff (from `qop`, wide/pivoted).
+        The cutoff is taken from `timestamp` and/or `event_id` (if both are provided,
+        the earlier timestamp is used). If `include_cutoff` is True the cutoff is
+        inclusive (<=); otherwise it is exclusive (<).
 
         Args:
-            object_id: Object id whose quantities should be aggregated.
-            timestamp: Optional timestamp cutoff (inclusive). Rows with
-                `TIMESTAMP_COL` greater than this value are excluded.
-            event_id: Optional event id to derive a cutoff timestamp from. If both
-                `event_id` and `timestamp` are provided, the earlier of the two
-                timestamps is used.
+            object_id: Object id to aggregate for.
+            timestamp: Optional cutoff timestamp (parsed via `pd.Timestamp`).
+            event_id: Optional event id whose timestamp can be used as a cutoff.
+            include_oqty: If True, add initial quantities (oqty) to the result.
+            include_cutoff: If True include rows at the cutoff timestamp (<=),
+                otherwise exclude them (<).
 
         Returns:
-            A pandas Series (or Series-like) with one entry per item type, containing
-            the aggregated quantity level.
+            A pandas Series with one entry per item type.
         """
+
+        wide_qop = self.wide_qop
+
         wide_qop_with_timestamps = (
-            self.wide_qop.loc[self.wide_qop[OID_COL].eq(object_id)]
+            wide_qop.loc[wide_qop[OID_COL].eq(object_id)]
             .merge(self._ocel.events.df[[EID_COL, TIMESTAMP_COL]], on=EID_COL)
             .sort_values(by=TIMESTAMP_COL)
             .set_index(EID_COL)
         )
 
+        cutt_of = pd.Timestamp(timestamp) if timestamp is not None else None
+
         if event_id:
-            event_timestamp = str(wide_qop_with_timestamps.loc[event_id, TIMESTAMP_COL])
+            event_timestamp = pd.Timestamp(
+                str(wide_qop_with_timestamps.loc[event_id, TIMESTAMP_COL])
+            )
 
-            if event_timestamp and timestamp:
-                timestamp = min(event_timestamp, timestamp)
-            else:
-                timestamp = event_timestamp
+            cutt_of = event_timestamp if cutt_of is None else min(event_timestamp, cutt_of)
 
-        if timestamp:
+        if cutt_of:
             wide_qop_with_timestamps = wide_qop_with_timestamps.loc[
-                wide_qop_with_timestamps[TIMESTAMP_COL].le(timestamp)
+                wide_qop_with_timestamps[TIMESTAMP_COL].le(cutt_of)
+                if include_cutoff
+                else wide_qop_with_timestamps[TIMESTAMP_COL].lt(cutt_of)
             ]
 
-        return (
+        object_item_level = (
             wide_qop_with_timestamps.drop(columns=[TIMESTAMP_COL, OID_COL], errors="ignore")
             .agg(["sum"])
             .iloc[0]
-            # I know this looks ugly but pyright won't shut up
-        ).add(self.wide_oqty.loc[object_id].iloc[0], fill_value=0)
+        )
+
+        return (
+            object_item_level.add(self.wide_oqty.loc[object_id].iloc[0], fill_value=0)
+            if include_oqty
+            else object_item_level
+        )
