@@ -1,6 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Literal, Optional
+from typing import Annotated, Literal, Optional
 
 import pandas as pd
 from fastapi import APIRouter, Query, Response
@@ -11,7 +11,12 @@ from app.dependencies import ApiOcel, ApiSession
 from app.internal.exceptions import NotFound
 from app.internal.model.base import PaginatedResponse
 from app.internal.model.events import Date_Distribution_Item, Entity_Time_Info
-from app.internal.model.ocel import OCELFilter, OcelMetadata, TypedAttribute
+from app.internal.model.ocel import (
+    AggregatedAttribute,
+    OCELFilter,
+    OcelMetadata,
+    TypedAttribute,
+)
 from app.internal.model.response import TempFileResponse
 from app.internal.ocel.default_ocel import (
     DEFAULT_OCEL_KEYS,
@@ -41,20 +46,10 @@ ocels_router = APIRouter(prefix="/ocels", tags=["ocels"])
 def getOcels(
     session: ApiSession, extension_name: Optional[str] = None
 ) -> list[OcelMetadata]:
-    extension_descriptions = registry_manager.get_extension_descriptions()
 
     return [
-        OcelMetadata(
-            created_at=value.ocel.meta.extra["upload_date"],
-            id=key,
-            name=value.ocel.meta.extra["name"],
-            extensions=[
-                extension_descriptions[extension.__class__.__name__]
-                for extension in value.ocel.extensions.all()
-                if extension.__class__.__name__ in extension_descriptions
-            ],
-        )
-        for key, value in session.ocels.items()
+        OcelMetadata.from_ocel(value.ocel)
+        for value in session.ocels.values()
         if extension_name is None
         or extension_name
         in [extension.__class__.__name__ for extension in value.ocel.extensions.all()]
@@ -120,6 +115,13 @@ def get_extension_meta() -> dict[str, OCELExtensionDescription]:
 
 
 # region Management
+@ocels_router.get(
+    "/{ocel_id}", summary="Get general information about a OCEL", operation_id="getOcel"
+)
+def get_ocel(ocel: ApiOcel) -> OcelMetadata:
+    return OcelMetadata.from_ocel(ocel)
+
+
 @ocels_router.post(
     "/{ocel_id}/delete",
     summary="Delete an uploaded OCEL",
@@ -149,14 +151,27 @@ def rename_ocel(ocel: ApiOcel, new_name: str):
 # endregion
 # region Info
 @ocels_router.get(
+    "/{ocel_id}/attributes",
+    response_model=list[AggregatedAttribute],
+    operation_id="AggregatedAttributes",
+)
+def get_aggr_attributes(ocel: ApiOcel):
+    return AggregatedAttribute.from_df(ocel.attributes.get_aggr_summary())
+
+
+@ocels_router.get(
     "/{ocel_id}/objects/attributes",
     response_model=list[TypedAttribute],
     operation_id="objectAttributes",
 )
 def get_object_attributes(
-    ocel: ApiOcel,
+    ocel: ApiOcel, attribute_names: Annotated[list[str], Query()] = []
 ):
-    return TypedAttribute.from_df(ocel.objects.attribute_summary)
+    return TypedAttribute.from_df(
+        ocel.attributes.get_object_summary(
+            attributes=None if len(attribute_names) == 0 else attribute_names
+        )
+    )
 
 
 @ocels_router.get(
@@ -165,9 +180,13 @@ def get_object_attributes(
     operation_id="eventAttributes",
 )
 def get_event_attributes(
-    ocel: ApiOcel,
+    ocel: ApiOcel, attribute_names: Annotated[list[str], Query()] = []
 ):
-    return TypedAttribute.from_df(ocel.events.attribute_summary)
+    return TypedAttribute.from_df(
+        ocel.attributes.get_activity_summary(
+            attributes=None if len(attribute_names) == 0 else attribute_names
+        )
+    )
 
 
 @ocels_router.get(

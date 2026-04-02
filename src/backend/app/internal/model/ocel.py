@@ -1,10 +1,6 @@
 from typing import Hashable, Self, TypedDict, cast
 
 import pandas as pd
-from ocelescope.ocel.constants import ValueType
-from pydantic.main import BaseModel
-
-from app.internal.registry.extension import OCELExtensionDescription
 from ocelescope import (
     OCEL,
     BaseFilter,
@@ -16,6 +12,11 @@ from ocelescope import (
     ObjectTypeFilter,
     TimeFrameFilter,
 )
+from ocelescope.ocel.constants import ValueType
+from pydantic.main import BaseModel
+
+from app.internal.registry import registry_manager
+from app.internal.registry.extension import OCELExtensionDescription
 
 
 class OcelMetadata(BaseModel):
@@ -24,13 +25,20 @@ class OcelMetadata(BaseModel):
     created_at: str
     extensions: list[OCELExtensionDescription]
 
+    @classmethod
+    def from_ocel(cls, ocel: OCEL):
+        extension_descriptions = registry_manager.get_extension_descriptions()
 
-class UploadingOcelMetadata(BaseModel):
-    task_id: str
-
-
-class OcelListResponse(BaseModel):
-    ocels: list[OcelMetadata]
+        return cls(
+            id=ocel.meta.id,
+            created_at=ocel.meta.extra["upload_date"],
+            name=ocel.meta.extra["name"],
+            extensions=[
+                extension_descriptions[extension.__class__.__name__]
+                for extension in ocel.extensions.all()
+                if extension.__class__.__name__ in extension_descriptions
+            ],
+        )
 
 
 # TODO: Remove this concept completly
@@ -74,7 +82,7 @@ class Attribute(BaseModel):
     @classmethod
     def from_df_row(cls, row: tuple[Hashable, pd.Series]) -> Self:
 
-        attribute_name = cast(tuple[str, ...], row[0])[0]
+        attribute_name = cast(str, row[0])
         series = row[1]
 
         return cls(
@@ -91,12 +99,32 @@ class Attribute(BaseModel):
         return [cls.from_df_row(row) for row in df.iterrows()]
 
 
+class AggregatedAttribute(Attribute):
+    object_types: list[str]
+    actitvities: list[str]
+
+    @classmethod
+    def from_df_row(cls, row: tuple[Hashable, pd.Series]) -> Self:
+
+        base = Attribute.from_df_row(row)
+
+        return cls(
+            object_types=row[1]["object_types"],
+            actitvities=row[1]["activities"],
+            **base.model_dump(),
+        )
+
+
 class TypedAttribute(Attribute):
     entity_type: str
 
     @classmethod
     def from_df_row(cls, row: tuple[Hashable, pd.Series]) -> "TypedAttribute":
-        entity_type = cast(tuple[str, str], row[0])[1]
-        base = Attribute.from_df_row(row)
+        index = cast(tuple[str, str], row[0])
+        entity_type = index[1]
+        base = Attribute.from_df_row((index[0], row[1]))
 
-        return cls(entity_type=entity_type, **base.model_dump())
+        return cls(
+            entity_type=entity_type,
+            **base.model_dump(),
+        )
