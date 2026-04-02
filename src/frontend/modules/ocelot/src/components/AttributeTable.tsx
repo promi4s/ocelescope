@@ -5,9 +5,13 @@ import {
   type AggregatedAttribute,
   type TypedAttribute,
 } from "@ocelescope/api-base";
-import { DataTable } from "mantine-datatable";
+import {
+  DataTable,
+  type DataTableColumn,
+  type DataTableRowClickHandler,
+} from "mantine-datatable";
 import { formatAttributeValue } from "../util/attributes";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   BoxIcon,
   Calendar1Icon,
@@ -48,9 +52,9 @@ const AttributesTable: React.FC<{
   const [selectedEntityType, setSelectedEntityType] =
     useState<Attribute["discriminator"]>("aggr");
 
-  const { records } = useMemo(() => {
+  const records = useMemo(() => {
     if (!attributes || !objectAttributes || !eventAttributes) {
-      return { records: [] };
+      return [];
     }
 
     const filteredAggregatedAttributes = attributes
@@ -103,7 +107,7 @@ const AttributesTable: React.FC<{
           uniqueAttributes.includes(name) || selection.includes(name),
       );
 
-    const records = [
+    return [
       ...filteredAggregatedAttributes,
       ...filteredObjectAttributes,
       ...filteredActivityAttributes,
@@ -118,16 +122,8 @@ const AttributesTable: React.FC<{
       )
         return isAggregatedAttribute(attribute1) ? -1 : 1;
 
-      const byEntityType = attribute1.entity_type.localeCompare(
-        attribute2.entity_type,
-      );
-
-      if (byEntityType !== 0) return byEntityType;
-
-      return 0;
+      return attribute1.entity_type.localeCompare(attribute2.entity_type);
     });
-
-    return { records };
   }, [
     attributes,
     objectAttributes,
@@ -136,108 +132,118 @@ const AttributesTable: React.FC<{
     selectedEntityType,
   ]);
 
+  const columns: DataTableColumn<Attribute>[] = useMemo(
+    () => [
+      {
+        accessor: "selector",
+        title: "",
+        render: (attribute) => {
+          const collapsible = isAggregatedAttribute(attribute)
+            ? attribute.object_types.length + attribute.actitvities.length > 1
+            : false;
+          return (
+            <>
+              {collapsible && (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <ThemeIcon size={"xs"} variant="subtle">
+                    {selection.includes(attribute.name) ? (
+                      <ChevronDown />
+                    ) : (
+                      <ChevronRight />
+                    )}
+                  </ThemeIcon>
+                </div>
+              )}
+            </>
+          );
+        },
+      },
+      {
+        accessor: "name",
+        title: "Attribute Name",
+      },
+      { accessor: "type", title: "Attribute Type" },
+      {
+        accessor: "entityTypeField",
+        title: "Type",
+        render: (attribute) => {
+          if (isAggregatedAttribute(attribute)) {
+            return [
+              ...(attribute.actitvities.length > 0
+                ? [`${attribute.actitvities.length} Activities`]
+                : []),
+              ...(attribute.object_types.length > 0
+                ? [`${attribute.object_types.length} Object Types`]
+                : []),
+            ].join(", ");
+          }
+
+          const Icon = entityMap[attribute.discriminator];
+
+          return (
+            <Group>
+              <Tooltip label={attribute.discriminator}>
+                <ThemeIcon size={"xs"} variant="subtle">
+                  <Icon />
+                </ThemeIcon>
+              </Tooltip>
+              {attribute.entity_type}
+            </Group>
+          );
+        },
+        filter: () => (
+          <Radio.Group
+            value={selectedEntityType}
+            label="Visible Types"
+            onChange={(newValue) =>
+              setSelectedEntityType(newValue as Attribute["discriminator"])
+            }
+          >
+            <Group mt="xs">
+              <Radio value={"aggr"} label="All" />
+              <Radio value={"activity"} label="Events" />
+              <Radio value={"object"} label="Objects" />
+            </Group>
+          </Radio.Group>
+        ),
+        filtering: selectedEntityType !== "aggr",
+      },
+      {
+        accessor: "range",
+        render: ({ type, min, max }) =>
+          `${formatAttributeValue(type, min)} - ${formatAttributeValue(type, max)}`,
+      },
+      { accessor: "distinct_values", title: "Values" },
+    ],
+    [selection, setSelectedEntityType],
+  );
+
+  const onRowClick: DataTableRowClickHandler<Attribute> = useCallback(
+    ({ record }) => {
+      if (isAggregatedAttribute(record)) {
+        setSelection((prev) =>
+          prev.includes(record.name)
+            ? prev.filter((attrName) => attrName !== record.name)
+            : [...prev, record.name],
+        );
+      }
+    },
+    [setSelection],
+  );
+
   return (
     <DataTable
       minHeight={150}
-      columns={[
-        {
-          accessor: "selector",
-          title: "",
-          render: (attribute) => {
-            const collapsible = isAggregatedAttribute(attribute)
-              ? attribute.object_types.length + attribute.actitvities.length > 1
-              : false;
-            return (
-              <>
-                {collapsible && (
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <ThemeIcon size={"xs"} variant="subtle">
-                      {selection.includes(attribute.name) ? (
-                        <ChevronDown />
-                      ) : (
-                        <ChevronRight />
-                      )}
-                    </ThemeIcon>
-                  </div>
-                )}
-              </>
-            );
-          },
-        },
-        {
-          accessor: "name",
-          title: "Attribute Name",
-        },
-        { accessor: "type", title: "Attribute Type" },
-        {
-          accessor: "entityTypeField",
-          title: "Type",
-          render: (attribute) => {
-            if (isAggregatedAttribute(attribute)) {
-              return [
-                ...(attribute.actitvities.length > 0
-                  ? [`${attribute.actitvities.length} Activities`]
-                  : []),
-                ...(attribute.object_types.length > 0
-                  ? [`${attribute.object_types.length} Object Types`]
-                  : []),
-              ].join(", ");
-            }
-
-            const Icon = entityMap[attribute.discriminator];
-
-            return (
-              <Group>
-                <Tooltip label={attribute.discriminator}>
-                  <ThemeIcon size={"xs"} variant="subtle">
-                    <Icon />
-                  </ThemeIcon>
-                </Tooltip>
-                {attribute.entity_type}
-              </Group>
-            );
-          },
-          filter: () => (
-            <Radio.Group
-              value={selectedEntityType}
-              label="Visible Types"
-              onChange={(newValue) =>
-                setSelectedEntityType(newValue as Attribute["discriminator"])
-              }
-            >
-              <Group mt="xs">
-                <Radio value={"aggr"} label="All" />
-                <Radio value={"activity"} label="Events" />
-                <Radio value={"object"} label="Objects" />
-              </Group>
-            </Radio.Group>
-          ),
-          filtering: selectedEntityType !== "aggr",
-        },
-        {
-          accessor: "range",
-          render: ({ type, min, max }) =>
-            `${formatAttributeValue(type, min)} - ${formatAttributeValue(type, max)}`,
-        },
-        { accessor: "distinct_values", title: "Values" },
-      ]}
+      columns={columns}
       records={records}
       highlightOnHover
-      onRowClick={({ record }) => {
-        if (isAggregatedAttribute(record)) {
-          setSelection((prev) =>
-            prev.includes(record.name)
-              ? prev.filter((attrName) => attrName !== record.name)
-              : [...prev, record.name],
-          );
-        }
-      }}
+      onRowClick={onRowClick}
       fetching={
         isActivityAttributesLoading ||
         isObjectAttributesLoading ||
