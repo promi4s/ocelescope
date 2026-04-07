@@ -1999,6 +1999,76 @@
         }
       }
     },
+    "/ocels/{ocel_id}/quantity/info": {
+      "get": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Get Quantity Info",
+        "operationId": "QuantityInfo",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuantityInfo"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/ocels/{ocel_id}/download": {
       "get": {
         "tags": [
@@ -4825,6 +4895,44 @@
           "output"
         ],
         "title": "PluginTaskSummary"
+      },
+      "QuantityInfo": {
+        "properties": {
+          "item_types": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Item Types"
+          },
+          "object_type_distribution": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "type": "object"
+            },
+            "type": "object",
+            "title": "Object Type Distribution"
+          },
+          "activity_distribution": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "type": "object"
+            },
+            "type": "object",
+            "title": "Activity Distribution"
+          }
+        },
+        "type": "object",
+        "required": [
+          "item_types",
+          "object_type_distribution",
+          "activity_distribution"
+        ],
+        "title": "QuantityInfo"
       },
       "RelationCountSummary": {
         "properties": {
