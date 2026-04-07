@@ -274,6 +274,7 @@ class QuantityManager(BaseManager):
             [QEL_ITEM_TYPE, QEL_QUANTITY],
         ].set_index(QEL_ITEM_TYPE)[QEL_QUANTITY]
 
+    # TODO: Check if using get_item_level_development would be more efficient
     def get_object_item_level(
         self,
         object_id: str,
@@ -319,7 +320,7 @@ class QuantityManager(BaseManager):
                 pd.Timestamp,
                 self._ocel.events.df.loc[
                     self._ocel.events.df[EID_COL].eq(event_id), TIMESTAMP_COL
-                ].iacast,
+                ].iat[0],
             )
 
             cutt_of = event_timestamp if cutt_of is None else min(event_timestamp, cutt_of)
@@ -336,6 +337,16 @@ class QuantityManager(BaseManager):
             .agg(["sum"])
             .iloc[0]
         )
+
+        if include_oqty:
+            object_item_types = self.get_object_item_types(object_id)
+            initial_quantities = self.get_oqty_for_object(object_id=object_id).reindex(
+                object_item_types, fill_value=0
+            )
+
+            object_item_level[object_item_types] = object_item_level[object_item_types].add(
+                initial_quantities
+            )
 
         return (
             object_item_level.add(self.wide_oqty.loc[object_id].iloc[0], fill_value=0)
