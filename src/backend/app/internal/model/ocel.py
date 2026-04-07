@@ -128,3 +128,36 @@ class TypedAttribute(Attribute):
             entity_type=entity_type,
             **base.model_dump(),
         )
+
+
+class QuantityInfo(BaseModel):
+    item_types: list[str]
+    object_type_distribution: dict[str, dict[str, int]]
+    activity_distribution: dict[str, dict[str, int]]
+
+    @classmethod
+    def from_ocel(cls, ocel: OCEL) -> Self:
+        object_type_distribution = cast(
+            dict[str, dict[str, int]],
+            {
+                item_type: group.droplevel(0).to_dict()
+                for item_type, group in ocel.quantities.it_object_type_count.groupby(
+                    level=0
+                )
+            },
+        )
+        activity_distribution = cast(
+            dict[str, dict[str, int]],
+            {
+                item_type: group.droplevel(0).to_dict()
+                for item_type, group in ocel.quantities.it_activity_count.groupby(
+                    level=0
+                )
+            },
+        )
+
+        return cls(
+            item_types=ocel.quantities.item_types,
+            object_type_distribution=object_type_distribution,
+            activity_distribution=activity_distribution,
+        )
