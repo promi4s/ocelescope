@@ -441,3 +441,61 @@ class QuantityManager(BaseManager):
             ].add(initial_quantities)
 
         return item_level_development.reset_index(drop=True)
+
+    def _get_it_entity_type_count(self, entity_type: Literal["events", "objects"]):
+        id_col = OID_COL if entity_type == "objects" else EID_COL
+        type_col = OTYPE_COL if entity_type == "objects" else ACTIVITY_COL
+
+        id_to_type_map = (
+            self._ocel.objects.type_by_id
+            if entity_type == "objects"
+            else self._ocel.events.activity_by_id
+        )
+
+        it_entity_id_pairs = pd.concat(
+            [
+                self.qop.loc[self._cleaned_qop_mask, [id_col, QEL_ITEM_TYPE]],
+                *(
+                    [self.oqty.loc[self._cleaned_qop_mask, [id_col, QEL_ITEM_TYPE]]]
+                    if entity_type == "objects"
+                    else []
+                ),
+            ],
+            ignore_index=True,
+        ).drop_duplicates()
+
+        it_entity_id_pairs = pd.merge(it_entity_id_pairs, id_to_type_map, on=id_col)
+
+        return it_entity_id_pairs.groupby([QEL_ITEM_TYPE, type_col]).agg(count=(id_col, "nunique"))[
+            "count"
+        ]
+
+    @property
+    def it_object_type_count(self) -> pd.Series:
+        """Count involved object types per item type.
+
+        The returned Series is indexed by (item type, object type) and contains the
+        number of **distinct objects** that occur for each such pair. Object types are
+        derived by mapping object ids to their type via the OCEL objects table.
+
+        Returns:
+            pd.Series: A Series with a MultiIndex
+            ``(QEL_ITEM_TYPE, OTYPE_COL)``. Values are the number of unique objects
+            (``OID_COL``) for each (item type, object type) pair.
+        """
+        return self._get_it_entity_type_count("objects")
+
+    @property
+    def it_activity_count(self) -> pd.Series:
+        """Count involved activities per item type.
+
+        The returned Series is indexed by (item type, activity) and contains the
+        number of **distinct events** that occur for each such pair. Activities are
+        derived by mapping event ids to their activity via the OCEL events table.
+
+        Returns:
+            pd.Series: A Series with a MultiIndex
+            ``(QEL_ITEM_TYPE, ACTIVITY_COL)``. Values are the number of unique events
+            (``EID_COL``) for each (item type, activity) pair.
+        """
+        return self._get_it_entity_type_count("events")
