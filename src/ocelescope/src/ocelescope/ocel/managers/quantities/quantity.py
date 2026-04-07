@@ -211,17 +211,25 @@ class QuantityManager(BaseManager):
 
         return pd.concat([initial_item_types, active_qty_operations]).dropna().unique()
 
-    def get_oqty_for_object(self, object_id) -> pd.DataFrame:
-        """Return the initial quantity rows for a specific object.
+    def get_oqty_for_object(self, object_id: str) -> pd.Series:
+        """Return the initial quantities (oqty) for a specific object as a Series.
+
+        The returned Series is indexed by item type (`QEL_ITEM_TYPE`) and contains the
+        corresponding initial quantity values (`QEL_QUANTITY`) for the given object.
 
         Args:
             object_id: Object id to filter on.
 
         Returns:
-            A DataFrame containing the initial quantities (`oqty`) for the given object.
+            A pandas Series with index `QEL_ITEM_TYPE` and values `QEL_QUANTITY`
+            representing the initial quantities for the given object. If the underlying
+            data contains multiple rows for the same item type, the Series will have a
+            non-unique index (i.e., duplicate item-type entries).
         """
 
-        return self.oqty.loc[self.oqty[OID_COL].eq(object_id)]
+        return self.oqty.loc[
+            self.oqty[OID_COL].eq(object_id), [QEL_ITEM_TYPE, QEL_QUANTITY]
+        ].set_index(QEL_ITEM_TYPE)[QEL_QUANTITY]
 
     def get_object_item_level(
         self,
