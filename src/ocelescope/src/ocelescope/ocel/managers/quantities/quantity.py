@@ -46,6 +46,9 @@ class QuantityManager(BaseManager):
             else (pd.DataFrame(columns=OQTY_COLUMNS), pd.DataFrame(columns=QOP_COLUMNS))
         )
 
+        self.qop = self.qop.loc[self._cleaned_qop_mask].reset_index(drop=True)
+        self.oqty = self.oqty.loc[self._cleaned_oqty_mask].reset_index(drop=True)
+
     def write_quantities(self, path: Path):
         """Write quantity-extension tables to a OCEL file.
 
@@ -57,7 +60,11 @@ class QuantityManager(BaseManager):
         """
 
         if not self.oqty.empty or not self.qop.empty:
-            write_quantity_extension(path, self.oqty, self.qop)
+            write_quantity_extension(
+                path,
+                self.oqty.loc[self._cleaned_oqty_mask],
+                self.qop.loc[self._cleaned_qop_mask],
+            )
 
     @property
     def _cleaned_oqty_mask(self):
