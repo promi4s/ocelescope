@@ -297,11 +297,16 @@ class QuantityManager(BaseManager):
         object_id: str,
         item_types: list[str] | None = None,
         include_events: Literal["all", "involved", "changed"] = "changed",
+        include_oqty: bool = True,
     ) -> pd.DataFrame:
         """Get item-level development for an object as a per-event DataFrame.
 
         The returned DataFrame is ordered by time and contains event metadata along
-        with one column per selected item type (tracked over the included events).
+        with one column per selected item type. Values represent the cumulative
+        development over the included events (cumulative sum of per-event quantity
+        changes). Optionally, the cumulative development can be offset by the
+        object's initial quantities (oqty) so that values represent absolute
+        quantities over time.
 
         Args:
             object_id: The object id to compute development for.
@@ -310,10 +315,16 @@ class QuantityManager(BaseManager):
             include_events: Which events to include in the output:
                 "all" (all events), "involved" (events involving the object), or
                 "changed" (only events where at least one selected item type changes).
+            include_oqty: If True, add the object's initial quantities (oqty) to the
+                cumulative development for each selected item type (i.e., return
+                absolute quantities rather than net change).
 
         Returns:
-            A pandas DataFrame with columns `[EID_COL, TIMESTAMP_COL, ACTIVITY_COL]`
-            plus one column per selected item type.
+            A pandas DataFrame ordered by timestamp with columns
+            `[EID_COL, ACTIVITY_COL, TIMESTAMP_COL]` plus one column per selected item
+            type. If `include_oqty=True`, item-type columns contain absolute
+            quantities (initial oqty + cumulative changes); otherwise they contain
+            cumulative changes only.
         """
 
         item_level_development = self.wide_qop
@@ -357,5 +368,14 @@ class QuantityManager(BaseManager):
         item_level_development[object_item_types] = item_level_development[
             object_item_types
         ].cumsum()
+
+        if include_oqty:
+            initial_quantities = self.get_oqty_for_object(object_id=object_id).reindex(
+                object_item_types, fill_value=0
+            )
+
+            item_level_development[object_item_types] = item_level_development[
+                object_item_types
+            ].add(initial_quantities)
 
         return item_level_development.reset_index(drop=True)
