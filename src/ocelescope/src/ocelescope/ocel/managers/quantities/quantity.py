@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, cast
 
 import pandas as pd
 
@@ -264,8 +264,11 @@ class QuantityManager(BaseManager):
         cutt_of = pd.Timestamp(timestamp) if timestamp is not None else None
 
         if event_id:
-            event_timestamp = pd.Timestamp(
-                str(wide_qop_with_timestamps.loc[event_id, TIMESTAMP_COL])
+            event_timestamp: pd.Timestamp = cast(
+                pd.Timestamp,
+                self._ocel.events.df.loc[
+                    self._ocel.events.df[EID_COL].eq(event_id), TIMESTAMP_COL
+                ].iacast,
             )
 
             cutt_of = event_timestamp if cutt_of is None else min(event_timestamp, cutt_of)
