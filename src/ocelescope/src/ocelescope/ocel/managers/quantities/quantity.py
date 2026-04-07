@@ -60,6 +60,14 @@ class QuantityManager(BaseManager):
             write_quantity_extension(path, self.oqty, self.qop)
 
     @property
+    def _cleaned_oqty_mask(self):
+        return self.oqty[QEL_QUANTITY].gt(0)
+
+    @property
+    def _cleaned_qop_mask(self):
+        return self.qop[QEL_QUANTITY].ne(0)
+
+    @property
     def wide_qop(self):
         """Return quantity operations in a wide (pivoted) format.
 
@@ -111,7 +119,13 @@ class QuantityManager(BaseManager):
         """
 
         return (
-            pd.concat([self.oqty[QEL_ITEM_TYPE], self.qop[QEL_ITEM_TYPE]], ignore_index=True)
+            pd.concat(
+                [
+                    self.oqty.loc[self._cleaned_oqty_mask, QEL_ITEM_TYPE],
+                    self.qop.loc[self._cleaned_qop_mask, QEL_ITEM_TYPE],
+                ],
+                ignore_index=True,
+            )
             .dropna()
             .unique()
             .tolist()
@@ -129,7 +143,15 @@ class QuantityManager(BaseManager):
             An array-like of unique object ids.
         """
         return (
-            pd.concat([self.oqty[OID_COL], self.qop[OID_COL]], ignore_index=True).dropna().unique()
+            pd.concat(
+                [
+                    self.oqty.loc[self._cleaned_oqty_mask, OID_COL],
+                    self.qop.loc[self._cleaned_qop_mask, OID_COL],
+                ],
+                ignore_index=True,
+            )
+            .dropna()
+            .unique()
         )
 
     def get_it_objects(self, item_type: str):
@@ -146,8 +168,12 @@ class QuantityManager(BaseManager):
             An array-like of unique object ids.
         """
 
-        oqty_ids = self.oqty.loc[self.oqty[QEL_ITEM_TYPE].eq(item_type), OID_COL]
-        qop_ids = self.qop.loc[self.qop[QEL_ITEM_TYPE].eq(item_type), OID_COL]
+        oqty_ids = self.oqty.loc[
+            self.oqty[QEL_ITEM_TYPE].eq(item_type) & self._cleaned_oqty_mask, OID_COL
+        ]
+        qop_ids = self.qop.loc[
+            self.qop[QEL_ITEM_TYPE].eq(item_type) & self._cleaned_qop_mask, OID_COL
+        ]
 
         return pd.concat([oqty_ids, qop_ids], ignore_index=True).dropna().unique()
 
@@ -190,7 +216,11 @@ class QuantityManager(BaseManager):
             An array-like of unique event ids.
 
         """
-        return self.qop.loc[self.qop[QEL_ITEM_TYPE].eq(item_type), EID_COL].dropna().unique()
+        return (
+            self.qop.loc[self.qop[QEL_ITEM_TYPE].eq(item_type) & self._cleaned_qop_mask, EID_COL]
+            .dropna()
+            .unique()
+        )
 
     def get_object_item_types(self, object_id: str):
         """Return item types associated with a given object.
@@ -206,8 +236,13 @@ class QuantityManager(BaseManager):
             An array-like of unique item type identifiers.
         """
 
-        initial_item_types = self.oqty.loc[self.oqty[OID_COL] == object_id, QEL_ITEM_TYPE]
-        active_qty_operations = self.qop.loc[self.qop[OID_COL] == object_id, QEL_ITEM_TYPE]
+        initial_item_types = self.oqty.loc[
+            self.oqty[OID_COL].eq(object_id) & self._cleaned_oqty_mask, QEL_ITEM_TYPE
+        ]
+
+        active_qty_operations = self.qop.loc[
+            self.qop[OID_COL].eq(object_id) & self._cleaned_qop_mask, QEL_ITEM_TYPE
+        ]
 
         return pd.concat([initial_item_types, active_qty_operations]).dropna().unique()
 
@@ -228,7 +263,8 @@ class QuantityManager(BaseManager):
         """
 
         return self.oqty.loc[
-            self.oqty[OID_COL].eq(object_id), [QEL_ITEM_TYPE, QEL_QUANTITY]
+            self.oqty[OID_COL].eq(object_id) & self._cleaned_oqty_mask,
+            [QEL_ITEM_TYPE, QEL_QUANTITY],
         ].set_index(QEL_ITEM_TYPE)[QEL_QUANTITY]
 
     def get_object_item_level(
