@@ -1,8 +1,9 @@
-import { Badge, LoadingOverlay, Table } from "@mantine/core";
+import { Badge, LoadingOverlay, Stack, Table } from "@mantine/core";
 import {
   useEventCounts,
   useGetOcel,
   useObjectCounts,
+  useQuantityInfo,
   useTimeInfo,
 } from "@ocelescope/api-base";
 import { useMemo } from "react";
@@ -13,6 +14,7 @@ const OCELInfo: React.FC<{ ocelId: string }> = ({ ocelId }) => {
   const { data: eventCounts } = useEventCounts(ocelId);
   const { data: objectCount } = useObjectCounts(ocelId);
   const { data: timeInfo } = useTimeInfo(ocelId);
+  const { data: quantityInfo } = useQuantityInfo(ocelId);
 
   const totalEventCount = useMemo(
     () => Object.values(eventCounts ?? {}).reduce((acc, curr) => acc + curr, 0),
@@ -29,33 +31,45 @@ const OCELInfo: React.FC<{ ocelId: string }> = ({ ocelId }) => {
   }
 
   return (
-    <Table>
+    <Table variant="vertical" layout="fixed" withTableBorder>
       <Table.Tbody>
         <Table.Tr>
-          <Table.Td>Name:</Table.Td>
+          <Table.Th w={160}>Name:</Table.Th>
           <Table.Td>{ocel.name}</Table.Td>
         </Table.Tr>
         <Table.Tr>
-          <Table.Td>Events:</Table.Td>
+          <Table.Th>Events:</Table.Th>
           <Table.Td>{`${totalEventCount} of ${Object.keys(eventCounts ?? {}).length} activities`}</Table.Td>
         </Table.Tr>
         <Table.Tr>
-          <Table.Td>Objects:</Table.Td>
+          <Table.Th>Objects:</Table.Th>
           <Table.Td>{`${totalObjectCount} of ${Object.keys(objectCount ?? {}).length} object types`}</Table.Td>
         </Table.Tr>
         <Table.Tr>
-          <Table.Td>Timeframe:</Table.Td>
+          <Table.Th>Timeframe:</Table.Th>
           <Table.Td>
             {`${formatTime(timeInfo?.start_time)} - ${formatTime(timeInfo?.end_time)}`}
           </Table.Td>
         </Table.Tr>
         {ocel.extensions.length > 0 && (
           <Table.Tr>
-            <Table.Td>Extensions:</Table.Td>
+            <Table.Th>Extensions:</Table.Th>
             <Table.Td>
               {ocel.extensions.map(({ label }) => (
                 <Badge>{label}</Badge>
               ))}
+            </Table.Td>
+          </Table.Tr>
+        )}
+        {quantityInfo && quantityInfo.item_types.length > 0 && (
+          <Table.Tr>
+            <Table.Th>Quantities:</Table.Th>
+            <Table.Td>
+              <Stack gap={0}>
+                <span>{`${quantityInfo.item_types.length} Item types`}</span>
+                <span>{`${quantityInfo.total_event_count} active events of ${quantityInfo.activities.length} activities`}</span>
+                <span>{`${quantityInfo.total_object_count} active objects of ${quantityInfo.object_types.length} object types`}</span>
+              </Stack>
             </Table.Td>
           </Table.Tr>
         )}

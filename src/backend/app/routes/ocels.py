@@ -15,6 +15,7 @@ from app.internal.model.ocel import (
     AggregatedAttribute,
     OCELFilter,
     OcelMetadata,
+    QuantityInfo,
     TypedAttribute,
 )
 from app.internal.model.response import TempFileResponse
@@ -356,6 +357,15 @@ def set_filter(
 # endregion
 
 
+# region Quantities
+@ocels_router.get("/{ocel_id}/quantity/info", operation_id="QuantityInfo")
+def get_quantity_info(
+    ocel: ApiOcel,
+) -> QuantityInfo:
+    return QuantityInfo.from_ocel(ocel)
+
+
+# endregion
 # region Export
 @ocels_router.get("/{ocel_id}/download", summary="Download OCEL including app state")
 def download_ocel(
