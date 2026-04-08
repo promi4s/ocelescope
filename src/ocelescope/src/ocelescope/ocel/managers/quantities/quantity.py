@@ -68,7 +68,7 @@ class QuantityManager(BaseManager):
 
     @property
     def _cleaned_oqty_mask(self):
-        return self.oqty[QEL_QUANTITY].gt(0)
+        return self.oqty[QEL_QUANTITY].ne(0)
 
     @property
     def _cleaned_qop_mask(self):
