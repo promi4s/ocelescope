@@ -132,32 +132,17 @@ class TypedAttribute(Attribute):
 
 class QuantityInfo(BaseModel):
     item_types: list[str]
-    object_type_distribution: dict[str, dict[str, int]]
-    activity_distribution: dict[str, dict[str, int]]
+    total_object_count: int
+    total_event_count: int
+    object_types: list[str]
+    activities: list[str]
 
     @classmethod
     def from_ocel(cls, ocel: OCEL) -> Self:
-        object_type_distribution = cast(
-            dict[str, dict[str, int]],
-            {
-                item_type: group.droplevel(0).to_dict()
-                for item_type, group in ocel.quantities.it_object_type_count.groupby(
-                    level=0
-                )
-            },
-        )
-        activity_distribution = cast(
-            dict[str, dict[str, int]],
-            {
-                item_type: group.droplevel(0).to_dict()
-                for item_type, group in ocel.quantities.it_activity_count.groupby(
-                    level=0
-                )
-            },
-        )
-
         return cls(
             item_types=ocel.quantities.item_types,
-            object_type_distribution=object_type_distribution,
-            activity_distribution=activity_distribution,
+            total_object_count=len(ocel.quantities.objects),
+            total_event_count=len(ocel.quantities.events),
+            object_types=ocel.quantities.object_types,
+            activities=ocel.quantities.activities,
         )

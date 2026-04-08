@@ -4905,32 +4905,36 @@
             "type": "array",
             "title": "Item Types"
           },
-          "object_type_distribution": {
-            "additionalProperties": {
-              "additionalProperties": {
-                "type": "integer"
-              },
-              "type": "object"
-            },
-            "type": "object",
-            "title": "Object Type Distribution"
+          "total_object_count": {
+            "type": "integer",
+            "title": "Total Object Count"
           },
-          "activity_distribution": {
-            "additionalProperties": {
-              "additionalProperties": {
-                "type": "integer"
-              },
-              "type": "object"
+          "total_event_count": {
+            "type": "integer",
+            "title": "Total Event Count"
+          },
+          "object_types": {
+            "items": {
+              "type": "string"
             },
-            "type": "object",
-            "title": "Activity Distribution"
+            "type": "array",
+            "title": "Object Types"
+          },
+          "activities": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Activities"
           }
         },
         "type": "object",
         "required": [
           "item_types",
-          "object_type_distribution",
-          "activity_distribution"
+          "total_object_count",
+          "total_event_count",
+          "object_types",
+          "activities"
         ],
         "title": "QuantityInfo"
       },
