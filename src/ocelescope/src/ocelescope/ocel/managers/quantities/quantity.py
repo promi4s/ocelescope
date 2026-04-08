@@ -163,6 +163,12 @@ class QuantityManager(BaseManager):
 
     @property
     def object_types(self) -> list[str]:
+        """Return all object types involved in quantities.
+
+
+        Returns:
+            A list of object types
+        """
         oid_type_map = self._ocel.objects.type_by_id
 
         return oid_type_map.loc[oid_type_map.index.isin(self.objects)].drop_duplicates().to_list()
@@ -221,6 +227,12 @@ class QuantityManager(BaseManager):
 
     @property
     def activities(self) -> list[str]:
+        """Return all activities involved in quantities.
+
+
+        Returns:
+            A list of activities
+        """
         activity_id_map = self._ocel.events.activity_by_id
 
         return (
