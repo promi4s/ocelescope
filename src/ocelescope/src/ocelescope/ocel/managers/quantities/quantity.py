@@ -161,6 +161,12 @@ class QuantityManager(BaseManager):
             .unique()
         )
 
+    @property
+    def object_types(self) -> list[str]:
+        oid_type_map = self._ocel.objects.type_by_id
+
+        return oid_type_map.loc[oid_type_map.index.isin(self.objects)].drop_duplicates().to_list()
+
     def get_it_objects(self, item_type: str):
         """Return object ids involved for a given item type.
 
@@ -212,6 +218,14 @@ class QuantityManager(BaseManager):
             An array-like of unique event ids.
         """
         return self.qop[EID_COL].dropna().unique()
+
+    @property
+    def activities(self) -> list[str]:
+        activity_id_map = self._ocel.events.activity_by_id
+
+        return (
+            activity_id_map.loc[activity_id_map.index.isin(self.events)].drop_duplicates().tolist()
+        )
 
     def get_it_events(self, item_type: str):
         """Return event ids involved in quantity operations for a given item type.
