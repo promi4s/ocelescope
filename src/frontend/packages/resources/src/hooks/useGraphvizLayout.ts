@@ -146,9 +146,9 @@ export const useGraphvizLayout = (
         > = {};
 
         for (const o of gvJson.objects ?? []) {
-          if (!o.name || !o.pos) return;
+          if (!o.name || !o.pos) continue;
           const p = parsePos(o.pos);
-          if (!p) return;
+          if (!p) continue;
           nodePos[o.name] = {
             ...p,
             width: o.width ? Number.parseFloat(o.width) * 72 : 0,
