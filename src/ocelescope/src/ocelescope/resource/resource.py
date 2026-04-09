@@ -48,7 +48,7 @@ T = TypeVar("T", bound=Resource)
 
 
 class Annotated(BaseModel, Generic[T]):
-    annotation: T | str | None = None
+    annotation: list[T | str] = []
 
     def get_annotation_str(self):
         return self.annotation if type(self.annotation) is str else None

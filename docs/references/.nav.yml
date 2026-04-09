@@ -14,3 +14,12 @@ nav:
 
   - Plugins:
       - plugins/index.md 
+
+  - Resources:
+    - resources/index.md
+    - Base Resources: 
+      - resources/base/petri_net.md
+      - resources/base/dfg.md
+    - Visualization:
+
+
