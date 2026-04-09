@@ -46,8 +46,12 @@ ENV PATH="/app/.venv/bin:$PATH"
 ENV DATA_DIR="/data"
 ENV PLUGIN_DIR="/plugins"
 
-USER nonroot
+COPY src/backend/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
+USER root
 WORKDIR /app/src/backend/
+ENTRYPOINT ["/entrypoint.sh"]
+
 
 CMD ["fastapi", "run", "app", "--host", "0.0.0.0"]
