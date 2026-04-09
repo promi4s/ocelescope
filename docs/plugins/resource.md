@@ -81,3 +81,36 @@ class ExamplePlugin(Plugin):
     def increment(self, x: MyResource) -> MyResource:
         return MyResource(value=x.value + 1)
 ```
+
+## Visualizing resources
+
+Resources can provide a visualization so they can be displayed in the frontend.
+
+A simple example is to return a Plotly figure from your resource:
+
+```python title="Example: Plotly visualization"
+from ocelescope import Resource
+from ocelescope.visualization.default.plotly import Plotly
+
+import plotly.graph_objects as go
+
+
+class Curve(Resource):
+    x: list[float]
+    y: list[float]
+
+    def visualize(self):
+        fig = go.Figure(data=go.Scatter(x=self.x, y=self.y, mode="lines"))
+        fig.update_layout(title="Curve")
+        return Plotly(figure=fig)
+```
+
+### Overview
+
+| Visualization | Class | What it shows | Reference |
+|---|---|---|---|
+| Graph | `Graph` | Node/edge graph with Graphviz-based layout | `../references/visualizations/graph.md` |
+| Dot | `DotVis` | Raw Graphviz DOT string (choose layout engine) | `../references/visualizations/dot.md` |
+| SVG | `SVGVis` | Raw SVG markup | `../references/visualizations/svg.md` |
+| Table | `Table` | Table with typed columns and rows | `../references/visualizations/table.md` |
+| Plotly | `Plotly` | Interactive Plotly figure serialized to JSON | `../references/visualizations/plotly.md` |
