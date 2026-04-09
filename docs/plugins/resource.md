@@ -1,38 +1,63 @@
 # Resources
 
-Resources are the primary mechanism for defining **inputs** and **outputs** in Ocelescope plugins.
+Resources are the main mechanism to define **inputs** and **outputs** of Ocelescope plugin methods.
 
-A resource can represent almost anything — from process models to tabular datasets.  
-Resources are automatically uploadable and downloadable, making them easy to share across plugin methods and even between different plugins.
+When you define a resource, it becomes **exportable** and **importable** by default through an automatic exchange format.
 
-## Defining a Resource
+Resources can also provide a visualization so they can be displayed in the frontend.
 
-To create a custom resource:
+<figure markdown="span">
+  ![An example plugin class](../assets/ResourceOverview.png){width="600"}
+</figure>
 
-- Define a Python class that inherits from `Resource` (provided by the `ocelescope` package).  
-- Resource classes can include any number of properties and methods required by your plugin.  
-- Metadata such as `label` and `description` can be added to improve how the resource appears in the frontend.  
-- Resources can be shared across plugins if they have the same **class name** and **field definitions**.
+## Defining a resource
 
-```python title="Example: Defining a Resource"
+Define a resource by creating a Python class that inherits from `Resource` (from the `ocelescope` package). The structure of the resource is described through typed fields on the class. You can also set `label` and `description` to control how the resource appears in the frontend.
+
+If you want to reuse a resource across plugins, keep the **class name** and the **field definitions** identical.
+
+```python title="Example: defining a resource"
 from ocelescope import Resource
 
 class Example(Resource):
     label = "Example Resource"
     description = "An example resource definition"
+
     property_a: str
     property_b: list[int]
 ```
 
-!!! warning "Resources Must Be JSON-Serializable"
-    For import and export to work, resources **must** be serializable and instantiable from their serialized form.
+!!! warning "Resources must be JSON-serializable"
+    For import and export to work, a resource must be serializable and instantiable from its serialized form.
 
-    Fields should use standard types such as `str`, `int`, `float`, `bool`, `list`, or `dict`, or any custom subclass that is itself serializable.
+    Use standard types like `str`, `int`, `float`, `bool`, `list`, or `dict`, or custom types that are themselves serializable.
 
-    To verify that your resource is serializable, try creating an instance from its own serialized output:
+    If you use nested classes (for example, a resource that contains nodes and edges), make those nested classes Pydantic models (inherit from `pydantic.BaseModel`) so they can be validated and serialized consistently.
 
     ```python
-    Example(Example(property_a="Example String", property_b=[1, 2, 3]).model_dump())
+    from pydantic import BaseModel
+    from ocelescope import Resource
+
+    class Node(BaseModel):
+        id: str
+        label: str
+
+    class Edge(BaseModel):
+        source: str
+        target: str
+        label: str | None = None
+
+    class GraphResource(Resource):
+        nodes: list[Node]
+        edges: list[Edge]
+
+    # Quick round-trip check (serialize -> create again)
+    GraphResource(
+        GraphResource(
+            nodes=[Node(id="n1", label="Start"), Node(id="n2", label="End")],
+            edges=[Edge(source="n1", target="n2", label="go")]
+        ).model_dump()
+    )
     ```
 
 ## Visualization
