@@ -1,3 +1,4 @@
+from ocelescope.ocel.constants.annotations import AnnotationElementType
 from ocelescope.ocel.constants.attributes import ATTRIBUTE_COL
 from ocelescope.ocel.constants.pm4py import (
     ACTIVITY_COL,
@@ -36,4 +37,5 @@ __all__ = [
     "QEL_QUANTITY_UPDATE",
     "ATTRIBUTE_COL",
     "ValueType",
+    "AnnotationElementType",
 ]

@@ -4,5 +4,7 @@
 submission-info.md
 run-ocean.bat
 mise.toml
+.DS_Store
 
-/node_modules
+node_modules
+.venv

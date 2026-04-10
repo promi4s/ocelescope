@@ -2,6 +2,7 @@ import matplotlib
 
 from ocelescope.ocel import (
     OCEL,
+    AnnotationElementType,
     BaseFilter,
     E2OCountFilter,
     EventAttributeFilter,
@@ -45,6 +46,7 @@ matplotlib.use("Agg")
 
 __all__ = [
     "OCEL",
+    "AnnotationElementType",
     "OCELExtension",
     "E2OCountFilter",
     "EventAttributeFilter",

@@ -1,3 +1,4 @@
+from ocelescope.ocel.constants.annotations import AnnotationElementType
 from ocelescope.ocel.core import OCEL
 from ocelescope.ocel.extensions.base_extension import OCELExtension
 from ocelescope.ocel.filter import (
@@ -14,6 +15,7 @@ from ocelescope.ocel.filter import (
 from ocelescope.ocel.models import RelationCountSummary
 
 __all__ = [
+    "AnnotationElementType",
     "OCEL",
     "OCELExtension",
     "E2OCountFilter",

@@ -1,0 +1,5 @@
+SQL_LABEL_DEFINITIONS_TABLE = "ocelescope_label_definitions"
+SQL_LABEL_ASSIGNMENTS_TABLE = "ocelescope_label_assignments"
+
+SQL_CATEGORY_DEFINITIONS_TABLE = "ocelescope_category_definitions"
+SQL_CATEGORY_ASSIGNMENTS_TABLE = "ocelescope_category_assignments"
