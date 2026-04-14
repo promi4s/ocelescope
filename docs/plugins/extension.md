@@ -83,7 +83,7 @@ class ExamplePlugin(Plugin):
     @plugin_method(label="Uses extension")
     def uses_extension(
         self,
-        ocel: Annotated[OCEL, OCELAnnotation(extension=HelloWorldExtension)],
+        ocel: Annotated[OCEL, OCELAnnotation(label="log", extension=HelloWorldExtension)],
     ):
       
       extension = ocel.extensions.get(HelloWorldExtension)  
