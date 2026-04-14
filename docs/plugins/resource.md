@@ -367,10 +367,6 @@ Resources can provide a visualization so they can be displayed in the frontend. 
 
 #### Dot (`DotVis`)
 
-<figure markdown="span">
-  ![DotVis example](../assets/visualizations/dot.png){width="400px"}
-</figure>
-
 ??? example "Code"
 
     ```python
@@ -399,14 +395,13 @@ Resources can provide a visualization so they can be displayed in the frontend. 
                 layout_engine="dot",
             )
     ```
+<figure markdown="span">
+  ![DotVis example](../assets/visualizations/dot.png){width="400px"}
+</figure>
 
 ---
 
 #### Plotly (`Plotly`)
-
-<figure markdown="span">
-  ![Plotly example](../assets/visualizations/plotly.png){width="400px"}
-</figure>
 
 ??? example "Code"
 
@@ -477,14 +472,13 @@ Resources can provide a visualization so they can be displayed in the frontend. 
 
             return Plotly(figure=fig)
     ```
+<figure markdown="span">
+  ![Plotly example](../assets/visualizations/plotly.png){width="400px"}
+</figure>
 
 #### Graph with annotations (`Graph`)
 
 You can annotate Graph nodes and edges with other visualizations, which the frontend can open when the user clicks the node or edge.
-
-<figure markdown="span">
-  ![Graph with annotations example](../assets/visualizations/annotatedGraph.png){width="400px"}
-</figure>
 
 ??? example "Code"
 
@@ -570,3 +564,6 @@ You can annotate Graph nodes and edges with other visualizations, which the fron
             )
 
     ```
+<figure markdown="span">
+  ![Graph with annotations example](../assets/visualizations/annotatedGraph.png){width="400px"}
+</figure>
