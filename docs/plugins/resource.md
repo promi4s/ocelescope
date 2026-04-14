@@ -122,123 +122,125 @@ Resources can provide a visualization so they can be displayed in the frontend. 
 ??? example "Code"
 
     ```python
+    from ocelescope import Resource
+    from ocelescope.visualization.default.graph import (
+        Graph,
+        GraphEdge,
+        GraphNode,
+        GraphvizLayoutConfig,
+    )
+
     class GraphExample(Resource):
-    label = "Graph example (complex)"
-    description = "A connected graph that shows all node shapes with colorful edges."
+        label = "Graph example (complex)"
+        description = "A connected graph that shows all node shapes with colorful edges."
 
-    def visualize(self) -> Graph:
-        nodes = [
-            GraphNode(
-                id="n_circle",
-                label="circle",
-                shape="circle",
-                color="#A7F3D0",
-                border_color="#065F46",
-                label_pos="bottom",
-                width=20,
-                height=20,
-                rank="source",
-            ),
-            GraphNode(
-                id="n_triangle",
-                label="triangle",
-                shape="triangle",
-                color="#BFDBFE",
-                border_color="#1D4ED8",
-                label_pos="bottom",
-                width=20,
-                height=20,
-            ),
-            GraphNode(
-                id="n_rectangle",
-                label="rectangle",
-                shape="rectangle",
-                color="#FDE68A",
-                border_color="#92400E",
-                label_pos="center",
-                width=40,
-                height=50,
-            ),
-            GraphNode(
-                id="n_diamond",
-                label="diamond",
-                shape="diamond",
-                color="#FBCFE8",
-                border_color="#9D174D",
-                label_pos="bottom",
-                width=40,
-                height=40,
-            ),
-            GraphNode(
-                id="n_hexagon",
-                label="hexagon",
-                shape="hexagon",
-                color="#DDD6FE",
-                border_color="#5B21B6",
-                label_pos="top",
-                width=30,
-                height=30,
-                rank="sink",
-            ),
-        ]
+        def visualize(self) -> Graph:
+            nodes = [
+                GraphNode(
+                    id="n_circle",
+                    label="circle",
+                    shape="circle",
+                    color="#A7F3D0",
+                    border_color="#065F46",
+                    label_pos="bottom",
+                    width=20,
+                    height=20,
+                    rank="source",
+                ),
+                GraphNode(
+                    id="n_triangle",
+                    label="triangle",
+                    shape="triangle",
+                    color="#BFDBFE",
+                    border_color="#1D4ED8",
+                    label_pos="bottom",
+                    width=20,
+                    height=20,
+                ),
+                GraphNode(
+                    id="n_rectangle",
+                    label="rectangle",
+                    shape="rectangle",
+                    color="#FDE68A",
+                    border_color="#92400E",
+                    label_pos="center",
+                    width=40,
+                    height=50,
+                ),
+                GraphNode(
+                    id="n_diamond",
+                    label="diamond",
+                    shape="diamond",
+                    color="#FBCFE8",
+                    border_color="#9D174D",
+                    label_pos="bottom",
+                    width=40,
+                    height=40,
+                ),
+                GraphNode(
+                    id="n_hexagon",
+                    label="hexagon",
+                    shape="hexagon",
+                    color="#DDD6FE",
+                    border_color="#5B21B6",
+                    label_pos="top",
+                    width=30,
+                    height=30,
+                    rank="sink",
+                ),
+            ]
 
-        # One outgoing edge per node (simple loop). Colorful edges and mixed arrowheads.
-        edges = [
-            GraphEdge(
-                source="n_circle",
-                target="n_triangle",
-                label="circle → triangle",
-                color="#EF4444",  # red
-                start_arrow=None,
-                end_arrow="triangle",
-            ),
-            GraphEdge(
-                source="n_triangle",
-                target="n_rectangle",
-                label="triangle → rectangle",
-                color="#F59E0B",  # amber
-                start_arrow="circle",
-                end_arrow="chevron",
-            ),
-            GraphEdge(
-                source="n_rectangle",
-                target="n_diamond",
-                label="rectangle → diamond",
-                color="#10B981",  # green
-                start_arrow="tee",
-                end_arrow="vee",
-            ),
-            GraphEdge(
-                source="n_diamond",
-                target="n_hexagon",
-                label="diamond → hexagon",
-                color="#3B82F6",  # blue
-                start_arrow="square",
-                end_arrow="diamond",
-            ),
-            GraphEdge(
-                source="n_hexagon",
-                target="n_circle",
-                label="hexagon → circle",
-                color="#8B5CF6",  # violet
-                start_arrow="triangle-cross",
-                end_arrow="circle-triangle",
-            ),
-        ]
+            edges = [
+                GraphEdge(
+                    source="n_circle",
+                    target="n_triangle",
+                    label="circle → triangle",
+                    color="#EF4444",
+                    start_arrow=None,
+                    end_arrow="triangle",
+                ),
+                GraphEdge(
+                    source="n_triangle",
+                    target="n_rectangle",
+                    label="triangle → rectangle",
+                    color="#F59E0B",
+                    start_arrow="circle",
+                    end_arrow="chevron",
+                ),
+                GraphEdge(
+                    source="n_rectangle",
+                    target="n_diamond",
+                    label="rectangle → diamond",
+                    color="#10B981",
+                    start_arrow="tee",
+                    end_arrow="vee",
+                ),
+                GraphEdge(
+                    source="n_diamond",
+                    target="n_hexagon",
+                    label="diamond → hexagon",
+                    color="#3B82F6",
+                    start_arrow="square",
+                    end_arrow="diamond",
+                ),
+                GraphEdge(
+                    source="n_hexagon",
+                    target="n_circle",
+                    label="hexagon → circle",
+                    color="#8B5CF6",
+                    start_arrow="triangle-cross",
+                    end_arrow="circle-triangle",
+                ),
+            ]
 
-        return Graph(
-            nodes=nodes,
-            edges=edges,
-            layout_config=GraphvizLayoutConfig(
-                engine="dot",
-                graphAttrs={
-                    "rankdir": "LR",
-                    "nodesep": 1,
-                    "ranksep": 1,
-                },
-            ),
-        )
-
+            return Graph(
+                nodes=nodes,
+                edges=edges,
+                layout_config=GraphvizLayoutConfig(
+                    engine="dot",
+                    graphAttrs={"rankdir": "LR", "nodesep": 1, "ranksep": 1},
+                ),
+            )
     ```
 
 <figure markdown="span">
