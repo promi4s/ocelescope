@@ -32,14 +32,6 @@ git clone https://github.com/Grkmr/minimal-plugin.git
 cd minimal-plugin
 ```
 
-### Cookiecutter Template
-
-You can also generate a plugin using the official Cookiecutter template:
-
-``` sh
-cookiecutter gh:rwth-pads/ocelescope --directory template
-```
-
 ------------------------------------------------------------------------
 
 For detailed setup instructions, refer to the [Setup section of the
