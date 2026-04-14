@@ -107,10 +107,10 @@ class Curve(Resource):
 
 ### Overview
 
-| Visualization | Class | What it shows | Reference |
-|---|---|---|---|
-| Graph | `Graph` | Node/edge graph with Graphviz-based layout | `../references/visualizations/graph.md` |
-| Dot | `DotVis` | Raw Graphviz DOT string (choose layout engine) | `../references/visualizations/dot.md` |
-| SVG | `SVGVis` | Raw SVG markup | `../references/visualizations/svg.md` |
-| Table | `Table` | Table with typed columns and rows | `../references/visualizations/table.md` |
-| Plotly | `Plotly` | Interactive Plotly figure serialized to JSON | `../references/visualizations/plotly.md` |
+| Class | Use case |
+|---|---|
+| [`Graph`](../references/resources/visualizations/graph.md#ocelescope.visualization.default.graph.Graph) | Interactive node/edge graph visualizations (for example process models and graphs). |
+| [`DotVis`](../references/resources/visualizations/dot.md#ocelescope.visualization.default.dot.DotVis) | Rendering raw Graphviz DOT when you already have a DOT string or want full Graphviz control. |
+| [`SVGVis`](../references/resources/visualizations/svg.md#ocelescope.visualization.default.svg.SVGVis) | Custom visuals with full control using raw SVG markup. |
+| [`Table`](../references/resources/visualizations/table.md#ocelescope.visualization.default.table.Table) | Displaying structured data as a typed table (rows + columns). |
+| [`Plotly`](../references/resources/visualizations/plotly.md#ocelescope.visualization.default.plotly.Plotly) | Interactive charts built with Plotly (figures serialized to JSON). |
