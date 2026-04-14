@@ -84,33 +84,33 @@ class ExamplePlugin(Plugin):
 
 ## Visualizing resources
 
-Resources can provide a visualization so they can be displayed in the frontend.
+Resources can provide a visualization so they can be displayed in the frontend. To do this, implement a `visualize()` method on your resource that returns one of the visualization classes provided by Ocelescope.
 
-A simple example is to return a Plotly figure from your resource:
+!!! example "A simple example is to return a Plotly figure from your resource"
 
-```python title="Example: Plotly visualization"
-from ocelescope import Resource
-from ocelescope.visualization.default.plotly import Plotly
+    ```python 
+    from ocelescope import Resource
+    from ocelescope.visualization.default.plotly import Plotly
 
-import plotly.graph_objects as go
+    import plotly.graph_objects as go
 
 
-class Curve(Resource):
-    x: list[float]
-    y: list[float]
+    class Curve(Resource):
+        x: list[float]
+        y: list[float]
 
-    def visualize(self):
-        fig = go.Figure(data=go.Scatter(x=self.x, y=self.y, mode="lines"))
-        fig.update_layout(title="Curve")
-        return Plotly(figure=fig)
-```
+        def visualize(self) -> Plotly:
+            fig = go.Figure(data=go.Scatter(x=self.x, y=self.y, mode="lines"))
+            fig.update_layout(title="Curve")
+            return Plotly(figure=fig)
+    ```
 
 ### Overview
 
 | Class | Use case |
 |---|---|
-| [`Graph`](../references/resources/visualizations/graph.md#ocelescope.visualization.default.graph.Graph) | Interactive node/edge graph visualizations (for example process models and graphs). |
-| [`DotVis`](../references/resources/visualizations/dot.md#ocelescope.visualization.default.dot.DotVis) | Rendering raw Graphviz DOT when you already have a DOT string or want full Graphviz control. |
-| [`SVGVis`](../references/resources/visualizations/svg.md#ocelescope.visualization.default.svg.SVGVis) | Custom visuals with full control using raw SVG markup. |
+| [`Graph`](../references/resources/visualizations/graph.md#ocelescope.visualization.default.graph.Graph) | Interactive node/edge graph visualizations. |
+| [`DotVis`](../references/resources/visualizations/dot.md#ocelescope.visualization.default.dot.DotVis) | Rendering raw Graphviz DOT when you already have a DOT string. |
+| [`SVGVis`](../references/resources/visualizations/svg.md#ocelescope.visualization.default.svg.SVGVis) | Render SVG markup. Useful when you generate SVG with another library (for example Matplotlib). |
 | [`Table`](../references/resources/visualizations/table.md#ocelescope.visualization.default.table.Table) | Displaying structured data as a typed table (rows + columns). |
-| [`Plotly`](../references/resources/visualizations/plotly.md#ocelescope.visualization.default.plotly.Plotly) | Interactive charts built with Plotly (figures serialized to JSON). |
+| [`Plotly`](../references/resources/visualizations/plotly.md#ocelescope.visualization.default.plotly.Plotly) | Interactive charts built with Plotly. |
