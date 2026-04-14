@@ -7,7 +7,7 @@ When you define a resource, it becomes **exportable** and **importable** by defa
 Resources can also provide a visualization so they can be displayed in the frontend.
 
 <figure markdown="span">
-  ![An example plugin class](../assets/ResourceOverview.png){width="600"}
+  ![Resource Overview](../assets/ResourceOverview.png){width="600"}
 </figure>
 
 ## Defining a resource
