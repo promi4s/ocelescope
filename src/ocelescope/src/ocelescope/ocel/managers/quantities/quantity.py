@@ -386,6 +386,7 @@ class QuantityManager(BaseManager):
         item_types: list[str] | None = None,
         include_events: Literal["all", "involved", "changed"] = "changed",
         include_oqty: bool = True,
+        pre_event: bool = False,
     ) -> pd.DataFrame:
         """Get item-level development for an object as a per-event DataFrame.
 
@@ -452,6 +453,9 @@ class QuantityManager(BaseManager):
             ]
 
         item_level_development = item_level_development.sort_values(TIMESTAMP_COL, ascending=True)
+
+        if pre_event:
+            item_level_development = item_level_development.shift(1, fill_value=0)
 
         item_level_development[object_item_types] = item_level_development[
             object_item_types
