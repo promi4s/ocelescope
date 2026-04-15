@@ -384,7 +384,7 @@ class QuantityManager(BaseManager):
         self,
         object_id: str,
         item_types: list[str] | None = None,
-        include_events: Literal["log", "involved", "changed"] = "changed",
+        include_events: Literal["log", "trace", "active"] = "trace",
         include_oqty: bool = True,
         pre_event: bool = False,
     ) -> pd.DataFrame:
@@ -402,8 +402,8 @@ class QuantityManager(BaseManager):
             item_types: Optional list of item type names to include. If None, all
                 item types available for the given object are included.
             include_events: Which events to include in the output:
-                "all" (all events), "involved" (events involving the object), or
-                "changed" (only events where at least one selected item type changes).
+                "log" (all events), "trace" (events involving the object), or
+                "active" (only events where at least one selected item type changes).
             include_oqty: If True, add the object's initial quantities (oqty) to the
                 cumulative development for each selected item type (i.e., return
                 absolute quantities rather than net change).
@@ -440,14 +440,14 @@ class QuantityManager(BaseManager):
             item_level_development,
             events_df,
             on=EID_COL,
-            how="left" if include_events == "changed" else "right",
+            how="left" if include_events == "active" else "right",
         )
 
         item_level_development[object_item_types] = item_level_development[
             object_item_types
         ].fillna(0)
 
-        if include_events == "changed":
+        if include_events == "active":
             item_level_development = item_level_development.loc[
                 ~item_level_development[object_item_types].eq(0).all(axis=1)
             ]
