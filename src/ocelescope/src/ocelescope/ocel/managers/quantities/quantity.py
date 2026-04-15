@@ -384,7 +384,7 @@ class QuantityManager(BaseManager):
         self,
         object_id: str,
         item_types: list[str] | None = None,
-        include_events: Literal["all", "involved", "changed"] = "changed",
+        include_events: Literal["log", "involved", "changed"] = "changed",
         include_oqty: bool = True,
         pre_event: bool = False,
     ) -> pd.DataFrame:
@@ -431,7 +431,7 @@ class QuantityManager(BaseManager):
 
         events_df = self._ocel.events.df[[EID_COL, ACTIVITY_COL, TIMESTAMP_COL]]
 
-        if include_events != "all":
+        if include_events != "log":
             events_df = events_df.loc[
                 events_df[EID_COL].isin(self._ocel.e2o.get_events_of_object(object_id))
             ]
