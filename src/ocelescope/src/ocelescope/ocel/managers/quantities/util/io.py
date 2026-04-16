@@ -1,5 +1,4 @@
-from __future__ import annotations
-
+import os
 import sqlite3
 import xml.etree.ElementTree as etree
 from pathlib import Path
@@ -7,628 +6,204 @@ from pathlib import Path
 import orjson
 import pandas as pd
 
-from ocelescope.ocel.constants.annotations import (
-    ANN_CATEGORY_ID,
-    ANN_CATEGORY_VALUE,
-    ANN_ELEMENT_REF,
-    ANN_ELEMENT_TYPE,
-    ANN_ID,
-    ANN_LABEL_ID,
-    ANN_NAME,
-    CATEGORY_ASSIGNMENT_COLUMNS,
-    CATEGORY_DEFINITION_COLUMNS,
-    LABEL_ASSIGNMENT_COLUMNS,
-    LABEL_DEFINITION_COLUMNS,
+from ocelescope.ocel.constants.pm4py import EID_COL, OID_COL
+from ocelescope.ocel.constants.quantity import OQTY_COLUMNS, QOP_COLUMNS
+
+from .constants import (
+    JSON_KEYMAP,
+    JSON_OPERATIONS,
+    JSON_QUANTITIES,
+    JSON_QUANTITY_EXTENSION,
+    QEL_ITEM_TYPE,
+    QEL_QUANTITY,
+    SQL_KEYMAP,
+    SQL_OPERATIONS,
+    SQL_QUANTITIES,
+    XML_EVENT_ID,
+    XML_ITEM,
+    XML_ITEM_TYPE,
+    XML_OBJECT_ID,
+    XML_OPERATION,
+    XML_OPERATIONS,
+    XML_QUANTITIES,
+    XML_QUANTITY,
+    XML_QUANTITY_EXTENSION,
+    XML_QUANTITY_TYPE,
+    inverse_keymap,
 )
-from ocelescope.ocel.managers.annotations.util.constants import (
-    SQL_CATEGORY_ASSIGNMENTS_TABLE,
-    SQL_CATEGORY_DEFINITIONS_TABLE,
-    SQL_LABEL_ASSIGNMENTS_TABLE,
-    SQL_LABEL_DEFINITIONS_TABLE,
-)
 
 
-def _q(identifier: str) -> str:
-    return f'"{identifier}"'
+def write_extension_to_xml(path: Path, oqty: pd.DataFrame, qop: pd.DataFrame):
+    quantity_extension = etree.Element(XML_QUANTITY_EXTENSION)
 
-
-def _empty(columns: list[str]) -> pd.DataFrame:
-    return pd.DataFrame(columns=columns)
-
-
-def _table_exists(conn: sqlite3.Connection, table_name: str) -> bool:
-    row = conn.execute(
-        "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?",
-        (table_name,),
-    ).fetchone()
-    return row is not None
-
-
-def _normalize(
-    df: pd.DataFrame,
-    columns: list[str],
-    dtypes: dict[str, type | str],
-    sort_by: list[str],
-) -> pd.DataFrame:
-    if df.empty:
-        return _empty(columns)
-
-    missing = [col for col in columns if col not in df.columns]
-    if missing:
-        raise ValueError(f"DataFrame is missing required columns: {missing}")
-
-    return (
-        df[columns].astype(dtypes).drop_duplicates().sort_values(by=sort_by).reset_index(drop=True)
-    )
-
-
-# -----------------------------------------------------------------------------
-# JSON constants
-# -----------------------------------------------------------------------------
-
-JSON_ANNOTATION_EXTENSION = "annotationExtension"
-JSON_LABEL_DEFINITIONS = "labelDefinitions"
-JSON_LABEL_ASSIGNMENTS = "labelAssignments"
-JSON_CATEGORY_DEFINITIONS = "categoryDefinitions"
-JSON_CATEGORY_ASSIGNMENTS = "categoryAssignments"
-
-JSON_LABEL_DEFINITION_KEYMAP = {
-    ANN_ID: "id",
-    ANN_ELEMENT_TYPE: "elementType",
-    ANN_NAME: "name",
-}
-JSON_LABEL_ASSIGNMENT_KEYMAP = {
-    ANN_LABEL_ID: "labelId",
-    ANN_ELEMENT_REF: "elementRef",
-}
-JSON_CATEGORY_DEFINITION_KEYMAP = {
-    ANN_ID: "id",
-    ANN_ELEMENT_TYPE: "elementType",
-    ANN_NAME: "name",
-}
-JSON_CATEGORY_ASSIGNMENT_KEYMAP = {
-    ANN_CATEGORY_ID: "categoryId",
-    ANN_ELEMENT_REF: "elementRef",
-    ANN_CATEGORY_VALUE: "value",
-}
-
-
-# -----------------------------------------------------------------------------
-# XML constants
-# -----------------------------------------------------------------------------
-
-XML_ANNOTATION_EXTENSION = "annotation-extension"
-
-XML_LABEL_DEFINITIONS = "label-definitions"
-XML_LABEL_DEFINITION = "label-definition"
-XML_LABEL_ASSIGNMENTS = "label-assignments"
-XML_LABEL_ASSIGNMENT = "label-assignment"
-
-XML_CATEGORY_DEFINITIONS = "category-definitions"
-XML_CATEGORY_DEFINITION = "category-definition"
-XML_CATEGORY_ASSIGNMENTS = "category-assignments"
-XML_CATEGORY_ASSIGNMENT = "category-assignment"
-
-XML_ID = "id"
-XML_ELEMENT_TYPE = "element-type"
-XML_NAME = "name"
-XML_LABEL_ID = "label-id"
-XML_CATEGORY_ID = "category-id"
-XML_ELEMENT_REF = "element-ref"
-XML_VALUE = "value"
-
-
-def inverse_keymap(keymap: dict[str, str]) -> dict[str, str]:
-    return {v: k for k, v in keymap.items()}
-
-
-# -----------------------------------------------------------------------------
-# Shared readers
-# -----------------------------------------------------------------------------
-
-
-def _read_table(
-    conn: sqlite3.Connection,
-    table_name: str,
-    columns: list[str],
-    dtypes: dict[str, type | str],
-    sort_by: list[str],
-) -> pd.DataFrame:
-    if not _table_exists(conn, table_name):
-        return _empty(columns)
-
-    query = f"SELECT {', '.join(_q(col) for col in columns)} FROM {table_name}"
-    df = pd.read_sql_query(query, conn)
-    return _normalize(df, columns=columns, dtypes=dtypes, sort_by=sort_by)
-
-
-def _ensure_annotation_tables_exist(conn: sqlite3.Connection) -> None:
-    conn.execute("PRAGMA foreign_keys = ON")
-    conn.executescript(
-        f"""
-        CREATE TABLE IF NOT EXISTS {SQL_LABEL_DEFINITIONS_TABLE} (
-            {_q(ANN_ID)} INTEGER PRIMARY KEY,
-            {_q(ANN_ELEMENT_TYPE)} TEXT NOT NULL,
-            {_q(ANN_NAME)} TEXT NOT NULL,
-            UNIQUE ({_q(ANN_ELEMENT_TYPE)}, {_q(ANN_NAME)})
-        );
-
-        CREATE TABLE IF NOT EXISTS {SQL_LABEL_ASSIGNMENTS_TABLE} (
-            {_q(ANN_LABEL_ID)} INTEGER NOT NULL,
-            {_q(ANN_ELEMENT_REF)} TEXT NOT NULL,
-            PRIMARY KEY ({_q(ANN_LABEL_ID)}, {_q(ANN_ELEMENT_REF)}),
-            FOREIGN KEY ({_q(ANN_LABEL_ID)})
-                REFERENCES {SQL_LABEL_DEFINITIONS_TABLE} ({_q(ANN_ID)})
-                ON DELETE CASCADE
-        );
-
-        CREATE TABLE IF NOT EXISTS {SQL_CATEGORY_DEFINITIONS_TABLE} (
-            {_q(ANN_ID)} INTEGER PRIMARY KEY,
-            {_q(ANN_ELEMENT_TYPE)} TEXT NOT NULL,
-            {_q(ANN_NAME)} TEXT NOT NULL,
-            UNIQUE ({_q(ANN_ELEMENT_TYPE)}, {_q(ANN_NAME)})
-        );
-
-        CREATE TABLE IF NOT EXISTS {SQL_CATEGORY_ASSIGNMENTS_TABLE} (
-            {_q(ANN_CATEGORY_ID)} INTEGER NOT NULL,
-            {_q(ANN_ELEMENT_REF)} TEXT NOT NULL,
-            {_q(ANN_CATEGORY_VALUE)} TEXT NOT NULL,
-            PRIMARY KEY ({_q(ANN_CATEGORY_ID)}, {_q(ANN_ELEMENT_REF)}),
-            FOREIGN KEY ({_q(ANN_CATEGORY_ID)})
-                REFERENCES {SQL_CATEGORY_DEFINITIONS_TABLE} ({_q(ANN_ID)})
-                ON DELETE CASCADE
-        );
-        """
-    )
-    conn.commit()
-
-
-def read_annotations_from_sqlite(
-    path: Path,
-) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    with sqlite3.connect(path) as conn:
-        conn.execute("PRAGMA foreign_keys = ON")
-
-        label_definitions = _read_table(
-            conn,
-            SQL_LABEL_DEFINITIONS_TABLE,
-            LABEL_DEFINITION_COLUMNS,
-            {ANN_ID: int, ANN_ELEMENT_TYPE: str, ANN_NAME: str},
-            [ANN_ID],
+    operations = etree.Element(XML_OPERATIONS)
+    for _, row in qop.iterrows():
+        operation = etree.SubElement(
+            operations,
+            XML_OPERATION,
+            {XML_EVENT_ID: str(row[EID_COL]), XML_OBJECT_ID: str(row[OID_COL])},
         )
-        label_assignments = _read_table(
-            conn,
-            SQL_LABEL_ASSIGNMENTS_TABLE,
-            LABEL_ASSIGNMENT_COLUMNS,
-            {ANN_LABEL_ID: int, ANN_ELEMENT_REF: str},
-            [ANN_LABEL_ID, ANN_ELEMENT_REF],
-        )
-        category_definitions = _read_table(
-            conn,
-            SQL_CATEGORY_DEFINITIONS_TABLE,
-            CATEGORY_DEFINITION_COLUMNS,
-            {ANN_ID: int, ANN_ELEMENT_TYPE: str, ANN_NAME: str},
-            [ANN_ID],
-        )
-        category_assignments = _read_table(
-            conn,
-            SQL_CATEGORY_ASSIGNMENTS_TABLE,
-            CATEGORY_ASSIGNMENT_COLUMNS,
-            {ANN_CATEGORY_ID: int, ANN_ELEMENT_REF: str, ANN_CATEGORY_VALUE: str},
-            [ANN_CATEGORY_ID, ANN_ELEMENT_REF],
-        )
+        item = etree.SubElement(operation, XML_ITEM, {XML_ITEM_TYPE: str(row[QEL_ITEM_TYPE])})
+        item.text = str(row[QEL_QUANTITY])
+    quantity_extension.append(operations)
 
-    return (
-        label_definitions,
-        label_assignments,
-        category_definitions,
-        category_assignments,
-    )
-
-
-def write_annotations_to_sqlite(
-    path: Path,
-    label_definitions: pd.DataFrame,
-    label_assignments: pd.DataFrame,
-    category_definitions: pd.DataFrame,
-    category_assignments: pd.DataFrame,
-) -> None:
-    label_definitions = _normalize(
-        label_definitions,
-        LABEL_DEFINITION_COLUMNS,
-        {ANN_ID: int, ANN_ELEMENT_TYPE: str, ANN_NAME: str},
-        [ANN_ID],
-    )
-    label_assignments = _normalize(
-        label_assignments,
-        LABEL_ASSIGNMENT_COLUMNS,
-        {ANN_LABEL_ID: int, ANN_ELEMENT_REF: str},
-        [ANN_LABEL_ID, ANN_ELEMENT_REF],
-    )
-    category_definitions = _normalize(
-        category_definitions,
-        CATEGORY_DEFINITION_COLUMNS,
-        {ANN_ID: int, ANN_ELEMENT_TYPE: str, ANN_NAME: str},
-        [ANN_ID],
-    )
-    category_assignments = _normalize(
-        category_assignments,
-        CATEGORY_ASSIGNMENT_COLUMNS,
-        {ANN_CATEGORY_ID: int, ANN_ELEMENT_REF: str, ANN_CATEGORY_VALUE: str},
-        [ANN_CATEGORY_ID, ANN_ELEMENT_REF],
-    )
-
-    with sqlite3.connect(path) as conn:
-        conn.execute("PRAGMA foreign_keys = ON")
-        _ensure_annotation_tables_exist(conn)
-
-        conn.execute(f"DELETE FROM {SQL_LABEL_ASSIGNMENTS_TABLE}")
-        conn.execute(f"DELETE FROM {SQL_CATEGORY_ASSIGNMENTS_TABLE}")
-        conn.execute(f"DELETE FROM {SQL_LABEL_DEFINITIONS_TABLE}")
-        conn.execute(f"DELETE FROM {SQL_CATEGORY_DEFINITIONS_TABLE}")
-
-        if not label_definitions.empty:
-            label_definitions.to_sql(
-                SQL_LABEL_DEFINITIONS_TABLE, conn, index=False, if_exists="append"
-            )
-        if not label_assignments.empty:
-            label_assignments.to_sql(
-                SQL_LABEL_ASSIGNMENTS_TABLE, conn, index=False, if_exists="append"
-            )
-        if not category_definitions.empty:
-            category_definitions.to_sql(
-                SQL_CATEGORY_DEFINITIONS_TABLE, conn, index=False, if_exists="append"
-            )
-        if not category_assignments.empty:
-            category_assignments.to_sql(
-                SQL_CATEGORY_ASSIGNMENTS_TABLE, conn, index=False, if_exists="append"
-            )
-
-        conn.commit()
-
-
-def read_annotations_from_json(
-    path: Path,
-) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    data = orjson.loads(path.read_bytes())
-
-    ext = data.get(
-        JSON_ANNOTATION_EXTENSION,
-        {
-            JSON_LABEL_DEFINITIONS: [],
-            JSON_LABEL_ASSIGNMENTS: [],
-            JSON_CATEGORY_DEFINITIONS: [],
-            JSON_CATEGORY_ASSIGNMENTS: [],
-        },
-    )
-
-    label_definitions = _normalize(
-        pd.DataFrame.from_records(
-            ext.get(JSON_LABEL_DEFINITIONS, []),
-            columns=list(JSON_LABEL_DEFINITION_KEYMAP.values()),
-        ).rename(columns=inverse_keymap(JSON_LABEL_DEFINITION_KEYMAP)),
-        LABEL_DEFINITION_COLUMNS,
-        {ANN_ID: int, ANN_ELEMENT_TYPE: str, ANN_NAME: str},
-        [ANN_ID],
-    )
-
-    label_assignments = _normalize(
-        pd.DataFrame.from_records(
-            ext.get(JSON_LABEL_ASSIGNMENTS, []),
-            columns=list(JSON_LABEL_ASSIGNMENT_KEYMAP.values()),
-        ).rename(columns=inverse_keymap(JSON_LABEL_ASSIGNMENT_KEYMAP)),
-        LABEL_ASSIGNMENT_COLUMNS,
-        {ANN_LABEL_ID: int, ANN_ELEMENT_REF: str},
-        [ANN_LABEL_ID, ANN_ELEMENT_REF],
-    )
-
-    category_definitions = _normalize(
-        pd.DataFrame.from_records(
-            ext.get(JSON_CATEGORY_DEFINITIONS, []),
-            columns=list(JSON_CATEGORY_DEFINITION_KEYMAP.values()),
-        ).rename(columns=inverse_keymap(JSON_CATEGORY_DEFINITION_KEYMAP)),
-        CATEGORY_DEFINITION_COLUMNS,
-        {ANN_ID: int, ANN_ELEMENT_TYPE: str, ANN_NAME: str},
-        [ANN_ID],
-    )
-
-    category_assignments = _normalize(
-        pd.DataFrame.from_records(
-            ext.get(JSON_CATEGORY_ASSIGNMENTS, []),
-            columns=list(JSON_CATEGORY_ASSIGNMENT_KEYMAP.values()),
-        ).rename(columns=inverse_keymap(JSON_CATEGORY_ASSIGNMENT_KEYMAP)),
-        CATEGORY_ASSIGNMENT_COLUMNS,
-        {ANN_CATEGORY_ID: int, ANN_ELEMENT_REF: str, ANN_CATEGORY_VALUE: str},
-        [ANN_CATEGORY_ID, ANN_ELEMENT_REF],
-    )
-
-    return (
-        label_definitions,
-        label_assignments,
-        category_definitions,
-        category_assignments,
-    )
-
-
-def write_annotations_to_json(
-    path: Path,
-    label_definitions: pd.DataFrame,
-    label_assignments: pd.DataFrame,
-    category_definitions: pd.DataFrame,
-    category_assignments: pd.DataFrame,
-) -> None:
-    label_definitions = _normalize(
-        label_definitions,
-        LABEL_DEFINITION_COLUMNS,
-        {ANN_ID: int, ANN_ELEMENT_TYPE: str, ANN_NAME: str},
-        [ANN_ID],
-    )
-    label_assignments = _normalize(
-        label_assignments,
-        LABEL_ASSIGNMENT_COLUMNS,
-        {ANN_LABEL_ID: int, ANN_ELEMENT_REF: str},
-        [ANN_LABEL_ID, ANN_ELEMENT_REF],
-    )
-    category_definitions = _normalize(
-        category_definitions,
-        CATEGORY_DEFINITION_COLUMNS,
-        {ANN_ID: int, ANN_ELEMENT_TYPE: str, ANN_NAME: str},
-        [ANN_ID],
-    )
-    category_assignments = _normalize(
-        category_assignments,
-        CATEGORY_ASSIGNMENT_COLUMNS,
-        {ANN_CATEGORY_ID: int, ANN_ELEMENT_REF: str, ANN_CATEGORY_VALUE: str},
-        [ANN_CATEGORY_ID, ANN_ELEMENT_REF],
-    )
-
-    data = orjson.loads(path.read_bytes())
-    data[JSON_ANNOTATION_EXTENSION] = {
-        JSON_LABEL_DEFINITIONS: label_definitions.rename(
-            columns=JSON_LABEL_DEFINITION_KEYMAP
-        ).to_dict(orient="records"),
-        JSON_LABEL_ASSIGNMENTS: label_assignments.rename(
-            columns=JSON_LABEL_ASSIGNMENT_KEYMAP
-        ).to_dict(orient="records"),
-        JSON_CATEGORY_DEFINITIONS: category_definitions.rename(
-            columns=JSON_CATEGORY_DEFINITION_KEYMAP
-        ).to_dict(orient="records"),
-        JSON_CATEGORY_ASSIGNMENTS: category_assignments.rename(
-            columns=JSON_CATEGORY_ASSIGNMENT_KEYMAP
-        ).to_dict(orient="records"),
-    }
-
-    path.write_bytes(orjson.dumps(data, option=orjson.OPT_APPEND_NEWLINE))
-
-
-def read_annotations_from_xml(
-    path: Path,
-) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    root = etree.parse(path).getroot()
-    ext = root.find(XML_ANNOTATION_EXTENSION)
-
-    if ext is None:
-        return (
-            _empty(LABEL_DEFINITION_COLUMNS),
-            _empty(LABEL_ASSIGNMENT_COLUMNS),
-            _empty(CATEGORY_DEFINITION_COLUMNS),
-            _empty(CATEGORY_ASSIGNMENT_COLUMNS),
-        )
-
-    label_definitions_data = []
-    for elem in ext.find(XML_LABEL_DEFINITIONS) or []:
-        label_definitions_data.append(
+    object_quantities = etree.Element(XML_QUANTITIES)
+    for _, row in oqty.iterrows():
+        quantity = etree.SubElement(
+            object_quantities,
+            XML_QUANTITY,
             {
-                ANN_ID: elem.attrib.get(XML_ID, ""),
-                ANN_ELEMENT_TYPE: elem.attrib.get(XML_ELEMENT_TYPE, ""),
-                ANN_NAME: elem.attrib.get(XML_NAME, ""),
-            }
+                XML_OBJECT_ID: str(row[OID_COL]),
+                XML_QUANTITY_TYPE: str(row[QEL_ITEM_TYPE]),
+            },
         )
+        quantity.text = str(row[QEL_QUANTITY])
+    quantity_extension.append(object_quantities)
 
-    label_assignments_data = []
-    for elem in ext.find(XML_LABEL_ASSIGNMENTS) or []:
-        label_assignments_data.append(
-            {
-                ANN_LABEL_ID: elem.attrib.get(XML_LABEL_ID, ""),
-                ANN_ELEMENT_REF: elem.attrib.get(XML_ELEMENT_REF, ""),
-            }
-        )
-
-    category_definitions_data = []
-    for elem in ext.find(XML_CATEGORY_DEFINITIONS) or []:
-        category_definitions_data.append(
-            {
-                ANN_ID: elem.attrib.get(XML_ID, ""),
-                ANN_ELEMENT_TYPE: elem.attrib.get(XML_ELEMENT_TYPE, ""),
-                ANN_NAME: elem.attrib.get(XML_NAME, ""),
-            }
-        )
-
-    category_assignments_data = []
-    for elem in ext.find(XML_CATEGORY_ASSIGNMENTS) or []:
-        category_assignments_data.append(
-            {
-                ANN_CATEGORY_ID: elem.attrib.get(XML_CATEGORY_ID, ""),
-                ANN_ELEMENT_REF: elem.attrib.get(XML_ELEMENT_REF, ""),
-                ANN_CATEGORY_VALUE: elem.attrib.get(XML_VALUE, ""),
-            }
-        )
-
-    label_definitions = _normalize(
-        pd.DataFrame(label_definitions_data, columns=LABEL_DEFINITION_COLUMNS),
-        LABEL_DEFINITION_COLUMNS,
-        {ANN_ID: int, ANN_ELEMENT_TYPE: str, ANN_NAME: str},
-        [ANN_ID],
-    )
-    label_assignments = _normalize(
-        pd.DataFrame(label_assignments_data, columns=LABEL_ASSIGNMENT_COLUMNS),
-        LABEL_ASSIGNMENT_COLUMNS,
-        {ANN_LABEL_ID: int, ANN_ELEMENT_REF: str},
-        [ANN_LABEL_ID, ANN_ELEMENT_REF],
-    )
-    category_definitions = _normalize(
-        pd.DataFrame(category_definitions_data, columns=CATEGORY_DEFINITION_COLUMNS),
-        CATEGORY_DEFINITION_COLUMNS,
-        {ANN_ID: int, ANN_ELEMENT_TYPE: str, ANN_NAME: str},
-        [ANN_ID],
-    )
-    category_assignments = _normalize(
-        pd.DataFrame(category_assignments_data, columns=CATEGORY_ASSIGNMENT_COLUMNS),
-        CATEGORY_ASSIGNMENT_COLUMNS,
-        {ANN_CATEGORY_ID: int, ANN_ELEMENT_REF: str, ANN_CATEGORY_VALUE: str},
-        [ANN_CATEGORY_ID, ANN_ELEMENT_REF],
-    )
-
-    return (
-        label_definitions,
-        label_assignments,
-        category_definitions,
-        category_assignments,
-    )
+    log = etree.parse(path)
+    log.getroot().append(quantity_extension)
+    log.write(path, xml_declaration=True, encoding="UTF-8")
 
 
-def write_annotations_to_xml(
-    path: Path,
-    label_definitions: pd.DataFrame,
-    label_assignments: pd.DataFrame,
-    category_definitions: pd.DataFrame,
-    category_assignments: pd.DataFrame,
-) -> None:
-    label_definitions = _normalize(
-        label_definitions,
-        LABEL_DEFINITION_COLUMNS,
-        {ANN_ID: int, ANN_ELEMENT_TYPE: str, ANN_NAME: str},
-        [ANN_ID],
-    )
-    label_assignments = _normalize(
-        label_assignments,
-        LABEL_ASSIGNMENT_COLUMNS,
-        {ANN_LABEL_ID: int, ANN_ELEMENT_REF: str},
-        [ANN_LABEL_ID, ANN_ELEMENT_REF],
-    )
-    category_definitions = _normalize(
-        category_definitions,
-        CATEGORY_DEFINITION_COLUMNS,
-        {ANN_ID: int, ANN_ELEMENT_TYPE: str, ANN_NAME: str},
-        [ANN_ID],
-    )
-    category_assignments = _normalize(
-        category_assignments,
-        CATEGORY_ASSIGNMENT_COLUMNS,
-        {ANN_CATEGORY_ID: int, ANN_ELEMENT_REF: str, ANN_CATEGORY_VALUE: str},
-        [ANN_CATEGORY_ID, ANN_ELEMENT_REF],
-    )
-
+def read_extension_from_xml(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
     tree = etree.parse(path)
     root = tree.getroot()
 
-    old_ext = root.find(XML_ANNOTATION_EXTENSION)
-    if old_ext is not None:
-        root.remove(old_ext)
+    quantity_ext = root.find(XML_QUANTITY_EXTENSION)
+    if quantity_ext is None:
+        return pd.DataFrame(columns=OQTY_COLUMNS), pd.DataFrame(columns=QOP_COLUMNS)
 
-    ext = etree.Element(XML_ANNOTATION_EXTENSION)
+    operations_data = []
+    operations_elem = quantity_ext.find(XML_OPERATIONS)
+    if operations_elem is not None:
+        for op in operations_elem.findall(XML_OPERATION):
+            eid = op.attrib.get(XML_EVENT_ID, "")
+            oid = op.attrib.get(XML_OBJECT_ID, "")
+            item_elem = op.find(XML_ITEM)
+            if item_elem is not None:
+                item_type = item_elem.attrib.get(XML_ITEM_TYPE, "")
+                quantity = item_elem.text or ""
+                operations_data.append(
+                    {
+                        EID_COL: eid,
+                        OID_COL: oid,
+                        QEL_ITEM_TYPE: item_type,
+                        QEL_QUANTITY: float(quantity),
+                    }
+                )
 
-    label_defs_elem = etree.SubElement(ext, XML_LABEL_DEFINITIONS)
-    for _, row in label_definitions.iterrows():
-        etree.SubElement(
-            label_defs_elem,
-            XML_LABEL_DEFINITION,
-            {
-                XML_ID: str(row[ANN_ID]),
-                XML_ELEMENT_TYPE: str(row[ANN_ELEMENT_TYPE]),
-                XML_NAME: str(row[ANN_NAME]),
-            },
+    # Read quantities
+    quantities_data = []
+    quantities_elem = quantity_ext.find(XML_QUANTITIES)
+    if quantities_elem is not None:
+        for q in quantities_elem.findall(XML_QUANTITY):
+            oid = q.attrib.get(XML_OBJECT_ID, "")
+            item_type = q.attrib.get(XML_QUANTITY_TYPE, "")
+            quantity = q.text or ""
+            quantities_data.append(
+                {
+                    OID_COL: oid,
+                    QEL_ITEM_TYPE: item_type,
+                    QEL_QUANTITY: float(quantity),
+                }
+            )
+
+    oqty_df = pd.DataFrame(quantities_data, columns=OQTY_COLUMNS)
+    qop_df = pd.DataFrame(operations_data, columns=QOP_COLUMNS)
+    return oqty_df, qop_df
+
+
+def read_extension_from_json(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
+    with open(path, "rb") as f:
+        json = orjson.loads(f.read())
+
+        quantityExtension = json.get(
+            JSON_QUANTITY_EXTENSION, {JSON_OPERATIONS: [], JSON_QUANTITIES: []}
         )
 
-    label_assigns_elem = etree.SubElement(ext, XML_LABEL_ASSIGNMENTS)
-    for _, row in label_assignments.iterrows():
-        etree.SubElement(
-            label_assigns_elem,
-            XML_LABEL_ASSIGNMENT,
-            {
-                XML_LABEL_ID: str(row[ANN_LABEL_ID]),
-                XML_ELEMENT_REF: str(row[ANN_ELEMENT_REF]),
-            },
-        )
+        oqty: pd.DataFrame = pd.DataFrame.from_records(
+            data=quantityExtension[JSON_QUANTITIES],
+            columns=[JSON_KEYMAP[OID_COL], JSON_KEYMAP[QEL_ITEM_TYPE], JSON_KEYMAP[QEL_QUANTITY]],
+        ).rename(columns=inverse_keymap(JSON_KEYMAP))
 
-    category_defs_elem = etree.SubElement(ext, XML_CATEGORY_DEFINITIONS)
-    for _, row in category_definitions.iterrows():
-        etree.SubElement(
-            category_defs_elem,
-            XML_CATEGORY_DEFINITION,
-            {
-                XML_ID: str(row[ANN_ID]),
-                XML_ELEMENT_TYPE: str(row[ANN_ELEMENT_TYPE]),
-                XML_NAME: str(row[ANN_NAME]),
-            },
-        )
+        qop: pd.DataFrame = pd.DataFrame.from_records(
+            data=quantityExtension[JSON_OPERATIONS],
+            columns=[
+                JSON_KEYMAP[EID_COL],
+                JSON_KEYMAP[OID_COL],
+                JSON_KEYMAP[QEL_ITEM_TYPE],
+                JSON_KEYMAP[QEL_QUANTITY],
+            ],
+        ).rename(columns=inverse_keymap(JSON_KEYMAP))
 
-    category_assigns_elem = etree.SubElement(ext, XML_CATEGORY_ASSIGNMENTS)
-    for _, row in category_assignments.iterrows():
-        etree.SubElement(
-            category_assigns_elem,
-            XML_CATEGORY_ASSIGNMENT,
-            {
-                XML_CATEGORY_ID: str(row[ANN_CATEGORY_ID]),
-                XML_ELEMENT_REF: str(row[ANN_ELEMENT_REF]),
-                XML_VALUE: str(row[ANN_CATEGORY_VALUE]),
-            },
-        )
-
-    root.append(ext)
-    tree.write(path, xml_declaration=True, encoding="UTF-8")
+    return (oqty, qop)
 
 
-# -----------------------------------------------------------------------------
-# Dispatch
-# -----------------------------------------------------------------------------
+def write_extension_to_json(path: Path, oqty: pd.DataFrame, qop: pd.DataFrame):
+    ocel = orjson.loads(path.read_bytes())
+
+    renamed_oqty = oqty.rename(columns=JSON_KEYMAP)
+
+    renamed_qop = qop.rename(columns=JSON_KEYMAP)
+
+    ocel[JSON_QUANTITY_EXTENSION] = {
+        JSON_QUANTITIES: renamed_oqty.to_dict(orient="records"),
+        JSON_OPERATIONS: renamed_qop.to_dict(orient="records"),
+    }
+
+    data = orjson.dumps(ocel, option=orjson.OPT_APPEND_NEWLINE)
+
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_bytes(data)
+    os.replace(tmp, path)
 
 
-def read_annotations_extension(
-    path: Path,
-) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def write_extension_to_sqlite(path: Path, oqty: pd.DataFrame, qop: pd.DataFrame):
+    with sqlite3.connect(path) as conn:
+        oqty.rename(columns=SQL_KEYMAP).to_sql(SQL_QUANTITIES, conn, index=False)
+        qop.rename(columns=SQL_KEYMAP).to_sql(SQL_OPERATIONS, conn, index=False)
+
+
+def read_extension_from_sqlite(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
+    with sqlite3.connect(path) as conn:
+        query_string = "SELECT * FROM {table_name}"
+
+        try:
+            oqty = pd.read_sql_query(
+                query_string.format(table_name=SQL_QUANTITIES), conn, index_col=None
+            ).rename(columns=inverse_keymap(SQL_KEYMAP))
+        except Exception:
+            oqty = pd.DataFrame(columns=OQTY_COLUMNS)
+
+        try:
+            qop = pd.read_sql_query(
+                query_string.format(table_name=SQL_OPERATIONS), conn, index_col=None
+            ).rename(columns=inverse_keymap(SQL_KEYMAP))
+        except Exception:
+            qop = pd.DataFrame(columns=QOP_COLUMNS)
+
+    return oqty, qop
+
+
+def read_quantity_extension(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
     match path.suffix:
-        case ".sqlite":
-            return read_annotations_from_sqlite(path)
-        case ".jsonocel" | ".json":
-            return read_annotations_from_json(path)
         case ".xmlocel" | ".xml":
-            return read_annotations_from_xml(path)
+            return read_extension_from_xml(path)
+        case ".jsonocel" | ".json":
+            return read_extension_from_json(path)
+        case ".sqlite":
+            return read_extension_from_sqlite(path)
         case _:
             raise ValueError(f"Unsupported extension: {path.suffix}")
 
 
-def write_annotations_extension(
-    path: Path,
-    label_definitions: pd.DataFrame,
-    label_assignments: pd.DataFrame,
-    category_definitions: pd.DataFrame,
-    category_assignments: pd.DataFrame,
-) -> None:
+def write_quantity_extension(path: Path, oqty: pd.DataFrame, qop: pd.DataFrame):
     match path.suffix:
-        case ".sqlite":
-            write_annotations_to_sqlite(
-                path,
-                label_definitions=label_definitions,
-                label_assignments=label_assignments,
-                category_definitions=category_definitions,
-                category_assignments=category_assignments,
-            )
-        case ".jsonocel" | ".json":
-            write_annotations_to_json(
-                path,
-                label_definitions=label_definitions,
-                label_assignments=label_assignments,
-                category_definitions=category_definitions,
-                category_assignments=category_assignments,
-            )
         case ".xmlocel" | ".xml":
-            write_annotations_to_xml(
-                path,
-                label_definitions=label_definitions,
-                label_assignments=label_assignments,
-                category_definitions=category_definitions,
-                category_assignments=category_assignments,
-            )
+            return write_extension_to_xml(path, oqty=oqty, qop=qop)
+        case ".jsonocel" | ".json":
+            return write_extension_to_json(path, oqty=oqty, qop=qop)
+        case ".sqlite":
+            return write_extension_to_sqlite(path, oqty=oqty, qop=qop)
         case _:
             raise ValueError(f"Unsupported extension: {path.suffix}")
