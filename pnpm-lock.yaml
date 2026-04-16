@@ -121,8 +121,8 @@ catalogs:
       specifier: ^6.0.1
       version: 6.0.1
     html-to-image:
-      specifier: ^1.11.13
-      version: 1.11.13
+      specifier: 1.11.11
+      version: 1.11.11
     json-schema-traverse:
       specifier: ^1.0.0
       version: 1.0.0
@@ -327,7 +327,7 @@ importers:
         version: 2.0.5
       html-to-image:
         specifier: 'catalog:'
-        version: 1.11.13
+        version: 1.11.11
       lucide-react:
         specifier: 'catalog:'
         version: 0.563.0(react@19.2.3)
@@ -2550,8 +2550,8 @@ packages:
   hookable@6.1.0:
     resolution: {integrity: sha512-ZoKZSJgu8voGK2geJS+6YtYjvIzu9AOM/KZXsBxr83uhLL++e9pEv/dlgwgy3dvHg06kTz6JOh1hk3C8Ceiymw==}
 
-  html-to-image@1.11.13:
-    resolution: {integrity: sha512-cuOPoI7WApyhBElTTb9oqsawRvZ0rHhaHwghRLlTuffoD1B2aDemlCruLeZrUIIdvG7gs9xeELEPm6PhuASqrg==}
+  html-to-image@1.11.11:
+    resolution: {integrity: sha512-9gux8QhvjRO/erSnDPv28noDZcPZmYE7e1vFsBLKLlRlKDSqNJYebj6Qz1TGd5lsRV+X+xYyjCKjuZdABinWjA==}
 
   human-signals@8.0.1:
     resolution: {integrity: sha512-eKCa6bwnJhvxj14kZk5NCPc6Hb6BdsU9DZcOnmQKSnO1VKrfV0zCvtttPZUsBvjmNDn8rpcJfpwSYnHBjc95MQ==}
@@ -5545,7 +5545,7 @@ snapshots:
 
   hookable@6.1.0: {}
 
-  html-to-image@1.11.13: {}
+  html-to-image@1.11.11: {}
 
   human-signals@8.0.1: {}
 
