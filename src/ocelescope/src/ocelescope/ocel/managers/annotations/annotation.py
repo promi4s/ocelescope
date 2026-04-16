@@ -13,47 +13,46 @@ from ocelescope.ocel.constants.annotations import (
     ANN_ID,
     ANN_LABEL_ID,
     ANN_NAME,
+    CATEGORY_ASSIGNMENT_COLUMNS,
+    CATEGORY_DEFINITION_COLUMNS,
+    LABEL_ASSIGNMENT_COLUMNS,
+    LABEL_DEFINITION_COLUMNS,
     AnnotationElementType,
 )
-from ocelescope.ocel.extensions.annotations.util.io import (
+from ocelescope.ocel.managers.annotations.util.io import (
     read_annotations_extension,
     write_annotations_extension,
 )
-from ocelescope.ocel.extensions.base_extension import OCELExtension
+from ocelescope.ocel.managers.base import BaseManager
 
 if TYPE_CHECKING:
     from ocelescope.ocel.core import OCEL
 
 
-class AnnotationExtension(OCELExtension):
-    name = "Annotations"
-    description = "Reads and stores annotations from an SQLite file. Annotations are labeles and categories that are created for objects, object types, events and activities to group them."
-    version = "1.0"
-    supported_extensions = [".sqlite"]
-
+class AnnotationManager(BaseManager):
     def __init__(
         self,
         ocel: OCEL,
-        label_definitions: pd.DataFrame,
-        label_assignments: pd.DataFrame,
-        category_definitions: pd.DataFrame,
-        category_assignments: pd.DataFrame,
     ):
+        super().__init__(ocel)
         self.ocel = ocel
-        self.label_definitions = label_definitions
-        self.label_assignments = label_assignments
-        self.category_definitions = category_definitions
-        self.category_assignments = category_assignments
+        (
+            self.label_definitions,
+            self.label_assignments,
+            self.category_definitions,
+            self.category_assignments,
+        ) = (
+            read_annotations_extension(ocel.meta.path)
+            if ocel.meta.path is not None
+            else (
+                pd.DataFrame(columns=LABEL_DEFINITION_COLUMNS),
+                pd.DataFrame(columns=LABEL_ASSIGNMENT_COLUMNS),
+                pd.DataFrame(columns=CATEGORY_DEFINITION_COLUMNS),
+                pd.DataFrame(columns=CATEGORY_ASSIGNMENT_COLUMNS),
+            )
+        )
 
-    @staticmethod
-    def has_extension(path: Path) -> bool:
-        return path.suffix in AnnotationExtension.supported_extensions
-
-    @classmethod
-    def import_extension(cls, ocel: OCEL, path: Path) -> "AnnotationExtension":
-        return cls(ocel, *read_annotations_extension(path))
-
-    def export_extension(self, path: Path) -> None:
+    def write_annotations(self, path: Path) -> None:
         write_annotations_extension(
             path,
             self.label_definitions,

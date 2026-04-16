@@ -3022,6 +3022,960 @@
         }
       }
     },
+    "/ocels/{ocel_id}/annotations/labels": {
+      "get": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "List all label definitions",
+        "operationId": "getLabels",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ocel Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LabelDefinition"
+                  },
+                  "title": "Response Getlabels"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Create a label definition",
+        "operationId": "createLabel",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ocel Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLabelRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LabelDefinition"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ocels/{ocel_id}/annotations/labels-with-assignments": {
+      "get": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "List all labels including their members",
+        "operationId": "getLabelsWithAssignments",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ocel Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LabelWithAssignments"
+                  },
+                  "title": "Response Getlabelswithassignments"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ocels/{ocel_id}/annotations/labels/{label_id}": {
+      "patch": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Rename a label definition",
+        "operationId": "renameLabel",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "label_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Label Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RenameLabelRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LabelDefinition"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Delete a label definition",
+        "operationId": "deleteLabel",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "label_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Label Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ocels/{ocel_id}/annotations/labels/{label_id}/assignments": {
+      "get": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Get members of a label",
+        "operationId": "getLabelAssignments",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "label_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Label Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LabelAssignment"
+                  },
+                  "title": "Response Getlabelassignments"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Add one member to a label",
+        "operationId": "addLabelAssignment",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "label_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Label Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddLabelAssignmentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Remove one member from a label",
+        "operationId": "removeLabelAssignment",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "label_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Label Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveLabelAssignmentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ocels/{ocel_id}/annotations/labels/{label_id}/assignements": {
+      "put": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Replace all members of a label",
+        "operationId": "setLabelAssignments",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "label_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Label Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetLabelAssignmentsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ocels/{ocel_id}/annotations/categories": {
+      "get": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "List all category definitions",
+        "operationId": "getCategories",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ocel Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryDefinition"
+                  },
+                  "title": "Response Getcategories"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Create a category definition",
+        "operationId": "createCategory",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ocel Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCategoryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryDefinition"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ocels/{ocel_id}/annotations/categories-with-assignments": {
+      "get": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "List all categories including their assignments",
+        "operationId": "getCategoriesWithAssignments",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ocel Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryWithAssignments"
+                  },
+                  "title": "Response Getcategorieswithassignments"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ocels/{ocel_id}/annotations/categories/{category_id}": {
+      "patch": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Rename a category definition",
+        "operationId": "renameCategory",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "category_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Category Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RenameCategoryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryDefinition"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Delete a category definition",
+        "operationId": "deleteCategory",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "category_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Category Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ocels/{ocel_id}/annotations/categories/{category_id}/assignments": {
+      "get": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Get assignments of a category",
+        "operationId": "getCategoryAssignments",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "category_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Category Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryAssignment"
+                  },
+                  "title": "Response Getcategoryassignments"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Replace all assignments of a category",
+        "operationId": "setCategoryAssignments",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "category_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Category Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetCategoryAssignmentsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Set one category value",
+        "operationId": "addCategoryAssignment",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "category_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Category Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddCategoryAssignmentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Remove one category value",
+        "operationId": "removeCategoryAssignment",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "category_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Category Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveCategoryAssignmentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/sse": {
       "get": {
         "summary": "Sse Endpoint",
@@ -3041,6 +3995,37 @@
   },
   "components": {
     "schemas": {
+      "AddCategoryAssignmentRequest": {
+        "properties": {
+          "element_ref": {
+            "type": "string",
+            "title": "Element Ref"
+          },
+          "value": {
+            "type": "string",
+            "title": "Value"
+          }
+        },
+        "type": "object",
+        "required": [
+          "element_ref",
+          "value"
+        ],
+        "title": "AddCategoryAssignmentRequest"
+      },
+      "AddLabelAssignmentRequest": {
+        "properties": {
+          "element_ref": {
+            "type": "string",
+            "title": "Element Ref"
+          }
+        },
+        "type": "object",
+        "required": [
+          "element_ref"
+        ],
+        "title": "AddLabelAssignmentRequest"
+      },
       "AggregatedAttribute": {
         "properties": {
           "name": {
@@ -3232,6 +4217,129 @@
           "file"
         ],
         "title": "Body_uploadResource"
+      },
+      "CategoryAssignment": {
+        "properties": {
+          "category_id": {
+            "type": "integer",
+            "title": "Category Id"
+          },
+          "element_ref": {
+            "type": "string",
+            "title": "Element Ref"
+          },
+          "value": {
+            "type": "string",
+            "title": "Value"
+          }
+        },
+        "type": "object",
+        "required": [
+          "category_id",
+          "element_ref",
+          "value"
+        ],
+        "title": "CategoryAssignment"
+      },
+      "CategoryDefinition": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "element_type": {
+            "type": "string",
+            "enum": [
+              "event",
+              "activity",
+              "object",
+              "object_type",
+              "item_type"
+            ],
+            "title": "Element Type"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "element_type",
+          "name"
+        ],
+        "title": "CategoryDefinition"
+      },
+      "CategoryWithAssignments": {
+        "properties": {
+          "definition": {
+            "$ref": "#/components/schemas/CategoryDefinition"
+          },
+          "assignments": {
+            "items": {
+              "$ref": "#/components/schemas/CategoryAssignment"
+            },
+            "type": "array",
+            "title": "Assignments"
+          }
+        },
+        "type": "object",
+        "required": [
+          "definition",
+          "assignments"
+        ],
+        "title": "CategoryWithAssignments"
+      },
+      "CreateCategoryRequest": {
+        "properties": {
+          "element_type": {
+            "type": "string",
+            "enum": [
+              "event",
+              "activity",
+              "object",
+              "object_type",
+              "item_type"
+            ],
+            "title": "Element Type"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "element_type",
+          "name"
+        ],
+        "title": "CreateCategoryRequest"
+      },
+      "CreateLabelRequest": {
+        "properties": {
+          "element_type": {
+            "type": "string",
+            "enum": [
+              "event",
+              "activity",
+              "object",
+              "object_type",
+              "item_type"
+            ],
+            "title": "Element Type"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "element_type",
+          "name"
+        ],
+        "title": "CreateLabelRequest"
       },
       "Date_Distribution_Item": {
         "properties": {
@@ -4126,6 +5234,74 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
+      "LabelAssignment": {
+        "properties": {
+          "label_id": {
+            "type": "integer",
+            "title": "Label Id"
+          },
+          "element_ref": {
+            "type": "string",
+            "title": "Element Ref"
+          }
+        },
+        "type": "object",
+        "required": [
+          "label_id",
+          "element_ref"
+        ],
+        "title": "LabelAssignment"
+      },
+      "LabelDefinition": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "element_type": {
+            "type": "string",
+            "enum": [
+              "event",
+              "activity",
+              "object",
+              "object_type",
+              "item_type"
+            ],
+            "title": "Element Type"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "element_type",
+          "name"
+        ],
+        "title": "LabelDefinition"
+      },
+      "LabelWithAssignments": {
+        "properties": {
+          "definition": {
+            "$ref": "#/components/schemas/LabelDefinition"
+          },
+          "asssignments": {
+            "items": {
+              "$ref": "#/components/schemas/LabelAssignment"
+            },
+            "type": "array",
+            "title": "Asssignments"
+          }
+        },
+        "type": "object",
+        "required": [
+          "definition",
+          "asssignments"
+        ],
+        "title": "LabelWithAssignments"
+      },
       "O2OCountFilter": {
         "properties": {
           "source": {
@@ -4976,6 +6152,58 @@
         ],
         "title": "RelationCountSummary"
       },
+      "RemoveCategoryAssignmentRequest": {
+        "properties": {
+          "element_ref": {
+            "type": "string",
+            "title": "Element Ref"
+          }
+        },
+        "type": "object",
+        "required": [
+          "element_ref"
+        ],
+        "title": "RemoveCategoryAssignmentRequest"
+      },
+      "RemoveLabelAssignmentRequest": {
+        "properties": {
+          "element_ref": {
+            "type": "string",
+            "title": "Element Ref"
+          }
+        },
+        "type": "object",
+        "required": [
+          "element_ref"
+        ],
+        "title": "RemoveLabelAssignmentRequest"
+      },
+      "RenameCategoryRequest": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "RenameCategoryRequest"
+      },
+      "RenameLabelRequest": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "RenameLabelRequest"
+      },
       "ResourceAnnotation": {
         "properties": {
           "label": {
@@ -5116,6 +6344,38 @@
           "svg"
         ],
         "title": "SVGVis"
+      },
+      "SetCategoryAssignmentsRequest": {
+        "properties": {
+          "mappings": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Mappings"
+          }
+        },
+        "type": "object",
+        "required": [
+          "mappings"
+        ],
+        "title": "SetCategoryAssignmentsRequest"
+      },
+      "SetLabelAssignmentsRequest": {
+        "properties": {
+          "element_refs": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Element Refs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "element_refs"
+        ],
+        "title": "SetLabelAssignmentsRequest"
       },
       "SystemTaskSummary": {
         "properties": {

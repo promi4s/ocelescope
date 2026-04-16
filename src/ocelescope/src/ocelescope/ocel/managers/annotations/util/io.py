@@ -15,10 +15,10 @@ from ocelescope.ocel.constants.annotations import (
     ANN_NAME,
     CATEGORY_ASSIGNMENT_COLUMNS,
     CATEGORY_DEFINITION_COLUMNS,
+    LABEL_ASSIGNMENT_COLUMNS,
     LABEL_DEFINITION_COLUMNS,
-    LABEL_MEMBERSHIP_COLUMNS,
 )
-from ocelescope.ocel.extensions.annotations.util.constants import (
+from ocelescope.ocel.managers.annotations.util.constants import (
     SQL_CATEGORY_ASSIGNMENTS_TABLE,
     SQL_CATEGORY_DEFINITIONS_TABLE,
     SQL_LABEL_ASSIGNMENTS_TABLE,
@@ -136,7 +136,7 @@ def read_annotations_from_sqlite(
         label_assignments = _read_table(
             conn,
             SQL_LABEL_ASSIGNMENTS_TABLE,
-            LABEL_MEMBERSHIP_COLUMNS,
+            LABEL_ASSIGNMENT_COLUMNS,
             {
                 ANN_LABEL_ID: int,
                 ANN_ELEMENT_REF: str,
@@ -193,7 +193,7 @@ def write_annotations_to_sqlite(
     )
     label_assignments = _normalize(
         label_assignments,
-        LABEL_MEMBERSHIP_COLUMNS,
+        LABEL_ASSIGNMENT_COLUMNS,
         {
             ANN_LABEL_ID: int,
             ANN_ELEMENT_REF: str,

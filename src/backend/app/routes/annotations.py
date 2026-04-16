@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-from ocelescope.ocel.extensions import AnnotationExtension
 
 from app.dependencies import ApiSession
 from app.internal.model.annotations import (
@@ -36,7 +35,7 @@ def get_labels(
     session: ApiSession,
     ocel_id: str,
 ) -> list[LabelDefinition]:
-    annotations = session.ocels[ocel_id].origin.extensions.get(AnnotationExtension)
+    annotations = session.ocels[ocel_id].origin.annotations
     assert annotations is not None
     df = annotations.get_label_definitions()
 
@@ -59,7 +58,7 @@ def get_labels_with_assignments(
     session: ApiSession,
     ocel_id: str,
 ) -> list[LabelWithAssignments]:
-    annotations = session.ocels[ocel_id].origin.extensions.get(AnnotationExtension)
+    annotations = session.ocels[ocel_id].origin.annotations
     assert annotations is not None
     items = annotations.get_labels_with_assignments()
 
@@ -98,7 +97,7 @@ def create_label(
     ocel_id: str,
     body: CreateLabelRequest,
 ) -> LabelDefinition:
-    annotations = session.ocels[ocel_id].origin.extensions.get(AnnotationExtension)
+    annotations = session.ocels[ocel_id].origin.annotations
     assert annotations is not None
     label_id = annotations.create_label(body.element_type, body.name)
     definition = annotations.get_label_definition(label_id)
@@ -121,7 +120,7 @@ def rename_label(
     label_id: int,
     body: RenameLabelRequest,
 ) -> LabelDefinition:
-    annotations = session.ocels[ocel_id].origin.extensions.get(AnnotationExtension)
+    annotations = session.ocels[ocel_id].origin.annotations
     assert annotations is not None
     annotations.rename_label(label_id, body.name)
     definition = annotations.get_label_definition(label_id)
@@ -143,7 +142,7 @@ def delete_label(
     ocel_id: str,
     label_id: int,
 ) -> None:
-    annotations = session.ocels[ocel_id].origin.extensions.get(AnnotationExtension)
+    annotations = session.ocels[ocel_id].origin.annotations
     assert annotations is not None
     annotations.delete_label(label_id)
 
@@ -158,7 +157,7 @@ def get_label_assignments(
     ocel_id: str,
     label_id: int,
 ) -> list[LabelAssignment]:
-    annotations = session.ocels[ocel_id].origin.extensions.get(AnnotationExtension)
+    annotations = session.ocels[ocel_id].origin.annotations
     assert annotations is not None
     df = annotations.get_label_assignments(label_id)
 
@@ -182,7 +181,7 @@ def set_label_assignments(
     label_id: int,
     body: SetLabelAssignmentsRequest,
 ) -> None:
-    annotations = session.ocels[ocel_id].origin.extensions.get(AnnotationExtension)
+    annotations = session.ocels[ocel_id].origin.annotations
     assert annotations is not None
     annotations.set_label_assignments(label_id, body.element_refs)
 
@@ -198,7 +197,7 @@ def add_label_assignment(
     label_id: int,
     body: AddLabelAssignmentRequest,
 ) -> None:
-    annotations = session.ocels[ocel_id].origin.extensions.get(AnnotationExtension)
+    annotations = session.ocels[ocel_id].origin.annotations
     assert annotations is not None
     annotations.add_label_assignment(label_id, body.element_ref)
 
@@ -214,7 +213,7 @@ def remove_label_assignment(
     label_id: int,
     body: RemoveLabelAssignmentRequest,
 ) -> None:
-    annotations = session.ocels[ocel_id].origin.extensions.get(AnnotationExtension)
+    annotations = session.ocels[ocel_id].origin.annotations
     assert annotations is not None
     annotations.remove_label_assignment(label_id, body.element_ref)
 
@@ -231,7 +230,7 @@ def get_categories(
     session: ApiSession,
     ocel_id: str,
 ) -> list[CategoryDefinition]:
-    annotations = session.ocels[ocel_id].origin.extensions.get(AnnotationExtension)
+    annotations = session.ocels[ocel_id].origin.annotations
     assert annotations is not None
     df = annotations.get_category_definitions()
 
@@ -254,7 +253,7 @@ def get_categories_with_assignments(
     session: ApiSession,
     ocel_id: str,
 ) -> list[CategoryWithAssignments]:
-    annotations = session.ocels[ocel_id].origin.extensions.get(AnnotationExtension)
+    annotations = session.ocels[ocel_id].origin.annotations
     assert annotations is not None
     items = annotations.get_categories_with_assignments()
 
@@ -294,7 +293,7 @@ def create_category(
     ocel_id: str,
     body: CreateCategoryRequest,
 ) -> CategoryDefinition:
-    annotations = session.ocels[ocel_id].origin.extensions.get(AnnotationExtension)
+    annotations = session.ocels[ocel_id].origin.annotations
     assert annotations is not None
     category_id = annotations.create_category(body.element_type, body.name)
     definition = annotations.get_category_definition(category_id)
@@ -317,7 +316,7 @@ def rename_category(
     category_id: int,
     body: RenameCategoryRequest,
 ) -> CategoryDefinition:
-    annotations = session.ocels[ocel_id].origin.extensions.get(AnnotationExtension)
+    annotations = session.ocels[ocel_id].origin.annotations
     assert annotations is not None
     annotations.rename_category(category_id, body.name)
     definition = annotations.get_category_definition(category_id)
@@ -339,7 +338,7 @@ def delete_category(
     ocel_id: str,
     category_id: int,
 ) -> None:
-    annotations = session.ocels[ocel_id].origin.extensions.get(AnnotationExtension)
+    annotations = session.ocels[ocel_id].origin.annotations
     assert annotations is not None
     annotations.delete_category(category_id)
 
@@ -354,7 +353,7 @@ def get_category_assignments(
     ocel_id: str,
     category_id: int,
 ) -> list[CategoryAssignment]:
-    annotations = session.ocels[ocel_id].origin.extensions.get(AnnotationExtension)
+    annotations = session.ocels[ocel_id].origin.annotations
     assert annotations is not None
     df = annotations.get_category_assignments(category_id)
 
@@ -379,7 +378,7 @@ def set_category_assignments(
     category_id: int,
     body: SetCategoryAssignmentsRequest,
 ) -> None:
-    annotations = session.ocels[ocel_id].origin.extensions.get(AnnotationExtension)
+    annotations = session.ocels[ocel_id].origin.annotations
     assert annotations is not None
     annotations.set_category_assignments(category_id, body.mappings)
 
@@ -395,7 +394,7 @@ def add_category_assignment(
     category_id: int,
     body: AddCategoryAssignmentRequest,
 ) -> None:
-    annotations = session.ocels[ocel_id].origin.extensions.get(AnnotationExtension)
+    annotations = session.ocels[ocel_id].origin.annotations
     assert annotations is not None
     annotations.add_category_assignment(category_id, body.element_ref, body.value)
 
@@ -411,6 +410,6 @@ def remove_category_assignment(
     category_id: int,
     body: RemoveCategoryAssignmentRequest,
 ) -> None:
-    annotations = session.ocels[ocel_id].origin.extensions.get(AnnotationExtension)
+    annotations = session.ocels[ocel_id].origin.annotations
     assert annotations is not None
     annotations.remove_category_assignment(category_id, body.element_ref)

@@ -18,6 +18,7 @@ from ocelescope.ocel.managers import (
     ObjectsManager,
     QuantityManager,
 )
+from ocelescope.ocel.managers.annotations.annotation import AnnotationManager
 from ocelescope.ocel.managers.attributes import AttributeManager
 from ocelescope.ocel.models.meta import OCELMeta
 
@@ -65,6 +66,7 @@ class OCEL:
         self.e2o = E2OManager(self)
         self.o2o = O2OManager(self)
         self.attributes = AttributeManager(self)
+        self.annotations = AnnotationManager(self)
 
     def filter(self, pipeline: list[BaseFilter]) -> OCEL:
         """
@@ -149,6 +151,7 @@ class OCEL:
                 raise ValueError(f"Unsupported extension: {path.suffix}")
 
         self.quantities.write_quantities(path)
+        self.annotations.write_annotations(path)
         self.extensions.export_all(path)
 
     def __deepcopy__(self, memo: dict[int, Any]):
