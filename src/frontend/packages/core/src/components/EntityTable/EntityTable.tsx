@@ -243,7 +243,7 @@ const EntityTable: React.FC = () => {
                               key={extension}
                               onClick={() =>
                                 downloadFile(
-                                  `/ocels/download?${new URLSearchParams({ ocel_id: id, ext: extension }).toString()}`,
+                                  `/ocels/${id}/download?${new URLSearchParams({ ocel_id: id, ext: extension }).toString()}`,
                                 )
                               }
                             >
