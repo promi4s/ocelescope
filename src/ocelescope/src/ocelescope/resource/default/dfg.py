@@ -25,6 +25,23 @@ class DirectlyFollowsGraph(Resource):
     activities: list[DFGActivity]
     edges: list[DFGEdge]
 
+    @classmethod
+    @classmethod
+    def discover(
+        cls,
+        ocel,
+        *,
+        excluded_event_types: list[str] | None = None,
+        excluded_object_types: list[str] | None = None,
+    ) -> "DirectlyFollowsGraph":
+        from ocelescope.discovery.pm4py import discover_ocdfg
+
+        return discover_ocdfg(
+            ocel=ocel,
+            excluded_event_types=excluded_event_types or [],
+            excluded_object_types=excluded_object_types or [],
+        )
+
     def visualize(self):
         color_map = generate_color_map([object_type.name for object_type in self.object_types])
 

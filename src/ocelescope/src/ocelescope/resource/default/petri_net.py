@@ -60,6 +60,25 @@ class PetriNet(Resource):
     transitions: list[Transition] = []
     arcs: list[Arc] = []
 
+    @classmethod
+    @classmethod
+    def discover(
+        cls,
+        ocel,
+        *,
+        variant: Literal["im", "imd"] = "im",
+        excluded_event_types: list[str] | None = None,
+        excluded_object_types: list[str] | None = None,
+    ) -> "PetriNet":
+        from ocelescope.discovery.pm4py import discover_ocpn
+
+        return discover_ocpn(
+            ocel=ocel,
+            variant=variant,
+            excluded_event_types=excluded_event_types or [],
+            excluded_object_types=excluded_object_types or [],
+        )
+
     def visualize(self):
         # Use your color generator function
         object_types = list({p.object_type for p in self.places})
