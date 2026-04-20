@@ -177,25 +177,32 @@ class OcelGraphDiscovery(Plugin):
 
 Now users will see a friendly label and description when selecting the OCEL input in the UI.
 
-#### Adding a Configuration Input
+### Adding a Configuration Input
 
-To add the other inputs of the mine_ocel_graph function we define a [configuration input](../plugins/plugin_class.md#configuration-inputs) class.  
+Now we add the remaining settings (`root_id`, `max_depth`, `max_neighbours`).  
+For that, we create a **configuration input** class.
 
-Lets create a new file called (`ìnput.py`), next to the plugin input that we could name to `OCELGraphInput` to match your plugin that inherits from the PluginInput of the ocelescope package.
+Create a new file called `input.py` next to `plugin.py`. In it, create a class called `OCELGraphInput` that inherits from `PluginInput`:
 
 ```python title="src/plugin-template/input.py"
 from ocelescope import PluginInput
+
 
 class OCELGraphInput(PluginInput):
     pass
 ```
 
-Now, extend your `OCELGraphInput` class to include configuration parameters for the **maximum depth** of the OCEL graph and the **maximum number of neighbours** per node.
+Now extend `OCELGraphInput` with two numeric settings:
 
-Use [Pydantic’s `Field`](https://docs.pydantic.dev/latest/concepts/fields/) to set titles, descriptions, defaults, and constraints for these integer values.
+- the maximum depth of the OCEL graph
+- the maximum number of neighbours per node
+
+Use Pydantic’s [`Field`](https://docs.pydantic.dev/latest/concepts/fields/) to set titles, descriptions, defaults, and constraints:
 
 ```python title="src/plugin-template/input.py"
+from ocelescope import PluginInput
 from pydantic import Field
+
 
 class OCELGraphInput(PluginInput, frozen=True):
     depth: int = Field(
@@ -203,136 +210,141 @@ class OCELGraphInput(PluginInput, frozen=True):
         description="The maximum depth of the OCEL graph",
         default=3,
         gt=0,
-        le=10
+        le=10,
     )
+
     max_neighbours: int = Field(
         title="Maximum Neighbours",
         description="The maximum amount of neighbours a node can have",
         default=5,
-        gt=0
+        gt=0,
     )
 ```
 
-To let users select the root entity of the OCEL graph, define two classes:
+Next, we need a way for users to select the **root** of the graph.  
+The root can be either:
 
-- `ObjectRoot` for selecting an object by its ID  
-- `EventRoot` for selecting an event by its ID  
+- an object ID, or
+- an event ID
 
-Each class uses the [`OCEL_FIELD`](../references/plugins/index.md#ocelescope.plugin.OCEL_FIELD) helper to link the field to the selected OCEL log, enabling autocomplete and validation in the UI.
+To let users select the root, we define two small input models:
+
+- `ObjectRoot` for selecting an object by its ID
+- `EventRoot` for selecting an event by its ID
+
+Both models use [`OCEL_FIELD`](../references/plugins/index.md#ocelescope.plugin.OCEL_FIELD).  
+This links the field to the selected OCEL log, so the UI can offer autocomplete and validation.
 
 !!! important
-    The `ocel_id` argument in `OCEL_FIELD` must exactly match the name of the OCEL parameter in your plugin method  
-    (for example, `ocel` in `def mine_ocel_graph(self, ocel: OCEL, ...)`).  
-    This ensures that the field is correctly linked to the user-selected OCEL log and will display the appropriate dropdown/autocomplete values.
+    The `ocel_id` in `OCEL_FIELD` must match the name of your OCEL parameter in the plugin method.  
+    In our case the parameter is named `ocel`, so we use `ocel_id="ocel"`.
 
 ```python title="src/plugin-template/input.py"
 from pydantic import BaseModel
 from ocelescope import OCEL_FIELD
 
+
 class ObjectRoot(BaseModel):
     class Config:
-        title = "Object" # Better readability in UI
+        title = "Object"  # Better readability in UI
 
     object_id: str = OCEL_FIELD(
         field_type="object_id",
-        title="Object Id",
+        title="Object ID",
         ocel_id="ocel",
-        description="The ID of the Object which is the root of the OCEL Graph",
+        description="The ID of the object that should be used as the root of the OCEL Graph",
     )
+
 
 class EventRoot(BaseModel):
     class Config:
-        title = "Event" # Better readability in UI
+        title = "Event"  # Better readability in UI
 
     event_id: str = OCEL_FIELD(
         field_type="event_id",
-        title="Event Id",
+        title="Event ID",
         ocel_id="ocel",
-        description="The ID of the Event which is the root of the OCEL Graph",
+        description="The ID of the event that should be used as the root of the OCEL Graph",
     )
 ```
 
-These classes are then combined in your main input class using a **union** type (`ObjectRoot | EventRoot`):
+Now combine both options in `OCELGraphInput` using a union type (`ObjectRoot | EventRoot`):
 
 ```python title="src/plugin-template/input.py"
+from ocelescope import PluginInput
+from pydantic import Field
+
+
 class OCELGraphInput(PluginInput, frozen=True):
     root: ObjectRoot | EventRoot
-    ...
+
+    depth: int = Field(
+        title="OCEL Graph Depth",
+        description="The maximum depth of the OCEL graph",
+        default=3,
+        gt=0,
+        le=10,
+    )
+
+    max_neighbours: int = Field(
+        title="Maximum Neighbours",
+        description="The maximum amount of neighbours a node can have",
+        default=5,
+        gt=0,
+    )
 ```
 
-??? example "Final Input Code"
+This will create an input form like this:
 
-    ```python title="src/plugin-template/input.py"
-    from ocelescope import OCEL_FIELD, PluginInput
-    from pydantic import BaseModel, Field
+![OCEL Graph input example](../assets/ocel-graph-input.png){width=600}
 
+### Adding the Configuration Input to the plugin method
 
-    class ObjectRoot(BaseModel):
-        class Config:
-            title = "Object"
+Now we can use `OCELGraphInput` as the configuration input for our plugin method.
 
-        object_id: str = OCEL_FIELD(
-            field_type="object_id",
-            title="Object Id",
-            ocel_id="ocel",
-            description="The ID of the Event which is the root of the OcelGraph",
-        )
-
-
-    class EventRoot(BaseModel):
-        class Config:
-            title = "Event"
-
-        event_id: str = OCEL_FIELD(
-            field_type="event_id",
-            title="Event Id",
-            ocel_id="ocel",
-            description="The ID of the Event which is the root of the OcelGraph",
-        )
-
-
-    class OCELGraphInput(PluginInput):
-        root: ObjectRoot | EventRoot
-        depth: int = Field(
-            title="OCEL Graph Depth", description="The maximum depth of the ocel graph", default=3, gt=0, le=10
-        )
-        max_neighbours: int = Field(
-            title="Maximum Neighbours", description="The maximum amount of neighbours a node can have", gt=0, default=5
-        )
-    ```
-
-    This code creates the following input form in the frontend:
-
-    ![OCEL Graph Input Example](../assets/ocel-graph-input.png)
-
-#### Adding the Configuration Input to the plugin method
-
-Now let's add the input class method to our plugin method.
+Import the input class and add it as a parameter named `input`:
 
 ```python title="src/plugin-template/plugin.py"
+from typing import Annotated
+
+from ocelescope import OCEL, OCELAnnotation, Plugin, plugin_method
+
 from .input import OCELGraphInput
 
-class OcelGraphDiscovery(Plugin):
 
-    @plugin_method(label="Mine OCEL Graph", description="Mines a OCEL Graph")
+class OcelGraphDiscovery(Plugin):
+    ...
+
+    @plugin_method(label="Mine OCEL Graph", description="Mines an OCEL Graph")
     def mine_ocel_graph(
         self,
         ocel: Annotated[
             OCEL,
-            OCELAnnotation(label="Event Log", description="The log from which the ocel graph should be mined from"),
+            OCELAnnotation(
+                label="Event Log",
+                description="The log from which the OCEL graph should be mined",
+            ),
         ],
         input: OCELGraphInput,
     ):
         ...
 ```
 
+!!! important
+    Each plugin method can have **exactly one** `PluginInput` parameter. It must be named `input`.
+
 ### Defining a Resource
 
-After we defined out Inputs now lets define our output. We want to define a custom output—an OCEL Graph—which in Ocelescope is done by creating a Python class that inherits from the `Resource` class. Let's also create it in a new file called `resource.py` next to the `plugin.py` file.
+Now that we have the inputs, we can define the output.
+
+Our plugin should return an **OCEL Graph**. In Ocelescope, custom outputs are implemented as [**resources**](../plugins/resource.md).  
+A resource is a Python class that inherits from `Resource`.
+
+Create a new file called `resource.py` next to `plugin.py` and define the resource like this:
 
 ```python title="src/plugin-template/resource.py"
-from ocelescope import Graph, GraphEdge, GraphNode, GraphvizLayoutConfig, Resource, generate_color_map
 from pydantic import BaseModel
+from ocelescope import Resource
 
 
 class EventNode(BaseModel):
@@ -353,27 +365,22 @@ class Relation(BaseModel):
 
 
 class OCELGraph(Resource):
-    label = "Ocel Graph"
-    description = "A Ocel graph"
+    label = "OCEL Graph"
+    description = "An OCEL graph"
 
     events: list[EventNode] = []
     objects: list[ObjectNode] = []
     relations: list[Relation] = []
-
-
 ```
 
 !!! important
-    All subclasses used as properties in your resource (such as `EventNode`, `ObjectNode`, `Relation`, `O2ORelation`, and `E2ORelation`) should inherit from Pydantic’s `BaseModel`.  
-    This ensures that your data structures are compatible with Ocelescope’s validation and serialization.
+    Any nested types you use inside a resource (like `EventNode`, `ObjectNode`, or `Relation`) should inherit from Pydantic’s `BaseModel`.  
+    This makes sure the resource can be validated and serialized correctly.
 
-A resource can include any property that can be serialized to JSON—such as lists, strings, numbers, or other `BaseModel` classes.
-
-You can also add any number of functions to work with the resource. For example, here’s how to get all event and object IDs inside the resource:
+You can also add helper properties or methods to your resource. For example:
 
 ```python title="src/plugin-template/resource.py"
 class OCELGraph(Resource):
-
     ...
 
     @property
@@ -382,144 +389,93 @@ class OCELGraph(Resource):
 
     @property
     def object_ids(self) -> list[str]:
-        return [object.id for object in self.objects]
+        return [obj.id for obj in self.objects]
 ```
 
-To tell Ocelescope that your method returns your `OCELGraph`, add it as a type hint in your plugin method:
+Finally, make sure your plugin method returns your resource by adding it as the return type:
 
-```python title="src/plugin-template/resource.py"
+```python title="src/plugin-template/plugin.py"
 from .resource import OCELGraph
+
 
 class OcelGraphDiscovery(Plugin):
     ...
-    @plugin_method(label="Mine OCEL Graph", description="Mines an OCEL Graph")
+
     def mine_ocel_graph(...) -> OCELGraph:
         ...
 ```
 
 #### Visualization
 
-At this point, our `OCELGraph` class can already be used as a resource and returned as an output from your plugin method. However, by default, it is just a data structure without any built-in visualization.
+At this point, `OCELGraph` can already be returned as a resource.  
+But it is only a data structure. By default, it has no visualization in the frontend.
 
-To enable visualization in the Ocelescope frontend, you can extend your resource class by adding a `visualize` method.  
-A visualization function is a class method that returns a predefined visualization object (such as a `Graph`), and should include a type hint for clarity.
+To visualize the resource in Ocelescope, add a `visualize()` method.  
+This method returns one of Ocelescope’s visualization objects (for example, [`Graph`](../references/resources/visualizations/graph.md)).
 
-For example, you can add the following `visualize` method to your `OCELGraph` class:
+Add this to your `OCELGraph` class:
 
 ```python title="src/plugin-template/resource.py"
-from ocelescope import Resource
-from ocelescope.visualization import Graph, GraphEdge, GraphvizLayoutConfig
-from ocelescope.visualization.default.graph import GraphNode
+from ocelescope.visualization.default.graph import (
+    Graph,
+    GraphEdge,
+    GraphNode,
+    GraphvizLayoutConfig,
+)
 from ocelescope.visualization.util.color import generate_color_map
 
-...
 
 class OCELGraph(Resource):
     ...
 
     def visualize(self) -> Graph:
-        color_map = generate_color_map(list(set([object.object_type for object in self.objects])))
+        color_map = generate_color_map(
+            list(set([obj.object_type for obj in self.objects]))
+        )
 
         object_nodes = [
             GraphNode(
-                id=object_node.id, shape="rectangle", label=object_node.id, color=color_map[object_node.object_type]
+                id=obj.id,
+                shape="rectangle",
+                label=obj.id,
+                color=color_map[obj.object_type],
             )
-            for object_node in self.objects
+            for obj in self.objects
         ]
 
-        event_nodes = [GraphNode(id=event.id, shape="rectangle", label=event.id) for event in self.events]
+        event_nodes = [
+            GraphNode(
+                id=event.id,
+                shape="rectangle",
+                label=event.id,
+            )
+            for event in self.events
+        ]
 
         edges = [
             GraphEdge(
-                source=edge.source,
-                target=edge.target,
-                label=edge.qualifier,
-                color=color_map[edge.object_type] if edge.object_type else None,
+                source=rel.source,
+                target=rel.target,
+                label=rel.qualifier,
+                color=color_map[rel.object_type] if rel.object_type else None,
             )
-            for edge in self.relations
+            for rel in self.relations
         ]
 
         return Graph(
             type="graph",
             nodes=object_nodes + event_nodes,
             edges=edges,
-            layout_config=GraphvizLayoutConfig(engine="neato", graphAttrs={"overlap": "prism"}),
+            layout_config=GraphvizLayoutConfig(
+                engine="neato",
+                graphAttrs={"overlap": "prism"},
+            ),
         )
 ```
 
-With this method, your resource will not only provide the OCEL graph data, but also a built-in visualization for the Ocelescope frontend to display.
+Now your resource will show up as an interactive graph in the frontend:
 
-![Image title](../assets/ocel-graph.png)
-
-??? example "Final OCELGraph Resource"
-
-```python title="src/plugin-template/resource.py"
-from ocelescope import Graph, GraphEdge, GraphNode, GraphvizLayoutConfig, Resource, generate_color_map
-from pydantic import BaseModel
-
-
-class EventNode(BaseModel):
-    id: str
-    activity: str
-
-
-class ObjectNode(BaseModel):
-    id: str
-    object_type: str
-
-
-class Relation(BaseModel):
-    qualifier: str
-    source: str
-    target: str
-    object_type: str | None = None
-
-
-class OCELGraph(Resource):
-    label = "Ocel Graph"
-    description = "A Ocel graph"
-
-    events: list[EventNode] = []
-    objects: list[ObjectNode] = []
-    relations: list[Relation] = []
-
-    @property
-    def event_ids(self) -> list[str]:
-        return [event.id for event in self.events]
-
-    @property
-    def object_ids(self) -> list[str]:
-        return [object.id for object in self.objects]
-
-    def visualize(self) -> Graph:
-        color_map = generate_color_map(list(set([object.object_type for object in self.objects])))
-
-        object_nodes = [
-            GraphNode(
-                id=object_node.id, shape="rectangle", label=object_node.id, color=color_map[object_node.object_type]
-            )
-            for object_node in self.objects
-        ]
-
-        event_nodes = [GraphNode(id=event.id, shape="rectangle", label=event.id) for event in self.events]
-
-        edges = [
-            GraphEdge(
-                source=edge.source,
-                target=edge.target,
-                label=edge.qualifier,
-                color=color_map[edge.object_type] if edge.object_type else None,
-            )
-            for edge in self.relations
-        ]
-
-        return Graph(
-            type="graph",
-            nodes=object_nodes + event_nodes,
-            edges=edges,
-            layout_config=GraphvizLayoutConfig(engine="neato", graphAttrs={"overlap": "prism"}),
-        )
-```
+![OCEL Graph visualization](../assets/ocel-graph.png)
 
 ### Implementing the Plugin Method
 
