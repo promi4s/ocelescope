@@ -69,84 +69,113 @@ The template is a minimal example. Most of your work will happen in `plugin.py`.
 
 ## Step 2: Writing the Plugin
 
+Now we start writing the actual plugin.
+
 ### Writing Plugin Metadata
 
-An Ocelescope plugin is defined by its Plugin Class. Let's start by adding some metadata to it.
+An Ocelescope plugin is defined by a **plugin class**. This class inherits from `Plugin` and contains your plugin methods.
 
-Open ``plugin.py``, find the plugin class, and rename the class and its metadata to something like the following:
+Open `src/plugin-template/plugin.py`, find the existing plugin class, and update the class name and metadata to something like this:
 
 ```python title="src/plugin-template/plugin.py"
+from ocelescope import Plugin
+
+
 class OcelGraphDiscovery(Plugin):
     label = "OCEL Graph"
     description = "Generate your own OCEL Graph"
     version = "0.1.0"
-    ...
 ```
 
-- The class name (OcelGraphDiscovery) is the unique name of your plugin and is used to distinguish it from other plugins.
+- The class name (`OcelGraphDiscovery`) is the unique name of your plugin and helps distinguish it from other plugins.
 - The label is what will be shown in the UI.
 - The description briefly explains what your plugin does.
-- The version field lets you update your plugin with new features or bug fixes over time.
+- The version lets you update your plugin over time.
 
 ### Adding a Plugin Method
 
-Now let’s start writing the actual script that processes an OCEL and generates an OCEL Graph.
+Now let’s add the function that will generate the OCEL Graph.
 
-Add a new method to your plugin class called ``mine_ocel_graph``. Every plugin method should be decorated with [``@plugin_method``](../references/plugins/index.md#ocelescope.plugin.plugin_method), where you can specify a label and a description. These will be displayed in the frontend interface.
+Add a new method to your plugin class called `mine_ocel_graph`. You mark plugin methods with [`@plugin_method`](../references/plugins/index.md#ocelescope.plugin.plugin_method). The label and description you set there will be shown in the UI.
 
 ```python title="src/plugin-template/plugin.py"
+from ocelescope import Plugin, plugin_method
+
+
 class OcelGraphDiscovery(Plugin):
-    @plugin_method(label="Mine OCEL Graph", description="Mines a ocel graph")
-    def mine_ocel_graph(
-        self,
-    ):
+    ...
+
+    @plugin_method(label="Mine OCEL Graph", description="Mines an OCEL Graph")
+    def mine_ocel_graph(self):
         pass
 ```
 
 ### Planning a Plugin Method
 
-When writing a plugin method, it’s always important to think beforehand about its inputs and outputs. For our OCEL Graph plugin, we need the following inputs:
+Before you implement the method, it helps to plan what it should take as input and what it should return.
 
-- ocel: The OCEL to analyze.
-- root_id: An identifier for the root of the graph. This can be either an object ID or an event ID from the OCEL log.
-- max_depth: The maximum depth to which the graph should be explored from the root entity.
-- max_neighbours: The maximum number of neighbours to include at each step, to prevent the graph from growing too large and becoming unmanageable.
+For our OCEL Graph plugin, we need the following inputs:
 
-As an output, our method will return an OCEL graph. Since plugin methods in Ocelescope can only return either OCELs or Resources, the OCEL Graph must be implemented as a resource.
+- `ocel`: the OCEL to analyze
+- `root_id`: the root of the graph (this can be an object ID or an event ID from the log)
+- `max_depth`: how far the graph should expand from the root
+- `max_neighbours`: how many neighbours to include per node (so the graph does not become too large)
+
+As output, the method should return the OCEL graph.
+
+In Ocelescope, plugin methods can only return either an `OCEL` or a `Resource`.  
+So we will implement the OCEL Graph as a custom `Resource` and return that.
 
 <figure markdown="span">
-  ![OCEL Graph Overview](../assets/ocelGraphTutorial/OCELGraphPluginOverview.png){width="600"}
+  ![OCEL Graph overview](../assets/ocelGraphTutorial/OCELGraphPluginOverview.png){width="600"}
 </figure>
 
-#### Adding an OCEL Input
+### Adding an OCEL Input
 
-Since our goal is to create an OCEL Graph, we need to have an OCEL as one of the method inputs. This can be done by simply adding it as a parameter to the `mine_ocel_graph` method:
+Since we want to build an OCEL Graph, our method needs an OCEL as input.  
+You can add it by adding an `ocel: OCEL` parameter to `mine_ocel_graph`:
 
 ```python title="src/plugin-template/plugin.py"
 from ocelescope import OCEL
-...
-  @plugin_method(label="Mine OCEL Graph", description="Mines a ocel graph")
-  def mine_ocel_graph(self, ocel: OCEL):
-      pass
+from ocelescope import Plugin, plugin_method
+
+
+class OcelGraphDiscovery(Plugin):
+    ...
+
+    @plugin_method(label="Mine OCEL Graph", description="Mines an OCEL Graph")
+    def mine_ocel_graph(self, ocel: OCEL):
+        pass
 ```
 
-To make it easier for users in the UI, you can give this input a prettier name and a helpful description. You do this by annotating the parameter with the [`OCELAnnotation`](../references/plugins/index.md#ocelescope.plugin.OCELAnnotation) class:
+To make this input nicer in the UI, you can add a label and description with [`OCELAnnotation`](../references/plugins/index.md#ocelescope.plugin.OCELAnnotation).  
+For that, wrap the type using `Annotated[...]`:
 
 ```python title="src/plugin-template/plugin.py"
-def mine_ocel_graph(
-    self,
-    ocel: Annotated[
-        OCEL,
-        OCELAnnotation(
-            label="Event Log",
-            description="The log from which the OCEL graph should be mined",
-        ),
-    ],
-):
-    pass
+from typing import Annotated
+
+from ocelescope import OCEL, OCELAnnotation
+from ocelescope import Plugin, plugin_method
+
+
+class OcelGraphDiscovery(Plugin):
+    ...
+
+    @plugin_method(label="Mine OCEL Graph", description="Mines an OCEL Graph")
+    def mine_ocel_graph(
+        self,
+        ocel: Annotated[
+            OCEL,
+            OCELAnnotation(
+                label="Event Log",
+                description="The log from which the OCEL graph should be mined",
+            ),
+        ],
+    ):
+        pass
 ```
 
-Now, in the UI, users will see a friendly label and description when selecting the OCEL input for your plugin.
+Now users will see a friendly label and description when selecting the OCEL input in the UI.
 
 #### Adding a Configuration Input
 
