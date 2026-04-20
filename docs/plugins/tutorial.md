@@ -27,7 +27,7 @@ An **OCEL graph** visualizes how objects and events are related to each other. T
     </div>
 
 !!! requirements
-    This project requires Python 3.13 to be installed on your system. For easy and reproducible package management, we recommend using [uv]("https://docs.astral.sh/uv/").
+    This project requires Python 3.13 to be installed on your system. For easy and reproducible package management, we recommend using [uv](https://docs.astral.sh/uv/).
 
 ## Step 1: Setup
 
@@ -479,28 +479,44 @@ Now your resource will show up as an interactive graph in the frontend:
 
 ### Implementing the Plugin Method
 
-Now let's add the method which transforms our input (the OCEL and configuration) and returns our resource. For the sake of this tutorial, we won’t discuss the implementation details. Instead, we’ll add the implementation in a utility file to keep the plugin method itself clean and readable.
+Now you can implement the plugin method that transforms your input (the OCEL and configuration) and returns your resource.
 
-Download the [util.py]("../assets/ocelGraphTutorial/util.py") and add it next to the plugin.py
+For this tutorial, we won’t go into the implementation details.  
+Instead, we will put the logic in a utility function to keep `plugin.py` clean and readable.
 
-In your plugin class, simply import and call this function:
+Download [`util.py`](../assets/ocelGraphTutorial/util.py) and add it next to `plugin.py`:
 
-```python
+```
+
+src/plugin-template/
+├── plugin.py
+└── util.py
+
+```
+
+Now import the function and return its result:
+
+```python title="src/plugin-template/plugin.py"
+from ocelescope import OCEL, Plugin, plugin_method
+
+from .input import OCELGraphInput
+from .resource import OCELGraph
 from .util import mine_ocel_graph
+
 
 class OcelGraphDiscovery(Plugin):
     ...
-    @plugin_method(label="Mine OCEL Graph", description="Mines a OCEL Graph")
+
+    @plugin_method(label="Mine OCEL Graph", description="Mines an OCEL Graph")
     def mine_ocel_graph(self, ocel: OCEL, input: OCELGraphInput) -> OCELGraph:
         return mine_ocel_graph(ocel, input)
 ```
 
 !!! warning
-
     Currently, **Ocelescope plugins only support relative imports**.  
-    This means you must ensure all imports inside your plugin use relative paths.
+    This means all imports inside your plugin must use relative paths:
 
-    ```python  title="src/plugin-template/plugin.py"
+    ```python title="src/plugin-template/plugin.py"
     # ✅ Correct (relative import)
     from .input import OCELGraphInput
     from .resource import OCELGraph
@@ -514,10 +530,11 @@ class OcelGraphDiscovery(Plugin):
 
 ## Step 3: Build Plugin
 
-Before your plugin can be built, make sure that the top-level `__init__.py` properly exposes your plugin class:
+Before you build the plugin, make sure your package exposes the plugin class at the top level.
 
-```python title="__init__.py"
+Open `src/plugin-template/__init__.py` and export your plugin class:
 
+```python title="src/plugin-template/__init__.py"
 from .plugin import OcelGraphDiscovery
 
 __all__ = [
@@ -525,30 +542,31 @@ __all__ = [
 ]
 ```
 
-In ocelescope plugins are basically just the packages zipped so in our case:
+Ocelescope plugins are distributed as a **zipped Python package**. After building, your zip should look like this:
 
 ```
-
-plugin.zip
- └ocel_graph/
-  ├── __init__.py
-  ├── util.py
-  ├── input.py
-  ├── resource.py
-  └── plugin.py
+plugin.zip/
+├─ ocel_graph/
+│  ├─ __init__.py
+│  ├─ plugin.py
+│  ├─ util.py
+│  ├─ input.py
+│  ├─ resource.py
 ```
 
-You can create the zip manually, or use the build command of the ocelescope library by running at the project root:
+You can create the zip manually, but it is easier to use the build command.
+
+Run this from the project root:
 
 ```sh
 ocelescope build
 ```
 
-Or if you are using uv:
+Or, if you are using `uv`:
 
 ```sh
 uv run ocelescope build
 ```
 
-The build script also checks for any absolute imports you may have missed and will raise an error if it finds them.
-After running the build, your plugin package will be created in the dist/ folder.
+The build script also checks for absolute imports and raises an error if it finds any.  
+That’s it. You can now upload the zip from `dist/` to an Ocelescope instance and run your plugin.
