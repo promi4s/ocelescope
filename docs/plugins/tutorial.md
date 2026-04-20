@@ -31,27 +31,28 @@ An **OCEL graph** visualizes how objects and events are related to each other. T
 
 ## Step 1: Setup
 
-To get started, we recommend using the official template for plugin development. You can clone the template repository with:
+To get started, use the plugin template. Clone it like this:
 
 ```sh
-git clone git@github.com:Grkmr/Ocelescope-Template.git
+git clone https://github.com/promi4s/plugin-template.git
+cd plugin-template
 ```
 
-Once you have your project set up, install all dependencies with:
+Now install the dependencies:
 
 ```sh
 uv sync
 ```
 
-If you prefer not to use uv, you can also use other Python package managers such as pip, pip-tools, or poetry to install dependencies. Simply reference the requirements.txt or pyproject.toml file included in the template. For example, with pip you can run:
+If you do not want to use uv, you can use any other Python package manager. For example, with pip you can run:
 
 ```sh
 pip install -r requirements.txt
 ```
 
-By using the template, you should have a plugin set up, and your project structure should look like the following:
+After that, your project should look similar to this:
 
-```
+```text
 plugin-template/
 ├── src/
 │   └── plugin-template/
@@ -60,10 +61,11 @@ plugin-template/
 ├── LICENSE
 ├── README.md
 ├── pyproject.toml
-└── requierements.txt
+├── requirements.txt
+└── uv.lock
 ```
 
-The template is designed as a minimal example, with the entire plugin logic contained in the ``plugin.py`` file. This makes it easy to get started and see how everything works in one place.
+The template is a minimal example. Most of your work will happen in `plugin.py`.
 
 ## Step 2: Writing the Plugin
 
