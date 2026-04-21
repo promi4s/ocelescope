@@ -20,6 +20,7 @@ XML_QUANTITY_TYPE = "type"
 
 JSON_QUANTITY_EXTENSION = "quantityExtension"
 JSON_OPERATIONS = "operations"
+JSON_PROPERTIES = "itemTypes"
 JSON_QUANTITIES = "quantities"
 
 JSON_KEYMAP = {

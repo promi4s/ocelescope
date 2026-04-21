@@ -13,6 +13,7 @@ from ocelescope.util.pandas import coerce_series, infer_column_dtype
 from .constants import (
     JSON_KEYMAP,
     JSON_OPERATIONS,
+    JSON_PROPERTIES,
     JSON_QUANTITIES,
     JSON_QUANTITY_EXTENSION,
     QEL_ITEM_TYPE,
@@ -218,9 +219,12 @@ def write_extension_to_json(
 
     renamed_qop = qop.rename(columns=JSON_KEYMAP)
 
+    renamed_properties = item_properties.rename(columns=JSON_KEYMAP)
+
     ocel[JSON_QUANTITY_EXTENSION] = {
         JSON_QUANTITIES: renamed_oqty.to_dict(orient="records"),
         JSON_OPERATIONS: renamed_qop.to_dict(orient="records"),
+        JSON_PROPERTIES: renamed_properties.to_dict(orient="records"),
     }
 
     data = orjson.dumps(ocel, option=orjson.OPT_APPEND_NEWLINE)
