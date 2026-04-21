@@ -272,7 +272,7 @@ def read_extension_from_sqlite(path: Path) -> tuple[pd.DataFrame, pd.DataFrame, 
             ]
         ]
 
-    return oqty, qop, item_properties
+    return oqty, qop, item_properties.apply(coerce_series)
 
 
 def read_quantity_extension(path: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
