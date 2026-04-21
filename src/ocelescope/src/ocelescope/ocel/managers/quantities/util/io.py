@@ -8,6 +8,7 @@ import pandas as pd
 
 from ocelescope.ocel.constants.pm4py import EID_COL, OID_COL
 from ocelescope.ocel.constants.quantity import OQTY_COLUMNS, QOP_COLUMNS
+from ocelescope.util.pandas import infer_column_dtype
 
 from .constants import (
     JSON_KEYMAP,
@@ -16,6 +17,7 @@ from .constants import (
     JSON_QUANTITY_EXTENSION,
     QEL_ITEM_TYPE,
     QEL_QUANTITY,
+    SQL_ITEM_PROPERTIES,
     SQL_KEYMAP,
     SQL_OPERATIONS,
     SQL_QUANTITIES,
@@ -25,6 +27,12 @@ from .constants import (
     XML_OBJECT_ID,
     XML_OPERATION,
     XML_OPERATIONS,
+    XML_PROPERTIES,
+    XML_PROPERTIES_TYPE,
+    XML_PROPERTIES_TYPE_NAME,
+    XML_PROPERTIY,
+    XML_PROPERTIY_NAME,
+    XML_PROPERTIY_TYPE,
     XML_QUANTITIES,
     XML_QUANTITY,
     XML_QUANTITY_EXTENSION,
@@ -33,9 +41,13 @@ from .constants import (
 )
 
 
-def write_extension_to_xml(path: Path, oqty: pd.DataFrame, qop: pd.DataFrame):
+# TODO: This is also a bit inefficient
+def write_extension_to_xml(
+    path: Path, oqty: pd.DataFrame, qop: pd.DataFrame, item_properties: pd.DataFrame
+):
     quantity_extension = etree.Element(XML_QUANTITY_EXTENSION)
 
+    # Quantity Operations
     operations = etree.Element(XML_OPERATIONS)
     for _, row in qop.iterrows():
         operation = etree.SubElement(
@@ -47,6 +59,7 @@ def write_extension_to_xml(path: Path, oqty: pd.DataFrame, qop: pd.DataFrame):
         item.text = str(row[QEL_QUANTITY])
     quantity_extension.append(operations)
 
+    # Object Quantities
     object_quantities = etree.Element(XML_QUANTITIES)
     for _, row in oqty.iterrows():
         quantity = etree.SubElement(
@@ -58,20 +71,55 @@ def write_extension_to_xml(path: Path, oqty: pd.DataFrame, qop: pd.DataFrame):
             },
         )
         quantity.text = str(row[QEL_QUANTITY])
+
     quantity_extension.append(object_quantities)
 
+    # Item Properties
+    column_type_map = {
+        str(col_name): infer_column_dtype(col_values)
+        for col_name, col_values in item_properties.drop(
+            columns=[QEL_ITEM_TYPE], errors="ignore"
+        ).items()
+    }
+
+    item_properties_tree = etree.Element(XML_PROPERTIES)
+
+    for _, row in item_properties.iterrows():
+        item_type_root = etree.SubElement(
+            item_properties_tree,
+            XML_PROPERTIES_TYPE,
+            {XML_PROPERTIES_TYPE_NAME: row[QEL_ITEM_TYPE]},
+        )
+        for property_name, value in row.dropna().drop(labels=[QEL_ITEM_TYPE]).items():
+            property = etree.SubElement(
+                item_type_root,
+                XML_PROPERTIY,
+                {
+                    XML_PROPERTIY_NAME: str(property_name),
+                    XML_PROPERTIY_TYPE: column_type_map[str(property_name)],
+                },
+            )
+            property.text = str(value)
+
+    quantity_extension.append(item_properties_tree)
+
+    # Export
     log = etree.parse(path)
     log.getroot().append(quantity_extension)
     log.write(path, xml_declaration=True, encoding="UTF-8")
 
 
-def read_extension_from_xml(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
+def read_extension_from_xml(path: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     tree = etree.parse(path)
     root = tree.getroot()
 
     quantity_ext = root.find(XML_QUANTITY_EXTENSION)
     if quantity_ext is None:
-        return pd.DataFrame(columns=OQTY_COLUMNS), pd.DataFrame(columns=QOP_COLUMNS)
+        return (
+            pd.DataFrame(columns=OQTY_COLUMNS),
+            pd.DataFrame(columns=QOP_COLUMNS),
+            pd.DataFrame(columns=[QEL_ITEM_TYPE]),
+        )
 
     operations_data = []
     operations_elem = quantity_ext.find(XML_OPERATIONS)
@@ -110,10 +158,11 @@ def read_extension_from_xml(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
 
     oqty_df = pd.DataFrame(quantities_data, columns=OQTY_COLUMNS)
     qop_df = pd.DataFrame(operations_data, columns=QOP_COLUMNS)
-    return oqty_df, qop_df
+    item_properties = pd.DataFrame(columns=[QEL_ITEM_TYPE])
+    return oqty_df, qop_df, item_properties
 
 
-def read_extension_from_json(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
+def read_extension_from_json(path: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     with open(path, "rb") as f:
         json = orjson.loads(f.read())
 
@@ -136,10 +185,12 @@ def read_extension_from_json(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
             ],
         ).rename(columns=inverse_keymap(JSON_KEYMAP))
 
-    return (oqty, qop)
+    return (oqty, qop, pd.DataFrame(columns=[QEL_ITEM_TYPE]))
 
 
-def write_extension_to_json(path: Path, oqty: pd.DataFrame, qop: pd.DataFrame):
+def write_extension_to_json(
+    path: Path, oqty: pd.DataFrame, qop: pd.DataFrame, item_properties: pd.DataFrame
+):
     ocel = orjson.loads(path.read_bytes())
 
     renamed_oqty = oqty.rename(columns=JSON_KEYMAP)
@@ -158,34 +209,40 @@ def write_extension_to_json(path: Path, oqty: pd.DataFrame, qop: pd.DataFrame):
     os.replace(tmp, path)
 
 
-def write_extension_to_sqlite(path: Path, oqty: pd.DataFrame, qop: pd.DataFrame):
+def write_extension_to_sqlite(
+    path: Path, oqty: pd.DataFrame, qop: pd.DataFrame, item_properties: pd.DataFrame
+):
     with sqlite3.connect(path) as conn:
         oqty.rename(columns=SQL_KEYMAP).to_sql(SQL_QUANTITIES, conn, index=False)
         qop.rename(columns=SQL_KEYMAP).to_sql(SQL_OPERATIONS, conn, index=False)
+        item_properties.rename(columns=SQL_KEYMAP).to_sql(SQL_ITEM_PROPERTIES, conn, index=False)
 
 
-def read_extension_from_sqlite(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
+def read_table_from_sqlite(conn: sqlite3.Connection, table_name: str, fallback_columns: list[str]):
+    query_string = "SELECT * FROM {table_name}"
+    try:
+        return pd.read_sql_query(
+            query_string.format(table_name=table_name), conn, index_col=None
+        ).rename(columns=inverse_keymap(SQL_KEYMAP))
+    except Exception:
+        return pd.DataFrame(columns=fallback_columns)
+
+
+def read_extension_from_sqlite(path: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     with sqlite3.connect(path) as conn:
-        query_string = "SELECT * FROM {table_name}"
+        oqty, qop, item_properties = [
+            read_table_from_sqlite(conn, table_name, fallback_columns)
+            for table_name, fallback_columns in [
+                (SQL_QUANTITIES, OQTY_COLUMNS),
+                (SQL_OPERATIONS, QOP_COLUMNS),
+                (SQL_ITEM_PROPERTIES, [QEL_ITEM_TYPE]),
+            ]
+        ]
 
-        try:
-            oqty = pd.read_sql_query(
-                query_string.format(table_name=SQL_QUANTITIES), conn, index_col=None
-            ).rename(columns=inverse_keymap(SQL_KEYMAP))
-        except Exception:
-            oqty = pd.DataFrame(columns=OQTY_COLUMNS)
-
-        try:
-            qop = pd.read_sql_query(
-                query_string.format(table_name=SQL_OPERATIONS), conn, index_col=None
-            ).rename(columns=inverse_keymap(SQL_KEYMAP))
-        except Exception:
-            qop = pd.DataFrame(columns=QOP_COLUMNS)
-
-    return oqty, qop
+    return oqty, qop, item_properties
 
 
-def read_quantity_extension(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
+def read_quantity_extension(path: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     match path.suffix:
         case ".xmlocel" | ".xml":
             return read_extension_from_xml(path)
@@ -197,13 +254,19 @@ def read_quantity_extension(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
             raise ValueError(f"Unsupported extension: {path.suffix}")
 
 
-def write_quantity_extension(path: Path, oqty: pd.DataFrame, qop: pd.DataFrame):
+def write_quantity_extension(
+    path: Path, oqty: pd.DataFrame, qop: pd.DataFrame, item_properties: pd.DataFrame
+):
     match path.suffix:
         case ".xmlocel" | ".xml":
-            return write_extension_to_xml(path, oqty=oqty, qop=qop)
+            return write_extension_to_xml(path, oqty=oqty, qop=qop, item_properties=item_properties)
         case ".jsonocel" | ".json":
-            return write_extension_to_json(path, oqty=oqty, qop=qop)
+            return write_extension_to_json(
+                path, oqty=oqty, qop=qop, item_properties=item_properties
+            )
         case ".sqlite":
-            return write_extension_to_sqlite(path, oqty=oqty, qop=qop)
+            return write_extension_to_sqlite(
+                path, oqty=oqty, qop=qop, item_properties=item_properties
+            )
         case _:
             raise ValueError(f"Unsupported extension: {path.suffix}")
