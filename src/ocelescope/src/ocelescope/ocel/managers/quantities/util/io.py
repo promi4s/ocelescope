@@ -31,9 +31,9 @@ from .constants import (
     XML_PROPERTIES,
     XML_PROPERTIES_TYPE,
     XML_PROPERTIES_TYPE_NAME,
-    XML_PROPERTIY,
-    XML_PROPERTIY_NAME,
-    XML_PROPERTIY_TYPE,
+    XML_PROPERTY,
+    XML_PROPERTY_NAME,
+    XML_PROPERTY_TYPE,
     XML_QUANTITIES,
     XML_QUANTITY,
     XML_QUANTITY_EXTENSION,
@@ -94,10 +94,10 @@ def write_extension_to_xml(
         for property_name, value in row.dropna().drop(labels=[QEL_ITEM_TYPE]).items():
             property = etree.SubElement(
                 item_type_root,
-                XML_PROPERTIY,
+                XML_PROPERTY,
                 {
-                    XML_PROPERTIY_NAME: str(property_name),
-                    XML_PROPERTIY_TYPE: column_type_map[str(property_name)],
+                    XML_PROPERTY_NAME: str(property_name),
+                    XML_PROPERTY_TYPE: column_type_map[str(property_name)],
                 },
             )
             property.text = str(value)
@@ -167,8 +167,8 @@ def read_extension_from_xml(path: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd.
                 {
                     QEL_ITEM_TYPE: item_type.attrib[XML_PROPERTIES_TYPE_NAME],
                     **{
-                        property_element.attrib[XML_PROPERTIY_NAME]: property_element.text
-                        for property_element in item_type.findall(XML_PROPERTIY)
+                        property_element.attrib[XML_PROPERTY_NAME]: property_element.text
+                        for property_element in item_type.findall(XML_PROPERTY)
                     },
                 }
             )
