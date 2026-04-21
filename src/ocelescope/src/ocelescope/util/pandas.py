@@ -16,6 +16,10 @@ class ValueType(StrEnum):
     DATE = "date"
 
 
+TRUE_VALUES = [True, "True", "true", "yes", "1"]
+FALSE_VALUES = [False, "false", "no", "0"]
+
+
 def infer_column_dtype(series: pd.Series) -> ValueType:
     with warnings.catch_warnings():
         warnings.filterwarnings(
@@ -29,7 +33,7 @@ def infer_column_dtype(series: pd.Series) -> ValueType:
         if s.empty:
             return ValueType.EMPTY
 
-        if s.isin([True, False, "True", "False", "true", "false", 0, 1]).all():
+        if s.isin(TRUE_VALUES + FALSE_VALUES).all():
             return ValueType.BOOL
 
         try:
@@ -52,6 +56,29 @@ def infer_column_dtype(series: pd.Series) -> ValueType:
             pass
 
         return ValueType.STRING
+
+
+def coerce_series(series: pd.Series) -> pd.Series:
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore",
+            message="Could not infer format",
+            category=UserWarning,
+        )
+
+        s = series.dropna()
+
+        try:
+            return pd.to_numeric(s, errors="raise")
+        except Exception:
+            pass
+
+        try:
+            return pd.to_datetime(s, errors="raise")
+        except Exception:
+            pass
+
+        return series
 
 
 def str_min(s: pd.Series):
