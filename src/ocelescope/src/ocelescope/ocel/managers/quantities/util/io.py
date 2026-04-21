@@ -208,11 +208,15 @@ def read_extension_from_json(path: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd
         ).rename(columns=inverse_keymap(JSON_KEYMAP))
 
         properties: pd.DataFrame = (
-            pd.DataFrame.from_records(
-                data=quantityExtension[JSON_PROPERTIES],
+            (
+                pd.DataFrame.from_records(
+                    data=quantityExtension[JSON_PROPERTIES],
+                )
+                .rename(columns=inverse_keymap(JSON_KEYMAP))
+                .apply(coerce_series)
             )
-            .rename(columns=inverse_keymap(JSON_KEYMAP))
-            .apply(coerce_series)
+            if len(quantityExtension[JSON_PROPERTIES]) > 0
+            else pd.DataFrame(columns=[QEL_ITEM_TYPE])
         )
 
     return (oqty, qop, properties)
