@@ -8,7 +8,7 @@ import pandas as pd
 
 from ocelescope.ocel.constants.pm4py import EID_COL, OID_COL
 from ocelescope.ocel.constants.quantity import OQTY_COLUMNS, QOP_COLUMNS
-from ocelescope.util.pandas import infer_column_dtype
+from ocelescope.util.pandas import coerce_series, infer_column_dtype
 
 from .constants import (
     JSON_KEYMAP,
@@ -156,10 +156,31 @@ def read_extension_from_xml(path: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd.
                 }
             )
 
+    # Read properties
+    property_tree = quantity_ext.find(XML_PROPERTIES)
+
+    item_property_data = []
+    if property_tree is not None:
+        for item_type in property_tree.findall(XML_PROPERTIES_TYPE):
+            item_property_data.append(
+                {
+                    QEL_ITEM_TYPE: item_type.attrib[XML_PROPERTIES_TYPE_NAME],
+                    **{
+                        property_element.attrib[XML_PROPERTIY_NAME]: property_element.text
+                        for property_element in item_type.findall(XML_PROPERTIY)
+                    },
+                }
+            )
+
     oqty_df = pd.DataFrame(quantities_data, columns=OQTY_COLUMNS)
     qop_df = pd.DataFrame(operations_data, columns=QOP_COLUMNS)
-    item_properties = pd.DataFrame(columns=[QEL_ITEM_TYPE])
-    return oqty_df, qop_df, item_properties
+    property_df = (
+        pd.DataFrame(item_property_data).apply(coerce_series)
+        if len(item_property_data) > 0
+        else pd.DataFrame(columns=[QEL_ITEM_TYPE])
+    )
+
+    return oqty_df, qop_df, property_df
 
 
 def read_extension_from_json(path: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:

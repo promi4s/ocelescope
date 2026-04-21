@@ -66,15 +66,13 @@ def coerce_series(series: pd.Series) -> pd.Series:
             category=UserWarning,
         )
 
-        s = series.dropna()
-
         try:
-            return pd.to_numeric(s, errors="raise")
+            return pd.to_numeric(series, errors="raise")
         except Exception:
             pass
 
         try:
-            return pd.to_datetime(s, errors="raise")
+            return pd.to_datetime(series, errors="raise")
         except Exception:
             pass
 
