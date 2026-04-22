@@ -11,7 +11,7 @@ dependencies = [
   "orjson>=3.11.7",
   "pandas>=2.3.1",
   "plotly>=6.3.1",
-  "pm4py~=2.7.15.3",
+  "pm4py~=2.7.22",
   "pydantic>=2.11.7",
   "r4pm[polars]>=0.5.3",
 ]
