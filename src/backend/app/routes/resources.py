@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import io
 import json
 from typing import Optional
 
@@ -10,10 +9,10 @@ from fastapi.routing import APIRouter
 from ocelescope import Visualization
 from ocelescope.visualization.manager import visualize_resource
 from pydantic.main import BaseModel
-from starlette.responses import StreamingResponse
 
 from app.dependencies import ApiSession
 from app.internal.model.resource import ResourceApi, ResourceStore
+from app.internal.model.response import TempFileResponse
 from app.internal.registry import registry_manager
 from app.internal.registry.registry_manager import ResourceInfo
 
@@ -38,7 +37,7 @@ def get_resource_meta() -> dict[str, ResourceInfo]:
 
 @resource_router.post("", operation_id="uploadResource")
 async def upload_resource(file: UploadFile, session: ApiSession):
-    if file.content_type != "application/json":
+    if file.content_type not in {"application/json", "application/octet-stream", None}:
         raise HTTPException(status_code=400, detail="Only JSON files are supported.")
 
     try:
@@ -56,19 +55,18 @@ async def upload_resource(file: UploadFile, session: ApiSession):
 @resource_router.get(
     "/resource/{resource_id}/download", operation_id="downloadResource"
 )
-def download_resource(session: ApiSession, resource_id: str):
+def download_resource(session: ApiSession, resource_id: str) -> TempFileResponse:
     resource = session.get_resource(id=resource_id)
-
-    # Convert to JSON and wrap in a BytesIO stream
-    json_bytes = io.BytesIO(json.dumps(resource.model_dump(), indent=2).encode("utf-8"))
-
-    return StreamingResponse(
-        content=json_bytes,
-        media_type="application/octet-stream",
-        headers={
-            "Content-Disposition": f"attachment; filename={resource.name}.ocelescope"
-        },
+    file_response = TempFileResponse(
+        prefix=resource.name,
+        suffix=".ocelescope",
+        filename=f"{resource.name}.ocelescope",
     )
+
+    with open(file_response.tmp_path, "w", encoding="utf-8") as output_file:
+        json.dump(resource.model_dump(), output_file, indent=2)
+
+    return file_response
 
 
 class GetResourceResponse(BaseModel):

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Hashable, Sequence, cast
 
+from ocelescope import Resource
+from ocelescope.discovery import discover_resource
 from pydantic import BaseModel, Field
 
 from app.internal.exceptions import BadRequest
@@ -10,8 +12,6 @@ from app.internal.model.resource import ResourceStore
 from app.internal.tasks.base import TaskBase, TaskState, TaskSummary
 from app.internal.util.hashing import generate_tuple_hash
 from app.sse_manager import ResourceLink, SystemNotification, sse_manager
-from ocelescope import Resource
-from ocelescope.discovery import discover_resource
 
 if TYPE_CHECKING:
     from app.internal.session import Session
@@ -47,7 +47,7 @@ class DiscoveryTask(TaskBase):
                 resource = cast(
                     Resource,
                     discover_resource(
-                        resource_type=self.request.resource_type,
+                        resource=self.request.resource_type,
                         ocel=self.session.get_ocel(self.request.ocel_id),
                         **cast(dict[str, Any], self.request.parameters),
                     ),
@@ -86,7 +86,9 @@ class DiscoveryTask(TaskBase):
 
     def _build_notification(self) -> SystemNotification:
         if self.state == TaskState.SUCCESS:
-            resource_id = self.result.resource_ids[0] if self.result.resource_ids else None
+            resource_id = (
+                self.result.resource_ids[0] if self.result.resource_ids else None
+            )
             return SystemNotification(
                 type="notification",
                 title="Discovery finished",
@@ -146,10 +148,7 @@ class DiscoveryTask(TaskBase):
 
         existing_id = session._dedupe_keys.get(key)
         if existing_id and existing_id in session.tasks:
-            print(
-                "[Task: discovery] "
-                f"Skipped (deduplicated) -> {existing_id}"
-            )
+            print(f"[Task: discovery] Skipped (deduplicated) -> {existing_id}")
             return existing_id
 
         task = cls(

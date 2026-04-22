@@ -2,7 +2,7 @@ import { Box } from "@mantine/core";
 import CytoscapeComponent from "../../../components/Cytoscape";
 import ActionButtons from "../../../components/Cytoscape/components/ActionButtons";
 import FloatingAnnotation from "../../../components/Cytoscape/components/FloatingAnnotation";
-import { useGraphvizLayout } from "../../../hooks/useGraphvizLayout";
+import { useElkGraphLayout } from "../../../hooks/useElkGraphLayout";
 import type { VisualizationByType, VisulizationsType } from "../../../types";
 import { Visualization } from "..";
 
@@ -10,7 +10,7 @@ const GraphViewer: React.FC<{
   visualization: VisualizationByType<"graph">;
   isPreview?: boolean;
 }> = ({ visualization, isPreview }) => {
-  const { elements } = useGraphvizLayout(visualization);
+  const { elements } = useElkGraphLayout(visualization);
 
   return (
     <Box h={"100%"} w={"100%"} pos={"relative"} style={{ overflow: "hidden" }}>

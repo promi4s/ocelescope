@@ -6,6 +6,10 @@ from typing_extensions import Literal
 
 from ocelescope import OCEL
 from ocelescope.ocel.filter.filters.entity_type import EventTypeFilter, ObjectTypeFilter
+from ocelescope.ocel.filter.filters.frequency import (
+    EventTypeFrequencyFilter,
+    ObjectTypeFrequencyFilter,
+)
 from ocelescope.resource.default.dfg import (
     DFGActivity,
     DFGEdge,
@@ -15,17 +19,37 @@ from ocelescope.resource.default.dfg import (
 from ocelescope.resource.default.petri_net import Arc, PetriNet, Place, Transition
 
 
+def _apply_discovery_filters(
+    *,
+    ocel: OCEL,
+    excluded_event_types: list[str],
+    excluded_object_types: list[str],
+    activity_frequency_threshold: int,
+    object_frequency_threshold: int,
+) -> OCEL:
+    filter_pipeline = [
+        EventTypeFilter(event_types=excluded_event_types, mode="exclude"),
+        ObjectTypeFilter(object_types=excluded_object_types, mode="exclude"),
+        EventTypeFrequencyFilter(threshold_percentage=activity_frequency_threshold),
+        ObjectTypeFrequencyFilter(threshold_percentage=object_frequency_threshold),
+    ]
+
+    return ocel.filter(filter_pipeline)
+
+
 def discover_ocdfg(
     ocel: OCEL,
     excluded_event_types: list[str],
     excluded_object_types: list[str],
+    activity_frequency_threshold: int,
+    object_frequency_threshold: int,
 ) -> DirectlyFollowsGraph:
-
-    filtered_ocel = ocel.filter(
-        [
-            EventTypeFilter(event_types=excluded_event_types, mode="exclude"),
-            ObjectTypeFilter(object_types=excluded_object_types, mode="exclude"),
-        ]
+    filtered_ocel = _apply_discovery_filters(
+        ocel=ocel,
+        excluded_event_types=excluded_event_types,
+        excluded_object_types=excluded_object_types,
+        activity_frequency_threshold=activity_frequency_threshold,
+        object_frequency_threshold=object_frequency_threshold,
     )
 
     ocdfg = pm4py.discover_ocdfg(filtered_ocel.ocel)
@@ -65,23 +89,24 @@ def discover_ocdfg(
     return DirectlyFollowsGraph(
         activities=[DFGActivity(name=activity) for activity in ocdfg["activities"]],
         edges=edges + start_activity_edges + end_activity_edges,
-        object_types=[
-            DFGObject(name=object_type) for object_type in ocdfg["object_types"]
-        ],
+        object_types=[DFGObject(name=object_type) for object_type in ocdfg["object_types"]],
     )
 
 
 def discover_ocpn(
-    ocel,
+    ocel: OCEL,
     variant: Literal["im", "imd"],
     excluded_event_types: list[str],
     excluded_object_types: list[str],
+    activity_frequency_threshold: int,
+    object_frequency_threshold: int,
 ) -> PetriNet:
-    filtered_ocel = ocel.filter(
-        [
-            EventTypeFilter(event_types=excluded_event_types, mode="exclude"),
-            ObjectTypeFilter(object_types=excluded_object_types, mode="exclude"),
-        ]
+    filtered_ocel = _apply_discovery_filters(
+        ocel=ocel,
+        excluded_event_types=excluded_event_types,
+        excluded_object_types=excluded_object_types,
+        activity_frequency_threshold=activity_frequency_threshold,
+        object_frequency_threshold=object_frequency_threshold,
     )
 
     petri_net = pm4py.discover_oc_petri_net(

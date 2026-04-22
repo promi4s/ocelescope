@@ -33,14 +33,45 @@ const CytoscapeGraph: React.FC<CytoscapeGraphProps> = ({
     {
       selector: "node",
       css: {
-        "font-size": 14,
+        // Typography
+        "font-size": 13,
+        "font-family": "system-ui, -apple-system, sans-serif",
+        "font-weight": 500,
+        color: "#1a1a1a",
+
+        // Shape & size
         shape: "data(shape)",
+        width: "data(width)",
+        height: "data(height)",
+
+        // Fill
+        "background-color": "data(color)",
+
+        // Default border — subtle
+        "border-width": 1.5,
+        "border-color": "rgba(0,0,0,0.15)",
+        "border-style": "solid",
+
+        // Label inside node
         label: "data(label)",
         "text-valign": "data(label_pos)",
         "text-halign": "center",
-        width: "data(width)",
-        height: "data(height)",
-        "background-color": "data(color)",
+        "text-wrap": "wrap",
+        "text-max-width": "data(width)",
+
+        // Breathing room between text and node edge
+        "padding": 8,
+      },
+    },
+    {
+      // Nodes whose label sits above or below get a background pill so the
+      // text is legible even when an edge runs behind it.
+      selector: "node[?label][label_pos != 'center']",
+      css: {
+        "text-background-opacity": 1,
+        "text-background-color": "#ffffff",
+        "text-background-shape": "roundrectangle",
+        "text-background-padding": "3px",
       },
     },
     {
@@ -51,27 +82,42 @@ const CytoscapeGraph: React.FC<CytoscapeGraphProps> = ({
         "border-style": "solid",
       },
     },
+    // Hover feedback
+    {
+      selector: "node:hover",
+      css: {
+        "border-width": 2.5,
+        "border-color": "rgba(0,0,0,0.4)",
+      },
+    },
   ] as any;
 
   const edgeStyles: cytoscape.StylesheetCSS[] = [
     {
       selector: "edge",
       css: {
+        // Line
+        width: 1.5,
         "line-color": "data(color)",
+        "line-opacity": 0.85,
+        "curve-style": "bezier",
+
+        // Default arrow
+        "target-arrow-shape": "triangle",
         "target-arrow-color": "data(color)",
         "source-arrow-color": "data(color)",
-        "arrow-scale": 1.5,
-        "curve-style": "bezier",
-        "font-size": 12,
+        "arrow-scale": 1.2,
+
+        // Label typography
+        "font-size": 11,
+        "font-family": "system-ui, -apple-system, sans-serif",
+        color: "#ffffff",
+        "text-rotation": "autorotate",
+
+        // Label pill — use the edge color as background so it blends in
         "text-background-opacity": 1,
         "text-background-shape": "roundrectangle",
         "text-background-padding": "3px",
-        "text-background-color": "#888",
-      },
-    },
-    {
-      selector: "edge[color]",
-      css: {
         "text-background-color": "data(color)",
       },
     },
@@ -79,7 +125,6 @@ const CytoscapeGraph: React.FC<CytoscapeGraphProps> = ({
       selector: "edge[label]",
       css: {
         label: "data(label)",
-        "text-rotation": "autorotate",
       },
     },
     {
@@ -87,7 +132,11 @@ const CytoscapeGraph: React.FC<CytoscapeGraphProps> = ({
       css: {
         "source-label": "data(start_label)",
         "source-text-rotation": "autorotate",
-        "source-text-offset": 20,
+        "source-text-offset": 24,
+        "source-text-background-opacity": 1,
+        "source-text-background-shape": "roundrectangle",
+        "source-text-background-padding": "3px",
+        "source-text-background-color": "data(color)",
       },
     },
     {
@@ -95,7 +144,11 @@ const CytoscapeGraph: React.FC<CytoscapeGraphProps> = ({
       css: {
         "target-label": "data(end_label)",
         "target-text-rotation": "autorotate",
-        "target-text-offset": 20,
+        "target-text-offset": 24,
+        "target-text-background-opacity": 1,
+        "target-text-background-shape": "roundrectangle",
+        "target-text-background-padding": "3px",
+        "target-text-background-color": "data(color)",
       },
     },
     {
@@ -108,6 +161,14 @@ const CytoscapeGraph: React.FC<CytoscapeGraphProps> = ({
       selector: "edge[end_arrow]",
       css: {
         "target-arrow-shape": "data(end_arrow)",
+      },
+    },
+    // Hover feedback
+    {
+      selector: "edge:hover",
+      css: {
+        width: 2.5,
+        "line-opacity": 1,
       },
     },
   ] as any;

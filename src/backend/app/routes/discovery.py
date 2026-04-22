@@ -58,6 +58,8 @@ def discover_petri_net(
             "variant": body.variant,
             "excluded_event_types": body.excluded_event_types,
             "excluded_object_types": body.excluded_object_types,
+            "activity_frequency_threshold": body.activity_frequency_threshold,
+            "object_frequency_threshold": body.object_frequency_threshold,
         },
     )
 
@@ -79,6 +81,8 @@ def discover_directly_follows_graph(
         parameters={
             "excluded_event_types": body.excluded_event_types,
             "excluded_object_types": body.excluded_object_types,
+            "activity_frequency_threshold": body.activity_frequency_threshold,
+            "object_frequency_threshold": body.object_frequency_threshold,
         },
     )
 

@@ -24,6 +24,20 @@ def DISCOVERY_FIELD(
     )
 
 
+def DISCOVERY_PERCENTAGE_FIELD(
+    *,
+    title: str,
+    description: str | None = None,
+):
+    return Field(
+        default=0,
+        ge=0,
+        le=100,
+        title=title,
+        description=description,
+    )
+
+
 class DiscoveryRequest(BaseModel):
     ocel_id: str
     resource_type: DiscoveryResourceType
@@ -54,6 +68,20 @@ class DiscoverPetriNetBody(RequestBody):
         description="Object types that should be ignored before discovery.",
         field_type="object_type",
     )
+    activity_frequency_threshold: int = DISCOVERY_PERCENTAGE_FIELD(
+        title="Activity Frequency",
+        description=(
+            "Keep only activities whose frequency is at least this percentage "
+            "of the most frequent activity."
+        ),
+    )
+    object_frequency_threshold: int = DISCOVERY_PERCENTAGE_FIELD(
+        title="Object Frequency",
+        description=(
+            "Keep only object types whose frequency is at least this percentage "
+            "of the most frequent object type."
+        ),
+    )
 
 
 class DiscoverDFGBody(RequestBody):
@@ -66,4 +94,18 @@ class DiscoverDFGBody(RequestBody):
         title="Excluded Object Types",
         description="Object types that should be ignored before discovery.",
         field_type="object_type",
+    )
+    activity_frequency_threshold: int = DISCOVERY_PERCENTAGE_FIELD(
+        title="Activity Frequency",
+        description=(
+            "Keep only activities whose frequency is at least this percentage "
+            "of the most frequent activity."
+        ),
+    )
+    object_frequency_threshold: int = DISCOVERY_PERCENTAGE_FIELD(
+        title="Object Frequency",
+        description=(
+            "Keep only object types whose frequency is at least this percentage "
+            "of the most frequent object type."
+        ),
     )
