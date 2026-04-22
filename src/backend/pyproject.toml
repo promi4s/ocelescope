@@ -8,7 +8,7 @@ authors = [
 ]
 requires-python = ">=3.13"
 dependencies = [
-  "pm4py~=2.7.15.3",
+  "pm4py~=2.7.22",
   "pint>=0.23,<0.24",
   "pandas>=2.3.1",
   "numpy>=2.3.2",
