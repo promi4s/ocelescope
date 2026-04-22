@@ -3030,8 +3030,51 @@
           "200": {
             "description": "Successful Response",
             "content": {
-              "application/json": {
-                "schema": {}
+              "text/event-stream": {
+                "itemSchema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "string",
+                      "contentMediaType": "application/json",
+                      "contentSchema": {
+                        "oneOf": [
+                          {
+                            "$ref": "#/components/schemas/SystemNotification"
+                          },
+                          {
+                            "$ref": "#/components/schemas/InvalidationRequest"
+                          },
+                          {
+                            "$ref": "#/components/schemas/InvalidSession"
+                          }
+                        ],
+                        "discriminator": {
+                          "propertyName": "type",
+                          "mapping": {
+                            "notification": "#/components/schemas/SystemNotification",
+                            "invalidation": "#/components/schemas/InvalidationRequest",
+                            "invalid-session": "#/components/schemas/InvalidSession"
+                          }
+                        },
+                        "title": "Streamitem Sse Endpoint Sse Get"
+                      }
+                    },
+                    "event": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "retry": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
               }
             }
           }
@@ -4126,6 +4169,46 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
+      "InvalidSession": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "invalid-session",
+            "title": "Type",
+            "default": "invalid-session"
+          }
+        },
+        "type": "object",
+        "title": "InvalidSession"
+      },
+      "InvalidationRequest": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "invalidation",
+            "title": "Type",
+            "default": "invalidation"
+          },
+          "routes": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "resources",
+                "ocels",
+                "tasks",
+                "plugins"
+              ]
+            },
+            "type": "array",
+            "title": "Routes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "routes"
+        ],
+        "title": "InvalidationRequest"
+      },
       "O2OCountFilter": {
         "properties": {
           "source": {
@@ -4536,6 +4619,25 @@
         ],
         "title": "OcelEntity"
       },
+      "OcelLink": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "ocel",
+            "title": "Type",
+            "default": "ocel"
+          },
+          "ocel_id": {
+            "type": "string",
+            "title": "Ocel Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ocel_id"
+        ],
+        "title": "OcelLink"
+      },
       "OcelMetadata": {
         "properties": {
           "id": {
@@ -4685,6 +4787,35 @@
           "methods"
         ],
         "title": "PluginApi"
+      },
+      "PluginLink": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "plugin",
+            "title": "Type",
+            "default": "plugin"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "method": {
+            "type": "string",
+            "title": "Method"
+          },
+          "task_id": {
+            "type": "string",
+            "title": "Task Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "method",
+          "task_id"
+        ],
+        "title": "PluginLink"
       },
       "PluginMeta": {
         "properties": {
@@ -5078,6 +5209,25 @@
         ],
         "title": "ResourceInfo"
       },
+      "ResourceLink": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "resource",
+            "title": "Type",
+            "default": "resource"
+          },
+          "resource_id": {
+            "type": "string",
+            "title": "Resource Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "resource_id"
+        ],
+        "title": "ResourceLink"
+      },
       "ResourceResult": {
         "properties": {
           "type": {
@@ -5131,6 +5281,69 @@
           "svg"
         ],
         "title": "SVGVis"
+      },
+      "SystemNotification": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "notification",
+            "title": "Type",
+            "default": "notification"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "notification_type": {
+            "type": "string",
+            "enum": [
+              "warning",
+              "info",
+              "error"
+            ],
+            "title": "Notification Type"
+          },
+          "link": {
+            "anyOf": [
+              {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/OcelLink"
+                  },
+                  {
+                    "$ref": "#/components/schemas/PluginLink"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ResourceLink"
+                  }
+                ],
+                "discriminator": {
+                  "propertyName": "type",
+                  "mapping": {
+                    "ocel": "#/components/schemas/OcelLink",
+                    "plugin": "#/components/schemas/PluginLink",
+                    "resource": "#/components/schemas/ResourceLink"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Link"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "message",
+          "notification_type"
+        ],
+        "title": "SystemNotification"
       },
       "SystemTaskSummary": {
         "properties": {
