@@ -234,7 +234,9 @@ def write_extension_to_json(
     ocel[JSON_QUANTITY_EXTENSION] = {
         JSON_QUANTITIES: renamed_oqty.to_dict(orient="records"),
         JSON_OPERATIONS: renamed_qop.to_dict(orient="records"),
-        JSON_PROPERTIES: renamed_properties.to_dict(orient="records"),
+        JSON_PROPERTIES: orjson.loads(
+            renamed_properties.to_json(orient="records", date_format="iso")
+        ),
     }
 
     data = orjson.dumps(ocel, option=orjson.OPT_APPEND_NEWLINE)
