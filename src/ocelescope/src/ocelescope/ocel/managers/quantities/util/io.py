@@ -176,7 +176,7 @@ def read_extension_from_xml(path: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd.
     oqty_df = pd.DataFrame(quantities_data, columns=OQTY_COLUMNS)
     qop_df = pd.DataFrame(operations_data, columns=QOP_COLUMNS)
     property_df = (
-        pd.DataFrame(item_property_data).apply(coerce_series)
+        pd.DataFrame(item_property_data)
         if len(item_property_data) > 0
         else pd.DataFrame(columns=[QEL_ITEM_TYPE])
     )
@@ -211,9 +211,7 @@ def read_extension_from_json(path: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd
             (
                 pd.DataFrame.from_records(
                     data=quantityExtension[JSON_PROPERTIES],
-                )
-                .rename(columns=inverse_keymap(JSON_KEYMAP))
-                .apply(coerce_series)
+                ).rename(columns=inverse_keymap(JSON_KEYMAP))
             )
             if len(quantityExtension[JSON_PROPERTIES]) > 0
             else pd.DataFrame(columns=[QEL_ITEM_TYPE])
@@ -276,24 +274,28 @@ def read_extension_from_sqlite(path: Path) -> tuple[pd.DataFrame, pd.DataFrame, 
             ]
         ]
 
-    return oqty, qop, item_properties.apply(coerce_series)
+    return oqty, qop, item_properties
 
 
 def read_quantity_extension(path: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+
     match path.suffix:
         case ".xmlocel" | ".xml":
-            return read_extension_from_xml(path)
+            oqty, qop, item_properties = read_extension_from_xml(path)
         case ".jsonocel" | ".json":
-            return read_extension_from_json(path)
+            oqty, qop, item_properties = read_extension_from_json(path)
         case ".sqlite":
-            return read_extension_from_sqlite(path)
+            oqty, qop, item_properties = read_extension_from_sqlite(path)
         case _:
             raise ValueError(f"Unsupported extension: {path.suffix}")
+
+    return oqty, qop, item_properties.apply(coerce_series)
 
 
 def write_quantity_extension(
     path: Path, oqty: pd.DataFrame, qop: pd.DataFrame, item_properties: pd.DataFrame
 ):
+
     match path.suffix:
         case ".xmlocel" | ".xml":
             return write_extension_to_xml(path, oqty=oqty, qop=qop, item_properties=item_properties)
