@@ -1,8 +1,15 @@
 from ocelescope.ocel.constants import EID_COL, OID_COL, QEL_ITEM_TYPE, QEL_QUANTITY
 
+# TODO: THIS IS ALL A MESS FIX IN FUTURE
 XML_QUANTITY_EXTENSION = "quantity-extension"
 XML_OPERATIONS = "operations"
 XML_OPERATION = "operation"
+XML_PROPERTIES = "item-properties"
+XML_PROPERTIES_TYPE = "item-type"
+XML_PROPERTIES_TYPE_NAME = "name"
+XML_PROPERTY = "property"
+XML_PROPERTY_NAME = "name"
+XML_PROPERTY_TYPE = "type"
 XML_QUANTITIES = "quantities"
 XML_QUANTITY = "quantity"
 XML_EVENT_ID = "event-id"
@@ -13,6 +20,7 @@ XML_QUANTITY_TYPE = "type"
 
 JSON_QUANTITY_EXTENSION = "quantityExtension"
 JSON_OPERATIONS = "operations"
+JSON_PROPERTIES = "itemTypes"
 JSON_QUANTITIES = "quantities"
 
 JSON_KEYMAP = {
@@ -24,6 +32,7 @@ JSON_KEYMAP = {
 
 SQL_OPERATIONS = "operation"
 SQL_QUANTITIES = "quantity"
+SQL_ITEM_PROPERTIES = "itemProperties"
 
 SQL_KEYMAP = {
     EID_COL: "ocel_event_id",

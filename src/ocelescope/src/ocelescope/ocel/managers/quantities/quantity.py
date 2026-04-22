@@ -40,10 +40,14 @@ class QuantityManager(BaseManager):
     ):
         super().__init__(ocel)
 
-        self.oqty, self.qop = (
+        self.oqty, self.qop, self.properties = (
             read_quantity_extension(ocel.meta.path)
             if ocel.meta.path is not None
-            else (pd.DataFrame(columns=OQTY_COLUMNS), pd.DataFrame(columns=QOP_COLUMNS))
+            else (
+                pd.DataFrame(columns=OQTY_COLUMNS),
+                pd.DataFrame(columns=QOP_COLUMNS),
+                pd.DataFrame(columns=[QEL_ITEM_TYPE]),
+            )
         )
 
         self.qop = self.qop.loc[self._cleaned_qop_mask].reset_index(drop=True)
@@ -64,6 +68,7 @@ class QuantityManager(BaseManager):
                 path,
                 self.oqty.loc[self._cleaned_oqty_mask],
                 self.qop.loc[self._cleaned_qop_mask],
+                self.properties,
             )
 
     @property
