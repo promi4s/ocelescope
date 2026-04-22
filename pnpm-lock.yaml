@@ -197,6 +197,9 @@ importers:
       '@ocelescope/core':
         specifier: workspace:*
         version: link:../packages/core
+      '@ocelescope/discovery':
+        specifier: workspace:*
+        version: link:../modules/discovery
       '@ocelescope/filter':
         specifier: workspace:*
         version: link:../modules/filter
@@ -225,6 +228,94 @@ importers:
       '@types/react-dom':
         specifier: 'catalog:'
         version: 19.2.3(@types/react@19.2.14)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+
+  src/frontend/modules/discovery:
+    dependencies:
+      '@mantine/carousel':
+        specifier: 'catalog:'
+        version: 8.3.16(@mantine/core@8.3.16(@mantine/hooks@8.3.16(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/hooks@8.3.16(react@19.2.3))(embla-carousel-react@8.6.0(react@19.2.3))(embla-carousel@8.6.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@mantine/core':
+        specifier: 'catalog:'
+        version: 8.3.16(@mantine/hooks@8.3.16(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@mantine/hooks':
+        specifier: 'catalog:'
+        version: 8.3.16(react@19.2.3)
+      '@ocelescope/api-base':
+        specifier: workspace:*
+        version: link:../../packages/api/base
+      '@ocelescope/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@ocelescope/resources':
+        specifier: workspace:*
+        version: link:../../packages/resources
+      '@rjsf/core':
+        specifier: 'catalog:'
+        version: 6.3.1(@rjsf/utils@6.3.1(react@19.2.3))(react@19.2.3)
+      '@rjsf/utils':
+        specifier: 'catalog:'
+        version: 6.3.1(react@19.2.3)
+      '@rjsf/validator-ajv8':
+        specifier: 'catalog:'
+        version: 6.3.1(@rjsf/utils@6.3.1(react@19.2.3))
+      '@tanstack/react-query':
+        specifier: 'catalog:'
+        version: 5.90.21(react@19.2.3)
+      embla-carousel:
+        specifier: 'catalog:'
+        version: 8.6.0
+      embla-carousel-react:
+        specifier: 'catalog:'
+        version: 8.6.0(react@19.2.3)
+      lucide-react:
+        specifier: 'catalog:'
+        version: 0.563.0(react@19.2.3)
+      next:
+        specifier: 'catalog:'
+        version: 16.1.6(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      react:
+        specifier: 'catalog:'
+        version: 19.2.3
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.2.3(react@19.2.3)
+      react-hook-form:
+        specifier: 'catalog:'
+        version: 7.71.2(react@19.2.3)
+      uniqolor:
+        specifier: 'catalog:'
+        version: 1.1.1
+    devDependencies:
+      '@apidevtools/json-schema-ref-parser':
+        specifier: 'catalog:'
+        version: 15.3.1(@types/json-schema@7.0.15)
+      '@rjsf/mantine':
+        specifier: 'catalog:'
+        version: 6.3.1(@mantine/core@8.3.16(@mantine/hooks@8.3.16(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/dates@8.3.16(@mantine/core@8.3.16(@mantine/hooks@8.3.16(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/hooks@8.3.16(react@19.2.3))(dayjs@1.11.19)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/hooks@8.3.16(react@19.2.3))(@rjsf/core@6.3.1(@rjsf/utils@6.3.1(react@19.2.3))(react@19.2.3))(@rjsf/utils@6.3.1(react@19.2.3))(react@19.2.3)
+      '@types/file-saver':
+        specifier: 'catalog:'
+        version: 2.0.7
+      '@types/node':
+        specifier: 'catalog:'
+        version: 25.3.3
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.2.14
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.2.3(@types/react@19.2.14)
+      flat:
+        specifier: 'catalog:'
+        version: 6.0.1
+      json-schema-traverse:
+        specifier: 'catalog:'
+        version: 1.0.0
+      tsdown:
+        specifier: 'catalog:'
+        version: 0.21.4(@tsdown/css@0.21.4)(typescript@5.9.3)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3

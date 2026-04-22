@@ -4,6 +4,7 @@ import pm4py
 from pm4py.objects.petri_net.obj import PetriNet as PMNet
 from typing_extensions import Literal
 
+from ocelescope import OCEL
 from ocelescope.ocel.filter.filters.entity_type import EventTypeFilter, ObjectTypeFilter
 from ocelescope.resource.default.dfg import (
     DFGActivity,
@@ -15,7 +16,7 @@ from ocelescope.resource.default.petri_net import Arc, PetriNet, Place, Transiti
 
 
 def discover_ocdfg(
-    ocel,
+    ocel: OCEL,
     excluded_event_types: list[str],
     excluded_object_types: list[str],
 ) -> DirectlyFollowsGraph:
@@ -37,7 +38,7 @@ def discover_ocdfg(
                     object_type=object_type,
                     source=source,
                     target=target,
-                    annotation=len(events),
+                    annotation=str(len(events)),
                 )
                 for (source, target), events in raw_edges.items()
             ]
@@ -64,7 +65,9 @@ def discover_ocdfg(
     return DirectlyFollowsGraph(
         activities=[DFGActivity(name=activity) for activity in ocdfg["activities"]],
         edges=edges + start_activity_edges + end_activity_edges,
-        object_types=[DFGObject(name=object_type) for object_type in ocdfg["object_types"]],
+        object_types=[
+            DFGObject(name=object_type) for object_type in ocdfg["object_types"]
+        ],
     )
 
 
@@ -91,29 +94,33 @@ def discover_ocpn(
     place_set: list[Place] = []
     transition_map: dict[str, Transition] = {}
     arcs: list[Arc] = []
+    initial_marking_by_place: dict[str, int] = {}
+    final_marking_by_place: dict[str, int] = {}
 
     seen_places: set[str] = set()
 
     for object_type, pm_net in flat_nets.items():
-        pm_net = pm_net[0]  # type: ignore
+        net, initial_marking, final_marking = pm_net
 
-        for place in pm_net.places:
+        for place in net.places:
             qualified_id = f"{object_type}_{place.name}"
             if qualified_id not in seen_places:
                 place_set.append(
                     Place(
                         id=qualified_id,
-                        place_type="source"
-                        if place.name == "source"
-                        else "sink"
-                        if place.name == "sink"
-                        else None,
                         object_type=object_type,
                     )
                 )
                 seen_places.add(qualified_id)
 
-        for transition in pm_net.transitions:
+            initial_tokens = int(initial_marking.get(place, 0))
+            final_tokens = int(final_marking.get(place, 0))
+            if initial_tokens > 0:
+                initial_marking_by_place[qualified_id] = initial_tokens
+            if final_tokens > 0:
+                final_marking_by_place[qualified_id] = final_tokens
+
+        for transition in net.transitions:
             label = transition.label or transition.name
             if label not in transition_map:
                 transition_map[label] = Transition(
@@ -121,7 +128,7 @@ def discover_ocpn(
                     label=transition.label,
                 )
 
-        for arc in pm_net.arcs:
+        for arc in net.arcs:
             match arc.source:
                 case PMNet.Place(name=name):
                     source_id = f"{object_type}_{name}"
@@ -142,6 +149,7 @@ def discover_ocpn(
                 Arc(
                     source=source_id,
                     target=target_id,
+                    weight=int(getattr(arc, "weight", 1)),
                 )
             )
 
@@ -149,4 +157,6 @@ def discover_ocpn(
         places=place_set,
         transitions=list(transition_map.values()),
         arcs=arcs,
+        initial_marking=initial_marking_by_place,
+        final_marking=final_marking_by_place,
     )

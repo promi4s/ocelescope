@@ -2151,6 +2151,137 @@
         }
       }
     },
+    "/discovery/meta": {
+      "get": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Get discovery method metadata",
+        "operationId": "getDiscoveryMeta",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DiscoveryMethodMeta"
+                  },
+                  "type": "array",
+                  "title": "Response Getdiscoverymeta"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ocels/{ocel_id}/discover/petri-net": {
+      "post": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Discover an object-centric Petri net",
+        "operationId": "discoverPetriNet",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ocel Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DiscoverPetriNetBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "title": "Response Discoverpetrinet"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ocels/{ocel_id}/discover/directly-follows-graph": {
+      "post": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Discover an object-centric directly follows graph",
+        "operationId": "discoverDirectlyFollowsGraph",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ocel Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DiscoverDFGBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "title": "Response Discoverdirectlyfollowsgraph"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/tasks/system": {
       "get": {
         "tags": [
@@ -2380,6 +2511,127 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PluginTaskSummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tasks/discovery": {
+      "get": {
+        "tags": [
+          "tasks"
+        ],
+        "summary": "returns all discovery tasks of a session",
+        "operationId": "getDiscoveryTasks",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "resource_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Resource Type"
+            }
+          },
+          {
+            "name": "only_running",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true,
+              "title": "Only Running"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DiscoveryTaskSummary"
+                  },
+                  "title": "Response Getdiscoverytasks"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tasks/discovery/{task_id}": {
+      "get": {
+        "tags": [
+          "tasks"
+        ],
+        "summary": "returns the discovery task of a given taskId",
+        "operationId": "getDiscoveryTask",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiscoveryTaskSummary"
                 }
               }
             }
@@ -3308,6 +3560,163 @@
         ],
         "title": "DefaultOCEL",
         "description": "Definition of a default OCEL on the server, for quick access. Supports pre-loading the OCEL on backend init."
+      },
+      "DiscoverDFGBody": {
+        "properties": {
+          "excludedEventTypes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Excluded Activities",
+            "description": "Activities that should be ignored before discovery.",
+            "x-ui-meta": {
+              "field_type": "event_type"
+            }
+          },
+          "excludedObjectTypes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Excluded Object Types",
+            "description": "Object types that should be ignored before discovery.",
+            "x-ui-meta": {
+              "field_type": "object_type"
+            }
+          }
+        },
+        "type": "object",
+        "title": "DiscoverDFGBody"
+      },
+      "DiscoverPetriNetBody": {
+        "properties": {
+          "variant": {
+            "type": "string",
+            "enum": [
+              "im",
+              "imd"
+            ],
+            "title": "Mining Variant",
+            "description": "Choose the inductive mining variant used for discovery.",
+            "default": "im",
+            "enumNames": [
+              "IM (traditional)",
+              "IMd (directly-follows)"
+            ]
+          },
+          "excludedEventTypes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Excluded Activities",
+            "description": "Activities that should be ignored before discovery.",
+            "x-ui-meta": {
+              "field_type": "event_type"
+            }
+          },
+          "excludedObjectTypes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Excluded Object Types",
+            "description": "Object types that should be ignored before discovery.",
+            "x-ui-meta": {
+              "field_type": "object_type"
+            }
+          }
+        },
+        "type": "object",
+        "title": "DiscoverPetriNetBody"
+      },
+      "DiscoveryMethodMeta": {
+        "properties": {
+          "resourceType": {
+            "type": "string",
+            "enum": [
+              "PetriNet",
+              "DirectlyFollowsGraph"
+            ],
+            "title": "Resourcetype"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "inputSchema": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Inputschema"
+          }
+        },
+        "type": "object",
+        "required": [
+          "resourceType",
+          "label",
+          "inputSchema"
+        ],
+        "title": "DiscoveryMethodMeta"
+      },
+      "DiscoveryOutput": {
+        "properties": {
+          "resource_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Resource Ids"
+          }
+        },
+        "type": "object",
+        "title": "DiscoveryOutput"
+      },
+      "DiscoveryTaskSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "state": {
+            "$ref": "#/components/schemas/TaskState"
+          },
+          "ocel_id": {
+            "type": "string",
+            "title": "Ocel Id"
+          },
+          "resource_type": {
+            "type": "string",
+            "enum": [
+              "PetriNet",
+              "DirectlyFollowsGraph"
+            ],
+            "title": "Resource Type"
+          },
+          "output": {
+            "$ref": "#/components/schemas/DiscoveryOutput"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "state",
+          "ocel_id",
+          "resource_type",
+          "output"
+        ],
+        "title": "DiscoveryTaskSummary"
       },
       "DotVis": {
         "properties": {

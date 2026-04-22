@@ -54,4 +54,9 @@ class Annotated(BaseModel, Generic[T]):
         return self.annotation if type(self.annotation) is str else None
 
     def get_annotation_visualization(self):
-        return self.annotation.visualize() if isinstance(self.annotation, Resource) else None
+        if not isinstance(self.annotation, Resource):
+            return None
+
+        from ocelescope.visualization.manager import visualize_resource
+
+        return visualize_resource(self.annotation)

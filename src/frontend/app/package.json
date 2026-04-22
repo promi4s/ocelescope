@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@ocelescope/core": "workspace:*",
+    "@ocelescope/discovery": "workspace:*",
     "@ocelescope/ocelot": "workspace:*",
     "@ocelescope/filter": "workspace:*",
     "@ocelescope/plugin": "workspace:*",

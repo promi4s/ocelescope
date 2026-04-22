@@ -7,6 +7,7 @@ from fastapi.routing import APIRouter
 
 from app.dependencies import ApiSession
 from app.internal.exceptions import NotFound
+from app.internal.tasks.discovery_task import DiscoveryTask, DiscoveryTaskSummary
 from app.internal.tasks.base import TaskState
 from app.internal.tasks.plugin import PluginTask, PluginTaskSummary
 from app.internal.tasks.system import SystemTask, SystemTaskSummary
@@ -79,6 +80,43 @@ def get_plugin_tasks(
 def get_plugin_task(session: ApiSession, task_id: str) -> PluginTaskSummary:
     task = session.get_task(task_id)
     if task is None or not isinstance(task, PluginTask):
+        raise NotFound("Task could not be found")
+
+    return task.summarize()
+
+
+@tasks_router.get(
+    "/discovery",
+    summary="returns all discovery tasks of a session",
+    operation_id="getDiscoveryTasks",
+)
+def get_discovery_tasks(
+    session: ApiSession,
+    ocel_id: Optional[str] = None,
+    resource_type: Optional[str] = None,
+    only_running: bool = True,
+) -> list[DiscoveryTaskSummary]:
+    def filter_tasks(task: DiscoveryTask):
+        return (
+            (ocel_id is None or task.request.ocel_id == ocel_id)
+            and (resource_type is None or task.request.resource_type == resource_type)
+            and (not only_running or task.state == TaskState.STARTED)
+        )
+
+    return [
+        cast(DiscoveryTaskSummary, task_summary)
+        for task_summary in session.list_tasks(DiscoveryTask, filter_tasks)
+    ]
+
+
+@tasks_router.get(
+    "/discovery/{task_id}",
+    summary="returns the discovery task of a given taskId",
+    operation_id="getDiscoveryTask",
+)
+def get_discovery_task(session: ApiSession, task_id: str) -> DiscoveryTaskSummary:
+    task = session.get_task(task_id)
+    if task is None or not isinstance(task, DiscoveryTask):
         raise NotFound("Task could not be found")
 
     return task.summarize()

@@ -1,8 +1,7 @@
-from typing import Literal, Optional
+from typing import Optional
 
+from pydantic import Field
 from ocelescope.resource.resource import Annotated, Resource
-from ocelescope.visualization import generate_color_map
-from ocelescope.visualization.default.graph import Graph, GraphEdge, GraphNode, GraphvizLayoutConfig
 
 
 class Place(Annotated):
@@ -11,12 +10,10 @@ class Place(Annotated):
     Attributes:
         id: Unique identifier of the place.
         object_type: Type of the object associated with this place.
-        place_type: Either "sink", "source", or None.
     """
 
     id: str
     object_type: str
-    place_type: Literal["sink", "source", None] | None
 
 
 class Transition(Annotated):
@@ -38,10 +35,13 @@ class Arc(Annotated):
         source: ID of the source node (place or transition).
         target: ID of the target node (place or transition).
         variable: Whether the arc represents a variable connection.
+        weight: Multiplicity of the arc.
     """
 
     source: str
     target: str
+    variable: bool = False
+    weight: int = 1
 
 
 class PetriNet(Resource):
@@ -51,100 +51,15 @@ class PetriNet(Resource):
         places: List of places in the Petri net.
         transitions: List of transitions in the Petri net.
         arcs: List of arcs connecting places and transitions.
+        initial_marking: Token counts of the initial marking by place id.
+        final_marking: Token counts of the final marking by place id.
     """
 
     label = "Petri Net"
     description = "An object-centric petri net"
 
-    places: list[Place] = []
-    transitions: list[Transition] = []
-    arcs: list[Arc] = []
-
-    @classmethod
-    @classmethod
-    def discover(
-        cls,
-        ocel,
-        *,
-        variant: Literal["im", "imd"] = "im",
-        excluded_event_types: list[str] | None = None,
-        excluded_object_types: list[str] | None = None,
-    ) -> "PetriNet":
-        from ocelescope.discovery.pm4py import discover_ocpn
-
-        return discover_ocpn(
-            ocel=ocel,
-            variant=variant,
-            excluded_event_types=excluded_event_types or [],
-            excluded_object_types=excluded_object_types or [],
-        )
-
-    def visualize(self):
-        # Use your color generator function
-        object_types = list({p.object_type for p in self.places})
-        color_map = generate_color_map(object_types)
-
-        # Build nodes
-        nodes: list[GraphNode] = []
-
-        for place in self.places:
-            nodes.append(
-                GraphNode(
-                    id=place.id,
-                    label=place.object_type if place.place_type else None,
-                    shape="circle",
-                    color=color_map.get(place.object_type, "#cccccc"),
-                    width=30,
-                    label_pos="bottom",
-                    height=30,
-                    annotation=place.get_annotation_visualization(),
-                )
-            )
-
-        for transition in self.transitions:
-            label = transition.label or None
-            nodes.append(
-                GraphNode(
-                    id=transition.id,
-                    label=label,
-                    width=None if label else 10,
-                    height=None if label else 40,
-                    shape="rectangle",
-                    color="#ffffff" if label else "#000000",
-                    border_color="#000000" if label else None,
-                    annotation=transition.get_annotation_visualization(),
-                )
-            )
-
-        # Build edges
-        edges: list[GraphEdge] = []
-
-        for arc in self.arcs:
-            object_type = next(
-                (p.object_type for p in self.places if p.id in {arc.source, arc.target}),
-                "default",
-            )
-            edges.append(
-                GraphEdge(
-                    source=arc.source,
-                    target=arc.target,
-                    end_arrow="triangle",
-                    color=color_map.get(object_type, "#cccccc"),
-                    annotation=arc.get_annotation_visualization(),
-                    label=arc.get_annotation_str(),
-                )
-            )
-
-        return Graph(
-            type="graph",
-            nodes=nodes,
-            edges=edges,
-            layout_config=GraphvizLayoutConfig(
-                engine="dot",
-                graphAttrs={
-                    "rankdir": "LR",
-                    "ranksep": "0.7",
-                    "nodesep": "0.7",
-                },
-            ),
-        )
+    places: list[Place] = Field(default_factory=list)
+    transitions: list[Transition] = Field(default_factory=list)
+    arcs: list[Arc] = Field(default_factory=list)
+    initial_marking: dict[str, int] = Field(default_factory=dict)
+    final_marking: dict[str, int] = Field(default_factory=dict)

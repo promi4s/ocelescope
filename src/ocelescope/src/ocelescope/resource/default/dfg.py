@@ -1,6 +1,5 @@
+from pydantic import Field
 from ocelescope.resource.resource import Annotated, Resource
-from ocelescope.visualization import generate_color_map
-from ocelescope.visualization.default.graph import Graph, GraphEdge, GraphNode, GraphvizLayoutConfig
 
 
 class DFGEdge(Annotated):
@@ -21,94 +20,6 @@ class DirectlyFollowsGraph(Resource):
     label = "Directly Follows Graph"
     description = "A object-centric directly follows graph"
 
-    object_types: list[DFGObject]
-    activities: list[DFGActivity]
-    edges: list[DFGEdge]
-
-    @classmethod
-    @classmethod
-    def discover(
-        cls,
-        ocel,
-        *,
-        excluded_event_types: list[str] | None = None,
-        excluded_object_types: list[str] | None = None,
-    ) -> "DirectlyFollowsGraph":
-        from ocelescope.discovery.pm4py import discover_ocdfg
-
-        return discover_ocdfg(
-            ocel=ocel,
-            excluded_event_types=excluded_event_types or [],
-            excluded_object_types=excluded_object_types or [],
-        )
-
-    def visualize(self):
-        color_map = generate_color_map([object_type.name for object_type in self.object_types])
-
-        activity_nodes = [
-            GraphNode(
-                id=activity.name,
-                label=activity.name,
-                shape="rectangle",
-                annotation=activity.get_annotation_visualization(),
-                color="#ffffff",
-                border_color="#000000",
-            )
-            for activity in self.activities
-        ]
-
-        start_nodes = [
-            GraphNode(
-                id=f"start_{object_type.name}",
-                label=object_type.name,
-                shape="circle",
-                color=color_map[object_type.name],
-                width=40,
-                height=40,
-                label_pos="top",
-                annotation=object_type.get_annotation_visualization(),
-            )
-            for object_type in self.object_types
-        ]
-
-        end_nodes = [
-            GraphNode(
-                id=f"end_{object_type.name}",
-                label=object_type.name,
-                shape="circle",
-                color=color_map[object_type.name],
-                width=40,
-                height=40,
-                label_pos="bottom",
-            )
-            for object_type in self.object_types
-        ]
-
-        nodes: list[GraphNode] = activity_nodes + start_nodes + end_nodes
-
-        edges = [
-            GraphEdge(
-                source=edge.source if edge.source else f"start_{edge.object_type}",
-                target=edge.target if edge.target else f"end_{edge.object_type}",
-                end_arrow="triangle",
-                color=color_map[edge.object_type],
-                annotation=edge.get_annotation_visualization(),
-                label=edge.get_annotation_str(),
-            )
-            for edge in self.edges
-        ]
-
-        return Graph(
-            type="graph",
-            nodes=nodes,
-            edges=edges,
-            layout_config=GraphvizLayoutConfig(
-                engine="dot",
-                graphAttrs={
-                    "rankdir": "BT",
-                    "splines": "True",
-                    "nodesep": "0.8",
-                    "ranksep": "0.5",
-                },
-            ),
-        )
+    object_types: list[DFGObject] = Field(default_factory=list)
+    activities: list[DFGActivity] = Field(default_factory=list)
+    edges: list[DFGEdge] = Field(default_factory=list)
