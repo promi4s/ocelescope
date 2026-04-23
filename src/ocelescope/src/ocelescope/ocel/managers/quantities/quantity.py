@@ -51,6 +51,9 @@ class QuantityManager(BaseManager):
         self.qop = self.qop.loc[self._cleaned_qop_mask].reset_index(drop=True)
         self.oqty = self.oqty.loc[self._cleaned_oqty_mask].reset_index(drop=True)
 
+    def is_populated(self) -> bool:
+        return any(not df.empty for df in [self.oqty, self.qop, self.properties])
+
     def write_quantities(self, path: Path):
         """Write quantity-extension tables to a OCEL file.
 
