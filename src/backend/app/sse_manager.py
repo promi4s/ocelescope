@@ -78,7 +78,7 @@ class SSEManager:
     def send_safe(self, session_id: str, message: SSEMessage):
         """Thread-safe send for sync context."""
         if not self.loop:
-            raise RuntimeError("Event loop not set on SSEManager")
+            return
         coro = self.send(session_id, message)
         asyncio.run_coroutine_threadsafe(coro, self.loop)
 
