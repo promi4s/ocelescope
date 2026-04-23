@@ -63,7 +63,7 @@ def import_ocel_task(
             notification_type="info",
             link=OcelLink(ocel_id=ocel_id),
         ),
-        InvalidationRequest(routes=["ocels"]),
+        InvalidationRequest(routes=["ocels", "tasks"]),
     ]
 
 
@@ -104,7 +104,7 @@ def import_plugin(
             message="Plugin uploaded successfully",
             notification_type="info",
         ),
-        InvalidationRequest(routes=["plugins"]),
+        InvalidationRequest(routes=["plugins", "tasks"]),
     ]
 
 
@@ -132,5 +132,5 @@ def import_resource(
             message=f"{resource.name} uploaded successfully",
             notification_type="info",
         ),
-        InvalidationRequest(routes=["resources"]),
+        InvalidationRequest(routes=["resources", "tasks"]),
     ]
