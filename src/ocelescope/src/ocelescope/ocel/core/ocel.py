@@ -164,7 +164,17 @@ class OCEL:
     def __deepcopy__(self, memo: dict[int, Any]):
         # TODO revisit this. Are the underlying DataFrames mutable? If not, might optimize this
         pm4py_ocel = deepcopy(self.ocel, memo)
-        ocel = OCEL(ocel=pm4py_ocel, meta=OCELMeta(extra=self.meta.extra))
+        ocel = OCEL(
+            ocel=pm4py_ocel,
+            meta=OCELMeta(extra=deepcopy(self.meta.extra, memo)),
+            quantityExtension=(
+                self.quantities.oqty.copy(),
+                self.quantities.qop.copy(),
+                self.quantities.properties.copy(),
+            )
+            if self.quantities.is_populated()
+            else None,
+        )
         return ocel
 
     def __str__(self):
