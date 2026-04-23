@@ -28,7 +28,7 @@ class ImportMetadata(TypedDict):
     uploaded_at: str
 
 
-@system_task(name="importOcel")
+@system_task(name="importOCEL")
 def import_ocel_task(
     session: Session,
     file_stream: IO[bytes],
