@@ -39,12 +39,8 @@ class InvalidationRequest(BaseModel):
     routes: list[Literal["resources", "ocels", "tasks", "plugins"]]
 
 
-class InvalidSession(BaseModel):
-    type: Literal["invalid-session"] = "invalid-session"
-
-
 SSEMessage = Annotated[
-    Union[SystemNotification, InvalidationRequest, InvalidSession],
+    Union[SystemNotification, InvalidationRequest],
     Field(discriminator="type"),
 ]
 
