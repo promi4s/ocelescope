@@ -58,7 +58,7 @@ def import_ocel_task(
 
     return [
         SystemNotification(
-            title="Ocel successfully uploaded",
+            title="OCEL successfully uploaded",
             message=f"{ocel.meta.extra.get('name', None) or 'OCEL '} was uploaded successfully",
             notification_type="info",
             link=OcelLink(ocel_id=ocel_id),
