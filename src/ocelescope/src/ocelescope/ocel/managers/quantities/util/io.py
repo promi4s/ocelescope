@@ -193,12 +193,12 @@ def read_extension_from_json(path: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd
         )
 
         oqty: pd.DataFrame = pd.DataFrame.from_records(
-            data=quantityExtension[JSON_QUANTITIES],
+            data=quantityExtension.get(JSON_QUANTITIES, []),
             columns=[JSON_KEYMAP[OID_COL], JSON_KEYMAP[QEL_ITEM_TYPE], JSON_KEYMAP[QEL_QUANTITY]],
         ).rename(columns=inverse_keymap(JSON_KEYMAP))
 
         qop: pd.DataFrame = pd.DataFrame.from_records(
-            data=quantityExtension[JSON_OPERATIONS],
+            data=quantityExtension.get(JSON_OPERATIONS, []),
             columns=[
                 JSON_KEYMAP[EID_COL],
                 JSON_KEYMAP[OID_COL],
@@ -213,7 +213,7 @@ def read_extension_from_json(path: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd
                     data=quantityExtension[JSON_PROPERTIES],
                 ).rename(columns=inverse_keymap(JSON_KEYMAP))
             )
-            if len(quantityExtension[JSON_PROPERTIES]) > 0
+            if len(quantityExtension.get(JSON_PROPERTIES, [])) > 0
             else pd.DataFrame(columns=[QEL_ITEM_TYPE])
         )
 
