@@ -16,8 +16,7 @@ const SSEWrapper = () => {
 
     const es = new EventSource(`${env.event_url}?sessionId=${sessionId}`);
 
-    //TODO: Use message names
-    es.onmessage = (event) => {
+    es.onmessage = async (event) => {
       const result = ServerEventMessage.safeParse(JSON.parse(event.data));
 
       if (!result.success) {
@@ -36,7 +35,7 @@ const SSEWrapper = () => {
           });
           break;
         case "invalidation":
-          invalidate(message.routes);
+          await invalidate(message.routes);
       }
     };
 
