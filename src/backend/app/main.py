@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import asyncio
 from contextlib import asynccontextmanager
+from typing import AsyncIterable
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.sse import EventSourceResponse
 
 from app.internal.config import config
 from app.internal.docs import init_custom_docs
@@ -18,7 +19,7 @@ from app.internal.utils import (
 )
 from app.middleware import session_access_middleware
 from app.routes import routes
-from app.sse_manager import sse_manager
+from app.sse_manager import SSEMessage, sse_manager
 from version import __version__
 
 
@@ -63,35 +64,19 @@ for route in routes:
     app.include_router(route)
 
 
-@app.get("/sse")
-async def sse_endpoint(request: Request):
+@app.get("/sse", response_class=EventSourceResponse, include_in_schema=False)
+async def sse_endpoint(request: Request) -> AsyncIterable[SSEMessage]:
     session_id = request.query_params.get("session_id")
-
     if not session_id:
-        return StreamingResponse(
-            iter(["data: Missing session_id\n\n"]), media_type="text/event-stream"
-        )
+        raise HTTPException(status_code=400, detail="Missing session_id")
 
     queue = await sse_manager.connect(session_id)
-    print(f"✅ SSE connected for session: {session_id}")
 
-    async def event_stream():
-        try:
-            while True:
-                if await request.is_disconnected():
-                    print(f"❌ SSE disconnected for session: {session_id}")
-                    sse_manager.disconnect(session_id)
-                    break
-
-                try:
-                    msg = await asyncio.wait_for(queue.get(), timeout=25)
-                    yield f"data: {msg}\n\n"
-                except asyncio.TimeoutError:
-                    yield ": keep-alive\n\n"
-        except asyncio.CancelledError:
-            sse_manager.disconnect(session_id)
-
-    return StreamingResponse(event_stream(), media_type="text/event-stream")
+    try:
+        while not await request.is_disconnected():
+            yield await queue.get()
+    finally:
+        sse_manager.disconnect(session_id)
 
 
 init_custom_docs(app)
