@@ -64,7 +64,7 @@ for route in routes:
     app.include_router(route)
 
 
-@app.get("/sse", response_class=EventSourceResponse)
+@app.get("/sse", response_class=EventSourceResponse, include_in_schema=False)
 async def sse_endpoint(request: Request) -> AsyncIterable[SSEMessage]:
     session_id = request.query_params.get("session_id")
     if not session_id:
