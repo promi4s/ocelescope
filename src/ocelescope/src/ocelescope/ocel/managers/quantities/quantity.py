@@ -12,7 +12,6 @@ from ocelescope.ocel.constants.quantity import (
 )
 from ocelescope.ocel.managers.base import BaseManager
 from ocelescope.ocel.managers.quantities.util.io import (
-    read_quantity_extension,
     write_quantity_extension,
 )
 
@@ -35,14 +34,13 @@ class QuantityManager(BaseManager):
     """
 
     def __init__(
-        self,
-        ocel: "OCEL",
+        self, ocel: "OCEL", tables: tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame] | None = None
     ):
         super().__init__(ocel)
 
         self.oqty, self.qop, self.properties = (
-            read_quantity_extension(ocel.meta.path)
-            if ocel.meta.path is not None
+            tables
+            if tables is not None
             else (
                 pd.DataFrame(columns=OQTY_COLUMNS),
                 pd.DataFrame(columns=QOP_COLUMNS),
