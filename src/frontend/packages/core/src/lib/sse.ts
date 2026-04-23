@@ -12,6 +12,7 @@ const ResourceLink = z.object({
 
 const PluginLink = z.object({
   type: z.literal("plugin"),
+  id: z.string(),
   method: z.string(),
   task_id: z.string(),
 });
@@ -27,7 +28,7 @@ const SystemNotification = z.object({
   title: z.string(),
   message: z.string(),
   notification_type: z.enum(["warning", "info", "error"]),
-  link: SystemLink,
+  link: z.optional(SystemLink),
 });
 
 const InvalidationRequest = z.object({
