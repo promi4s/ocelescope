@@ -1,107 +1,64 @@
-import { Graphviz } from "@hpcc-js/wasm-graphviz";
-import { useEffect, useRef, useState } from "react";
+import ELK from "elkjs/lib/elk.bundled.js";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  applyNodeChanges,
   Background,
   Controls,
   type Edge,
   type Node,
+  type NodeChange,
   ReactFlow,
   ReactFlowProvider,
+  useNodes,
+  useNodesInitialized,
   useReactFlow,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
 import type { VisualizationByType } from "../../../../types";
-import { toDot } from "../../../../hooks/useGraphvizLayout";
-import PlaceNode, {
-  PLACE_NODE_DIAMETER,
-  type PlaceNodeType,
-} from "./nodes/PlaceNode";
+import PlaceNode, { type PlaceNodeType } from "./nodes/PlaceNode";
 import TransitionNode, { type TransitionNodeType } from "./nodes/TransitionNode";
+import StartNode, { type StartNodeType } from "./nodes/StartNode";
+import EndNode, { type EndNodeType } from "./nodes/EndNode";
 import GraphFlowEdge, { type GraphFlowEdgeType } from "./edges/GraphFlowEdge";
 
-// ─── Constants (must match PlaceNode / TransitionNode DOM sizes) ──────────────
-const PLACE_DIAMETER = PLACE_NODE_DIAMETER;
-const PLACE_WITH_LABEL_HEIGHT = PLACE_NODE_DIAMETER + 28;
-const TRANSITION_SILENT_W = 10;
-const TRANSITION_SILENT_H = 34;
-const TRANSITION_CHAR_WIDTH = 7.5;
-const TRANSITION_H_PADDING = 24;
-const TRANSITION_HEIGHT = 34;
-const TRANSITION_MIN_W = 90;
-const TRANSITION_MAX_W = 180;
+// ─── ELK singleton ────────────────────────────────────────────────────────────
+const elk = new ELK();
 
-// ─── Node/edge type maps ──────────────────────────────────────────────────────
-const nodeTypes = { place: PlaceNode, transition: TransitionNode };
+// ─── Node / edge type maps ────────────────────────────────────────────────────
+const nodeTypes = { place: PlaceNode, transition: TransitionNode, start: StartNode, end: EndNode };
 const edgeTypes = { graphflow: GraphFlowEdge };
 
-// ─── Size estimators ──────────────────────────────────────────────────────────
-const estimatePlaceSize = (label: string | null | undefined) => ({
-  width: PLACE_DIAMETER,
-  height: label ? PLACE_WITH_LABEL_HEIGHT : PLACE_DIAMETER,
-});
-
-const estimateTransitionSize = (label: string | null | undefined) => {
-  if (!label) return { width: TRANSITION_SILENT_W, height: TRANSITION_SILENT_H };
-  const textW = label.length * TRANSITION_CHAR_WIDTH + TRANSITION_H_PADDING * 2;
-  return {
-    width: Math.max(TRANSITION_MIN_W, Math.min(TRANSITION_MAX_W, textW)),
-    height: TRANSITION_HEIGHT,
-  };
-};
-
 // ─── Types ────────────────────────────────────────────────────────────────────
-type Point = { x: number; y: number };
-type RFNode = PlaceNodeType | TransitionNodeType;
+type RFNode = PlaceNodeType | TransitionNodeType | StartNodeType | EndNodeType;
 type RFEdge = GraphFlowEdgeType;
 
-type GraphvizJSON = {
-  /** "llx,lly,urx,ury" bounding box */
-  bb?: string;
-  objects?: Array<{
-    name?: string;
-    pos?: string;
-    /** Present on subgraph entries — used to exclude them */
-    nodes?: number[];
-  }>;
-};
-
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-const safeId = (id: string) => id.replace(/[^a-zA-Z0-9_]/g, "_");
-
 const hasPlaceMarking = (label: string | null | undefined, m: "m0=" | "mf=") =>
   label?.includes(m) ?? false;
 
-/**
- * Parse a "x,y" position string and flip Y so Graphviz coordinates
- * (origin bottom-left, Y↑) map to React Flow coordinates (origin top-left, Y↓).
- */
-const parsePoint = (value: string | undefined, bbHeight: number): Point | null => {
-  if (!value) return null;
-  const [xs, ys] = value.split(",");
-  const x = Number.parseFloat(xs ?? "");
-  const y = Number.parseFloat(ys ?? "");
-  if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
-  return { x, y: bbHeight - y };
+/** Map GraphViz rankdir to ELK direction option. */
+const rankdirToElkDirection = (rankdir?: string): string => {
+  switch (rankdir) {
+    case "LR":
+      return "RIGHT";
+    case "RL":
+      return "LEFT";
+    case "BT":
+      return "UP";
+    default:
+      return "DOWN"; // TB or unset
+  }
 };
 
-/** Parse the bounding-box height from Graphviz's "llx,lly,urx,ury" string. */
-const parseBBHeight = (bb: string | undefined): number => {
-  if (!bb) return 0;
-  const parts = bb.split(",");
-  const ury = Number.parseFloat(parts[3] ?? "0");
-  return Number.isFinite(ury) ? ury : 0;
-};
-
-// ─── React Flow node/edge builders ───────────────────────────────────────────
+// ─── Node / edge builders ─────────────────────────────────────────────────────
 function buildRFNodes(visualization: VisualizationByType<"graph">): RFNode[] {
   return (visualization.nodes ?? []).map((node) => {
     const id = node.id ?? "";
-    const isPlace = node.shape === "circle";
     const label = node.label ?? null;
-    const color = node.color ?? (isPlace ? "#aec6e8" : "#ffffff");
+    const color = node.color ?? "#aec6e8";
 
-    if (isPlace) {
+    if (node.shape === "circle") {
       return {
         id,
         type: "place" as const,
@@ -117,12 +74,30 @@ function buildRFNodes(visualization: VisualizationByType<"graph">): RFNode[] {
       } satisfies PlaceNodeType;
     }
 
-    const { width, height } = estimateTransitionSize(label);
+    if (node.shape === "start") {
+      return {
+        id,
+        type: "start" as const,
+        position: { x: 0, y: 0 },
+        data: { label, color },
+      } satisfies StartNodeType;
+    }
+
+    if (node.shape === "end") {
+      return {
+        id,
+        type: "end" as const,
+        position: { x: 0, y: 0 },
+        data: { label, color },
+      } satisfies EndNodeType;
+    }
+
     return {
       id,
       type: "transition" as const,
       position: { x: 0, y: 0 },
-      data: { label, color, borderColor: node.border_color ?? null, width, height },
+      // TransitionNode sizes itself via CSS; React Flow measures the DOM size for ELK.
+      data: { label, color: node.color ?? "#ffffff", borderColor: node.border_color ?? null },
     } satisfies TransitionNodeType;
   });
 }
@@ -142,97 +117,103 @@ function buildRFEdges(visualization: VisualizationByType<"graph">): RFEdge[] {
   }));
 }
 
-/** Attach explicit node sizes so Graphviz produces accurate spline endpoints. */
-function withExplicitSizes(
-  visualization: VisualizationByType<"graph">,
-): VisualizationByType<"graph"> {
-  return {
-    ...visualization,
-    nodes: (visualization.nodes ?? []).map((node) => {
-      if (node.shape === "circle") {
-        return { ...node, width: PLACE_DIAMETER, height: PLACE_DIAMETER };
-      }
-      const { width, height } = estimateTransitionSize(node.label ?? null);
-      return { ...node, width, height };
-    }),
-  };
-}
-
-// ─── Inner component ──────────────────────────────────────────────────────────
+// ─── Inner component (needs ReactFlowProvider ancestor) ───────────────────────
 const GraphFlowInner: React.FC<{
   visualization: VisualizationByType<"graph">;
   isPreview?: boolean | undefined;
 }> = ({ visualization, isPreview }) => {
-  const [nodes, setNodes] = useState<Node[]>([]);
-  const [edges, setEdges] = useState<Edge[]>([]);
+  const [nodes, setNodes] = useState<Node[]>(() => buildRFNodes(visualization) as Node[]);
+  const [edges, setEdges] = useState<Edge[]>(() => buildRFEdges(visualization) as Edge[]);
+
   const { fitView } = useReactFlow();
-  const cancelRef = useRef({ cancelled: false });
+  // useNodes() returns the internal store's node list, which carries measured sizes
+  // after React Flow has rendered and measured each node's DOM element.
+  const rfNodes = useNodes();
+  const nodesInitialized = useNodesInitialized();
 
+  // Guard: prevent running ELK multiple times for the same set of nodes.
+  const elkApplied = useRef(false);
+
+  // Keep a stable ref so the layout effect can read current values without
+  // needing them in its own dependency array (avoids infinite loops).
+  const latestRef = useRef({ rfNodes, edges, visualization });
   useEffect(() => {
-    cancelRef.current = { cancelled: false };
+    latestRef.current = { rfNodes, edges, visualization };
+  });
 
-    const rfNodes = buildRFNodes(visualization);
-    const rfEdges = buildRFEdges(visualization);
-    const dot = toDot(withExplicitSizes(visualization));
+  // Reset nodes/edges when the visualization changes.
+  useEffect(() => {
+    setNodes(buildRFNodes(visualization) as Node[]);
+    setEdges(buildRFEdges(visualization) as Edge[]);
+    elkApplied.current = false;
+    // Resetting nodes to position {0,0} (no measured sizes) causes nodesInitialized
+    // to cycle false → true, which re-triggers the layout effect below.
+  }, [visualization]);
+
+  // Run ELK once all current nodes have been measured by React Flow.
+  // Depends only on nodesInitialized so it fires exactly when the measurement
+  // state changes (false → true after nodes are rendered for the first time,
+  // or after a visualization reset puts new un-measured nodes into the store).
+  useEffect(() => {
+    if (!nodesInitialized || elkApplied.current) return;
+    elkApplied.current = true;
+
+    const { rfNodes: measured, edges: currentEdges, visualization: vis } = latestRef.current;
+    if (measured.length === 0) return;
+
+    const direction = rankdirToElkDirection(
+      (vis.layout_config?.graphAttrs as Record<string, string> | undefined)?.["rankdir"],
+    );
 
     (async () => {
       try {
-        const gv = await Graphviz.load();
-        const json = gv.layout(dot, "json", visualization.layout_config?.engine ?? "dot");
-        const laidOut = JSON.parse(json) as GraphvizJSON;
+        const laidOut = await elk.layout({
+          id: "root",
+          layoutOptions: {
+            "elk.algorithm": "layered",
+            "elk.direction": direction,
+            "elk.spacing.nodeNode": "30",
+            "elk.layered.spacing.nodeNodeBetweenLayers": "60",
+            "elk.edgeRouting": "ORTHOGONAL",
+          },
+          children: measured.map((node) => ({
+            id: node.id,
+            width: node.measured?.width ?? 50,
+            height: node.measured?.height ?? 34,
+          })),
+          edges: currentEdges.map((edge) => ({
+            id: edge.id,
+            sources: [edge.source],
+            targets: [edge.target],
+          })),
+        });
 
-        if (cancelRef.current.cancelled) return;
-
-        // Flip Y: Graphviz Y↑ → React Flow Y↓
-        const bbHeight = parseBBHeight(laidOut.bb);
-
-        // Map safeId → Graphviz center (Y-flipped)
-        const nodePositions: Record<string, Point> = {};
-        for (const obj of laidOut.objects ?? []) {
-          if (!obj.name || !obj.pos || obj.nodes) continue; // skip subgraphs
-          const pt = parsePoint(obj.pos, bbHeight);
-          if (pt) nodePositions[obj.name] = pt;
+        const positions: Record<string, { x: number; y: number }> = {};
+        for (const child of laidOut.children ?? []) {
+          if (child.id && child.x != null && child.y != null) {
+            positions[child.id] = { x: child.x, y: child.y };
+          }
         }
 
-        // Position each React Flow node at its Graphviz center (top-left offset)
-        const positionedNodes = rfNodes.map((node) => {
-          const center = nodePositions[safeId(node.id)];
-          const { width } =
-            node.type === "place"
-              ? estimatePlaceSize(node.data.label)
-              : estimateTransitionSize(node.data.label);
-          const anchorH =
-            node.type === "place"
-              ? PLACE_DIAMETER
-              : estimateTransitionSize(node.data.label).height;
+        setNodes((prev) =>
+          prev.map((node) => {
+            const pos = positions[node.id];
+            return pos ? { ...node, position: pos } : node;
+          }),
+        );
 
-          return {
-            ...node,
-            position: center
-              ? { x: center.x - width / 2, y: center.y - anchorH / 2 }
-              : { x: 0, y: 0 },
-          };
-        });
-
-        setNodes(positionedNodes as Node[]);
-        setEdges(rfEdges as Edge[]);
-
-        requestAnimationFrame(() => {
-          if (!cancelRef.current.cancelled) fitView({ padding: 0.15 });
-        });
+        requestAnimationFrame(() => fitView({ padding: 0.15 }));
       } catch {
-        if (!cancelRef.current.cancelled) {
-          // Layout failed — render without positions; floating edges still work
-          setNodes(rfNodes as Node[]);
-          setEdges(rfEdges as Edge[]);
-        }
+        // ELK layout failed — nodes stay at (0,0); floating edges still render.
+        requestAnimationFrame(() => fitView({ padding: 0.15 }));
       }
     })();
+  }, [nodesInitialized, fitView]);
 
-    return () => {
-      cancelRef.current.cancelled = true;
-    };
-  }, [visualization, fitView]);
+  const onNodesChange = useCallback(
+    (changes: NodeChange[]) => setNodes((nds) => applyNodeChanges(changes, nds)),
+    [],
+  );
 
   return (
     <ReactFlow
@@ -240,6 +221,7 @@ const GraphFlowInner: React.FC<{
       edges={edges}
       nodeTypes={nodeTypes}
       edgeTypes={edgeTypes}
+      onNodesChange={onNodesChange}
       nodesDraggable={!isPreview}
       nodesConnectable={false}
       elementsSelectable={!isPreview}

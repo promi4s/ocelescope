@@ -13,7 +13,7 @@ class AnnotatedElement(BaseModel, Generic[T]):
     annotation: T | None = None
 
 
-GraphShapes = Literal["circle", "triangle", "rectangle", "diamond", "hexagon"]
+GraphShapes = Literal["circle", "triangle", "rectangle", "diamond", "hexagon", "start", "end"]
 
 
 EdgeArrow = (

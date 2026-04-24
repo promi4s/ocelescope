@@ -4270,7 +4270,9 @@
               "triangle",
               "rectangle",
               "diamond",
-              "hexagon"
+              "hexagon",
+              "start",
+              "end"
             ],
             "title": "Shape"
           },

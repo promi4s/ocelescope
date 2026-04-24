@@ -39,11 +39,8 @@ def visualize_ocdfg(resource: DirectlyFollowsGraph) -> Graph:
         GraphNode(
             id=f"start_{object_type.name}",
             label=object_type.name,
-            shape="circle",
+            shape="start",
             color=color_map[object_type.name],
-            width=40,
-            height=40,
-            label_pos="top",
             annotation=object_type.get_annotation_visualization(),
         )
         for object_type in resource.object_types
@@ -54,12 +51,8 @@ def visualize_ocdfg(resource: DirectlyFollowsGraph) -> Graph:
         GraphNode(
             id=f"end_{object_type.name}",
             label=object_type.name,
-            shape="circle",
+            shape="end",
             color=color_map[object_type.name],
-            width=40,
-            height=40,
-            label_pos="bottom",
-            layout_attrs={"peripheries": 2},
         )
         for object_type in resource.object_types
         if object_type.name in end_object_types

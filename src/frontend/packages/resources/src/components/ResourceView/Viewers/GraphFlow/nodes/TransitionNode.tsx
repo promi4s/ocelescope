@@ -6,18 +6,16 @@ export type TransitionNodeData = {
   label?: string | null;
   color: string;
   borderColor?: string | null;
-  width: number;
-  height: number;
 };
 
 export type TransitionNodeType = Node<TransitionNodeData, "transition">;
 
-/** Silent transition: a thin black vertical bar, classic Petri net notation. */
-const SilentTransition = ({ width, height }: { width: number; height: number }) => (
+/** Silent transition: a thin dark vertical bar, classic Petri net notation. */
+const SilentTransition = () => (
   <div
     style={{
-      width,
-      height,
+      width: 10,
+      height: 34,
       backgroundColor: "#222",
       borderRadius: 2,
       boxShadow: "0 1px 4px rgba(0,0,0,0.35)",
@@ -25,24 +23,22 @@ const SilentTransition = ({ width, height }: { width: number; height: number }) 
   />
 );
 
-/** Labeled transition: a Mantine-styled activity box. */
+/** Labeled transition: a Mantine-styled activity box that sizes to its label. */
 const LabeledTransition = ({
   label,
   borderColor,
-  width,
-  height,
 }: {
   label: string;
   borderColor?: string | null | undefined;
-  width: number;
-  height: number;
 }) => (
   <div
     style={{
-      width,
-      height,
       boxSizing: "border-box",
-      padding: "6px 12px",
+      minWidth: 90,
+      maxWidth: 200,
+      width: "max-content",
+      height: 34,
+      padding: "0 12px",
       backgroundColor: "#ffffff",
       border: `1.5px solid ${borderColor ?? "#333"}`,
       borderRadius: 5,
@@ -62,6 +58,7 @@ const LabeledTransition = ({
         whiteSpace: "nowrap",
         overflow: "hidden",
         textOverflow: "ellipsis",
+        maxWidth: 176,
       }}
     >
       {label}
@@ -70,7 +67,7 @@ const LabeledTransition = ({
 );
 
 const TransitionNode = memo(({ data }: NodeProps<TransitionNodeType>) => {
-  const { label, borderColor, width, height } = data;
+  const { label, borderColor } = data;
 
   return (
     <>
@@ -81,14 +78,9 @@ const TransitionNode = memo(({ data }: NodeProps<TransitionNodeType>) => {
       />
 
       {label ? (
-        <LabeledTransition
-          label={label}
-          borderColor={borderColor}
-          width={width}
-          height={height}
-        />
+        <LabeledTransition label={label} borderColor={borderColor} />
       ) : (
-        <SilentTransition width={width} height={height} />
+        <SilentTransition />
       )}
 
       <Handle
