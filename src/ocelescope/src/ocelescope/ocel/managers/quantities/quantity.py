@@ -12,7 +12,6 @@ from ocelescope.ocel.constants.quantity import (
 )
 from ocelescope.ocel.managers.base import BaseManager
 from ocelescope.ocel.managers.quantities.util.io import (
-    read_quantity_extension,
     write_quantity_extension,
 )
 
@@ -35,19 +34,25 @@ class QuantityManager(BaseManager):
     """
 
     def __init__(
-        self,
-        ocel: "OCEL",
+        self, ocel: "OCEL", tables: tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame] | None = None
     ):
         super().__init__(ocel)
 
-        self.oqty, self.qop = (
-            read_quantity_extension(ocel.meta.path)
-            if ocel.meta.path is not None
-            else (pd.DataFrame(columns=OQTY_COLUMNS), pd.DataFrame(columns=QOP_COLUMNS))
+        self.oqty, self.qop, self.properties = (
+            tables
+            if tables is not None
+            else (
+                pd.DataFrame(columns=OQTY_COLUMNS),
+                pd.DataFrame(columns=QOP_COLUMNS),
+                pd.DataFrame(columns=[QEL_ITEM_TYPE]),
+            )
         )
 
         self.qop = self.qop.loc[self._cleaned_qop_mask].reset_index(drop=True)
         self.oqty = self.oqty.loc[self._cleaned_oqty_mask].reset_index(drop=True)
+
+    def is_populated(self) -> bool:
+        return any(not df.empty for df in [self.oqty, self.qop, self.properties])
 
     def write_quantities(self, path: Path):
         """Write quantity-extension tables to a OCEL file.
@@ -64,6 +69,7 @@ class QuantityManager(BaseManager):
                 path,
                 self.oqty.loc[self._cleaned_oqty_mask],
                 self.qop.loc[self._cleaned_qop_mask],
+                self.properties,
             )
 
     @property

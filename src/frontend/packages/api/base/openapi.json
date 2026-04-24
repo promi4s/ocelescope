@@ -3273,22 +3273,6 @@
           }
         }
       }
-    },
-    "/sse": {
-      "get": {
-        "summary": "Sse Endpoint",
-        "operationId": "sse_endpoint_sse_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          }
-        }
-      }
     }
   },
   "components": {
@@ -3445,7 +3429,7 @@
           "files": {
             "items": {
               "type": "string",
-              "format": "binary"
+              "contentMediaType": "application/octet-stream"
             },
             "type": "array",
             "title": "Files"
@@ -3461,7 +3445,7 @@
         "properties": {
           "file": {
             "type": "string",
-            "format": "binary",
+            "contentMediaType": "application/octet-stream",
             "title": "File"
           }
         },
@@ -3475,7 +3459,7 @@
         "properties": {
           "file": {
             "type": "string",
-            "format": "binary",
+            "contentMediaType": "application/octet-stream",
             "title": "File"
           }
         },
@@ -5385,6 +5369,21 @@
         ],
         "title": "RelationCountSummary"
       },
+      "Resource": {
+        "properties": {
+          "_ocelescope_resource_type": {
+            "type": "string",
+            "title": "Ocelescope Resource Type",
+            "readOnly": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "_ocelescope_resource_type"
+        ],
+        "title": "Resource",
+        "description": "Abstract base class for resources.\n\nAttributes:\n    label: Optional human-readable label for this resource class.\n    description: Optional human-readable description for this resource class."
+      },
       "ResourceAnnotation": {
         "properties": {
           "label": {
@@ -5774,6 +5773,13 @@
           "type": {
             "type": "string",
             "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
           }
         },
         "type": "object",

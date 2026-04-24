@@ -8,5 +8,6 @@ mise.toml
 .venv
 .ruff_cache
 .pnpm-store
+__pycache__
 
 /node_modules

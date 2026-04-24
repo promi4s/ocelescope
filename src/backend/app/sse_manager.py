@@ -40,20 +40,21 @@ class InvalidationRequest(BaseModel):
 
 
 SSEMessage = Annotated[
-    Union[SystemNotification, InvalidationRequest], Field(discriminator="type")
+    Union[SystemNotification, InvalidationRequest],
+    Field(discriminator="type"),
 ]
 
 
 class SSEManager:
     def __init__(self):
-        self.connections: dict[str, asyncio.Queue[str]] = {}
+        self.connections: dict[str, asyncio.Queue[SSEMessage]] = {}
         self.loop: asyncio.AbstractEventLoop | None = None
 
     def set_loop(self, loop: asyncio.AbstractEventLoop):
         """Store event loop reference for thread-safe sends."""
         self.loop = loop
 
-    async def connect(self, session_id: str) -> asyncio.Queue[str]:
+    async def connect(self, session_id: str) -> asyncio.Queue[SSEMessage]:
         """Create a message queue for the connected session."""
         queue = asyncio.Queue()
         self.connections[session_id] = queue
@@ -63,14 +64,13 @@ class SSEManager:
         """Remove session connection."""
         self.connections.pop(session_id, None)
 
-    # Use full SSE api and name events
     async def send(self, session_id: str, message: SSEMessage):
         """Send JSON message to one client (async)."""
         queue = self.connections.get(session_id)
         if queue:
-            await queue.put(message.model_dump_json())
+            await queue.put(message)
 
-    async def broadcast(self, message: str):
+    async def broadcast(self, message: SSEMessage):
         """Send plain text to all clients (async)."""
         for q in self.connections.values():
             await q.put(message)

@@ -4,6 +4,7 @@ import warnings
 from pathlib import Path
 from typing import Any
 
+import pandas as pd
 import pm4py
 import r4pm
 from pm4py.objects.ocel.obj import OCEL as PM4PYOCEL
@@ -19,6 +20,8 @@ from ocelescope.ocel.managers import (
     QuantityManager,
 )
 from ocelescope.ocel.managers.attributes import AttributeManager
+from ocelescope.ocel.managers.quantities.util.io import read_quantity_extension
+from ocelescope.ocel.util.io import pretty_print_json, pretty_print_xml
 from ocelescope.ocel.models.meta import OCELMeta
 
 
@@ -55,13 +58,18 @@ class OCEL:
             relation-count summaries.
     """
 
-    def __init__(self, ocel: PM4PYOCEL, meta: OCELMeta | None = None):
+    def __init__(
+        self,
+        ocel: PM4PYOCEL,
+        meta: OCELMeta | None = None,
+        quantityExtension: tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame] | None = None,
+    ):
         self.ocel = ocel
         self.meta = meta or OCELMeta()
         self.extensions = ExtensionManager(self)
         self.objects = ObjectsManager(self)
         self.events = EventsManager(self)
-        self.quantities = QuantityManager(self)
+        self.quantities = QuantityManager(self, quantityExtension)
         self.e2o = E2OManager(self)
         self.o2o = O2OManager(self)
         self.attributes = AttributeManager(self)
@@ -117,7 +125,10 @@ class OCEL:
                 case _:
                     raise ValueError(f"Unsupported extension: {path.suffix}")
 
-        return OCEL(ocel=pm4py_ocel, meta=OCELMeta(path=path, extra=meta))
+        quantity_table = read_quantity_extension(path)
+        return OCEL(
+            ocel=pm4py_ocel, meta=OCELMeta(path=path, extra=meta), quantityExtension=quantity_table
+        )
 
     def write(self, path: str | Path):
         """
@@ -140,9 +151,13 @@ class OCEL:
 
         match path.suffix:
             case ".xmlocel" | ".xml":
-                r4pm.df.export_ocel_pm4py(self.ocel, str(path.with_suffix(".xml")))
+                xml_path = path.with_suffix(".xml")
+                r4pm.df.export_ocel_pm4py(self.ocel, str(xml_path))
+                pretty_print_xml(xml_path)
             case ".jsonocel" | ".json":
-                r4pm.df.export_ocel_pm4py(self.ocel, str(path.with_suffix(".json")))
+                json_path = path.with_suffix(".json")
+                r4pm.df.export_ocel_pm4py(self.ocel, str(json_path))
+                pretty_print_json(json_path)
             case ".sqlite":
                 pm4py.write_ocel2_sqlite(self.ocel, str(path))
             case _:
