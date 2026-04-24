@@ -33,7 +33,7 @@ const PluginBreadcrumbs: React.FC = () => {
         <Anchor
           component={Link}
           href={{
-            query: { ...query, pluginId: plugin?.id, methdodName: undefined },
+            query: { ...query, pluginId: plugin?.id, methodName: undefined },
           }}
         >
           {plugin?.meta.label}

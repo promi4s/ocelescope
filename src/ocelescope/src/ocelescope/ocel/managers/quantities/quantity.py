@@ -12,7 +12,6 @@ from ocelescope.ocel.constants.quantity import (
 )
 from ocelescope.ocel.managers.base import BaseManager
 from ocelescope.ocel.managers.quantities.util.io import (
-    read_quantity_extension,
     write_quantity_extension,
 )
 
@@ -35,19 +34,25 @@ class QuantityManager(BaseManager):
     """
 
     def __init__(
-        self,
-        ocel: "OCEL",
+        self, ocel: "OCEL", tables: tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame] | None = None
     ):
         super().__init__(ocel)
 
-        self.oqty, self.qop = (
-            read_quantity_extension(ocel.meta.path)
-            if ocel.meta.path is not None
-            else (pd.DataFrame(columns=OQTY_COLUMNS), pd.DataFrame(columns=QOP_COLUMNS))
+        self.oqty, self.qop, self.properties = (
+            tables
+            if tables is not None
+            else (
+                pd.DataFrame(columns=OQTY_COLUMNS),
+                pd.DataFrame(columns=QOP_COLUMNS),
+                pd.DataFrame(columns=[QEL_ITEM_TYPE]),
+            )
         )
 
         self.qop = self.qop.loc[self._cleaned_qop_mask].reset_index(drop=True)
         self.oqty = self.oqty.loc[self._cleaned_oqty_mask].reset_index(drop=True)
+
+    def is_populated(self) -> bool:
+        return any(not df.empty for df in [self.oqty, self.qop, self.properties])
 
     def write_quantities(self, path: Path):
         """Write quantity-extension tables to a OCEL file.
@@ -64,6 +69,7 @@ class QuantityManager(BaseManager):
                 path,
                 self.oqty.loc[self._cleaned_oqty_mask],
                 self.qop.loc[self._cleaned_qop_mask],
+                self.properties,
             )
 
     @property
@@ -384,8 +390,9 @@ class QuantityManager(BaseManager):
         self,
         object_id: str,
         item_types: list[str] | None = None,
-        include_events: Literal["all", "involved", "changed"] = "changed",
+        include_events: Literal["log", "trace", "active"] = "trace",
         include_oqty: bool = True,
+        pre_event: bool = False,
     ) -> pd.DataFrame:
         """Get item-level development for an object as a per-event DataFrame.
 
@@ -401,8 +408,8 @@ class QuantityManager(BaseManager):
             item_types: Optional list of item type names to include. If None, all
                 item types available for the given object are included.
             include_events: Which events to include in the output:
-                "all" (all events), "involved" (events involving the object), or
-                "changed" (only events where at least one selected item type changes).
+                "log" (all events), "trace" (events involving the object), or
+                "active" (only events where at least one selected item type changes).
             include_oqty: If True, add the object's initial quantities (oqty) to the
                 cumulative development for each selected item type (i.e., return
                 absolute quantities rather than net change).
@@ -430,7 +437,7 @@ class QuantityManager(BaseManager):
 
         events_df = self._ocel.events.df[[EID_COL, ACTIVITY_COL, TIMESTAMP_COL]]
 
-        if include_events != "all":
+        if include_events != "log":
             events_df = events_df.loc[
                 events_df[EID_COL].isin(self._ocel.e2o.get_events_of_object(object_id))
             ]
@@ -439,19 +446,22 @@ class QuantityManager(BaseManager):
             item_level_development,
             events_df,
             on=EID_COL,
-            how="left" if include_events == "changed" else "right",
+            how="left" if include_events == "active" else "right",
         )
 
         item_level_development[object_item_types] = item_level_development[
             object_item_types
         ].fillna(0)
 
-        if include_events == "changed":
+        if include_events == "active":
             item_level_development = item_level_development.loc[
                 ~item_level_development[object_item_types].eq(0).all(axis=1)
             ]
 
         item_level_development = item_level_development.sort_values(TIMESTAMP_COL, ascending=True)
+
+        if pre_event:
+            item_level_development = item_level_development.shift(1, fill_value=0)
 
         item_level_development[object_item_types] = item_level_development[
             object_item_types

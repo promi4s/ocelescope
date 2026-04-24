@@ -43,7 +43,7 @@ catalog:
   embla-carousel-react: ^8.6.0
   file-saver: ^2.0.5
   flat: ^6.0.1
-  html-to-image: ^1.11.13
+  html-to-image: 1.11.11
   json-schema-traverse: ^1.0.0
   lodash: ^4.17.23
   lucide-react: ^0.563.0

@@ -48,7 +48,14 @@ def apply_filters(ocel: "OCEL", filters: list[BaseFilter]) -> "OCEL":
         filtered_ocel = pm4py.filter_ocel_objects(filtered_ocel, filtered_object_ids, positive=True)
 
     # TODO: Don't do this step
-    filtered_ocel = OCEL(filtered_ocel, ocel.meta)
+    filtered_ocel = OCEL(
+        filtered_ocel,
+        ocel.meta,
+        # TODO: Clean up quantities
+        quantityExtension=(ocel.quantities.oqty, ocel.quantities.qop, ocel.quantities.properties)
+        if ocel.quantities.is_populated
+        else None,
+    )
     filtered_ocel.meta = ocel.meta
 
     return filtered_ocel

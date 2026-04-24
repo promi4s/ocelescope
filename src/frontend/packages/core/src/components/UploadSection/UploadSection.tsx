@@ -89,9 +89,11 @@ const FileUploadZone: React.FC<{
 
 const UploadSection: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }) => {
   const [isPending, setIsPending] = useState(false);
+  const invalidate = useInvalidate();
 
-  const onUploadSuccess = useCallback(() => {
+  const onUploadSuccess = useCallback(async () => {
     setIsPending(false);
+    await invalidate(["tasks"]);
     onSuccess?.();
   }, [onSuccess]);
 
