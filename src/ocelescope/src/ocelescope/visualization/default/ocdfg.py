@@ -12,6 +12,16 @@ from ocelescope.visualization.util.color import generate_color_map
 
 def visualize_ocdfg(resource: DirectlyFollowsGraph) -> Graph:
     color_map = generate_color_map([object_type.name for object_type in resource.object_types])
+    start_object_types = {
+        edge.object_type
+        for edge in resource.edges
+        if edge.source is None and edge.target is not None
+    }
+    end_object_types = {
+        edge.object_type
+        for edge in resource.edges
+        if edge.source is not None and edge.target is None
+    }
 
     activity_nodes = [
         GraphNode(
@@ -37,6 +47,7 @@ def visualize_ocdfg(resource: DirectlyFollowsGraph) -> Graph:
             annotation=object_type.get_annotation_visualization(),
         )
         for object_type in resource.object_types
+        if object_type.name in start_object_types
     ]
 
     end_nodes = [
@@ -48,8 +59,10 @@ def visualize_ocdfg(resource: DirectlyFollowsGraph) -> Graph:
             width=40,
             height=40,
             label_pos="bottom",
+            layout_attrs={"peripheries": 2},
         )
         for object_type in resource.object_types
+        if object_type.name in end_object_types
     ]
 
     edges = [
@@ -71,7 +84,7 @@ def visualize_ocdfg(resource: DirectlyFollowsGraph) -> Graph:
         layout_config=GraphvizLayoutConfig(
             engine="dot",
             graphAttrs={
-                "rankdir": "BT",
+                "rankdir": "LR",
                 "splines": "True",
                 "nodesep": "0.8",
                 "ranksep": "0.5",

@@ -758,6 +758,9 @@ importers:
       '@ocelescope/api-base':
         specifier: workspace:*
         version: link:../api/base
+      '@xyflow/react':
+        specifier: 'catalog:'
+        version: 12.10.1(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       cytoscape:
         specifier: 'catalog:'
         version: 3.33.1

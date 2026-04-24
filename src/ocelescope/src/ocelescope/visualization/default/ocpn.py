@@ -61,12 +61,6 @@ def visualize_ocpn(resource: PetriNet) -> Graph:
             initial_tokens = initial_marking.get(node_id, 0)
             final_tokens = final_marking.get(node_id, 0)
             layout_attrs: dict[str, str | int | float | bool] | None = None
-            rank = None
-
-            if initial_tokens > 0 and final_tokens <= 0:
-                rank = "source"
-            elif final_tokens > 0 and initial_tokens <= 0:
-                rank = "sink"
 
             if final_tokens > 0:
                 layout_attrs = {"peripheries": 2}
@@ -85,7 +79,6 @@ def visualize_ocpn(resource: PetriNet) -> Graph:
                     height=30,
                     label_pos="bottom",
                     annotation=place.get_annotation_visualization(),
-                    rank=rank,
                     layout_attrs=layout_attrs,
                 )
             )
@@ -132,8 +125,14 @@ def visualize_ocpn(resource: PetriNet) -> Graph:
             engine="dot",
             graphAttrs={
                 "rankdir": "LR",
-                "ranksep": "0.7",
-                "nodesep": "0.7",
+                "ranksep": 0.58,
+                "nodesep": 0.42,
+                "splines": "polyline",
+                "concentrate": True,
+                "pad": 0.1,
+                "margin": 0,
             },
+            nodeAttrs={"margin": "0.08,0.05"},
+            edgeAttrs={"minlen": 1},
         ),
     )

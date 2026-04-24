@@ -35,6 +35,7 @@
   },
   "peerDependencies": {
     "@hpcc-js/wasm-graphviz": "catalog:",
+    "@xyflow/react": "catalog:",
     "elkjs": "catalog:",
     "@mantine/core": "catalog:",
     "@ocelescope/api-base": "workspace:*",

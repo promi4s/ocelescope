@@ -1,6 +1,6 @@
 import { defineModule } from "@ocelescope/core";
 import { ChartNetwork } from "lucide-react";
-import DiscoveryRoute from "./routes/discovery";
+import DiscoveryRoute from "./components/DiscoveryPage";
 
 export default defineModule({
   name: "discovery",

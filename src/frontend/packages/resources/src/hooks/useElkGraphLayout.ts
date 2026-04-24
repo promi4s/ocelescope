@@ -57,7 +57,7 @@ export const useElkGraphLayout = (
     const nodes = visualization.nodes ?? [];
     const edges = visualization.edges ?? [];
 
-    const rankdir = (visualization.layout_config?.graphAttrs as Record<string, string> | undefined)?.rankdir;
+    const rankdir = (visualization.layout_config?.graphAttrs as Record<string, string> | undefined)?.["rankdir"];
     const direction = toElkDirection(rankdir);
 
     // Build node size map — used both for ELK input and Cytoscape data

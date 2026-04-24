@@ -71,7 +71,7 @@ def discover_ocdfg(
     start_activity_edges = [
         DFGEdge(
             object_type=object_type,
-            source=activity,
+            target=activity,
         )
         for object_type, activities in ocdfg["start_activities"]["events"].items()
         for activity in activities.keys()

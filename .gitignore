@@ -5,5 +5,8 @@ submission-info.md
 run-ocean.bat
 mise.toml
 .DS_Store
+.venv
+.ruff_cache
+.pnpm-store
 
 /node_modules

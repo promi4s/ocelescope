@@ -64,6 +64,8 @@ export const toDot = (visualization: VisualizationByType<"graph">) => {
       label: node.label ? esc(node.label) : undefined,
       shape: node.shape,
       color: node.color,
+      fixedsize:
+        node.width != null || node.height != null ? "true" : undefined,
       ...(node.width && { width: (node.width / 72).toFixed(4) }),
       ...(node.height && { height: (node.height / 72).toFixed(4) }),
     };
