@@ -70,6 +70,16 @@ const AnnotationElementRefInput: React.FC<Props> = ({
       );
 
     case "item_type":
+      return (
+        <OcelTypeSelect
+          ocelId={ocelId}
+          entityType="item_type"
+          value={value}
+          onChange={onChange}
+          isMulti={isMulti}
+          label={label}
+        />
+      );
     default:
       return (
         <TextInput

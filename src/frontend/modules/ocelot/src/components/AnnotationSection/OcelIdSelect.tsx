@@ -61,7 +61,6 @@ const OcelIdSelect: React.FC<Props> = ({
 
   const query = entityType === "event" ? eventQuery : objectQuery;
 
-  const currentPageItems = query.data?.response ?? [];
   const currentPage = query.data?.page ?? page;
   const totalPages = query.data?.total_pages ?? 1;
 

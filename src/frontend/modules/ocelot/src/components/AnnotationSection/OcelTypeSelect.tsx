@@ -1,10 +1,14 @@
 import { MultiSelect, Select } from "@mantine/core";
 import { useMemo } from "react";
-import { useEventCounts, useObjectCounts } from "@ocelescope/api-base";
+import {
+  useEventCounts,
+  useObjectCounts,
+  useQuantityInfo,
+} from "@ocelescope/api-base";
 
 type Props = {
   ocelId: string;
-  entityType: "activity" | "object_type";
+  entityType: "activity" | "object_type" | "item_type";
   value: string | string[];
   onChange: (value: string | string[]) => void;
   isMulti?: boolean;
@@ -23,18 +27,31 @@ const OcelTypeSelect: React.FC<Props> = ({
 }) => {
   const eventCountsQuery = useEventCounts(ocelId);
   const objectCountsQuery = useObjectCounts(ocelId);
+  const quantityInfoQuery = useQuantityInfo(ocelId);
 
   const data = useMemo(() => {
-    if (entityType === "activity") {
-      return Object.keys(eventCountsQuery.data ?? {});
+    switch (entityType) {
+      case "activity":
+        return Object.keys(eventCountsQuery.data ?? {});
+      case "object_type":
+        return Object.keys(objectCountsQuery.data ?? {});
+      case "item_type":
+        return quantityInfoQuery.data?.item_types ?? [];
     }
-    return Object.keys(objectCountsQuery.data ?? {});
-  }, [entityType, eventCountsQuery.data, objectCountsQuery.data]);
+  }, [
+    entityType,
+    eventCountsQuery.data,
+    objectCountsQuery.data,
+    quantityInfoQuery.data,
+  ]);
 
-  const loading =
-    entityType === "activity"
-      ? eventCountsQuery.isLoading
-      : objectCountsQuery.isLoading;
+  console.log(data);
+
+  const loading = {
+    activity: eventCountsQuery.isLoading,
+    object_type: objectCountsQuery.isLoading,
+    item_type: quantityInfoQuery.isLoading,
+  }[entityType];
 
   if (isMulti) {
     return (
