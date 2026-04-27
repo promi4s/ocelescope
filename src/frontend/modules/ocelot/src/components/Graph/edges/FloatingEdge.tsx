@@ -46,22 +46,20 @@ const FloatingEdge = ({
     Math.atan2((sy > ty ? -1 : 1) * offsetY, offsetX) * (180 / Math.PI);
 
   return (
-    <>
-      <BaseEdge
-        path={edgePath}
-        {...props}
-        labels={
-          data?.mid
-            ? [
-                {
-                  transform: `translate(-50% , -50%) translate(${labelX}px, ${labelY}px) rotate(${angle}deg)`,
-                  label: data.mid,
-                },
-              ]
-            : []
-        }
-      />
-    </>
+    <BaseEdge
+      path={edgePath}
+      {...props}
+      labels={
+        data?.mid
+          ? [
+              {
+                transform: `translate(-50% , -50%) translate(${labelX}px, ${labelY}px) rotate(${angle}deg)`,
+                label: data.mid,
+              },
+            ]
+          : []
+      }
+    />
   );
 };
 

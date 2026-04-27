@@ -125,7 +125,7 @@ const InnerFlow: React.FC<Props> = ({
                 movedNodes.includes(edge.target) ||
                 movedNodes.includes(edge.source)
                   ? undefined
-                  : edge.data?.["position"],
+                  : edge.data?.position,
             },
           })),
         );

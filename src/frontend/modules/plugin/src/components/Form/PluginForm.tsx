@@ -49,7 +49,7 @@ export const buildUiSchemaV2 = async ({
           .join(".");
 
         uiSchema[path] = {
-          "ui:field": subschema["field_type"] ?? subschema["type"],
+          "ui:field": subschema.field_type ?? subschema.type,
         };
       }
     },

@@ -10,15 +10,15 @@ import {
   UnstyledButton,
 } from "@mantine/core";
 import { useGetOcels, useLogout } from "@ocelescope/api-base";
+import { useQueryClient } from "@tanstack/react-query";
 import { HomeIcon, LogOutIcon, PackageIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useState } from "react";
 import useModulePath from "../../../hooks/useModulePath";
 import type { OcelescopeConfig } from "../../../lib/config";
 import { getModuleRoute } from "../../../lib/getModuleRoute";
 import classes from "../AppShell.module.css";
-import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 
 const LogoutButton: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -80,7 +80,7 @@ const NavBar: React.FC<{ config: OcelescopeConfig }> = ({ config }) => {
   const isOcelAvailable = ocels?.length !== 0;
 
   return (
-    <AppShell.Navbar className={classes["navbar"] ?? ""}>
+    <AppShell.Navbar className={classes.navbar ?? ""}>
       <Stack justify="space-between" h={"100%"} gap={0}>
         <Stack gap={0} flex={1}>
           <NavLink

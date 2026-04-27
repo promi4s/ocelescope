@@ -18,11 +18,11 @@ const FileDropzone: React.FC<{
   const openRef = useRef<() => void>(null);
 
   return (
-    <div className={classes["wrapper"]}>
+    <div className={classes.wrapper}>
       <Dropzone
         openRef={openRef}
         onDrop={onUpload}
-        className={classes["dropzone"] ?? ""}
+        className={classes.dropzone ?? ""}
         radius="md"
         accept={accept ?? {}}
       >
@@ -35,7 +35,7 @@ const FileDropzone: React.FC<{
               <XIcon size={50} color={theme.colors.red[6]} />
             </Dropzone.Reject>
             <Dropzone.Idle>
-              <UploadIcon size={50} className={classes["icon"]} />
+              <UploadIcon size={50} className={classes.icon} />
             </Dropzone.Idle>
           </Group>
 
@@ -49,7 +49,7 @@ const FileDropzone: React.FC<{
             {content.idle && <Dropzone.Idle>{content.idle}</Dropzone.Idle>}
           </Text>
 
-          <Text className={classes["description"] ?? ""}>
+          <Text className={classes.description ?? ""}>
             {content.description || (
               <span>Drag&apos;n&apos;drop files here to upload.</span>
             )}
@@ -58,7 +58,7 @@ const FileDropzone: React.FC<{
       </Dropzone>
 
       <Button
-        className={classes["control"] ?? ""}
+        className={classes.control ?? ""}
         size="sm"
         radius="xl"
         onClick={() => openRef.current?.()}

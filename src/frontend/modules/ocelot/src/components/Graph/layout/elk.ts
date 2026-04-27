@@ -30,7 +30,7 @@ export const useElkLayout = () => {
   };
 
   const layout = useCallback(
-    async (options?: any) => {
+    async (_options?: any) => {
       const nodes = getNodes();
       const edges = getEdges();
 
@@ -52,8 +52,8 @@ export const useElkLayout = () => {
           id: edge.id,
           sources: [edge.source],
           targets: [edge.target],
-          layoutOptions: edge?.data?.["mid"]
-            ? { "elk.edge.minimalLength": edge.data["mid"].toString() }
+          layoutOptions: edge?.data?.mid
+            ? { "elk.edge.minimalLength": edge.data.mid.toString() }
             : undefined,
         })),
       };
@@ -99,7 +99,7 @@ export const useElkLayout = () => {
           }),
         );
         fitView();
-      } catch (error) {}
+      } catch (_error) {}
     },
     [setEdges, setNodes, getNodes, getEdges, fitView],
   );

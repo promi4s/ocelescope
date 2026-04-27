@@ -1,8 +1,8 @@
 import { Container, Grid, LoadingOverlay, Stack, Title } from "@mantine/core";
 import { defineModuleRoute, useCurrentOcel } from "@ocelescope/core";
-import OCELInfo from "../components/OcelInfo";
 import AttributeTable from "../components/AttributeTable";
 import { EntityBarList } from "../components/EntityBarList/EntityBarList";
+import OCELInfo from "../components/OcelInfo";
 
 const LogOverviewPage = () => {
   const { id } = useCurrentOcel();

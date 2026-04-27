@@ -44,6 +44,9 @@
       "security": {
         "noDangerouslySetInnerHtml": "off"
       },
+      "style": {
+        "noNonNullAssertion": "off"
+      },
       "a11y": {
         "noSvgWithoutTitle": "off"
       }
