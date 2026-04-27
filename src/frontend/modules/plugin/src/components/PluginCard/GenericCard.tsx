@@ -8,11 +8,11 @@ import {
   Stack,
   Text,
 } from "@mantine/core";
+import { generateColor } from "@marko19907/string-to-color";
 import { EllipsisVertical } from "lucide-react";
 import Link from "next/link";
 import type React from "react";
 import type { ComponentProps } from "react";
-import uniqolor from "uniqolor";
 
 export const GenericCard: React.FC<{
   title: string;
@@ -29,7 +29,7 @@ export const GenericCard: React.FC<{
           {tags && (
             <Group gap={"xs"}>
               {tags.map((tag) => (
-                <Badge key={tag} size="sm" color={uniqolor(tag).color}>
+                <Badge key={tag} size="sm" color={generateColor(tag)}>
                   {tag}
                 </Badge>
               ))}

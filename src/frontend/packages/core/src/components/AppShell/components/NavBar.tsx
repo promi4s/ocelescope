@@ -1,12 +1,74 @@
-import { AppShell, Divider, NavLink, Stack } from "@mantine/core";
-import { useGetOcels } from "@ocelescope/api-base";
-import { HomeIcon, PackageIcon } from "lucide-react";
+import {
+  AppShell,
+  Button,
+  Divider,
+  Group,
+  Modal,
+  NavLink,
+  Stack,
+  Text,
+  UnstyledButton,
+} from "@mantine/core";
+import { useGetOcels, useLogout } from "@ocelescope/api-base";
+import { useQueryClient } from "@tanstack/react-query";
+import { HomeIcon, LogOutIcon, PackageIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useState } from "react";
 import useModulePath from "../../../hooks/useModulePath";
 import type { OcelescopeConfig } from "../../../lib/config";
 import { getModuleRoute } from "../../../lib/getModuleRoute";
 import classes from "../AppShell.module.css";
+
+const LogoutButton: React.FC = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const queryClient = useQueryClient();
+  const { push } = useRouter();
+  const { mutate: logout } = useLogout({
+    mutation: {
+      onSuccess: () => {
+        queryClient.clear();
+        setIsModalOpen(false);
+        push("/");
+      },
+    },
+  });
+
+  return (
+    <>
+      <Modal
+        opened={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Are you sure?"
+      >
+        <Text>
+          If you leave now, all your data and progress will be{" "}
+          <strong>deleted permanently</strong>. This action cannot be undone.
+        </Text>
+
+        <Button
+          color="red"
+          mt="md"
+          onClick={() => {
+            logout();
+          }}
+          fullWidth
+        >
+          Accept
+        </Button>
+      </Modal>
+      <UnstyledButton
+        className={classes.button ?? ""}
+        onClick={() => setIsModalOpen(true)}
+      >
+        <Group justify={"space-between"} w={"100%"}>
+          <Text style={{ lineHeight: 1 }}>Logout</Text>
+          <LogOutIcon className={classes.buttonIcon} />
+        </Group>
+      </UnstyledButton>
+    </>
+  );
+};
 
 const NavBar: React.FC<{ config: OcelescopeConfig }> = ({ config }) => {
   const { modules = [] } = config;
@@ -18,7 +80,7 @@ const NavBar: React.FC<{ config: OcelescopeConfig }> = ({ config }) => {
   const isOcelAvailable = ocels?.length !== 0;
 
   return (
-    <AppShell.Navbar className={classes["navbar"] ?? ""}>
+    <AppShell.Navbar className={classes.navbar ?? ""}>
       <Stack justify="space-between" h={"100%"} gap={0}>
         <Stack gap={0} flex={1}>
           <NavLink
@@ -77,6 +139,7 @@ const NavBar: React.FC<{ config: OcelescopeConfig }> = ({ config }) => {
           })}
         </Stack>
         <Divider />
+        <LogoutButton />
       </Stack>
     </AppShell.Navbar>
   );

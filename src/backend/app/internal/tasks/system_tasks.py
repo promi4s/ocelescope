@@ -28,7 +28,7 @@ class ImportMetadata(TypedDict):
     uploaded_at: str
 
 
-@system_task(name="importOcel")
+@system_task(name="importOCEL")
 def import_ocel_task(
     session: Session,
     file_stream: IO[bytes],
@@ -58,12 +58,12 @@ def import_ocel_task(
 
     return [
         SystemNotification(
-            title="Ocel successfully uploaded",
+            title="OCEL successfully uploaded",
             message=f"{ocel.meta.extra.get('name', None) or 'OCEL '} was uploaded successfully",
             notification_type="info",
             link=OcelLink(ocel_id=ocel_id),
         ),
-        InvalidationRequest(routes=["ocels"]),
+        InvalidationRequest(routes=["ocels", "tasks"]),
     ]
 
 
@@ -104,7 +104,7 @@ def import_plugin(
             message="Plugin uploaded successfully",
             notification_type="info",
         ),
-        InvalidationRequest(routes=["plugins"]),
+        InvalidationRequest(routes=["plugins", "tasks"]),
     ]
 
 
@@ -132,5 +132,5 @@ def import_resource(
             message=f"{resource.name} uploaded successfully",
             notification_type="info",
         ),
-        InvalidationRequest(routes=["resources"]),
+        InvalidationRequest(routes=["resources", "tasks"]),
     ]

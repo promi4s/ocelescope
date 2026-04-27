@@ -2,6 +2,7 @@ import {
   ActionIcon,
   Badge,
   Group,
+  Loader,
   Menu,
   MenuItem,
   TextInput,
@@ -13,6 +14,7 @@ import {
   useDeleteResource,
   useGetOcels,
   useGetResourceMeta,
+  useGetSystemTasks,
   useRenameOcel,
   useRenameResource,
   useResources,
@@ -41,14 +43,20 @@ type Entity = {
   name: string;
   createdAt: string;
   downloadFormats?: string[];
+  isUploading?: boolean;
 };
 
 //TODO: sync with api
-const ocelExtenisions = [".sqlite", ".xmlocel", ".jsonocel"] as const;
+const ocelExtenisions = [".sqlite", ".xml", ".json"] as const;
 
 const EntityTable: React.FC = () => {
   const { data: ocels = [] } = useGetOcels();
   const { data: resources = [] } = useResources();
+
+  const { data: tasks = [] } = useGetSystemTasks({
+    only_running: true,
+    task_name: "importOCEL",
+  });
 
   const invalidate = useInvalidate();
   const downloadFile = useDownloadFile();
@@ -122,8 +130,17 @@ const EntityTable: React.FC = () => {
       }),
     );
 
-    return [...ocelEntities, ...resourceEntities];
-  }, [ocels, resources, resourceMeta]);
+    const taskEntity = tasks.map<Entity>(({ id, metadata }) => ({
+      id: id,
+      createdAt: metadata.uploaded_at as string,
+      name: metadata.fileName as string,
+      entityTypes: [],
+      type: "ocel",
+      isUploading: true,
+    }));
+
+    return [...ocelEntities, ...resourceEntities, ...taskEntity];
+  }, [ocels, resources, tasks, resourceMeta]);
 
   return (
     <>
@@ -183,7 +200,11 @@ const EntityTable: React.FC = () => {
                 </>
               ),
             },
-            { accessor: "createdAt" },
+            {
+              accessor: "createdAt",
+              render: ({ createdAt, isUploading }) =>
+                isUploading ? "uploading" : formatDateTime(createdAt),
+            },
             {
               accessor: "entityTypes",
               title: "Type",
@@ -203,77 +224,81 @@ const EntityTable: React.FC = () => {
               accessor: "",
               textAlign: "right",
               width: "0%",
-              render: ({ type, id, name }) => (
-                <Menu width={200} position="left-start">
-                  <Menu.Target>
-                    <ActionIcon
-                      variant="subtle"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <EllipsisVerticalIcon size={20} />
-                    </ActionIcon>
-                  </Menu.Target>
-                  <Menu.Dropdown onClick={(e) => e.stopPropagation()}>
-                    <Menu.Item
-                      leftSection={<PencilIcon size={16} />}
-                      onClick={() => setRenamedEntitiy({ id, value: name })}
-                    >
-                      Rename
-                    </Menu.Item>
-                    {type === "resource" && (
-                      <MenuItem
-                        leftSection={<EyeIcon size={16} />}
-                        onClick={() => setViewedResource(id)}
+              //TODO: Maybe put this into its own component it is getting way to big
+              render: ({ type, id, name, isUploading }) =>
+                isUploading ? (
+                  <Loader size={20} />
+                ) : (
+                  <Menu width={200} position="left-start">
+                    <Menu.Target>
+                      <ActionIcon
+                        variant="subtle"
+                        onClick={(e) => e.stopPropagation()}
                       >
-                        Inspect
-                      </MenuItem>
-                    )}
-                    {type === "ocel" ? (
-                      <Menu.Sub position="right-start">
-                        <Menu.Sub.Target>
-                          <Menu.Sub.Item
-                            leftSection={<DownloadIcon size={16} />}
-                          >
-                            Download
-                          </Menu.Sub.Item>
-                        </Menu.Sub.Target>
-                        <Menu.Sub.Dropdown>
-                          {ocelExtenisions.map((extension) => (
-                            <Menu.Item
-                              key={extension}
-                              onClick={() =>
-                                downloadFile(
-                                  `/ocels/download?${new URLSearchParams({ ocel_id: id, ext: extension }).toString()}`,
-                                )
-                              }
-                            >
-                              {extension}
-                            </Menu.Item>
-                          ))}
-                        </Menu.Sub.Dropdown>
-                      </Menu.Sub>
-                    ) : (
+                        <EllipsisVerticalIcon size={20} />
+                      </ActionIcon>
+                    </Menu.Target>
+                    <Menu.Dropdown onClick={(e) => e.stopPropagation()}>
                       <Menu.Item
-                        onClick={() =>
-                          downloadFile(`/resources/resource/${id}/download`)
-                        }
-                        leftSection={<DownloadIcon size={16} />}
+                        leftSection={<PencilIcon size={16} />}
+                        onClick={() => setRenamedEntitiy({ id, value: name })}
                       >
-                        Download
+                        Rename
                       </Menu.Item>
-                    )}
-                    <Menu.Divider />
-                    <Menu.Item
-                      leftSection={<TrashIcon size={16} color={"red"} />}
-                      color="red"
-                      fw="bold"
-                      onClick={() => deleteEntity(id, type)}
-                    >
-                      Delete
-                    </Menu.Item>
-                  </Menu.Dropdown>
-                </Menu>
-              ),
+                      {type === "resource" && (
+                        <MenuItem
+                          leftSection={<EyeIcon size={16} />}
+                          onClick={() => setViewedResource(id)}
+                        >
+                          Inspect
+                        </MenuItem>
+                      )}
+                      {type === "ocel" ? (
+                        <Menu.Sub position="right-start">
+                          <Menu.Sub.Target>
+                            <Menu.Sub.Item
+                              leftSection={<DownloadIcon size={16} />}
+                            >
+                              Download
+                            </Menu.Sub.Item>
+                          </Menu.Sub.Target>
+                          <Menu.Sub.Dropdown>
+                            {ocelExtenisions.map((extension) => (
+                              <Menu.Item
+                                key={extension}
+                                onClick={() =>
+                                  downloadFile(
+                                    `/ocels/${id}/download?${new URLSearchParams({ ocel_id: id, ext: extension }).toString()}`,
+                                  )
+                                }
+                              >
+                                {extension}
+                              </Menu.Item>
+                            ))}
+                          </Menu.Sub.Dropdown>
+                        </Menu.Sub>
+                      ) : (
+                        <Menu.Item
+                          onClick={() =>
+                            downloadFile(`/resources/resource/${id}/download`)
+                          }
+                          leftSection={<DownloadIcon size={16} />}
+                        >
+                          Download
+                        </Menu.Item>
+                      )}
+                      <Menu.Divider />
+                      <Menu.Item
+                        leftSection={<TrashIcon size={16} color={"red"} />}
+                        color="red"
+                        fw="bold"
+                        onClick={() => deleteEntity(id, type)}
+                      >
+                        Delete
+                      </Menu.Item>
+                    </Menu.Dropdown>
+                  </Menu>
+                ),
             },
           ]}
           records={entities}

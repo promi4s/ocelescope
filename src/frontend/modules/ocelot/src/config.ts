@@ -2,9 +2,9 @@ import { defineModule } from "@ocelescope/core";
 import OcelotIcon from "./components/OcelotIcon";
 import eventOverviewRoute from "./routes/eventOverview";
 import eventRoute from "./routes/events";
+import logOverview from "./routes/logOverview";
 import objectsOverviewRoute from "./routes/objectOverview";
 import objectsRoute from "./routes/objects";
-import logOverview from "./routes/logOverview";
 
 export default defineModule({
   name: "ocelot",

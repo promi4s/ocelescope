@@ -100,7 +100,8 @@ class RegistryManager:
                 compatible_wheels = [
                     wheel_file
                     for wheel_file in (module_path / "wheels").iterdir()
-                    if is_wheel_compatible(wheel_file.name)
+                    if wheel_file.suffix == ".whl"
+                    and is_wheel_compatible(wheel_file.name)
                 ]
 
                 for wheel in compatible_wheels:

@@ -53,7 +53,7 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-hook-form": "catalog:",
-    "uniqolor": "catalog:"
+    "@marko19907/string-to-color": "catalog:"
   },
   "devDependencies": {
     "@apidevtools/json-schema-ref-parser": "catalog:",
@@ -66,5 +66,6 @@
     "json-schema-traverse": "catalog:",
     "tsdown": "catalog:",
     "typescript": "catalog:"
-  }
+  },
+  "dependencies": {}
 }
