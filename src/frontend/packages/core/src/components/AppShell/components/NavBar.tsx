@@ -80,7 +80,7 @@ const NavBar: React.FC<{ config: OcelescopeConfig }> = ({ config }) => {
   const isOcelAvailable = ocels?.length !== 0;
 
   return (
-    <AppShell.Navbar className={classes["navbar"] ?? ""}>
+    <AppShell.Navbar className={classes.navbar ?? ""}>
       <Stack justify="space-between" h={"100%"} gap={0}>
         <Stack gap={0} flex={1}>
           <NavLink

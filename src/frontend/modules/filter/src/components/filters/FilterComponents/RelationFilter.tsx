@@ -251,31 +251,27 @@ export const E2OCountFilter: React.FC<FilterPageComponentProps> = ({
   });
 
   return (
-    <>
-      <Stack>
-        {fields.map((field, index) => (
-          <Paper shadow="xs" p="md" key={field.id}>
-            <RelationFilter
-              control={control}
-              index={index}
-              relationType={"e2o_count"}
-              soureRelations={filterableE2ORelation}
-              targetRelations={filterableO2ERelation}
-              remove={() => remove(index)}
-            />
-          </Paper>
-        ))}
+    <Stack>
+      {fields.map((field, index) => (
+        <Paper shadow="xs" p="md" key={field.id}>
+          <RelationFilter
+            control={control}
+            index={index}
+            relationType={"e2o_count"}
+            soureRelations={filterableE2ORelation}
+            targetRelations={filterableO2ERelation}
+            remove={() => remove(index)}
+          />
+        </Paper>
+      ))}
 
-        <Button
-          onClick={() =>
-            append({ source: "", target: "", range: [null, null] })
-          }
-          leftSection={<PlusIcon height={30} />}
-        >
-          Add Filter
-        </Button>
-      </Stack>
-    </>
+      <Button
+        onClick={() => append({ source: "", target: "", range: [null, null] })}
+        leftSection={<PlusIcon height={30} />}
+      >
+        Add Filter
+      </Button>
+    </Stack>
   );
 };
 export const O2OCountFilter: React.FC<FilterPageComponentProps> = ({
@@ -310,30 +306,26 @@ export const O2OCountFilter: React.FC<FilterPageComponentProps> = ({
   });
 
   return (
-    <>
-      <Stack>
-        {fields.map((field, index) => (
-          <Paper shadow="xs" p="md" key={field.id}>
-            <RelationFilter
-              control={control}
-              relationType="o2o_count"
-              index={index}
-              soureRelations={filterableO2ORelation}
-              targetRelations={filterableO2OReverseRelation}
-              remove={() => remove(index)}
-            />
-          </Paper>
-        ))}
+    <Stack>
+      {fields.map((field, index) => (
+        <Paper shadow="xs" p="md" key={field.id}>
+          <RelationFilter
+            control={control}
+            relationType="o2o_count"
+            index={index}
+            soureRelations={filterableO2ORelation}
+            targetRelations={filterableO2OReverseRelation}
+            remove={() => remove(index)}
+          />
+        </Paper>
+      ))}
 
-        <Button
-          onClick={() =>
-            append({ range: [null, null], source: "", target: "" })
-          }
-          leftSection={<PlusIcon height={30} />}
-        >
-          Add Filter
-        </Button>
-      </Stack>
-    </>
+      <Button
+        onClick={() => append({ range: [null, null], source: "", target: "" })}
+        leftSection={<PlusIcon height={30} />}
+      >
+        Add Filter
+      </Button>
+    </Stack>
   );
 };

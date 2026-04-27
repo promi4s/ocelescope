@@ -132,8 +132,8 @@ const EntityTable: React.FC = () => {
 
     const taskEntity = tasks.map<Entity>(({ id, metadata }) => ({
       id: id,
-      createdAt: metadata["uploaded_at"] as string,
-      name: metadata["fileName"] as string,
+      createdAt: metadata.uploaded_at as string,
+      name: metadata.fileName as string,
       entityTypes: [],
       type: "ocel",
       isUploading: true,

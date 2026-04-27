@@ -28,7 +28,7 @@ export const createModulesPage = (config: OcelescopeConfig) => {
   const getStaticProps: GetStaticProps<ModulePageProps> = async ({
     params,
   }) => {
-    const slugs: string[] = (params?.["slug"] ?? []) as string[];
+    const slugs: string[] = (params?.slug ?? []) as string[];
 
     const moduleConfig = modules.find(({ name }) => name === slugs[1]);
     const routeName = moduleConfig?.routes.find(

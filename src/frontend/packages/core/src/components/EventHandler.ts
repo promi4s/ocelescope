@@ -3,7 +3,7 @@ import type { ReadableStream as NodeReadableStream } from "node:stream/web";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export const sseHandler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const session_id = req.query["sessionId"] as string;
+  const session_id = req.query.sessionId as string;
   const backendUrl = `http://backend:8000/sse?session_id=${encodeURIComponent(session_id || "")}`;
 
   try {
