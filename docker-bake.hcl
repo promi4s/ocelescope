@@ -3,7 +3,7 @@ variable "VERSION" {
 }
 
 variable "REPO" {
-  default = "ghcr.io/rwth-pads/ocelescope"
+  default = "ghcr.io/promi4s/ocelescope"
 }
 
 group "default" {
@@ -17,8 +17,8 @@ target "backend" {
   }
 
   tags = [
-    "grkmr/ocelescope_backend:${VERSION}",
-    "grkmr/ocelescope_backend:latest",
+    "${REPO}-backend:${VERSION}",
+    "${REPO}-backend:latest",
   ]
 }
 
@@ -26,8 +26,8 @@ target "frontend" {
   dockerfile = "./src/frontend/Dockerfile"
 
   tags = [
-    "grkmr/ocelescope_frontend:${VERSION}",
-    "grkmr/ocelescope_frontend:latest",
+    "${REPO}-frontend:${VERSION}",
+    "${REPO}-frontend:latest",
   ]
 }
 
