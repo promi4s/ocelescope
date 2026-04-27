@@ -2096,7 +2096,7 @@
           {
             "name": "ext",
             "in": "query",
-            "required": true,
+            "required": false,
             "schema": {
               "enum": [
                 ".xml",
@@ -2104,6 +2104,7 @@
                 ".sqlite"
               ],
               "type": "string",
+              "default": ".json",
               "title": "Ext"
             }
           },

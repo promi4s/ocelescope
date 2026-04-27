@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -66,7 +67,7 @@ class PluginTask(TaskBase, Generic[P]):
             )
 
             ocel_args: dict[str, OCEL] = {
-                key: self.session.get_ocel(self.input["ocels"][key])
+                key: deepcopy(self.session.get_ocel(self.input["ocels"][key]))
                 for key in method.input_ocels.keys()
             }
 
@@ -100,6 +101,9 @@ class PluginTask(TaskBase, Generic[P]):
 
                 for entitiy_index, entitiy in enumerate(item):
                     if isinstance(entitiy, OCEL):
+                        entitiy.meta.extra["name"] = (
+                            f"{plugin.meta().name if plugin else self.plugin_id}_{self.method_name}_{item_index}_{entitiy_index}"
+                        )
                         self.result.ocel_ids.append(self.session.add_ocel(entitiy))
                     if isinstance(entitiy, Resource):
                         self.result.resource_ids.append(

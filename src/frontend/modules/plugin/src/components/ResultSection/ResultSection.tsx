@@ -6,18 +6,28 @@ import {
   Group,
   LoadingOverlay,
   SimpleGrid,
+  Stack,
   Text,
+  Title,
 } from "@mantine/core";
-import { useGetPluginTask, useResource } from "@ocelescope/api-base";
+import {
+  useEventCounts,
+  useGetOcel,
+  useGetPluginTask,
+  useObjectCounts,
+  useResource,
+} from "@ocelescope/api-base";
 import { useDownloadFile } from "@ocelescope/core";
 import { ResourceModal, ResourceViewer } from "@ocelescope/resources";
-import { Download } from "lucide-react";
-import { useState } from "react";
+import { Download, DownloadIcon } from "lucide-react";
+import { useMemo, useState } from "react";
+
+import { generateColor } from "@marko19907/string-to-color";
 
 const ResourceCard: React.FC<{
-  resourceId: string;
+  id: string;
   onClick: (resourceId: string) => void;
-}> = ({ resourceId, onClick }) => {
+}> = ({ id: resourceId, onClick }) => {
   const { data: resource } = useResource(resourceId);
   const downloadFile = useDownloadFile();
 
@@ -59,6 +69,70 @@ const ResourceCard: React.FC<{
   );
 };
 
+const summarizeCount = (
+  entityTypeDistribution: Record<string, number> = {},
+) => {
+  return {
+    typeCount: Object.keys(entityTypeDistribution ?? {}).length,
+    entityCount: Object.values(entityTypeDistribution ?? {}).reduce(
+      (acc, curr) => acc + curr,
+      0,
+    ),
+  };
+};
+
+export const OCELCard: React.FC<{ id: string }> = ({ id }) => {
+  const { data: ocel } = useGetOcel(id);
+  const { data: objectCounts } = useObjectCounts(id);
+  const { data: eventCounts } = useEventCounts(id);
+
+  const downloadFile = useDownloadFile();
+
+  const objectSummary = useMemo(
+    () => summarizeCount(objectCounts),
+    [objectCounts],
+  );
+  const eventSummary = useMemo(
+    () => summarizeCount(eventCounts),
+    [eventCounts],
+  );
+
+  const ready = !!(ocel && objectCounts && eventCounts);
+
+  return (
+    <Card shadow="sm" padding="lg" radius="md" withBorder pos="relative">
+      <LoadingOverlay visible={!ready} />
+
+      <Stack gap="sm" justify="space-between">
+        <Group justify="space-between" align="center">
+          <Title order={4}>{ocel?.name ?? "Loading…"}</Title>
+          <Badge color={generateColor("OCEL")}>OCEL</Badge>
+        </Group>
+        <Stack>
+          <Text size="sm" c="dimmed">
+            {ready
+              ? `${objectSummary.entityCount} objects · ${objectSummary.typeCount} types`
+              : "—"}
+          </Text>
+
+          <Text size="sm" c="dimmed">
+            {ready
+              ? `${eventSummary.entityCount} events · ${eventSummary.typeCount} activities`
+              : "—"}
+          </Text>
+        </Stack>
+        <Button
+          onClick={() => downloadFile(`/ocels/${id}/download`)}
+          leftSection={<DownloadIcon />}
+          disabled={!ready}
+        >
+          Download
+        </Button>
+      </Stack>
+    </Card>
+  );
+};
+
 const ResultSection: React.FC<{ taskId: string }> = ({ taskId }) => {
   const { data: pluginSummary } = useGetPluginTask(taskId, {
     query: {
@@ -85,9 +159,12 @@ const ResultSection: React.FC<{ taskId: string }> = ({ taskId }) => {
       {pluginSummary?.output.resource_ids?.map((resourceId) => (
         <ResourceCard
           key={resourceId}
-          resourceId={resourceId}
+          id={resourceId}
           onClick={setOpenedResource}
         />
+      ))}
+      {pluginSummary?.output.ocel_ids?.map((ocelId) => (
+        <OCELCard key={ocelId} id={ocelId} />
       ))}
     </SimpleGrid>
   );

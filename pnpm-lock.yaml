@@ -168,9 +168,6 @@ catalogs:
     typescript:
       specifier: ^5.9.3
       version: 5.9.3
-    uniqolor:
-      specifier: ^1.1.1
-      version: 1.1.1
     zod:
       specifier: ^4.3.6
       version: 4.3.6
@@ -380,6 +377,9 @@ importers:
       '@mantine/hooks':
         specifier: 'catalog:'
         version: 8.3.16(react@19.2.3)
+      '@marko19907/string-to-color':
+        specifier: 'catalog:'
+        version: 1.0.2
       '@ocelescope/api-base':
         specifier: workspace:*
         version: link:../../packages/api/base
@@ -422,9 +422,6 @@ importers:
       react-hook-form:
         specifier: 'catalog:'
         version: 7.71.2(react@19.2.3)
-      uniqolor:
-        specifier: 'catalog:'
-        version: 1.1.1
     devDependencies:
       '@apidevtools/json-schema-ref-parser':
         specifier: 'catalog:'
@@ -3585,9 +3582,6 @@ packages:
     resolution: {integrity: sha512-wH590V9VNgYH9g3lH9wWjTrUoKsjLF6sGLjhR4sH1LWpLmCOH0Zf7PukhDA8BiS7KHe4oPNkcTHqYkj7SOGUOw==}
     engines: {node: '>=20'}
 
-  uniqolor@1.1.1:
-    resolution: {integrity: sha512-HUwezlXCwm5bzsEXW7AP7ybezH13uWENRgYT+3dOdhJPvpYucSqvIGckMiLn+Uy2j0NVf3fPp43uZ4aun3t4Ww==}
-
   universalify@2.0.1:
     resolution: {integrity: sha512-gptHNQghINnc/vTGIk0SOFGFNXw7JVrlRUtConJRlvaw6DuX0wO5Jeko9sWrMBhh+PsYAZ7oXAiOnf/UKogyiw==}
     engines: {node: '>= 10.0.0'}
@@ -6625,8 +6619,6 @@ snapshots:
   unicorn-magic@0.3.0: {}
 
   unicorn-magic@0.4.0: {}
-
-  uniqolor@1.1.1: {}
 
   universalify@2.0.1: {}
 
