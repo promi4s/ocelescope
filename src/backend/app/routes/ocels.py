@@ -370,7 +370,7 @@ def get_quantity_info(
 @ocels_router.get("/{ocel_id}/download", summary="Download OCEL including app state")
 def download_ocel(
     ocel: ApiOcel,
-    ext: OCELFileExtensions,
+    ext: OCELFileExtensions = ".json",
 ) -> TempFileResponse:
     name = ocel.meta.extra["name"]
     tmp_file_prefix = datetime.now().strftime("%Y%m%d-%H%M%S") + "-" + name

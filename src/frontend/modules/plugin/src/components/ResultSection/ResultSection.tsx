@@ -8,6 +8,7 @@ import {
   SimpleGrid,
   Stack,
   Text,
+  Title,
 } from "@mantine/core";
 import {
   useEventCounts,
@@ -18,8 +19,10 @@ import {
 } from "@ocelescope/api-base";
 import { useDownloadFile } from "@ocelescope/core";
 import { ResourceModal, ResourceViewer } from "@ocelescope/resources";
-import { Download } from "lucide-react";
+import { Download, DownloadIcon } from "lucide-react";
 import { useMemo, useState } from "react";
+
+import { generateColor } from "@marko19907/string-to-color";
 
 const ResourceCard: React.FC<{
   id: string;
@@ -78,36 +81,54 @@ const summarizeCount = (
   };
 };
 
-const OCELCard: React.FC<{
-  id: string;
-}> = ({ id }) => {
+export const OCELCard: React.FC<{ id: string }> = ({ id }) => {
   const { data: ocel } = useGetOcel(id);
   const { data: objectCounts } = useObjectCounts(id);
   const { data: eventCounts } = useEventCounts(id);
 
-  const objectSummary = useMemo(() => {
-    return summarizeCount(objectCounts);
-  }, [objectCounts]);
+  const downloadFile = useDownloadFile();
 
-  const eventSummary = useMemo(() => {
-    return summarizeCount(eventCounts);
-  }, [eventCounts]);
+  const objectSummary = useMemo(
+    () => summarizeCount(objectCounts),
+    [objectCounts],
+  );
+  const eventSummary = useMemo(
+    () => summarizeCount(eventCounts),
+    [eventCounts],
+  );
+
+  const ready = !!(ocel && objectCounts && eventCounts);
 
   return (
-    <Card shadow="sm" padding="lg" radius="md" withBorder pos={"relative"}>
-      {ocel && objectCounts && eventCounts ? (
+    <Card shadow="sm" padding="lg" radius="md" withBorder pos="relative">
+      <LoadingOverlay visible={!ready} />
+
+      <Stack gap="sm" justify="space-between">
+        <Group justify="space-between" align="center">
+          <Title order={4}>{ocel?.name ?? "Loading…"}</Title>
+          <Badge color={generateColor("OCEL")}>OCEL</Badge>
+        </Group>
         <Stack>
-          <Text>{ocel.name}</Text>
-          <Text>
-            {`${objectSummary.entityCount} objects from ${objectSummary.typeCount} types`}
+          <Text size="sm" c="dimmed">
+            {ready
+              ? `${objectSummary.entityCount} objects · ${objectSummary.typeCount} types`
+              : "—"}
           </Text>
-          <Text>
-            {`${eventSummary.entityCount} events from ${eventSummary.typeCount} activities`}
+
+          <Text size="sm" c="dimmed">
+            {ready
+              ? `${eventSummary.entityCount} events · ${eventSummary.typeCount} activities`
+              : "—"}
           </Text>
         </Stack>
-      ) : (
-        <LoadingOverlay />
-      )}
+        <Button
+          onClick={() => downloadFile(`/ocels/${id}/download`)}
+          leftSection={<DownloadIcon />}
+          disabled={!ready}
+        >
+          Download
+        </Button>
+      </Stack>
     </Card>
   );
 };

@@ -66,5 +66,8 @@
     "json-schema-traverse": "catalog:",
     "tsdown": "catalog:",
     "typescript": "catalog:"
+  },
+  "dependencies": {
+    "@marko19907/string-to-color": "catalog:"
   }
 }
