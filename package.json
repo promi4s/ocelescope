@@ -13,7 +13,7 @@
     "lint": "pnpm run lint:backend && pnpm run lint:frontend",
     "format:frontend": "biome format .",
     "format:backend": "uv run ruff format ./src/",
-    "format": "pnpm run format:frontend && format:backend",
+    "format": "pnpm run format:frontend && pnpm run format:backend",
     "api:generate": "uv run python src/backend/generate_openapi.py src/frontend/packages/api/base",
     "api:build": "pnpm -r --filter \"@ocelescope/api-base...\" run build",
     "api:sync": "pnpm run api:generate && pnpm run api:build",
