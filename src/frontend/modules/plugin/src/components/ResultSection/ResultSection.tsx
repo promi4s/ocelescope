@@ -10,6 +10,7 @@ import {
   Text,
   Title,
 } from "@mantine/core";
+import { generateColor } from "@marko19907/string-to-color";
 import {
   useEventCounts,
   useGetOcel,
@@ -21,8 +22,6 @@ import { useDownloadFile } from "@ocelescope/core";
 import { ResourceModal, ResourceViewer } from "@ocelescope/resources";
 import { Download, DownloadIcon } from "lucide-react";
 import { useMemo, useState } from "react";
-
-import { generateColor } from "@marko19907/string-to-color";
 
 const ResourceCard: React.FC<{
   id: string;

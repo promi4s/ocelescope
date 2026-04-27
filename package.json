@@ -8,7 +8,7 @@
     "init": "pnpm run init:backend && pnpm run init:frontend",
     "dev:frontend": "pnpm -r --parallel --filter \"!@ocelescope/app\" run dev",
     "build:frontend": "pnpm -r --filter \"!@ocelescope/app\" run build",
-    "lint:frontend": "biome check .",
+    "lint:frontend": "biome check --write",
     "lint:backend": "uv run ruff check ./src/",
     "lint": "pnpm run lint:backend && pnpm run lint:frontend",
     "format:frontend": "biome format .",
