@@ -1,4 +1,14 @@
 from ocelescope.ocel.constants.attributes import ATTRIBUTE_COL
+from ocelescope.ocel.constants.executions import (
+    EXECUTION_ACT_LIST_COL,
+    EXECUTION_EID_LIST_COL,
+    EXECUTION_OTYPE_COL,
+    EXECUTION_TSTAMP_LIST_COL,
+    EXECUTION_VARIANT_ID_COL,
+    VARIANT_ACT_LIST_COL,
+    VARIANT_FREQUENCY_COL,
+    VARIANT_OTYPE_COL,
+)
 from ocelescope.ocel.constants.pm4py import (
     ACTIVITY_COL,
     E2O_ACTIVITY,
@@ -36,4 +46,12 @@ __all__ = [
     "QEL_QUANTITY_UPDATE",
     "ATTRIBUTE_COL",
     "ValueType",
+    "EXECUTION_ACT_LIST_COL",
+    "EXECUTION_EID_LIST_COL",
+    "EXECUTION_OTYPE_COL",
+    "EXECUTION_TSTAMP_LIST_COL",
+    "EXECUTION_VARIANT_ID_COL",
+    "VARIANT_ACT_LIST_COL",
+    "VARIANT_FREQUENCY_COL",
+    "VARIANT_OTYPE_COL",
 ]
