@@ -1,117 +1,94 @@
 # Extensions
 
-In some use cases, OCEL logs contain more information than is specified in the OCEL 2.0 standard.  
-To support these cases in a standardized and portable way, Ocelescope provides **OCEL extensions**.
+OCEL extensions let you store and load **extra data** that is not part of the OCEL 2.0 standard.
 
-Extensions allow you to add custom data to OCEL logs and store or load that data alongside the main event and object logs.
+Use an extension when your plugin needs custom information to travel with the log (import/export), instead of keeping it in a separate side file.
 
-## Defining an OCEL Extension
+## Defining an OCEL extension
 
-To define an extension, create a class that inherits from `OCELExtension` (provided by the `ocelescope` package).  
-This class defines how the extension is detected, imported, and exported.
+Create a class that inherits from `OCELExtension`.
 
-Each extension must define the following attributes and methods:
+Your extension should:
 
-- `name`: A short identifier for the extension
-- `description`: A human-readable explanation of what the extension adds
-- `version`: The extension’s version
-- `supported_extensions`: A list of file types the extension supports (e.g., `[".xmlocel"]`)
+- describe itself (`name`, `description`, `version`)
+- declare which file types it supports (`supported_extensions`)
+- implement:
+  - `has_extension(path: Path) -> bool` to detect if the file contains the extension data
+  - `import_extension(ocel: OCEL, path: Path) -> OCELExtension` to load the extension data
+  - `export_extension(path: Path) -> None` to save the extension data
 
-The class must also implement three key methods:
+Ocelescope loads and exports extensions based on the OCEL file path suffix (for example `.json`, `.xml`, or `.sqlite`).
 
-- `has_extension(path: Path) -> bool`  
-  Checks if the extension is present at the given file path
+!!! example
 
-- `import_extension(ocel: OCEL, path: Path) -> OCELExtension`  
-  Loads the extension data from the path and returns an instance
+    This extension stores a message inside a `.json` OCEL file under a custom field called `hello_message`.
 
-- `export_extension(path: Path) -> None`  
-  Saves the extension data to the path
+    ```python
+    import json
+    from pathlib import Path
 
-## Base Class: `OCELExtension`
+    from ocelescope import OCEL, OCELExtension
 
-```python
-from abc import ABC, abstractmethod
-from pathlib import Path
-from typing import TypeVar
 
-from ocelescope.ocel.constants import OCELFileExtensions
+    class HelloWorldExtension(OCELExtension):
+        name = "HelloWorld"
+        description = "Stores a message string in the .json OCEL file"
+        version = "1.0"
+        supported_extensions = [".json"]
 
-T = TypeVar("T", bound="OCELExtension")
+        def __init__(self, ocel: OCEL, message: str):
+            self.ocel = ocel
+            self.message = message
 
-class OCELExtension(ABC):
-    """
-    Abstract base class for OCEL extensions that can be imported/exported from a file path.
-    """
+        @staticmethod
+        def has_extension(path: Path) -> bool:
+            if path.suffix != ".json":
+                return False
 
-    name: str
-    description: str
-    version: str
-    supported_extensions: list[OCELFileExtensions]
+            try:
+                data = json.loads(path.read_text(encoding="utf-8"))
+            except Exception:
+                return False
 
-    @staticmethod
-    @abstractmethod
-    def has_extension(path: Path) -> bool:
-        pass
-
-    @classmethod
-    @abstractmethod
-    def import_extension(cls: type[T], ocel: "OCEL", path: Path) -> T:
-        pass
-
-    @abstractmethod
-    def export_extension(self, path: Path) -> None:
-        pass
-```
-
-## Example: “Hello World” Extension
-
-This version of the `HelloWorldExtension` stores a message directly inside the `.jsonocel` file under a custom top-level field like `"hello_message"`.
-It only loads if that field is present.
-
-```python
-import json
-from pathlib import Path
-from ocelescope import OCEL, OCELExtension
-
-class HelloWorldExtension(OCELExtension):
-    name = "HelloWorld"
-    description = "Stores a simple message string in the .jsonocel file"
-    version = "1.0"
-    supported_extensions = [".jsonocel"]
-
-    def __init__(self, ocel: OCEL, message: str = "Hello from extension!"):
-        self.ocel = ocel
-        self.message = message
-
-    @staticmethod
-    def has_extension(path: Path) -> bool:
-        if path.suffix != ".jsonocel":
-            return False
-
-        try:
-            with open(path, "r", encoding="utf-8") as f:
-                data = json.load(f)
             return "hello_message" in data
-        except Exception:
-            return False
 
-    @classmethod
-    def import_extension(cls, ocel: OCEL, path: Path) -> "HelloWorldExtension":
-        with open(path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        message = data.get("hello_message", "No message found.")
-        return cls(ocel, message=message)
+        @classmethod
+        def import_extension(cls, ocel: OCEL, path: Path) -> "HelloWorldExtension":
+            data = json.loads(path.read_text(encoding="utf-8"))
+            return cls(ocel=ocel, message=str(data.get("hello_message", "")))
 
-    def export_extension(self, path: Path) -> None:
-        try:
-            with open(path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-        except Exception:
-            data = {}
+        def export_extension(self, path: Path) -> None:
+            try:
+                data = json.loads(path.read_text(encoding="utf-8"))
+            except Exception:
+                data = {}
 
-        data["hello_message"] = self.message
+            data["hello_message"] = self.message
+            path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+    ```
 
-        with open(path, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2)
+## Requiring an extension in a plugin method
+
+If your method depends on an extension being present, declare it on the OCEL input with `OCELAnnotation`.
+
+Pass the **extension class** (not an instance).
+
+```python
+from typing import Annotated
+
+from ocelescope import OCEL, OCELAnnotation, Plugin, plugin_method
+
+
+class ExamplePlugin(Plugin):
+    @plugin_method(label="Uses extension")
+    def uses_extension(
+        self,
+        ocel: Annotated[OCEL, OCELAnnotation(label="log", extension=HelloWorldExtension)],
+    ):
+      
+      extension = ocel.extensions.get(HelloWorldExtension)  
+      if extension is not None:
+          print(extension.message)
+
+      ...
 ```

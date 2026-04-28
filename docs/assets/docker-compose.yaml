@@ -1,11 +1,11 @@
 services:
   backend:
-    image: grkmr/ocelescope_backend:latest
+    image: ghcr.io/promi4s/ocelescope-backend:latest
     volumes:
       - plugins_store:/plugins
     restart: unless-stopped
-  frontend:
-    image: grkmr/ocelescope_frontend:latest
+  frontend: 
+    image: ghcr.io/promi4s/ocelescope-frontend:latest
     ports:
       - "3000:3000"
     restart: unless-stopped

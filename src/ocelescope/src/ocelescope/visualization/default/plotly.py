@@ -10,6 +10,23 @@ from ocelescope.visualization.visualization import Visualization
 
 # TODO: This can not be the best way to do this find a better solution
 class Plotly(Visualization):
+    """Plotly visualization.
+
+    This visualization wraps a Plotly `Figure`. The figure is stored internally as a
+    private attribute and is exposed through the `figure` property.
+
+    The JSON-serializable representation is provided by the computed `data` field,
+    which serializes the figure to Plotly JSON.
+
+    Attributes:
+        type: Fixed discriminator `"plotly"`.
+        figure: Wrapped Plotly figure (available as a property).
+
+    Notes:
+        The figure is stored in a Pydantic private attribute (`_figure`).
+        The `data` field is computed from `figure` using Plotly JSON serialization.
+    """
+
     type: Literal["plotly"] = "plotly"
 
     _figure: Figure = PrivateAttr()
