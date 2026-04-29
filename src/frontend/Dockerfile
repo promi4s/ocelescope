@@ -27,6 +27,8 @@ COPY src/frontend/app ./src/frontend/app
 COPY src/frontend/packages ./src/frontend/packages
 COPY src/frontend/modules ./src/frontend/modules
 
+ENV EXTERNAL_API_BASE_URL="http://backend:8000"
+
 RUN pnpm install --frozen-lockfile
 RUN pnpm --filter "@ocelescope/app..." build
 

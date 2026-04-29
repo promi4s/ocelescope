@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+const apiBase = process.env.EXTERNAL_API_BASE_URL ?? "http://localhost:8000";
+
 const nextConfig: NextConfig = {
   output: "standalone",
   reactStrictMode: true,
@@ -18,7 +20,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/external/:path*",
-        destination: "http://backend:8000/:path*",
+        destination: `${apiBase}/:path*`,
       },
     ];
   },

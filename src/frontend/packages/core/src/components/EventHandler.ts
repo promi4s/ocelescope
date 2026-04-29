@@ -2,9 +2,11 @@ import { Readable } from "node:stream";
 import type { ReadableStream as NodeReadableStream } from "node:stream/web";
 import type { NextApiRequest, NextApiResponse } from "next";
 
+const apiBase = process.env.EXTERNAL_API_BASE_URL ?? "http://localhost:8000";
+
 export const sseHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   const session_id = req.query.sessionId as string;
-  const backendUrl = `http://backend:8000/sse?session_id=${encodeURIComponent(session_id || "")}`;
+  const backendUrl = `${apiBase}/sse?session_id=${encodeURIComponent(session_id || "")}`;
 
   try {
     const controller = new AbortController();
