@@ -159,7 +159,9 @@ const renderDiscoveryField = ({
     property.maximum !== undefined
   ) {
     const currentValue =
-      typeof value === "number" ? value : (property.default as number | undefined);
+      typeof value === "number"
+        ? value
+        : (property.default as number | undefined);
     const isPercentage = property.maximum === 100 && property.minimum === 0;
 
     return (
@@ -249,13 +251,16 @@ const DiscoveryPage = () => {
 
     setSelectedMethodType(
       methods.find((method) => method.resourceType === "DirectlyFollowsGraph")
-        ?.resourceType ?? methods[0]?.resourceType ?? null,
+        ?.resourceType ??
+        methods[0]?.resourceType ??
+        null,
     );
   }, [methods, selectedMethodType]);
 
   const selectedMethod = useMemo(
     () =>
-      methods.find((method) => method.resourceType === selectedMethodType) ?? null,
+      methods.find((method) => method.resourceType === selectedMethodType) ??
+      null,
     [methods, selectedMethodType],
   );
 
@@ -289,7 +294,9 @@ const DiscoveryPage = () => {
           setTaskId(newTaskId);
         },
         onError: (error) => {
-          setSubmitError(error instanceof Error ? error.message : "Discovery failed");
+          setSubmitError(
+            error instanceof Error ? error.message : "Discovery failed",
+          );
         },
       },
     });
@@ -304,15 +311,14 @@ const DiscoveryPage = () => {
         setTaskId(newTaskId);
       },
       onError: (error) => {
-        setSubmitError(error instanceof Error ? error.message : "Discovery failed");
+        setSubmitError(
+          error instanceof Error ? error.message : "Discovery failed",
+        );
       },
     },
   });
 
-  const {
-    data: task,
-    error: taskError,
-  } = useGetDiscoveryTask(taskId ?? "", {
+  const { data: task, error: taskError } = useGetDiscoveryTask(taskId ?? "", {
     query: {
       enabled: !!taskId,
       refetchInterval: ({ state }) => {
@@ -387,7 +393,9 @@ const DiscoveryPage = () => {
     submitError ||
     (methodsError instanceof Error ? methodsError.message : undefined) ||
     (taskError instanceof Error ? taskError.message : undefined) ||
-    (task?.state === "FAILURE" ? "The backend discovery task failed." : undefined);
+    (task?.state === "FAILURE"
+      ? "The backend discovery task failed."
+      : undefined);
 
   if (!ocelId) {
     return <LoadingOverlay visible />;
@@ -461,27 +469,31 @@ const DiscoveryPage = () => {
             </Text>
           )}
 
-          {Object.entries(selectedSchema.properties ?? {}).map(([name, property]) => (
-            <Box key={name}>
-              {renderDiscoveryField({
-                name,
-                property,
-                value: activeFormData[name],
-                eventTypeOptions: Object.keys(eventCounts),
-                objectTypeOptions: Object.keys(objectCounts),
-                onChange: (value) =>
-                  setFormDataByMethod((current) => ({
-                    ...current,
-                    [selectedMethodType as DiscoveryResourceType]: {
-                      ...((selectedMethodType &&
-                        current[selectedMethodType as DiscoveryResourceType]) ??
-                        {}),
-                      [name]: value,
-                    },
-                  })),
-              })}
-            </Box>
-          ))}
+          {Object.entries(selectedSchema.properties ?? {}).map(
+            ([name, property]) => (
+              <Box key={name}>
+                {renderDiscoveryField({
+                  name,
+                  property,
+                  value: activeFormData[name],
+                  eventTypeOptions: Object.keys(eventCounts),
+                  objectTypeOptions: Object.keys(objectCounts),
+                  onChange: (value) =>
+                    setFormDataByMethod((current) => ({
+                      ...current,
+                      [selectedMethodType as DiscoveryResourceType]: {
+                        ...((selectedMethodType &&
+                          current[
+                            selectedMethodType as DiscoveryResourceType
+                          ]) ??
+                          {}),
+                        [name]: value,
+                      },
+                    })),
+                })}
+              </Box>
+            ),
+          )}
 
           {errorMessage && (
             <Alert color="red" title="Discovery failed">

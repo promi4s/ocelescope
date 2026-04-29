@@ -17,7 +17,9 @@ discovery_router = APIRouter(prefix="/ocels/{ocel_id}/discover", tags=["ocels"])
 discovery_meta_router = APIRouter(prefix="/discovery", tags=["ocels"])
 
 
-DISCOVERY_MODELS: Mapping[DiscoveryResourceType, type[DiscoverPetriNetBody] | type[DiscoverDFGBody]] = {
+DISCOVERY_MODELS: Mapping[
+    DiscoveryResourceType, type[DiscoverPetriNetBody] | type[DiscoverDFGBody]
+] = {
     "PetriNet": DiscoverPetriNetBody,
     "DirectlyFollowsGraph": DiscoverDFGBody,
 }

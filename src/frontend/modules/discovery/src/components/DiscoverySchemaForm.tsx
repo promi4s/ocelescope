@@ -219,8 +219,12 @@ export const DiscoverySchemaForm: React.FC<DiscoverySchemaFormProps> = ({
       validator={validator}
       uiSchema={uiSchema}
       fields={fields}
-      onChange={(event) => onChange((event.formData ?? {}) as Record<string, unknown>)}
-      onSubmit={(event) => onSubmit((event.formData ?? {}) as Record<string, unknown>)}
+      onChange={(event) =>
+        onChange((event.formData ?? {}) as Record<string, unknown>)
+      }
+      onSubmit={(event) =>
+        onSubmit((event.formData ?? {}) as Record<string, unknown>)
+      }
     />
   );
 };

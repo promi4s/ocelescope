@@ -5,7 +5,7 @@ from ocelescope.visualization.default.graph import (
     Graph,
     GraphEdge,
     GraphNode,
-    GraphvizLayoutConfig,
+    LayoutConfig,
 )
 from ocelescope.visualization.util.color import generate_color_map
 
@@ -74,13 +74,5 @@ def visualize_ocdfg(resource: DirectlyFollowsGraph) -> Graph:
         type="graph",
         nodes=activity_nodes + start_nodes + end_nodes,
         edges=edges,
-        layout_config=GraphvizLayoutConfig(
-            engine="dot",
-            graphAttrs={
-                "rankdir": "LR",
-                "splines": "True",
-                "nodesep": "0.8",
-                "ranksep": "0.5",
-            },
-        ),
+        layout_config=LayoutConfig(direction="LR"),
     )

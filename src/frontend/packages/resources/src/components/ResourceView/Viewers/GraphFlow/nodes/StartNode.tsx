@@ -14,7 +14,14 @@ const StartNode = memo(({ data }: NodeProps<StartNodeType>) => {
   const { color, label } = data;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 4,
+      }}
+    >
       <Handle
         type="target"
         position={Position.Left}

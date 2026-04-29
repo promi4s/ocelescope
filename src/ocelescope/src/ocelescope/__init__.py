@@ -33,7 +33,7 @@ from ocelescope.visualization import (
     GraphEdge,
     GraphNode,
     GraphShapes,
-    GraphvizLayoutConfig,
+    LayoutConfig,
     SVGVis,
     Table,
     TableColumn,
@@ -78,7 +78,7 @@ __all__ = [
     "GraphNode",
     "GraphEdge",
     "EdgeArrow",
-    "GraphvizLayoutConfig",
+    "LayoutConfig",
     "GraphShapes",
     # Table
     "Table",

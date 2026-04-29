@@ -10,7 +10,7 @@ from ocelescope.visualization.default.graph import (
     GraphEdge,
     GraphNode,
     GraphShapes,
-    GraphvizLayoutConfig,
+    LayoutConfig,
 )
 from ocelescope.visualization.default.plotly import Plotly
 from ocelescope.visualization.default.svg import SVGVis
@@ -30,7 +30,7 @@ __all__ = [
     "GraphNode",
     "GraphEdge",
     "EdgeArrow",
-    "GraphvizLayoutConfig",
+    "LayoutConfig",
     "GraphShapes",
     # Table
     "Table",

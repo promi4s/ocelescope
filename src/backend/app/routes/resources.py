@@ -85,7 +85,9 @@ def get_resource(session: ApiSession, resource_id: str) -> GetResourceResponse:
             id=resource_id,
             **resource.model_dump(),
         ),
-        visualization=visualize_resource(resource_instance) if resource_instance else None,
+        visualization=visualize_resource(resource_instance)
+        if resource_instance
+        else None,
     )
 
 

@@ -12,7 +12,7 @@
     "types": [],
     "declaration": true,
     "emitDeclarationOnly": true,
-    "verbatimModuleSyntax": true,
+    "verbatimModuleSyntax": true
   },
-  "include": ["src"],
+  "include": ["src"]
 }

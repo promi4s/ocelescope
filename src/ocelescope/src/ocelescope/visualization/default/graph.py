@@ -3,7 +3,6 @@ from typing import Generic, Literal, TypeVar
 from pydantic import BaseModel, Field
 
 from ocelescope.util.pydantic import uuid_factory
-from ocelescope.visualization.default.dot import GraphvizLayoutEngineName
 from ocelescope.visualization.visualization import Visualization
 
 T = TypeVar("T", bound=Visualization)
@@ -64,15 +63,12 @@ class GraphEdge(AnnotatedElement):
     layout_attrs: dict[str, str | int | float | bool] | None = None
 
 
-class GraphvizLayoutConfig(BaseModel):
-    engine: GraphvizLayoutEngineName = "dot"
-    graphAttrs: dict[str, str | int | float | bool] | None = None
-    nodeAttrs: dict[str, str | int | float | bool] | None = None
-    edgeAttrs: dict[str, str | int | float | bool] | None = None
+class LayoutConfig(BaseModel):
+    direction: Literal["LR", "TB", "RL", "BT"] = "TB"
 
 
 class Graph(Visualization):
     type: Literal["graph"] = "graph"
     nodes: list[GraphNode] = []
     edges: list[GraphEdge] = []
-    layout_config: GraphvizLayoutConfig = GraphvizLayoutConfig()
+    layout_config: LayoutConfig = LayoutConfig()

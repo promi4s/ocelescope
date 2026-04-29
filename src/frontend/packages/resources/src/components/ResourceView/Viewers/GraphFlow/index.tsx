@@ -17,7 +17,9 @@ import "@xyflow/react/dist/style.css";
 
 import type { VisualizationByType } from "../../../../types";
 import PlaceNode, { type PlaceNodeType } from "./nodes/PlaceNode";
-import TransitionNode, { type TransitionNodeType } from "./nodes/TransitionNode";
+import TransitionNode, {
+  type TransitionNodeType,
+} from "./nodes/TransitionNode";
 import StartNode, { type StartNodeType } from "./nodes/StartNode";
 import EndNode, { type EndNodeType } from "./nodes/EndNode";
 import GraphFlowEdge, { type GraphFlowEdgeType } from "./edges/GraphFlowEdge";
@@ -26,7 +28,12 @@ import GraphFlowEdge, { type GraphFlowEdgeType } from "./edges/GraphFlowEdge";
 const elk = new ELK();
 
 // ─── Node / edge type maps ────────────────────────────────────────────────────
-const nodeTypes = { place: PlaceNode, transition: TransitionNode, start: StartNode, end: EndNode };
+const nodeTypes = {
+  place: PlaceNode,
+  transition: TransitionNode,
+  start: StartNode,
+  end: EndNode,
+};
 const edgeTypes = { graphflow: GraphFlowEdge };
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -67,8 +74,9 @@ function buildRFNodes(visualization: VisualizationByType<"graph">): RFNode[] {
           label,
           color,
           isFinalMarking:
-            (node.layout_attrs as Record<string, unknown> | null)?.["peripheries"] === 2 ||
-            hasPlaceMarking(label, "mf="),
+            (node.layout_attrs as Record<string, unknown> | null)?.[
+              "peripheries"
+            ] === 2 || hasPlaceMarking(label, "mf="),
           isInitialMarking: hasPlaceMarking(label, "m0="),
         },
       } satisfies PlaceNodeType;
@@ -97,7 +105,11 @@ function buildRFNodes(visualization: VisualizationByType<"graph">): RFNode[] {
       type: "transition" as const,
       position: { x: 0, y: 0 },
       // TransitionNode sizes itself via CSS; React Flow measures the DOM size for ELK.
-      data: { label, color: node.color ?? "#ffffff", borderColor: node.border_color ?? null },
+      data: {
+        label,
+        color: node.color ?? "#ffffff",
+        borderColor: node.border_color ?? null,
+      },
     } satisfies TransitionNodeType;
   });
 }
@@ -112,7 +124,8 @@ function buildRFEdges(visualization: VisualizationByType<"graph">): RFEdge[] {
       color: edge.color ?? "#555555",
       label: edge.label ?? null,
       isVariable:
-        (edge.layout_attrs as Record<string, unknown> | null)?.["style"] === "dashed",
+        (edge.layout_attrs as Record<string, unknown> | null)?.["style"] ===
+        "dashed",
     },
   }));
 }
@@ -122,8 +135,12 @@ const GraphFlowInner: React.FC<{
   visualization: VisualizationByType<"graph">;
   isPreview?: boolean | undefined;
 }> = ({ visualization, isPreview }) => {
-  const [nodes, setNodes] = useState<Node[]>(() => buildRFNodes(visualization) as Node[]);
-  const [edges, setEdges] = useState<Edge[]>(() => buildRFEdges(visualization) as Edge[]);
+  const [nodes, setNodes] = useState<Node[]>(
+    () => buildRFNodes(visualization) as Node[],
+  );
+  const [edges, setEdges] = useState<Edge[]>(
+    () => buildRFEdges(visualization) as Edge[],
+  );
 
   const { fitView } = useReactFlow();
   // useNodes() returns the internal store's node list, which carries measured sizes
@@ -158,11 +175,15 @@ const GraphFlowInner: React.FC<{
     if (!nodesInitialized || elkApplied.current) return;
     elkApplied.current = true;
 
-    const { rfNodes: measured, edges: currentEdges, visualization: vis } = latestRef.current;
+    const {
+      rfNodes: measured,
+      edges: currentEdges,
+      visualization: vis,
+    } = latestRef.current;
     if (measured.length === 0) return;
 
     const direction = rankdirToElkDirection(
-      (vis.layout_config?.graphAttrs as Record<string, string> | undefined)?.["rankdir"],
+      vis.layout_config?.direction ?? undefined,
     );
 
     (async () => {
@@ -172,9 +193,16 @@ const GraphFlowInner: React.FC<{
           layoutOptions: {
             "elk.algorithm": "layered",
             "elk.direction": direction,
-            "elk.spacing.nodeNode": "30",
-            "elk.layered.spacing.nodeNodeBetweenLayers": "60",
             "elk.edgeRouting": "ORTHOGONAL",
+
+            "elk.spacing.nodeNode": "50",
+            "elk.layered.spacing.nodeNodeBetweenLayers": "80",
+            "elk.spacing.edgeEdge": "40",
+            "elk.spacing.edgeNode": "25",
+
+            "elk.layered.crossingMinimization.strategy": "LAYER_SWEEP",
+
+            "elk.edgeLabels.placement": "CENTER",
           },
           children: measured.map((node) => ({
             id: node.id,
@@ -211,7 +239,8 @@ const GraphFlowInner: React.FC<{
   }, [nodesInitialized, fitView]);
 
   const onNodesChange = useCallback(
-    (changes: NodeChange[]) => setNodes((nds) => applyNodeChanges(changes, nds)),
+    (changes: NodeChange[]) =>
+      setNodes((nds) => applyNodeChanges(changes, nds)),
     [],
   );
 

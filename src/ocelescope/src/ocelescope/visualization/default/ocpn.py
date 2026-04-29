@@ -6,7 +6,7 @@ from ocelescope.visualization.default.graph import (
     Graph,
     GraphEdge,
     GraphNode,
-    GraphvizLayoutConfig,
+    LayoutConfig,
 )
 from ocelescope.visualization.util.color import generate_color_map
 
@@ -121,18 +121,5 @@ def visualize_ocpn(resource: PetriNet) -> Graph:
         type="graph",
         nodes=nodes,
         edges=edges,
-        layout_config=GraphvizLayoutConfig(
-            engine="dot",
-            graphAttrs={
-                "rankdir": "LR",
-                "ranksep": 0.58,
-                "nodesep": 0.42,
-                "splines": "polyline",
-                "concentrate": True,
-                "pad": 0.1,
-                "margin": 0,
-            },
-            nodeAttrs={"margin": "0.08,0.05"},
-            edgeAttrs={"minlen": 1},
-        ),
+        layout_config=LayoutConfig(direction="LR"),
     )

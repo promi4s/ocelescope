@@ -72,9 +72,7 @@ class PetriNetGraph(nx.MultiDiGraph):
 
     def transition_names(self) -> list[str]:
         return sorted(
-            node_id
-            for node_id, data in self.nodes(data=True)
-            if data.get("kind") == "transition"
+            node_id for node_id, data in self.nodes(data=True) if data.get("kind") == "transition"
         )
 
     def object_types(self) -> list[str]:

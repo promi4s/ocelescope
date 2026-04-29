@@ -1,7 +1,6 @@
-const sessionHeader =
-  `${process.env["NEXT_PUBLIC_APPLICATION_ID"] ?? "ocelescope"}-session-id`;
+const sessionHeader = `${process.env["NEXT_PUBLIC_APPLICATION_ID"] ?? "ocelescope"}-session-id`;
 
-export const request = async <T,>(
+export const request = async <T>(
   url: string,
   options: RequestInit,
 ): Promise<T> => {

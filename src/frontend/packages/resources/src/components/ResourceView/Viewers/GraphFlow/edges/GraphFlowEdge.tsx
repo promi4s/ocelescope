@@ -72,9 +72,7 @@ const GraphFlowEdge = memo(
     } else {
       // Try floating border-to-border path; fall back to handle-based coords.
       const params =
-        sourceNode && targetNode
-          ? getEdgeParams(sourceNode, targetNode)
-          : null;
+        sourceNode && targetNode ? getEdgeParams(sourceNode, targetNode) : null;
 
       [edgePath, labelX, labelY] = getBezierPath(
         params
