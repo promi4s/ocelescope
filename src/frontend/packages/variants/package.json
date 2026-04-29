@@ -1,0 +1,51 @@
+{
+  "name": "@ocelescope/variants",
+  "type": "module",
+  "version": "0.0.0",
+  "description": "A starter for creating a React component library.",
+  "author": "Author Name <author.name@mail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/author/library#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/author/library.git"
+  },
+  "bugs": {
+    "url": "https://github.com/author/library/issues"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json",
+    "./style.css": "./dist/style.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "pnpm run build",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  },
+  "peerDependencies": {
+    "@marko19907/string-to-color": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "catalog:",
+    "@storybook/react-vite": "^10.3.5",
+    "@types/css-modules": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "storybook": "^10.3.5",
+    "tsdown": "catalog:",
+    "typescript": "catalog:"
+  }
+}
