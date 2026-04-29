@@ -38,6 +38,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
+ENV EXTERNAL_API_BASE_URL="http://backend:8000"
 
 # Copy the standalone bundle for the app as the runtime root
 COPY --from=builder /repo/src/frontend/app/.next/standalone ./
