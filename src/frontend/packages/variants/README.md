@@ -1,29 +1,56 @@
-# react-components-starter
+# @ocelescope/variants
 
-A starter for creating a React component library.
+React components for rendering **variants** in Ocelescope.
 
-## Development
+Currently, this package exports a single component:
 
-- Install dependencies:
+- `Variant` — renders a sequence of activities as a compact, colored “ribbon”.
 
-```bash
-npm install
+## Installation
+
+This package is primarily developed inside the Ocelescope pnpm workspace.
+If you consume it from npm, install it like any other package.
+
+## Usage
+
+```tsx
+import { Variant } from "@ocelescope/variants";
+import "@ocelescope/variants/styles.css";
+
+export function Example() {
+  return (
+    <Variant
+      variant={["Create", "Approve", "Ship", "Invoice"]}
+      colors={{ Approve: "#7c3aed" }}
+    />
+  );
+}
 ```
 
-- Run the playground:
+### Props
+
+- `variant: string[]`  
+  The ordered list of activity labels.
+
+- `colors?: Record<string, string>`  
+  Optional overrides for activity colors. Activities not present in `colors` get a deterministic generated color.
+
+## Development (monorepo)
+
+From the repository root:
 
 ```bash
-npm run play
+pnpm i
 ```
 
-- Run the unit tests:
+Build just this package:
 
 ```bash
-npm run test
+pnpm --filter @ocelescope/variants build
 ```
 
-- Build the library:
+Run Storybook:
 
 ```bash
-npm run build
+pnpm --filter @ocelescope/variants storybook
 ```
