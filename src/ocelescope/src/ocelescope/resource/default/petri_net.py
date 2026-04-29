@@ -5,11 +5,14 @@ from ocelescope.resource.resource import Annotated, Resource
 
 
 class Place(Annotated):
-    """A place in a Petri net.
+    """A place in an object-centric Petri net.
+
+    Each place is associated with exactly one object type, representing
+    the lifecycle of objects of that type.
 
     Attributes:
         id: Unique identifier of the place.
-        object_type: Type of the object associated with this place.
+        object_type: Object type whose lifecycle this place belongs to.
     """
 
     id: str
@@ -17,11 +20,14 @@ class Place(Annotated):
 
 
 class Transition(Annotated):
-    """A transition in a Petri net.
+    """A transition in an object-centric Petri net.
+
+    A transition with a ``None`` label is a silent (tau) transition and
+    will be rendered as a thin black bar in the visualization.
 
     Attributes:
         id: Unique identifier of the transition.
-        label: Optional label describing the transition.
+        label: Activity label. ``None`` indicates a silent transition.
     """
 
     id: str
@@ -29,12 +35,15 @@ class Transition(Annotated):
 
 
 class Arc(Annotated):
-    """An arc connecting places and transitions in a Petri net.
+    """An arc connecting a place and a transition in an object-centric Petri net.
+
+    Variable arcs allow a transition to consume or produce a variable number
+    of tokens, used to model synchronisation across object types.
 
     Attributes:
         source: ID of the source node (place or transition).
         target: ID of the target node (place or transition).
-        variable: Whether the arc represents a variable connection.
+        variable: Whether this is a variable arc.
         weight: Multiplicity of the arc.
     """
 
@@ -45,14 +54,18 @@ class Arc(Annotated):
 
 
 class PetriNet(Resource):
-    """An object-centric Petri net representation.
+    """An object-centric Petri net (OC-PN).
+
+    Places are partitioned by object type. Transitions may synchronise across
+    object types via shared arcs. Variable arcs allow a transition to consume
+    or produce tokens from multiple instances of an object type.
 
     Attributes:
-        places: List of places in the Petri net.
-        transitions: List of transitions in the Petri net.
-        arcs: List of arcs connecting places and transitions.
-        initial_marking: Token counts of the initial marking by place id.
-        final_marking: Token counts of the final marking by place id.
+        places: Places in the net, each associated with an object type.
+        transitions: Transitions in the net, labeled or silent.
+        arcs: Arcs connecting places and transitions.
+        initial_marking: Token counts of the initial marking, keyed by place id.
+        final_marking: Token counts of the final marking, keyed by place id.
     """
 
     label = "Petri Net"
