@@ -1,6 +1,8 @@
 from pydantic import Field
 
 from ocelescope.resource.resource import Annotated, Resource
+from ocelescope.visualization.default.graph import Graph, GraphEdge, GraphNode, LayoutConfig
+from ocelescope.visualization.util.color import generate_color_map
 
 
 class DFGActivity(Annotated):
@@ -100,3 +102,70 @@ class DirectlyFollowsGraph(Resource):
             A list of object type names.
         """
         return [object_type.name for object_type in self.object_types]
+
+    def visualize(self) -> Graph:
+        color_map = generate_color_map([ot.name for ot in self.object_types])
+
+        start_object_types = {
+            edge.object_type
+            for edge in self.edges
+            if edge.source is None and edge.target is not None
+        }
+        end_object_types = {
+            edge.object_type
+            for edge in self.edges
+            if edge.source is not None and edge.target is None
+        }
+
+        activity_nodes = [
+            GraphNode(
+                id=activity.name,
+                label=activity.name,
+                shape="rectangle",
+                annotation=activity.get_annotation_visualization(),
+                color="#ffffff",
+                border_color="#000000",
+            )
+            for activity in self.activities
+        ]
+
+        start_nodes = [
+            GraphNode(
+                id=f"start_{ot.name}",
+                label=ot.name,
+                shape="start",
+                color=color_map[ot.name],
+                annotation=ot.get_annotation_visualization(),
+            )
+            for ot in self.object_types
+            if ot.name in start_object_types
+        ]
+
+        end_nodes = [
+            GraphNode(
+                id=f"end_{ot.name}",
+                label=ot.name,
+                shape="end",
+                color=color_map[ot.name],
+            )
+            for ot in self.object_types
+            if ot.name in end_object_types
+        ]
+
+        edges = [
+            GraphEdge(
+                source=edge.source if edge.source else f"start_{edge.object_type}",
+                target=edge.target if edge.target else f"end_{edge.object_type}",
+                end_arrow="triangle",
+                color=color_map[edge.object_type],
+                annotation=edge.get_annotation_visualization(),
+                label=edge.get_annotation_str(),
+            )
+            for edge in self.edges
+        ]
+
+        return Graph(
+            nodes=activity_nodes + start_nodes + end_nodes,
+            edges=edges,
+            layout_config=LayoutConfig(direction="RIGHT"),
+        )

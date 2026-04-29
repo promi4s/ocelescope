@@ -15,7 +15,7 @@ import { colorToId } from "../utils/color";
 export type GraphFlowEdgeData = {
   color: string;
   label?: string | null;
-  isVariable: boolean;
+  dashed: boolean;
   path?: string | null;
   labelPosition?: { x: number; y: number } | null;
 };
@@ -151,7 +151,7 @@ const GraphFlowEdge = memo((props: EdgeProps<GraphFlowEdgeType>) => {
   if (!data) return null;
 
   const color = data.color ?? "#555";
-  const isVariable = data.isVariable ?? false;
+  const dashed = data.dashed ?? false;
   const markerId = `arrow-${colorToId(color)}`;
   const customLabelPosition = fallbackLabelPosition(props);
 
@@ -192,7 +192,7 @@ const GraphFlowEdge = memo((props: EdgeProps<GraphFlowEdgeType>) => {
         style={{
           stroke: color,
           strokeWidth: 1.5,
-          strokeDasharray: isVariable ? "6 3" : undefined,
+          strokeDasharray: dashed ? "6 3" : undefined,
         }}
       />
       {data.label && (

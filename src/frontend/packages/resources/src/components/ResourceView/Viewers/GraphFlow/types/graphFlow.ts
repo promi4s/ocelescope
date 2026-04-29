@@ -14,5 +14,4 @@ export type GraphFlowNodeType =
 export type GraphFlowReactNode = Node<GraphFlowNodeType["data"]>;
 export type GraphFlowReactEdge = Edge<NonNullable<GraphFlowEdgeType["data"]>>;
 
-export type RankDirection = "TB" | "LR" | "RL" | "BT" | string;
 export type ElkDirection = "DOWN" | "RIGHT" | "LEFT" | "UP";

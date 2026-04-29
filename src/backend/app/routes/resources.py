@@ -7,7 +7,6 @@ from fastapi.datastructures import UploadFile
 from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
 from ocelescope import Visualization
-from ocelescope.visualization.manager import visualize_resource
 from pydantic.main import BaseModel
 
 from app.dependencies import ApiSession
@@ -85,8 +84,8 @@ def get_resource(session: ApiSession, resource_id: str) -> GetResourceResponse:
             id=resource_id,
             **resource.model_dump(),
         ),
-        visualization=visualize_resource(resource_instance)
-        if resource_instance
+        visualization=resource_instance.visualize()
+        if resource_instance is not None
         else None,
     )
 

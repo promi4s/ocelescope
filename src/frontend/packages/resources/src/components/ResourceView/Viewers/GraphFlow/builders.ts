@@ -4,16 +4,6 @@ import type { GraphFlowNodeType } from "./types/graphFlow";
 import { hasMarking } from "./utils/labels";
 import type { GraphFlowEdgeType } from "./edges/GraphFlowEdge";
 
-type LayoutAttrs = Record<string, unknown> | null | undefined;
-
-const layoutAttrs = (attrs: unknown): LayoutAttrs => attrs as LayoutAttrs;
-
-const isFinalPlace = (attrs: unknown, label: string | null): boolean =>
-  layoutAttrs(attrs)?.["peripheries"] === 2 || hasMarking(label, "mf=");
-
-const isVariableEdge = (attrs: unknown): boolean =>
-  layoutAttrs(attrs)?.["style"] === "dashed";
-
 export const buildGraphFlowNodes = (
   visualization: VisualizationByType<"graph">,
 ): GraphFlowNodeType[] =>
@@ -31,7 +21,7 @@ export const buildGraphFlowNodes = (
           data: {
             label,
             color,
-            isFinalMarking: isFinalPlace(node.layout_attrs, label),
+            isFinalMarking: node.double_border ?? false,
             isInitialMarking: hasMarking(label, "m0="),
           },
         };
@@ -77,6 +67,6 @@ export const buildGraphFlowEdges = (
     data: {
       color: edge.color ?? DEFAULT_COLORS.edge,
       label: edge.label ?? null,
-      isVariable: isVariableEdge(edge.layout_attrs),
+      dashed: edge.dashed ?? false,
     },
   }));

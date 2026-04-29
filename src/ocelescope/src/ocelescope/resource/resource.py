@@ -41,7 +41,7 @@ class Resource(BaseModel, ABC):
             Optional[Visualization]: A visualization object or ``None``.
         """
 
-        return
+        ...
 
 
 T = TypeVar("T", bound=Resource)
@@ -56,7 +56,4 @@ class Annotated(BaseModel, Generic[T]):
     def get_annotation_visualization(self):
         if not isinstance(self.annotation, Resource):
             return None
-
-        from ocelescope.visualization.manager import visualize_resource
-
-        return visualize_resource(self.annotation)
+        return self.annotation.visualize()

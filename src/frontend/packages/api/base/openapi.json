@@ -7,7 +7,9 @@
   "paths": {
     "/ocelot/events": {
       "get": {
-        "tags": ["ocelot"],
+        "tags": [
+          "ocelot"
+        ],
         "summary": "Get Events",
         "operationId": "ocelot_paginatedEvents",
         "parameters": [
@@ -94,7 +96,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -132,7 +137,9 @@
     },
     "/ocelot/objects": {
       "get": {
-        "tags": ["ocelot"],
+        "tags": [
+          "ocelot"
+        ],
         "summary": "Get Objects",
         "operationId": "ocelot_paginatedObjects",
         "parameters": [
@@ -219,7 +226,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -257,7 +267,9 @@
     },
     "/ocelot/objects/changes/{object_id}": {
       "get": {
-        "tags": ["ocelot"],
+        "tags": [
+          "ocelot"
+        ],
         "summary": "Get Object Changes",
         "operationId": "ocelot_getObjectChanges",
         "parameters": [
@@ -293,7 +305,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -329,7 +344,9 @@
     },
     "/ocelot/objectInfo": {
       "get": {
-        "tags": ["ocelot"],
+        "tags": [
+          "ocelot"
+        ],
         "summary": "Get Objects Info",
         "operationId": "ocelot_objectInfo",
         "parameters": [
@@ -356,7 +373,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -398,7 +418,9 @@
     },
     "/ocelot/eventInfo": {
       "get": {
-        "tags": ["ocelot"],
+        "tags": [
+          "ocelot"
+        ],
         "summary": "Get Event Info",
         "operationId": "ocelot_eventInfo",
         "parameters": [
@@ -425,7 +447,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -467,7 +492,9 @@
     },
     "/session/upload": {
       "post": {
-        "tags": ["session"],
+        "tags": [
+          "session"
+        ],
         "summary": "Upload ocels, resources or tasks",
         "operationId": "upload",
         "requestBody": {
@@ -510,7 +537,9 @@
     },
     "/session/logout": {
       "post": {
-        "tags": ["session"],
+        "tags": [
+          "session"
+        ],
         "summary": "Deletes the Session",
         "operationId": "logout",
         "responses": {
@@ -527,7 +556,9 @@
     },
     "/ocels": {
       "get": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "List uploaded and uploading OCELs",
         "description": "Returns metadata for all uploaded OCELs along with any OCEL files currently being imported. Includes the ID of the currently active OCEL, if one is selected.",
         "operationId": "getOcels",
@@ -579,7 +610,9 @@
     },
     "/ocels/default": {
       "get": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Get default OCEL metadata",
         "operationId": "getDefaultOcel",
         "parameters": [
@@ -632,7 +665,9 @@
         }
       },
       "post": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Import default OCEL",
         "operationId": "importDefaultOcel",
         "parameters": [
@@ -662,7 +697,9 @@
                 }
               ],
               "description": "Dataset version (optional)",
-              "examples": ["1.0"],
+              "examples": [
+                "1.0"
+              ],
               "title": "Version"
             },
             "description": "Dataset version (optional)"
@@ -692,7 +729,9 @@
     },
     "/ocels/extension/meta": {
       "get": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Get Extension Meta",
         "operationId": "getExtensionMeta",
         "responses": {
@@ -715,7 +754,9 @@
     },
     "/ocels/{ocel_id}": {
       "get": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Get general information about a OCEL",
         "operationId": "getOcel",
         "parameters": [
@@ -742,7 +783,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -780,7 +824,9 @@
     },
     "/ocels/{ocel_id}/delete": {
       "post": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Delete an uploaded OCEL",
         "description": "Deletes the uploaded OCEL with the given `ocel_id`. This action is irreversible and removes the OCEL from the session.",
         "operationId": "deleteOcel",
@@ -819,7 +865,9 @@
     },
     "/ocels/{ocel_id}/rename": {
       "post": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Rename an uploaded OCEL",
         "description": "Renames the OCEL represented by the given `ApiOcel` object to `new_name`. This updates the display name used in the UI and metadata.",
         "operationId": "renameOcel",
@@ -856,7 +904,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -892,7 +943,9 @@
     },
     "/ocels/{ocel_id}/attributes": {
       "get": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Get Aggr Attributes",
         "operationId": "AggregatedAttributes",
         "parameters": [
@@ -919,7 +972,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -961,7 +1017,9 @@
     },
     "/ocels/{ocel_id}/objects/attributes": {
       "get": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Get Object Attributes",
         "operationId": "objectAttributes",
         "parameters": [
@@ -1001,7 +1059,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1043,7 +1104,9 @@
     },
     "/ocels/{ocel_id}/events/attributes": {
       "get": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Get Event Attributes",
         "operationId": "eventAttributes",
         "parameters": [
@@ -1083,7 +1146,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1125,7 +1191,9 @@
     },
     "/ocels/{ocel_id}/events/counts": {
       "get": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Get Event Counts",
         "operationId": "eventCounts",
         "parameters": [
@@ -1152,7 +1220,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1194,7 +1265,9 @@
     },
     "/ocels/{ocel_id}/events/time": {
       "get": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Get Time Info",
         "operationId": "timeInfo",
         "parameters": [
@@ -1253,7 +1326,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1291,7 +1367,9 @@
     },
     "/ocels/{ocel_id}/objects/counts": {
       "get": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Get Object Counts",
         "operationId": "objectCounts",
         "parameters": [
@@ -1318,7 +1396,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1360,7 +1441,9 @@
     },
     "/ocels/{ocel_id}/relations/e2o": {
       "get": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Get E2O",
         "operationId": "e2o",
         "parameters": [
@@ -1385,7 +1468,10 @@
             "in": "query",
             "required": false,
             "schema": {
-              "enum": ["source", "target"],
+              "enum": [
+                "source",
+                "target"
+              ],
               "type": "string",
               "default": "source",
               "title": "Direction"
@@ -1398,7 +1484,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1440,7 +1529,9 @@
     },
     "/ocels/{ocel_id}/relations/o2o": {
       "get": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Get Object Relations",
         "operationId": "o2o",
         "parameters": [
@@ -1465,7 +1556,10 @@
             "in": "query",
             "required": false,
             "schema": {
-              "enum": ["source", "target"],
+              "enum": [
+                "source",
+                "target"
+              ],
               "type": "string",
               "default": "source",
               "title": "Direction"
@@ -1478,7 +1572,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1520,7 +1617,9 @@
     },
     "/ocels/{ocel_id}/events/ids": {
       "get": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Get Event Ids",
         "operationId": "eventIds",
         "parameters": [
@@ -1583,7 +1682,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1621,7 +1723,9 @@
     },
     "/ocels/{ocel_id}/objects/ids": {
       "get": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Get Object Ids",
         "operationId": "objectIds",
         "parameters": [
@@ -1684,7 +1788,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1722,7 +1829,9 @@
     },
     "/ocels/{ocel_id}/filter": {
       "get": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Get Filter",
         "operationId": "getFilters",
         "parameters": [
@@ -1749,7 +1858,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1793,7 +1905,9 @@
         }
       },
       "post": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Set Filter",
         "operationId": "setFilters",
         "parameters": [
@@ -1820,7 +1934,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1884,7 +2001,9 @@
     },
     "/ocels/{ocel_id}/quantity/info": {
       "get": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Get Quantity Info",
         "operationId": "QuantityInfo",
         "parameters": [
@@ -1911,7 +2030,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1949,7 +2071,9 @@
     },
     "/ocels/{ocel_id}/download": {
       "get": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Download OCEL including app state",
         "operationId": "download_ocel_ocels__ocel_id__download_get",
         "parameters": [
@@ -1974,7 +2098,11 @@
             "in": "query",
             "required": false,
             "schema": {
-              "enum": [".xml", ".json", ".sqlite"],
+              "enum": [
+                ".xml",
+                ".json",
+                ".sqlite"
+              ],
               "type": "string",
               "default": ".json",
               "title": "Ext"
@@ -1987,7 +2115,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -2023,7 +2154,9 @@
     },
     "/discovery/meta": {
       "get": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Get discovery method metadata",
         "operationId": "getDiscoveryMeta",
         "responses": {
@@ -2046,7 +2179,9 @@
     },
     "/ocels/{ocel_id}/discover/petri-net": {
       "post": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Discover an object-centric Petri net",
         "operationId": "discoverPetriNet",
         "parameters": [
@@ -2097,7 +2232,9 @@
     },
     "/ocels/{ocel_id}/discover/directly-follows-graph": {
       "post": {
-        "tags": ["ocels"],
+        "tags": [
+          "ocels"
+        ],
         "summary": "Discover an object-centric directly follows graph",
         "operationId": "discoverDirectlyFollowsGraph",
         "parameters": [
@@ -2148,7 +2285,9 @@
     },
     "/tasks/system": {
       "get": {
-        "tags": ["tasks"],
+        "tags": [
+          "tasks"
+        ],
         "summary": "returns all tasks of a session",
         "operationId": "getSystemTasks",
         "parameters": [
@@ -2229,7 +2368,9 @@
     },
     "/tasks/system/{task_id}": {
       "get": {
-        "tags": ["tasks"],
+        "tags": [
+          "tasks"
+        ],
         "summary": "returns the task of a given taskId",
         "operationId": "getSystemTask",
         "parameters": [
@@ -2269,7 +2410,9 @@
     },
     "/tasks/plugin": {
       "get": {
-        "tags": ["tasks"],
+        "tags": [
+          "tasks"
+        ],
         "summary": "returns all tasks of a session",
         "operationId": "getPluginTasks",
         "parameters": [
@@ -2346,7 +2489,9 @@
     },
     "/tasks/plugin/{task_id}": {
       "get": {
-        "tags": ["tasks"],
+        "tags": [
+          "tasks"
+        ],
         "summary": "returns the task of a given taskId",
         "operationId": "getPluginTask",
         "parameters": [
@@ -2386,7 +2531,9 @@
     },
     "/tasks/discovery": {
       "get": {
-        "tags": ["tasks"],
+        "tags": [
+          "tasks"
+        ],
         "summary": "returns all discovery tasks of a session",
         "operationId": "getDiscoveryTasks",
         "parameters": [
@@ -2463,7 +2610,9 @@
     },
     "/tasks/discovery/{task_id}": {
       "get": {
-        "tags": ["tasks"],
+        "tags": [
+          "tasks"
+        ],
         "summary": "returns the discovery task of a given taskId",
         "operationId": "getDiscoveryTask",
         "parameters": [
@@ -2503,7 +2652,9 @@
     },
     "/plugins": {
       "get": {
-        "tags": ["plugins"],
+        "tags": [
+          "plugins"
+        ],
         "summary": "Get Plugins",
         "operationId": "plugins",
         "responses": {
@@ -2524,7 +2675,9 @@
         }
       },
       "post": {
-        "tags": ["plugins"],
+        "tags": [
+          "plugins"
+        ],
         "summary": "Upload Plugin",
         "operationId": "uploadPlugin",
         "requestBody": {
@@ -2561,7 +2714,9 @@
     },
     "/plugins/{plugin_id}": {
       "get": {
-        "tags": ["plugins"],
+        "tags": [
+          "plugins"
+        ],
         "summary": "Get Plugin",
         "operationId": "getPlugin",
         "parameters": [
@@ -2607,7 +2762,9 @@
         }
       },
       "delete": {
-        "tags": ["plugins"],
+        "tags": [
+          "plugins"
+        ],
         "summary": "Delete Plugin",
         "operationId": "deletePlugin",
         "parameters": [
@@ -2645,7 +2802,9 @@
     },
     "/plugins/{plugin_id}/{method_name}": {
       "get": {
-        "tags": ["plugins"],
+        "tags": [
+          "plugins"
+        ],
         "summary": "Get Plugin Method",
         "operationId": "getPluginMethod",
         "parameters": [
@@ -2700,7 +2859,9 @@
         }
       },
       "post": {
-        "tags": ["plugins"],
+        "tags": [
+          "plugins"
+        ],
         "summary": "Run Plugin",
         "operationId": "runPlugin",
         "parameters": [
@@ -2760,7 +2921,9 @@
     },
     "/plugins/{plugin_id}/{method_name}/computed/{provider}": {
       "post": {
-        "tags": ["plugins"],
+        "tags": [
+          "plugins"
+        ],
         "summary": "Get Computed",
         "operationId": "getComputedValues",
         "parameters": [
@@ -2832,7 +2995,9 @@
     },
     "/resources": {
       "get": {
-        "tags": ["resources"],
+        "tags": [
+          "resources"
+        ],
         "summary": "Get Resources",
         "operationId": "resources",
         "parameters": [
@@ -2881,7 +3046,9 @@
         }
       },
       "post": {
-        "tags": ["resources"],
+        "tags": [
+          "resources"
+        ],
         "summary": "Upload Resource",
         "operationId": "uploadResource",
         "requestBody": {
@@ -2918,7 +3085,9 @@
     },
     "/resources/meta": {
       "get": {
-        "tags": ["resources"],
+        "tags": [
+          "resources"
+        ],
         "summary": "Get Resource Meta",
         "operationId": "getResourceMeta",
         "responses": {
@@ -2941,7 +3110,9 @@
     },
     "/resources/resource/{resource_id}/download": {
       "get": {
-        "tags": ["resources"],
+        "tags": [
+          "resources"
+        ],
         "summary": "Download Resource",
         "operationId": "downloadResource",
         "parameters": [
@@ -2979,7 +3150,9 @@
     },
     "/resources/resource/{resource_id}": {
       "get": {
-        "tags": ["resources"],
+        "tags": [
+          "resources"
+        ],
         "summary": "Get Resource",
         "operationId": "resource",
         "parameters": [
@@ -3017,7 +3190,9 @@
         }
       },
       "delete": {
-        "tags": ["resources"],
+        "tags": [
+          "resources"
+        ],
         "summary": "Delete Resource",
         "operationId": "deleteResource",
         "parameters": [
@@ -3053,7 +3228,9 @@
         }
       },
       "post": {
-        "tags": ["resources"],
+        "tags": [
+          "resources"
+        ],
         "summary": "Rename Resource",
         "operationId": "renameResource",
         "parameters": [
@@ -3211,7 +3388,11 @@
           }
         },
         "type": "object",
-        "required": ["input_ocels", "input_resources", "input"],
+        "required": [
+          "input_ocels",
+          "input_resources",
+          "input"
+        ],
         "title": "Body_getComputedValues"
       },
       "Body_runPlugin": {
@@ -3238,7 +3419,10 @@
           }
         },
         "type": "object",
-        "required": ["input_ocels", "input_resources"],
+        "required": [
+          "input_ocels",
+          "input_resources"
+        ],
         "title": "Body_runPlugin"
       },
       "Body_upload": {
@@ -3253,7 +3437,9 @@
           }
         },
         "type": "object",
-        "required": ["files"],
+        "required": [
+          "files"
+        ],
         "title": "Body_upload"
       },
       "Body_uploadPlugin": {
@@ -3265,7 +3451,9 @@
           }
         },
         "type": "object",
-        "required": ["file"],
+        "required": [
+          "file"
+        ],
         "title": "Body_uploadPlugin"
       },
       "Body_uploadResource": {
@@ -3277,7 +3465,9 @@
           }
         },
         "type": "object",
-        "required": ["file"],
+        "required": [
+          "file"
+        ],
         "title": "Body_uploadResource"
       },
       "Date_Distribution_Item": {
@@ -3299,7 +3489,11 @@
           }
         },
         "type": "object",
-        "required": ["start_timestamp", "end_timestamp", "entity_count"],
+        "required": [
+          "start_timestamp",
+          "end_timestamp",
+          "entity_count"
+        ],
         "title": "Date_Distribution_Item"
       },
       "DefaultOCEL": {
@@ -3343,7 +3537,12 @@
           }
         },
         "type": "object",
-        "required": ["key", "name", "version", "file"],
+        "required": [
+          "key",
+          "name",
+          "version",
+          "file"
+        ],
         "title": "DefaultOCEL",
         "description": "Definition of a default OCEL on the server, for quick access. Supports pre-loading the OCEL on backend init."
       },
@@ -3395,11 +3594,17 @@
         "properties": {
           "variant": {
             "type": "string",
-            "enum": ["im", "imd"],
+            "enum": [
+              "im",
+              "imd"
+            ],
             "title": "Mining Variant",
             "description": "Choose the inductive mining variant used for discovery.",
             "default": "im",
-            "enumNames": ["IM (traditional)", "IMd (directly-follows)"]
+            "enumNames": [
+              "IM (traditional)",
+              "IMd (directly-follows)"
+            ]
           },
           "excludedEventTypes": {
             "items": {
@@ -3447,7 +3652,10 @@
         "properties": {
           "resourceType": {
             "type": "string",
-            "enum": ["PetriNet", "DirectlyFollowsGraph"],
+            "enum": [
+              "PetriNet",
+              "DirectlyFollowsGraph"
+            ],
             "title": "Resourcetype"
           },
           "label": {
@@ -3472,7 +3680,11 @@
           }
         },
         "type": "object",
-        "required": ["resourceType", "label", "inputSchema"],
+        "required": [
+          "resourceType",
+          "label",
+          "inputSchema"
+        ],
         "title": "DiscoveryMethodMeta"
       },
       "DiscoveryOutput": {
@@ -3503,7 +3715,10 @@
           },
           "resource_type": {
             "type": "string",
-            "enum": ["PetriNet", "DirectlyFollowsGraph"],
+            "enum": [
+              "PetriNet",
+              "DirectlyFollowsGraph"
+            ],
             "title": "Resource Type"
           },
           "output": {
@@ -3511,7 +3726,13 @@
           }
         },
         "type": "object",
-        "required": ["id", "state", "ocel_id", "resource_type", "output"],
+        "required": [
+          "id",
+          "state",
+          "ocel_id",
+          "resource_type",
+          "output"
+        ],
         "title": "DiscoveryTaskSummary"
       },
       "DotVis": {
@@ -3545,8 +3766,11 @@
           }
         },
         "type": "object",
-        "required": ["dot_str"],
-        "title": "DotVis"
+        "required": [
+          "dot_str"
+        ],
+        "title": "DotVis",
+        "description": "Graphviz DOT visualization.\n\nThis visualization stores a raw DOT source string plus the selected layout engine.\nIt is useful when you already have DOT output (for example from `graphviz.Digraph`)\nand want to render it directly.\n\nAttributes:\n    type: Fixed discriminator `\"dot\"`.\n    dot_str: The DOT source string.\n    layout_engine: Graphviz layout engine used for layouting."
       },
       "E2OCountFilter": {
         "properties": {
@@ -3562,7 +3786,10 @@
             "anyOf": [
               {
                 "type": "string",
-                "enum": ["include", "exclude"]
+                "enum": [
+                  "include",
+                  "exclude"
+                ]
               },
               {
                 "type": "null"
@@ -3612,13 +3839,20 @@
           },
           "direction": {
             "type": "string",
-            "enum": ["source", "target"],
+            "enum": [
+              "source",
+              "target"
+            ],
             "title": "Direction",
             "default": "source"
           }
         },
         "type": "object",
-        "required": ["source", "target", "range"],
+        "required": [
+          "source",
+          "target",
+          "range"
+        ],
         "title": "E2OCountFilter"
       },
       "Entity_Time_Info": {
@@ -3640,7 +3874,11 @@
           }
         },
         "type": "object",
-        "required": ["start_time", "end_time", "date_distribution"],
+        "required": [
+          "start_time",
+          "end_time",
+          "date_distribution"
+        ],
         "title": "Entity_Time_Info"
       },
       "EventAttributeFilter": {
@@ -3766,7 +4004,10 @@
           }
         },
         "type": "object",
-        "required": ["target_type", "attribute"],
+        "required": [
+          "target_type",
+          "attribute"
+        ],
         "title": "EventAttributeFilter"
       },
       "EventTypeFilter": {
@@ -3780,13 +4021,18 @@
           },
           "mode": {
             "type": "string",
-            "enum": ["exclude", "include"],
+            "enum": [
+              "exclude",
+              "include"
+            ],
             "title": "Mode",
             "default": "include"
           }
         },
         "type": "object",
-        "required": ["event_types"],
+        "required": [
+          "event_types"
+        ],
         "title": "EventTypeFilter"
       },
       "GetResourceResponse": {
@@ -3833,7 +4079,10 @@
           }
         },
         "type": "object",
-        "required": ["resource", "visualization"],
+        "required": [
+          "resource",
+          "visualization"
+        ],
         "title": "GetResourceResponse"
       },
       "Graph": {
@@ -3863,12 +4112,13 @@
           "layout_config": {
             "$ref": "#/components/schemas/LayoutConfig",
             "default": {
-              "direction": "TB"
+              "direction": "DOWN"
             }
           }
         },
         "type": "object",
-        "title": "Graph"
+        "title": "Graph",
+        "description": "Graph visualization composed of nodes and directed edges.\n\nThis visualization is meant for model-like structures (for example Petri nets\nor directly-follows graphs). Layout is performed by the frontend renderer (ELK).\n\nAttributes:\n    type: Fixed discriminator `\"graph\"`.\n    nodes: List of nodes.\n    edges: List of edges.\n    layout_config: Layout hints (direction, spacing) consumed by the renderer."
       },
       "GraphEdge": {
         "properties": {
@@ -4015,8 +4265,12 @@
           }
         },
         "type": "object",
-        "required": ["source", "target"],
-        "title": "GraphEdge"
+        "required": [
+          "source",
+          "target"
+        ],
+        "title": "GraphEdge",
+        "description": "A directed edge in a `Graph` visualization.\n\nAn edge connects `source` -> `target` and can carry labels and arrowhead styles.\n\nAttributes:\n    id: Unique edge id. Defaults to a generated UUID string.\n    source: Source node id.\n    target: Target node id.\n    color: Optional edge color.\n    label: Optional label shown along the edge.\n    start_arrow: Optional arrowhead style at the start of the edge.\n    end_arrow: Optional arrowhead style at the end of the edge.\n    start_label: Optional label shown near the source.\n    end_label: Optional label shown near the target.\n    layout_attrs: Additional Graphviz attributes for this edge.\n    annotation: Optional attached visualization."
       },
       "GraphNode": {
         "properties": {
@@ -4047,7 +4301,15 @@
           },
           "shape": {
             "type": "string",
-            "enum": ["circle", "triangle", "rectangle", "diamond", "hexagon", "start", "end"],
+            "enum": [
+              "circle",
+              "triangle",
+              "rectangle",
+              "diamond",
+              "hexagon",
+              "start",
+              "end"
+            ],
             "title": "Shape"
           },
           "width": {
@@ -4118,7 +4380,11 @@
           },
           "label_pos": {
             "type": "string",
-            "enum": ["top", "center", "bottom"],
+            "enum": [
+              "top",
+              "center",
+              "bottom"
+            ],
             "title": "Label Pos",
             "default": "center"
           },
@@ -4126,7 +4392,10 @@
             "anyOf": [
               {
                 "type": "string",
-                "enum": ["source", "sink"]
+                "enum": [
+                  "source",
+                  "sink"
+                ]
               },
               {
                 "type": "integer"
@@ -4166,8 +4435,11 @@
           }
         },
         "type": "object",
-        "required": ["shape"],
-        "title": "GraphNode"
+        "required": [
+          "shape"
+        ],
+        "title": "GraphNode",
+        "description": "A node in a `Graph` visualization.\n\nA node defines its identity and visual appearance (shape, label, colors, size).\nLayout coordinates (`x`, `y`) are typically filled by the layouting step, not\nby the resource author.\n\nAttributes:\n    id: Unique node id. Defaults to a generated UUID string.\n    label: Optional label shown near the node.\n    shape: Node shape identifier.\n    width: Optional node width.\n    height: Optional node height.\n    color: Optional fill color (for example hex).\n    x: Optional x-coordinate after layouting.\n    y: Optional y-coordinate after layouting.\n    border_color: Optional border/stroke color.\n    label_pos: Label position relative to the node.\n    rank: Optional layout constraint (source/sink or numeric rank).\n    layout_attrs: Additional Graphviz attributes for this node.\n    annotation: Optional attached visualization."
       },
       "HTTPValidationError": {
         "properties": {
@@ -4186,13 +4458,99 @@
         "properties": {
           "direction": {
             "type": "string",
-            "enum": ["LR", "TB", "RL", "BT"],
+            "enum": [
+              "RIGHT",
+              "LEFT",
+              "UP",
+              "DOWN"
+            ],
             "title": "Direction",
-            "default": "TB"
+            "default": "DOWN"
+          },
+          "algorithm": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "layered",
+                  "force",
+                  "stress",
+                  "mrtree",
+                  "radial",
+                  "box",
+                  "fixed"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Algorithm"
+          },
+          "edge_routing": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "ORTHOGONAL",
+                  "POLYLINE",
+                  "SPLINES"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Edge Routing"
+          },
+          "node_spacing": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Node Spacing"
+          },
+          "layer_spacing": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Layer Spacing"
+          },
+          "edge_edge_spacing": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Edge Edge Spacing"
+          },
+          "edge_node_spacing": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Edge Node Spacing"
           }
         },
         "type": "object",
-        "title": "LayoutConfig"
+        "title": "LayoutConfig",
+        "description": "ELK-based layout configuration for a `Graph` visualization.\n\nAll fields are optional; omitted fields fall back to the renderer's defaults.\n\nAttributes:\n    direction: Primary layout direction (ELK direction names).\n    algorithm: ELK layout algorithm.\n    edge_routing: Edge routing style.\n    node_spacing: Pixel spacing between nodes in the same layer.\n    layer_spacing: Pixel spacing between layers.\n    edge_edge_spacing: Pixel spacing between parallel edges.\n    edge_node_spacing: Pixel spacing between edges and nodes."
       },
       "O2OCountFilter": {
         "properties": {
@@ -4208,7 +4566,10 @@
             "anyOf": [
               {
                 "type": "string",
-                "enum": ["include", "exclude"]
+                "enum": [
+                  "include",
+                  "exclude"
+                ]
               },
               {
                 "type": "null"
@@ -4258,13 +4619,20 @@
           },
           "direction": {
             "type": "string",
-            "enum": ["source", "target"],
+            "enum": [
+              "source",
+              "target"
+            ],
             "title": "Direction",
             "default": "source"
           }
         },
         "type": "object",
-        "required": ["source", "target", "range"],
+        "required": [
+          "source",
+          "target",
+          "range"
+        ],
         "title": "O2OCountFilter"
       },
       "OCELAnnotation": {
@@ -4297,8 +4665,11 @@
           }
         },
         "type": "object",
-        "required": ["label"],
-        "title": "OCELAnnotation"
+        "required": [
+          "label"
+        ],
+        "title": "OCELAnnotation",
+        "description": "UI annotation metadata for an `OCEL`-typed parameter or result.\n\nIn addition to the base `Annotation` fields, this annotation may specify an\nOCEL extension. To keep the annotation JSON-serializable and stable for\nfrontend consumption, the constructor accepts an `OCELExtension` class and\ncoerces it to its class name (a string).\n\nAttributes:\n    label: Human-readable label to display in the UI.\n    description: Optional longer text shown in the UI to explain the OCEL.\n    extension: Optional extension identifier. If constructed with an\n        `OCELExtension` class, it is coerced to that class' name."
       },
       "OCELExtensionDescription": {
         "properties": {
@@ -4316,7 +4687,11 @@
           }
         },
         "type": "object",
-        "required": ["name", "label", "description"],
+        "required": [
+          "name",
+          "label",
+          "description"
+        ],
         "title": "OCELExtensionDescription"
       },
       "OCELFilter": {
@@ -4386,7 +4761,10 @@
           }
         },
         "type": "object",
-        "required": ["is_list", "annotation"],
+        "required": [
+          "is_list",
+          "annotation"
+        ],
         "title": "OCELResult"
       },
       "ObjectAttributeFilter": {
@@ -4512,7 +4890,10 @@
           }
         },
         "type": "object",
-        "required": ["target_type", "attribute"],
+        "required": [
+          "target_type",
+          "attribute"
+        ],
         "title": "ObjectAttributeFilter"
       },
       "ObjectTypeFilter": {
@@ -4526,13 +4907,18 @@
           },
           "mode": {
             "type": "string",
-            "enum": ["exclude", "include"],
+            "enum": [
+              "exclude",
+              "include"
+            ],
             "title": "Mode",
             "default": "include"
           }
         },
         "type": "object",
-        "required": ["object_types"],
+        "required": [
+          "object_types"
+        ],
         "title": "ObjectTypeFilter"
       },
       "OcelEntity": {
@@ -4570,7 +4956,11 @@
           }
         },
         "type": "object",
-        "required": ["id", "attributes", "relations"],
+        "required": [
+          "id",
+          "attributes",
+          "relations"
+        ],
         "title": "OcelEntity"
       },
       "OcelMetadata": {
@@ -4596,7 +4986,12 @@
           }
         },
         "type": "object",
-        "required": ["id", "name", "created_at", "extensions"],
+        "required": [
+          "id",
+          "name",
+          "created_at",
+          "extensions"
+        ],
         "title": "OcelMetadata"
       },
       "PaginatedResponse": {
@@ -4626,7 +5021,13 @@
           }
         },
         "type": "object",
-        "required": ["page", "page_size", "total_pages", "total_items", "items"],
+        "required": [
+          "page",
+          "page_size",
+          "total_pages",
+          "total_items",
+          "items"
+        ],
         "title": "PaginatedResponse"
       },
       "PaginatedResponse_list_str__": {
@@ -4657,7 +5058,13 @@
           }
         },
         "type": "object",
-        "required": ["response", "page", "page_size", "total_items", "total_pages"],
+        "required": [
+          "response",
+          "page",
+          "page_size",
+          "total_items",
+          "total_pages"
+        ],
         "title": "PaginatedResponse[list[str]]"
       },
       "Plotly": {
@@ -4676,8 +5083,11 @@
           }
         },
         "type": "object",
-        "required": ["data"],
-        "title": "Plotly"
+        "required": [
+          "data"
+        ],
+        "title": "Plotly",
+        "description": "Plotly visualization.\n\nThis visualization wraps a Plotly `Figure`. The figure is stored internally as a\nprivate attribute and is exposed through the `figure` property.\n\nThe JSON-serializable representation is provided by the computed `data` field,\nwhich serializes the figure to Plotly JSON.\n\nAttributes:\n    type: Fixed discriminator `\"plotly\"`.\n    figure: Wrapped Plotly figure (available as a property).\n\nNotes:\n    The figure is stored in a Pydantic private attribute (`_figure`).\n    The `data` field is computed from `figure` using Plotly JSON serialization."
       },
       "PluginApi": {
         "properties": {
@@ -4697,7 +5107,11 @@
           }
         },
         "type": "object",
-        "required": ["id", "meta", "methods"],
+        "required": [
+          "id",
+          "meta",
+          "methods"
+        ],
         "title": "PluginApi"
       },
       "PluginMeta": {
@@ -4727,7 +5141,12 @@
           }
         },
         "type": "object",
-        "required": ["name", "version", "label", "description"],
+        "required": [
+          "name",
+          "version",
+          "label",
+          "description"
+        ],
         "title": "PluginMeta"
       },
       "PluginMethod": {
@@ -4818,7 +5237,10 @@
           }
         },
         "type": "object",
-        "required": ["name", "input_schema"],
+        "required": [
+          "name",
+          "input_schema"
+        ],
         "title": "PluginMethod"
       },
       "PluginOutput": {
@@ -4863,7 +5285,12 @@
           }
         },
         "type": "object",
-        "required": ["task_id", "plugin_name", "method_name", "version"],
+        "required": [
+          "task_id",
+          "plugin_name",
+          "method_name",
+          "version"
+        ],
         "title": "PluginSource"
       },
       "PluginTaskSummary": {
@@ -4888,7 +5315,13 @@
           }
         },
         "type": "object",
-        "required": ["id", "state", "plugin_id", "method_name", "output"],
+        "required": [
+          "id",
+          "state",
+          "plugin_id",
+          "method_name",
+          "output"
+        ],
         "title": "PluginTaskSummary"
       },
       "QuantityInfo": {
@@ -4961,7 +5394,14 @@
           }
         },
         "type": "object",
-        "required": ["qualifier", "source", "target", "min_count", "max_count", "sum"],
+        "required": [
+          "qualifier",
+          "source",
+          "target",
+          "min_count",
+          "max_count",
+          "sum"
+        ],
         "title": "RelationCountSummary"
       },
       "Resource": {
@@ -4973,7 +5413,9 @@
           }
         },
         "type": "object",
-        "required": ["_ocelescope_resource_type"],
+        "required": [
+          "_ocelescope_resource_type"
+        ],
         "title": "Resource",
         "description": "Abstract base class for resources.\n\nAttributes:\n    label: Optional human-readable label for this resource class.\n    description: Optional human-readable description for this resource class."
       },
@@ -4996,8 +5438,11 @@
           }
         },
         "type": "object",
-        "required": ["label"],
-        "title": "ResourceAnnotation"
+        "required": [
+          "label"
+        ],
+        "title": "ResourceAnnotation",
+        "description": "UI annotation metadata for a `Resource`-typed parameter or result.\n\nThis annotation is used to provide frontend-facing text (label/description)\nfor resources.\n\nAttributes:\n    label: Human-readable label to display in the UI.\n    description: Optional longer text shown in the UI to explain the resource."
       },
       "ResourceApi": {
         "properties": {
@@ -5029,7 +5474,12 @@
           }
         },
         "type": "object",
-        "required": ["type", "name", "source", "id"],
+        "required": [
+          "type",
+          "name",
+          "source",
+          "id"
+        ],
         "title": "ResourceApi"
       },
       "ResourceInfo": {
@@ -5051,7 +5501,10 @@
           }
         },
         "type": "object",
-        "required": ["label", "description"],
+        "required": [
+          "label",
+          "description"
+        ],
         "title": "ResourceInfo"
       },
       "ResourceResult": {
@@ -5082,7 +5535,11 @@
           }
         },
         "type": "object",
-        "required": ["resource_type", "is_list", "annotation"],
+        "required": [
+          "resource_type",
+          "is_list",
+          "annotation"
+        ],
         "title": "ResourceResult"
       },
       "SVGVis": {
@@ -5099,8 +5556,11 @@
           }
         },
         "type": "object",
-        "required": ["svg"],
-        "title": "SVGVis"
+        "required": [
+          "svg"
+        ],
+        "title": "SVGVis",
+        "description": "SVG visualization.\n\nUse this visualization when you want full control over the rendered output\nby providing raw SVG markup.\n\nAttributes:\n    type: Fixed discriminator `\"svg\"`.\n    svg: SVG markup as a string."
       },
       "SystemTaskSummary": {
         "properties": {
@@ -5122,7 +5582,12 @@
           }
         },
         "type": "object",
-        "required": ["id", "state", "name", "metadata"],
+        "required": [
+          "id",
+          "state",
+          "name",
+          "metadata"
+        ],
         "title": "SystemTaskSummary"
       },
       "Table": {
@@ -5150,8 +5615,12 @@
           }
         },
         "type": "object",
-        "required": ["columns", "rows"],
-        "title": "Table"
+        "required": [
+          "columns",
+          "rows"
+        ],
+        "title": "Table",
+        "description": "Tabular visualization with typed columns and row data.\n\nRows are dictionaries keyed by `TableColumn.id`.\n\nAttributes:\n    type: Fixed discriminator `\"table\"`.\n    columns: Column definitions.\n    rows: List of row dicts."
       },
       "TableColumn": {
         "properties": {
@@ -5172,7 +5641,13 @@
           },
           "data_type": {
             "type": "string",
-            "enum": ["string", "number", "boolean", "date", "datetime"],
+            "enum": [
+              "string",
+              "number",
+              "boolean",
+              "date",
+              "datetime"
+            ],
             "title": "Data Type",
             "default": "string"
           },
@@ -5188,12 +5663,22 @@
           }
         },
         "type": "object",
-        "required": ["id"],
-        "title": "TableColumn"
+        "required": [
+          "id"
+        ],
+        "title": "TableColumn",
+        "description": "Column definition for a `Table` visualization.\n\nAttributes:\n    id: Column id (used as key in each row dict).\n    label: Optional human-readable column label.\n    data_type: Column data type (for example `\"string\"` or `\"number\"`).\n    sortable: Whether the column can be sorted in the frontend.\n    visible: Whether the column is visible by default."
       },
       "TaskState": {
         "type": "string",
-        "enum": ["PENDING", "STARTED", "SUCCESS", "FAILURE", "SKIPPED", "CANCELLED"],
+        "enum": [
+          "PENDING",
+          "STARTED",
+          "SUCCESS",
+          "FAILURE",
+          "SKIPPED",
+          "CANCELLED"
+        ],
         "title": "TaskState"
       },
       "TimeFrameFilter": {
@@ -5228,13 +5713,18 @@
           },
           "mode": {
             "type": "string",
-            "enum": ["exclude", "include"],
+            "enum": [
+              "exclude",
+              "include"
+            ],
             "title": "Mode",
             "default": "include"
           }
         },
         "type": "object",
-        "required": ["time_range"],
+        "required": [
+          "time_range"
+        ],
         "title": "TimeFrameFilter"
       },
       "TypedAttribute": {
@@ -5332,12 +5822,23 @@
           }
         },
         "type": "object",
-        "required": ["loc", "msg", "type"],
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
         "title": "ValidationError"
       },
       "ValueType": {
         "type": "string",
-        "enum": ["empty", "string", "bool", "int", "float", "date"],
+        "enum": [
+          "empty",
+          "string",
+          "bool",
+          "int",
+          "float",
+          "date"
+        ],
         "title": "ValueType"
       },
       "Visualization": {
@@ -5348,8 +5849,11 @@
           }
         },
         "type": "object",
-        "required": ["type"],
-        "title": "Visualization"
+        "required": [
+          "type"
+        ],
+        "title": "Visualization",
+        "description": "Base class for all frontend visualizations.\n\nA visualization is a JSON-serializable object that a `Resource.visualize()` method\ncan return so the frontend can render the resource.\n\nEvery visualization has a `type` discriminator. Concrete subclasses set `type`\nto a fixed literal value (for example `\"table\"` or `\"plotly\"`).\n\nAttributes:\n    type: Discriminator used by the frontend to select the renderer."
       }
     }
   }
