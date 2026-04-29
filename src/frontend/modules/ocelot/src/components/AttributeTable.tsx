@@ -1,25 +1,24 @@
+import { Group, Radio, ThemeIcon, Tooltip } from "@mantine/core";
 import {
+  type AggregatedAttribute,
+  type TypedAttribute,
   useAggregatedAttributes,
   useEventAttributes,
   useObjectAttributes,
-  type AggregatedAttribute,
-  type TypedAttribute,
 } from "@ocelescope/api-base";
-import {
-  DataTable,
-  type DataTableColumn,
-  type DataTableRowClickHandler,
-} from "mantine-datatable";
-import { formatAttributeValue } from "../util/attributes";
-import { useCallback, useMemo, useState } from "react";
 import {
   BoxIcon,
   Calendar1Icon,
   ChevronDown,
   ChevronRight,
 } from "lucide-react";
-
-import { Group, Radio, ThemeIcon, Tooltip } from "@mantine/core";
+import {
+  DataTable,
+  type DataTableColumn,
+  type DataTableRowClickHandler,
+} from "mantine-datatable";
+import { useCallback, useMemo, useState } from "react";
+import { formatAttributeValue } from "../util/attributes";
 
 const entityMap = {
   activity: Calendar1Icon,

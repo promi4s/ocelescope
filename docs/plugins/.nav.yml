@@ -2,6 +2,7 @@ title: "Plugin Development"
 collapse: true
 nav:
   - index.md
+  - structure.md
   - plugin_class.md
   - resource.md
   - extension.md

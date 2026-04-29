@@ -1972,10 +1972,11 @@
           {
             "name": "ext",
             "in": "query",
-            "required": true,
+            "required": false,
             "schema": {
               "enum": [".xml", ".json", ".sqlite"],
               "type": "string",
+              "default": ".json",
               "title": "Ext"
             }
           },

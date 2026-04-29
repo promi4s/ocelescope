@@ -89,6 +89,8 @@ class Session:
     def add_ocel(self, ocel: OCEL) -> str:
         self.ocels[ocel.meta.id] = SessionOCEL(ocel)
 
+        sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
+
         return ocel.meta.id
 
     def get_ocel(self, ocel_id: str, use_original: bool = False) -> OCEL:

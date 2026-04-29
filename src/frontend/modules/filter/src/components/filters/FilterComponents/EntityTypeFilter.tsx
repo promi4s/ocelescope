@@ -13,32 +13,30 @@ const EntityTypeFilterInput: React.FC<{
 }> = ({ entityTypes, onChange, showGraph = false, selectedEntityTypes }) => {
   return (
     <Stack pos={"relative"}>
-      <>
-        {showGraph && (
-          <BarChartSelect
-            selected={selectedEntityTypes}
-            values={entityTypes ?? []}
-            onSelect={(selectedValue) => {
-              onChange(
-                selectedEntityTypes.includes(selectedValue)
-                  ? selectedEntityTypes.filter((v) => v !== selectedValue)
-                  : [...selectedEntityTypes, selectedValue],
-              );
-            }}
-          />
-        )}
-
-        <MultiSelect
-          label="Event Types"
-          data={entityTypes.map(({ key }) => key)}
-          value={selectedEntityTypes}
-          searchable
-          hidePickedOptions
-          nothingFoundMessage={"No event type found"}
-          onChange={(newValues) => onChange(newValues)}
-          clearable
+      {showGraph && (
+        <BarChartSelect
+          selected={selectedEntityTypes}
+          values={entityTypes ?? []}
+          onSelect={(selectedValue) => {
+            onChange(
+              selectedEntityTypes.includes(selectedValue)
+                ? selectedEntityTypes.filter((v) => v !== selectedValue)
+                : [...selectedEntityTypes, selectedValue],
+            );
+          }}
         />
-      </>
+      )}
+
+      <MultiSelect
+        label="Event Types"
+        data={entityTypes.map(({ key }) => key)}
+        value={selectedEntityTypes}
+        searchable
+        hidePickedOptions
+        nothingFoundMessage={"No event type found"}
+        onChange={(newValues) => onChange(newValues)}
+        clearable
+      />
     </Stack>
   );
 };

@@ -32,60 +32,58 @@ const SingleLineTabs: React.FC<{
   );
 
   return (
-    <>
-      <Flex align="center" justify="center">
-        <Button
-          variant="subtle"
-          onClick={() => {
-            onChangeCurrentTab(tabs[Math.max(0, currentTabIndex - 1)]!.value);
+    <Flex align="center" justify="center">
+      <Button
+        variant="subtle"
+        onClick={() => {
+          onChangeCurrentTab(tabs[Math.max(0, currentTabIndex - 1)]!.value);
+        }}
+        disabled={currentTabIndex === 0}
+      >
+        <ChevronLeftIcon />
+      </Button>
+      <ScrollArea w={"100%"} scrollbars={false} viewportRef={scrollableRef}>
+        <Tabs
+          variant="default"
+          value={currentTab}
+          onChange={(newTab) => {
+            if (newTab) {
+              onChangeCurrentTab(newTab);
+            }
           }}
-          disabled={currentTabIndex === 0}
         >
-          <ChevronLeftIcon />
-        </Button>
-        <ScrollArea w={"100%"} scrollbars={false} viewportRef={scrollableRef}>
-          <Tabs
-            variant="default"
-            value={currentTab}
-            onChange={(newTab) => {
-              if (newTab) {
-                onChangeCurrentTab(newTab);
-              }
+          <Tabs.List
+            style={{
+              flexWrap: "unset",
+              minWidth: "max-content", // Ensures it grows with content
             }}
+            grow
+            justify="space-between"
           >
-            <Tabs.List
-              style={{
-                flexWrap: "unset",
-                minWidth: "max-content", // Ensures it grows with content
-              }}
-              grow
-              justify="space-between"
-            >
-              {tabs.map((tab) => (
-                <Tabs.Tab
-                  key={tab.value}
-                  value={tab.value}
-                  ref={currentTab === tab.value ? targetRef : undefined}
-                >
-                  {tab.label}
-                </Tabs.Tab>
-              ))}
-            </Tabs.List>
-          </Tabs>
-        </ScrollArea>
-        <Button
-          variant="subtle"
-          onClick={() => {
-            onChangeCurrentTab(
-              tabs[Math.min(tabs.length - 1, currentTabIndex + 1)]!.value,
-            );
-          }}
-          disabled={currentTabIndex === tabs.length - 1}
-        >
-          <ChevronRightIcon />
-        </Button>
-      </Flex>
-    </>
+            {tabs.map((tab) => (
+              <Tabs.Tab
+                key={tab.value}
+                value={tab.value}
+                ref={currentTab === tab.value ? targetRef : undefined}
+              >
+                {tab.label}
+              </Tabs.Tab>
+            ))}
+          </Tabs.List>
+        </Tabs>
+      </ScrollArea>
+      <Button
+        variant="subtle"
+        onClick={() => {
+          onChangeCurrentTab(
+            tabs[Math.min(tabs.length - 1, currentTabIndex + 1)]!.value,
+          );
+        }}
+        disabled={currentTabIndex === tabs.length - 1}
+      >
+        <ChevronRightIcon />
+      </Button>
+    </Flex>
   );
 };
 
