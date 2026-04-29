@@ -53,12 +53,12 @@
   },
   "devDependencies": {
     "@faker-js/faker": "catalog:",
-    "@storybook/react-vite": "^10.3.5",
+    "@storybook/react-vite": "catalog:",
     "@types/css-modules": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "storybook": "^10.3.5",
+    "storybook": "catalog:",
     "tsdown": "catalog:",
     "typescript": "catalog:"
   }
