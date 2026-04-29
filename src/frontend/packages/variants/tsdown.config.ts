@@ -2,7 +2,12 @@ import { defineConfig } from "tsdown";
 
 export default defineConfig({
   platform: "neutral",
-  dts: true,
-  exports: true,
-  // ...config options
+  entry: ["src/index.ts", "src/styles.css"],
+  css: {
+    modules: {
+      scopeBehaviour: "local",
+      generateScopedName: "[hash]_[local]",
+      localsConvention: "camelCase",
+    },
+  },
 });
