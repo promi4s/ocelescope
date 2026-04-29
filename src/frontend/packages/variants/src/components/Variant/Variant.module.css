@@ -6,6 +6,9 @@
 }
 
 .item {
+  --base: var(--c, #3498db);
+  --bg: var(--base);
+
   float: left;
   width: 50px;
   height: 40px;
@@ -13,9 +16,10 @@
   text-align: center;
 
   color: #fff;
-  background: var(--c, #3498db);
+  background: var(--bg);
   position: relative;
   margin-right: 23px;
+  padding-right: 5px;
   cursor: default;
 }
 
@@ -38,14 +42,14 @@
 
 .item::before {
   left: -20px;
-  border-color: var(--c, #3498db);
+  border-color: var(--bg);
   border-left-color: transparent;
 }
 
 .item::after {
   left: 100%;
   border-color: transparent;
-  border-left-color: var(--c, #3498db);
+  border-left-color: var(--bg);
 }
 
 .item:first-child {
@@ -64,4 +68,9 @@
 
 .item:last-child::after {
   border: none;
+}
+
+.item:hover {
+  --bg: color-mix(in srgb, var(--base) 85%, black);
+  width: unset;
 }
