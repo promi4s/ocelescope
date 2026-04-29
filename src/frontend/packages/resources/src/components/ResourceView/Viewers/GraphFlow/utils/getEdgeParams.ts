@@ -1,5 +1,5 @@
 import { type InternalNode, Position } from "@xyflow/react";
-import { PLACE_NODE_DIAMETER } from "../nodes/PlaceNode";
+import { PLACE_NODE_DIAMETER } from "../constants/graphFlow";
 
 /** Center of a node in absolute coordinates. */
 const center = (node: InternalNode) => {

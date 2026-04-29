@@ -1,6 +1,8 @@
 import { Text } from "@mantine/core";
-import { Handle, type Node, type NodeProps, Position } from "@xyflow/react";
+import { type Node, type NodeProps } from "@xyflow/react";
 import { memo } from "react";
+import { HiddenHandles } from "../components/HiddenHandles";
+import { DEFAULT_COLORS, TRANSITION_HEIGHT } from "../constants/graphFlow";
 
 export type TransitionNodeData = {
   label?: string | null;
@@ -10,12 +12,11 @@ export type TransitionNodeData = {
 
 export type TransitionNodeType = Node<TransitionNodeData, "transition">;
 
-/** Silent transition: a thin dark vertical bar, classic Petri net notation. */
 const SilentTransition = () => (
   <div
     style={{
       width: 10,
-      height: 34,
+      height: TRANSITION_HEIGHT,
       backgroundColor: "#222",
       borderRadius: 2,
       boxShadow: "0 1px 4px rgba(0,0,0,0.35)",
@@ -23,7 +24,6 @@ const SilentTransition = () => (
   />
 );
 
-/** Labeled transition: a Mantine-styled activity box that sizes to its label. */
 const LabeledTransition = ({
   label,
   borderColor,
@@ -37,10 +37,10 @@ const LabeledTransition = ({
       minWidth: 90,
       maxWidth: 200,
       width: "max-content",
-      height: 34,
+      height: TRANSITION_HEIGHT,
       padding: "0 12px",
-      backgroundColor: "#ffffff",
-      border: `1.5px solid ${borderColor ?? "#333"}`,
+      backgroundColor: DEFAULT_COLORS.transition,
+      border: `1.5px solid ${borderColor ?? DEFAULT_COLORS.transitionBorder}`,
       borderRadius: 5,
       boxShadow: "0 2px 6px rgba(0,0,0,0.10), 0 0 0 0.5px rgba(0,0,0,0.06)",
       display: "flex",
@@ -66,31 +66,16 @@ const LabeledTransition = ({
   </div>
 );
 
-const TransitionNode = memo(({ data }: NodeProps<TransitionNodeType>) => {
-  const { label, borderColor } = data;
-
-  return (
-    <>
-      <Handle
-        type="target"
-        position={Position.Left}
-        style={{ opacity: 0, pointerEvents: "none" }}
-      />
-
-      {label ? (
-        <LabeledTransition label={label} borderColor={borderColor} />
-      ) : (
-        <SilentTransition />
-      )}
-
-      <Handle
-        type="source"
-        position={Position.Right}
-        style={{ opacity: 0, pointerEvents: "none" }}
-      />
-    </>
-  );
-});
+const TransitionNode = memo(({ data }: NodeProps<TransitionNodeType>) => (
+  <>
+    <HiddenHandles />
+    {data.label ? (
+      <LabeledTransition label={data.label} borderColor={data.borderColor} />
+    ) : (
+      <SilentTransition />
+    )}
+  </>
+));
 
 TransitionNode.displayName = "TransitionNode";
 
