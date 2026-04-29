@@ -20,9 +20,10 @@ from ocelescope.ocel.managers import (
     QuantityManager,
 )
 from ocelescope.ocel.managers.attributes import AttributeManager
+from ocelescope.ocel.managers.executions import ExecutionsManager
 from ocelescope.ocel.managers.quantities.util.io import read_quantity_extension
-from ocelescope.ocel.util.io import pretty_print_json, pretty_print_xml
 from ocelescope.ocel.models.meta import OCELMeta
+from ocelescope.ocel.util.io import pretty_print_json, pretty_print_xml
 
 
 class OCEL:
@@ -73,6 +74,7 @@ class OCEL:
         self.e2o = E2OManager(self)
         self.o2o = O2OManager(self)
         self.attributes = AttributeManager(self)
+        self.executions = ExecutionsManager(self)
 
     def filter(self, pipeline: list[BaseFilter]) -> OCEL:
         """
