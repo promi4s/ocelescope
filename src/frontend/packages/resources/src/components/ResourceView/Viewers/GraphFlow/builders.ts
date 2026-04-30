@@ -7,8 +7,8 @@ import type { GraphFlowEdgeType } from "./edges/GraphFlowEdge";
 export const buildGraphFlowNodes = (
   visualization: VisualizationByType<"graph">,
 ): GraphFlowNodeType[] =>
-  (visualization.nodes ?? []).map((node) => {
-    const id = node.id ?? "";
+  (visualization.nodes ?? []).map((node, index) => {
+    const id = node.id ?? `node-${index}`;
     const label = node.label ?? null;
     const color = node.color ?? DEFAULT_COLORS.place;
 

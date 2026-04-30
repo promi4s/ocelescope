@@ -184,8 +184,6 @@ class DirectlyFollowsGraph(Resource):
                     "elk.layered.spacing.nodeNodeBetweenLayers": "80",
                     "elk.spacing.edgeEdge": "40",
                     "elk.spacing.edgeNode": "25",
-                    "elk.layered.crossingMinimization.strategy": "LAYER_SWEEP",
-                    "elk.edgeLabels.placement": "CENTER",
                 }
             ),
         )

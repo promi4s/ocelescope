@@ -175,15 +175,13 @@ class PetriNet(Resource):
             edges=edges,
             layout_config=LayoutConfig(
                 elk_options={
-                    "elk.direction": "RIGHT",
                     "elk.algorithm": "layered",
-                    "elk.edgeRouting": "ORTHOGONAL",
-                    "elk.spacing.nodeNode": "50",
-                    "elk.layered.spacing.nodeNodeBetweenLayers": "80",
-                    "elk.spacing.edgeEdge": "40",
-                    "elk.spacing.edgeNode": "25",
-                    "elk.layered.crossingMinimization.strategy": "LAYER_SWEEP",
-                    "elk.edgeLabels.placement": "CENTER",
+                    "elk.direction": "RIGHT",
+                    "elk.edgeRouting": "SPLINES",
+                    "elk.spacing.nodeNode": "25",
+                    "elk.layered.spacing.nodeNodeBetweenLayers": "50",
+                    "elk.layered.nodePlacement.strategy": "BRANDES_KOEPF",
+                    "elk.layered.layering.strategy": "NETWORK_SIMPLEX",
                 }
             ),
         )

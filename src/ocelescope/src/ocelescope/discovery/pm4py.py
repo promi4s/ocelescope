@@ -62,28 +62,22 @@ def discover_ocdfg(
                     object_type=object_type,
                     source=source,
                     target=target,
-                    annotation=[str(len(events))],
+                    annotation=str(len(events)),
                 )
                 for (source, target), events in raw_edges.items()
             ]
         )
 
     start_activity_edges = [
-        DFGEdge(
-            object_type=object_type,
-            target=activity,
-        )
+        DFGEdge(object_type=object_type, target=activity, annotation=str(len(events)))
         for object_type, activities in ocdfg["start_activities"]["events"].items()
-        for activity in activities.keys()
+        for activity, events in activities.items()
     ]
 
     end_activity_edges = [
-        DFGEdge(
-            source=activity,
-            object_type=object_type,
-        )
+        DFGEdge(source=activity, object_type=object_type, annotation=str(len(events)))
         for object_type, activities in ocdfg["end_activities"]["events"].items()
-        for activity in activities.keys()
+        for activity, events in activities.items()
     ]
 
     return DirectlyFollowsGraph(
@@ -145,8 +139,13 @@ def discover_ocpn(
             if final_tokens > 0:
                 final_marking_by_place[qualified_id] = final_tokens
 
+        def transition_id(t: PMNet.Transition) -> str:
+            # Labeled transitions are shared across object types in an OC-PN.
+            # Silent transitions are structural and local to each subnet.
+            return t.label if t.label is not None else f"{object_type}__{t.name}"
+
         for transition in net.transitions:
-            trans_id = transition.name
+            trans_id = transition_id(transition)
 
             if trans_id not in transition_map:
                 transition_map[trans_id] = Transition(
@@ -155,21 +154,19 @@ def discover_ocpn(
                 )
 
         for arc in net.arcs:
-            match arc.source:
-                case PMNet.Place(name=name):
-                    source_id = f"{object_type}_{name}"
-                case PMNet.Transition(name=name):
-                    source_id = name
-                case _:
-                    source_id = str(arc.source)
+            if isinstance(arc.source, PMNet.Place):
+                source_id = f"{object_type}_{arc.source.name}"
+            elif isinstance(arc.source, PMNet.Transition):
+                source_id = transition_id(arc.source)
+            else:
+                source_id = str(arc.source)
 
-            match arc.target:
-                case PMNet.Place(name=name):
-                    target_id = f"{object_type}_{name}"
-                case PMNet.Transition(name=name):
-                    target_id = name
-                case _:
-                    target_id = str(arc.target)
+            if isinstance(arc.target, PMNet.Place):
+                target_id = f"{object_type}_{arc.target.name}"
+            elif isinstance(arc.target, PMNet.Transition):
+                target_id = transition_id(arc.target)
+            else:
+                target_id = str(arc.target)
 
             arc_props = getattr(arc, "properties", {})
 
