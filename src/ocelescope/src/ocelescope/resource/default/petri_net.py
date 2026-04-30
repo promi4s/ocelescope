@@ -178,8 +178,6 @@ class PetriNet(Resource):
                     "elk.algorithm": "layered",
                     "elk.direction": "RIGHT",
                     "elk.edgeRouting": "SPLINES",
-                    "elk.spacing.nodeNode": "25",
-                    "elk.layered.spacing.nodeNodeBetweenLayers": "50",
                     "elk.layered.nodePlacement.strategy": "BRANDES_KOEPF",
                     "elk.layered.layering.strategy": "NETWORK_SIMPLEX",
                 }

@@ -179,11 +179,7 @@ class DirectlyFollowsGraph(Resource):
                 elk_options={
                     "elk.direction": "RIGHT",
                     "elk.algorithm": "layered",
-                    "elk.edgeRouting": "ORTHOGONAL",
-                    "elk.spacing.nodeNode": "50",
-                    "elk.layered.spacing.nodeNodeBetweenLayers": "80",
-                    "elk.spacing.edgeEdge": "40",
-                    "elk.spacing.edgeNode": "25",
+                    "elk.edgeRouting": "SPLINES",
                 }
             ),
         )
