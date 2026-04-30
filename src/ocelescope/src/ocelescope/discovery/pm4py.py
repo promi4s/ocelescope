@@ -1,7 +1,4 @@
-from __future__ import annotations
-
 import pm4py
-from pm4py.objects.petri_net.obj import PetriNet as PMNet
 from typing_extensions import Literal
 
 from ocelescope import OCEL
@@ -16,7 +13,7 @@ from ocelescope.resource.default.dfg import (
     DFGObject,
     DirectlyFollowsGraph,
 )
-from ocelescope.resource.default.petri_net import Arc, PetriNet, Place, Transition
+from ocelescope.resource.default.petri_net import Arc, ArcType, Marking, PetriNet, Place, Transition
 
 
 def _apply_discovery_filters(
@@ -103,86 +100,34 @@ def discover_ocpn(
         object_frequency_threshold=object_frequency_threshold,
     )
 
-    petri_net = pm4py.discover_oc_petri_net(
+    ocpn = pm4py.discover_oc_petri_net(
         inductive_miner_variant=variant,
         ocel=filtered_ocel.ocel,
     )
 
-    flat_nets = petri_net["petri_nets"]
+    pnet = PetriNet()
 
-    place_set: list[Place] = []
-    transition_map: dict[str, Transition] = {}
-    arcs: list[Arc] = []
-    initial_marking_by_place: dict[str, int] = {}
-    final_marking_by_place: dict[str, int] = {}
-
-    seen_places: set[str] = set()
-
-    for object_type, pm_net in flat_nets.items():
-        net, initial_marking, final_marking = pm_net
-
-        for place in net.places:
-            qualified_id = f"{object_type}_{place.name}"
-            if qualified_id not in seen_places:
-                place_set.append(
-                    Place(
-                        id=qualified_id,
-                        object_type=object_type,
-                    )
-                )
-                seen_places.add(qualified_id)
-
-            initial_tokens = int(initial_marking.get(place, 0))
-            final_tokens = int(final_marking.get(place, 0))
-            if initial_tokens > 0:
-                initial_marking_by_place[qualified_id] = initial_tokens
-            if final_tokens > 0:
-                final_marking_by_place[qualified_id] = final_tokens
-
-        def transition_id(t: PMNet.Transition) -> str:
-            # Labeled transitions are shared across object types in an OC-PN.
-            # Silent transitions are structural and local to each subnet.
-            return t.label if t.label is not None else f"{object_type}__{t.name}"
-
-        for transition in net.transitions:
-            trans_id = transition_id(transition)
-
-            if trans_id not in transition_map:
-                transition_map[trans_id] = Transition(
-                    id=trans_id,
-                    label=transition.label,
-                )
-
-        for arc in net.arcs:
-            if isinstance(arc.source, PMNet.Place):
-                source_id = f"{object_type}_{arc.source.name}"
-            elif isinstance(arc.source, PMNet.Transition):
-                source_id = transition_id(arc.source)
-            else:
-                source_id = str(arc.source)
-
-            if isinstance(arc.target, PMNet.Place):
-                target_id = f"{object_type}_{arc.target.name}"
-            elif isinstance(arc.target, PMNet.Transition):
-                target_id = transition_id(arc.target)
-            else:
-                target_id = str(arc.target)
-
-            arc_props = getattr(arc, "properties", {})
-
-            arcs.append(
-                Arc(
-                    source=source_id,
-                    target=target_id,
-                    weight=getattr(arc, "weight", 1),
-                    variable=arc_props.get("variable", False),
-                )
+    for place in ocpn.places:
+        pnet.add_place(
+            Place(
+                name=place.name,
+                object_type=place.object_type,
             )
+        )
 
-    return PetriNet(
-        places=place_set,
-        transitions=list(transition_map.values()),
-        arcs=arcs,
-        initial_marking=initial_marking_by_place,
-        final_marking=final_marking_by_place,
-    )
+    for transition in ocpn.transitions:
+        pnet.add_transition(Transition(name=transition.name, label=transition.label))
+
+    for arc in ocpn.arcs:
+        pnet.add_arc(
+            Arc(
+                source=str(arc.source.name),
+                target=str(arc.target.name),
+                type=ArcType.VARIABLE if arc.is_variable else ArcType.NORMAL,
+            ),
+        )
+
+    pnet.initial_marking = Marking({place.name: 1 for place in ocpn.initial_marking.keys()})
+    pnet.final_marking = Marking({place.name: 1 for place in ocpn.final_marking.keys()})
+
+    return pnet

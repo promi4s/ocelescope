@@ -39,9 +39,12 @@ export const useGraphFlowLayout = (visualization: VisualizationByType<"graph">) 
     layoutIdRef.current++;
   }, [visualization]);
 
-  // Run ELK layout once nodes are measured
+  const hasNodes = nodes.length > 0;
+
+  // Run ELK layout once nodes are measured (or immediately when there are none)
   useEffect(() => {
-    if (!nodesInitialized || layoutApplied.current) return;
+    if (layoutApplied.current) return;
+    if (hasNodes && !nodesInitialized) return;
     layoutApplied.current = true;
 
     const myLayoutId = layoutIdRef.current;
@@ -95,7 +98,7 @@ export const useGraphFlowLayout = (visualization: VisualizationByType<"graph">) 
     };
 
     void runLayout();
-  }, [fitView, nodesInitialized]);
+  }, [fitView, nodesInitialized, hasNodes]);
 
   const onNodesChange = useCallback(
     (changes: NodeChange[]) => setNodes((current) => applyNodeChanges(changes, current)),
