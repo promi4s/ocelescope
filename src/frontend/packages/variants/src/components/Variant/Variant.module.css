@@ -1,15 +1,27 @@
 .variant {
   list-style: none;
-  display: inline-block;
+  display: flex;
+
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+
   padding: 0;
   margin: 0;
+
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
 
 .item {
   --base: var(--c, #3498db);
   --bg: var(--base);
 
-  float: left;
+  flex: 0 0 auto;
+  float: none;
+  margin-right: 0;
+
   width: 50px;
   height: 40px;
   line-height: 40px;
