@@ -28,7 +28,7 @@ catalogs:
       specifier: ^8.1.1
       version: 8.3.16
     '@mantine/core':
-      specifier: ^8.3.14
+      specifier: ^8.3.16
       version: 8.3.16
     '@mantine/dates':
       specifier: ^8.3.15
@@ -42,6 +42,9 @@ catalogs:
     '@marko19907/string-to-color':
       specifier: ^1.0.2
       version: 1.0.2
+    '@ocelescope/core':
+      specifier: ^0.0.1
+      version: 0.0.1
     '@rjsf/core':
       specifier: ^6.3.1
       version: 6.3.1
@@ -203,6 +206,9 @@ importers:
       '@ocelescope/core':
         specifier: workspace:*
         version: link:../packages/core
+      '@ocelescope/executions':
+        specifier: workspace:*
+        version: link:../modules/variants
       '@ocelescope/filter':
         specifier: workspace:*
         version: link:../modules/filter
@@ -214,7 +220,7 @@ importers:
         version: link:../modules/plugin
       next:
         specifier: 'catalog:'
-        version: 16.1.6(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        version: 16.1.6(@babel/core@7.29.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       react:
         specifier: 'catalog:'
         version: 19.2.3
@@ -421,7 +427,7 @@ importers:
         version: 0.563.0(react@19.2.3)
       next:
         specifier: 'catalog:'
-        version: 16.1.6(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        version: 16.1.6(@babel/core@7.29.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       react:
         specifier: 'catalog:'
         version: 19.2.3
@@ -456,6 +462,40 @@ importers:
       json-schema-traverse:
         specifier: 'catalog:'
         version: 1.0.0
+      tsdown:
+        specifier: 'catalog:'
+        version: 0.21.4(@tsdown/css@0.21.4)(typescript@5.9.3)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+
+  src/frontend/modules/variants:
+    dependencies:
+      '@mantine/core':
+        specifier: 'catalog:'
+        version: 8.3.16(@mantine/hooks@8.3.16(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@ocelescope/core':
+        specifier: 'catalog:'
+        version: 0.0.1(32f996d11496793688de34e32b6f1901)
+      react:
+        specifier: 'catalog:'
+        version: 19.2.3
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.2.3(react@19.2.3)
+    devDependencies:
+      '@types/css-modules':
+        specifier: 'catalog:'
+        version: 1.0.5
+      '@types/node':
+        specifier: 'catalog:'
+        version: 25.3.3
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.2.14
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.2.3(@types/react@19.2.14)
       tsdown:
         specifier: 'catalog:'
         version: 0.21.4(@tsdown/css@0.21.4)(typescript@5.9.3)
@@ -620,7 +660,7 @@ importers:
         version: 8.3.13(@mantine/core@8.3.16(@mantine/hooks@8.3.16(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/hooks@8.3.16(react@19.2.3))(clsx@2.1.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       next:
         specifier: 'catalog:'
-        version: 16.1.6(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        version: 16.1.6(@babel/core@7.29.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       react:
         specifier: 'catalog:'
         version: 19.2.3
@@ -705,7 +745,7 @@ importers:
         version: 8.3.13(@mantine/core@8.3.16(@mantine/hooks@8.3.16(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/hooks@8.3.16(react@19.2.3))(clsx@2.1.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       next:
         specifier: 'catalog:'
-        version: 16.1.6(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        version: 16.1.6(@babel/core@7.29.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       react:
         specifier: 'catalog:'
         version: 19.2.3
@@ -761,6 +801,9 @@ importers:
       '@marko19907/string-to-color':
         specifier: 'catalog:'
         version: 1.0.2
+      '@ocelescope/core':
+        specifier: 'catalog:'
+        version: 0.0.1(32f996d11496793688de34e32b6f1901)
       react:
         specifier: 'catalog:'
         version: 19.2.3
@@ -771,6 +814,9 @@ importers:
       '@faker-js/faker':
         specifier: 'catalog:'
         version: 10.4.0
+      '@mantine/core':
+        specifier: 'catalog:'
+        version: 8.3.16(@mantine/hooks@8.3.16(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@storybook/react-vite':
         specifier: 'catalog:'
         version: 10.3.5(esbuild@0.27.3)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(storybook@10.3.5(@testing-library/dom@10.4.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(typescript@5.9.3)(vite@8.0.10(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(yaml@2.8.2))
@@ -1535,6 +1581,66 @@ packages:
   '@nodelib/fs.walk@1.2.8':
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
+
+  '@ocelescope/api-base@0.0.0':
+    resolution: {integrity: sha512-k4UXZf+faJxBMopbNoxjSFzfbaWpK7DJ9tEzmhAmCqxDBTirMshqXodpqobhNIfNGsJWC9tWc/3nV5iG+exGsQ==}
+    peerDependencies:
+      '@ocelescope/api-client': 0.0.0
+      '@tanstack/react-query': ^5.90.20
+      react: ^19.2.0
+      react-dom: ^19.2.0
+
+  '@ocelescope/api-client@0.0.0':
+    resolution: {integrity: sha512-jsc4fH8SfrzGf60KBnQveEaJugYw4RDy8oyj3Cxk/mgBU/qAeci7hHYmnx9BSrItgBlDmovWXh5uPqYDIgtxCg==}
+    peerDependencies:
+      react: ^19.2.0
+      react-dom: ^19.2.0
+      zod: ^4.3.6
+      zustand: ^5.0.11
+
+  '@ocelescope/core@0.0.1':
+    resolution: {integrity: sha512-L4Em1I7wmJqDZYK0AA/bJd5GhOE+Oq+M+btWrLqT9TybWA5NeqHBhnaDIijHSg0ZkCi4d+XWfZmEi2TVQsrMsA==}
+    peerDependencies:
+      '@mantine/core': ^8.3.14
+      '@mantine/dropzone': ^8.3.14
+      '@mantine/hooks': ^8.3.14
+      '@marko19907/string-to-color': ^1.0.2
+      '@ocelescope/api-base': 0.0.0
+      '@ocelescope/api-client': 0.0.0
+      '@ocelescope/resources': 0.0.0
+      '@tanstack/react-query': ^5.90.21
+      '@tanstack/react-query-devtools': ^5.91.3
+      clsx: ^2.1.1
+      content-disposition-attachment: ^0.3.1
+      dayjs: ^1.11.19
+      file-saver: ^2.0.5
+      lucide-react: ^0.563.0
+      mantine-datatable: ^8.3.13
+      next: ^16.1.6
+      react: ^19.2.0
+      react-dom: ^19.2.0
+      zod: ^4.3.6
+      zustand: ^5.0.11
+
+  '@ocelescope/resources@0.0.0':
+    resolution: {integrity: sha512-cpbXcPYwHmvacL2/Tw/Y6ykji4TKX7SXf9e7Ney2/JImmXGNKlkW3vs4mhT38R7lpFjMSM3/fhPnGveiGltAww==}
+    peerDependencies:
+      '@floating-ui/react': ^0.27.18
+      '@hpcc-js/wasm-graphviz': ^1.21.0
+      '@mantine/core': ^8.3.14
+      '@ocelescope/api-base': 0.0.0
+      cytoscape: ^3.33.1
+      dayjs: ^1.11.19
+      file-saver: ^2.0.5
+      lodash: ^4.17.23
+      lucide-react: ^0.563.0
+      mantine-datatable: ^8.3.13
+      next: 16.1.6
+      react: ^19.2.0
+      react-cytoscapejs: ^2.0.0
+      react-dom: ^19.2.0
+      react-plotly.js: ^2.6.0
+      react-zoom-pan-pinch: ^3.7.0
 
   '@orval/angular@8.5.2':
     resolution: {integrity: sha512-Hkzc8a1x9h8zJXsgUWjj5PvSVMs1jLtup3KH+BlJ50OXRsLtsZ2fk4LftTAc/RX0oxcdV+fUAgntCjjHI4R/bA==}
@@ -5195,6 +5301,62 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.20.1
 
+  '@ocelescope/api-base@0.0.0(@ocelescope/api-client@0.0.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(zod@4.3.6)(zustand@5.0.11(@types/react@19.2.14)(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))))(@tanstack/react-query@5.90.21(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
+    dependencies:
+      '@ocelescope/api-client': 0.0.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(zod@4.3.6)(zustand@5.0.11(@types/react@19.2.14)(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3)))
+      '@tanstack/react-query': 5.90.21(react@19.2.3)
+      react: 19.2.3
+      react-dom: 19.2.3(react@19.2.3)
+
+  '@ocelescope/api-client@0.0.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(zod@4.3.6)(zustand@5.0.11(@types/react@19.2.14)(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3)))':
+    dependencies:
+      react: 19.2.3
+      react-dom: 19.2.3(react@19.2.3)
+      zod: 4.3.6
+      zustand: 5.0.11(@types/react@19.2.14)(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
+
+  '@ocelescope/core@0.0.1(32f996d11496793688de34e32b6f1901)':
+    dependencies:
+      '@mantine/core': 8.3.16(@mantine/hooks@8.3.16(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@mantine/dropzone': 8.3.16(@mantine/core@8.3.16(@mantine/hooks@8.3.16(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/hooks@8.3.16(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@mantine/hooks': 8.3.16(react@19.2.3)
+      '@marko19907/string-to-color': 1.0.2
+      '@ocelescope/api-base': 0.0.0(@ocelescope/api-client@0.0.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(zod@4.3.6)(zustand@5.0.11(@types/react@19.2.14)(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))))(@tanstack/react-query@5.90.21(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@ocelescope/api-client': 0.0.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(zod@4.3.6)(zustand@5.0.11(@types/react@19.2.14)(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3)))
+      '@ocelescope/resources': 0.0.0(21d11dae36eb0eb935f6403a1fbf16d9)
+      '@tanstack/react-query': 5.90.21(react@19.2.3)
+      '@tanstack/react-query-devtools': 5.91.3(@tanstack/react-query@5.90.21(react@19.2.3))(react@19.2.3)
+      clsx: 2.1.1
+      content-disposition-attachment: 0.3.1
+      dayjs: 1.11.19
+      file-saver: 2.0.5
+      lucide-react: 0.563.0(react@19.2.3)
+      mantine-datatable: 8.3.13(@mantine/core@8.3.16(@mantine/hooks@8.3.16(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/hooks@8.3.16(react@19.2.3))(clsx@2.1.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      next: 16.1.6(@babel/core@7.29.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      react: 19.2.3
+      react-dom: 19.2.3(react@19.2.3)
+      zod: 4.3.6
+      zustand: 5.0.11(@types/react@19.2.14)(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
+
+  '@ocelescope/resources@0.0.0(21d11dae36eb0eb935f6403a1fbf16d9)':
+    dependencies:
+      '@floating-ui/react': 0.27.19(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@hpcc-js/wasm-graphviz': 1.21.1
+      '@mantine/core': 8.3.16(@mantine/hooks@8.3.16(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@ocelescope/api-base': 0.0.0(@ocelescope/api-client@0.0.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(zod@4.3.6)(zustand@5.0.11(@types/react@19.2.14)(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))))(@tanstack/react-query@5.90.21(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      cytoscape: 3.33.1
+      dayjs: 1.11.19
+      file-saver: 2.0.5
+      lodash: 4.17.23
+      lucide-react: 0.563.0(react@19.2.3)
+      mantine-datatable: 8.3.13(@mantine/core@8.3.16(@mantine/hooks@8.3.16(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/hooks@8.3.16(react@19.2.3))(clsx@2.1.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      next: 16.1.6(@babel/core@7.29.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      react: 19.2.3
+      react-cytoscapejs: 2.0.0(cytoscape@3.33.1)(react@19.2.3)
+      react-dom: 19.2.3(react@19.2.3)
+      react-plotly.js: 2.6.0(plotly.js@3.4.0(mapbox-gl@1.13.3))(react@19.2.3)
+      react-zoom-pan-pinch: 3.7.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+
   '@orval/angular@8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)':
     dependencies:
       '@orval/core': 8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)
@@ -7254,7 +7416,7 @@ snapshots:
 
   next-tick@1.1.0: {}
 
-  next@16.1.6(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
+  next@16.1.6(@babel/core@7.29.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
     dependencies:
       '@next/env': 16.1.6
       '@swc/helpers': 0.5.15
@@ -7263,7 +7425,7 @@ snapshots:
       postcss: 8.4.31
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
-      styled-jsx: 5.1.6(react@19.2.3)
+      styled-jsx: 5.1.6(@babel/core@7.29.0)(react@19.2.3)
     optionalDependencies:
       '@next/swc-darwin-arm64': 16.1.6
       '@next/swc-darwin-x64': 16.1.6
@@ -8028,10 +8190,12 @@ snapshots:
 
   strongly-connected-components@1.0.1: {}
 
-  styled-jsx@5.1.6(react@19.2.3):
+  styled-jsx@5.1.6(@babel/core@7.29.0)(react@19.2.3):
     dependencies:
       client-only: 0.0.1
       react: 19.2.3
+    optionalDependencies:
+      '@babel/core': 7.29.0
 
   supercluster@7.1.5:
     dependencies:
