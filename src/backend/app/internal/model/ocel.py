@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import Hashable, Self, TypedDict, cast
 
 import pandas as pd
@@ -12,7 +13,12 @@ from ocelescope import (
     ObjectTypeFilter,
     TimeFrameFilter,
 )
-from ocelescope.ocel.constants import ValueType
+from ocelescope.ocel.constants import (
+    VARIANT_ACT_LIST_COL,
+    VARIANT_FREQUENCY_COL,
+    VARIANT_OTYPE_COL,
+    ValueType,
+)
 from pydantic.main import BaseModel
 
 from app.internal.registry import registry_manager
@@ -144,3 +150,25 @@ class QuantityInfo(BaseModel):
             object_types=ocel.quantities.object_types,
             activities=ocel.quantities.activities,
         )
+
+
+@dataclass
+class CaseCentricVariant:
+    id: str
+    object_type: str
+    activity_order: list[str]
+    frequency: int
+
+    @classmethod
+    def from_ocel(cls, ocel: OCEL, object_types: list[str]) -> list[Self]:
+        variants = ocel.executions.get_object_variants(object_types=object_types)
+
+        return [
+            cls(
+                id=str(id),
+                object_type=data[VARIANT_OTYPE_COL],
+                activity_order=data[VARIANT_ACT_LIST_COL],
+                frequency=data[VARIANT_FREQUENCY_COL],
+            )
+            for id, data in variants.iterrows()
+        ]
