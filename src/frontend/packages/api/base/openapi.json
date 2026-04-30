@@ -4129,6 +4129,7 @@
         "type": "object",
         "title": "Graph",
         "description": "Graph visualization composed of nodes and directed edges.\n\nThis visualization is meant for model-like structures (for example Petri nets\nor directly-follows graphs). Layout is performed by the frontend renderer (ELK).\n\nAttributes:\n    type: Fixed discriminator `\"graph\"`.\n    nodes: List of nodes.\n    edges: List of edges.\n    layout_config: Layout hints consumed by the renderer."
+        "description": "Graph visualization composed of nodes and directed edges.\n\nThis visualization is meant for model-like structures (for example Petri nets\nor directly-follows graphs). Layout and rendering are performed using Graphviz.\n\nAttributes:\n    type: Fixed discriminator `\"graph\"`.\n    nodes: List of nodes.\n    edges: List of edges.\n    layout_config: Graphviz layout configuration."
       },
       "GraphEdge": {
         "properties": {
@@ -4260,6 +4261,7 @@
         ],
         "title": "GraphEdge",
         "description": "A directed edge in a `Graph` visualization.\n\nAn edge connects `source` -> `target` and can carry labels and arrowhead styles.\n\nAttributes:\n    id: Unique edge id. Defaults to a generated UUID string.\n    source: Source node id.\n    target: Target node id.\n    color: Optional edge color.\n    label: Optional label shown along the edge.\n    style: Visual style options.\n    start_arrow: Optional arrowhead style at the start of the edge.\n    end_arrow: Optional arrowhead style at the end of the edge.\n    start_label: Optional label shown near the source.\n    end_label: Optional label shown near the target.\n    annotation: Optional attached visualization."
+        "description": "A directed edge in a `Graph` visualization.\n\nAn edge connects `source` -> `target` and can carry labels and arrowhead styles.\n\nAttributes:\n    id: Unique edge id. Defaults to a generated UUID string.\n    source: Source node id.\n    target: Target node id.\n    color: Optional edge color.\n    label: Optional label shown along the edge.\n    start_arrow: Optional arrowhead style at the start of the edge.\n    end_arrow: Optional arrowhead style at the end of the edge.\n    start_label: Optional label shown near the source.\n    end_label: Optional label shown near the target.\n    layout_attrs: Additional Graphviz attributes for this edge.\n    annotation: Optional attached visualization."
       },
       "GraphNode": {
         "properties": {
@@ -4406,6 +4408,112 @@
         ],
         "title": "GraphNode",
         "description": "A node in a `Graph` visualization.\n\nA node defines its identity and visual appearance (shape, label, colors, size).\nLayout coordinates (`x`, `y`) are typically filled by the layouting step, not\nby the resource author.\n\nAttributes:\n    id: Unique node id. Defaults to a generated UUID string.\n    label: Optional label shown near the node.\n    shape: Node shape identifier.\n    width: Optional node width.\n    height: Optional node height.\n    color: Optional fill color (for example hex).\n    x: Optional x-coordinate after layouting.\n    y: Optional y-coordinate after layouting.\n    border_color: Optional border/stroke color.\n    style: Visual style options.\n    label_pos: Label position relative to the node.\n    rank: Optional layout constraint (source/sink or numeric rank).\n    annotation: Optional attached visualization."
+        "description": "A node in a `Graph` visualization.\n\nA node defines its identity and visual appearance (shape, label, colors, size).\nLayout coordinates (`x`, `y`) are typically filled by the layouting step, not\nby the resource author.\n\nAttributes:\n    id: Unique node id. Defaults to a generated UUID string.\n    label: Optional label shown near the node.\n    shape: Node shape identifier.\n    width: Optional node width.\n    height: Optional node height.\n    color: Optional fill color (for example hex).\n    x: Optional x-coordinate after layouting.\n    y: Optional y-coordinate after layouting.\n    border_color: Optional border/stroke color.\n    label_pos: Label position relative to the node.\n    rank: Optional layout constraint (source/sink or numeric rank).\n    layout_attrs: Additional Graphviz attributes for this node.\n    annotation: Optional attached visualization."
+      },
+      "GraphvizLayoutConfig": {
+        "properties": {
+          "engine": {
+            "type": "string",
+            "enum": [
+              "circo",
+              "dot",
+              "fdp",
+              "sfdp",
+              "neato",
+              "osage",
+              "patchwork",
+              "twopi",
+              "nop",
+              "nop2"
+            ],
+            "title": "Engine",
+            "default": "dot"
+          },
+          "graphAttrs": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    }
+                  ]
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Graphattrs"
+          },
+          "nodeAttrs": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    }
+                  ]
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nodeattrs"
+          },
+          "edgeAttrs": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    }
+                  ]
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Edgeattrs"
+          }
+        },
+        "type": "object",
+        "title": "GraphvizLayoutConfig",
+        "description": "Layout configuration for `Graph` rendering via Graphviz.\n\nThis config selects the Graphviz layout engine and allows you to define default\nGraphviz attributes for the graph, nodes, and edges.\n\nAttributes:\n    engine: Graphviz layout engine name.\n    graphAttrs: Global Graphviz graph attributes.\n    nodeAttrs: Default Graphviz node attributes.\n    edgeAttrs: Default Graphviz edge attributes."
       },
       "HTTPValidationError": {
         "properties": {
