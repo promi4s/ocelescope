@@ -35,10 +35,12 @@ class ExecutionsManager(BaseManager):
         include_timestamps: bool = False,
         include_eid: bool = False,
     ) -> pd.DataFrame:
-        e2o = self._ocel.e2o.df.sort_values(by=[OID_COL, TIMESTAMP_COL])
+        e2o = self._ocel.e2o.df.sort_values(by=[OID_COL, TIMESTAMP_COL]).copy()
 
         if object_types is not None:
             e2o = e2o.loc[e2o[OTYPE_COL].isin(object_types)]
+
+        e2o[ACTIVITY_COL] = e2o[ACTIVITY_COL].map(str)
 
         executions = e2o.groupby(by=OID_COL).agg(
             **{
