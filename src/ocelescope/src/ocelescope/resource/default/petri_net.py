@@ -3,7 +3,14 @@ from typing import Optional
 from pydantic import Field
 
 from ocelescope.resource.resource import Annotated, Resource
-from ocelescope.visualization.default.graph import Graph, GraphEdge, GraphNode, LayoutConfig
+from ocelescope.visualization.default.graph import (
+    EdgeStyle,
+    Graph,
+    GraphEdge,
+    GraphNode,
+    LayoutConfig,
+    NodeStyle,
+)
 from ocelescope.visualization.util.color import generate_color_map
 
 
@@ -34,7 +41,7 @@ class Transition(Annotated):
     """
 
     id: str
-    label: Optional[str]
+    label: Optional[str] = None
 
 
 class Arc(Annotated):
@@ -106,7 +113,7 @@ class PetriNet(Resource):
                     color=color_map.get(place.object_type, "#cccccc"),
                     width=30,
                     height=30,
-                    double_border=final_tokens > 0,
+                    style=NodeStyle(double_border=final_tokens > 0),
                     label_pos="bottom",
                     annotation=place.get_annotation_visualization(),
                 )
@@ -159,12 +166,24 @@ class PetriNet(Resource):
                     color=color_map.get(object_type or "", "#cccccc"),
                     annotation=arc.get_annotation_visualization(),
                     label=" | ".join(label_parts) if label_parts else None,
-                    dashed=arc.variable,
+                    style=EdgeStyle(dashed=arc.variable),
                 )
             )
 
         return Graph(
             nodes=nodes,
             edges=edges,
-            layout_config=LayoutConfig(direction="RIGHT"),
+            layout_config=LayoutConfig(
+                elk_options={
+                    "elk.direction": "RIGHT",
+                    "elk.algorithm": "layered",
+                    "elk.edgeRouting": "ORTHOGONAL",
+                    "elk.spacing.nodeNode": "50",
+                    "elk.layered.spacing.nodeNodeBetweenLayers": "80",
+                    "elk.spacing.edgeEdge": "40",
+                    "elk.spacing.edgeNode": "25",
+                    "elk.layered.crossingMinimization.strategy": "LAYER_SWEEP",
+                    "elk.edgeLabels.placement": "CENTER",
+                }
+            ),
         )

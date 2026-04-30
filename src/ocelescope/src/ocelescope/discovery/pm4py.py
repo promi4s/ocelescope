@@ -62,7 +62,7 @@ def discover_ocdfg(
                     object_type=object_type,
                     source=source,
                     target=target,
-                    annotation=str(len(events)),
+                    annotation=[str(len(events))],
                 )
                 for (source, target), events in raw_edges.items()
             ]
@@ -146,10 +146,11 @@ def discover_ocpn(
                 final_marking_by_place[qualified_id] = final_tokens
 
         for transition in net.transitions:
-            label = transition.label or transition.name
-            if label not in transition_map:
-                transition_map[label] = Transition(
-                    id=label,
+            trans_id = transition.name
+
+            if trans_id not in transition_map:
+                transition_map[trans_id] = Transition(
+                    id=trans_id,
                     label=transition.label,
                 )
 
@@ -157,24 +158,27 @@ def discover_ocpn(
             match arc.source:
                 case PMNet.Place(name=name):
                     source_id = f"{object_type}_{name}"
-                case PMNet.Transition(label=label, name=name):
-                    source_id = label or name
+                case PMNet.Transition(name=name):
+                    source_id = name
                 case _:
                     source_id = str(arc.source)
 
             match arc.target:
                 case PMNet.Place(name=name):
                     target_id = f"{object_type}_{name}"
-                case PMNet.Transition(label=label, name=name):
-                    target_id = label or name
+                case PMNet.Transition(name=name):
+                    target_id = name
                 case _:
                     target_id = str(arc.target)
+
+            arc_props = getattr(arc, "properties", {})
 
             arcs.append(
                 Arc(
                     source=source_id,
                     target=target_id,
-                    weight=int(getattr(arc, "weight", 1)),
+                    weight=getattr(arc, "weight", 1),
+                    variable=arc_props.get("variable", False),
                 )
             )
 

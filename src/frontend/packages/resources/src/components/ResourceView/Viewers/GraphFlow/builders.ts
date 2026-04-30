@@ -21,25 +21,10 @@ export const buildGraphFlowNodes = (
           data: {
             label,
             color,
-            isFinalMarking: node.double_border ?? false,
+            isFinalMarking: node.style?.double_border ?? false,
+            innerSymbol: node.style?.inner_symbol ?? null,
             isInitialMarking: hasMarking(label, "m0="),
           },
-        };
-
-      case "start":
-        return {
-          id,
-          type: "start" as const,
-          position: DEFAULT_NODE_POSITION,
-          data: { label, color },
-        };
-
-      case "end":
-        return {
-          id,
-          type: "end" as const,
-          position: DEFAULT_NODE_POSITION,
-          data: { label, color },
         };
 
       default:
@@ -67,6 +52,6 @@ export const buildGraphFlowEdges = (
     data: {
       color: edge.color ?? DEFAULT_COLORS.edge,
       label: edge.label ?? null,
-      dashed: edge.dashed ?? false,
+      dashed: edge.style?.dashed ?? false,
     },
   }));

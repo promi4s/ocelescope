@@ -3855,6 +3855,18 @@
         ],
         "title": "E2OCountFilter"
       },
+      "EdgeStyle": {
+        "properties": {
+          "dashed": {
+            "type": "boolean",
+            "title": "Dashed",
+            "default": false
+          }
+        },
+        "type": "object",
+        "title": "EdgeStyle",
+        "description": "Visual style options for a `GraphEdge`.\n\nAttributes:\n    dashed: Renders the edge as a dashed line (e.g. variable arcs)."
+      },
       "Entity_Time_Info": {
         "properties": {
           "start_time": {
@@ -4111,14 +4123,12 @@
           },
           "layout_config": {
             "$ref": "#/components/schemas/LayoutConfig",
-            "default": {
-              "direction": "DOWN"
-            }
+            "default": {}
           }
         },
         "type": "object",
         "title": "Graph",
-        "description": "Graph visualization composed of nodes and directed edges.\n\nThis visualization is meant for model-like structures (for example Petri nets\nor directly-follows graphs). Layout is performed by the frontend renderer (ELK).\n\nAttributes:\n    type: Fixed discriminator `\"graph\"`.\n    nodes: List of nodes.\n    edges: List of edges.\n    layout_config: Layout hints (direction, spacing) consumed by the renderer."
+        "description": "Graph visualization composed of nodes and directed edges.\n\nThis visualization is meant for model-like structures (for example Petri nets\nor directly-follows graphs). Layout is performed by the frontend renderer (ELK).\n\nAttributes:\n    type: Fixed discriminator `\"graph\"`.\n    nodes: List of nodes.\n    edges: List of edges.\n    layout_config: Layout hints consumed by the renderer."
       },
       "GraphEdge": {
         "properties": {
@@ -4165,6 +4175,12 @@
               }
             ],
             "title": "Label"
+          },
+          "style": {
+            "$ref": "#/components/schemas/EdgeStyle",
+            "default": {
+              "dashed": false
+            }
           },
           "start_arrow": {
             "anyOf": [
@@ -4235,33 +4251,6 @@
               }
             ],
             "title": "End Label"
-          },
-          "layout_attrs": {
-            "anyOf": [
-              {
-                "additionalProperties": {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "integer"
-                    },
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "boolean"
-                    }
-                  ]
-                },
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Layout Attrs"
           }
         },
         "type": "object",
@@ -4270,7 +4259,7 @@
           "target"
         ],
         "title": "GraphEdge",
-        "description": "A directed edge in a `Graph` visualization.\n\nAn edge connects `source` -> `target` and can carry labels and arrowhead styles.\n\nAttributes:\n    id: Unique edge id. Defaults to a generated UUID string.\n    source: Source node id.\n    target: Target node id.\n    color: Optional edge color.\n    label: Optional label shown along the edge.\n    start_arrow: Optional arrowhead style at the start of the edge.\n    end_arrow: Optional arrowhead style at the end of the edge.\n    start_label: Optional label shown near the source.\n    end_label: Optional label shown near the target.\n    layout_attrs: Additional Graphviz attributes for this edge.\n    annotation: Optional attached visualization."
+        "description": "A directed edge in a `Graph` visualization.\n\nAn edge connects `source` -> `target` and can carry labels and arrowhead styles.\n\nAttributes:\n    id: Unique edge id. Defaults to a generated UUID string.\n    source: Source node id.\n    target: Target node id.\n    color: Optional edge color.\n    label: Optional label shown along the edge.\n    style: Visual style options.\n    start_arrow: Optional arrowhead style at the start of the edge.\n    end_arrow: Optional arrowhead style at the end of the edge.\n    start_label: Optional label shown near the source.\n    end_label: Optional label shown near the target.\n    annotation: Optional attached visualization."
       },
       "GraphNode": {
         "properties": {
@@ -4306,9 +4295,7 @@
               "triangle",
               "rectangle",
               "diamond",
-              "hexagon",
-              "start",
-              "end"
+              "hexagon"
             ],
             "title": "Shape"
           },
@@ -4378,6 +4365,12 @@
             ],
             "title": "Border Color"
           },
+          "style": {
+            "$ref": "#/components/schemas/NodeStyle",
+            "default": {
+              "double_border": false
+            }
+          },
           "label_pos": {
             "type": "string",
             "enum": [
@@ -4405,8 +4398,31 @@
               }
             ],
             "title": "Rank"
-          },
-          "layout_attrs": {
+          }
+        },
+        "type": "object",
+        "required": [
+          "shape"
+        ],
+        "title": "GraphNode",
+        "description": "A node in a `Graph` visualization.\n\nA node defines its identity and visual appearance (shape, label, colors, size).\nLayout coordinates (`x`, `y`) are typically filled by the layouting step, not\nby the resource author.\n\nAttributes:\n    id: Unique node id. Defaults to a generated UUID string.\n    label: Optional label shown near the node.\n    shape: Node shape identifier.\n    width: Optional node width.\n    height: Optional node height.\n    color: Optional fill color (for example hex).\n    x: Optional x-coordinate after layouting.\n    y: Optional y-coordinate after layouting.\n    border_color: Optional border/stroke color.\n    style: Visual style options.\n    label_pos: Label position relative to the node.\n    rank: Optional layout constraint (source/sink or numeric rank).\n    annotation: Optional attached visualization."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "LayoutConfig": {
+        "properties": {
+          "elk_options": {
             "anyOf": [
               {
                 "additionalProperties": {
@@ -4431,126 +4447,39 @@
                 "type": "null"
               }
             ],
-            "title": "Layout Attrs"
-          }
-        },
-        "type": "object",
-        "required": [
-          "shape"
-        ],
-        "title": "GraphNode",
-        "description": "A node in a `Graph` visualization.\n\nA node defines its identity and visual appearance (shape, label, colors, size).\nLayout coordinates (`x`, `y`) are typically filled by the layouting step, not\nby the resource author.\n\nAttributes:\n    id: Unique node id. Defaults to a generated UUID string.\n    label: Optional label shown near the node.\n    shape: Node shape identifier.\n    width: Optional node width.\n    height: Optional node height.\n    color: Optional fill color (for example hex).\n    x: Optional x-coordinate after layouting.\n    y: Optional y-coordinate after layouting.\n    border_color: Optional border/stroke color.\n    label_pos: Label position relative to the node.\n    rank: Optional layout constraint (source/sink or numeric rank).\n    layout_attrs: Additional Graphviz attributes for this node.\n    annotation: Optional attached visualization."
-      },
-      "HTTPValidationError": {
-        "properties": {
-          "detail": {
-            "items": {
-              "$ref": "#/components/schemas/ValidationError"
-            },
-            "type": "array",
-            "title": "Detail"
-          }
-        },
-        "type": "object",
-        "title": "HTTPValidationError"
-      },
-      "LayoutConfig": {
-        "properties": {
-          "direction": {
-            "type": "string",
-            "enum": [
-              "RIGHT",
-              "LEFT",
-              "UP",
-              "DOWN"
-            ],
-            "title": "Direction",
-            "default": "DOWN"
-          },
-          "algorithm": {
-            "anyOf": [
-              {
-                "type": "string",
-                "enum": [
-                  "layered",
-                  "force",
-                  "stress",
-                  "mrtree",
-                  "radial",
-                  "box",
-                  "fixed"
-                ]
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Algorithm"
-          },
-          "edge_routing": {
-            "anyOf": [
-              {
-                "type": "string",
-                "enum": [
-                  "ORTHOGONAL",
-                  "POLYLINE",
-                  "SPLINES"
-                ]
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Edge Routing"
-          },
-          "node_spacing": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Node Spacing"
-          },
-          "layer_spacing": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Layer Spacing"
-          },
-          "edge_edge_spacing": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Edge Edge Spacing"
-          },
-          "edge_node_spacing": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Edge Node Spacing"
+            "title": "Elk Options"
           }
         },
         "type": "object",
         "title": "LayoutConfig",
-        "description": "ELK-based layout configuration for a `Graph` visualization.\n\nAll fields are optional; omitted fields fall back to the renderer's defaults.\n\nAttributes:\n    direction: Primary layout direction (ELK direction names).\n    algorithm: ELK layout algorithm.\n    edge_routing: Edge routing style.\n    node_spacing: Pixel spacing between nodes in the same layer.\n    layer_spacing: Pixel spacing between layers.\n    edge_edge_spacing: Pixel spacing between parallel edges.\n    edge_node_spacing: Pixel spacing between edges and nodes."
+        "description": "ELK-based layout configuration for a `Graph` visualization.\n\nAttributes:\n    elk_options: Additional ELK layout options passed directly to the renderer.\n        Keys and values mirror the ELK option format (e.g. ``{\"elk.algorithm\": \"force\"}``)."
+      },
+      "NodeStyle": {
+        "properties": {
+          "double_border": {
+            "type": "boolean",
+            "title": "Double Border",
+            "default": false
+          },
+          "inner_symbol": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "triangle",
+                  "square"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Inner Symbol"
+          }
+        },
+        "type": "object",
+        "title": "NodeStyle",
+        "description": "Visual style options for a `GraphNode`.\n\nAttributes:\n    double_border: Renders a second border inside the node (e.g. final-marking places).\n    inner_symbol: Optional symbol rendered inside the node shape."
       },
       "O2OCountFilter": {
         "properties": {

@@ -14,22 +14,57 @@ export type PlaceNodeData = {
   color: string;
   isFinalMarking: boolean;
   isInitialMarking: boolean;
+  innerSymbol?: "triangle" | "square" | null;
 };
 
 export type PlaceNodeType = Node<PlaceNodeData, "place">;
 
 const labelOffset = PLACE_NODE_DIAMETER + 6;
 
+const InnerSymbol = ({
+  symbol,
+  borderColor,
+}: {
+  symbol: "triangle" | "square";
+  borderColor: string;
+}) => {
+  if (symbol === "triangle") {
+    return (
+      <div
+        style={{
+          width: 0,
+          height: 0,
+          borderTop: `${MARKING_DOT_SIZE * 0.6}px solid transparent`,
+          borderBottom: `${MARKING_DOT_SIZE * 0.6}px solid transparent`,
+          borderLeft: `${MARKING_DOT_SIZE}px solid ${borderColor}`,
+          marginLeft: 2,
+        }}
+      />
+    );
+  }
+  return (
+    <div
+      style={{
+        width: MARKING_DOT_SIZE,
+        height: MARKING_DOT_SIZE,
+        backgroundColor: borderColor,
+      }}
+    />
+  );
+};
+
 const PlaceCircle = ({
   color,
   borderColor,
   isFinalMarking,
   isInitialMarking,
+  innerSymbol,
 }: {
   color: string;
   borderColor: string;
   isFinalMarking: boolean;
   isInitialMarking: boolean;
+  innerSymbol?: "triangle" | "square" | null;
 }) => (
   <div
     style={{
@@ -57,7 +92,7 @@ const PlaceCircle = ({
       />
     )}
 
-    {isInitialMarking && (
+    {isInitialMarking && !innerSymbol && (
       <div
         style={{
           width: MARKING_DOT_SIZE,
@@ -67,11 +102,13 @@ const PlaceCircle = ({
         }}
       />
     )}
+
+    {innerSymbol && <InnerSymbol symbol={innerSymbol} borderColor={borderColor} />}
   </div>
 );
 
 const PlaceNode = memo(({ data }: NodeProps<PlaceNodeType>) => {
-  const { color, label, isFinalMarking, isInitialMarking } = data;
+  const { color, label, isFinalMarking, isInitialMarking, innerSymbol } = data;
   const objectType = parseObjectType(label);
   const borderColor = darkenHex(color);
 
@@ -89,6 +126,7 @@ const PlaceNode = memo(({ data }: NodeProps<PlaceNodeType>) => {
         borderColor={borderColor}
         isFinalMarking={isFinalMarking}
         isInitialMarking={isInitialMarking}
+        innerSymbol={innerSymbol}
       />
       {objectType && (
         <NodeLabel absolute top={labelOffset}>

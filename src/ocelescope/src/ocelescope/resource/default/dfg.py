@@ -1,7 +1,13 @@
 from pydantic import Field
 
 from ocelescope.resource.resource import Annotated, Resource
-from ocelescope.visualization.default.graph import Graph, GraphEdge, GraphNode, LayoutConfig
+from ocelescope.visualization.default.graph import (
+    Graph,
+    GraphEdge,
+    GraphNode,
+    LayoutConfig,
+    NodeStyle,
+)
 from ocelescope.visualization.util.color import generate_color_map
 
 
@@ -133,8 +139,9 @@ class DirectlyFollowsGraph(Resource):
             GraphNode(
                 id=f"start_{ot.name}",
                 label=ot.name,
-                shape="start",
+                shape="circle",
                 color=color_map[ot.name],
+                style=NodeStyle(inner_symbol="triangle"),
                 annotation=ot.get_annotation_visualization(),
             )
             for ot in self.object_types
@@ -145,8 +152,9 @@ class DirectlyFollowsGraph(Resource):
             GraphNode(
                 id=f"end_{ot.name}",
                 label=ot.name,
-                shape="end",
+                shape="circle",
                 color=color_map[ot.name],
+                style=NodeStyle(inner_symbol="square"),
             )
             for ot in self.object_types
             if ot.name in end_object_types
@@ -167,5 +175,17 @@ class DirectlyFollowsGraph(Resource):
         return Graph(
             nodes=activity_nodes + start_nodes + end_nodes,
             edges=edges,
-            layout_config=LayoutConfig(direction="RIGHT"),
+            layout_config=LayoutConfig(
+                elk_options={
+                    "elk.direction": "RIGHT",
+                    "elk.algorithm": "layered",
+                    "elk.edgeRouting": "ORTHOGONAL",
+                    "elk.spacing.nodeNode": "50",
+                    "elk.layered.spacing.nodeNodeBetweenLayers": "80",
+                    "elk.spacing.edgeEdge": "40",
+                    "elk.spacing.edgeNode": "25",
+                    "elk.layered.crossingMinimization.strategy": "LAYER_SWEEP",
+                    "elk.edgeLabels.placement": "CENTER",
+                }
+            ),
         )

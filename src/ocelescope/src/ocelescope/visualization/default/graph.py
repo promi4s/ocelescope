@@ -12,7 +12,7 @@ class AnnotatedElement(BaseModel, Generic[T]):
     annotation: T | None = None
 
 
-GraphShapes = Literal["circle", "triangle", "rectangle", "diamond", "hexagon", "start", "end"]
+GraphShapes = Literal["circle", "triangle", "rectangle", "diamond", "hexagon"]
 
 
 EdgeArrow = (
@@ -33,6 +33,28 @@ EdgeArrow = (
 )
 
 
+class NodeStyle(BaseModel):
+    """Visual style options for a `GraphNode`.
+
+    Attributes:
+        double_border: Renders a second border inside the node (e.g. final-marking places).
+        inner_symbol: Optional symbol rendered inside the node shape.
+    """
+
+    double_border: bool = False
+    inner_symbol: Literal["triangle", "square"] | None = None
+
+
+class EdgeStyle(BaseModel):
+    """Visual style options for a `GraphEdge`.
+
+    Attributes:
+        dashed: Renders the edge as a dashed line (e.g. variable arcs).
+    """
+
+    dashed: bool = False
+
+
 class GraphNode(AnnotatedElement):
     """A node in a `Graph` visualization.
 
@@ -50,7 +72,7 @@ class GraphNode(AnnotatedElement):
         x: Optional x-coordinate after layouting.
         y: Optional y-coordinate after layouting.
         border_color: Optional border/stroke color.
-        double_border: Whether to render a double border (for example final-marking places).
+        style: Visual style options.
         label_pos: Label position relative to the node.
         rank: Optional layout constraint (source/sink or numeric rank).
         annotation: Optional attached visualization.
@@ -65,7 +87,7 @@ class GraphNode(AnnotatedElement):
     x: float | None = None
     y: float | None = None
     border_color: str | None = None
-    double_border: bool = False
+    style: NodeStyle = NodeStyle()
     label_pos: Literal["top", "center", "bottom"] = "center"
 
     rank: Literal["source", "sink"] | int | None = None
@@ -82,7 +104,7 @@ class GraphEdge(AnnotatedElement):
         target: Target node id.
         color: Optional edge color.
         label: Optional label shown along the edge.
-        dashed: Whether to render the edge as a dashed line.
+        style: Visual style options.
         start_arrow: Optional arrowhead style at the start of the edge.
         end_arrow: Optional arrowhead style at the end of the edge.
         start_label: Optional label shown near the source.
@@ -95,40 +117,24 @@ class GraphEdge(AnnotatedElement):
     target: str
     color: str | None = None
     label: str | None = None
-    dashed: bool = False
+    style: EdgeStyle = EdgeStyle()
     start_arrow: EdgeArrow = None
     end_arrow: EdgeArrow = None
     start_label: str | None = None
     end_label: str | None = None
 
 
-ELKAlgorithm = Literal["layered", "force", "stress", "mrtree", "radial", "box", "fixed"]
-ELKEdgeRouting = Literal["ORTHOGONAL", "POLYLINE", "SPLINES"]
-ELKDirection = Literal["RIGHT", "LEFT", "UP", "DOWN"]
-
-
 class LayoutConfig(BaseModel):
     """ELK-based layout configuration for a `Graph` visualization.
 
-    All fields are optional; omitted fields fall back to the renderer's defaults.
-
     Attributes:
-        direction: Primary layout direction (ELK direction names).
-        algorithm: ELK layout algorithm.
-        edge_routing: Edge routing style.
-        node_spacing: Pixel spacing between nodes in the same layer.
-        layer_spacing: Pixel spacing between layers.
-        edge_edge_spacing: Pixel spacing between parallel edges.
-        edge_node_spacing: Pixel spacing between edges and nodes.
+        elk_options: Additional ELK layout options passed directly to the renderer.
+            Keys and values mirror the ELK option format (e.g. ``{"elk.algorithm": "force"}``).
+
+            For all available options see https://eclipse.dev/elk/reference/options.html.
     """
 
-    direction: ELKDirection = "DOWN"
-    algorithm: ELKAlgorithm | None = None
-    edge_routing: ELKEdgeRouting | None = None
-    node_spacing: float | None = None
-    layer_spacing: float | None = None
-    edge_edge_spacing: float | None = None
-    edge_node_spacing: float | None = None
+    elk_options: dict[str, str | int | float | bool] | None = None
 
 
 class Graph(Visualization):
@@ -141,7 +147,7 @@ class Graph(Visualization):
         type: Fixed discriminator `"graph"`.
         nodes: List of nodes.
         edges: List of edges.
-        layout_config: Layout hints (direction, spacing) consumed by the renderer.
+        layout_config: Layout hints consumed by the renderer.
     """
 
     type: Literal["graph"] = "graph"
