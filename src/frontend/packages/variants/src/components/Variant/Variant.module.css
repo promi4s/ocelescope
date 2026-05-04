@@ -21,11 +21,13 @@
   --base: var(--c, #3498db);
   --bg: var(--base);
 
+  display: flex;
+  align-items: center;
+
   flex: 0 0 auto;
   float: none;
   margin-right: 0;
 
-  width: 50px;
   height: 40px;
   line-height: 40px;
   text-align: center;
@@ -41,7 +43,8 @@
   scroll-snap-stop: always;
 }
 
-.item span {
+.itemLabel {
+  width: 50px;
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
