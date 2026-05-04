@@ -20,8 +20,9 @@ export const Variant: React.FC<{
 
   return (
     <ul className={styles.variant}>
-      {variant.map((activity) => (
+      {variant.map((activity, index) => (
         <li
+          key={`${activity}_${index}`}
           className={styles.item}
           style={{ "--c": colorMap[activity] } as React.CSSProperties}
         >
