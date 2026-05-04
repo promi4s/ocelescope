@@ -14,7 +14,7 @@ catalog:
   '@mantine/core': ^8.3.16
   '@mantine/dates': ^8.3.15
   '@mantine/dropzone': ^8.3.14
-  '@mantine/hooks': ^8.3.14
+  '@mantine/hooks': ^8.3.16
   '@mantine/notifications': ^8.3.15
   '@marko19907/string-to-color': ^1.0.2
   '@ocelescope/core': ^0.0.1
