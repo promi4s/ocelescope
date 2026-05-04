@@ -94,5 +94,8 @@
 
 .item:hover {
   --bg: color-mix(in srgb, var(--base) 85%, black);
-  width: unset;
+}
+
+.item:hover .itemLabel {
+  width: auto;
 }
