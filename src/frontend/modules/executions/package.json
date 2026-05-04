@@ -15,7 +15,8 @@
   },
   "exports": {
     ".": "./dist/index.js",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./styles.css": "./dist/style.css"
   },
   "files": [
     "dist"
@@ -35,11 +36,16 @@
   },
   "peerDependencies": {
     "@mantine/core": "catalog:",
-    "@ocelescope/core": "catalog:",
+    "@mantine/hooks": "catalog:",
+    "@ocelescope/api-base": "workspace:*",
+    "@ocelescope/core": "workspace:*",
+    "@ocelescope/variants": "workspace:*",
     "react": "catalog:",
     "react-dom": "catalog:"
   },
   "devDependencies": {
+    "@mantine/hooks": "catalog:",
+    "@tsdown/css": "catalog:",
     "@types/css-modules": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",

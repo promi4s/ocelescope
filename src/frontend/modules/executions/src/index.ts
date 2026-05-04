@@ -1,5 +1,5 @@
 import { defineModule } from "@ocelescope/core";
-import caseCentricView from "./pages/caseCentricView";
+import caseCentricView from "./pages/CaseCentricView/CaseCentricView";
 
 export default defineModule({
   authors: [{ name: "Görkem-Emre Öztürk" }],
