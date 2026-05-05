@@ -3,7 +3,10 @@ import { memo } from "react";
 import { AnnotationBadge } from "../components/AnnotationBadge";
 import { HiddenHandles } from "../components/HiddenHandles";
 import { NodeLabel } from "../components/NodeLabel";
-import { MARKING_DOT_SIZE } from "../constants/graphFlow";
+import {
+  EXTERNAL_NODE_LABEL_HEIGHT,
+  MARKING_DOT_SIZE,
+} from "../constants/graphFlow";
 import { parseObjectType } from "../utils/labels";
 
 export type PlaceNodeData = {
@@ -83,6 +86,7 @@ const PlaceCircle = ({
   <div
     style={{
       position: "relative",
+      boxSizing: "border-box",
       width,
       height,
       borderRadius: "50%",
@@ -191,7 +195,7 @@ const PlaceNode = memo(({ data }: NodeProps<PlaceNodeType>) => {
   const objectType = parseObjectType(label);
   const visualWidth = width as number;
   const visualHeight = height as number;
-  const labelOffset = visualHeight + 6;
+  const labelOffset = EXTERNAL_NODE_LABEL_HEIGHT + visualHeight + 6;
   const showLabelOnTop = labelPos === "top";
   const showLabelInCenter = labelPos === "center";
   const showExternalLabel = objectType && !showLabelInCenter;
@@ -201,13 +205,13 @@ const PlaceNode = memo(({ data }: NodeProps<PlaceNodeType>) => {
       style={{
         position: "relative",
         width: visualWidth,
-        paddingTop: showExternalLabel && showLabelOnTop ? 22 : 0,
-        paddingBottom: showExternalLabel && !showLabelOnTop ? 22 : 0,
+        paddingTop: showExternalLabel ? EXTERNAL_NODE_LABEL_HEIGHT : 0,
+        paddingBottom: showExternalLabel ? EXTERNAL_NODE_LABEL_HEIGHT : 0,
       }}
     >
       <HiddenHandles />
       {showExternalLabel && showLabelOnTop && (
-        <NodeLabel absolute top={-22}>
+        <NodeLabel absolute top={-EXTERNAL_NODE_LABEL_HEIGHT}>
           {objectType}
         </NodeLabel>
       )}

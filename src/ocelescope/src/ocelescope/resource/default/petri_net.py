@@ -59,8 +59,8 @@ class Arc(Annotated):
     of tokens, used to model synchronisation across object types.
 
     Attributes:
-        source: ID of the source node (place or transition).
-        target: ID of the target node (place or transition).
+        source: name of the source node (place or transition).
+        target: name of the target node (place or transition).
         type: Whether this is a variable arc.
         weight: Multiplicity of the arc.
     """
@@ -213,7 +213,7 @@ class PetriNet(Resource):
             nodes.append(
                 GraphNode(
                     id=place.name,
-                    label=place.object_type,
+                    label=place.object_type if initial_tokens else None,
                     shape="circle",
                     color=color_map.get(place.object_type, "#cccccc"),
                     border_color="#000000",
@@ -246,13 +246,8 @@ class PetriNet(Resource):
             )
 
         edges: list[GraphEdge] = []
-        arc_counts: dict[tuple[str, str], int] = {}
 
         for arc in self.arcs:
-            edge_key = (arc.source, arc.target)
-            arc_index = arc_counts.get(edge_key, 0)
-            arc_counts[edge_key] = arc_index + 1
-
             source_place = place_index.get(arc.source)
             target_place = place_index.get(arc.target)
             object_type = (
@@ -274,7 +269,7 @@ class PetriNet(Resource):
 
             edges.append(
                 GraphEdge(
-                    id=f"{arc.source}:{arc.target}:{arc_index}",
+                    id=f"{arc.source}:{arc.target}",
                     source=arc.source,
                     target=arc.target,
                     end_arrow="triangle",
@@ -299,15 +294,16 @@ class PetriNet(Resource):
                     "elk.layered.nodePlacement.bk.fixedAlignment": "BALANCED",
                     "elk.layered.crossingMinimization.strategy": "LAYER_SWEEP",
                     "elk.layered.cycleBreaking.strategy": "DEPTH_FIRST",
-                    "elk.spacing.nodeNode": 32,
-                    "elk.layered.spacing.nodeNodeBetweenLayers": 35,
-                    "elk.spacing.edgeNode": 24,
-                    "elk.layered.spacing.edgeNodeBetweenLayers": 24,
-                    "elk.spacing.edgeEdge": 16,
-                    "elk.spacing.labelNode": 10,
-                    "elk.spacing.edgeLabel": 10,
-                    "elk.spacing.labelLabel": 8,
+                    "elk.spacing.nodeNode": 22,
+                    "elk.layered.spacing.nodeNodeBetweenLayers": 34,
+                    "elk.spacing.edgeNode": 12,
+                    "elk.layered.spacing.edgeNodeBetweenLayers": 15,
+                    "elk.spacing.edgeEdge": 15,
+                    "elk.spacing.labelNode": 6,
+                    "elk.spacing.edgeLabel": 6,
+                    "elk.spacing.labelLabel": 4,
                     "elk.edgeLabels.placement": "CENTER",
+                    "elk.edgeLabels.inline": "false",
                 }
             ),
         )

@@ -4,6 +4,7 @@ import { memo } from "react";
 import { AnnotationBadge } from "../components/AnnotationBadge";
 import { HiddenHandles } from "../components/HiddenHandles";
 import { NodeLabel } from "../components/NodeLabel";
+import { EXTERNAL_NODE_LABEL_HEIGHT } from "../constants/graphFlow";
 
 export type TransitionNodeData = {
   label?: string | null;
@@ -64,6 +65,7 @@ const SilentTransition = ({
 }) => (
   <div
     style={{
+      boxSizing: "border-box",
       width,
       height,
       backgroundColor: color,
@@ -162,13 +164,20 @@ const TransitionNode = memo(({ data }: NodeProps<TransitionNodeType>) => {
   const isSilent = shape === "rectangle" && !label;
   const isExternalLabel = label && labelPos !== "center" && labelPos != null;
   const boxWidth = width ?? null;
-  const bottomLabelTop = height != null ? height + 4 : null;
+  const bottomLabelTop =
+    height != null ? EXTERNAL_NODE_LABEL_HEIGHT + height + 4 : null;
 
   return (
-    <div style={{ position: "relative" }}>
+    <div
+      style={{
+        position: "relative",
+        paddingTop: isExternalLabel ? EXTERNAL_NODE_LABEL_HEIGHT : 0,
+        paddingBottom: isExternalLabel ? EXTERNAL_NODE_LABEL_HEIGHT : 0,
+      }}
+    >
       <HiddenHandles />
       {isExternalLabel && labelPos === "top" && (
-        <NodeLabel absolute top={-20}>
+        <NodeLabel absolute top={0}>
           {label}
         </NodeLabel>
       )}

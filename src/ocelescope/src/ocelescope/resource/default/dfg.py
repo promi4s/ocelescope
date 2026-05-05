@@ -128,7 +128,7 @@ class DirectlyFollowsGraph(Resource):
                 id=activity.name,
                 label=activity.name,
                 shape="rectangle",
-                width=120,
+                width=140,
                 height=40,
                 annotation=activity.get_annotation_visualization(),
                 color="#ffffff",

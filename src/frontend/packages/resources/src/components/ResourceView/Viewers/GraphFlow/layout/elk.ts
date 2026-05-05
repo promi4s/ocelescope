@@ -8,6 +8,7 @@ import type {
   GraphLayoutResult,
 } from "../pipeline/types";
 import { normalizeEdgeRouting } from "../pipeline/validateGraphVisualization";
+import { EXTERNAL_NODE_LABEL_HEIGHT } from "../constants/graphFlow";
 import type { ElkEdgeResult } from "./elkTypes";
 
 const elk = new ELK();
@@ -69,6 +70,14 @@ const toEdgeLayoutMap = (
     return acc;
   }, {});
 
+const compareById = <T extends { id: string }>(left: T, right: T) =>
+  left.id.localeCompare(right.id);
+
+const compareEdgesForLayout = (left: Edge, right: Edge) =>
+  left.source.localeCompare(right.source) ||
+  left.target.localeCompare(right.target) ||
+  left.id.localeCompare(right.id);
+
 // ─── Main export ─────────────────────────────────────────────────────────────
 
 export const layoutWithElk = async ({
@@ -81,6 +90,8 @@ export const layoutWithElk = async ({
   layoutPlan: Extract<GraphLayoutPlan, { type: "elk" }>;
 }): Promise<GraphLayoutResult> => {
   interface NodeDataExtras {
+    label?: string | null;
+    labelPos?: "top" | "center" | "bottom" | null;
     width?: number | null;
     height?: number | null;
     rank?: "source" | "sink" | number | null;
@@ -93,14 +104,21 @@ export const layoutWithElk = async ({
     hasIntegerRanks
       ? { "elk.partitioning.activate": true, ...layoutPlan.elkOptions }
       : layoutPlan.elkOptions;
+  const layoutNodes = [...nodes].sort(compareById);
+  const layoutEdges = [...edges].sort(compareEdgesForLayout);
 
   const graph = await elk.layout({
     id: "root",
     layoutOptions: mergedLayoutOptions as Record<string, string>,
-    children: nodes.map((node) => {
+    children: layoutNodes.map((node) => {
       const nodeData = node.data as NodeDataExtras;
       const explicitWidth = nodeData.width ?? null;
       const explicitHeight = nodeData.height ?? null;
+      const label = nodeData.label ?? null;
+      const hasExternalLabel =
+        Boolean(label) &&
+        nodeData.labelPos !== "center" &&
+        nodeData.labelPos != null;
       const rank = nodeData.rank ?? null;
 
       const nodeLayoutOptions: Record<string, string> = {};
@@ -114,12 +132,14 @@ export const layoutWithElk = async ({
 
       return {
         id: node.id,
-        width: explicitWidth ?? node.measured?.width ?? 50,
-        height: explicitHeight ?? node.measured?.height ?? 34,
+        width: explicitWidth as number,
+        height:
+          (explicitHeight as number) +
+          (hasExternalLabel ? EXTERNAL_NODE_LABEL_HEIGHT * 2 : 0),
         layoutOptions: nodeLayoutOptions,
       };
     }),
-    edges: edges.map((edge) => {
+    edges: layoutEdges.map((edge) => {
       const edgeLabel = (edge.data as { label?: string | null } | undefined)
         ?.label;
       return {

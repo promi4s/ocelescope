@@ -258,8 +258,15 @@ export const validateGraphVisualization = (
   });
 
   const nodeIds = new Set(nodes.flatMap((node) => (node.id ? [node.id] : [])));
+  const edgeIds = new Set<string>();
   edges.forEach((edge, index) => {
     validateEdge(edge, index, nodeIds, errors);
+    if (edge.id) {
+      if (edgeIds.has(edge.id)) {
+        errors.push(`edges[${index}].id duplicates "${edge.id}".`);
+      }
+      edgeIds.add(edge.id);
+    }
   });
 
   const nodesWithPosition = nodes.filter(

@@ -4146,6 +4146,17 @@
             "type": "string",
             "title": "Id"
           },
+          "stable_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stable Id"
+          },
           "source": {
             "type": "string",
             "title": "Source"
@@ -4259,7 +4270,7 @@
           "target"
         ],
         "title": "GraphEdge",
-        "description": "A directed edge in a `Graph` visualization.\n\nAn edge connects `source` -> `target` and can carry labels and arrowhead styles.\n\nAttributes:\n    id: Unique edge id. Defaults to a generated UUID string.\n    source: Source node id.\n    target: Target node id.\n    color: Optional edge color.\n    label: Optional label shown along the edge.\n    style: Visual style options.\n    start_arrow: Optional arrowhead style at the start of the edge.\n    end_arrow: Optional arrowhead style at the end of the edge.\n    start_label: Optional label shown near the source.\n    end_label: Optional label shown near the target.\n    annotation: Optional attached visualization."
+        "description": "A directed edge in a `Graph` visualization.\n\nAn edge connects `source` -> `target` and can carry labels and arrowhead styles.\n\nAttributes:\n    id: Unique edge id. Defaults to a generated UUID string.\n    stable_id: Optional semantic id used to derive deterministic renderer ids.\n    source: Source node id.\n    target: Target node id.\n    color: Optional edge color.\n    label: Optional label shown along the edge.\n    style: Visual style options.\n    start_arrow: Optional arrowhead style at the start of the edge.\n    end_arrow: Optional arrowhead style at the end of the edge.\n    start_label: Optional label shown near the source.\n    end_label: Optional label shown near the target.\n    annotation: Optional attached visualization."
       },
       "GraphNode": {
         "properties": {
@@ -4276,6 +4287,17 @@
           "id": {
             "type": "string",
             "title": "Id"
+          },
+          "stable_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stable Id"
           },
           "label": {
             "anyOf": [
@@ -4405,7 +4427,7 @@
           "shape"
         ],
         "title": "GraphNode",
-        "description": "A node in a `Graph` visualization.\n\nA node defines its identity and visual appearance (shape, label, colors, size).\nLayout coordinates (`x`, `y`) are typically filled by the layouting step, not\nby the resource author.\n\nAttributes:\n    id: Unique node id. Defaults to a generated UUID string.\n    label: Optional label shown near the node.\n    shape: Node shape identifier.\n    width: Optional node width.\n    height: Optional node height.\n    color: Optional fill color (for example hex).\n    x: Optional x-coordinate after layouting.\n    y: Optional y-coordinate after layouting.\n    border_color: Optional border/stroke color.\n    style: Visual style options.\n    label_pos: Label position relative to the node.\n    rank: Optional layout constraint (source/sink or numeric rank).\n    annotation: Optional attached visualization."
+        "description": "A node in a `Graph` visualization.\n\nA node defines its identity and visual appearance (shape, label, colors, size).\nLayout coordinates (`x`, `y`) are typically filled by the layouting step, not\nby the resource author.\n\nAttributes:\n    id: Unique node id. Defaults to a generated UUID string.\n    stable_id: Optional semantic id used to derive deterministic renderer ids.\n    label: Optional label shown near the node.\n    shape: Node shape identifier.\n    width: Optional node width.\n    height: Optional node height.\n    color: Optional fill color (for example hex).\n    x: Optional x-coordinate after layouting.\n    y: Optional y-coordinate after layouting.\n    border_color: Optional border/stroke color.\n    style: Visual style options.\n    label_pos: Label position relative to the node.\n    rank: Optional layout constraint (source/sink or numeric rank).\n    annotation: Optional attached visualization."
       },
       "HTTPValidationError": {
         "properties": {

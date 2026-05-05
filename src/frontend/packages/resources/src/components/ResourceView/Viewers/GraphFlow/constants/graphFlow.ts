@@ -10,3 +10,4 @@ export const DEFAULT_COLORS = {
 
 export const MARKING_DOT_SIZE = 12;
 export const FIT_VIEW_PADDING = 0.15;
+export const EXTERNAL_NODE_LABEL_HEIGHT = 22;

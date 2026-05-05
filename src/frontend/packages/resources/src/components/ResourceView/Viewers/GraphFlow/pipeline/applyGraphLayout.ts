@@ -7,7 +7,12 @@ export const applyNodePositions = (
 ): Node[] =>
   nodes.map((node) => {
     const position = positions[node.id];
-    return position ? { ...node, position } : node;
+    if (!position) return node;
+
+    return {
+      ...node,
+      position,
+    };
   });
 
 export const applyEdgeLayouts = (

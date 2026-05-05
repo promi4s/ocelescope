@@ -1,5 +1,6 @@
 import pm4py
 from typing_extensions import Literal
+from uuid import UUID
 
 from ocelescope import OCEL
 from ocelescope.ocel.filter.filters.entity_type import EventTypeFilter, ObjectTypeFilter
@@ -14,6 +15,14 @@ from ocelescope.resource.default.dfg import (
     DirectlyFollowsGraph,
 )
 from ocelescope.resource.default.petri_net import Arc, ArcType, Marking, PetriNet, Place, Transition
+
+
+def _is_uuid(value: object) -> bool:
+    try:
+        UUID(str(value))
+    except (TypeError, ValueError):
+        return False
+    return True
 
 
 def _apply_discovery_filters(
@@ -105,7 +114,13 @@ def discover_ocpn(
         ocel=filtered_ocel.ocel,
     )
 
+    # Workaround: PM4Py generally provides useful custom ids for places and silent
+    # transitions, but visible activity transitions use UUID names while the stable
+    # activity identity is stored in the label. Rewrite those transition names here
+    # so the discovered resource and its visualization stay stable across runs.
+
     pnet = PetriNet()
+    transition_name_map: dict[str, str] = {}
 
     for place in ocpn.places:
         pnet.add_place(
@@ -116,13 +131,24 @@ def discover_ocpn(
         )
 
     for transition in ocpn.transitions:
-        pnet.add_transition(Transition(name=transition.name, label=transition.label))
+        original_name = str(transition.name)
+        transition_name = (
+            str(transition.label)
+            if transition.label is not None and _is_uuid(original_name)
+            else original_name
+        )
+        transition_name_map[original_name] = transition_name
+        pnet.add_transition(Transition(name=transition_name, label=transition.label))
 
     for arc in ocpn.arcs:
         pnet.add_arc(
             Arc(
-                source=str(arc.source.name),
-                target=str(arc.target.name),
+                source=transition_name_map.get(
+                    str(arc.source.name), str(arc.source.name)
+                ),
+                target=transition_name_map.get(
+                    str(arc.target.name), str(arc.target.name)
+                ),
                 type=ArcType.VARIABLE if arc.is_variable else ArcType.NORMAL,
             ),
         )
