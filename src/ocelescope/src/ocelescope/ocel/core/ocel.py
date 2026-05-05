@@ -10,6 +10,7 @@ import r4pm
 from pm4py.objects.ocel.obj import OCEL as PM4PYOCEL
 from pm4py.objects.ocel.obj import deepcopy
 
+from ocelescope.ocel.constants.pm4py import OID_COL, TIMESTAMP_COL
 from ocelescope.ocel.extensions.manager import ExtensionManager
 from ocelescope.ocel.filter.base import BaseFilter
 from ocelescope.ocel.managers import (
@@ -167,6 +168,40 @@ class OCEL:
 
         self.quantities.write_quantities(path)
         self.extensions.export_all(path)
+
+    def write_xes(self, object_type: str, path: str | Path):
+        """
+        Export the OCEL as a flattened XES log for a given object type.
+
+        Args:
+            object_type: Object type to flatten the OCEL to.
+            path: Output file path for the XES file.
+
+        Returns:
+            None
+        """
+
+        attr = (
+            self.objects.object_attr_changes(object_types=[object_type])
+            .reset_index()
+            .sort_values([TIMESTAMP_COL, OID_COL])
+            .drop_duplicates(subset=OID_COL, keep="last")
+            .set_index([OID_COL])
+        )[self.objects.dynamic_attribute_names].dropna(axis=1, how="all")
+
+        objects = self.ocel.objects.set_index(OID_COL)
+
+        missing_col = [col for col in attr.columns if col not in objects.columns]
+        objects[missing_col] = pd.NA
+        objects.update(attr)
+
+        self.ocel.objects = objects.reset_index()
+
+        pm4py.write_xes(
+            pm4py.ocel_flattening(self.ocel, object_type),
+            str(path),
+            variant_str="r4pm/rustxes",
+        )
 
     def __deepcopy__(self, memo: dict[int, Any]):
         # TODO revisit this. Are the underlying DataFrames mutable? If not, might optimize this
