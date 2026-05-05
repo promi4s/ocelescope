@@ -1,8 +1,8 @@
-from typing import Iterable, cast
+from typing import Any, Iterable, cast
 
 import pandas as pd
 
-from ocelescope.ocel.constants.pm4py import OID_COL, OTYPE_COL
+from ocelescope.ocel.constants.pm4py import OID_COL, OTYPE_COL, TIMESTAMP_COL
 from ocelescope.ocel.managers.base import BaseManager
 from ocelescope.util.cache import instance_lru_cache
 
@@ -143,3 +143,62 @@ class ObjectsManager(BaseManager):
         """
 
         return self._ocel.attributes.get_object_summary()
+
+    def object_attr_changes(
+        self,
+        object_types: Iterable[Any] | None = None,
+        objects: Iterable[Any] | None = None,
+        attributes: Iterable[Any] | None = None,
+    ):
+        """
+        Return dynamic object attributes over time.
+
+        Filters `object_changes` by object type and/or object id, forward-fills
+        attribute values per object, and returns one row per `(object_id, timestamp)`.
+
+        Args:
+            object_types: Optional object types to include.
+            objects: Optional object ids to include.
+            attributes: Optional dynamic attribute names to include. If omitted, all
+                dynamic attributes are returned.
+
+        Returns:
+            pandas.DataFrame: DataFrame indexed by `(ocel:oid, ocel:timestamp)` with
+            the selected dynamic attribute columns and the object type column
+            (`ocel:type`).
+        """
+
+        attr_cols = [
+            attr_name
+            for attr_name in self.dynamic_attribute_names
+            if attributes is None or attr_name in attributes
+        ]
+
+        changes = self.changes
+
+        mask = pd.Series(True, index=changes.index)
+
+        if object_types is not None:
+            mask &= changes[OTYPE_COL].isin(object_types)
+
+        if objects is not None:
+            mask &= changes[OID_COL].isin(objects)
+
+        changes = cast(pd.DataFrame, changes.loc[mask])
+
+        changes.sort_values([OID_COL, TIMESTAMP_COL])
+
+        changes[attr_cols] = changes.groupby(OID_COL)[attr_cols].ffill()
+
+        return (
+            changes.assign(_nn=changes.notna().sum(axis=1))
+            .reset_index()
+            .sort_values([TIMESTAMP_COL, OID_COL] + ["_nn"])
+            .drop_duplicates(subset=[TIMESTAMP_COL, OID_COL], keep="last")
+            .set_index([OID_COL, TIMESTAMP_COL], drop=True)[
+                attr_cols
+                + [
+                    OTYPE_COL,
+                ]
+            ]
+        )
