@@ -15,9 +15,9 @@ export type TransitionNodeType = Node<TransitionNodeData, "transition">;
 const SilentTransition = () => (
   <div
     style={{
-      width: 10,
-      height: TRANSITION_HEIGHT,
-      backgroundColor: "#222",
+      width: width ?? 10,
+      height: height ?? TRANSITION_HEIGHT,
+      backgroundColor: color,
       borderRadius: 2,
       boxShadow: "0 1px 4px rgba(0,0,0,0.35)",
     }}
