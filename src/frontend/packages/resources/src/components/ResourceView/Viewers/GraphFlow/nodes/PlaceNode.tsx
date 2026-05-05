@@ -1,33 +1,39 @@
-import { type Node, type NodeProps } from "@xyflow/react";
+import type { Node, NodeProps } from "@xyflow/react";
 import { memo } from "react";
+import { AnnotationBadge } from "../components/AnnotationBadge";
 import { HiddenHandles } from "../components/HiddenHandles";
 import { NodeLabel } from "../components/NodeLabel";
-import {
-  MARKING_DOT_SIZE,
-  PLACE_NODE_DIAMETER,
-} from "../constants/graphFlow";
-import { darkenHex } from "../utils/color";
+import { MARKING_DOT_SIZE } from "../constants/graphFlow";
 import { parseObjectType } from "../utils/labels";
 
 export type PlaceNodeData = {
   label?: string | null;
   color: string;
+  borderColor?: string | null | undefined;
   isFinalMarking: boolean;
-  isInitialMarking: boolean;
+  initialTokens?: number | null | undefined;
+  finalTokens?: number | null | undefined;
   innerSymbol?: "triangle" | "square" | null;
+  annotation?: { type?: string } | null;
+  labelPos?: "top" | "center" | "bottom" | null;
+  width?: number | null;
+  height?: number | null;
+  rank?: "source" | "sink" | number | null;
 };
 
 export type PlaceNodeType = Node<PlaceNodeData, "place">;
-
-const labelOffset = PLACE_NODE_DIAMETER + 6;
 
 const InnerSymbol = ({
   symbol,
   borderColor,
 }: {
   symbol: "triangle" | "square";
-  borderColor: string;
+  borderColor: string | null;
 }) => {
+  if (!borderColor) {
+    return null;
+  }
+
   if (symbol === "triangle") {
     return (
       <div
@@ -54,84 +60,177 @@ const InnerSymbol = ({
 };
 
 const PlaceCircle = ({
+  width,
+  height,
   color,
   borderColor,
   isFinalMarking,
-  isInitialMarking,
+  initialTokens,
+  finalTokens,
   innerSymbol,
+  centerLabel,
 }: {
+  width: number;
+  height: number;
   color: string;
-  borderColor: string;
+  borderColor: string | null;
   isFinalMarking: boolean;
-  isInitialMarking: boolean;
-  innerSymbol?: "triangle" | "square" | null;
+  initialTokens?: number | null | undefined;
+  finalTokens?: number | null | undefined;
+  innerSymbol?: "triangle" | "square" | null | undefined;
+  centerLabel?: string | null | undefined;
 }) => (
   <div
     style={{
       position: "relative",
-      width: PLACE_NODE_DIAMETER,
-      height: PLACE_NODE_DIAMETER,
+      width,
+      height,
       borderRadius: "50%",
       backgroundColor: color,
-      border: `2px solid ${borderColor}`,
+      border: borderColor ? `2px solid ${borderColor}` : "none",
       boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
       display: "flex",
+      flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
+      gap: 2,
     }}
   >
-    {isFinalMarking && (
+    {(isFinalMarking || Boolean(finalTokens)) && (
       <div
         style={{
           position: "absolute",
           inset: 5,
           borderRadius: "50%",
-          border: `2px solid ${borderColor}`,
+          border: borderColor ? `2px solid ${borderColor}` : "none",
           pointerEvents: "none",
         }}
       />
     )}
 
-    {isInitialMarking && !innerSymbol && (
-      <div
+    {initialTokens &&
+      !innerSymbol &&
+      (initialTokens === 1 ? (
+        <div
+          title="Initial marking: 1"
+          style={{
+            width: MARKING_DOT_SIZE,
+            height: MARKING_DOT_SIZE,
+            borderRadius: "50%",
+            backgroundColor: "rgba(0,0,0,0.65)",
+          }}
+        />
+      ) : (
+        <span
+          title={`Initial marking: ${initialTokens}`}
+          style={{
+            color: "#111",
+            fontSize: 11,
+            fontWeight: 700,
+            lineHeight: 1,
+          }}
+        >
+          {initialTokens}
+        </span>
+      ))}
+
+    {finalTokens && finalTokens > 1 && (
+      <span
+        title={`Final marking: ${finalTokens}`}
         style={{
-          width: MARKING_DOT_SIZE,
-          height: MARKING_DOT_SIZE,
-          borderRadius: "50%",
-          backgroundColor: "rgba(0,0,0,0.65)",
+          position: "absolute",
+          right: 4,
+          bottom: 3,
+          color: "#111",
+          fontSize: 9,
+          fontWeight: 700,
+          lineHeight: 1,
         }}
-      />
+      >
+        {finalTokens}
+      </span>
     )}
 
-    {innerSymbol && <InnerSymbol symbol={innerSymbol} borderColor={borderColor} />}
+    {innerSymbol && (
+      <InnerSymbol symbol={innerSymbol} borderColor={borderColor} />
+    )}
+    {centerLabel && (
+      <span
+        style={{
+          maxWidth: width - 6,
+          color: "#111",
+          fontSize: 10,
+          fontWeight: 600,
+          lineHeight: 1,
+          overflow: "hidden",
+          textAlign: "center",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {centerLabel}
+      </span>
+    )}
   </div>
 );
 
 const PlaceNode = memo(({ data }: NodeProps<PlaceNodeType>) => {
-  const { color, label, isFinalMarking, isInitialMarking, innerSymbol } = data;
+  const {
+    color,
+    label,
+    borderColor,
+    isFinalMarking,
+    initialTokens,
+    finalTokens,
+    innerSymbol,
+    annotation,
+    labelPos,
+    width,
+    height,
+  } = data;
   const objectType = parseObjectType(label);
-  const borderColor = darkenHex(color);
+  const visualWidth = width as number;
+  const visualHeight = height as number;
+  const labelOffset = visualHeight + 6;
+  const showLabelOnTop = labelPos === "top";
+  const showLabelInCenter = labelPos === "center";
+  const showExternalLabel = objectType && !showLabelInCenter;
 
   return (
     <div
       style={{
         position: "relative",
-        width: PLACE_NODE_DIAMETER,
-        paddingBottom: objectType ? 22 : 0,
+        width: visualWidth,
+        paddingTop: showExternalLabel && showLabelOnTop ? 22 : 0,
+        paddingBottom: showExternalLabel && !showLabelOnTop ? 22 : 0,
       }}
     >
       <HiddenHandles />
+      {showExternalLabel && showLabelOnTop && (
+        <NodeLabel absolute top={-22}>
+          {objectType}
+        </NodeLabel>
+      )}
       <PlaceCircle
+        width={visualWidth}
+        height={visualHeight}
         color={color}
-        borderColor={borderColor}
+        borderColor={borderColor ?? null}
         isFinalMarking={isFinalMarking}
-        isInitialMarking={isInitialMarking}
-        innerSymbol={innerSymbol}
+        initialTokens={initialTokens}
+        finalTokens={finalTokens}
+        innerSymbol={innerSymbol ?? null}
+        centerLabel={objectType && showLabelInCenter ? objectType : null}
       />
-      {objectType && (
+      {showExternalLabel && !showLabelOnTop && (
         <NodeLabel absolute top={labelOffset}>
           {objectType}
         </NodeLabel>
+      )}
+      {annotation && (
+        <div style={{ position: "absolute", right: -8, top: -8 }}>
+          <AnnotationBadge />
+        </div>
       )}
     </div>
   );
@@ -140,4 +239,3 @@ const PlaceNode = memo(({ data }: NodeProps<PlaceNodeType>) => {
 PlaceNode.displayName = "PlaceNode";
 
 export default PlaceNode;
-export { PLACE_NODE_DIAMETER } from "../constants/graphFlow";

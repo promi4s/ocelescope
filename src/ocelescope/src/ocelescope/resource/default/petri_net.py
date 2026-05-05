@@ -200,8 +200,8 @@ class PetriNet(Resource):
         return graph
 
     def visualize(self) -> Graph:
-        object_types = list({place.object_type for place in self.places})
-        color_map = generate_color_map(object_types)
+        object_types = [place.object_type for place in self.places]
+        color_map = generate_color_map(object_types, "custom")
         place_index = {place.name: place for place in self.places}
 
         nodes: list[GraphNode] = []
@@ -210,23 +210,20 @@ class PetriNet(Resource):
             initial_tokens = self.initial_marking.get(place.name, 0)
             final_tokens = self.final_marking.get(place.name, 0)
 
-            label_parts = [place.object_type]
-            if initial_tokens > 0:
-                label_parts.append(f"m0={initial_tokens}")
-            if final_tokens > 0:
-                label_parts.append(f"mf={final_tokens}")
-
             nodes.append(
                 GraphNode(
                     id=place.name,
-                    label=" | ".join(label_parts)
-                    if initial_tokens > 0 or final_tokens > 0
-                    else None,
+                    label=place.object_type,
                     shape="circle",
                     color=color_map.get(place.object_type, "#cccccc"),
-                    width=30,
-                    height=30,
-                    style=NodeStyle(double_border=final_tokens > 0),
+                    border_color="#000000",
+                    width=44,
+                    height=44,
+                    style=NodeStyle(
+                        double_border=final_tokens > 0,
+                        initial_tokens=initial_tokens or None,
+                        final_tokens=final_tokens or None,
+                    ),
                     label_pos="bottom",
                     annotation=place.get_annotation_visualization(),
                 )
@@ -239,8 +236,8 @@ class PetriNet(Resource):
                 GraphNode(
                     id=transition.name,
                     label=transition.label,
-                    width=None if labeled else 10,
-                    height=None if labeled else 40,
+                    width=140 if labeled else 10,
+                    height=40,
                     shape="rectangle",
                     color="#ffffff" if labeled else "#000000",
                     border_color="#000000" if labeled else None,
@@ -283,7 +280,7 @@ class PetriNet(Resource):
                     end_arrow="triangle",
                     color=color_map.get(object_type or "", "#cccccc"),
                     annotation=arc.get_annotation_visualization(),
-                    label=" | ".join(label_parts) if label_parts else None,
+                    label=" | ".join(label_parts),
                     style=EdgeStyle(dashed=arc.type == ArcType.VARIABLE),
                 )
             )
@@ -296,8 +293,21 @@ class PetriNet(Resource):
                     "elk.algorithm": "layered",
                     "elk.direction": "RIGHT",
                     "elk.edgeRouting": "SPLINES",
-                    "elk.layered.nodePlacement.strategy": "BRANDES_KOEPF",
                     "elk.layered.layering.strategy": "NETWORK_SIMPLEX",
+                    "elk.layered.nodePlacement.strategy": "BRANDES_KOEPF",
+                    "elk.layered.nodePlacement.bk.edgeStraightening": "IMPROVE_STRAIGHTNESS",
+                    "elk.layered.nodePlacement.bk.fixedAlignment": "BALANCED",
+                    "elk.layered.crossingMinimization.strategy": "LAYER_SWEEP",
+                    "elk.layered.cycleBreaking.strategy": "DEPTH_FIRST",
+                    "elk.spacing.nodeNode": 32,
+                    "elk.layered.spacing.nodeNodeBetweenLayers": 35,
+                    "elk.spacing.edgeNode": 24,
+                    "elk.layered.spacing.edgeNodeBetweenLayers": 24,
+                    "elk.spacing.edgeEdge": 16,
+                    "elk.spacing.labelNode": 10,
+                    "elk.spacing.edgeLabel": 10,
+                    "elk.spacing.labelLabel": 8,
+                    "elk.edgeLabels.placement": "CENTER",
                 }
             ),
         )

@@ -7,7 +7,11 @@ type NodeLabelProps = {
   top?: number;
 };
 
-export const NodeLabel = ({ children, absolute = false, top }: NodeLabelProps) => (
+export const NodeLabel = ({
+  children,
+  absolute = false,
+  top,
+}: NodeLabelProps) => (
   <Text
     size="xs"
     fw={600}

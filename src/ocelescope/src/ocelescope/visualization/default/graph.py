@@ -39,10 +39,14 @@ class NodeStyle(BaseModel):
     Attributes:
         double_border: Renders a second border inside the node (e.g. final-marking places).
         inner_symbol: Optional symbol rendered inside the node shape.
+        initial_tokens: Optional initial token count rendered inside a place node.
+        final_tokens: Optional final token count rendered inside a place node.
     """
 
     double_border: bool = False
     inner_symbol: Literal["triangle", "square"] | None = None
+    initial_tokens: int | None = None
+    final_tokens: int | None = None
 
 
 class EdgeStyle(BaseModel):

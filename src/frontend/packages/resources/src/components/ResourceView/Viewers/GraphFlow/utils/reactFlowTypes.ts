@@ -1,6 +1,6 @@
+import GraphFlowEdge from "../edges/GraphFlowEdge";
 import PlaceNode from "../nodes/PlaceNode";
 import TransitionNode from "../nodes/TransitionNode";
-import GraphFlowEdge from "../edges/GraphFlowEdge";
 
 export const nodeTypes = {
   place: PlaceNode,

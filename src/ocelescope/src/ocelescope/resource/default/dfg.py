@@ -110,7 +110,7 @@ class DirectlyFollowsGraph(Resource):
         return [object_type.name for object_type in self.object_types]
 
     def visualize(self) -> Graph:
-        color_map = generate_color_map([ot.name for ot in self.object_types])
+        color_map = generate_color_map([ot.name for ot in self.object_types], "custom")
 
         start_object_types = {
             edge.object_type
@@ -128,6 +128,8 @@ class DirectlyFollowsGraph(Resource):
                 id=activity.name,
                 label=activity.name,
                 shape="rectangle",
+                width=120,
+                height=40,
                 annotation=activity.get_annotation_visualization(),
                 color="#ffffff",
                 border_color="#000000",
@@ -141,7 +143,11 @@ class DirectlyFollowsGraph(Resource):
                 label=ot.name,
                 shape="circle",
                 color=color_map[ot.name],
+                border_color="#000000",
+                width=44,
+                height=44,
                 style=NodeStyle(inner_symbol="triangle"),
+                label_pos="bottom",
                 annotation=ot.get_annotation_visualization(),
             )
             for ot in self.object_types
@@ -154,7 +160,11 @@ class DirectlyFollowsGraph(Resource):
                 label=ot.name,
                 shape="circle",
                 color=color_map[ot.name],
+                border_color="#000000",
+                width=44,
+                height=44,
                 style=NodeStyle(inner_symbol="square"),
+                label_pos="bottom",
             )
             for ot in self.object_types
             if ot.name in end_object_types

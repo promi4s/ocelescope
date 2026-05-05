@@ -1,18 +1,46 @@
 import { type InternalNode, Position } from "@xyflow/react";
-import { PLACE_NODE_DIAMETER } from "../constants/graphFlow";
 
-/** Center of a node in absolute coordinates. */
-const center = (node: InternalNode) => {
+type VisualNodeData = {
+  width?: number | null;
+  height?: number | null;
+  label?: string | null;
+  labelPos?: "top" | "center" | "bottom" | null;
+};
+
+const placeBounds = (node: InternalNode) => {
+  const data = node.data as VisualNodeData;
+  const width = data.width ?? 0;
+  const height = data.height ?? 0;
+  const hasExternalTopLabel = Boolean(data.label) && data.labelPos === "top";
+
+  return {
+    x: node.internals.positionAbsolute.x,
+    y: node.internals.positionAbsolute.y + (hasExternalTopLabel ? 22 : 0),
+    width,
+    height,
+  };
+};
+
+const visualBounds = (node: InternalNode) => {
   if (node.type === "place") {
-    return {
-      x: node.internals.positionAbsolute.x + PLACE_NODE_DIAMETER / 2,
-      y: node.internals.positionAbsolute.y + PLACE_NODE_DIAMETER / 2,
-    };
+    return placeBounds(node);
   }
 
   return {
-    x: node.internals.positionAbsolute.x + (node.measured.width ?? 0) / 2,
-    y: node.internals.positionAbsolute.y + (node.measured.height ?? 0) / 2,
+    x: node.internals.positionAbsolute.x,
+    y: node.internals.positionAbsolute.y,
+    width: node.measured.width ?? 0,
+    height: node.measured.height ?? 0,
+  };
+};
+
+/** Center of a node in absolute coordinates. */
+const center = (node: InternalNode) => {
+  const bounds = visualBounds(node);
+
+  return {
+    x: bounds.x + bounds.width / 2,
+    y: bounds.y + bounds.height / 2,
   };
 };
 
@@ -25,8 +53,9 @@ const rectBorderPoint = (
   node: InternalNode,
   other: InternalNode,
 ): { x: number; y: number } | null => {
-  const hw = (node.measured.width ?? 0) / 2;
-  const hh = (node.measured.height ?? 0) / 2;
+  const bounds = visualBounds(node);
+  const hw = bounds.width / 2;
+  const hh = bounds.height / 2;
   if (hw === 0 || hh === 0) return null;
 
   const nc = center(node);
@@ -47,22 +76,23 @@ const rectBorderPoint = (
 };
 
 /**
- * Point on `node`'s circular border heading toward `other`.
- * Assumes the node is a square bounding box so radius = width/2.
+ * Point on `node`'s elliptical border heading toward `other`.
  */
 const circleBorderPoint = (
   node: InternalNode,
   other: InternalNode,
 ): { x: number; y: number } | null => {
-  const radius = PLACE_NODE_DIAMETER / 2;
-  if (radius === 0) return null;
+  const bounds = placeBounds(node);
+  const rx = bounds.width / 2;
+  const ry = bounds.height / 2;
+  if (rx === 0 || ry === 0) return null;
 
   const nc = center(node);
   const oc = center(other);
   const angle = Math.atan2(oc.y - nc.y, oc.x - nc.x);
   return {
-    x: nc.x + Math.cos(angle) * radius,
-    y: nc.y + Math.sin(angle) * radius,
+    x: nc.x + Math.cos(angle) * rx,
+    y: nc.y + Math.sin(angle) * ry,
   };
 };
 

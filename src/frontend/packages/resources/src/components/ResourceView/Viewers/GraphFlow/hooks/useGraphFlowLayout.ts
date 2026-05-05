@@ -1,4 +1,3 @@
-import { useCallback, useEffect, useRef, useState } from "react";
 import {
   applyNodeChanges,
   type Edge,
@@ -8,61 +7,126 @@ import {
   useNodesInitialized,
   useReactFlow,
 } from "@xyflow/react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { VisualizationByType } from "../../../../../types";
 import { FIT_VIEW_PADDING } from "../constants/graphFlow";
-import { buildGraphFlowEdges, buildGraphFlowNodes } from "../builders";
-import { layoutWithElk } from "../layout/elk";
+import {
+  applyEdgeLayouts,
+  applyNodePositions,
+} from "../pipeline/applyGraphLayout";
+import { createGraphFlowModel } from "../pipeline/createGraphFlowModel";
+import { layoutGraphFlowModel } from "../pipeline/layoutGraphFlowModel";
+import {
+  type GraphFlowModel,
+  GraphVisualizationError,
+} from "../pipeline/types";
 
-export const useGraphFlowLayout = (visualization: VisualizationByType<"graph">) => {
-  const [nodes, setNodes] = useState<Node[]>(() => buildGraphFlowNodes(visualization) as Node[]);
-  const [edges, setEdges] = useState<Edge[]>(() => buildGraphFlowEdges(visualization) as Edge[]);
+const toGraphError = (error: unknown): GraphVisualizationError => {
+  if (error instanceof GraphVisualizationError) {
+    return error;
+  }
+
+  return new GraphVisualizationError("Graph layout failed.", [
+    error instanceof Error ? error.message : String(error),
+  ]);
+};
+
+const measuredNodesMatchModel = (
+  measuredNodes: Node[],
+  model: GraphFlowModel,
+) => {
+  if (measuredNodes.length !== model.nodes.length) return false;
+
+  const measuredNodeIds = new Set(measuredNodes.map((node) => node.id));
+  return model.nodes.every((node) => measuredNodeIds.has(node.id));
+};
+
+export const useGraphFlowLayout = (
+  visualization: VisualizationByType<"graph">,
+) => {
+  const [model, setModel] = useState<GraphFlowModel | null>(null);
+  const [nodes, setNodes] = useState<Node[]>([]);
+  const [edges, setEdges] = useState<Edge[]>([]);
   const [layoutReady, setLayoutReady] = useState(false);
+  const [error, setError] = useState<GraphVisualizationError | null>(null);
 
   const { fitView } = useReactFlow();
   const measuredNodes = useNodes();
   const nodesInitialized = useNodesInitialized();
   const layoutApplied = useRef(false);
   const layoutIdRef = useRef(0);
-  const latestInput = useRef({ measuredNodes, edges, visualization });
+  const latestInput = useRef({ measuredNodes, edges, model });
 
   // Keep latest input in sync every render
   useEffect(() => {
-    latestInput.current = { measuredNodes, edges, visualization };
+    latestInput.current = { measuredNodes, edges, model };
   });
 
   // Reset when visualization changes
   useEffect(() => {
-    setNodes(buildGraphFlowNodes(visualization) as Node[]);
-    setEdges(buildGraphFlowEdges(visualization) as Edge[]);
-    setLayoutReady(false);
     layoutApplied.current = false;
     layoutIdRef.current++;
-  }, [visualization]);
+
+    try {
+      const nextModel = createGraphFlowModel(visualization);
+      setModel(nextModel);
+      setNodes(nextModel.nodes);
+      setEdges(nextModel.edges);
+      setError(null);
+      setLayoutReady(
+        nextModel.layoutPlan.type === "fixed-positions" ||
+          nextModel.nodes.length === 0,
+      );
+
+      if (nextModel.layoutPlan.type === "fixed-positions") {
+        requestAnimationFrame(() => fitView({ padding: FIT_VIEW_PADDING }));
+      }
+    } catch (err) {
+      setModel(null);
+      setNodes([]);
+      setEdges([]);
+      setError(toGraphError(err));
+      setLayoutReady(true);
+    }
+  }, [fitView, visualization]);
 
   const hasNodes = nodes.length > 0;
 
   // Run ELK layout once nodes are measured (or immediately when there are none)
   useEffect(() => {
+    if (error || !model || model.layoutPlan.type !== "elk") return;
     if (layoutApplied.current) return;
     if (hasNodes && !nodesInitialized) return;
+    if (hasNodes && !measuredNodesMatchModel(measuredNodes, model)) return;
     layoutApplied.current = true;
 
     const myLayoutId = layoutIdRef.current;
 
     const runLayout = async () => {
-      const { measuredNodes: currentNodes, edges: currentEdges, visualization: currentViz } =
-        latestInput.current;
+      const {
+        measuredNodes: currentNodes,
+        edges: currentEdges,
+        model: currentModel,
+      } = latestInput.current;
 
-      if (currentNodes.length === 0) {
+      if (!currentModel || currentModel.nodes.length === 0) {
         setLayoutReady(true);
         return;
       }
 
+      if (
+        currentNodes.length === 0 ||
+        !measuredNodesMatchModel(currentNodes, currentModel)
+      ) {
+        layoutApplied.current = false;
+        return;
+      }
+
       try {
-        const { positions, edgeLayouts } = await layoutWithElk({
-          nodes: currentNodes,
+        const layout = await layoutGraphFlowModel({
+          model: currentModel,
+          measuredNodes: currentNodes,
           edges: currentEdges,
-          visualization: currentViz,
         });
 
         // Discard result if visualization changed while ELK was running
@@ -71,39 +135,28 @@ export const useGraphFlowLayout = (visualization: VisualizationByType<"graph">) 
           return;
         }
 
-        setNodes((current) =>
-          current.map((node) => {
-            const pos = positions[node.id];
-            return pos ? { ...node, position: pos } : node;
-          }),
-        );
-
-        setEdges((current) =>
-          current.map((edge) => {
-            const layout = edgeLayouts[edge.id];
-            if (!layout) return edge;
-            return {
-              ...edge,
-              data: { ...edge.data, path: layout.path, labelPosition: layout.labelPosition },
-            };
-          }),
-        );
+        if (layout) {
+          setNodes((current) => applyNodePositions(current, layout.positions));
+          setEdges((current) => applyEdgeLayouts(current, layout.edgeLayouts));
+        }
 
         setLayoutReady(true);
         requestAnimationFrame(() => fitView({ padding: FIT_VIEW_PADDING }));
       } catch (err) {
-        console.error("[GraphFlow] ELK layout failed:", err);
         layoutApplied.current = false;
+        setError(toGraphError(err));
+        setLayoutReady(true);
       }
     };
 
     void runLayout();
-  }, [fitView, nodesInitialized, hasNodes]);
+  }, [fitView, nodesInitialized, hasNodes, model, error, measuredNodes]);
 
   const onNodesChange = useCallback(
-    (changes: NodeChange[]) => setNodes((current) => applyNodeChanges(changes, current)),
+    (changes: NodeChange[]) =>
+      setNodes((current) => applyNodeChanges(changes, current)),
     [],
   );
 
-  return { nodes, edges, layoutReady, onNodesChange };
+  return { nodes, edges, layoutReady, error, onNodesChange };
 };
