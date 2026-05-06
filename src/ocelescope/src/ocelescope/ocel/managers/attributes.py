@@ -3,7 +3,13 @@ import pandas as pd
 
 from ocelescope.ocel.constants import ACTIVITY_COL
 from ocelescope.ocel.constants.attributes import ATTRIBUTE_COL
-from ocelescope.ocel.constants.pm4py import EID_COL, OID_COL, OTYPE_COL, TIMESTAMP_COL
+from ocelescope.ocel.constants.pm4py import (
+    EID_COL,
+    OBJECT_CHANGES_DF_COLS,
+    OID_COL,
+    OTYPE_COL,
+    TIMESTAMP_COL,
+)
 from ocelescope.ocel.managers.base import BaseManager
 from ocelescope.util.pandas import (
     infer_column_dtype,
@@ -58,37 +64,49 @@ class AttributeManager(BaseManager):
             A dataframe containing a union of event rows and object/object-change
             rows with normalized missing values.
         """
-        event_table = (
+
+        objects_table = (
+            self._ocel.objects.df
+            if object_types is None
+            else self._ocel.objects.df.loc[self._ocel.objects.df[OTYPE_COL].isin(object_types)]
+        )
+
+        changes_table = (
+            self._ocel.objects.changes
+            if object_types is None
+            else self._ocel.objects.changes.loc[
+                self._ocel.objects.changes[OTYPE_COL].isin(object_types)
+            ]
+        )
+
+        events_table = (
             self._ocel.events.df
             if activities is None
-            else self._ocel.events.df[self._ocel.events.df[ACTIVITY_COL].isin(activities)]
+            else self._ocel.events.df.loc[self._ocel.events.df[ACTIVITY_COL].isin(activities)]
         )
 
-        object_table = pd.concat(
-            [self._ocel.objects.df, self._ocel.objects.changes]
-            if object_types is None
-            else [
-                self._ocel.objects.df[self._ocel.objects.df[OTYPE_COL].isin(object_types)],
-                self._ocel.objects.changes[
-                    self._ocel.objects.changes[OTYPE_COL].isin(object_types)
-                ],
-            ],
-            ignore_index=True,
-            sort=False,
-        )
-
-        merged = (
-            pd.concat([event_table, object_table], ignore_index=True, sort=False)
-            .drop(columns=["ocel:field", "@@cumcount", "new_value"], errors="ignore")
-            .replace(["null", ""], pd.NA)
-        )
+        object_keep = [col for col in objects_table.columns if col != OID_COL]
+        changes_keep = [
+            col
+            for col in changes_table.columns
+            if col not in [c for c in OBJECT_CHANGES_DF_COLS if c != OTYPE_COL]
+        ]
+        event_keep = [col for col in events_table.columns if col not in [EID_COL, TIMESTAMP_COL]]
 
         if attributes is not None:
-            wanted = [OID_COL, EID_COL, OTYPE_COL, ACTIVITY_COL, TIMESTAMP_COL, *attributes]
-            columns = [c for c in dict.fromkeys(wanted) if c in merged.columns]
-            merged = merged.loc[:, columns]
+            allowed = set(attributes) | {ACTIVITY_COL, OTYPE_COL}
+            object_keep = [col for col in object_keep if col in allowed]
+            changes_keep = [col for col in changes_keep if col in allowed]
+            event_keep = [col for col in event_keep if col in allowed]
 
-        return merged
+        return pd.concat(
+            [
+                objects_table[object_keep],
+                changes_table[changes_keep],
+                events_table[event_keep],
+            ],
+            ignore_index=True,
+        )
 
     def get_aggr_summary(
         self,
