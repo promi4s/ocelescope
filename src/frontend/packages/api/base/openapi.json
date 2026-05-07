@@ -3064,10 +3064,6 @@
             "type": "integer",
             "title": "Distinct Values"
           },
-          "total_values": {
-            "type": "integer",
-            "title": "Total Values"
-          },
           "type": {
             "$ref": "#/components/schemas/ValueType"
           },
@@ -3092,7 +3088,6 @@
           "min",
           "max",
           "distinct_values",
-          "total_values",
           "type",
           "object_types",
           "actitvities"
@@ -5329,10 +5324,6 @@
             "type": "integer",
             "title": "Distinct Values"
           },
-          "total_values": {
-            "type": "integer",
-            "title": "Total Values"
-          },
           "type": {
             "$ref": "#/components/schemas/ValueType"
           },
@@ -5347,7 +5338,6 @@
           "min",
           "max",
           "distinct_values",
-          "total_values",
           "type",
           "entity_type"
         ],

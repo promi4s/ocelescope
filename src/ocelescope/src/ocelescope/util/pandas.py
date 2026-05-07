@@ -79,30 +79,6 @@ def coerce_series(series: pd.Series) -> pd.Series:
         return series
 
 
-def str_min(s: pd.Series):
-    x = s.dropna()
-    if x.empty:
-        return pd.NA
-    return x.astype(str).min()
-
-
-def str_max(s: pd.Series):
-    x = s.dropna()
-    if x.empty:
-        return pd.NA
-    return x.astype(str).max()
-
-
-def num_min(s: pd.Series):
-    x = pd.to_numeric(s, errors="coerce")
-    return x.min(skipna=True)
-
-
-def num_max(s: pd.Series):
-    x = pd.to_numeric(s, errors="coerce")
-    return x.max(skipna=True)
-
-
 def select_min_max_by_type(
     df: pd.DataFrame,
     type_col: str,

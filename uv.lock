@@ -929,6 +929,18 @@ wheels = [
 ]
 
 [[package]]
+name = "ipython-autotime"
+version = "0.3.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "ipython" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c2/9d/f8b72a7cf940c704299ef712c75e862abd7fac3bbc4675a87f9851f20241/ipython-autotime-0.3.2.tar.gz", hash = "sha256:fc03ab920266072f0f6d7f1cc04247afe1c2f22f7bd052542af700939769d5f4", size = 6347, upload-time = "2023-11-01T11:43:24.725Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d1/6b/c668b9d6a3552eeb4d82c0e6f1e79debc9cfaecc2d59ddb5b2f38c24cdfc/ipython_autotime-0.3.2-py2.py3-none-any.whl", hash = "sha256:c51e1175b9d0d2c5da51ac17963f3a836036cf389b8ef20f8a7483573d2c3dce", size = 6971, upload-time = "2023-11-01T11:43:23.549Z" },
+]
+
+[[package]]
 name = "ipython-pygments-lexers"
 version = "1.1.1"
 source = { registry = "https://pypi.org/simple" }
@@ -1973,6 +1985,9 @@ docs = [
 lint = [
     { name = "ruff" },
 ]
+repl = [
+    { name = "ipython-autotime" },
+]
 
 [package.metadata]
 
@@ -1988,6 +2003,7 @@ docs = [
     { name = "mkdocstrings-python", specifier = ">=2.0.3" },
 ]
 lint = [{ name = "ruff", specifier = ">=0.15.7" }]
+repl = [{ name = "ipython-autotime", specifier = ">=0.3.2" }]
 
 [[package]]
 name = "orjson"
