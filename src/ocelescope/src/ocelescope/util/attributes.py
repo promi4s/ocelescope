@@ -21,8 +21,11 @@ def summarize_attribute_values(attr_name: str, attr_table: pd.DataFrame):
 
     attr_type = infer_column_dtype(attr_col)
 
-    if attr_type == ValueType.STRING:
-        attr_col = attr_col.astype("str")
+    match attr_type:
+        case ValueType.STRING:
+            attr_col = attr_col.astype("str")
+        case ValueType.INT | ValueType.FLOAT:
+            attr_col = pd.to_numeric(attr_col, errors="coerce")
 
     return [
         attr_name,
