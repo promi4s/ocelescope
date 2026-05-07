@@ -1,8 +1,7 @@
 import type { Edge, Node } from "@xyflow/react";
 import { DEFAULT_COLORS, DEFAULT_NODE_POSITION } from "../constants/graphFlow";
-import type { GraphFlowEdgeType } from "../edges/GraphFlowEdge";
-import type { PlaceNodeType } from "../nodes/PlaceNode";
-import type { TransitionNodeType } from "../nodes/TransitionNode";
+import type { GraphFlowEdgeType } from "../edges/types";
+import type { GraphFlowNodeType } from "../nodes/types";
 import type {
   BackendGraphEdge,
   BackendGraphNode,
@@ -11,8 +10,6 @@ import type {
   GraphVisualization,
 } from "./types";
 import { normalizeElkOptions } from "./validateGraphVisualization";
-
-type GraphFlowNodeType = PlaceNodeType | TransitionNodeType;
 
 const hasFixedPosition = (node: BackendGraphNode) =>
   node.x !== undefined &&
@@ -25,61 +22,26 @@ const getNodePosition = (node: BackendGraphNode) =>
     ? { x: node.x as number, y: node.y as number }
     : DEFAULT_NODE_POSITION;
 
-const mapNode = (node: BackendGraphNode): GraphFlowNodeType => {
-  const id = node.id as string;
-  const label = node.label ?? null;
-  const color = node.color ?? DEFAULT_COLORS.place;
-  const labelPos = node.label_pos ?? "center";
-  const width = node.width ?? null;
-  const height = node.height ?? null;
-  const rank = node.rank ?? null;
-  const annotation = node.annotation ?? null;
-  const doubleBorder = node.style?.double_border ?? false;
-  const innerSymbol = node.style?.inner_symbol ?? null;
-  const initialTokens = node.style?.initial_tokens ?? null;
-  const finalTokens = node.style?.final_tokens ?? null;
-
-  if (node.shape === "circle") {
-    return {
-      id,
-      type: "place",
-      position: getNodePosition(node),
-      data: {
-        label,
-        color,
-        borderColor: node.border_color ?? null,
-        isFinalMarking: doubleBorder,
-        initialTokens,
-        finalTokens,
-        innerSymbol,
-        annotation,
-        labelPos,
-        width,
-        height,
-        rank,
-      },
-    };
-  }
-
-  return {
-    id,
-    type: "transition",
-    position: getNodePosition(node),
-    data: {
-      label,
-      shape: node.shape,
-      color: node.color ?? DEFAULT_COLORS.transition,
-      borderColor: node.border_color ?? null,
-      doubleBorder,
-      innerSymbol,
-      annotation,
-      labelPos,
-      width,
-      height,
-      rank,
-    },
-  };
-};
+const mapNode = (node: BackendGraphNode): GraphFlowNodeType => ({
+  id: node.id as string,
+  type: "node",
+  position: getNodePosition(node),
+  data: {
+    label: node.label ?? null,
+    shape: node.shape ?? "rectangle",
+    color: node.color ?? DEFAULT_COLORS.transition,
+    borderColor: node.border_color ?? null,
+    doubleBorder: node.style?.double_border ?? null,
+    innerSymbol: node.style?.inner_symbol ?? null,
+    initialTokens: node.style?.initial_tokens ?? null,
+    finalTokens: node.style?.final_tokens ?? null,
+    labelPos: node.label_pos ?? "center",
+    width: node.width ?? null,
+    height: node.height ?? null,
+    rank: node.rank ?? null,
+    annotation: node.annotation ?? null,
+  },
+});
 
 const mapEdge = (edge: BackendGraphEdge): GraphFlowEdgeType => ({
   id: edge.id as string,
@@ -90,6 +52,7 @@ const mapEdge = (edge: BackendGraphEdge): GraphFlowEdgeType => ({
     color: edge.color ?? DEFAULT_COLORS.edge,
     label: edge.label ?? null,
     dashed: edge.style?.dashed ?? false,
+    bold: edge.style?.bold ?? false,
     startArrow: edge.start_arrow ?? null,
     endArrow: edge.end_arrow ?? null,
     startLabel: edge.start_label ?? null,

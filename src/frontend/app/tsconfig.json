@@ -16,8 +16,10 @@
     "paths": {
       "@/*": ["./*"],
       "@ocelescope/core": ["../packages/core/src/index.ts"],
-      "@ocelescope/core/styles": ["../packages/core/src/styles/styles.ts"]
-    }
+      "@ocelescope/resources": ["../packages/resources/src/index.ts"],
+      "@ocelescope/core/styles": ["../packages/core/src/styles/styles.ts"],
+      "@ocelescope/discovery": ["../modules/discovery/src/index.ts"],
+    },
   },
   "include": [
     "next-env.d.ts",
@@ -25,7 +27,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "**/*.mts"
+    "**/*.mts",
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
 }

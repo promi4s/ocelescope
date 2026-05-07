@@ -3,9 +3,11 @@ import {
   Controls,
   ReactFlow,
   ReactFlowProvider,
+  useReactFlow,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { Alert, Code, LoadingOverlay, Stack } from "@mantine/core";
+import { useEffect } from "react";
 
 import type { VisualizationByType } from "../../../../types";
 import { FIT_VIEW_PADDING } from "./constants/graphFlow";
@@ -18,8 +20,18 @@ type GraphFlowProps = {
 };
 
 const GraphFlowCanvas = ({ visualization, isPreview }: GraphFlowProps) => {
-  const { nodes, edges, layoutReady, error, onNodesChange } =
+  const { nodes, edges, layoutReady, fitViewVersion, error, onNodesChange } =
     useGraphFlowLayout(visualization);
+
+  const { fitView } = useReactFlow();
+
+  // Fit the viewport after each completed layout. Using useEffect (post-commit)
+  // ensures React has applied all node positions to the DOM before fitView runs,
+  // avoiding the race condition of requestAnimationFrame inside async callbacks.
+  useEffect(() => {
+    if (fitViewVersion === 0) return;
+    fitView({ padding: FIT_VIEW_PADDING });
+  }, [fitViewVersion, fitView]);
 
   if (error) {
     return (

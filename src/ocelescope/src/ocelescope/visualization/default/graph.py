@@ -53,10 +53,12 @@ class EdgeStyle(BaseModel):
     """Visual style options for a `GraphEdge`.
 
     Attributes:
-        dashed: Renders the edge as a dashed line (e.g. variable arcs).
+        dashed: Renders the edge as a dashed line.
+        bold: Renders the edge as a bold line.
     """
 
     dashed: bool = False
+    bold: bool = False
 
 
 class GraphNode(AnnotatedElement):

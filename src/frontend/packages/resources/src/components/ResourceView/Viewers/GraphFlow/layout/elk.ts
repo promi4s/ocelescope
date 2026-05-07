@@ -16,8 +16,6 @@ const elk = new ELK();
 type NodePositionMap = GraphLayoutResult["positions"];
 type ElkEdgeLayoutMap = GraphLayoutResult["edgeLayouts"];
 
-// ─── Routing detection ───────────────────────────────────────────────────────
-
 const getEdgeRouting = (
   edge: ElkEdgeResult,
   fallback: GraphEdgeRouting,
@@ -30,8 +28,6 @@ const getEdgeRouting = (
     ? fallback
     : normalizeEdgeRouting(edgeRouting);
 };
-
-// ─── Map builders ────────────────────────────────────────────────────────────
 
 const toPositionMap = (
   children: Array<{ id?: string; x?: number; y?: number }> = [],
@@ -77,8 +73,6 @@ const compareEdgesForLayout = (left: Edge, right: Edge) =>
   left.source.localeCompare(right.source) ||
   left.target.localeCompare(right.target) ||
   left.id.localeCompare(right.id);
-
-// ─── Main export ─────────────────────────────────────────────────────────────
 
 export const layoutWithElk = async ({
   nodes,

@@ -276,7 +276,7 @@ class PetriNet(Resource):
                     color=color_map.get(object_type or "", "#cccccc"),
                     annotation=arc.get_annotation_visualization(),
                     label=" | ".join(label_parts),
-                    style=EdgeStyle(dashed=arc.type == ArcType.VARIABLE),
+                    style=EdgeStyle(bold=arc.type == ArcType.VARIABLE),
                 )
             )
 
