@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 
 from ocelescope.ocel.constants import ACTIVITY_COL
@@ -11,14 +10,7 @@ from ocelescope.ocel.constants.pm4py import (
     TIMESTAMP_COL,
 )
 from ocelescope.ocel.managers.base import BaseManager
-from ocelescope.util.pandas import (
-    infer_column_dtype,
-    num_max,
-    num_min,
-    select_min_max_by_type,
-    str_max,
-    str_min,
-)
+from ocelescope.util.attributes import summarize_attribute_values
 
 ENTITY_TYPE = "ocel:entity_type"
 ENTITY_TYPE_NAME = "ocel:entity_type_name"
@@ -101,9 +93,13 @@ class AttributeManager(BaseManager):
 
         return pd.concat(
             [
-                objects_table[object_keep],
-                changes_table[changes_keep],
-                events_table[event_keep],
+                table
+                for table in [
+                    objects_table[object_keep],
+                    changes_table[changes_keep],
+                    events_table[event_keep],
+                ]
+                if len(table) > 0
             ],
             ignore_index=True,
         )
@@ -145,31 +141,29 @@ class AttributeManager(BaseManager):
         -------
         pandas.DataFrame
             A dataframe indexed by `ATTRIBUTE_COL` with (at least) the columns:
-            `distinct_values`, `total`, `type`, `min`, `max`, `activities`,
+            `distinct_values`, `type`, `min`, `max`, `activities`,
             `object_types`.
         """
-        attribute_table = (
-            self._merged_att_table(
-                object_types=object_types, activities=activities, attributes=attributes
-            )
-            .drop(columns=[EID_COL, OID_COL, TIMESTAMP_COL], errors="ignore")
-            .melt(id_vars=[OTYPE_COL, ACTIVITY_COL], var_name=ATTRIBUTE_COL, value_name="value")
-            .dropna(subset=["value"])
-            .groupby([ATTRIBUTE_COL], sort=False)
-            .agg(
-                distinct_values=("value", "nunique"),
-                min_str=("value", str_min),
-                max_str=("value", str_max),
-                min_num=("value", num_min),
-                max_num=("value", num_max),
-                total=("value", "size"),
-                type=("value", infer_column_dtype),
-                activities=(ACTIVITY_COL, lambda x: x.dropna().unique().tolist()),
-                object_types=(OTYPE_COL, lambda x: x.dropna().unique().tolist()),
-            )
+        attr_table = self._merged_att_table(
+            object_types=object_types, activities=activities, attributes=attributes
         )
 
-        return select_min_max_by_type(attribute_table, "type")
+        return pd.DataFrame(
+            [
+                summarize_attribute_values(attr_name, attr_table)
+                for attr_name in attr_table.columns
+                if attr_name not in [ACTIVITY_COL, OTYPE_COL]
+            ],
+            columns=[
+                ATTRIBUTE_COL,
+                "type",
+                "min",
+                "max",
+                "distinct_values",
+                "activities",
+                "object_types",
+            ],
+        ).set_index(ATTRIBUTE_COL, drop=True)
 
     def get_summary(
         self,
@@ -211,42 +205,34 @@ class AttributeManager(BaseManager):
         pandas.DataFrame
             A dataframe indexed by (`ATTRIBUTE_COL`, `ENTITY_TYPE`,
             `ENTITY_TYPE_NAME`) with columns including:
-            `distinct_values`, `total`, `type`, `min`, `max`.
+            `distinct_values`, `type`, `min`, `max`.
         """
-        attribute_table = self._merged_att_table(
-            object_types=object_types, activities=activities, attributes=attributes
+
+        merged = self._merged_att_table(
+            object_types=object_types, attributes=attributes, activities=activities
         )
 
-        attribute_table[ENTITY_TYPE] = np.where(
-            attribute_table[ACTIVITY_COL].isna(), "object", "event"
-        )
-        attribute_table[ENTITY_TYPE_NAME] = attribute_table[ACTIVITY_COL].fillna(
-            attribute_table[OTYPE_COL]
-        )
+        attribute_names = [col for col in merged.columns if col not in [OTYPE_COL, ACTIVITY_COL]]
 
-        attribute_table = (
-            attribute_table.drop(
-                columns=[EID_COL, OID_COL, TIMESTAMP_COL, ACTIVITY_COL, OTYPE_COL], errors="ignore"
-            )
-            .melt(
-                id_vars=[ENTITY_TYPE, ENTITY_TYPE_NAME],
-                var_name=ATTRIBUTE_COL,
-                value_name="value",
-            )
-            .dropna(subset=["value"])
-            .groupby([ATTRIBUTE_COL, ENTITY_TYPE, ENTITY_TYPE_NAME], sort=False)
-            .agg(
-                distinct_values=("value", "nunique"),
-                min_str=("value", str_min),
-                max_str=("value", str_max),
-                min_num=("value", num_min),
-                max_num=("value", num_max),
-                total=("value", "size"),
-                type=("value", infer_column_dtype),
-            )
-        )
-
-        return select_min_max_by_type(attribute_table, "type")
+        return pd.DataFrame(
+            [
+                ([group[0], "object"] if pd.notna(group[0]) else [group[1], "activity"])
+                + (summarize_attribute_values(col, group_df)[:-2])
+                for group, group_df in merged.groupby([OTYPE_COL, ACTIVITY_COL], dropna=False)[
+                    attribute_names
+                ]
+                for col in group_df.dropna(axis=1, how="all").columns
+            ],
+            columns=[
+                ENTITY_TYPE_NAME,
+                ENTITY_TYPE,
+                ATTRIBUTE_COL,
+                "type",
+                "min",
+                "max",
+                "distinct_values",
+            ],
+        ).set_index([ENTITY_TYPE_NAME, ENTITY_TYPE, ATTRIBUTE_COL], drop=False)
 
     def get_object_summary(
         self, attributes: list[str] | None = None, object_types: list[str] | None = None
