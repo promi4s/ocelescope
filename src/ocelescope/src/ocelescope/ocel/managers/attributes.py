@@ -214,13 +214,14 @@ class AttributeManager(BaseManager):
 
         attribute_names = [col for col in merged.columns if col not in [OTYPE_COL, ACTIVITY_COL]]
 
+        # TODO: Make this better readable
         return pd.DataFrame(
             [
                 ([group[0], "object"] if pd.notna(group[0]) else [group[1], "activity"])
                 + (summarize_attribute_values(col, group_df)[:-2])
-                for group, group_df in merged.groupby([OTYPE_COL, ACTIVITY_COL], dropna=False)[
-                    attribute_names
-                ]
+                for group, group_df in merged.groupby(
+                    list(set([OTYPE_COL, ACTIVITY_COL]) & set(merged.columns)), dropna=False
+                )[attribute_names]
                 for col in group_df.dropna(axis=1, how="all").columns
             ],
             columns=[
@@ -232,7 +233,7 @@ class AttributeManager(BaseManager):
                 "max",
                 "distinct_values",
             ],
-        ).set_index([ENTITY_TYPE_NAME, ENTITY_TYPE, ATTRIBUTE_COL], drop=False)
+        ).set_index([ENTITY_TYPE_NAME, ENTITY_TYPE, ATTRIBUTE_COL])
 
     def get_object_summary(
         self, attributes: list[str] | None = None, object_types: list[str] | None = None
