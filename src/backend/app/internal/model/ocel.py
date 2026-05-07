@@ -119,8 +119,8 @@ class TypedAttribute(Attribute):
     @classmethod
     def from_df_row(cls, row: tuple[Hashable, pd.Series]) -> "TypedAttribute":
         index = cast(tuple[str, str], row[0])
-        entity_type = index[1]
-        base = Attribute.from_df_row((index[0], row[1]))
+        entity_type = index[0]
+        base = Attribute.from_df_row((index[1], row[1]))
 
         return cls(
             entity_type=entity_type,
