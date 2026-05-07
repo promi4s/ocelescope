@@ -76,7 +76,6 @@ class Attribute(BaseModel):
     min: str | int | float
     max: str | int | float
     distinct_values: int
-    total_values: int
     type: ValueType
 
     @classmethod
@@ -90,7 +89,6 @@ class Attribute(BaseModel):
             min=series["min"],
             max=series["max"],
             distinct_values=series["distinct_values"],
-            total_values=series["total"],
             type=series["type"],
         )
 
