@@ -27,7 +27,6 @@ import {
 } from "@ocelescope/api-base";
 import { defineModuleRoute, useCurrentOcel } from "@ocelescope/core";
 import { ResourceViewer } from "@ocelescope/resources";
-import { useMediaQuery } from "@mantine/hooks";
 import { ChevronsLeft, ChevronsRight } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -253,7 +252,7 @@ const renderDiscoveryField = ({
   );
 };
 
-// ─── Settings fields (shared between desktop panel and mobile) ────────────────
+// ─── Settings fields ──────────────────────────────────────────────────────────
 
 const DiscoverySettingsContent = ({
   methods,
@@ -333,14 +332,12 @@ const DiscoverySettingsContent = ({
 
 const DiscoveryPageContent = ({
   ocelId,
-  isMobile,
   panelWidth,
   setPanelWidth,
   isPanelCollapsed,
   setIsPanelCollapsed,
 }: {
   ocelId: string;
-  isMobile: boolean | undefined;
   panelWidth: number;
   setPanelWidth: (w: number) => void;
   isPanelCollapsed: boolean;
@@ -556,14 +553,14 @@ const DiscoveryPageContent = ({
       h="100%"
       style={{
         display: "flex",
-        flexDirection: isMobile ? "column" : "row",
+        flexDirection: "row",
         overflow: "hidden",
       }}
     >
       <LoadingOverlay visible={isMethodsLoading} />
 
       {/* Canvas area */}
-      <Box pos="relative" flex={1} mih={isMobile ? 400 : undefined} style={{ overflow: "hidden" }}>
+      <Box pos="relative" flex={1} style={{ overflow: "hidden" }}>
         <LoadingOverlay visible={Boolean(isDiscovering && latestResourceId)} />
         {latestResourceId ? (
           <Box h="100%" p="sm">
@@ -580,9 +577,8 @@ const DiscoveryPageContent = ({
         )}
       </Box>
 
-      {/* Desktop right panel — single wrapper ensures border spans full height */}
-      {!isMobile && (
-        <Box
+      {/* Right panel — single wrapper ensures border spans full height */}
+      <Box
           style={{
             borderLeft: "1px solid var(--mantine-color-default-border)",
             display: "flex",
@@ -663,22 +659,6 @@ const DiscoveryPageContent = ({
             </>
           )}
         </Box>
-      )}
-
-      {/* Mobile settings */}
-      {isMobile && (
-        <Box
-          w="100%"
-          p="lg"
-          style={{
-            overflowY: "auto",
-            flexShrink: 0,
-            borderTop: "1px solid var(--mantine-color-default-border)",
-          }}
-        >
-          <DiscoverySettingsContent {...settingsProps} />
-        </Box>
-      )}
     </Box>
   );
 };
@@ -687,7 +667,6 @@ const DiscoveryPageContent = ({
 
 const DiscoveryPage = () => {
   const { id: ocelId } = useCurrentOcel();
-  const isMobile = useMediaQuery("(max-width: 62em)");
 
   const [panelWidth, setPanelWidth] = useState(() => loadPanelState().width);
   const [isPanelCollapsed, setIsPanelCollapsed] = useState(
@@ -709,7 +688,6 @@ const DiscoveryPage = () => {
     <DiscoveryPageContent
       key={ocelId}
       ocelId={ocelId}
-      isMobile={isMobile}
       panelWidth={panelWidth}
       setPanelWidth={setPanelWidth}
       isPanelCollapsed={isPanelCollapsed}

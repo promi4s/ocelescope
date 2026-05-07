@@ -15,12 +15,6 @@ catalogs:
     '@faker-js/faker':
       specifier: ^10.4.0
       version: 10.4.0
-    '@floating-ui/react':
-      specifier: ^0.27.18
-      version: 0.27.19
-    '@hpcc-js/wasm-graphviz':
-      specifier: ^1.21.0
-      version: 1.21.1
     '@mantine/carousel':
       specifier: ^8.3.15
       version: 8.3.16
@@ -126,9 +120,6 @@ catalogs:
     json-schema-traverse:
       specifier: ^1.0.0
       version: 1.0.0
-    lodash:
-      specifier: ^4.17.23
-      version: 4.17.23
     lucide-react:
       specifier: ^0.563.0
       version: 0.563.0
@@ -150,12 +141,6 @@ catalogs:
     react-hook-form:
       specifier: ^7.71.2
       version: 7.71.2
-    react-plotly.js:
-      specifier: ^2.6.0
-      version: 2.6.0
-    react-zoom-pan-pinch:
-      specifier: ^3.7.0
-      version: 3.7.0
     recharts:
       specifier: ^2.15.3
       version: 2.15.4
@@ -770,6 +755,9 @@ importers:
       file-saver:
         specifier: 'catalog:'
         version: 2.0.5
+      html-to-image:
+        specifier: 'catalog:'
+        version: 1.11.11
       lodash:
         specifier: 'catalog:'
         version: 4.17.23
@@ -3752,12 +3740,6 @@ packages:
 
   rc9@2.1.2:
     resolution: {integrity: sha512-btXCnMmRIBINM2LDZoEmOogIZU7Qe7zn4BpomSKZ/ykbLObuBdvG+mFq11DL6fjH1DRwHhrlgtYWG96bJiC7Cg==}
-
-  react-cytoscapejs@2.0.0:
-    resolution: {integrity: sha512-t3SSl1DQy7+JQjN+8QHi1anEJlM3i3aAeydHTsJwmjo/isyKK7Rs7oCvU6kZsB9NwZidzZQR21Vm2PcBLG/Tjg==}
-    peerDependencies:
-      cytoscape: ^3.2.19
-      react: '>=15.0.0'
 
   react-docgen-typescript@2.4.0:
     resolution: {integrity: sha512-ZtAp5XTO5HRzQctjPU0ybY0RRCQO19X/8fxn3w7y2VVTUbGHDKULPTL4ky3vB05euSgG5NpALhEhDPvQ56wvXg==}
@@ -7400,12 +7382,6 @@ snapshots:
     dependencies:
       defu: 6.1.4
       destr: 2.0.5
-
-  react-cytoscapejs@2.0.0(cytoscape@3.33.1)(react@19.2.3):
-    dependencies:
-      cytoscape: 3.33.1
-      prop-types: 15.8.1
-      react: 19.2.3
 
   react-docgen-typescript@2.4.0(typescript@5.9.3):
     dependencies:

@@ -34,12 +34,13 @@
     "prepublishOnly": "pnpm run build"
   },
   "peerDependencies": {
+    "@floating-ui/react": "catalog:",
     "@hpcc-js/wasm-graphviz": "catalog:",
-    "@xyflow/react": "catalog:",
-    "elkjs": "catalog:",
     "@mantine/core": "catalog:",
     "@ocelescope/api-base": "workspace:*",
+    "@xyflow/react": "catalog:",
     "dayjs": "catalog:",
+    "elkjs": "catalog:",
     "file-saver": "catalog:",
     "lodash": "catalog:",
     "lucide-react": "catalog:",
@@ -48,10 +49,10 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-plotly.js": "catalog:",
-    "react-zoom-pan-pinch": "catalog:",
-    "@floating-ui/react": "catalog:"
+    "react-zoom-pan-pinch": "catalog:"
   },
   "devDependencies": {
+    "@tsdown/css": "catalog:",
     "@types/file-saver": "catalog:",
     "@types/lodash": "catalog:",
     "@types/node": "catalog:",
@@ -60,7 +61,9 @@
     "@types/react-plotly.js": "catalog:",
     "bumpp": "catalog:",
     "tsdown": "catalog:",
-    "@tsdown/css": "catalog:",
     "typescript": "catalog:"
+  },
+  "dependencies": {
+    "html-to-image": "catalog:"
   }
 }
