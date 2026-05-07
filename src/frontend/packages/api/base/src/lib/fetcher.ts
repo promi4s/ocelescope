@@ -1,6 +1,7 @@
-import { client } from "@ocelescope/api-client";
+import { customFetch as fetch } from "@ocelescope/api-client";
+import type { AxiosRequestConfig } from "axios";
 
 export const customFetch = async <T>(
-  url: string,
-  options: RequestInit,
-): Promise<T> => client(url, options);
+  config: AxiosRequestConfig,
+  options?: AxiosRequestConfig,
+): Promise<T> => fetch<T>(config, options);

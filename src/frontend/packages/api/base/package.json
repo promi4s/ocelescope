@@ -37,7 +37,8 @@
     "@ocelescope/api-client": "workspace:*",
     "@tanstack/react-query": "catalog:",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "axios": "catalog:"
   },
   "devDependencies": {
     "@ocelescope/api-config": "workspace:*",

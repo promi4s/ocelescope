@@ -1,58 +1,53 @@
+import Axios, {
+  type AxiosError,
+  AxiosHeaders,
+  type AxiosRequestConfig,
+  type AxiosResponse,
+} from "axios";
 import { useSessionStore } from "../store/sessionStore";
 import { env } from "./env";
 
-export const client = async <T>(
-  url: string,
-  options: RequestInit,
-): Promise<T> => {
-  let response: Response;
+export const AXIOS_INSTANCE = Axios.create({});
 
-  const { sessionId, setSessionId } = useSessionStore.getState();
-
-  const headers = new Headers(options.headers || {});
+AXIOS_INSTANCE.interceptors.request.use((config) => {
+  const { sessionId } = useSessionStore.getState();
 
   if (sessionId) {
+    const headers = AxiosHeaders.from(config.headers);
     headers.set(env.session_id, sessionId);
+    config.headers = headers;
   }
 
-  try {
-    response = await fetch(url, {
-      ...options,
-      headers,
-    });
-  } catch (error: any) {
-    if (error.name === "AbortError") {
-      return Promise.reject(error);
+  return config;
+});
+
+AXIOS_INSTANCE.interceptors.response.use(
+  (response) => {
+    const { sessionId, setSessionId } = useSessionStore.getState();
+
+    const newSessionId = response.headers?.[env.session_id];
+    if (newSessionId && newSessionId !== sessionId) {
+      setSessionId(newSessionId);
     }
-    throw error;
-  }
 
-  const newSessionId = response.headers.get(env.session_id);
-  if (newSessionId !== sessionId && newSessionId != null) {
-    setSessionId(response.headers.get(env.session_id));
-  }
+    return response;
+  },
+  (error: AxiosError<any>) => {
+    return Promise.reject(error);
+  },
+);
 
-  const contentType = response.headers.get("content-type") || "";
+export const customFetch = async <T>(
+  config: AxiosRequestConfig,
+  options?: AxiosRequestConfig,
+): Promise<T> => {
+  const response: AxiosResponse<T> = await AXIOS_INSTANCE({
+    ...config,
+    ...options,
+  });
 
-  let data: any;
-  try {
-    if (contentType.includes("application/json")) {
-      data = await response.json();
-    } else {
-      data = await response.text();
-    }
-  } catch (error: any) {
-    if (error.name === "AbortError") {
-      console.warn("Body parsing aborted");
-      return Promise.reject(error);
-    }
-    console.error("Error parsing response body:", error);
-    data = null;
-  }
-
-  if (!response.ok) {
-    throw new Error(data?.message || `HTTP error ${response.status}`);
-  }
-
-  return data as T;
+  return response.data;
 };
+
+export type ErrorType<Error> = AxiosError<Error>;
+export type BodyType<BodyData> = BodyData;

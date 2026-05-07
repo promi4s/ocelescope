@@ -21,6 +21,7 @@ catalog:
   '@rjsf/mantine': ^6.3.1
   '@rjsf/utils': ^6.3.1
   '@rjsf/validator-ajv8': ^6.3.1
+  '@storybook/react-vite': ^10.3.5
   '@tanstack/react-query': ^5.90.21
   '@tanstack/react-query-devtools': ^5.91.3
   '@tsconfig/strictest': ^2.0.8
@@ -34,6 +35,7 @@ catalog:
   '@types/react-dom': ^19.2.3
   '@types/react-plotly.js': ^2.6.4
   '@xyflow/react': ^12.10.1
+  axios: ^1.16.0
   bumpp: ^10.3.2
   clsx: ^2.1.1
   content-disposition-attachment: ^0.3.1
@@ -59,13 +61,12 @@ catalog:
   react-zoom-pan-pinch: ^3.7.0
   recharts: ^2.15.3
   rolldown: 1.0.0-rc.6
+  storybook: ^10.3.5
   tsdown: ^0.21.4
   typescript: ^5.9.3
   uniqolor: ^1.1.1
   zod: ^4.3.6
   zustand: ^5.0.11
-  '@storybook/react-vite': ^10.3.5
-  storybook: ^10.3.5
 
 catalogMode: prefer
 

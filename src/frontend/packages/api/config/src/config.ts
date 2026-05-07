@@ -11,7 +11,7 @@ const generateOptions = (options: Options) =>
             mode: options.output?.mode ?? "single",
             target: options.output?.target ?? "./src/api/coreApi.ts",
             client: options.output?.client ?? "react-query",
-            httpClient: options.output?.httpClient ?? "fetch",
+            httpClient: options.output?.httpClient ?? "axios",
             baseUrl: options.output?.baseUrl ?? "/api/external",
             clean: options.output?.clean ?? true,
             override: {
@@ -24,8 +24,10 @@ const generateOptions = (options: Options) =>
                   staleTime: 1000 * 60 * 5,
                 },
               },
-              fetch: {
-                includeHttpResponseReturnType: false,
+              paramsSerializerOptions: {
+                qs: {
+                  arrayFormat: "repeat",
+                },
               },
               ...options.output?.override,
             },
