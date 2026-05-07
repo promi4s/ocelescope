@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import orjson
 import pandas as pd
@@ -6,7 +7,6 @@ import pm4py
 import polars as pl
 import r4pm
 
-from ocelescope import OCEL
 from ocelescope.ocel.constants.pm4py import (
     ACTIVITY_COL,
     E2O_QUALIFIER,
@@ -15,6 +15,10 @@ from ocelescope.ocel.constants.pm4py import (
     OTYPE_COL,
     TIMESTAMP_COL,
 )
+
+if TYPE_CHECKING:
+    from ocelescope.ocel.core.ocel import OCEL
+
 
 RENAME_MAP = {
     "case:concept:name": OID_COL,
@@ -78,7 +82,7 @@ def create_ocel_from_xml(path: str, fallback_object_name: str = "LogObject") -> 
     )
 
 
-def write_ocel_to_xes(ocel: OCEL, object_type: str, path: str | Path):
+def write_ocel_to_xes(ocel: "OCEL", object_type: str, path: str | Path):
     attr = (
         ocel.objects.object_attr_changes(object_types=[object_type])
         .reset_index()
