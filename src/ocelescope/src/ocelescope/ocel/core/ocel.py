@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import warnings
+from os import PathLike
 from pathlib import Path
 from typing import Any
 
@@ -24,6 +25,7 @@ from ocelescope.ocel.managers.executions import ExecutionsManager
 from ocelescope.ocel.managers.quantities.util.io import read_quantity_extension
 from ocelescope.ocel.models.meta import OCELMeta
 from ocelescope.ocel.util.io import pretty_print_json, pretty_print_xml
+from ocelescope.ocel.util.xes import create_ocel_from_xml, write_ocel_to_xes
 
 
 class OCEL:
@@ -167,6 +169,24 @@ class OCEL:
 
         self.quantities.write_quantities(path)
         self.extensions.export_all(path)
+
+    def write_xes(self, object_type: str, path: str | Path):
+        """
+        Export the OCEL as a flattened XES log for a given object type.
+
+        Args:
+            object_type: Object type to flatten the OCEL to.
+            path: Output file path for the XES file.
+
+        Returns:
+            None
+        """
+
+        write_ocel_to_xes(ocel=self, object_type=object_type, path=path)
+
+    @staticmethod
+    def read_xes(path: str | PathLike, fallback_object_name: str = "LogObject") -> OCEL:
+        return OCEL(ocel=create_ocel_from_xml(str(path), fallback_object_name))
 
     def __deepcopy__(self, memo: dict[int, Any]):
         # TODO revisit this. Are the underlying DataFrames mutable? If not, might optimize this
