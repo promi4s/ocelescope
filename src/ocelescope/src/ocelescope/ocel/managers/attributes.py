@@ -10,7 +10,7 @@ from ocelescope.ocel.constants.pm4py import (
     TIMESTAMP_COL,
 )
 from ocelescope.ocel.managers.base import BaseManager
-from ocelescope.util.attributes import summarize_attribute_values
+from ocelescope.ocel.util.attributes import summarize_attribute_values
 
 ENTITY_TYPE = "ocel:entity_type"
 ENTITY_TYPE_NAME = "ocel:entity_type_name"
