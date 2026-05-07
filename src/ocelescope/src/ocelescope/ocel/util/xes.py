@@ -1,8 +1,12 @@
+from pathlib import Path
+
 import orjson
+import pandas as pd
 import pm4py
 import polars as pl
 import r4pm
 
+from ocelescope import OCEL
 from ocelescope.ocel.constants.pm4py import (
     ACTIVITY_COL,
     E2O_QUALIFIER,
@@ -71,4 +75,28 @@ def create_ocel_from_xml(path: str, fallback_object_name: str = "LogObject") -> 
         events=event_table.to_pandas(),
         objects=object_table.to_pandas(),
         relations=e2o_table.to_pandas(),
+    )
+
+
+def write_ocel_to_xes(ocel: OCEL, object_type: str, path: str | Path):
+    attr = (
+        ocel.objects.object_attr_changes(object_types=[object_type])
+        .reset_index()
+        .sort_values([TIMESTAMP_COL, OID_COL])
+        .drop_duplicates(subset=OID_COL, keep="last")
+        .set_index([OID_COL])
+    )[ocel.objects.dynamic_attribute_names].dropna(axis=1, how="all")
+
+    objects = ocel.ocel.objects.set_index(OID_COL)
+
+    missing_col = [col for col in attr.columns if col not in objects.columns]
+    objects[missing_col] = pd.NA
+    objects.update(attr)
+
+    ocel.ocel.objects = objects.reset_index()
+
+    pm4py.write_xes(
+        pm4py.ocel_flattening(ocel.ocel, object_type),
+        str(path),
+        variant_str="r4pm/rustxes",
     )

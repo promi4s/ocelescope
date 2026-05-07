@@ -11,7 +11,6 @@ import r4pm
 from pm4py.objects.ocel.obj import OCEL as PM4PYOCEL
 from pm4py.objects.ocel.obj import deepcopy
 
-from ocelescope.ocel.constants.pm4py import OID_COL, TIMESTAMP_COL
 from ocelescope.ocel.extensions.manager import ExtensionManager
 from ocelescope.ocel.filter.base import BaseFilter
 from ocelescope.ocel.managers import (
@@ -26,7 +25,7 @@ from ocelescope.ocel.managers.executions import ExecutionsManager
 from ocelescope.ocel.managers.quantities.util.io import read_quantity_extension
 from ocelescope.ocel.models.meta import OCELMeta
 from ocelescope.ocel.util.io import pretty_print_json, pretty_print_xml
-from ocelescope.ocel.util.xes import create_ocel_from_xml
+from ocelescope.ocel.util.xes import create_ocel_from_xml, write_ocel_to_xes
 
 
 class OCEL:
@@ -183,34 +182,11 @@ class OCEL:
             None
         """
 
-        attr = (
-            self.objects.object_attr_changes(object_types=[object_type])
-            .reset_index()
-            .sort_values([TIMESTAMP_COL, OID_COL])
-            .drop_duplicates(subset=OID_COL, keep="last")
-            .set_index([OID_COL])
-        )[self.objects.dynamic_attribute_names].dropna(axis=1, how="all")
-
-        objects = self.ocel.objects.set_index(OID_COL)
-
-        missing_col = [col for col in attr.columns if col not in objects.columns]
-        objects[missing_col] = pd.NA
-        objects.update(attr)
-
-        self.ocel.objects = objects.reset_index()
-
-        pm4py.write_xes(
-            pm4py.ocel_flattening(self.ocel, object_type),
-            str(path),
-            variant_str="r4pm/rustxes",
-        )
+        write_ocel_to_xes(ocel=self, object_type=object_type, path=path)
 
     @staticmethod
     def read_xes(path: str | PathLike, fallback_object_name: str = "LogObject") -> OCEL:
-
-        ocel = create_ocel_from_xml(str(path), fallback_object_name)
-
-        return OCEL(ocel=ocel)
+        return OCEL(ocel=create_ocel_from_xml(str(path), fallback_object_name))
 
     def __deepcopy__(self, memo: dict[int, Any]):
         # TODO revisit this. Are the underlying DataFrames mutable? If not, might optimize this
