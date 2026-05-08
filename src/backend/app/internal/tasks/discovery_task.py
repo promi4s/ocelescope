@@ -3,11 +3,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Hashable, Sequence, cast
 
 from ocelescope import Resource
-from ocelescope.discovery import discover_resource
+from ocelescope.discovery import discovery_registry
 from pydantic import BaseModel, Field
 
 from app.internal.exceptions import BadRequest
-from app.internal.model.discovery import DiscoveryRequest, DiscoveryResourceType
+from app.internal.model.discovery import DiscoveryRequest
 from app.internal.model.resource import ResourceStore
 from app.internal.tasks.base import TaskBase, TaskState, TaskSummary
 from app.internal.util.hashing import generate_tuple_hash
@@ -23,7 +23,9 @@ class DiscoveryOutput(BaseModel):
 
 class DiscoveryTaskSummary(TaskSummary):
     ocel_id: str
-    resource_type: DiscoveryResourceType
+    method_id: str
+    name: str
+    resource_type: str
     output: DiscoveryOutput
 
 
@@ -44,12 +46,15 @@ class DiscoveryTask(TaskBase):
         self.state = TaskState.STARTED
         try:
             try:
+                algorithm = discovery_registry.get(self.request.method_id)
+                parameters = algorithm.parse_parameters(
+                    cast(dict[str, Any], self.request.parameters)
+                )
                 resource = cast(
                     Resource,
-                    discover_resource(
-                        resource=self.request.resource_type,
+                    algorithm.run_untyped(
                         ocel=self.session.get_ocel(self.request.ocel_id),
-                        **cast(dict[str, Any], self.request.parameters),
+                        parameters=parameters,
                     ),
                 )
             except KeyError as exc:
@@ -94,6 +99,7 @@ class DiscoveryTask(TaskBase):
                 title="Discovery finished",
                 message=(
                     f"Successfully discovered {self.request.resource_type} "
+                    f"with {self.request.name} "
                     f"for {self.request.ocel_id}"
                 ),
                 notification_type="info",
@@ -106,6 +112,7 @@ class DiscoveryTask(TaskBase):
                 title="Discovery cancelled",
                 message=(
                     f"Discovery of {self.request.resource_type} "
+                    f"with {self.request.name} "
                     f"for {self.request.ocel_id} was cancelled"
                 ),
                 notification_type="warning",
@@ -124,6 +131,8 @@ class DiscoveryTask(TaskBase):
             id=self.id,
             state=self.state,
             ocel_id=self.request.ocel_id,
+            method_id=self.request.method_id,
+            name=self.request.name,
             resource_type=self.request.resource_type,
             output=self.result,
         )

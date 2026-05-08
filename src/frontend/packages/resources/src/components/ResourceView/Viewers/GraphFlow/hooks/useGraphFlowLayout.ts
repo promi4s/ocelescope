@@ -27,7 +27,6 @@ export const useGraphFlowLayout = (
   const [edges, setEdges] = useState<Edge[]>([]);
   const [layoutReady, setLayoutReady] = useState(false);
   const [error, setError] = useState<GraphVisualizationError | null>(null);
-  const [fitViewVersion, setFitViewVersion] = useState(0);
 
   const measuredNodes = useNodes();
   const nodesInitialized = useNodesInitialized();
@@ -51,9 +50,6 @@ export const useGraphFlowLayout = (
       setError(snapshot.error);
       setLayoutReady(snapshot.layoutReady);
 
-      if (snapshot.layoutReady) {
-        setFitViewVersion((version) => version + 1);
-      }
     } catch (err) {
       const snapshot = createErrorLayoutSnapshot(err);
       setModel(snapshot.model);
@@ -112,7 +108,6 @@ export const useGraphFlowLayout = (
         setNodes(layout.nodes);
         setEdges(layout.edges);
         setLayoutReady(true);
-        setFitViewVersion((version) => version + 1);
       } catch (err) {
         layoutApplied.current = false;
         setError(createErrorLayoutSnapshot(err).error);
@@ -129,5 +124,5 @@ export const useGraphFlowLayout = (
     [],
   );
 
-  return { nodes, edges, layoutReady, fitViewVersion, error, onNodesChange };
+  return { nodes, edges, layoutReady, error, onNodesChange };
 };

@@ -1,9 +1,19 @@
-from ocelescope.discovery.pm4py import discover_ocdfg, discover_ocpn
-from ocelescope.discovery.manager import discover_resource, discovery_registry
+from ocelescope.discovery.algorithm import (
+    DiscoveryAlgorithm,
+    DiscoveryParameters,
+    FilteredDiscoveryParameters,
+)
+from ocelescope.discovery.algorithms.directly_follows_graph import PM4PyObjectCentricDFG
+from ocelescope.discovery.algorithms.petri_net_inductive_miner import (
+    PM4PyObjectCentricInductiveMiner,
+)
+from ocelescope.discovery.manager import discovery_registry
 
 __all__ = [
-    "discover_ocdfg",
-    "discover_ocpn",
-    "discover_resource",
+    "DiscoveryAlgorithm",
+    "DiscoveryParameters",
+    "FilteredDiscoveryParameters",
+    "PM4PyObjectCentricDFG",
+    "PM4PyObjectCentricInductiveMiner",
     "discovery_registry",
 ]

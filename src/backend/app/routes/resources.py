@@ -6,7 +6,7 @@ from typing import Optional
 from fastapi.datastructures import UploadFile
 from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
-from ocelescope import Visualization
+from ocelescope import PetriNet, Visualization
 from pydantic.main import BaseModel
 
 from app.dependencies import ApiSession
@@ -64,6 +64,32 @@ def download_resource(session: ApiSession, resource_id: str) -> TempFileResponse
 
     with open(file_response.tmp_path, "w", encoding="utf-8") as output_file:
         json.dump(resource.model_dump(), output_file, indent=2)
+
+    return file_response
+
+
+@resource_router.get(
+    "/resource/{resource_id}/download/pnml", operation_id="downloadResourceAsPnml"
+)
+def download_resource_as_pnml(
+    session: ApiSession, resource_id: str
+) -> TempFileResponse:
+    import pm4py
+
+    resource = session.get_resource(id=resource_id)
+    resource_instance = registry_manager.get_resource_instance(resource)
+
+    if not isinstance(resource_instance, PetriNet):
+        raise HTTPException(status_code=400, detail="Resource is not a Petri net.")
+
+    pm4py_net, initial_marking, final_marking = resource_instance.to_pm4py()
+
+    file_response = TempFileResponse(
+        prefix=resource.name,
+        suffix=".pnml",
+        filename=f"{resource.name}.pnml",
+    )
+    pm4py.write_pnml(pm4py_net, initial_marking, final_marking, file_response.tmp_path)
 
     return file_response
 

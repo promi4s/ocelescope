@@ -64,6 +64,7 @@
     "typescript": "catalog:"
   },
   "dependencies": {
-    "html-to-image": "catalog:"
+    "html-to-image": "catalog:",
+    "jspdf": "catalog:"
   }
 }

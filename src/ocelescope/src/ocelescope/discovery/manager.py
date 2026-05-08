@@ -1,33 +1,67 @@
 from __future__ import annotations
 
-from typing import Any, Callable
+from dataclasses import dataclass
+from typing import Any
+from uuid import uuid4
 
-from ocelescope.discovery.pm4py import discover_ocdfg, discover_ocpn
-from ocelescope.ocel import OCEL
-from ocelescope.resource import DirectlyFollowsGraph, PetriNet, Resource
+from ocelescope.discovery.algorithm import DiscoveryAlgorithm
+from ocelescope.discovery.algorithms import PM4PyObjectCentricDFG, PM4PyObjectCentricInductiveMiner
 
-ResourceDiscoverer = Callable[..., Resource]
+
+@dataclass(frozen=True)
+class RegisteredDiscoveryAlgorithm:
+    method_id: str
+    algorithm: type[DiscoveryAlgorithm[Any, Any]]
+
+    @property
+    def resource_type(self) -> str:
+        return self.algorithm.resource_type()
+
+    @property
+    def name(self) -> str:
+        return self.algorithm.name
+
+    @property
+    def description(self) -> str | None:
+        return self.algorithm.description
+
+    def parse_parameters(self, parameters: dict[str, Any]):
+        return self.algorithm.parse_parameters(parameters)
+
+    def dump_parameters(self, parameters) -> dict[str, Any]:
+        return self.algorithm.dump_parameters(parameters)
+
+    def parameters_schema(self) -> dict[str, Any]:
+        return self.algorithm.parameters_schema()
+
+    def run_untyped(self, **kwargs):
+        return self.algorithm.run_untyped(**kwargs)
 
 
 class DiscoveryRegistry:
     def __init__(self) -> None:
-        self._discoverers: dict[str, ResourceDiscoverer] = {}
+        self._algorithms: dict[str, RegisteredDiscoveryAlgorithm] = {}
 
-    def register(self, resource: str, discoverer: ResourceDiscoverer) -> None:
-        self._discoverers[resource] = discoverer
+    def register(
+        self,
+        algorithm: type[DiscoveryAlgorithm[Any, Any]],
+    ) -> None:
+        method_id = str(uuid4())
+        self._algorithms[method_id] = RegisteredDiscoveryAlgorithm(
+            method_id=method_id,
+            algorithm=algorithm,
+        )
 
-    def discover(self, resource: str, ocel: OCEL, **parameters: Any) -> Resource:
-        discoverer = self._discoverers.get(resource)
-        if discoverer is None:
-            raise KeyError(f"Resource '{resource}' does not support discovery")
+    def get(self, method_id: str) -> RegisteredDiscoveryAlgorithm:
+        algorithm = self._algorithms.get(method_id)
+        if algorithm is None:
+            raise KeyError(f"Discovery method '{method_id}' is not registered")
+        return algorithm
 
-        return discoverer(ocel=ocel, **parameters)
+    def list_algorithms(self) -> list[RegisteredDiscoveryAlgorithm]:
+        return list(self._algorithms.values())
 
 
 discovery_registry = DiscoveryRegistry()
-discovery_registry.register(PetriNet.get_type(), discover_ocpn)
-discovery_registry.register(DirectlyFollowsGraph.get_type(), discover_ocdfg)
-
-
-def discover_resource(resource: str, ocel: OCEL, **parameters: Any) -> Resource:
-    return discovery_registry.discover(resource=resource, ocel=ocel, **parameters)
+discovery_registry.register(PM4PyObjectCentricInductiveMiner)
+discovery_registry.register(PM4PyObjectCentricDFG)

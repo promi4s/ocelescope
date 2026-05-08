@@ -1,9 +1,14 @@
 from collections import defaultdict
 from enum import Enum
-from typing import Any, Optional
+from typing import TYPE_CHECKING, Any, Optional
+from uuid import UUID
 
 import networkx as nx
 from pydantic import Field
+
+if TYPE_CHECKING:
+    from pm4py.objects.petri_net.obj import Marking as Pm4pyMarking
+    from pm4py.objects.petri_net.obj import PetriNet as Pm4pyPetriNet
 
 from ocelescope.resource.resource import Annotated, Resource
 from ocelescope.visualization.default.graph import (
@@ -307,3 +312,85 @@ class PetriNet(Resource):
                 }
             ),
         )
+
+    @classmethod
+    def from_pm4py(cls, ocpn: Any) -> "PetriNet":
+        """Convert a pm4py ObjectCentricPetriNet to a PetriNet.
+
+        Rewrites UUID transition names to their activity labels for stability
+        across runs. pm4py assigns random UUIDs to visible transitions while
+        the stable identity is stored in the label.
+        """
+
+        def _is_uuid(value: object) -> bool:
+            try:
+                UUID(str(value))
+            except (TypeError, ValueError):
+                return False
+            return True
+
+        pnet = cls()
+        transition_name_map: dict[str, str] = {}
+
+        for place in ocpn.places:
+            pnet.add_place(Place(name=place.name, object_type=place.object_type))
+
+        for transition in ocpn.transitions:
+            original_name = str(transition.name)
+            transition_name = (
+                str(transition.label)
+                if transition.label is not None and _is_uuid(original_name)
+                else original_name
+            )
+            transition_name_map[original_name] = transition_name
+            pnet.add_transition(Transition(name=transition_name, label=transition.label))
+
+        for arc in ocpn.arcs:
+            pnet.add_arc(
+                Arc(
+                    source=transition_name_map.get(str(arc.source.name), str(arc.source.name)),
+                    target=transition_name_map.get(str(arc.target.name), str(arc.target.name)),
+                    type=ArcType.VARIABLE if arc.is_variable else ArcType.NORMAL,
+                )
+            )
+
+        pnet.initial_marking = Marking({place.name: 1 for place in ocpn.initial_marking.keys()})
+        pnet.final_marking = Marking({place.name: 1 for place in ocpn.final_marking.keys()})
+
+        return pnet
+
+    def to_pm4py(
+        self,
+    ) -> tuple["Pm4pyPetriNet", "Pm4pyMarking", "Pm4pyMarking"]:
+        from pm4py.objects.petri_net.obj import Marking
+        from pm4py.objects.petri_net.obj import PetriNet as Pm4pyPetriNet
+        from pm4py.objects.petri_net.utils import petri_utils
+
+        net = Pm4pyPetriNet()
+
+        place_map: dict[str, Pm4pyPetriNet.Place] = {}
+        for place in self.places:
+            p = Pm4pyPetriNet.Place(place.name)
+            net.places.add(p)
+            place_map[place.name] = p
+
+        transition_map: dict[str, Pm4pyPetriNet.Transition] = {}
+        for transition in self.transitions:
+            t = Pm4pyPetriNet.Transition(transition.name, transition.label)
+            net.transitions.add(t)
+            transition_map[transition.name] = t
+
+        node_map: dict[str, Any] = {**place_map, **transition_map}
+        for arc in self.arcs:
+            petri_utils.add_arc_from_to(
+                node_map[arc.source], node_map[arc.target], net, weight=arc.weight
+            )
+
+        initial_marking = Marking(
+            {place_map[name]: tokens for name, tokens in self.initial_marking.items()}
+        )
+        final_marking = Marking(
+            {place_map[name]: tokens for name, tokens in self.final_marking.items()}
+        )
+
+        return net, initial_marking, final_marking

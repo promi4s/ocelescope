@@ -38,6 +38,7 @@ import UploadSection from "../UploadSection/UploadSection";
 
 type Entity = {
   type: "ocel" | "resource";
+  resourceType?: string;
   entityTypes: string[];
   id: string;
   name: string;
@@ -126,6 +127,7 @@ const EntityTable: React.FC = () => {
         name,
         entityTypes: [resourceMeta[type]?.label ?? type],
         type: "resource" as const,
+        resourceType: type,
         createdAt: formatDateTime(dayjs(created_at).toISOString()),
       }),
     );
@@ -225,7 +227,7 @@ const EntityTable: React.FC = () => {
               textAlign: "right",
               width: "0%",
               //TODO: Maybe put this into its own component it is getting way to big
-              render: ({ type, id, name, isUploading }) =>
+              render: ({ type, resourceType, id, name, isUploading }) =>
                 isUploading ? (
                   <Loader size={20} />
                 ) : (
@@ -275,6 +277,36 @@ const EntityTable: React.FC = () => {
                                 {extension}
                               </Menu.Item>
                             ))}
+                          </Menu.Sub.Dropdown>
+                        </Menu.Sub>
+                      ) : resourceType === "PetriNet" ? (
+                        <Menu.Sub position="right-start">
+                          <Menu.Sub.Target>
+                            <Menu.Sub.Item
+                              leftSection={<DownloadIcon size={16} />}
+                            >
+                              Download
+                            </Menu.Sub.Item>
+                          </Menu.Sub.Target>
+                          <Menu.Sub.Dropdown>
+                            <Menu.Item
+                              onClick={() =>
+                                downloadFile(
+                                  `/resources/resource/${id}/download`,
+                                )
+                              }
+                            >
+                              .ocelescope
+                            </Menu.Item>
+                            <Menu.Item
+                              onClick={() =>
+                                downloadFile(
+                                  `/resources/resource/${id}/download/pnml`,
+                                )
+                              }
+                            >
+                              .pnml
+                            </Menu.Item>
                           </Menu.Sub.Dropdown>
                         </Menu.Sub>
                       ) : (

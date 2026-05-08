@@ -2152,13 +2152,66 @@
         }
       }
     },
-    "/discovery/meta": {
+    "/discovery/ocels/{ocel_id}/tasks": {
+      "post": {
+        "tags": [
+          "discovery"
+        ],
+        "summary": "Create a discovery task",
+        "operationId": "createDiscoveryTask",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ocel Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDiscoveryTaskBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "title": "Response Creatediscoverytask"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/discovery/methods": {
       "get": {
         "tags": [
-          "ocels"
+          "discovery"
         ],
-        "summary": "Get discovery method metadata",
-        "operationId": "getDiscoveryMeta",
+        "summary": "List discovery methods",
+        "operationId": "listDiscoveryMethods",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -2169,113 +2222,7 @@
                     "$ref": "#/components/schemas/DiscoveryMethodMeta"
                   },
                   "type": "array",
-                  "title": "Response Getdiscoverymeta"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/ocels/{ocel_id}/discover/petri-net": {
-      "post": {
-        "tags": [
-          "ocels"
-        ],
-        "summary": "Discover an object-centric Petri net",
-        "operationId": "discoverPetriNet",
-        "parameters": [
-          {
-            "name": "ocel_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Ocel Id"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DiscoverPetriNetBody"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string",
-                  "title": "Response Discoverpetrinet"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/ocels/{ocel_id}/discover/directly-follows-graph": {
-      "post": {
-        "tags": [
-          "ocels"
-        ],
-        "summary": "Discover an object-centric directly follows graph",
-        "operationId": "discoverDirectlyFollowsGraph",
-        "parameters": [
-          {
-            "name": "ocel_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Ocel Id"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DiscoverDFGBody"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string",
-                  "title": "Response Discoverdirectlyfollowsgraph"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "title": "Response Listdiscoverymethods"
                 }
               }
             }
@@ -3148,6 +3095,46 @@
         }
       }
     },
+    "/resources/resource/{resource_id}/download/pnml": {
+      "get": {
+        "tags": [
+          "resources"
+        ],
+        "summary": "Download Resource As Pnml",
+        "operationId": "downloadResourceAsPnml",
+        "parameters": [
+          {
+            "name": "resource_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Resource Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/resources/resource/{resource_id}": {
       "get": {
         "tags": [
@@ -3470,6 +3457,24 @@
         ],
         "title": "Body_uploadResource"
       },
+      "CreateDiscoveryTaskBody": {
+        "properties": {
+          "methodId": {
+            "type": "string",
+            "title": "Methodid"
+          },
+          "parameters": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Parameters"
+          }
+        },
+        "type": "object",
+        "required": [
+          "methodId"
+        ],
+        "title": "CreateDiscoveryTaskBody"
+      },
       "Date_Distribution_Item": {
         "properties": {
           "start_timestamp": {
@@ -3546,121 +3551,19 @@
         "title": "DefaultOCEL",
         "description": "Definition of a default OCEL on the server, for quick access. Supports pre-loading the OCEL on backend init."
       },
-      "DiscoverDFGBody": {
-        "properties": {
-          "excludedEventTypes": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Excluded Activities",
-            "description": "Activities that should be ignored before discovery.",
-            "x-ui-meta": {
-              "field_type": "event_type"
-            }
-          },
-          "excludedObjectTypes": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Excluded Object Types",
-            "description": "Object types that should be ignored before discovery.",
-            "x-ui-meta": {
-              "field_type": "object_type"
-            }
-          },
-          "activityFrequencyThreshold": {
-            "type": "integer",
-            "maximum": 100.0,
-            "minimum": 0.0,
-            "title": "Activity Frequency",
-            "description": "Keep only activities whose frequency is at least this percentage of the most frequent activity.",
-            "default": 0
-          },
-          "objectFrequencyThreshold": {
-            "type": "integer",
-            "maximum": 100.0,
-            "minimum": 0.0,
-            "title": "Object Frequency",
-            "description": "Keep only object types whose frequency is at least this percentage of the most frequent object type.",
-            "default": 0
-          }
-        },
-        "type": "object",
-        "title": "DiscoverDFGBody"
-      },
-      "DiscoverPetriNetBody": {
-        "properties": {
-          "variant": {
-            "type": "string",
-            "enum": [
-              "im",
-              "imd"
-            ],
-            "title": "Mining Variant",
-            "description": "Choose the inductive mining variant used for discovery.",
-            "default": "im",
-            "enumNames": [
-              "IM (traditional)",
-              "IMd (directly-follows)"
-            ]
-          },
-          "excludedEventTypes": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Excluded Activities",
-            "description": "Activities that should be ignored before discovery.",
-            "x-ui-meta": {
-              "field_type": "event_type"
-            }
-          },
-          "excludedObjectTypes": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Excluded Object Types",
-            "description": "Object types that should be ignored before discovery.",
-            "x-ui-meta": {
-              "field_type": "object_type"
-            }
-          },
-          "activityFrequencyThreshold": {
-            "type": "integer",
-            "maximum": 100.0,
-            "minimum": 0.0,
-            "title": "Activity Frequency",
-            "description": "Keep only activities whose frequency is at least this percentage of the most frequent activity.",
-            "default": 0
-          },
-          "objectFrequencyThreshold": {
-            "type": "integer",
-            "maximum": 100.0,
-            "minimum": 0.0,
-            "title": "Object Frequency",
-            "description": "Keep only object types whose frequency is at least this percentage of the most frequent object type.",
-            "default": 0
-          }
-        },
-        "type": "object",
-        "title": "DiscoverPetriNetBody"
-      },
       "DiscoveryMethodMeta": {
         "properties": {
+          "methodId": {
+            "type": "string",
+            "title": "Methodid"
+          },
           "resourceType": {
             "type": "string",
-            "enum": [
-              "PetriNet",
-              "DirectlyFollowsGraph"
-            ],
             "title": "Resourcetype"
           },
-          "label": {
+          "name": {
             "type": "string",
-            "title": "Label"
+            "title": "Name"
           },
           "description": {
             "anyOf": [
@@ -3681,8 +3584,9 @@
         },
         "type": "object",
         "required": [
+          "methodId",
           "resourceType",
-          "label",
+          "name",
           "inputSchema"
         ],
         "title": "DiscoveryMethodMeta"
@@ -3713,12 +3617,16 @@
             "type": "string",
             "title": "Ocel Id"
           },
+          "method_id": {
+            "type": "string",
+            "title": "Method Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
           "resource_type": {
             "type": "string",
-            "enum": [
-              "PetriNet",
-              "DirectlyFollowsGraph"
-            ],
             "title": "Resource Type"
           },
           "output": {
@@ -3730,6 +3638,8 @@
           "id",
           "state",
           "ocel_id",
+          "method_id",
+          "name",
           "resource_type",
           "output"
         ],

@@ -1,112 +1,68 @@
-from collections.abc import Mapping
-
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
+from ocelescope.discovery import discovery_registry
+from pydantic import ValidationError
 
 from app.dependencies import ApiSession
 from app.internal.model.discovery import (
-    DiscoverDFGBody,
+    CreateDiscoveryTaskBody,
     DiscoveryMethodMeta,
-    DiscoverPetriNetBody,
     DiscoveryRequest,
-    DiscoveryResourceType,
 )
-from app.internal.registry import registry_manager
 from app.internal.tasks.discovery_task import DiscoveryTask
 
-discovery_router = APIRouter(prefix="/ocels/{ocel_id}/discover", tags=["ocels"])
-discovery_meta_router = APIRouter(prefix="/discovery", tags=["ocels"])
+discovery_router = APIRouter(prefix="/discovery", tags=["discovery"])
 
 
-DISCOVERY_MODELS: Mapping[
-    DiscoveryResourceType, type[DiscoverPetriNetBody] | type[DiscoverDFGBody]
-] = {
-    "PetriNet": DiscoverPetriNetBody,
-    "DirectlyFollowsGraph": DiscoverDFGBody,
-}
-
-
-def _create_discovery_task(
-    *,
+@discovery_router.post(
+    "/ocels/{ocel_id}/tasks",
+    summary="Create a discovery task",
+    operation_id="createDiscoveryTask",
+)
+def create_discovery_task(
     session: ApiSession,
     ocel_id: str,
-    resource_type: DiscoveryResourceType,
-    parameters: dict[str, object],
+    body: CreateDiscoveryTaskBody,
 ) -> str:
+    try:
+        algorithm = discovery_registry.get(body.method_id)
+        parsed_parameters = algorithm.parse_parameters(body.parameters)
+        parameters = algorithm.dump_parameters(parsed_parameters)
+    except KeyError:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Discovery method '{body.method_id}' is not registered",
+        )
+    except ValidationError as exc:
+        raise HTTPException(status_code=422, detail=exc.errors()) from exc
+
     return DiscoveryTask.create_discovery_task(
         session=session,
         request=DiscoveryRequest(
             ocel_id=ocel_id,
-            resource_type=resource_type,
+            method_id=algorithm.method_id,
+            name=algorithm.name,
+            resource_type=algorithm.resource_type,
             parameters=parameters,
         ),
     )
 
 
-@discovery_router.post(
-    "/petri-net",
-    summary="Discover an object-centric Petri net",
-    operation_id="discoverPetriNet",
+@discovery_router.get(
+    "/methods",
+    summary="List discovery methods",
+    operation_id="listDiscoveryMethods",
 )
-def discover_petri_net(
-    session: ApiSession,
-    ocel_id: str,
-    body: DiscoverPetriNetBody,
-) -> str:
-    return _create_discovery_task(
-        session=session,
-        ocel_id=ocel_id,
-        resource_type="PetriNet",
-        parameters={
-            "variant": body.variant,
-            "excluded_event_types": body.excluded_event_types,
-            "excluded_object_types": body.excluded_object_types,
-            "activity_frequency_threshold": body.activity_frequency_threshold,
-            "object_frequency_threshold": body.object_frequency_threshold,
-        },
-    )
-
-
-@discovery_router.post(
-    "/directly-follows-graph",
-    summary="Discover an object-centric directly follows graph",
-    operation_id="discoverDirectlyFollowsGraph",
-)
-def discover_directly_follows_graph(
-    session: ApiSession,
-    ocel_id: str,
-    body: DiscoverDFGBody,
-) -> str:
-    return _create_discovery_task(
-        session=session,
-        ocel_id=ocel_id,
-        resource_type="DirectlyFollowsGraph",
-        parameters={
-            "excluded_event_types": body.excluded_event_types,
-            "excluded_object_types": body.excluded_object_types,
-            "activity_frequency_threshold": body.activity_frequency_threshold,
-            "object_frequency_threshold": body.object_frequency_threshold,
-        },
-    )
-
-
-@discovery_meta_router.get(
-    "/meta",
-    summary="Get discovery method metadata",
-    operation_id="getDiscoveryMeta",
-)
-def get_discovery_meta() -> list[DiscoveryMethodMeta]:
+def list_discovery_methods() -> list[DiscoveryMethodMeta]:
     methods: list[DiscoveryMethodMeta] = []
 
-    for resource_type, input_model in DISCOVERY_MODELS.items():
-        resource_class = registry_manager.get_resource_class(resource_type)
+    for algorithm in discovery_registry.list_algorithms():
         methods.append(
             DiscoveryMethodMeta(
-                resource_type=resource_type,
-                label=resource_class.label or resource_type
-                if resource_class is not None
-                else resource_type,
-                description=resource_class.description if resource_class else None,
-                input_schema=input_model.model_json_schema(by_alias=True),
+                method_id=algorithm.method_id,
+                resource_type=algorithm.resource_type,
+                name=algorithm.name,
+                description=algorithm.description,
+                input_schema=algorithm.parameters_schema(),
             )
         )
 

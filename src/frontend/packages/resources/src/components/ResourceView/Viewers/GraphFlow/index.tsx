@@ -1,18 +1,24 @@
 import {
   Background,
+  ControlButton,
   Controls,
   ReactFlow,
   ReactFlowProvider,
-  getNodesBounds,
-  getViewportForBounds,
   useReactFlow,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { Alert, Code, LoadingOverlay, Stack, ActionIcon } from "@mantine/core";
+import {
+  ActionIcon,
+  Alert,
+  Code,
+  LoadingOverlay,
+  Menu,
+  Stack,
+} from "@mantine/core";
 import { useCallback, useEffect, useRef } from "react";
-import { saveAs } from "file-saver";
-import { toPng } from "html-to-image";
-import { DownloadIcon } from "lucide-react";
+import { DownloadIcon, Maximize2Icon } from "lucide-react";
+import { computeAutoFitBounds } from "./utils/bounds";
+import { downloadPdf, downloadPng, downloadSvg } from "./utils/download";
 
 import type { VisualizationByType } from "../../../../types";
 import { FIT_VIEW_PADDING } from "./constants/graphFlow";
@@ -25,67 +31,48 @@ type GraphFlowProps = {
 };
 
 const GraphFlowCanvas = ({ visualization, isPreview }: GraphFlowProps) => {
-  const { nodes, edges, layoutReady, fitViewVersion, error, onNodesChange } =
+  const { nodes, edges, layoutReady, error, onNodesChange } =
     useGraphFlowLayout(visualization);
 
-  const { fitView, getNodes } = useReactFlow();
+  const { fitBounds, getNodes, getEdges, getNodesBounds } = useReactFlow();
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  const handleDownload = useCallback(async () => {
-    if (!wrapperRef.current) return;
-
-    const allNodes = getNodes();
-    if (allNodes.length === 0) return;
-
-    // Compute the bounding box of all nodes, then derive a viewport transform
-    // that fits everything into the output image — independent of current pan/zoom.
-    const bounds = getNodesBounds(allNodes);
-    const MAX_PX = 2048;
-    const scale = Math.min(MAX_PX / bounds.width, MAX_PX / bounds.height);
-    const imageWidth = Math.ceil(bounds.width * scale);
-    const imageHeight = Math.ceil(bounds.height * scale);
-
-    const { x, y, zoom } = getViewportForBounds(
-      bounds,
-      imageWidth,
-      imageHeight,
-      0.01,
-      10,
-      0.05, // 5% padding inside the image
-    );
-
-    const viewportEl = wrapperRef.current.querySelector(
-      ".react-flow__viewport",
-    ) as HTMLElement | null;
-    if (!viewportEl) return;
-
-    // Override the viewport transform for the capture only — the live view is unchanged.
-    const dataUrl = await toPng(viewportEl, {
-      backgroundColor: "#ffffff",
-      width: imageWidth,
-      height: imageHeight,
-      skipFonts: true, // avoids fetching/embedding font files — biggest perf win
-      style: {
-        width: `${imageWidth}px`,
-        height: `${imageHeight}px`,
-        transform: `translate(${x}px, ${y}px) scale(${zoom})`,
-      },
-      filter: (node) =>
-        !(node instanceof Element) ||
-        (!node.classList.contains("react-flow__panel") &&
-          !node.classList.contains("react-flow__background")),
+  const fitViewWithEdges = useCallback(() => {
+    fitBounds(computeAutoFitBounds(getNodes(), getEdges()), {
+      padding: FIT_VIEW_PADDING,
     });
+  }, [fitBounds, getNodes, getEdges]);
 
-    saveAs(dataUrl, "graph.png");
-  }, [getNodes]);
+  const handleDownloadPng = useCallback(
+    () =>
+      wrapperRef.current &&
+      downloadPng(wrapperRef.current, getNodes(), getNodesBounds),
+    [getNodes, getNodesBounds],
+  );
+  const handleDownloadSvg = useCallback(
+    () =>
+      wrapperRef.current &&
+      downloadSvg(wrapperRef.current, getNodes(), getNodesBounds),
+    [getNodes, getNodesBounds],
+  );
+  const handleDownloadPdf = useCallback(
+    () =>
+      wrapperRef.current &&
+      downloadPdf(wrapperRef.current, getNodes(), getNodesBounds),
+    [getNodes, getNodesBounds],
+  );
 
-  // Fit the viewport after each completed layout. Using useEffect (post-commit)
-  // ensures React has applied all node positions to the DOM before fitView runs,
-  // avoiding the race condition of requestAnimationFrame inside async callbacks.
+  const wasReadyRef = useRef(false);
   useEffect(() => {
-    if (fitViewVersion === 0) return;
-    fitView({ padding: FIT_VIEW_PADDING });
-  }, [fitViewVersion, fitView]);
+    if (!layoutReady) {
+      wasReadyRef.current = false;
+      return;
+    }
+    if (wasReadyRef.current) return;
+    wasReadyRef.current = true;
+
+    fitViewWithEdges();
+  }, [layoutReady, fitViewWithEdges]);
 
   if (error) {
     return (
@@ -119,20 +106,28 @@ const GraphFlowCanvas = ({ visualization, isPreview }: GraphFlowProps) => {
           elementsSelectable={false}
           zoomOnScroll={!isPreview}
           panOnDrag={!isPreview}
-          fitViewOptions={{ padding: FIT_VIEW_PADDING }}
           minZoom={0.05}
           maxZoom={3}
         >
           {!isPreview && (
             <>
               <Background color="#e5e7eb" gap={20} size={1} />
-              <Controls showInteractive={false}>
-                <ActionIcon
-                  variant="transparent"
-                  onClick={handleDownload}
-                >
-                  <DownloadIcon color={"black"} size={18} />
-                </ActionIcon>
+              <Controls showInteractive={false} showFitView={false}>
+                <ControlButton onClick={fitViewWithEdges} title="fit view">
+                  <Maximize2Icon size={11} />
+                </ControlButton>
+                <Menu position="right" withinPortal={false}>
+                  <Menu.Target>
+                    <ActionIcon variant="transparent">
+                      <DownloadIcon color="black" size={18} />
+                    </ActionIcon>
+                  </Menu.Target>
+                  <Menu.Dropdown>
+                    <Menu.Item onClick={handleDownloadPng}>PNG</Menu.Item>
+                    <Menu.Item onClick={handleDownloadSvg}>SVG</Menu.Item>
+                    <Menu.Item onClick={handleDownloadPdf}>PDF</Menu.Item>
+                  </Menu.Dropdown>
+                </Menu>
               </Controls>
             </>
           )}
