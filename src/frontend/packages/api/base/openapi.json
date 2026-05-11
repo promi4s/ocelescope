@@ -2161,19 +2161,22 @@
         "operationId": "getSystemTasks",
         "parameters": [
           {
-            "name": "task_name",
+            "name": "task_names",
             "in": "query",
             "required": false,
             "schema": {
               "anyOf": [
                 {
-                  "type": "string"
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
                 },
                 {
                   "type": "null"
                 }
               ],
-              "title": "Task Name"
+              "title": "Task Names"
             }
           },
           {
@@ -2192,7 +2195,6 @@
                   "type": "null"
                 }
               ],
-              "default": [],
               "title": "Task Ids"
             }
           },
