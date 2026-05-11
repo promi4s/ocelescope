@@ -19,16 +19,16 @@ tasks_router = APIRouter(prefix="/tasks", tags=["tasks"])
 )
 def get_system_tasks(
     session: ApiSession,
-    task_name: str | None = None,
-    task_ids: list[str] | None = Query(default=[]),
+    task_names: list[str] | None = Query(default=None),
+    task_ids: list[str] | None = Query(default=None),
     only_running: bool = True,
 ) -> list[SystemTaskSummary]:
     def filter_tasks(task: SystemTask):
         return (
-            task_name is None
-            or task.name == task_name
+            (not task_names or task.name in task_names)
             and (not task_ids or task.id in task_ids)
-        ) and (not only_running or task.state == TaskState.STARTED)
+            and (not only_running or task.state == TaskState.STARTED)
+        )
 
     return [
         cast(SystemTaskSummary, task_summary)

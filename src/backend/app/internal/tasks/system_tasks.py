@@ -67,6 +67,37 @@ def import_ocel_task(
     ]
 
 
+@system_task(name="importXES")
+def import_xes_task(
+    session: Session,
+    file_stream: IO[bytes],
+    metadata: ImportMetadata,
+):
+    file_path = Path(metadata["fileName"])
+
+    with stream_to_tempfile(file_stream, prefix=file_path.stem, suffix=".xes") as path:
+        ocel = OCEL.read_xes(
+            path,
+        )
+
+    ocel.meta.extra = {
+        "name": file_path.stem,
+        "upload_date": datetime.now().isoformat(),
+    }
+
+    ocel_id = session.add_ocel(ocel)
+
+    return [
+        SystemNotification(
+            title="XES was uploaded successfully",
+            message=f"{ocel.meta.extra.get('name', None) or 'OCEL '} was uploaded successfully",
+            notification_type="info",
+            link=OcelLink(ocel_id=ocel_id),
+        ),
+        InvalidationRequest(routes=["ocels", "tasks"]),
+    ]
+
+
 @system_task(name="importPlugin")
 def import_plugin(
     session: Session,
@@ -100,8 +131,8 @@ def import_plugin(
 
     return [
         SystemNotification(
-            title="Ocel successfully uploaded",
-            message="Plugin uploaded successfully",
+            title="Plugin successfully uploaded",
+            message="",
             notification_type="info",
         ),
         InvalidationRequest(routes=["plugins", "tasks"]),

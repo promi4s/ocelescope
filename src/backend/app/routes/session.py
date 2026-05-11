@@ -15,6 +15,7 @@ from app.internal.tasks.system_tasks import (
     import_ocel_task,
     import_plugin,
     import_resource,
+    import_xes_task,
 )
 
 session_router = APIRouter(prefix="/session", tags=["session"])
@@ -40,15 +41,10 @@ async def upload(session: ApiSession, files: list[UploadFile] = File(...)) -> li
                 task_method = import_plugin
             case ".ocelescope":
                 task_method = import_resource
-            case _:
-                if file_path.suffix in [
-                    ".xml",
-                    ".xmlocel",
-                    ".json",
-                    ".jsonocel",
-                    ".sqlite",
-                ]:
-                    task_method = import_ocel_task
+            case ".xml" | ".xmlocel" | ".json" | ".jsonocel" | ".sqlite":
+                task_method = import_ocel_task
+            case ".xes":
+                task_method = import_xes_task
 
         if task_method is not None:
             tasks.append(

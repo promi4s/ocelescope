@@ -55,7 +55,7 @@ const EntityTable: React.FC = () => {
 
   const { data: tasks = [] } = useGetSystemTasks({
     only_running: true,
-    task_name: "importOCEL",
+    task_names: ["importOCEL", "importXES"],
   });
 
   const invalidate = useInvalidate();
