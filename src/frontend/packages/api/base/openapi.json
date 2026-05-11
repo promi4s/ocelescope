@@ -2074,8 +2074,8 @@
         "tags": [
           "ocels"
         ],
-        "summary": "Download OCEL including app state",
-        "operationId": "download_ocel_ocels__ocel_id__download_get",
+        "summary": "Download OCEL",
+        "operationId": "downloadOCEL",
         "parameters": [
           {
             "name": "ocel_id",
@@ -2157,8 +2157,8 @@
         "tags": [
           "ocels"
         ],
-        "summary": "Download OCEL including app state",
-        "operationId": "download_flat_log_ocels__ocel_id__download_xes_get",
+        "summary": "Download OCEL as a xes",
+        "operationId": "downloadFlatLog",
         "parameters": [
           {
             "name": "ocel_id",

@@ -367,7 +367,11 @@ def get_quantity_info(
 
 # endregion
 # region Export
-@ocels_router.get("/{ocel_id}/download", summary="Download OCEL including app state")
+@ocels_router.get(
+    "/{ocel_id}/download",
+    summary="Download OCEL",
+    operation_id="downloadOCEL",
+)
 def download_ocel(
     ocel: ApiOcel,
     ext: OCELFileExtensions = ".json",
@@ -385,7 +389,9 @@ def download_ocel(
 
 
 @ocels_router.get(
-    "/{ocel_id}/download/xes", summary="Download OCEL including app state"
+    "/{ocel_id}/download/xes",
+    summary="Download OCEL as a xes",
+    operation_id="downloadFlatLog",
 )
 def download_flat_log(
     ocel: ApiOcel, object_type_name: Literal[".xes"]
