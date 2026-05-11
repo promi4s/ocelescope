@@ -31,7 +31,7 @@ import {
 } from "lucide-react";
 import { DataTable } from "mantine-datatable";
 import { useCallback, useMemo, useState } from "react";
-import { useDownloadFile } from "../../hooks/useDownload";
+import { useDownloadOCEL, useDownloadResource } from "../../hooks/useDownload";
 import useInvalidate from "../../hooks/useInvalidate";
 import dayjs, { formatDateTime } from "../../lib/dayjs";
 import UploadSection from "../UploadSection/UploadSection";
@@ -59,7 +59,10 @@ const EntityTable: React.FC = () => {
   });
 
   const invalidate = useInvalidate();
-  const downloadFile = useDownloadFile();
+
+  const { download: downloadOCEL } = useDownloadOCEL();
+  const { download: downloadResource } = useDownloadResource();
+
   const { data: resourceMeta = {} } = useGetResourceMeta();
 
   const { mutate: deleteResource } = useDeleteResource({
@@ -267,9 +270,7 @@ const EntityTable: React.FC = () => {
                               <Menu.Item
                                 key={extension}
                                 onClick={() =>
-                                  downloadFile(
-                                    `/ocels/${id}/download?${new URLSearchParams({ ocel_id: id, ext: extension }).toString()}`,
-                                  )
+                                  downloadOCEL(id, { ext: extension })
                                 }
                               >
                                 {extension}
@@ -279,9 +280,7 @@ const EntityTable: React.FC = () => {
                         </Menu.Sub>
                       ) : (
                         <Menu.Item
-                          onClick={() =>
-                            downloadFile(`/resources/resource/${id}/download`)
-                          }
+                          onClick={() => downloadResource(id)}
                           leftSection={<DownloadIcon size={16} />}
                         >
                           Download

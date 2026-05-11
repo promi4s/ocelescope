@@ -49,6 +49,7 @@
     "lucide-react": "catalog:",
     "mantine-datatable": "catalog:",
     "next": "catalog:",
+    "qs": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "zod": "catalog:",
@@ -56,14 +57,16 @@
   },
   "devDependencies": {
     "@mantine/notifications": "catalog:",
+    "@tsdown/css": "catalog:",
     "@types/css-modules": "catalog:",
     "@types/file-saver": "catalog:",
     "@types/node": "catalog:",
+    "@types/qs": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "bumpp": "catalog:",
+    "qs": "catalog:",
     "tsdown": "catalog:",
-    "typescript": "catalog:",
-    "@tsdown/css": "catalog:"
+    "typescript": "catalog:"
   }
 }
