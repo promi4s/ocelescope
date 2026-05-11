@@ -35,6 +35,7 @@ import { useDownloadOCEL, useDownloadResource } from "../../hooks/useDownload";
 import useInvalidate from "../../hooks/useInvalidate";
 import dayjs, { formatDateTime } from "../../lib/dayjs";
 import UploadSection from "../UploadSection/UploadSection";
+import { XESExportWindow } from "./XESExportWindow";
 
 type Entity = {
   type: "ocel" | "resource";
@@ -59,6 +60,10 @@ const EntityTable: React.FC = () => {
   });
 
   const invalidate = useInvalidate();
+
+  const [exportOcelId, setExportOcelId] = useState<string | undefined>(
+    undefined,
+  );
 
   const { download: downloadOCEL } = useDownloadOCEL();
   const { download: downloadResource } = useDownloadResource();
@@ -153,6 +158,11 @@ const EntityTable: React.FC = () => {
           onClose={() => setViewedResource(undefined)}
         />
       )}
+      <XESExportWindow
+        key={exportOcelId}
+        ocelId={exportOcelId}
+        onClose={() => setExportOcelId(undefined)}
+      />
       {entities.length ? (
         <DataTable<Entity>
           withTableBorder
@@ -276,6 +286,12 @@ const EntityTable: React.FC = () => {
                                 {extension}
                               </Menu.Item>
                             ))}
+                            <Menu.Item
+                              key={".xes"}
+                              onClick={() => setExportOcelId(id)}
+                            >
+                              {".xes"}
+                            </Menu.Item>
                           </Menu.Sub.Dropdown>
                         </Menu.Sub>
                       ) : (
