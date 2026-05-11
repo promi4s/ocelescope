@@ -400,6 +400,7 @@ def download_flat_log(ocel: ApiOcel, object_type_name: str) -> TempFileResponse:
     file_response = TempFileResponse(
         prefix=tmp_file_prefix,
         suffix=".xes",
+        filename=f"{name}_{object_type_name}.xes",
     )
 
     ocel.write_xes(object_type_name, Path(file_response.tmp_path))
