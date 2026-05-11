@@ -367,7 +367,11 @@ def get_quantity_info(
 
 # endregion
 # region Export
-@ocels_router.get("/{ocel_id}/download", summary="Download OCEL including app state")
+@ocels_router.get(
+    "/{ocel_id}/download",
+    summary="Download OCEL",
+    operation_id="downloadOCEL",
+)
 def download_ocel(
     ocel: ApiOcel,
     ext: OCELFileExtensions = ".json",
@@ -380,6 +384,25 @@ def download_ocel(
     )
 
     ocel.write(Path(file_response.tmp_path))
+
+    return file_response
+
+
+@ocels_router.get(
+    "/{ocel_id}/download/xes",
+    summary="Download OCEL as a xes",
+    operation_id="downloadFlatLog",
+)
+def download_flat_log(ocel: ApiOcel, object_type_name: str) -> TempFileResponse:
+    name = ocel.meta.extra["name"]
+    tmp_file_prefix = datetime.now().strftime("%Y%m%d-%H%M%S") + "-" + name
+
+    file_response = TempFileResponse(
+        prefix=tmp_file_prefix,
+        suffix=".xes",
+    )
+
+    ocel.write_xes(object_type_name, Path(file_response.tmp_path))
 
     return file_response
 
