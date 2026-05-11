@@ -7,7 +7,9 @@ import Axios, {
 import { useSessionStore } from "../store/sessionStore";
 import { env } from "./env";
 
-export const AXIOS_INSTANCE = Axios.create({});
+export const AXIOS_INSTANCE = Axios.create({
+  paramsSerializer: { indexes: null },
+});
 
 AXIOS_INSTANCE.interceptors.request.use((config) => {
   const { sessionId } = useSessionStore.getState();

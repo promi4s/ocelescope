@@ -24,11 +24,6 @@ const generateOptions = (options: Options) =>
                   staleTime: 1000 * 60 * 5,
                 },
               },
-              paramsSerializerOptions: {
-                qs: {
-                  arrayFormat: "repeat",
-                },
-              },
               ...options.output?.override,
             },
           },
