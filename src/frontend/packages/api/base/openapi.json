@@ -2152,6 +2152,84 @@
         }
       }
     },
+    "/ocels/{ocel_id}/download/xes": {
+      "get": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Download OCEL including app state",
+        "operationId": "download_flat_log_ocels__ocel_id__download_xes_get",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "object_type_name",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "const": ".xes",
+              "type": "string",
+              "title": "Object Type Name"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/tasks/system": {
       "get": {
         "tags": [

@@ -384,4 +384,23 @@ def download_ocel(
     return file_response
 
 
+@ocels_router.get(
+    "/{ocel_id}/download/xes", summary="Download OCEL including app state"
+)
+def download_flat_log(
+    ocel: ApiOcel, object_type_name: Literal[".xes"]
+) -> TempFileResponse:
+    name = ocel.meta.extra["name"]
+    tmp_file_prefix = datetime.now().strftime("%Y%m%d-%H%M%S") + "-" + name
+
+    file_response = TempFileResponse(
+        prefix=tmp_file_prefix,
+        suffix=".xes",
+    )
+
+    ocel.write_xes(object_type_name, Path(file_response.tmp_path))
+
+    return file_response
+
+
 # endregion
