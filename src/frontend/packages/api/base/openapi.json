@@ -2181,7 +2181,6 @@
             "in": "query",
             "required": true,
             "schema": {
-              "const": ".xes",
               "type": "string",
               "title": "Object Type Name"
             }

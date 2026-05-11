@@ -393,9 +393,7 @@ def download_ocel(
     summary="Download OCEL as a xes",
     operation_id="downloadFlatLog",
 )
-def download_flat_log(
-    ocel: ApiOcel, object_type_name: Literal[".xes"]
-) -> TempFileResponse:
+def download_flat_log(ocel: ApiOcel, object_type_name: str) -> TempFileResponse:
     name = ocel.meta.extra["name"]
     tmp_file_prefix = datetime.now().strftime("%Y%m%d-%H%M%S") + "-" + name
 
