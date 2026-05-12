@@ -215,6 +215,9 @@ importers:
       '@ocelescope/filter':
         specifier: workspace:*
         version: link:../modules/filter
+      '@ocelescope/management':
+        specifier: workspace:*
+        version: link:../modules/management
       '@ocelescope/ocelot':
         specifier: workspace:*
         version: link:../modules/ocelot
