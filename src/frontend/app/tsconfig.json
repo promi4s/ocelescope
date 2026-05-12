@@ -17,7 +17,9 @@
       "@/*": ["./*"],
       "@ocelescope/core": ["../packages/core/src/index.ts"],
       "@ocelescope/core/styles": ["../packages/core/src/styles/styles.ts"],
-      "@ocelescope/management": ["../modules/management/src/index.ts"]
+      "@ocelescope/management": ["../modules/management/src/index.ts"],
+      "@ocelescope/ocelot": ["../modules/ocelot/src/index.ts"],
+      "@ocelescope/ocelot/styles.css": ["../modules/ocelot/src/styles.css"]
     }
   },
   "include": [
