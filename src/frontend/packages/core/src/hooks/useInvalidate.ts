@@ -2,7 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 type InvalidationRouteName = "ocels" | "resources" | "tasks" | "plugins";
 
-const useInvalidate = () => {
+export const useInvalidate = () => {
   const queryClient = useQueryClient();
 
   return async (routeNames: InvalidationRouteName[]) =>
@@ -14,5 +14,3 @@ const useInvalidate = () => {
         ),
     });
 };
-
-export default useInvalidate;

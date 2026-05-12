@@ -19,6 +19,12 @@ import {
   useRenameResource,
   useResources,
 } from "@ocelescope/api-base";
+import {
+  UploadSection,
+  useDownloadOCEL,
+  useDownloadResource,
+  useInvalidate,
+} from "@ocelescope/core";
 import { ResourceModal } from "@ocelescope/resources";
 import {
   CheckIcon,
@@ -31,10 +37,7 @@ import {
 } from "lucide-react";
 import { DataTable } from "mantine-datatable";
 import { useCallback, useMemo, useState } from "react";
-import { useDownloadOCEL, useDownloadResource } from "../../hooks/useDownload";
-import useInvalidate from "../../hooks/useInvalidate";
-import dayjs, { formatDateTime } from "../../lib/dayjs";
-import UploadSection from "../UploadSection/UploadSection";
+import dayjs, { formatDateTime } from "../util/dayjs";
 import { XESExportWindow } from "./XESExportWindow";
 
 type Entity = {
@@ -50,7 +53,7 @@ type Entity = {
 //TODO: sync with api
 const ocelExtenisions = [".sqlite", ".xml", ".json"] as const;
 
-const EntityTable: React.FC = () => {
+const ResourceManagementTable: React.FC = () => {
   const { data: ocels = [] } = useGetOcels();
   const { data: resources = [] } = useResources();
 
@@ -328,4 +331,4 @@ const EntityTable: React.FC = () => {
   );
 };
 
-export default EntityTable;
+export default ResourceManagementTable;

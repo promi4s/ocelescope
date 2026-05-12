@@ -33,6 +33,9 @@ catalogs:
     '@mantine/dates':
       specifier: ^8.3.15
       version: 8.3.16
+    '@mantine/dropzone':
+      specifier: ^8.3.14
+      version: 8.3.16
     '@mantine/hooks':
       specifier: ^8.3.14
       version: 8.3.16
@@ -102,6 +105,12 @@ catalogs:
     bumpp:
       specifier: ^10.3.2
       version: 10.4.1
+    clsx:
+      specifier: ^2.1.1
+      version: 2.1.1
+    content-disposition-attachment:
+      specifier: ^0.3.1
+      version: 0.3.1
     cytoscape:
       specifier: ^3.33.1
       version: 3.33.1
@@ -206,6 +215,9 @@ importers:
       '@ocelescope/filter':
         specifier: workspace:*
         version: link:../modules/filter
+      '@ocelescope/management':
+        specifier: workspace:*
+        version: link:../modules/management
       '@ocelescope/ocelot':
         specifier: workspace:*
         version: link:../modules/ocelot
@@ -283,6 +295,58 @@ importers:
       '@mantine/notifications':
         specifier: 'catalog:'
         version: 8.3.16(@mantine/core@8.3.16(@mantine/hooks@8.3.16(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/hooks@8.3.16(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@types/node':
+        specifier: 'catalog:'
+        version: 25.3.3
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.2.14
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.2.3(@types/react@19.2.14)
+      tsdown:
+        specifier: 'catalog:'
+        version: 0.21.4(@tsdown/css@0.21.4)(typescript@5.9.3)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+
+  src/frontend/modules/management:
+    dependencies:
+      '@mantine/core':
+        specifier: 'catalog:'
+        version: 8.3.16(@mantine/hooks@8.3.16(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@marko19907/string-to-color':
+        specifier: '*'
+        version: 1.0.2
+      '@ocelescope/api-base':
+        specifier: workspace:*
+        version: link:../../packages/api/base
+      '@ocelescope/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@ocelescope/resources':
+        specifier: workspace:*
+        version: link:../../packages/resources
+      dayjs:
+        specifier: 'catalog:'
+        version: 1.11.19
+      lucide-react:
+        specifier: 'catalog:'
+        version: 0.563.0(react@19.2.3)
+      react:
+        specifier: 'catalog:'
+        version: 19.2.3
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.2.3(react@19.2.3)
+    devDependencies:
+      '@tsdown/css':
+        specifier: 'catalog:'
+        version: 0.21.4(jiti@2.6.1)(postcss@8.5.12)(tsdown@0.21.4)(yaml@2.8.2)
+      '@types/css-modules':
+        specifier: 'catalog:'
+        version: 1.0.5
       '@types/node':
         specifier: 'catalog:'
         version: 25.3.3

@@ -16,7 +16,8 @@
     "paths": {
       "@/*": ["./*"],
       "@ocelescope/core": ["../packages/core/src/index.ts"],
-      "@ocelescope/core/styles": ["../packages/core/src/styles/styles.ts"]
+      "@ocelescope/core/styles": ["../packages/core/src/styles/styles.ts"],
+      "@ocelescope/management": ["../modules/management/src/index.ts"]
     }
   },
   "include": [

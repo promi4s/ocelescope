@@ -1,7 +1,7 @@
 import { Button, Modal, Select, Stack } from "@mantine/core";
 import { useObjectCounts } from "@ocelescope/api-base";
+import { useDownloadFlatOCEL } from "@ocelescope/core";
 import { useState } from "react";
-import { useDownloadFlatOCEL } from "../../hooks/useDownload";
 
 export const XESExportWindow: React.FC<{
   ocelId?: string;
