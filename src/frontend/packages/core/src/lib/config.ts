@@ -22,7 +22,6 @@ export type ModuleRouteDefinition = {
 };
 
 export type OcelescopeConfig = {
-  homePage?: React.FC;
   modules?: readonly ModuleDefinition[];
 };
 

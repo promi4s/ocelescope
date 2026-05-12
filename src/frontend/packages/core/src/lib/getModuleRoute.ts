@@ -11,7 +11,7 @@ export const getModuleRoute = ({
   query?: Record<string, string>;
 }) => {
   return {
-    pathname: `/modules/${moduleName}/${routeName}`,
+    pathname: `/${moduleName}/${routeName}`,
     ...(query && {
       query: {
         ...query,
