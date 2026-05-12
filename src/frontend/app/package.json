@@ -15,6 +15,7 @@
     "@ocelescope/filter": "workspace:*",
     "@ocelescope/plugin": "workspace:*",
     "@ocelescope/management": "workspace:*",
+    "@ocelescope/log-overview": "workspace:*",
     "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"
