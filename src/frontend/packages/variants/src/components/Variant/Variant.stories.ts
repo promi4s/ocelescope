@@ -30,3 +30,7 @@ const generateVariant = (length: number) => {
 export const Default: Story = {
   args: { variant: generateVariant(10) },
 };
+
+export const Grouped: Story = {
+  args: { variant: generateVariant(10), enableGrouping: true },
+};

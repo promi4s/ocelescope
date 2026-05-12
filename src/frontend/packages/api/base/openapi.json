@@ -1999,6 +1999,89 @@
         }
       }
     },
+    "/ocels/{ocel_id}/executions/variants/${object_type}": {
+      "get": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Get Object Variants",
+        "operationId": "ObjectVariants",
+        "parameters": [
+          {
+            "name": "object_type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Object Type"
+            }
+          },
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CaseCentricVariant"
+                  },
+                  "title": "Response Objectvariants"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/ocels/{ocel_id}/quantity/info": {
       "get": {
         "tags": [
@@ -3291,6 +3374,37 @@
           "file"
         ],
         "title": "Body_uploadResource"
+      },
+      "CaseCentricVariant": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "object_type": {
+            "type": "string",
+            "title": "Object Type"
+          },
+          "activity_order": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Activity Order"
+          },
+          "frequency": {
+            "type": "integer",
+            "title": "Frequency"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "object_type",
+          "activity_order",
+          "frequency"
+        ],
+        "title": "CaseCentricVariant"
       },
       "Date_Distribution_Item": {
         "properties": {

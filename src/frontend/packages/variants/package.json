@@ -47,19 +47,26 @@
     "build-storybook": "storybook build"
   },
   "peerDependencies": {
+    "@mantine/core": "catalog:",
     "@marko19907/string-to-color": "catalog:",
+    "lucide-react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"
   },
   "devDependencies": {
     "@faker-js/faker": "catalog:",
+    "@mantine/core": "catalog:",
     "@storybook/react-vite": "catalog:",
     "@types/css-modules": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "lucide-react": "catalog:",
     "storybook": "catalog:",
     "tsdown": "catalog:",
     "typescript": "catalog:"
+  },
+  "dependencies": {
+    "@ocelescope/core": "catalog:"
   }
 }

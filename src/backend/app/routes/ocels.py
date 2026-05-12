@@ -13,6 +13,7 @@ from app.internal.model.base import PaginatedResponse
 from app.internal.model.events import Date_Distribution_Item, Entity_Time_Info
 from app.internal.model.ocel import (
     AggregatedAttribute,
+    CaseCentricVariant,
     OCELFilter,
     OcelMetadata,
     QuantityInfo,
@@ -352,6 +353,15 @@ def set_filter(
     session.filter_ocel(ocel.meta.id, unmerge_filter(filter or {}))
 
     return merge_filters(session.get_ocel_filters(ocel.meta.id))
+
+
+# endregion
+# region Executions
+@ocels_router.get(
+    "/{ocel_id}/executions/variants/${object_type}", operation_id="ObjectVariants"
+)
+def get_object_variants(ocel: ApiOcel, object_type: str) -> list[CaseCentricVariant]:
+    return CaseCentricVariant.from_ocel(ocel, object_types=[object_type])
 
 
 # endregion

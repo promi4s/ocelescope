@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
   transpilePackages: [
     "@ocelescope/core",
     "@ocelescope/resources",
+    "@ocelescope/executions",
     "@ocelescope/ocelot",
     "@ocelescope/api-base",
     "@ocelescope/api-client",

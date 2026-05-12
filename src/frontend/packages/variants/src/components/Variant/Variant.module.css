@@ -1,16 +1,33 @@
 .variant {
   list-style: none;
-  display: inline-block;
+  display: flex;
+
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+
   padding: 0;
   margin: 0;
+
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
 }
 
 .item {
   --base: var(--c, #3498db);
   --bg: var(--base);
 
-  float: left;
-  width: 50px;
+  display: flex;
+  align-items: center;
+
+  flex: 0 0 auto;
+  float: none;
+  margin-right: 0;
+
   height: 40px;
   line-height: 40px;
   text-align: center;
@@ -21,12 +38,17 @@
   margin-right: 23px;
   padding-right: 5px;
   cursor: default;
+
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
-.item span {
+.itemLabel {
+  width: 50px;
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .item::before,
@@ -72,5 +94,8 @@
 
 .item:hover {
   --bg: color-mix(in srgb, var(--base) 85%, black);
-  width: unset;
+}
+
+.item:hover .itemLabel {
+  width: auto;
 }

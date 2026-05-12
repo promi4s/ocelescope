@@ -11,9 +11,6 @@
     "declaration": true,
     "emitDeclarationOnly": true,
     "verbatimModuleSyntax": true,
-    "paths": {
-      "lucide-react": ["./node_modules/lucide-react/dist/lucide-react.suffixed"]
-    },
     "noPropertyAccessFromIndexSignature": false
   },
   "include": ["src"]
