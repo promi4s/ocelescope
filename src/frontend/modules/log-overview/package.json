@@ -15,7 +15,8 @@
   },
   "exports": {
     ".": "./dist/index.js",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./styles.css": "./dist/style.css"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -33,6 +34,7 @@
   },
   "peerDependencies": {
     "@mantine/core": "catalog:",
+    "mantine-datatable": "catalog:",
     "@ocelescope/api-base": "workspace:*",
     "@ocelescope/core": "workspace:*",
     "@marko19907/string-to-color": "*",

@@ -215,6 +215,9 @@ importers:
       '@ocelescope/filter':
         specifier: workspace:*
         version: link:../modules/filter
+      '@ocelescope/log-overview':
+        specifier: workspace:*
+        version: link:../modules/log-overview
       '@ocelescope/management':
         specifier: workspace:*
         version: link:../modules/management
@@ -334,6 +337,9 @@ importers:
       lucide-react:
         specifier: 'catalog:'
         version: 0.563.0(react@19.2.3)
+      mantine-datatable:
+        specifier: 'catalog:'
+        version: 8.3.13(@mantine/core@8.3.16(@mantine/hooks@8.3.16(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/hooks@8.3.16(react@19.2.3))(clsx@2.1.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       react:
         specifier: 'catalog:'
         version: 19.2.3
