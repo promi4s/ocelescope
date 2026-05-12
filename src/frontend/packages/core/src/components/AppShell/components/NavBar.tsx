@@ -11,7 +11,7 @@ import {
 } from "@mantine/core";
 import { useGetOcels, useLogout } from "@ocelescope/api-base";
 import { useQueryClient } from "@tanstack/react-query";
-import { HomeIcon, LogOutIcon, PackageIcon } from "lucide-react";
+import { LogOutIcon, PackageIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -72,7 +72,6 @@ const LogoutButton: React.FC = () => {
 
 const NavBar: React.FC<{ config: OcelescopeConfig }> = ({ config }) => {
   const { modules = [] } = config;
-  const router = useRouter();
 
   const modulePath = useModulePath(config);
   const { data: ocels } = useGetOcels();
@@ -83,14 +82,6 @@ const NavBar: React.FC<{ config: OcelescopeConfig }> = ({ config }) => {
     <AppShell.Navbar className={classes.navbar ?? ""}>
       <Stack justify="space-between" h={"100%"} gap={0}>
         <Stack gap={0} flex={1}>
-          <NavLink
-            component={Link}
-            href="/"
-            label="Home"
-            leftSection={<HomeIcon size={16} />}
-            active={router.asPath === "/"}
-          />
-          <Divider />
           {modules.map(({ label, name, icon: Icon = PackageIcon, routes }) => {
             const isModuleDisabled =
               !Object.values(routes).some(
@@ -106,7 +97,6 @@ const NavBar: React.FC<{ config: OcelescopeConfig }> = ({ config }) => {
                 component={Link}
                 href={getModuleRoute({
                   moduleName: name,
-                  routeName: routes[0]?.name ?? "",
                 })}
                 disabled={isModuleDisabled}
                 {...(isModuleDisabled ? { opened: false } : {})}
@@ -129,7 +119,7 @@ const NavBar: React.FC<{ config: OcelescopeConfig }> = ({ config }) => {
                         component={Link}
                         active={
                           name === modulePath?.moduleName &&
-                          routeName === modulePath.moduleName
+                          routeName === modulePath.routeName
                         }
                       />
                     ),
