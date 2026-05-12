@@ -1,5 +1,5 @@
 import { Modal, Text } from "@mantine/core";
-import UploadSection from "../UploadSection/UploadSection";
+import { UploadSection } from "../UploadSection/UploadSection";
 
 export const UploadModal: React.FC<{
   visible: boolean;

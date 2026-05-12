@@ -32,9 +32,9 @@ import {
 import { DataTable } from "mantine-datatable";
 import { useCallback, useMemo, useState } from "react";
 import { useDownloadOCEL, useDownloadResource } from "../../hooks/useDownload";
-import useInvalidate from "../../hooks/useInvalidate";
+import { useInvalidate } from "../../hooks/useInvalidate";
 import dayjs, { formatDateTime } from "../../lib/dayjs";
-import UploadSection from "../UploadSection/UploadSection";
+import { UploadSection } from "../UploadSection/UploadSection";
 import { XESExportWindow } from "./XESExportWindow";
 
 type Entity = {
