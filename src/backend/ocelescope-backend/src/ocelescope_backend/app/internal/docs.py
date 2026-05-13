@@ -6,8 +6,9 @@
 from typing import Literal
 
 from fastapi import FastAPI
-from ocelescope_backend.app.internal.config import config
 from starlette.responses import HTMLResponse
+
+from ocelescope_backend.app.internal.config import config
 
 
 def get_rapidoc_html(

@@ -13,7 +13,6 @@ from ocelescope_backend.app.internal.docs import init_custom_docs
 from ocelescope_backend.app.internal.ocel.default_ocel import load_default_ocels
 from ocelescope_backend.app.internal.registrar import (
     register_initial_plugins,
-    register_modules,
 )
 from ocelescope_backend.app.internal.utils import error_handler_server
 from ocelescope_backend.app.middleware import session_access_middleware
@@ -52,7 +51,6 @@ def create_app() -> FastAPI:
     app.middleware("http")(session_access_middleware)
     app.exception_handler(Exception)(error_handler_server)
 
-    register_modules(app)
     register_initial_plugins()
 
     for route in routes:
