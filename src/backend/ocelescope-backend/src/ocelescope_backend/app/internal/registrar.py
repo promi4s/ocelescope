@@ -1,48 +1,9 @@
-import importlib
-import pkgutil
 from pathlib import Path
 
-from fastapi import FastAPI
-from fastapi.routing import APIRoute, APIRouter
-
-import modules
 from ocelescope_backend.app.internal.config import config
 from ocelescope_backend.app.internal.registry.registry_manager import registry_manager
 
-# Use direct path-based loading for safety
 prototyping_path = Path(__file__).parent / "prototype_plugins"
-
-
-def register_modules(app: FastAPI):
-    for _, module_name, _ in pkgutil.iter_modules(modules.__path__):
-        try:
-            mod = importlib.import_module(f"modules.{module_name}.module")
-        except ModuleNotFoundError as e:
-            print(f"Module '{module_name}' skipped: {e}")
-            continue
-        except Exception as e:
-            print(f"Failed to load module '{module_name}': {e}")
-            continue
-
-        if hasattr(mod, "router"):
-            router: APIRouter = mod.router
-
-            for route in router.routes:
-                if isinstance(route, APIRoute):
-                    route.operation_id = (
-                        f"{module_name}_{route.operation_id or route.name}"
-                    )
-
-            meta = getattr(mod, "meta", {})
-            prefix = meta.get("prefix", f"/{module_name}")
-            tags = meta.get("tags", [module_name])
-            app.include_router(mod.router, prefix=prefix, tags=tags)
-
-        if hasattr(mod, "State"):
-            setattr(mod, "_module_state", mod.State)
-
-        if hasattr(mod, "meta"):
-            setattr(mod, "_module_meta", mod.meta)
 
 
 def register_initial_plugins():
