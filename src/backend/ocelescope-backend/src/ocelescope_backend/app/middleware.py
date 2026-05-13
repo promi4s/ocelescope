@@ -1,9 +1,8 @@
 from fastapi import Request
 from fastapi.responses import Response
 
-from app.internal.config import config
-from app.internal.session import Session
-
+from ocelescope_backend.app.internal.config import config
+from ocelescope_backend.app.internal.session import Session
 
 EXCLUDED_PATHS = ["/logout", "/docs"]
 

@@ -3,10 +3,10 @@ from __future__ import annotations
 from typing import Annotated, Literal
 
 from fastapi import Depends, HTTPException, Request
-from ocelescope import OCEL
 
-from app.internal.exceptions import NotFound
-from app.internal.session import Session
+from ocelescope import OCEL
+from ocelescope_backend.app.internal.exceptions import NotFound
+from ocelescope_backend.app.internal.session import Session
 
 
 def get_session(request: Request) -> Session:

@@ -6,7 +6,7 @@ readme = "README.md"
 requires-python = ">=3.13"
 
 [tool.uv.workspace]
-members = ["src/backend", "src/ocelescope"]
+members = ["src/ocelescope", "src/backend/ocelescope-backend"]
 
 [tool.ruff.lint]
 ignore = ["E731"]
@@ -25,6 +25,4 @@ docs = [
   "mkdocs-minify-plugin>=0.8.0",
   "mkdocstrings-python>=2.0.3",
 ]
-repl = [
-    "ipython-autotime>=0.3.2",
-]
+repl = ["ipython-autotime>=0.3.2"]

@@ -3,7 +3,7 @@ from pathlib import Path
 
 import typer
 
-from app import app as fast_app
+from ocelescope_backend.app import app as fast_app
 
 app = typer.Typer()
 
