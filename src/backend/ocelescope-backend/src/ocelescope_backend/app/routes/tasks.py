@@ -5,11 +5,11 @@ from typing import Optional, cast
 from fastapi import Query
 from fastapi.routing import APIRouter
 
-from app.dependencies import ApiSession
-from app.internal.exceptions import NotFound
-from app.internal.tasks.base import TaskState
-from app.internal.tasks.plugin import PluginTask, PluginTaskSummary
-from app.internal.tasks.system import SystemTask, SystemTaskSummary
+from ocelescope_backend.app.dependencies import ApiSession
+from ocelescope_backend.app.internal.exceptions import NotFound
+from ocelescope_backend.app.internal.tasks.base import TaskState
+from ocelescope_backend.app.internal.tasks.plugin import PluginTask, PluginTaskSummary
+from ocelescope_backend.app.internal.tasks.system import SystemTask, SystemTaskSummary
 
 tasks_router = APIRouter(prefix="/tasks", tags=["tasks"])
 

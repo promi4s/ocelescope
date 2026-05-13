@@ -9,7 +9,7 @@ from ocelescope import (
     TimeFrameFilter,
 )
 
-from app.internal.model.ocel import OCELFilter
+from ocelescope_backend.app.internal.model.ocel import OCELFilter
 
 
 # TODO: Delete this file

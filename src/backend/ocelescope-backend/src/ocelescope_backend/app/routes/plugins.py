@@ -10,15 +10,15 @@ from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
 from ocelescope import OCEL, PluginMethod, Resource
 
-from app.dependencies import ApiSession
-from app.internal.config import config
-from app.internal.model.plugin import PluginApi
+from ocelescope_backend.app.dependencies import ApiSession
+from ocelescope_backend.app.internal.config import config
+from ocelescope_backend.app.internal.model.plugin import PluginApi
 
 # TODO: Put this in own util function
-from app.internal.registry import registry_manager
-from app.internal.tasks.base import _call_with_known_params
-from app.internal.tasks.plugin import PluginTask
-from app.sse_manager import InvalidationRequest, sse_manager
+from ocelescope_backend.app.internal.registry import registry_manager
+from ocelescope_backend.app.internal.tasks.base import _call_with_known_params
+from ocelescope_backend.app.internal.tasks.plugin import PluginTask
+from ocelescope_backend.app.sse_manager import InvalidationRequest, sse_manager
 
 plugin_router = APIRouter(prefix="/plugins", tags=["plugins"])
 

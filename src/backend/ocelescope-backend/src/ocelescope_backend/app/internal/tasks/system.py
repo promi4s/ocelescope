@@ -10,20 +10,20 @@ from typing import (
     Sequence,
 )
 
-from app.internal.tasks.base import (
+from ocelescope_backend.app.internal.tasks.base import (
     TaskBase,
     TaskState,
     TaskSummary,
     _call_with_known_params,
     make_hashable,
 )
-from app.sse_manager import (
+from ocelescope_backend.app.sse_manager import (
     SSEMessage,
     sse_manager,
 )
 
 if TYPE_CHECKING:
-    from app.internal.session import Session
+    from ocelescope_backend.app.internal.session import Session
 
 P = ParamSpec("P")
 

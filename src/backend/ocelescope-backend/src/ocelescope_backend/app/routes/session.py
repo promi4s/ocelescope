@@ -8,10 +8,10 @@ from fastapi import File, Request, UploadFile
 from fastapi.responses import JSONResponse, Response
 from fastapi.routing import APIRouter
 
-from app.dependencies import ApiSession
-from app.internal.config import config
-from app.internal.session import Session
-from app.internal.tasks.system_tasks import (
+from ocelescope_backend.app.dependencies import ApiSession
+from ocelescope_backend.app.internal.config import config
+from ocelescope_backend.app.internal.session import Session
+from ocelescope_backend.app.internal.tasks.system_tasks import (
     import_ocel_task,
     import_plugin,
     import_resource,

@@ -6,7 +6,7 @@
 from typing import Literal
 
 from fastapi import FastAPI
-from app.internal.config import config
+from ocelescope_backend.app.internal.config import config
 from starlette.responses import HTMLResponse
 
 

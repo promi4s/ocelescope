@@ -11,10 +11,10 @@ from ocelescope import Visualization
 from pydantic.main import BaseModel
 from starlette.responses import StreamingResponse
 
-from app.dependencies import ApiSession
-from app.internal.model.resource import ResourceApi, ResourceStore
-from app.internal.registry import registry_manager
-from app.internal.registry.registry_manager import ResourceInfo
+from ocelescope_backend.app.dependencies import ApiSession
+from ocelescope_backend.app.internal.model.resource import ResourceApi, ResourceStore
+from ocelescope_backend.app.internal.registry import registry_manager
+from ocelescope_backend.app.internal.registry.registry_manager import ResourceInfo
 
 resource_router = APIRouter(prefix="/resources", tags=["resources"])
 

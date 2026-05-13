@@ -11,8 +11,8 @@ from fastapi.responses import JSONResponse
 from pydantic.fields import FieldInfo
 from starlette.routing import Route
 
-from app.internal.config import config
-from app.internal.logger import logger
+from ocelescope_backend.app.internal.config import config
+from ocelescope_backend.app.internal.logger import logger
 
 
 async def error_handler_server(request: Request, exc: Exception) -> Response:

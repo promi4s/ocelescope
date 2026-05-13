@@ -4,14 +4,14 @@ from copy import deepcopy
 from functools import cached_property
 from typing import Any
 
-from ocelescope import OCEL
 from pydantic import Field, FilePath
 
-import app.internal.util.misc as util
-from app.internal.config import config
-from app.internal.logger import logger
-from app.internal.model.base import ApiBaseModel
-from app.internal.session import Session
+import ocelescope_backend.app.internal.util.misc as util
+from ocelescope import OCEL
+from ocelescope_backend.app.internal.config import config
+from ocelescope_backend.app.internal.logger import logger
+from ocelescope_backend.app.internal.model.base import ApiBaseModel
+from ocelescope_backend.app.internal.session import Session
 
 OCEL_BASE_PATH = None
 DEFAULT_OCELS: list["DefaultOCEL"] = []

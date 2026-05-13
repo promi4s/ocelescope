@@ -7,28 +7,31 @@ from fastapi import APIRouter, Query, Response
 from ocelescope import RelationCountSummary
 from ocelescope.ocel.constants.misc import OCELFileExtensions
 
-from app.dependencies import ApiOcel, ApiSession
-from app.internal.exceptions import NotFound
-from app.internal.model.base import PaginatedResponse
-from app.internal.model.events import Date_Distribution_Item, Entity_Time_Info
-from app.internal.model.ocel import (
+from ocelescope_backend.app.dependencies import ApiOcel, ApiSession
+from ocelescope_backend.app.internal.exceptions import NotFound
+from ocelescope_backend.app.internal.model.base import PaginatedResponse
+from ocelescope_backend.app.internal.model.events import (
+    Date_Distribution_Item,
+    Entity_Time_Info,
+)
+from ocelescope_backend.app.internal.model.ocel import (
     AggregatedAttribute,
     OCELFilter,
     OcelMetadata,
     QuantityInfo,
     TypedAttribute,
 )
-from app.internal.model.response import TempFileResponse
-from app.internal.ocel.default_ocel import (
+from ocelescope_backend.app.internal.model.response import TempFileResponse
+from ocelescope_backend.app.internal.ocel.default_ocel import (
     DEFAULT_OCEL_KEYS,
     DefaultOCEL,
     filter_default_ocels,
     get_default_ocel,
 )
-from app.internal.registry import registry_manager
-from app.internal.registry.extension import OCELExtensionDescription
-from app.internal.util.filters import merge_filters, unmerge_filter
-from app.internal.util.pandas import search_paginated_dataframe
+from ocelescope_backend.app.internal.registry import registry_manager
+from ocelescope_backend.app.internal.registry.extension import OCELExtensionDescription
+from ocelescope_backend.app.internal.util.filters import merge_filters, unmerge_filter
+from ocelescope_backend.app.internal.util.pandas import search_paginated_dataframe
 
 ocels_router = APIRouter(prefix="/ocels", tags=["ocels"])
 

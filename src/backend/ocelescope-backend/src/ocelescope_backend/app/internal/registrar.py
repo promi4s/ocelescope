@@ -6,8 +6,8 @@ from fastapi import FastAPI
 from fastapi.routing import APIRoute, APIRouter
 
 import modules
-from app.internal.config import config
-from app.internal.registry.registry_manager import registry_manager
+from ocelescope_backend.app.internal.config import config
+from ocelescope_backend.app.internal.registry.registry_manager import registry_manager
 
 # Use direct path-based loading for safety
 prototyping_path = Path(__file__).parent / "prototype_plugins"

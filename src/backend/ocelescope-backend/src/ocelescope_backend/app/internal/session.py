@@ -6,12 +6,12 @@ from typing import Any, Callable, Hashable, Type, TypeVar, cast
 
 from ocelescope import OCEL, BaseFilter
 
-from app.internal.exceptions import NotFound
-from app.internal.model.module import Module
-from app.internal.model.ocel import SessionOCEL
-from app.internal.model.resource import ResourceApi, ResourceStore
-from app.internal.tasks.base import TaskBase
-from app.sse_manager import InvalidationRequest, sse_manager
+from ocelescope_backend.app.internal.exceptions import NotFound
+from ocelescope_backend.app.internal.model.module import Module
+from ocelescope_backend.app.internal.model.ocel import SessionOCEL
+from ocelescope_backend.app.internal.model.resource import ResourceApi, ResourceStore
+from ocelescope_backend.app.internal.tasks.base import TaskBase
+from ocelescope_backend.app.sse_manager import InvalidationRequest, sse_manager
 
 T = TypeVar("T", bound=Module)
 

@@ -10,13 +10,13 @@ from uuid import uuid4
 from fastapi import HTTPException
 from ocelescope import OCEL
 
-from app.internal.config import config
-from app.internal.model.resource import ResourceStore
-from app.internal.registry import registry_manager
-from app.internal.session import Session
-from app.internal.tasks.system import system_task
-from app.internal.util.stream_to_tempfile import stream_to_tempfile
-from app.sse_manager import (
+from ocelescope_backend.app.internal.config import config
+from ocelescope_backend.app.internal.model.resource import ResourceStore
+from ocelescope_backend.app.internal.registry import registry_manager
+from ocelescope_backend.app.internal.session import Session
+from ocelescope_backend.app.internal.tasks.system import system_task
+from ocelescope_backend.app.internal.util.stream_to_tempfile import stream_to_tempfile
+from ocelescope_backend.app.sse_manager import (
     InvalidationRequest,
     OcelLink,
     SystemNotification,

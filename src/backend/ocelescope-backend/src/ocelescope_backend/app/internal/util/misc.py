@@ -6,8 +6,8 @@ from typing import Callable, Hashable, Iterable, Literal, TypeVar
 import numpy as np
 from pydantic_settings import BaseSettings
 
-from app.internal.logger import logger
-from app.internal.util.types import PathLike
+from ocelescope_backend.app.internal.logger import logger
+from ocelescope_backend.app.internal.util.types import PathLike
 
 
 def pluralize(

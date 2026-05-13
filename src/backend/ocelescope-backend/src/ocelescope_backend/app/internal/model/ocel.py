@@ -15,8 +15,8 @@ from ocelescope import (
 from ocelescope.ocel.constants import ValueType
 from pydantic.main import BaseModel
 
-from app.internal.registry import registry_manager
-from app.internal.registry.extension import OCELExtensionDescription
+from ocelescope_backend.app.internal.registry import registry_manager
+from ocelescope_backend.app.internal.registry.extension import OCELExtensionDescription
 
 
 class OcelMetadata(BaseModel):

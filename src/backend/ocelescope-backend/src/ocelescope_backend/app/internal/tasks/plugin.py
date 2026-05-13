@@ -12,19 +12,23 @@ from ocelescope import OCEL, BaseFilter, Resource
 from pydantic.fields import Field
 from pydantic.main import BaseModel
 
-from app.internal.model.resource import ResourceStore
-from app.internal.registry import registry_manager
-from app.internal.tasks.base import (
+from ocelescope_backend.app.internal.model.resource import ResourceStore
+from ocelescope_backend.app.internal.registry import registry_manager
+from ocelescope_backend.app.internal.tasks.base import (
     TaskBase,
     TaskState,
     TaskSummary,
     _call_with_known_params,
 )
-from app.internal.util.hashing import generate_tuple_hash
-from app.sse_manager import PluginLink, SystemNotification, sse_manager
+from ocelescope_backend.app.internal.util.hashing import generate_tuple_hash
+from ocelescope_backend.app.sse_manager import (
+    PluginLink,
+    SystemNotification,
+    sse_manager,
+)
 
 if TYPE_CHECKING:
-    from app.internal.session import Session
+    from ocelescope_backend.app.internal.session import Session
 
 P = ParamSpec("P")
 

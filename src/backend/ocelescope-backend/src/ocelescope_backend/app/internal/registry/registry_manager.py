@@ -5,13 +5,13 @@ from typing import Any, Dict, TypedDict
 
 from ocelescope import Plugin, Resource
 
-from app.internal.config import config
-from app.internal.model.plugin import PluginApi
-from app.internal.model.resource import ResourceStore
-from app.internal.registry.extension import ExtensionRegistry
-from app.internal.registry.plugin import PluginRegistry
-from app.internal.registry.resource import ResourceRegistry
-from app.internal.util.dynamic_import import (
+from ocelescope_backend.app.internal.config import config
+from ocelescope_backend.app.internal.model.plugin import PluginApi
+from ocelescope_backend.app.internal.model.resource import ResourceStore
+from ocelescope_backend.app.internal.registry.extension import ExtensionRegistry
+from ocelescope_backend.app.internal.registry.plugin import PluginRegistry
+from ocelescope_backend.app.internal.registry.resource import ResourceRegistry
+from ocelescope_backend.app.internal.util.dynamic_import import (
     import_wheel_dynamically,
     is_wheel_compatible,
 )
