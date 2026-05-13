@@ -5,18 +5,14 @@ import uuid
 from typing import Any, Callable, Hashable, Type, TypeVar, cast
 
 from ocelescope import OCEL, BaseFilter
-
 from ocelescope_backend.app.internal.exceptions import NotFound
-from ocelescope_backend.app.internal.model.module import Module
 from ocelescope_backend.app.internal.model.ocel import SessionOCEL
 from ocelescope_backend.app.internal.model.resource import ResourceApi, ResourceStore
 from ocelescope_backend.app.internal.tasks.base import TaskBase
 from ocelescope_backend.app.sse_manager import InvalidationRequest, sse_manager
 
-T = TypeVar("T", bound=Module)
-
-
 S = TypeVar("S", bound=TaskBase)
+T = TypeVar("T")
 
 
 class Session:
@@ -34,7 +30,7 @@ class Session:
         self._dedupe_keys: dict[Hashable, str] = {}  # dedupe key → task_id
 
         # Plugins
-        self._module_states: dict[str, Module] = {}
+        self._module_states: dict[str, Any] = {}
 
         # Resources
         self._resources: dict[str, ResourceStore] = {}
@@ -67,10 +63,17 @@ class Session:
             if isinstance(task, task_type) and filter(task)
         ]
 
-    def get_module_state(self, key: str, cls: Type[T]) -> T:
-        if key not in self._module_states:
-            self._module_states[key] = cls()
-        return cast(T, self._module_states[key])
+    def get_module_state(self, key: str, state_cls: type[T]) -> T:
+        state = self._module_states.get(key)
+
+        if state is None:
+            state = state_cls()
+            self._module_states[key] = state
+
+        return cast(T, state)
+
+    def clear_module_state(self, key: str) -> None:
+        self._module_states.pop(key, None)
 
     @staticmethod
     def get(session_id: str) -> Session | None:
@@ -156,11 +159,6 @@ class Session:
 
         self._resources[id].name = new_name
         sse_manager.send_safe(self.id, InvalidationRequest(routes=["resources"]))
-
-    # endregion
-    def invalidate_module_states(self):
-        for module_state in self._module_states.values():
-            module_state.clear_cache()
 
     def __str__(self):
         d = {
