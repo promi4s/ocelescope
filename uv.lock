@@ -14,6 +14,7 @@ resolution-markers = [
 members = [
     "ocelescope",
     "ocelescope-backend",
+    "ocelescope-module-ocelot",
     "ocelescope-workspace",
 ]
 
@@ -1356,6 +1357,21 @@ requires-dist = [
     { name = "pydantic", specifier = ">=2.11.7" },
     { name = "pydantic-settings", specifier = ">=2.2.1,<3" },
     { name = "uvicorn", specifier = ">=0.28.0,<0.29" },
+]
+
+[[package]]
+name = "ocelescope-module-ocelot"
+version = "0.1.0"
+source = { editable = "src/backend/modules/ocelescope-module-ocelot" }
+dependencies = [
+    { name = "fastapi" },
+    { name = "ocelescope-backend" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "fastapi" },
+    { name = "ocelescope-backend", editable = "src/backend/ocelescope-backend" },
 ]
 
 [[package]]

@@ -6,7 +6,11 @@ readme = "README.md"
 requires-python = ">=3.13"
 
 [tool.uv.workspace]
-members = ["src/ocelescope", "src/backend/ocelescope-backend"]
+members = [
+    "src/ocelescope",
+    "src/backend/ocelescope-backend",
+    "src/backend/modules/ocelescope-module-ocelot",
+]
 
 [tool.ruff.lint]
 ignore = ["E731"]
