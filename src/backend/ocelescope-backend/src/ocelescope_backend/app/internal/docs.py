@@ -48,7 +48,6 @@ def get_rapidoc_html(
 
 def init_custom_docs(app: FastAPI):
     assert app.openapi_url is not None
-    print(app.openapi_url)
 
     @app.get("/docs", include_in_schema=False)
     async def docs(ui: Literal["swaggerui", "rapidoc"] = "rapidoc", curl: bool = True):

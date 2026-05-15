@@ -18,7 +18,7 @@ dependencies = [
 ]
 
 [project.scripts]
-ocelescope-backend = "ocelescope_backend.cli:main"
+ocelescope-backend = "ocelescope_backend.cli:app"
 
 [build-system]
 requires = ["uv_build>=0.8.4,<0.9.0"]

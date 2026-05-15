@@ -9,6 +9,10 @@ from ocelescope_backend.app.modules.base import Module
 ENTRYPOINT_GROUP = "ocelescope_backend.modules"
 
 
+def get_module_path(module: type[Module]):
+    return f"/modules/{module.meta.key}/v{module.meta.version.major}"
+
+
 def discover_modules() -> list[type[Module]]:
     modules: list[type[Module]] = []
 
@@ -43,13 +47,13 @@ def mount_modules(app: FastAPI) -> list[type[Module]]:
 
         sub_app = module_cls.create_app()
 
-        sub_app_path = f"/modules/{meta.key}/v{meta.version.major}"
+        module_path = get_module_path(module_cls)
 
         if sub_app.docs_url is None and sub_app.redoc_url is None:
-            sub_app.openapi_url = sub_app_path + "/openapi.json"
+            sub_app.openapi_url = module_path + "/openapi.json"
             init_custom_docs(sub_app)
 
-        app.mount(f"/modules/{meta.key}/v{meta.version.major}", sub_app)
+        app.mount(module_path, sub_app)
 
         seen_modules.add((meta.key, meta.version.major))
 

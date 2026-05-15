@@ -1,55 +1,66 @@
-import json
-import sys
 from pathlib import Path
+from typing import Annotated
 
-from uvicorn.main import main as uvicorn_main
+import orjson
+import typer
+import uvicorn
 
+from ocelescope_backend.app.modules.loader import discover_modules, get_module_path
 from ocelescope_backend.factory import create_app
 
-
-def openapi(path: str) -> None:
-    output_dir = Path(path)
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    openapi_path = output_dir / "openapi.json"
-    fastapi_app = create_app()
-
-    with open(openapi_path, "w") as f:
-        json.dump(fastapi_app.openapi(), f, indent=2)
-
-    print(f"OpenAPI written to {openapi_path}")
+app = typer.Typer()
 
 
-def serve(args: list[str]) -> None:
-    extra_args = list(args)
-
-    if "--host" not in extra_args:
-        extra_args = ["--host", "0.0.0.0", *extra_args]
-
-    if "--port" not in extra_args:
-        extra_args = ["--port", "8000", *extra_args]
-
-    sys.argv = [
-        "uvicorn",
+@app.command("serve")
+def serve(
+    host: Annotated[str, typer.Option()] = "0.0.0.0",
+    port: Annotated[int, typer.Option()] = 8000,
+    reload: Annotated[bool, typer.Option("--reload")] = False,
+    reload_dirs: Annotated[list[Path] | None, typer.Option("--reload-dir")] = None,
+    env_file: Annotated[Path | None, typer.Option()] = None,
+) -> None:
+    uvicorn.run(
         "ocelescope_backend.main:app",
-        *extra_args,
-    ]
-    uvicorn_main()
+        host=host,
+        port=port,
+        reload=reload,
+        reload_dirs=[str(dir) for dir in reload_dirs]
+        if reload_dirs is not None
+        else reload_dirs,
+        timeout_graceful_shutdown=1 if reload else None,
+        env_file=env_file,
+    )
 
 
-def main() -> None:
-    args = sys.argv[1:]
+@app.command("openapi")
+def generate_base_api(
+    path: Annotated[Path, typer.Option()] = Path("openapi.json"),
+    module: Annotated[str | None, typer.Option()] = None,
+    version: Annotated[int | None, typer.Option()] = None,
+) -> None:
+    if module is not None:
+        module_class = next(
+            (
+                candidate
+                for candidate in discover_modules()
+                if candidate.meta.key == module
+                and (version is None or candidate.meta.version.major == version)
+            ),
+            None,
+        )
+        if module_class is None:
+            raise typer.BadParameter(f"Unknown module: {module}")
 
-    if args and args[0] == "openapi":
-        if len(args) != 2:
-            print("Usage: ocelescope-backend openapi <output-dir>")
-            raise SystemExit(2)
+        fastapi_app = module_class.create_app()
+        prefix = get_module_path(module_class)
 
-        openapi(args[1])
-        return
+        openapi_schema = fastapi_app.openapi()
+        openapi_schema["paths"] = {
+            f"{prefix}{route_path}": route_schema
+            for route_path, route_schema in openapi_schema["paths"].items()
+        }
+    else:
+        fastapi_app = create_app()
+        openapi_schema = fastapi_app.openapi()
 
-    serve(args)
-
-
-if __name__ == "__main__":
-    main()
+    path.write_bytes(orjson.dumps(openapi_schema, option=orjson.OPT_INDENT_2))
