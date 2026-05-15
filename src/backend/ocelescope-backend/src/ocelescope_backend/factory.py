@@ -16,6 +16,7 @@ from ocelescope_backend.app.internal.registrar import (
 )
 from ocelescope_backend.app.internal.utils import error_handler_server
 from ocelescope_backend.app.middleware import session_access_middleware
+from ocelescope_backend.app.modules.loader import mount_modules
 from ocelescope_backend.app.routes import routes
 from ocelescope_backend.app.sse_manager import SSEMessage, sse_manager
 from ocelescope_backend.version import __version__
@@ -52,6 +53,7 @@ def create_app() -> FastAPI:
     app.exception_handler(Exception)(error_handler_server)
 
     register_initial_plugins()
+    mount_modules(app)
 
     for route in routes:
         app.include_router(route)

@@ -5,7 +5,7 @@ requires-python = ">=3.11"
 dependencies = ["fastapi", "ocelescope-backend"]
 
 [project.entry-points."ocelescope_backend.modules"]
-test-module = "ocelescope_module_ocelot.module:TestModule"
+ocelotV1 = "ocelescope_module_ocelot.module:Ocelot"
 
 
 [build-system]

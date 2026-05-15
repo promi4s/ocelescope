@@ -3,14 +3,13 @@ from dataclasses import dataclass
 from typing import ClassVar
 
 from fastapi import FastAPI
+from packaging.version import Version
 
 
 @dataclass(frozen=True)
 class ModuleMeta:
     key: str
-    label: str
-    version: str
-    mount_path: str
+    version: Version
 
 
 class Module(ABC):
