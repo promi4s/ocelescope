@@ -1396,6 +1396,7 @@ lint = [
     { name = "ruff" },
 ]
 repl = [
+    { name = "ipython" },
     { name = "ipython-autotime" },
 ]
 
@@ -1413,7 +1414,10 @@ docs = [
     { name = "mkdocstrings-python", specifier = ">=2.0.3" },
 ]
 lint = [{ name = "ruff", specifier = ">=0.15.7" }]
-repl = [{ name = "ipython-autotime", specifier = ">=0.3.2" }]
+repl = [
+    { name = "ipython", specifier = ">=9.11.0" },
+    { name = "ipython-autotime", specifier = ">=0.3.2" },
+]
 
 [[package]]
 name = "orjson"

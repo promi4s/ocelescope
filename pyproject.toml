@@ -7,9 +7,9 @@ requires-python = ">=3.13"
 
 [tool.uv.workspace]
 members = [
-    "src/ocelescope",
-    "src/backend/ocelescope-backend",
-    "src/backend/modules/ocelescope-module-ocelot",
+  "src/ocelescope",
+  "src/backend/ocelescope-backend",
+  "src/backend/modules/ocelescope-module-ocelot",
 ]
 
 [tool.ruff.lint]
@@ -29,4 +29,8 @@ docs = [
   "mkdocs-minify-plugin>=0.8.0",
   "mkdocstrings-python>=2.0.3",
 ]
-repl = ["ipython-autotime>=0.3.2"]
+
+repl = [
+    "ipython>=9.11.0",
+    "ipython-autotime>=0.3.2",
+]
