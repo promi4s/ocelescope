@@ -1,10 +1,10 @@
 import type {
-  PaginatedResponse,
   RelationCountSummary,
   TypedAttribute,
 } from "@ocelescope/api-base";
 import { DataTable, type DataTableSortStatus } from "mantine-datatable";
 import { useMemo } from "react";
+import type { PaginatedResponse } from "../api/base";
 
 const EntityTable: React.FC<{
   entities: PaginatedResponse;

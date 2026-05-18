@@ -28,9 +28,10 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsdown",
     "dev": "tsdown --watch ./src",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build": "orval && tsdown",
+    "generate:api": "uv run ocelescope-backend openapi --module ocelot --path src/frontend/modules/ocelot/openapi.json"
   },
   "peerDependencies": {
     "@dagrejs/dagre": "catalog:",
@@ -48,7 +49,9 @@
     "mantine-datatable": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "recharts": "catalog:"
+    "recharts": "catalog:",
+    "axios": "catalog:",
+    "@ocelescope/api-client": "workspace:*"
   },
   "devDependencies": {
     "@tsdown/css": "catalog:",
@@ -57,7 +60,7 @@
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-
+    "@ocelescope/api-config": "workspace:*",
     "tsdown": "catalog:",
     "typescript": "catalog:"
   }

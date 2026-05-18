@@ -13,7 +13,9 @@ router = APIRouter()
 
 
 @router.get(
-    "{ocel_id}/events", response_model=PaginatedResponse, operation_id="paginatedEvents"
+    "/{ocel_id}/events",
+    response_model=PaginatedResponse,
+    operation_id="paginatedEvents",
 )
 def get_events(
     ocel: ApiOcel,
@@ -34,7 +36,7 @@ def get_events(
 
 
 @router.get(
-    "{ocel_id}/objects",
+    "/{ocel_id}/objects",
     response_model=PaginatedResponse,
     operation_id="paginatedObjects",
 )

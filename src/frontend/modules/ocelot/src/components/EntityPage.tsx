@@ -6,13 +6,12 @@ import {
   useO2o,
   useObjectAttributes,
   useObjectCounts,
-  useOcelotPaginatedEvents,
-  useOcelotPaginatedObjects,
 } from "@ocelescope/api-base";
 import { useCurrentOcel } from "@ocelescope/core";
 import { keepPreviousData } from "@tanstack/react-query";
 import type { DataTableSortStatus } from "mantine-datatable";
 import { useEffect, useMemo, useState } from "react";
+import { usePaginatedEvents, usePaginatedObjects } from "../api/base";
 import EntityTable from "./EntityTable";
 import SingleLineTabs from "./SingleLineTabs/SingleLineTabs";
 
@@ -50,10 +49,10 @@ const EntityPage: React.FC<{ type: "events" | "objects" }> = ({ type }) => {
   }, [unfilteredRelations, currentTab]);
 
   const { data: entities } = (
-    areEntitiesEvents ? useOcelotPaginatedEvents : useOcelotPaginatedObjects
+    areEntitiesEvents ? usePaginatedEvents : usePaginatedObjects
   )(
+    id,
     {
-      ocel_id: id,
       type: currentTab,
       page_size: pageSize,
       page,
