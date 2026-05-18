@@ -11,6 +11,19 @@ from ocelescope_backend.factory import create_app
 app = typer.Typer()
 
 
+def join_openapi_path(prefix: str, route_path: str) -> str:
+    prefix = prefix.strip("/")
+    route_path = route_path.strip("/")
+
+    if prefix and route_path:
+        return f"/{prefix}/{route_path}"
+    if prefix:
+        return f"/{prefix}"
+    if route_path:
+        return f"/{route_path}"
+    return "/"
+
+
 @app.command("serve")
 def serve(
     host: Annotated[str, typer.Option()] = "0.0.0.0",
@@ -56,7 +69,7 @@ def generate_base_api(
 
         openapi_schema = fastapi_app.openapi()
         openapi_schema["paths"] = {
-            f"{prefix}{route_path}": route_schema
+            join_openapi_path(prefix, route_path): route_schema
             for route_path, route_schema in openapi_schema["paths"].items()
         }
     else:
