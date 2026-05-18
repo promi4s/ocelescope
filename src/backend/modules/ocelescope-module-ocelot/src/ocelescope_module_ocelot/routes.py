@@ -1,14 +1,56 @@
-from fastapi import APIRouter
-from ocelescope_backend.app.dependencies import ApiSession
+from typing import Annotated
+
+from fastapi import APIRouter, Query
+from ocelescope_backend.app.dependencies import ApiOcel
+
+from ocelescope_module_ocelot.models import PaginatedResponse
+from ocelescope_module_ocelot.util import (
+    get_paginated_event_table,
+    get_paginated_object_table,
+)
 
 router = APIRouter()
 
 
-@router.get("/ping")
-def ping() -> dict[str, object]:
-    return {"ok": True, "module": "test-module"}
+@router.get(
+    "{ocel_id}/events", response_model=PaginatedResponse, operation_id="paginatedEvents"
+)
+def get_events(
+    ocel: ApiOcel,
+    type: Annotated[str, Query(description="Activity name")],
+    page: Annotated[int, Query(ge=1)] = 1,
+    page_size: Annotated[int, Query(ge=1, le=100)] = 10,
+    sort_by: Annotated[str | None, Query()] = None,
+    ascending: Annotated[bool, Query()] = True,
+):
+    return get_paginated_event_table(
+        ocel=ocel,
+        activity=type,
+        page_index=page,
+        page_size=page_size,
+        sort_by=sort_by,
+        ascending=ascending,
+    )
 
 
-@router.get("/session")
-def session_info(session: ApiSession) -> dict[str, str]:
-    return {"session_id": session.id}
+@router.get(
+    "{ocel_id}/objects",
+    response_model=PaginatedResponse,
+    operation_id="paginatedObjects",
+)
+def get_objects(
+    ocel: ApiOcel,
+    type: Annotated[str, Query(description="Object type name")],
+    page: Annotated[int, Query(ge=1)] = 1,
+    page_size: Annotated[int, Query(ge=1, le=100)] = 10,
+    sort_by: Annotated[str | None, Query()] = None,
+    ascending: Annotated[bool, Query()] = True,
+):
+    return get_paginated_object_table(
+        ocel=ocel,
+        object_type=type,
+        page_index=page,
+        page_size=page_size,
+        sort_by=sort_by,
+        ascending=ascending,
+    )
