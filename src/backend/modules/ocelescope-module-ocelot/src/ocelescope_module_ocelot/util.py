@@ -163,6 +163,16 @@ def get_activity_columns_def(
     ]
 
 
+def get_sort_by_key(sort_by, id_string):
+    match sort_by:
+        case "id":
+            return id_string
+        case "timestamp":
+            return TIMESTAMP_COL
+        case _:
+            return sort_by
+
+
 def get_paginated_event_table(
     ocel: OCEL,
     page_size: int,
@@ -174,7 +184,9 @@ def get_paginated_event_table(
     events_table = ocel.events.df.loc[ocel.events.df[ACTIVITY_COL].eq(activity)]
 
     if sort_by is not None:
-        events_table = events_table.sort_values(by=sort_by, ascending=ascending)
+        events_table = events_table.sort_values(
+            by=get_sort_by_key(sort_by, EID_COL), ascending=ascending
+        )
 
     events_table, total_entities, total_pages = paginate_df(
         events_table,
@@ -248,7 +260,9 @@ def get_paginated_object_table(
             object_table.update(changes)
 
         object_table[sort_by] = coerce_series(object_table[sort_by])
-        object_table = object_table.sort_values(by=sort_by, ascending=ascending)
+        object_table = object_table.sort_values(
+            by=get_sort_by_key(sort_by, OID_COL), ascending=ascending
+        )
 
     object_table, total_objects, total_pages = paginate_df(
         object_table,
