@@ -1,6 +1,5 @@
 import math
-from copy import Error
-from typing import Any, Iterable, TypeVar, cast
+from typing import Any, Iterable, TypeVar
 
 import numpy as np
 import pandas as pd
@@ -33,23 +32,23 @@ from ocelescope_module_ocelot.models import (
 T = TypeVar("T")
 
 
-def to_python_scalar(x):
-    if isinstance(x, np.generic):
-        return x.item()
-    return x
+def to_python_scalar(value: Any) -> Any:
+    if isinstance(value, np.generic):
+        return value.item()
+    return value
 
 
 def none_or_python_value(value: Any) -> Any | None:
     if value is None:
         return None
-    if isinstance(value, str) and value.strip() == "":
+    if isinstance(value, str) and not value.strip():
         return None
-    if pd.isna(value):
+    if pd.api.types.is_scalar(value) and pd.isna(value):
         return None
     return to_python_scalar(value)
 
 
-def get_non_null(values: Iterable[T | None]) -> T | None:
+def first_present(values: Iterable[Any]) -> Any | None:
     for value in values:
         cleaned_value = none_or_python_value(value)
         if cleaned_value is not None:
@@ -57,23 +56,57 @@ def get_non_null(values: Iterable[T | None]) -> T | None:
     return None
 
 
-def get_object_columns_def(ocel: OCEL, object_type: str):
+def relation_accessor(parts: Iterable[Any]) -> str:
+    return str(first_present(parts))
 
+
+def paginate_df(
+    df: pd.DataFrame,
+    page_size: int,
+    page_index: int,
+) -> tuple[pd.DataFrame, int, int]:
+    if page_size <= 0:
+        raise ValueError("page_size must be greater than 0")
+    if page_index <= 0:
+        raise ValueError("page_index must be greater than 0")
+
+    total_items = len(df)
+    total_pages = math.ceil(total_items / page_size) if total_items else 0
+
+    if total_pages > 0 and page_index > total_pages:
+        raise ValueError(f"page_index {page_index} exceeds total_pages {total_pages}")
+
+    start = (page_index - 1) * page_size
+    end = page_index * page_size
+    return df.iloc[start:end], total_items, total_pages
+
+
+def serialize_object_attribute(value: Any) -> Any:
+    if isinstance(value, (str, bytes, dict)) or not isinstance(value, Iterable):
+        return to_python_scalar(value)
+
+    return first_present(reversed(value))
+
+
+def get_object_columns_def(
+    ocel: OCEL,
+    object_type: str,
+) -> list[EntityTableColumn]:
     typed_o2o = ocel.o2o.typed_df
+
+    relation_rows = typed_o2o.loc[
+        typed_o2o[O2O_SOURCE_TYPE].eq(object_type)
+    ].drop_duplicates([O2O_TARGET_TYPE, O2O_QUALIFIER])[
+        [O2O_TARGET_TYPE, O2O_QUALIFIER]
+    ]
 
     relation_columns = [
         EntityTableColumn(
-            accessor=str(get_non_null([qualifier, object_type])),
+            accessor=relation_accessor([qualifier, target_object_type]),
             type="relation",
-            title=f"{qualifier} ({object_type})",
+            title=f"{qualifier} ({target_object_type})",
         )
-        for _, object_type, qualifier in typed_o2o.loc[
-            typed_o2o[O2O_SOURCE_TYPE].eq(object_type)
-        ]
-        .drop_duplicates([O2O_TARGET_TYPE, O2O_QUALIFIER])[
-            [O2O_TARGET_TYPE, O2O_QUALIFIER]
-        ]
-        .itertuples()
+        for _, target_object_type, qualifier in relation_rows.itertuples()
     ]
 
     attribute_columns = [
@@ -83,29 +116,32 @@ def get_object_columns_def(ocel: OCEL, object_type: str):
         ).index
     ]
 
-    return (
-        [EntityTableColumn(accessor="id", type="relation", title="#")]
-        + attribute_columns
-        + relation_columns
-    )
+    return [
+        EntityTableColumn(accessor="id", type="relation", title="#"),
+        *attribute_columns,
+        *relation_columns,
+    ]
 
 
-def get_activity_columns_def(ocel: OCEL, activity_name: str):
+def get_activity_columns_def(
+    ocel: OCEL,
+    activity_name: str,
+) -> list[EntityTableColumn]:
     typed_e2o = ocel.e2o.df
+
+    relation_rows = typed_e2o.loc[
+        typed_e2o[E2O_ACTIVITY].eq(activity_name)
+    ].drop_duplicates([E2O_OBJECT_TYPE, E2O_QUALIFIER])[
+        [E2O_OBJECT_TYPE, E2O_QUALIFIER]
+    ]
 
     relation_columns = [
         EntityTableColumn(
-            accessor=str(get_non_null([qualifier, object_type])),
+            accessor=relation_accessor([qualifier, object_type]),
             type="relation",
             title=f"{qualifier} ({object_type})",
         )
-        for _, object_type, qualifier in typed_e2o.loc[
-            typed_e2o[E2O_ACTIVITY].eq(activity_name)
-        ]
-        .drop_duplicates([E2O_OBJECT_TYPE, E2O_QUALIFIER])[
-            [E2O_OBJECT_TYPE, E2O_QUALIFIER]
-        ]
-        .itertuples()
+        for _, object_type, qualifier in relation_rows.itertuples()
     ]
 
     attribute_columns = [
@@ -115,16 +151,16 @@ def get_activity_columns_def(ocel: OCEL, activity_name: str):
         ).index
     ]
 
-    return (
-        [
-            EntityTableColumn(accessor="id", title="#", type="attribute"),
-            EntityTableColumn(
-                accessor="timestamp", title="Timestamp", type="attribute"
-            ),
-        ]
-        + attribute_columns
-        + relation_columns
-    )
+    return [
+        EntityTableColumn(accessor="id", title="#", type="attribute"),
+        EntityTableColumn(
+            accessor="timestamp",
+            title="Timestamp",
+            type="attribute",
+        ),
+        *attribute_columns,
+        *relation_columns,
+    ]
 
 
 def get_paginated_event_table(
@@ -134,32 +170,27 @@ def get_paginated_event_table(
     activity: str,
     sort_by: str | None = None,
     ascending: bool = True,
-):
+) -> PaginatedResponse:
     events_table = ocel.events.df.loc[ocel.events.df[ACTIVITY_COL].eq(activity)]
-
-    total_entities = len(events_table)
-
-    total_pages = math.ceil(total_entities / page_size)
 
     if sort_by is not None:
         events_table = events_table.sort_values(by=sort_by, ascending=ascending)
 
-    total_entities = len(events_table)
+    events_table, total_entities, total_pages = paginate_df(
+        events_table,
+        page_size=page_size,
+        page_index=page_index,
+    )
 
-    total_pages = math.ceil(total_entities / page_size)
-
-    if page_index > total_pages:
-        raise Error
-
-    events_table = events_table.iloc[
-        (page_index - 1) * page_size : (page_index) * page_size
-    ].dropna(axis=1)
+    events_table = events_table.dropna(axis=1, how="all")
 
     e2o_table = (
         ocel.e2o.df.loc[ocel.e2o.df[EID_COL].isin(events_table[EID_COL])]
         .groupby([EID_COL, E2O_QUALIFIER, OTYPE_COL])[OID_COL]
         .agg(list)
     )
+
+    e2o_entity_ids = set(e2o_table.index.get_level_values(0))
 
     return PaginatedResponse(
         page=page_index,
@@ -168,21 +199,21 @@ def get_paginated_event_table(
         total_items=total_entities,
         items=[
             OcelEntity(
-                id=str(id),
-                timestamp=attributes[TIMESTAMP_COL],
+                id=str(entity_id),
+                timestamp=row[TIMESTAMP_COL],
                 attributes={
-                    str(a): to_python_scalar(b)
-                    for a, b in attributes.items()
-                    if a not in [TIMESTAMP_COL, ACTIVITY_COL]
+                    str(column_name): to_python_scalar(value)
+                    for column_name, value in row.items()
+                    if column_name not in [TIMESTAMP_COL, ACTIVITY_COL]
                 },
                 relations={
-                    str(get_non_null(cast(list, index)[1:])): objects
-                    for index, objects in e2o_table.loc[[str(id)]].items()
+                    relation_accessor(index[1:]): objects
+                    for index, objects in e2o_table.loc[[str(entity_id)]].items()
                 }
-                if id in e2o_table.index.get_level_values(0)
+                if entity_id in e2o_entity_ids
                 else {},
             )
-            for id, attributes in events_table.set_index(EID_COL).iterrows()
+            for entity_id, row in events_table.set_index(EID_COL).iterrows()
         ],
     )
 
@@ -194,11 +225,10 @@ def get_paginated_object_table(
     object_type: str,
     sort_by: str | None = None,
     ascending: bool = True,
-):
-    object_table = ocel.objects.df
-    object_table = object_table.loc[object_table[OTYPE_COL].eq(object_type)].set_index(
-        OID_COL
-    )
+) -> PaginatedResponse:
+    object_table = ocel.objects.df.loc[
+        ocel.objects.df[OTYPE_COL].eq(object_type)
+    ].set_index(OID_COL)
 
     if sort_by:
         if sort_by in ocel.objects.dynamic_attribute_names:
@@ -218,27 +248,25 @@ def get_paginated_object_table(
             object_table.update(changes)
 
         object_table[sort_by] = coerce_series(object_table[sort_by])
-
         object_table = object_table.sort_values(by=sort_by, ascending=ascending)
 
-    total_objects = len(object_table)
-
-    total_pages = math.ceil(total_objects / page_size)
-
-    object_table = object_table.iloc[
-        (page_index - 1) * page_size : (page_index) * page_size
-    ]
+    object_table, total_objects, total_pages = paginate_df(
+        object_table,
+        page_size=page_size,
+        page_index=page_index,
+    )
 
     changes_table = ocel.objects.changes.loc[
         ocel.objects.changes[OID_COL].isin(object_table.index)
     ].dropna(axis=1, how="all")
 
     if not changes_table.empty:
-        dynamic_attr = changes_table["ocel:field"].drop_duplicates()
-        dynamic_attributes_aggr = {field: (field, list) for field in dynamic_attr}
+        dynamic_attributes = changes_table["ocel:field"].drop_duplicates()
+        dynamic_attributes_aggr = {field: (field, list) for field in dynamic_attributes}
 
         changes_table = changes_table.groupby(OID_COL).agg(
-            **dynamic_attributes_aggr, **{TIMESTAMP_COL: (TIMESTAMP_COL, list)}
+            **dynamic_attributes_aggr,
+            **{TIMESTAMP_COL: (TIMESTAMP_COL, list)},
         )
 
         object_table = object_table.merge(
@@ -249,20 +277,25 @@ def get_paginated_object_table(
             suffixes=("", "_new"),
         )
 
-        for col in dynamic_attr:
-            object_table[col] = object_table[f"{col}_new"].combine_first(
-                object_table[col].astype(object)
-            )
+        for column_name in dynamic_attributes:
+            object_table[column_name] = object_table[
+                f"{column_name}_new"
+            ].combine_first(object_table[column_name].astype(object))
 
-        object_table = object_table.drop(columns=[f"{col}_new" for col in dynamic_attr])
+        object_table = object_table.drop(
+            columns=[f"{column_name}_new" for column_name in dynamic_attributes]
+        )
 
+    typed_o2o = ocel.o2o.typed_df
     o2o_table = (
-        ocel.o2o.typed_df.loc[ocel.o2o.df[O2O_SOURCE_ID].isin(object_table.index)]
+        typed_o2o.loc[typed_o2o[O2O_SOURCE_ID].isin(object_table.index)]
         .groupby([O2O_SOURCE_ID, O2O_QUALIFIER, O2O_TARGET_TYPE])[O2O_TARGET_ID]
         .agg(list)
     )
 
-    object_table = object_table.dropna(axis=1, how="all").drop(OTYPE_COL, axis=1)
+    object_table = object_table.dropna(axis=1, how="all").drop(columns=[OTYPE_COL])
+
+    o2o_entity_ids = set(o2o_table.index.get_level_values(0))
 
     return PaginatedResponse(
         page=page_index,
@@ -271,21 +304,19 @@ def get_paginated_object_table(
         total_items=total_objects,
         items=[
             OcelEntity(
-                id=str(id),
+                id=str(entity_id),
                 attributes={
-                    str(a): to_python_scalar(b)
-                    if not isinstance(b, Iterable) or isinstance(b, (str, bytes, dict))
-                    else get_non_null(reversed(b))
-                    for a, b in attributes.items()
-                    if a != TIMESTAMP_COL
+                    str(column_name): serialize_object_attribute(value)
+                    for column_name, value in row.items()
+                    if column_name != TIMESTAMP_COL
                 },
                 relations={
-                    str(get_non_null(cast(list, index)[1:])): list(objects)
-                    for index, objects in o2o_table.loc[[str(id)]].items()
+                    relation_accessor(index[1:]): list(objects)
+                    for index, objects in o2o_table.loc[[str(entity_id)]].items()
                 }
-                if id in o2o_table.index.get_level_values(0)
+                if entity_id in o2o_entity_ids
                 else {},
             )
-            for id, attributes in object_table.iterrows()
+            for entity_id, row in object_table.iterrows()
         ],
     )
