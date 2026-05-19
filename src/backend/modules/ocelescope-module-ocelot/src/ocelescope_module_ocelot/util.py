@@ -2,6 +2,7 @@ import math
 from copy import Error
 from typing import Iterable, TypeVar, cast
 
+import numpy as np
 import pandas as pd
 from ocelescope.ocel.constants import ACTIVITY_COL
 from ocelescope.ocel.constants.pm4py import (
@@ -23,10 +24,16 @@ from ocelescope_module_ocelot.models import OcelEntity, PaginatedResponse
 T = TypeVar("T")
 
 
+def to_python_scalar(x):
+    if isinstance(x, np.generic):
+        return x.item()
+    return x
+
+
 def get_non_null(values: Iterable[T | None]) -> T | None:
     for value in values:
         if pd.notna(value):
-            return value
+            return to_python_scalar(value)
     return None
 
 
@@ -74,7 +81,9 @@ def get_paginated_event_table(
                 id=str(id),
                 timestamp=attributes[TIMESTAMP_COL],
                 attributes={
-                    str(a): b if type(b) is not list else get_non_null(reversed(b))
+                    str(a): to_python_scalar(b)
+                    if type(b) is not list
+                    else get_non_null(reversed(b))
                     for a, b in attributes.items()
                     if a not in [TIMESTAMP_COL, ACTIVITY_COL]
                 },
@@ -176,14 +185,14 @@ def get_paginated_object_table(
             OcelEntity(
                 id=str(id),
                 attributes={
-                    str(a): b
+                    str(a): to_python_scalar(b)
                     if not isinstance(b, Iterable) or isinstance(b, (str, bytes, dict))
                     else get_non_null(reversed(b))
                     for a, b in attributes.items()
                     if a != TIMESTAMP_COL
                 },
                 relations={
-                    str(get_non_null(cast(list, index)[1:])): objects
+                    str(get_non_null(cast(list, index)[1:])): list(objects)
                     for index, objects in o2o_table.loc[[str(id)]].items()
                 }
                 if id in o2o_table.index.get_level_values(0)
