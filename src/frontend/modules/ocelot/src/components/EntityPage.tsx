@@ -1,12 +1,5 @@
 import { Flex } from "@mantine/core";
-import {
-  useE2o,
-  useEventAttributes,
-  useEventCounts,
-  useO2o,
-  useObjectAttributes,
-  useObjectCounts,
-} from "@ocelescope/api-base";
+import { useEventCounts, useObjectCounts } from "@ocelescope/api-base";
 import { useCurrentOcel } from "@ocelescope/core";
 import { keepPreviousData } from "@tanstack/react-query";
 import type { DataTableSortStatus } from "mantine-datatable";
@@ -24,10 +17,6 @@ const EntityPage: React.FC<{ type: "events" | "objects" }> = ({ type }) => {
     areEntitiesEvents ? useEventCounts : useObjectCounts
   )(id);
 
-  const { data: attributes } = (
-    areEntitiesEvents ? useEventAttributes : useObjectAttributes
-  )(id);
-
   const [currentTab, setCurrentTab] = useState("");
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState<DataTableSortStatus | undefined>(undefined);
@@ -38,15 +27,6 @@ const EntityPage: React.FC<{ type: "events" | "objects" }> = ({ type }) => {
     () => Object.keys(entityCounts ?? {}),
     [entityCounts],
   );
-
-  //TODO: Make this in a collapsable table rather then extra collumns
-  const { data: unfilteredRelations = [] } = (
-    areEntitiesEvents ? useE2o : useO2o
-  )(id);
-
-  const relations = useMemo(() => {
-    return unfilteredRelations.filter(({ source }) => source === currentTab);
-  }, [unfilteredRelations, currentTab]);
 
   const { data: entities } = (
     areEntitiesEvents ? usePaginatedEvents : usePaginatedObjects
@@ -67,14 +47,6 @@ const EntityPage: React.FC<{ type: "events" | "objects" }> = ({ type }) => {
         staleTime: 5000,
       },
     },
-  );
-
-  const entityAttributes = useMemo(
-    () =>
-      attributes?.filter(
-        ({ entity_type }) => entity_type === (currentTab ?? entityNames[0]),
-      ),
-    [currentTab, entityNames],
   );
 
   useEffect(() => {
@@ -102,11 +74,9 @@ const EntityPage: React.FC<{ type: "events" | "objects" }> = ({ type }) => {
       {entities && (
         <EntityTable
           entities={entities}
-          attributes={entityAttributes}
           withTimestamp={type === "events"}
           onPageChange={(newPage) => setPage(newPage)}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          relations={relations}
           sortStatus={sort}
           onStartStatusChange={(sortStatus) => setSort(sortStatus)}
         />
