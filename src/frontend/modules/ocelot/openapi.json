@@ -259,20 +259,11 @@
         }
       }
     },
-    "/modules/ocelot/v1/{ocel_id}/objects/{object_type}/columns": {
+    "/modules/ocelot/v1/{ocel_id}/objects/columns": {
       "get": {
         "summary": "Get Object Columns",
         "operationId": "objectColumns",
         "parameters": [
-          {
-            "name": "object_type",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Object Type"
-            }
-          },
           {
             "name": "ocel_id",
             "in": "path",
@@ -287,6 +278,15 @@
                 }
               ],
               "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "type_name",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Type Name"
             }
           },
           {
@@ -339,20 +339,11 @@
         }
       }
     },
-    "/modules/ocelot/v1/{ocel_id}/events/{activity_name}/columns": {
+    "/modules/ocelot/v1/{ocel_id}/events/columns": {
       "get": {
         "summary": "Get Activity Columns",
         "operationId": "activityColumns",
         "parameters": [
-          {
-            "name": "activity_name",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Activity Name"
-            }
-          },
           {
             "name": "ocel_id",
             "in": "path",
@@ -367,6 +358,15 @@
                 }
               ],
               "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "type_name",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Type Name"
             }
           },
           {

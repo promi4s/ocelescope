@@ -1,6 +1,5 @@
 import { Flex } from "@mantine/core";
 import { useEventCounts, useObjectCounts } from "@ocelescope/api-base";
-import { useCurrentOcel } from "@ocelescope/core";
 import { keepPreviousData } from "@tanstack/react-query";
 import type { DataTableSortStatus } from "mantine-datatable";
 import { useEffect, useMemo, useState } from "react";
@@ -13,16 +12,17 @@ import {
 import EntityTable from "./EntityTable";
 import SingleLineTabs from "./SingleLineTabs/SingleLineTabs";
 
-const EntityPage: React.FC<{ type: "events" | "objects" }> = ({ type }) => {
-  const { id } = useCurrentOcel();
-
+const EntityPage: React.FC<{ ocelId: string; type: "events" | "objects" }> = ({
+  ocelId,
+  type,
+}) => {
   const areEntitiesEvents = type === "events";
 
   const { data: entityCounts } = (
     areEntitiesEvents ? useEventCounts : useObjectCounts
-  )(id);
+  )(ocelId);
 
-  const [currentTab, setCurrentTab] = useState("");
+  const [currentTab, setCurrentTab] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState<DataTableSortStatus | undefined>(undefined);
 
@@ -36,9 +36,9 @@ const EntityPage: React.FC<{ type: "events" | "objects" }> = ({ type }) => {
   const { data: entities } = (
     areEntitiesEvents ? usePaginatedEvents : usePaginatedObjects
   )(
-    id,
+    ocelId,
     {
-      type: currentTab,
+      type: currentTab ?? "",
       page_size: pageSize,
       page,
       ...(sort && {
@@ -48,6 +48,7 @@ const EntityPage: React.FC<{ type: "events" | "objects" }> = ({ type }) => {
     },
     {
       query: {
+        enabled: !!currentTab,
         placeholderData: keepPreviousData,
         staleTime: 5000,
       },
@@ -55,8 +56,13 @@ const EntityPage: React.FC<{ type: "events" | "objects" }> = ({ type }) => {
   );
 
   const { data } = (areEntitiesEvents ? useActivityColumns : useObjectColumns)(
-    id,
-    currentTab,
+    ocelId,
+    { type_name: currentTab ?? "" },
+    {
+      query: {
+        enabled: !!currentTab,
+      },
+    },
   );
 
   useEffect(() => {
@@ -79,7 +85,7 @@ const EntityPage: React.FC<{ type: "events" | "objects" }> = ({ type }) => {
           setPage(1);
           setSort(undefined);
         }}
-        currentTab={currentTab ?? entityNames[0]}
+        currentTab={currentTab ?? entityNames[0] ?? ""}
       />
       {entities && (
         <EntityTable

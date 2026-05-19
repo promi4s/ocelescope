@@ -60,11 +60,11 @@ def get_objects(
     )
 
 
-@router.get("/{ocel_id}/objects/{object_type}/columns", operation_id="objectColumns")
-def get_object_columns(ocel: ApiOcel, object_type: str) -> list[EntityTableColumn]:
-    return get_object_columns_def(ocel, object_type)
+@router.get("/{ocel_id}/objects/columns", operation_id="objectColumns")
+def get_object_columns(ocel: ApiOcel, type_name: str) -> list[EntityTableColumn]:
+    return get_object_columns_def(ocel, type_name)
 
 
-@router.get("/{ocel_id}/events/{activity_name}/columns", operation_id="activityColumns")
-def get_activity_columns(ocel: ApiOcel, activity_name: str) -> list[EntityTableColumn]:
-    return get_activity_columns_def(ocel, activity_name)
+@router.get("/{ocel_id}/events/columns", operation_id="activityColumns")
+def get_activity_columns(ocel: ApiOcel, type_name: str) -> list[EntityTableColumn]:
+    return get_activity_columns_def(ocel, type_name)
