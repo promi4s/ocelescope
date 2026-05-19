@@ -3,8 +3,10 @@ from typing import Annotated
 from fastapi import APIRouter, Query
 from ocelescope_backend.app.dependencies import ApiOcel
 
-from ocelescope_module_ocelot.models import PaginatedResponse
+from ocelescope_module_ocelot.models import EntityTableColumn, PaginatedResponse
 from ocelescope_module_ocelot.util import (
+    get_activity_columns_def,
+    get_object_columns_def,
     get_paginated_event_table,
     get_paginated_object_table,
 )
@@ -56,3 +58,13 @@ def get_objects(
         sort_by=sort_by,
         ascending=ascending,
     )
+
+
+@router.get("/{ocel_id}/objects/{object_type}/columns", operation_id="objectColumns")
+def get_object_columns(ocel: ApiOcel, object_type: str) -> list[EntityTableColumn]:
+    return get_object_columns_def(ocel, object_type)
+
+
+@router.get("/{ocel_id}/events/{activity_name}/columns", operation_id="activityColumns")
+def get_activity_columns(ocel: ApiOcel, activity_name: str) -> list[EntityTableColumn]:
+    return get_activity_columns_def(ocel, activity_name)

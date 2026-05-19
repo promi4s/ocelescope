@@ -1,10 +1,15 @@
 import math
 from copy import Error
-from typing import Iterable, TypeVar, cast
+from typing import Any, Iterable, TypeVar, cast
 
 import numpy as np
 import pandas as pd
-from ocelescope.ocel.constants import ACTIVITY_COL
+from ocelescope.ocel.constants import (
+    ACTIVITY_COL,
+    E2O_ACTIVITY,
+    E2O_OBJECT_TYPE,
+    O2O_SOURCE_TYPE,
+)
 from ocelescope.ocel.constants.pm4py import (
     E2O_QUALIFIER,
     EID_COL,
@@ -19,7 +24,11 @@ from ocelescope.ocel.constants.pm4py import (
 from ocelescope.util.pandas import coerce_series
 
 from ocelescope import OCEL
-from ocelescope_module_ocelot.models import OcelEntity, PaginatedResponse
+from ocelescope_module_ocelot.models import (
+    EntityTableColumn,
+    OcelEntity,
+    PaginatedResponse,
+)
 
 T = TypeVar("T")
 
@@ -30,11 +39,92 @@ def to_python_scalar(x):
     return x
 
 
+def none_or_python_value(value: Any) -> Any | None:
+    if value is None:
+        return None
+    if isinstance(value, str) and value.strip() == "":
+        return None
+    if pd.isna(value):
+        return None
+    return to_python_scalar(value)
+
+
 def get_non_null(values: Iterable[T | None]) -> T | None:
     for value in values:
-        if pd.notna(value):
-            return to_python_scalar(value)
+        cleaned_value = none_or_python_value(value)
+        if cleaned_value is not None:
+            return cleaned_value
     return None
+
+
+def get_object_columns_def(ocel: OCEL, object_type: str):
+
+    typed_o2o = ocel.o2o.typed_df
+
+    relation_columns = [
+        EntityTableColumn(
+            accessor=str(get_non_null([qualifier, object_type])),
+            type="relation",
+            title=f"{qualifier} ({object_type})",
+        )
+        for _, object_type, qualifier in typed_o2o.loc[
+            typed_o2o[O2O_SOURCE_TYPE].eq(object_type)
+        ]
+        .drop_duplicates([O2O_TARGET_TYPE, O2O_QUALIFIER])[
+            [O2O_TARGET_TYPE, O2O_QUALIFIER]
+        ]
+        .itertuples()
+    ]
+
+    attribute_columns = [
+        EntityTableColumn(accessor=attribute, type="attribute")
+        for _, attribute in ocel.attributes.get_object_summary(
+            object_types=[object_type]
+        ).index
+    ]
+
+    return (
+        [EntityTableColumn(accessor="id", type="relation", title="#")]
+        + attribute_columns
+        + relation_columns
+    )
+
+
+def get_activity_columns_def(ocel: OCEL, activity_name: str):
+    typed_e2o = ocel.e2o.df
+
+    relation_columns = [
+        EntityTableColumn(
+            accessor=str(get_non_null([qualifier, object_type])),
+            type="relation",
+            title=f"{qualifier} ({object_type})",
+        )
+        for _, object_type, qualifier in typed_e2o.loc[
+            typed_e2o[E2O_ACTIVITY].eq(activity_name)
+        ]
+        .drop_duplicates([E2O_OBJECT_TYPE, E2O_QUALIFIER])[
+            [E2O_OBJECT_TYPE, E2O_QUALIFIER]
+        ]
+        .itertuples()
+    ]
+
+    attribute_columns = [
+        EntityTableColumn(accessor=attribute, type="attribute")
+        for _, attribute in ocel.attributes.get_activity_summary(
+            activities=[activity_name]
+        ).index
+    ]
+
+    return (
+        [
+            EntityTableColumn(accessor="id", title="#", type="attribute"),
+            EntityTableColumn(
+                accessor="timestamp", title="Timestamp", type="attribute"
+            ),
+        ]
+        + attribute_columns
+        + relation_columns
+    )
 
 
 def get_paginated_event_table(
@@ -63,7 +153,7 @@ def get_paginated_event_table(
 
     events_table = events_table.iloc[
         (page_index - 1) * page_size : (page_index) * page_size
-    ]
+    ].dropna(axis=1)
 
     e2o_table = (
         ocel.e2o.df.loc[ocel.e2o.df[EID_COL].isin(events_table[EID_COL])]
@@ -82,8 +172,6 @@ def get_paginated_event_table(
                 timestamp=attributes[TIMESTAMP_COL],
                 attributes={
                     str(a): to_python_scalar(b)
-                    if type(b) is not list
-                    else get_non_null(reversed(b))
                     for a, b in attributes.items()
                     if a not in [TIMESTAMP_COL, ACTIVITY_COL]
                 },

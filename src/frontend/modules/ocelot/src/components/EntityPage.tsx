@@ -4,7 +4,12 @@ import { useCurrentOcel } from "@ocelescope/core";
 import { keepPreviousData } from "@tanstack/react-query";
 import type { DataTableSortStatus } from "mantine-datatable";
 import { useEffect, useMemo, useState } from "react";
-import { usePaginatedEvents, usePaginatedObjects } from "../api/base";
+import {
+  useActivityColumns,
+  useObjectColumns,
+  usePaginatedEvents,
+  usePaginatedObjects,
+} from "../api/base";
 import EntityTable from "./EntityTable";
 import SingleLineTabs from "./SingleLineTabs/SingleLineTabs";
 
@@ -49,6 +54,11 @@ const EntityPage: React.FC<{ type: "events" | "objects" }> = ({ type }) => {
     },
   );
 
+  const { data } = (areEntitiesEvents ? useActivityColumns : useObjectColumns)(
+    id,
+    currentTab,
+  );
+
   useEffect(() => {
     if (!currentTab && entityNames.length > 0) {
       setCurrentTab(entityNames[0]!);
@@ -74,6 +84,7 @@ const EntityPage: React.FC<{ type: "events" | "objects" }> = ({ type }) => {
       {entities && (
         <EntityTable
           entities={entities}
+          columns={data ?? []}
           withTimestamp={type === "events"}
           onPageChange={(newPage) => setPage(newPage)}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}

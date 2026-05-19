@@ -1,5 +1,6 @@
+from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
 
 from pydantic import BaseModel
 
@@ -17,3 +18,10 @@ class PaginatedResponse(BaseModel):
     total_pages: int
     total_items: int
     items: List[OcelEntity]
+
+
+@dataclass
+class EntityTableColumn:
+    accessor: str
+    type: Literal["attribute", "relation"]
+    title: str | None = None
