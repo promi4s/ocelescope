@@ -21,7 +21,9 @@ def discover_modules() -> list[type[Module]]:
         loaded: Any = ep.load()
 
         if not issubclass(loaded, Module):
-            logger.warning(f"Entry point '{ep.name}' is not a subclass of Module")
+            logger.warning(
+                f"Entry point '{ep.name}' from '{ep.module}' is not a subclass of Module"
+            )
             continue
 
         modules.append(loaded)
@@ -48,7 +50,6 @@ def mount_modules(app: FastAPI) -> list[type[Module]]:
         module_path = get_module_path(module_cls)
 
         if sub_app.docs_url is None and sub_app.redoc_url is None:
-            sub_app.openapi_url = module_path + "/openapi.json"
             init_custom_docs(sub_app)
 
         app.mount(module_path, sub_app)
