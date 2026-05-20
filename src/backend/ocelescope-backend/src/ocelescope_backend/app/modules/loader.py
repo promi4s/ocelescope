@@ -4,6 +4,7 @@ from typing import Any
 from fastapi import FastAPI
 
 from ocelescope_backend.app.internal.docs import init_custom_docs
+from ocelescope_backend.app.internal.logger import logger
 from ocelescope_backend.app.modules.base import Module
 
 ENTRYPOINT_GROUP = "ocelescope_backend.modules"
@@ -19,13 +20,9 @@ def discover_modules() -> list[type[Module]]:
     for ep in entry_points(group=ENTRYPOINT_GROUP):
         loaded: Any = ep.load()
 
-        if not isinstance(loaded, type):
-            raise TypeError(
-                f"Entry point '{ep.name}' did not load a class: {type(loaded)!r}"
-            )
-
         if not issubclass(loaded, Module):
-            raise TypeError(f"Entry point '{ep.name}' is not a subclass of Module")
+            logger.warning(f"Entry point '{ep.name}' is not a subclass of Module")
+            continue
 
         modules.append(loaded)
 
@@ -41,9 +38,10 @@ def mount_modules(app: FastAPI) -> list[type[Module]]:
         meta = module_cls.meta
 
         if (meta.key, meta.version.major) in seen_modules:
-            raise ValueError(
+            logger.warning(
                 f"Duplicated Module detected key: {meta.key} version: v{meta.version.major}"
             )
+            continue
 
         sub_app = module_cls.create_app()
 
