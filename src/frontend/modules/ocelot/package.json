@@ -31,7 +31,7 @@
     "dev": "tsdown --watch ./src",
     "typecheck": "tsc --noEmit",
     "build": "orval && tsdown",
-    "generate:api": "uv run ocelescope-backend openapi --module ocelot --path src/frontend/modules/ocelot/openapi.json"
+    "generate:api": "uv run ocelescope-backend openapi --module ocelot"
   },
   "peerDependencies": {
     "@dagrejs/dagre": "catalog:",
