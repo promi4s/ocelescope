@@ -21,8 +21,7 @@
     "dev:frontend": "pnpm -r --parallel --filter \"@ocelescope/app\" run dev",
     "dev:backend": "uv run ocelescope-backend serve --reload --reload-dir src/backend/ --env-file src/backend/.env",
     "dev:app": "pnpm run dev:backend & pnpm run dev:frontend",
-    "docker:dev": "docker compose -f docker-compose.dev.yml up --build --watch",
-    "docker:prod": "docker compose -f docker-compose.yml up --build",
+    "docker:up": "docker compose -f docker-compose.yml up --build",
     "docker:down": "docker compose down",
     "notebook": "uv run --with jupyterlab --with jupyter-ruff jupyter lab notebooks/"
   },
