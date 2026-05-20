@@ -1,8 +1,8 @@
-from __future__ import annotations
-
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
+
+from ocelescope.ocel.filter.base import BaseFilter
 
 
 def _snake_to_camel(value: str) -> str:
@@ -76,16 +76,45 @@ class FilteredDiscoveryParameters(DiscoveryParameters):
         field_type="object_type",
     )
     activity_frequency_threshold: int = discovery_percentage_field(
-        title="Activity Threshold",
+        title="Activity Frequency Threshold",
         description=(
-            "Keep only activities whose frequency is at least this percentage "
-            "of the most frequent activity."
+            "Frequency threshold for activities, as a percentage of all events. "
+            "Loop iterations count individually."
         ),
+    )
+    activity_frequency_mode: Literal["include", "exclude"] = select_field(
+        default="include",
+        title="Activity Frequency Mode",
+        description="Whether to keep or remove activities that meet the frequency threshold.",
+        options={"include": "Keep frequent", "exclude": "Remove frequent"},
     )
     object_frequency_threshold: int = discovery_percentage_field(
-        title="Object Threshold",
-        description=(
-            "Keep only object types whose frequency is at least this percentage "
-            "of the most frequent object type."
-        ),
+        title="Object Type Frequency Threshold",
+        description=("Frequency threshold for object types, as a percentage of all objects."),
     )
+    object_frequency_mode: Literal["include", "exclude"] = select_field(
+        default="include",
+        title="Object Type Frequency Mode",
+        description="Whether to keep or remove object types that meet the frequency threshold.",
+        options={"include": "Keep frequent", "exclude": "Remove frequent"},
+    )
+
+    def build_filter_pipeline(self) -> list[BaseFilter]:
+        from ocelescope.ocel.filter.filters.entity_type import EventTypeFilter, ObjectTypeFilter
+        from ocelescope.ocel.filter.filters.frequency import (
+            EventTypeFrequencyFilter,
+            ObjectTypeFrequencyFilter,
+        )
+
+        return [
+            EventTypeFilter(event_types=self.excluded_event_types, mode="exclude"),
+            ObjectTypeFilter(object_types=self.excluded_object_types, mode="exclude"),
+            EventTypeFrequencyFilter(
+                threshold_percentage=self.activity_frequency_threshold,
+                mode=self.activity_frequency_mode,
+            ),
+            ObjectTypeFrequencyFilter(
+                threshold_percentage=self.object_frequency_threshold,
+                mode=self.object_frequency_mode,
+            ),
+        ]
