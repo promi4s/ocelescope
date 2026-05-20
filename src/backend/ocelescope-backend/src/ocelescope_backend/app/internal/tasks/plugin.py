@@ -5,13 +5,13 @@ from typing import (
     Generic,
     Hashable,
     ParamSpec,
-    TypedDict,
 )
 
-from ocelescope import OCEL, BaseFilter, Resource
 from pydantic.fields import Field
 from pydantic.main import BaseModel
+from typing_extensions import TypedDict
 
+from ocelescope import OCEL, BaseFilter, Resource
 from ocelescope_backend.app.internal.model.resource import ResourceStore
 from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.tasks.base import (

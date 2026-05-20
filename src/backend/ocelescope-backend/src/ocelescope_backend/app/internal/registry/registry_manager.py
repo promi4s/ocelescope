@@ -1,10 +1,11 @@
 import importlib.util
 import shutil
 import sys
-from typing import Any, Dict, TypedDict
+from typing import Any, Dict
+
+from typing_extensions import TypedDict
 
 from ocelescope import Plugin, Resource
-
 from ocelescope_backend.app.internal.config import config
 from ocelescope_backend.app.internal.model.plugin import PluginApi
 from ocelescope_backend.app.internal.model.resource import ResourceStore

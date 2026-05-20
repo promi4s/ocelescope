@@ -1,6 +1,10 @@
-from typing import Hashable, Self, TypedDict, cast
+from typing import Hashable, Self, cast
 
 import pandas as pd
+from ocelescope.ocel.constants import ValueType
+from pydantic.main import BaseModel
+from typing_extensions import TypedDict
+
 from ocelescope import (
     OCEL,
     BaseFilter,
@@ -12,9 +16,6 @@ from ocelescope import (
     ObjectTypeFilter,
     TimeFrameFilter,
 )
-from ocelescope.ocel.constants import ValueType
-from pydantic.main import BaseModel
-
 from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.registry.extension import OCELExtensionDescription
 

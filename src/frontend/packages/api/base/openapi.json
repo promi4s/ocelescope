@@ -4477,7 +4477,8 @@
           "max_count",
           "sum"
         ],
-        "title": "RelationCountSummary"
+        "title": "RelationCountSummary",
+        "description": "Summary statistics for relationship multiplicities in O2O or E2O relations.\n\nThis structure captures how many related objects (or events) occur for each\ncombination of source type, target type, and qualifier. It is typically used\nin relation summaries such as those produced by O2OManager.summary or\nE2OManager.summary.\n\nAttributes:\n    qualifier (str):\n        The relation qualifier (e.g., role, relationship type) used in the\n        OCEL relation. For O2O this is often empty; for E2O this may describe\n        the nature of the event–object link.\n    source (str):\n        The source object or event type associated with the relation.\n    target (str):\n        The target object or event type associated with the relation.\n    min_count (int):\n        The minimum number of related items observed for any source instance.\n    max_count (int):\n        The maximum number of related items observed for any source instance.\n    sum (int):\n        The total number of relation occurrences across all instances."
       },
       "Resource": {
         "properties": {

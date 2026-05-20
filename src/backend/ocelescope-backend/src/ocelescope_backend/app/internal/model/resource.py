@@ -1,6 +1,8 @@
-from typing import Any, TypedDict
-from pydantic import BaseModel, Field
 from datetime import datetime
+from typing import Any
+
+from pydantic import BaseModel, Field
+from typing_extensions import TypedDict
 
 
 class PluginSource(TypedDict):

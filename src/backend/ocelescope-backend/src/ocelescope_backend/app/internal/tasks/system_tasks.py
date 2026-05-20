@@ -4,12 +4,13 @@ import tempfile
 import zipfile
 from datetime import datetime
 from pathlib import Path
-from typing import IO, TypedDict
+from typing import IO
 from uuid import uuid4
 
 from fastapi import HTTPException
-from ocelescope import OCEL
+from typing_extensions import TypedDict
 
+from ocelescope import OCEL
 from ocelescope_backend.app.internal.config import config
 from ocelescope_backend.app.internal.model.resource import ResourceStore
 from ocelescope_backend.app.internal.registry import registry_manager
