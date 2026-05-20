@@ -7,6 +7,7 @@ from app.internal.model.discovery import (
     CreateDiscoveryTaskBody,
     DiscoveryMethodMeta,
     DiscoveryRequest,
+    DiscoveryVariant,
 )
 from app.internal.tasks.discovery_task import DiscoveryTask
 
@@ -24,9 +25,9 @@ def create_discovery_task(
     body: CreateDiscoveryTaskBody,
 ) -> str:
     try:
-        algorithm = discovery_registry.get(body.method_id)
-        parsed_parameters = algorithm.parse_parameters(body.parameters)
-        parameters = algorithm.dump_parameters(parsed_parameters)
+        info = discovery_registry.get(body.method_id)
+        parsed_parameters = info.parse_parameters(body.parameters)
+        parameters = info.dump_parameters(parsed_parameters)
     except KeyError:
         raise HTTPException(
             status_code=404,
@@ -39,9 +40,9 @@ def create_discovery_task(
         session=session,
         request=DiscoveryRequest(
             ocel_id=ocel_id,
-            method_id=algorithm.method_id,
-            name=algorithm.name,
-            resource_type=algorithm.resource_type,
+            method_id=info.method_id,
+            name=info.name,
+            resource_type=info.resource_type.get_type(),
             parameters=parameters,
         ),
     )
@@ -53,17 +54,18 @@ def create_discovery_task(
     operation_id="listDiscoveryMethods",
 )
 def list_discovery_methods() -> list[DiscoveryMethodMeta]:
-    methods: list[DiscoveryMethodMeta] = []
-
-    for algorithm in discovery_registry.list_algorithms():
-        methods.append(
-            DiscoveryMethodMeta(
-                method_id=algorithm.method_id,
-                resource_type=algorithm.resource_type,
-                name=algorithm.name,
-                description=algorithm.description,
-                input_schema=algorithm.parameters_schema(),
-            )
+    return [
+        DiscoveryMethodMeta(
+            name=group.name,
+            description=group.description,
+            input_schema=group.parameters_schema(),
+            variants=[
+                DiscoveryVariant(
+                    method_id=v.method_id,
+                    resource_type=v.resource_type.get_type(),
+                )
+                for v in group.variants
+            ],
         )
-
-    return methods
+        for group in discovery_registry.list_groups()
+    ]

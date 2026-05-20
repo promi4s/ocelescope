@@ -1,9 +1,4 @@
-import {
-  Box,
-  Center,
-  LoadingOverlay,
-  Text,
-} from "@mantine/core";
+import { Box, Center, LoadingOverlay, Text } from "@mantine/core";
 import {
   useCreateDiscoveryTask,
   useEventCounts,
@@ -29,8 +24,6 @@ import {
   PANEL_MIN,
 } from "../utils/discoveryState";
 
-// ─── Inner component (keyed by ocelId for correct lazy init) ──────────────────
-
 const DiscoveryPageContent = ({
   ocelId,
   panelWidth,
@@ -44,11 +37,12 @@ const DiscoveryPageContent = ({
   isPanelCollapsed: boolean;
   setIsPanelCollapsed: (v: boolean) => void;
 }) => {
-  // Lazily initialize from localStorage — runs once at mount since key={ocelId}
   const initialSettings = loadStoredSettings(ocelId);
 
   const [selectedMethodId, setSelectedMethodId] = useState<string | null>(
-    initialSettings.selectedMethodId ?? initialSettings.selectedMethodType ?? null,
+    initialSettings.selectedMethodId ??
+      initialSettings.selectedMethodType ??
+      null,
   );
   const [formDataByMethod, setFormDataByMethod] = useState<
     Partial<Record<string, Record<string, unknown>>>
@@ -78,7 +72,10 @@ const DiscoveryPageContent = ({
       if (!dragRef.current) return;
       const delta = dragRef.current.startX - ev.clientX;
       setPanelWidth(
-        Math.max(PANEL_MIN, Math.min(PANEL_MAX, dragRef.current.startWidth + delta)),
+        Math.max(
+          PANEL_MIN,
+          Math.min(PANEL_MAX, dragRef.current.startWidth + delta),
+        ),
       );
     };
 
@@ -113,15 +110,15 @@ const DiscoveryPageContent = ({
   useEffect(() => {
     if (selectedMethodId || methods.length === 0) return;
     setSelectedMethodId(
-      methods.find((m) => m.resourceType === "DirectlyFollowsGraph")
+      methods.flatMap((m) => m.variants).find((v) => v.resourceType === "DirectlyFollowsGraph")
         ?.methodId ??
-        methods[0]?.methodId ??
+        methods[0]?.variants[0]?.methodId ??
         null,
     );
   }, [methods, selectedMethodId]);
 
   const selectedMethod = useMemo(
-    () => methods.find((m) => m.methodId === selectedMethodId) ?? null,
+    () => methods.find((m) => m.variants.some((v) => v.methodId === selectedMethodId)) ?? null,
     [methods, selectedMethodId],
   );
 
@@ -132,7 +129,10 @@ const DiscoveryPageContent = ({
     if (!selectedMethodId || !selectedMethod) return;
     setFormDataByMethod((current) => {
       if (current[selectedMethodId]) return current;
-      return { ...current, [selectedMethodId]: getInitialFormData(selectedSchema) };
+      return {
+        ...current,
+        [selectedMethodId]: getInitialFormData(selectedSchema),
+      };
     });
   }, [selectedMethod, selectedMethodId, selectedSchema]);
 
@@ -159,10 +159,7 @@ const DiscoveryPageContent = ({
     query: {
       enabled: !!taskId,
       refetchInterval: ({ state }) => {
-        if (
-          state.data?.state === "PENDING" ||
-          state.data?.state === "STARTED"
-        )
+        if (state.data?.state === "PENDING" || state.data?.state === "STARTED")
           return 1000;
         return false;
       },
@@ -171,7 +168,8 @@ const DiscoveryPageContent = ({
 
   useEffect(() => {
     const resourceId = task?.output.resource_ids?.at(-1);
-    if (task?.state === "SUCCESS" && resourceId) setLatestResourceId(resourceId);
+    if (task?.state === "SUCCESS" && resourceId)
+      setLatestResourceId(resourceId);
   }, [task]);
 
   const requestPayload = useMemo(
@@ -213,7 +211,9 @@ const DiscoveryPageContent = ({
     submitError ||
     (methodsError instanceof Error ? methodsError.message : undefined) ||
     (taskError instanceof Error ? taskError.message : undefined) ||
-    (task?.state === "FAILURE" ? "The backend discovery task failed." : undefined);
+    (task?.state === "FAILURE"
+      ? "The backend discovery task failed."
+      : undefined);
 
   const settingsProps = {
     methods,
@@ -269,8 +269,6 @@ const DiscoveryPageContent = ({
     </Box>
   );
 };
-
-// ─── Outer shell — owns panel state, renders inner with key={ocelId} ──────────
 
 const DiscoveryPage = () => {
   const { id: ocelId } = useCurrentOcel();

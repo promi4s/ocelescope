@@ -41,18 +41,17 @@ class DiscoveryTask(TaskBase):
         self.request = request
         self.result = DiscoveryOutput()
         self.error: BaseException | None = None
+        self._actual_resource_type = request.resource_type
 
     def run(self):
         self.state = TaskState.STARTED
         try:
             try:
-                algorithm = discovery_registry.get(self.request.method_id)
-                parameters = algorithm.parse_parameters(
-                    cast(dict[str, Any], self.request.parameters)
-                )
+                info = discovery_registry.get(self.request.method_id)
+                parameters = info.parse_parameters(cast(dict[str, Any], self.request.parameters))
                 resource = cast(
                     Resource,
-                    algorithm.run_untyped(
+                    info.run(
                         ocel=self.session.get_ocel(self.request.ocel_id),
                         parameters=parameters,
                     ),
@@ -60,11 +59,11 @@ class DiscoveryTask(TaskBase):
             except KeyError as exc:
                 raise BadRequest(str(exc)) from exc
 
-            resource_name = self._build_resource_name(resource.get_type())
+            self._actual_resource_type = resource.get_type()
             resource_id = self.session.add_resource(
                 ResourceStore(
-                    name=resource_name,
-                    type=resource.get_type(),
+                    name=self._build_resource_name(self._actual_resource_type),
+                    type=self._actual_resource_type,
                     source=None,
                     data=resource.model_dump(),
                 )
@@ -90,6 +89,7 @@ class DiscoveryTask(TaskBase):
         return f"{ocel_name}_{resource_type}"
 
     def _build_notification(self) -> SystemNotification:
+        resource_type = self._actual_resource_type
         if self.state == TaskState.SUCCESS:
             resource_id = (
                 self.result.resource_ids[0] if self.result.resource_ids else None
@@ -98,7 +98,7 @@ class DiscoveryTask(TaskBase):
                 type="notification",
                 title="Discovery finished",
                 message=(
-                    f"Successfully discovered {self.request.resource_type} "
+                    f"Successfully discovered {resource_type} "
                     f"with {self.request.name} "
                     f"for {self.request.ocel_id}"
                 ),
@@ -111,7 +111,7 @@ class DiscoveryTask(TaskBase):
                 type="notification",
                 title="Discovery cancelled",
                 message=(
-                    f"Discovery of {self.request.resource_type} "
+                    f"Discovery of {resource_type} "
                     f"with {self.request.name} "
                     f"for {self.request.ocel_id} was cancelled"
                 ),
@@ -133,7 +133,7 @@ class DiscoveryTask(TaskBase):
             ocel_id=self.request.ocel_id,
             method_id=self.request.method_id,
             name=self.request.name,
-            resource_type=self.request.resource_type,
+            resource_type=self._actual_resource_type,
             output=self.result,
         )
 

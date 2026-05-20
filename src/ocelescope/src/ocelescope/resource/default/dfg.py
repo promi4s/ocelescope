@@ -1,3 +1,5 @@
+from typing import Any
+
 from pydantic import Field
 
 from ocelescope.resource.resource import Annotated, Resource
@@ -108,6 +110,38 @@ class DirectlyFollowsGraph(Resource):
             A list of object type names.
         """
         return [object_type.name for object_type in self.object_types]
+
+    @classmethod
+    def from_pm4py(cls, ocdfg: Any) -> "DirectlyFollowsGraph":
+        """Convert a pm4py OCDFG dict to a DirectlyFollowsGraph."""
+        edges = [
+            DFGEdge(
+                object_type=object_type,
+                source=source,
+                target=target,
+                annotation=str(len(events)),
+            )
+            for object_type, raw_edges in ocdfg["edges"]["event_couples"].items()
+            for (source, target), events in raw_edges.items()
+        ]
+
+        start_edges = [
+            DFGEdge(object_type=object_type, target=activity, annotation=str(len(events)))
+            for object_type, activities in ocdfg["start_activities"]["events"].items()
+            for activity, events in activities.items()
+        ]
+
+        end_edges = [
+            DFGEdge(source=activity, object_type=object_type, annotation=str(len(events)))
+            for object_type, activities in ocdfg["end_activities"]["events"].items()
+            for activity, events in activities.items()
+        ]
+
+        return cls(
+            activities=[DFGActivity(name=a) for a in ocdfg["activities"]],
+            object_types=[DFGObject(name=ot) for ot in ocdfg["object_types"]],
+            edges=edges + start_edges + end_edges,
+        )
 
     def visualize(self) -> Graph:
         color_map = generate_color_map([ot.name for ot in self.object_types], "custom")

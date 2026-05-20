@@ -18,9 +18,13 @@ class CreateDiscoveryTaskBody(RequestBody):
     parameters: dict[str, Any] = Field(default_factory=dict)
 
 
-class DiscoveryMethodMeta(ApiBaseModel):
+class DiscoveryVariant(ApiBaseModel):
     method_id: str
     resource_type: str
+
+
+class DiscoveryMethodMeta(ApiBaseModel):
     name: str
     description: str | None = None
     input_schema: dict[str, Any]
+    variants: list[DiscoveryVariant]

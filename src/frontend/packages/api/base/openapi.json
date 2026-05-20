@@ -3553,14 +3553,6 @@
       },
       "DiscoveryMethodMeta": {
         "properties": {
-          "methodId": {
-            "type": "string",
-            "title": "Methodid"
-          },
-          "resourceType": {
-            "type": "string",
-            "title": "Resourcetype"
-          },
           "name": {
             "type": "string",
             "title": "Name"
@@ -3580,14 +3572,20 @@
             "additionalProperties": true,
             "type": "object",
             "title": "Inputschema"
+          },
+          "variants": {
+            "items": {
+              "$ref": "#/components/schemas/DiscoveryVariant"
+            },
+            "type": "array",
+            "title": "Variants"
           }
         },
         "type": "object",
         "required": [
-          "methodId",
-          "resourceType",
           "name",
-          "inputSchema"
+          "inputSchema",
+          "variants"
         ],
         "title": "DiscoveryMethodMeta"
       },
@@ -3644,6 +3642,24 @@
           "output"
         ],
         "title": "DiscoveryTaskSummary"
+      },
+      "DiscoveryVariant": {
+        "properties": {
+          "methodId": {
+            "type": "string",
+            "title": "Methodid"
+          },
+          "resourceType": {
+            "type": "string",
+            "title": "Resourcetype"
+          }
+        },
+        "type": "object",
+        "required": [
+          "methodId",
+          "resourceType"
+        ],
+        "title": "DiscoveryVariant"
       },
       "DotVis": {
         "properties": {

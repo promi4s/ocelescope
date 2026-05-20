@@ -2,7 +2,6 @@ import { Alert, Box, Select, Stack, Text } from "@mantine/core";
 import type { DiscoveryMethodMeta } from "@ocelescope/api-base";
 import type { Dispatch, SetStateAction } from "react";
 import type { DiscoverySchema } from "../types";
-import { getMethodOptionLabel } from "../utils/labels";
 import { DiscoveryField } from "./DiscoveryField";
 
 type DiscoverySettingsContentProps = {
@@ -31,47 +30,63 @@ export const DiscoverySettingsContent = ({
   eventCounts,
   objectCounts,
   errorMessage,
-}: DiscoverySettingsContentProps) => (
-  <Stack gap="md">
-    <Select
-      label="Discovery Method"
-      value={selectedMethodId}
-      onChange={setSelectedMethodId}
-      data={methods.map((method) => ({
-        value: method.methodId,
-        label: getMethodOptionLabel(method),
-      }))}
-      allowDeselect={false}
-    />
-    {selectedMethod?.description && (
-      <Text size="sm" c="dimmed">
-        {selectedMethod.description}
-      </Text>
-    )}
-    {Object.entries(selectedSchema.properties ?? {}).map(([name, property]) => (
-      <Box key={name}>
-        <DiscoveryField
-          name={name}
-          property={property}
-          value={activeFormData[name]}
-          eventTypeOptions={Object.keys(eventCounts)}
-          objectTypeOptions={Object.keys(objectCounts)}
-          onChange={(value) =>
-            setFormDataByMethod((current) => ({
-              ...current,
-              [selectedMethodId as string]: {
-                ...((selectedMethodId && current[selectedMethodId]) ?? {}),
-                [name]: value,
-              },
-            }))
-          }
+}: DiscoverySettingsContentProps) => {
+  const selectedVariants = selectedMethod?.variants ?? [];
+
+  return (
+    <Stack gap="md">
+      <Select
+        label="Discovery Method"
+        value={selectedMethod?.name ?? null}
+        onChange={(name) => {
+          const group = methods.find((m) => m.name === name);
+          setSelectedMethodId(group?.variants[0]?.methodId ?? null);
+        }}
+        data={methods.map((m) => ({ value: m.name, label: m.name }))}
+        allowDeselect={false}
+      />
+      {selectedVariants.length > 1 && (
+        <Select
+          label="Output Format"
+          value={selectedMethodId}
+          onChange={setSelectedMethodId}
+          data={selectedVariants.map((v) => ({
+            value: v.methodId,
+            label: v.resourceType,
+          }))}
+          allowDeselect={false}
         />
-      </Box>
-    ))}
-    {errorMessage && (
-      <Alert color="red" title="Discovery failed">
-        {errorMessage}
-      </Alert>
-    )}
-  </Stack>
-);
+      )}
+      {selectedMethod?.description && (
+        <Text size="sm" c="dimmed">
+          {selectedMethod.description}
+        </Text>
+      )}
+      {Object.entries(selectedSchema.properties ?? {}).map(([name, property]) => (
+        <Box key={name}>
+          <DiscoveryField
+            name={name}
+            property={property}
+            value={activeFormData[name]}
+            eventTypeOptions={Object.keys(eventCounts)}
+            objectTypeOptions={Object.keys(objectCounts)}
+            onChange={(value) =>
+              setFormDataByMethod((current) => ({
+                ...current,
+                [selectedMethodId as string]: {
+                  ...((selectedMethodId && current[selectedMethodId]) ?? {}),
+                  [name]: value,
+                },
+              }))
+            }
+          />
+        </Box>
+      ))}
+      {errorMessage && (
+        <Alert color="red" title="Discovery failed">
+          {errorMessage}
+        </Alert>
+      )}
+    </Stack>
+  );
+};

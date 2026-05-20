@@ -1,9 +1,9 @@
-from ocelescope.discovery.algorithms.directly_follows_graph import PM4PyObjectCentricDFG
-from ocelescope.discovery.algorithms.petri_net_inductive_miner import (
-    PM4PyObjectCentricInductiveMiner,
-)
+from ocelescope.discovery.algorithms.dfg_miner import OCDFGMiner, ocdfg_miner
+from ocelescope.discovery.algorithms.inductive_miner import InductiveMinerParameters, inductive_miner
 
 __all__ = [
-    "PM4PyObjectCentricDFG",
-    "PM4PyObjectCentricInductiveMiner",
+    "InductiveMinerParameters",
+    "OCDFGMiner",
+    "inductive_miner",
+    "ocdfg_miner",
 ]
