@@ -3,10 +3,14 @@ name = "ocelescope-workspace"
 version = "0.1.0"
 description = "Workspace for ocelescope package"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.11"
 
 [tool.uv.workspace]
-members = ["src/backend", "src/ocelescope"]
+members = [
+  "src/ocelescope",
+  "src/backend/ocelescope-backend",
+  "src/backend/modules/ocelescope-module-ocelot",
+]
 
 [tool.ruff.lint]
 ignore = ["E731"]
@@ -25,6 +29,5 @@ docs = [
   "mkdocs-minify-plugin>=0.8.0",
   "mkdocstrings-python>=2.0.3",
 ]
-repl = [
-    "ipython-autotime>=0.3.2",
-]
+
+repl = ["ipython>=9.11.0", "ipython-autotime>=0.3.2"]

@@ -1,0 +1,19 @@
+[project]
+name = "ocelescope-module-ocelot"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = ["fastapi", "ocelescope-backend"]
+
+[project.entry-points."ocelescope_backend.modules"]
+ocelotV1 = "ocelescope_module_ocelot.module:Ocelot"
+
+
+[build-system]
+requires = ["uv_build>=0.8.4,<0.9.0"]
+build-backend = "uv_build"
+
+[tool.uv]
+package = true
+
+[tool.uv.sources]
+ocelescope-backend = { workspace = true }

@@ -1,0 +1,76 @@
+from __future__ import annotations
+
+import asyncio
+from contextlib import asynccontextmanager
+from typing import AsyncIterable
+
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.sse import EventSourceResponse
+
+from ocelescope_backend.app.internal.config import config
+from ocelescope_backend.app.internal.docs import init_custom_docs
+from ocelescope_backend.app.internal.ocel.default_ocel import load_default_ocels
+from ocelescope_backend.app.internal.registrar import (
+    register_initial_plugins,
+)
+from ocelescope_backend.app.internal.utils import error_handler_server
+from ocelescope_backend.app.middleware import session_access_middleware
+from ocelescope_backend.app.modules.loader import mount_modules
+from ocelescope_backend.app.routes import routes
+from ocelescope_backend.app.sse_manager import SSEMessage, sse_manager
+from ocelescope_backend.version import __version__
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    load_default_ocels()
+    sse_manager.set_loop(asyncio.get_running_loop())
+    yield
+
+
+def create_app() -> FastAPI:
+    app = FastAPI(
+        title="Ocelescope Backend",
+        version=__version__,
+        docs_url=None,
+        redoc_url=None,
+        debug=config.MODE == "development",
+        lifespan=lifespan,
+        redirect_slashes=False,
+    )
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[config.FRONTEND_URL],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+        expose_headers=[config.SESSION_ID_HEADER, "content-disposition"],
+    )
+
+    app.middleware("http")(session_access_middleware)
+    app.exception_handler(Exception)(error_handler_server)
+
+    register_initial_plugins()
+    mount_modules(app)
+
+    for route in routes:
+        app.include_router(route)
+
+    @app.get("/sse", response_class=EventSourceResponse, include_in_schema=False)
+    async def sse_endpoint(request: Request) -> AsyncIterable[SSEMessage]:
+        session_id = request.query_params.get("session_id")
+        if not session_id:
+            raise HTTPException(status_code=400, detail="Missing session_id")
+
+        queue = await sse_manager.connect(session_id)
+
+        try:
+            while not await request.is_disconnected():
+                yield await queue.get()
+        finally:
+            sse_manager.disconnect(session_id)
+
+    init_custom_docs(app)
+    return app

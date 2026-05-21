@@ -1,35 +1,28 @@
 import { Flex } from "@mantine/core";
-import {
-  useE2o,
-  useEventAttributes,
-  useEventCounts,
-  useO2o,
-  useObjectAttributes,
-  useObjectCounts,
-  useOcelotPaginatedEvents,
-  useOcelotPaginatedObjects,
-} from "@ocelescope/api-base";
-import { useCurrentOcel } from "@ocelescope/core";
+import { useEventCounts, useObjectCounts } from "@ocelescope/api-base";
 import { keepPreviousData } from "@tanstack/react-query";
 import type { DataTableSortStatus } from "mantine-datatable";
 import { useEffect, useMemo, useState } from "react";
+import {
+  useActivityColumns,
+  useObjectColumns,
+  usePaginatedEvents,
+  usePaginatedObjects,
+} from "../api/base";
 import EntityTable from "./EntityTable";
 import SingleLineTabs from "./SingleLineTabs/SingleLineTabs";
 
-const EntityPage: React.FC<{ type: "events" | "objects" }> = ({ type }) => {
-  const { id } = useCurrentOcel();
-
+const EntityPage: React.FC<{ ocelId: string; type: "events" | "objects" }> = ({
+  ocelId,
+  type,
+}) => {
   const areEntitiesEvents = type === "events";
 
   const { data: entityCounts } = (
     areEntitiesEvents ? useEventCounts : useObjectCounts
-  )(id);
+  )(ocelId);
 
-  const { data: attributes } = (
-    areEntitiesEvents ? useEventAttributes : useObjectAttributes
-  )(id);
-
-  const [currentTab, setCurrentTab] = useState("");
+  const [currentTab, setCurrentTab] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState<DataTableSortStatus | undefined>(undefined);
 
@@ -40,21 +33,12 @@ const EntityPage: React.FC<{ type: "events" | "objects" }> = ({ type }) => {
     [entityCounts],
   );
 
-  //TODO: Make this in a collapsable table rather then extra collumns
-  const { data: unfilteredRelations = [] } = (
-    areEntitiesEvents ? useE2o : useO2o
-  )(id);
-
-  const relations = useMemo(() => {
-    return unfilteredRelations.filter(({ source }) => source === currentTab);
-  }, [unfilteredRelations, currentTab]);
-
   const { data: entities } = (
-    areEntitiesEvents ? useOcelotPaginatedEvents : useOcelotPaginatedObjects
+    areEntitiesEvents ? usePaginatedEvents : usePaginatedObjects
   )(
+    ocelId,
     {
-      ocel_id: id,
-      type: currentTab,
+      type: currentTab ?? "",
       page_size: pageSize,
       page,
       ...(sort && {
@@ -64,18 +48,21 @@ const EntityPage: React.FC<{ type: "events" | "objects" }> = ({ type }) => {
     },
     {
       query: {
+        enabled: !!currentTab,
         placeholderData: keepPreviousData,
         staleTime: 5000,
       },
     },
   );
 
-  const entityAttributes = useMemo(
-    () =>
-      attributes?.filter(
-        ({ entity_type }) => entity_type === (currentTab ?? entityNames[0]),
-      ),
-    [currentTab, entityNames],
+  const { data } = (areEntitiesEvents ? useActivityColumns : useObjectColumns)(
+    ocelId,
+    { type_name: currentTab ?? "" },
+    {
+      query: {
+        enabled: !!currentTab,
+      },
+    },
   );
 
   useEffect(() => {
@@ -98,16 +85,15 @@ const EntityPage: React.FC<{ type: "events" | "objects" }> = ({ type }) => {
           setPage(1);
           setSort(undefined);
         }}
-        currentTab={currentTab ?? entityNames[0]}
+        currentTab={currentTab ?? entityNames[0] ?? ""}
       />
       {entities && (
         <EntityTable
           entities={entities}
-          attributes={entityAttributes}
+          columns={data ?? []}
           withTimestamp={type === "events"}
           onPageChange={(newPage) => setPage(newPage)}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          relations={relations}
           sortStatus={sort}
           onStartStatusChange={(sortStatus) => setSort(sortStatus)}
         />

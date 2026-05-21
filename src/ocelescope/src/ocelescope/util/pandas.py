@@ -76,7 +76,7 @@ def coerce_series(series: pd.Series) -> pd.Series:
         except Exception:
             pass
 
-        return series
+        return series.astype(str)
 
 
 def select_min_max_by_type(

@@ -1,15 +1,14 @@
-import type {
-  PaginatedResponse,
-  RelationCountSummary,
-  TypedAttribute,
-} from "@ocelescope/api-base";
-import { DataTable, type DataTableSortStatus } from "mantine-datatable";
+import {
+  DataTable,
+  type DataTableColumn,
+  type DataTableSortStatus,
+} from "mantine-datatable";
 import { useMemo } from "react";
+import type { EntityTableColumn, PaginatedResponse } from "../api/base";
 
 const EntityTable: React.FC<{
   entities: PaginatedResponse;
-  attributes?: TypedAttribute[];
-  relations?: RelationCountSummary[];
+  columns: EntityTableColumn[];
   withTimestamp?: boolean;
   onPageChange: (nextPage: number) => void;
   onPageSizeChange: (newPageSize: number) => void;
@@ -17,36 +16,12 @@ const EntityTable: React.FC<{
   onStartStatusChange: (sortStatus: DataTableSortStatus) => void;
 }> = ({
   entities,
-  withTimestamp,
-  attributes = [],
-  relations = [],
+  columns,
   onPageChange,
   onPageSizeChange,
   sortStatus,
   onStartStatusChange,
 }) => {
-  const columns = useMemo(
-    () => [
-      {
-        accessor: "id",
-        title: "#",
-        sortable: true,
-      },
-      ...(withTimestamp
-        ? [{ accessor: "timestamp", title: "date", sortable: true }]
-        : []),
-      ...attributes.map(({ name }) => ({
-        accessor: name,
-        sortable: true,
-      })),
-      ...relations.map(({ qualifier, target }) => ({
-        accessor: `${qualifier}::${target}`,
-        title: `${qualifier} (${target})`,
-      })),
-    ],
-    [withTimestamp, attributes, relations],
-  );
-
   const records = useMemo(
     () =>
       entities.items.map((entity) => ({
@@ -64,6 +39,15 @@ const EntityTable: React.FC<{
     [entities],
   );
 
+  const transformeColumns: DataTableColumn[] = useMemo(
+    () =>
+      columns.map((column) => ({
+        ...column,
+        sortable: column.type === "attribute",
+      })),
+    [columns],
+  );
+
   return (
     <DataTable
       page={entities.page}
@@ -71,7 +55,7 @@ const EntityTable: React.FC<{
       recordsPerPage={entities.page_size}
       onPageChange={onPageChange}
       withColumnBorders
-      columns={columns}
+      columns={transformeColumns}
       records={records}
       recordsPerPageOptions={[20, 40, 50]}
       onRecordsPerPageChange={onPageSizeChange}
