@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional, cast
+from typing import TYPE_CHECKING, Optional, Sequence, cast
 
 import pandas as pd
 import pm4py
@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from ocelescope.ocel.core.ocel import OCEL
 
 
-def compute_combined_masks(ocel: "OCEL", filters: list[BaseFilter]) -> FilterResult:
+def compute_combined_masks(ocel: "OCEL", filters: Sequence[BaseFilter]) -> FilterResult:
     combined = FilterResult(
         events=pd.Series(True, index=ocel.events.df.index),
         objects=pd.Series(True, index=ocel.objects.df.index),
@@ -22,7 +22,7 @@ def compute_combined_masks(ocel: "OCEL", filters: list[BaseFilter]) -> FilterRes
     return combined
 
 
-def apply_filters(ocel: "OCEL", filters: list[BaseFilter]) -> "OCEL":
+def apply_filters(ocel: "OCEL", filters: Sequence[BaseFilter]) -> "OCEL":
     from ocelescope.ocel.core.ocel import OCEL
 
     masks = compute_combined_masks(ocel, filters)
