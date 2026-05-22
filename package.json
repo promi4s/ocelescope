@@ -28,5 +28,9 @@
     "@biomejs/biome": "2.4.2",
     "@tsconfig/strictest": "catalog:",
     "orval": "catalog:"
+  },
+  "dependencies": {
+    "echarts": "catalog:",
+    "echarts-for-react": "catalog:"
   }
 }

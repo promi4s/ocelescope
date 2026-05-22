@@ -1,0 +1,46 @@
+{
+  "name": "@ocelescope/charts",
+  "type": "module",
+  "version": "0.0.0",
+  "description": "Reusable chart components for Ocelescope.",
+  "license": "MIT",
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch ./src",
+    "typecheck": "tsc --noEmit",
+    "storybook": "storybook dev -p 6007",
+    "build-storybook": "storybook build"
+  },
+  "peerDependencies": {
+    "@mantine/core": "catalog:",
+    "@ocelescope/api-base": "workspace:*",
+    "echarts": "catalog:",
+    "echarts-for-react": "catalog:",
+    "lucide-react": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@mantine/core": "catalog:",
+    "@storybook/react-vite": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "echarts": "catalog:",
+    "echarts-for-react": "catalog:",
+    "lucide-react": "catalog:",
+    "storybook": "catalog:",
+    "tsdown": "catalog:",
+    "typescript": "catalog:"
+  }
+}
