@@ -1,55 +1,14 @@
-import { Box, LoadingOverlay } from "@mantine/core";
-import { showNotification } from "@mantine/notifications";
-import type { OCELFilter } from "@ocelescope/api-base";
-import { useGetFilters, useSetFilters } from "@ocelescope/api-base";
 import { defineModuleRoute, useCurrentOcel } from "@ocelescope/core";
-import { useRef } from "react";
+import { useState } from "react";
 import FilterForm from "../components/FilterForm";
+import type { FilterType } from "../types/filter";
 
 const FilterPage = () => {
   const { id: ocelId } = useCurrentOcel();
 
-  const {
-    data: filter,
-    isLoading: isFilterLoading,
-    refetch,
-  } = useGetFilters(ocelId, undefined, { query: { enabled: !!ocelId } });
+  const [currentFilter, setCurrentFilter] = useState<FilterType>("activity");
 
-  const resetFormRef = useRef<(filter: OCELFilter) => void>(() => {});
-
-  const { mutate: applyFilter, isPending: isApplying } = useSetFilters({
-    mutation: {
-      onSuccess: async (data) => {
-        await refetch();
-        resetFormRef.current?.(data as OCELFilter);
-        showNotification({
-          message: "Filter successfully applied",
-          color: "green",
-        });
-      },
-    },
-  });
-
-  return (
-    <Box pos={"relative"}>
-      <LoadingOverlay visible={!ocelId || isApplying || isFilterLoading} />
-      {!isFilterLoading && (
-        <FilterForm
-          ocelId={ocelId as string}
-          filter={filter ?? {}}
-          onSubmit={(value) =>
-            applyFilter({
-              ocelId: ocelId,
-              data: value,
-            })
-          }
-          onResetRef={(fn) => {
-            resetFormRef.current = fn;
-          }}
-        />
-      )}
-    </Box>
-  );
+  return <FilterForm ocelId={ocelId as string} selectedType={currentFilter} />;
 };
 
 export default defineModuleRoute({

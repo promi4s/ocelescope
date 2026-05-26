@@ -1,4 +1,5 @@
-from typing import Annotated, ClassVar
+from dataclasses import dataclass
+from typing import Annotated, ClassVar, Literal
 
 from ocelescope_backend.app.modules import ModuleFilter
 from pydantic import Field
@@ -16,35 +17,35 @@ from ocelescope import (
 
 class NativeFilterBase(ModuleFilter):
     OcelescopeModuleSource = "FilterV1"
-    NativeFilterType = ClassVar[str]
+    NativeFilterType: ClassVar[str]
 
 
 class NativeE2OCountFilter(NativeFilterBase, E2OCountFilter):
-    type = "e2o_count"
+    type: Literal["e2o_count"]
 
 
 class NativeO2OCountFilter(NativeFilterBase, O2OCountFilter):
-    type = "o2o_count"
+    type: Literal["o2o_count"]
 
 
 class NativeActivityFilter(NativeFilterBase, EventTypeFilter):
-    type = "activity"
+    type: Literal["activity"]
 
 
 class NativeObjectTypeFilter(NativeFilterBase, ObjectTypeFilter):
-    type = "object_type"
+    type: Literal["object_type"]
 
 
 class NativeEventAttributeFilter(NativeFilterBase, EventAttributeFilter):
-    type = "event_attributes"
+    type: Literal["event_attributes"]
 
 
 class NativeObjectAttributeFilter(NativeFilterBase, ObjectAttributeFilter):
-    type = "object_attribute"
+    type: Literal["object_attribute"]
 
 
 class NativeTimeFrameFilter(NativeFilterBase, TimeFrameFilter):
-    type = "time_frame"
+    type: Literal["time_frame"]
 
 
 NativeFilter = Annotated[
@@ -57,3 +58,8 @@ NativeFilter = Annotated[
     | NativeTimeFrameFilter,
     Field(discriminator="type"),
 ]
+
+
+@dataclass
+class OCELFilterBody:
+    pipeline: list[NativeFilter]

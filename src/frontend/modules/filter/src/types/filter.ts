@@ -1,7 +1,5 @@
-import type { OCELFilter } from "@ocelescope/api-base";
+import type { OCELFilterBody } from "../api/base";
 
-export type Filter = OCELFilter;
+export type Filter = OCELFilterBody["pipeline"][number];
 
-export type FilterType = keyof OCELFilter;
-
-export type FilterConfigByType<T extends FilterType> = Filter[T];
+export type FilterType = Filter["type"];

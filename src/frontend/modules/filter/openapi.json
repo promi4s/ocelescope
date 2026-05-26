@@ -1,0 +1,762 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Filter",
+    "version": "1.0"
+  },
+  "paths": {
+    "/modules/filter/v1/{ocel_id}/filter": {
+      "get": {
+        "summary": "Getfitler",
+        "operationId": "getFilter",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ocel Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OCELFilterBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Setfilter",
+        "operationId": "setFilter",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ocel Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OCELFilterBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "NativeActivityFilter": {
+        "properties": {
+          "event_types": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Event Types"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "exclude",
+              "include"
+            ],
+            "title": "Mode",
+            "default": "include"
+          },
+          "type": {
+            "type": "string",
+            "const": "activity",
+            "title": "Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_types",
+          "type"
+        ],
+        "title": "NativeActivityFilter"
+      },
+      "NativeE2OCountFilter": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "target": {
+            "type": "string",
+            "title": "Target"
+          },
+          "mode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "include",
+                  "exclude"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mode",
+            "default": "include"
+          },
+          "range": {
+            "prefixItems": [
+              {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            ],
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "Range"
+          },
+          "qualifier": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qualifier"
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "source",
+              "target"
+            ],
+            "title": "Direction",
+            "default": "source"
+          },
+          "type": {
+            "type": "string",
+            "const": "e2o_count",
+            "title": "Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "source",
+          "target",
+          "range",
+          "type"
+        ],
+        "title": "NativeE2OCountFilter"
+      },
+      "NativeEventAttributeFilter": {
+        "properties": {
+          "target_type": {
+            "type": "string",
+            "title": "Target Type"
+          },
+          "attribute": {
+            "type": "string",
+            "title": "Attribute"
+          },
+          "time_range": {
+            "anyOf": [
+              {
+                "prefixItems": [
+                  {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                ],
+                "type": "array",
+                "maxItems": 2,
+                "minItems": 2
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time Range"
+          },
+          "number_range": {
+            "anyOf": [
+              {
+                "prefixItems": [
+                  {
+                    "anyOf": [
+                      {
+                        "type": "integer"
+                      },
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  {
+                    "anyOf": [
+                      {
+                        "type": "integer"
+                      },
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                ],
+                "type": "array",
+                "maxItems": 2,
+                "minItems": 2
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Number Range"
+          },
+          "values": {
+            "anyOf": [
+              {
+                "items": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ]
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Values"
+          },
+          "regex": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Regex"
+          },
+          "type": {
+            "type": "string",
+            "const": "event_attributes",
+            "title": "Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "target_type",
+          "attribute",
+          "type"
+        ],
+        "title": "NativeEventAttributeFilter"
+      },
+      "NativeO2OCountFilter": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "target": {
+            "type": "string",
+            "title": "Target"
+          },
+          "mode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "include",
+                  "exclude"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mode",
+            "default": "include"
+          },
+          "range": {
+            "prefixItems": [
+              {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            ],
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "Range"
+          },
+          "qualifier": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qualifier"
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "source",
+              "target"
+            ],
+            "title": "Direction",
+            "default": "source"
+          },
+          "type": {
+            "type": "string",
+            "const": "o2o_count",
+            "title": "Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "source",
+          "target",
+          "range",
+          "type"
+        ],
+        "title": "NativeO2OCountFilter"
+      },
+      "NativeObjectAttributeFilter": {
+        "properties": {
+          "target_type": {
+            "type": "string",
+            "title": "Target Type"
+          },
+          "attribute": {
+            "type": "string",
+            "title": "Attribute"
+          },
+          "time_range": {
+            "anyOf": [
+              {
+                "prefixItems": [
+                  {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                ],
+                "type": "array",
+                "maxItems": 2,
+                "minItems": 2
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time Range"
+          },
+          "number_range": {
+            "anyOf": [
+              {
+                "prefixItems": [
+                  {
+                    "anyOf": [
+                      {
+                        "type": "integer"
+                      },
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  {
+                    "anyOf": [
+                      {
+                        "type": "integer"
+                      },
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                ],
+                "type": "array",
+                "maxItems": 2,
+                "minItems": 2
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Number Range"
+          },
+          "values": {
+            "anyOf": [
+              {
+                "items": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ]
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Values"
+          },
+          "regex": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Regex"
+          },
+          "type": {
+            "type": "string",
+            "const": "object_attribute",
+            "title": "Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "target_type",
+          "attribute",
+          "type"
+        ],
+        "title": "NativeObjectAttributeFilter"
+      },
+      "NativeObjectTypeFilter": {
+        "properties": {
+          "object_types": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Object Types"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "exclude",
+              "include"
+            ],
+            "title": "Mode",
+            "default": "include"
+          },
+          "type": {
+            "type": "string",
+            "const": "object_type",
+            "title": "Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "object_types",
+          "type"
+        ],
+        "title": "NativeObjectTypeFilter"
+      },
+      "NativeTimeFrameFilter": {
+        "properties": {
+          "time_range": {
+            "prefixItems": [
+              {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            ],
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "Time Range"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "exclude",
+              "include"
+            ],
+            "title": "Mode",
+            "default": "include"
+          },
+          "type": {
+            "type": "string",
+            "const": "time_frame",
+            "title": "Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "time_range",
+          "type"
+        ],
+        "title": "NativeTimeFrameFilter"
+      },
+      "OCELFilterBody": {
+        "properties": {
+          "pipeline": {
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/NativeE2OCountFilter"
+                },
+                {
+                  "$ref": "#/components/schemas/NativeO2OCountFilter"
+                },
+                {
+                  "$ref": "#/components/schemas/NativeActivityFilter"
+                },
+                {
+                  "$ref": "#/components/schemas/NativeObjectTypeFilter"
+                },
+                {
+                  "$ref": "#/components/schemas/NativeEventAttributeFilter"
+                },
+                {
+                  "$ref": "#/components/schemas/NativeObjectAttributeFilter"
+                },
+                {
+                  "$ref": "#/components/schemas/NativeTimeFrameFilter"
+                }
+              ],
+              "discriminator": {
+                "propertyName": "type",
+                "mapping": {
+                  "activity": "#/components/schemas/NativeActivityFilter",
+                  "e2o_count": "#/components/schemas/NativeE2OCountFilter",
+                  "event_attributes": "#/components/schemas/NativeEventAttributeFilter",
+                  "o2o_count": "#/components/schemas/NativeO2OCountFilter",
+                  "object_attribute": "#/components/schemas/NativeObjectAttributeFilter",
+                  "object_type": "#/components/schemas/NativeObjectTypeFilter",
+                  "time_frame": "#/components/schemas/NativeTimeFrameFilter"
+                }
+              }
+            },
+            "type": "array",
+            "title": "Pipeline"
+          }
+        },
+        "type": "object",
+        "required": [
+          "pipeline"
+        ],
+        "title": "OCELFilterBody"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

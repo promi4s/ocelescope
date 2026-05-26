@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from ocelescope_backend.app.modules import Module, ModuleMeta
-from ocelescope_module_ocelot.routes import router
 from packaging.version import Version
+
+from ocelescope_module_filter.routes import router
 
 
 class Filter(Module):
