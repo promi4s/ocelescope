@@ -1,15 +1,21 @@
-export { EChart } from "./EChart";
-export type { EChartProps } from "./EChart";
+export { ChartCard } from "./ChartCard";
+export type { ChartCardProps } from "./ChartCard";
+
+export { EChartCard } from "./EChartCard";
+export type { EChartCardProps } from "./EChartCard";
 
 export { DistributionChart } from "./distributionChart/DistributionChart";
 export type {
   DistributionChartProps,
   DistributionData,
   DistributionDisplayMode,
-} from "./distributionChart/DistributionChart";
+} from "./distributionChart";
 
 export { SunburstChart } from "./sunburstChart/SunburstChart";
-export type { SunburstChartProps, SunburstNode } from "./sunburstChart/SunburstChart";
+export type {
+  SunburstChartProps,
+  SunburstNode,
+} from "./sunburstChart/SunburstChart";
 
 export { BarChart } from "./barChart/BarChart";
 export type { BarChartProps, BarSeries } from "./barChart/BarChart";

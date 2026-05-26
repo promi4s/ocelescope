@@ -1,5 +1,5 @@
 import type { EChartsOption } from "echarts";
-import { EChart } from "../EChart";
+import { EChartCard } from "../EChartCard";
 
 export interface LineSeries {
   name: string;
@@ -8,6 +8,7 @@ export interface LineSeries {
 }
 
 export interface LineChartProps {
+  title: string;
   series: LineSeries[];
   /** "time" for timestamp x-axis, "value" for numeric. Default: "value". */
   xType?: "time" | "value";
@@ -18,10 +19,10 @@ export interface LineChartProps {
   info?: string;
   height?: number | string;
   filename?: string;
-  title?: string;
 }
 
-export const LineChart: React.FC<LineChartProps> = ({
+export function LineChart({
+  title,
   series,
   xType = "value",
   xLabel,
@@ -31,8 +32,7 @@ export const LineChart: React.FC<LineChartProps> = ({
   info,
   height = 340,
   filename = "line-chart",
-  title,
-}) => {
+}: LineChartProps) {
   const option: EChartsOption = {
     grid: {
       containLabel: true,
@@ -51,7 +51,7 @@ export const LineChart: React.FC<LineChartProps> = ({
           marker: string;
         }>;
         const x = arr[0]?.data[0];
-        const xLabel =
+        const xStr =
           xType === "time" && x != null
             ? new Date(x).toLocaleString(undefined, {
                 year: "numeric",
@@ -67,34 +67,35 @@ export const LineChart: React.FC<LineChartProps> = ({
               `${p.marker}${p.seriesName}: <b>${p.data[1].toLocaleString("en-US")}${unit ? ` ${unit}` : ""}</b>`,
           )
           .join("<br/>");
-        return `<strong>${xLabel}</strong><br/>${rows}`;
+        return `<strong>${xStr}</strong><br/>${rows}`;
       },
     },
-    xAxis: xType === "time"
-      ? {
-          type: "time" as const,
-          name: xLabel,
-          nameLocation: "middle" as const,
-          nameGap: 28,
-          axisLabel: {
-            formatter: {
-              year: "{yyyy}",
-              month: "{MMM} {yyyy}",
-              day: "{d} {MMM}",
-              hour: "{d} {MMM} {HH}:{mm}",
-              minute: "{HH}:{mm}",
-              second: "{HH}:{mm}:{ss}",
-              millisecond: "{HH}:{mm}:{ss}",
+    xAxis:
+      xType === "time"
+        ? {
+            type: "time" as const,
+            name: xLabel,
+            nameLocation: "middle" as const,
+            nameGap: 28,
+            axisLabel: {
+              formatter: {
+                year: "{yyyy}",
+                month: "{MMM} {yyyy}",
+                day: "{d} {MMM}",
+                hour: "{d} {MMM} {HH}:{mm}",
+                minute: "{HH}:{mm}",
+                second: "{HH}:{mm}:{ss}",
+                millisecond: "{HH}:{mm}:{ss}",
+              },
+              hideOverlap: true,
             },
-            hideOverlap: true,
+          }
+        : {
+            type: "value" as const,
+            name: xLabel,
+            nameLocation: "middle" as const,
+            nameGap: 28,
           },
-        }
-      : {
-          type: "value" as const,
-          name: xLabel,
-          nameLocation: "middle" as const,
-          nameGap: 28,
-        },
     yAxis: {
       type: "value",
       name: yLabel ?? (unit ? `Value (${unit})` : undefined),
@@ -113,12 +114,6 @@ export const LineChart: React.FC<LineChartProps> = ({
   };
 
   return (
-    <EChart
-      option={option}
-      info={info}
-      height={height}
-      filename={filename}
-      title={title}
-    />
+    <EChartCard title={title} info={info} filename={filename} height={height} option={option} />
   );
-};
+}

@@ -42,8 +42,6 @@ export const Normal: Story = {
     data: {
       values: genNormal(400, 120, 25, 1),
       missingCount: 12,
-      totalCount: 412,
-      unit: "s",
     },
   },
 };
@@ -54,7 +52,6 @@ export const Bimodal: Story = {
     data: {
       values: [...genNormal(200, 30, 6, 2), ...genNormal(200, 90, 10, 3)],
       missingCount: 0,
-      totalCount: 400,
     },
   },
 };
@@ -65,8 +62,6 @@ export const RightSkewed: Story = {
     data: {
       values: genNormal(350, 0, 0.8, 4).map((z) => Math.exp(5 + z)),
       missingCount: 28,
-      totalCount: 378,
-      unit: "€",
     },
   },
 };
@@ -77,8 +72,6 @@ export const Uniform: Story = {
     data: {
       values: Array.from({ length: 300 }, (_, i) => makeLCG(5 + i * 17)() * 60),
       missingCount: 0,
-      totalCount: 300,
-      unit: "min",
     },
   },
 };
@@ -89,7 +82,6 @@ export const AllMissing: Story = {
     data: {
       values: [],
       missingCount: 50,
-      totalCount: 50,
     },
   },
 };
@@ -100,7 +92,6 @@ export const SingleValue: Story = {
     data: {
       values: Array(100).fill(42) as number[],
       missingCount: 0,
-      totalCount: 100,
     },
   },
 };

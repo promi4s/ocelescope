@@ -1,5 +1,5 @@
 import type { EChartsOption } from "echarts";
-import { EChart } from "../EChart";
+import { EChartCard } from "../EChartCard";
 
 export interface SunburstNode {
   name: string;
@@ -8,24 +8,23 @@ export interface SunburstNode {
 }
 
 export interface SunburstChartProps {
+  title: string;
   data: SunburstNode[];
   total?: number;
   info?: string;
   height?: number | string;
   filename?: string;
-  title?: string;
 }
 
-export const SunburstChart: React.FC<SunburstChartProps> = ({
+export function SunburstChart({
+  title,
   data,
   total,
   info,
   height = 340,
   filename = "sunburst",
-  title,
-}) => {
-  const grandTotal =
-    total ?? data.reduce((s, n) => s + (n.value ?? 0), 0);
+}: SunburstChartProps) {
+  const grandTotal = total ?? data.reduce((s, n) => s + (n.value ?? 0), 0);
 
   const option: EChartsOption = {
     tooltip: {
@@ -54,12 +53,6 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
   };
 
   return (
-    <EChart
-      option={option}
-      info={info}
-      height={height}
-      filename={filename}
-      title={title}
-    />
+    <EChartCard title={title} info={info} filename={filename} height={height} option={option} />
   );
-};
+}

@@ -1,5 +1,6 @@
 import { defineModule } from "@ocelescope/core";
 import { BinocularsIcon } from "lucide-react";
+import exploration from "./pages/exploration";
 import logOverview from "./pages/logOverview";
 
 export default defineModule({
@@ -7,6 +8,6 @@ export default defineModule({
   description: "A tool for inspecting OCELs",
   label: "Log Overview",
   authors: [{ name: "Öztürk, Görkem-Emre" }],
-  routes: [logOverview],
+  routes: [logOverview, exploration],
   icon: BinocularsIcon,
 });

@@ -1,5 +1,5 @@
 import type { EChartsOption } from "echarts";
-import { EChart } from "../EChart";
+import { EChartCard } from "../EChartCard";
 
 export interface BarSeries {
   name: string;
@@ -8,6 +8,7 @@ export interface BarSeries {
 }
 
 export interface BarChartProps {
+  title: string;
   categories: string[];
   series: BarSeries[];
   stacked?: boolean;
@@ -19,10 +20,10 @@ export interface BarChartProps {
   info?: string;
   height?: number | string;
   filename?: string;
-  title?: string;
 }
 
-export const BarChart: React.FC<BarChartProps> = ({
+export function BarChart({
+  title,
   categories,
   series,
   stacked = false,
@@ -33,8 +34,7 @@ export const BarChart: React.FC<BarChartProps> = ({
   info,
   height = 340,
   filename = "bar-chart",
-  title,
-}) => {
+}: BarChartProps) {
   const isHorizontal = orientation === "horizontal";
 
   const categoryAxis = {
@@ -80,12 +80,6 @@ export const BarChart: React.FC<BarChartProps> = ({
   };
 
   return (
-    <EChart
-      option={option}
-      info={info}
-      height={height}
-      filename={filename}
-      title={title}
-    />
+    <EChartCard title={title} info={info} filename={filename} height={height} option={option} />
   );
-};
+}
