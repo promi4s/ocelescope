@@ -1,64 +1,34 @@
 import { Center, Group, Select, Stack, Text } from "@mantine/core";
-import { ValueType, useAggregatedAttributes, useEventCounts } from "@ocelescope/api-base";
-import { ChartCard, DistributionChart } from "@ocelescope/charts";
+import { ChartCard } from "@ocelescope/charts";
 import { useCallback, useState } from "react";
 
-import { useEventAttributeValues } from "../api/base";
+import type { AttributeInfo } from "../api/base";
+import { useEventAttributes } from "../api/base";
+import { AttributeDistributionChart } from "./AttributeDistributionChart";
 
 export function EventAttributeDistributionPanel({ ocelId }: { ocelId: string }) {
-  const { data: eventCounts } = useEventCounts(ocelId);
-  const { data: aggregatedAttributes } = useAggregatedAttributes(ocelId);
+  const { data: eventAttributes } = useEventAttributes(ocelId);
 
-  const [activity, setActivity] = useState<string | null>(null);
-  const [attribute, setAttribute] = useState<string | null>(null);
+  const [eventType, setEventType] = useState<string | null>(null);
+  const [attribute, setAttribute] = useState<AttributeInfo | null>(null);
 
-  const handleActivityChange = useCallback(
-    (newActivity: string | null) => {
-      setActivity(newActivity);
-      setAttribute(null);
-    },
-    [],
-  );
+  const handleEventTypeChange = useCallback((next: string | null) => {
+    setEventType(next);
+    setAttribute(null);
+  }, []);
 
-  const activitiesWithNumericAttributes = new Set(
-    aggregatedAttributes
-      ?.filter((a) => a.type === ValueType.int || a.type === ValueType.float)
-      .flatMap((a) => a.actitvities) ?? [],
-  );
-
-  const activities = Object.keys(eventCounts ?? {}).map((a) => ({
-    value: a,
-    label: a,
-    disabled: !activitiesWithNumericAttributes.has(a),
-  }));
-
-  const numericAttributes = [
-    ...new Set(
-      aggregatedAttributes
-        ?.filter(
-          (a) =>
-            (a.type === ValueType.int || a.type === ValueType.float) &&
-            (activity === null
-              ? a.actitvities.length > 0
-              : a.actitvities.includes(activity)),
-        )
-        .map((a) => a.name) ?? [],
-    ),
-  ];
-
-  const { data: values } = useEventAttributeValues(ocelId, attribute ?? "", {
-    activity: activity ?? undefined,
-  });
+  const eventTypes = Object.keys(eventAttributes ?? {});
+  const attributes: AttributeInfo[] = eventType ? (eventAttributes?.[eventType] ?? []) : [];
 
   return (
     <Stack>
       <Group align="flex-end">
         <Select
-          label="Activity"
-          placeholder="All activities"
-          data={activities}
-          value={activity}
-          onChange={handleActivityChange}
+          label="Event type"
+          placeholder="Select an event type"
+          data={eventTypes}
+          value={eventType}
+          onChange={handleEventTypeChange}
           clearable
           searchable
           style={{ minWidth: 200 }}
@@ -66,27 +36,29 @@ export function EventAttributeDistributionPanel({ ocelId }: { ocelId: string }) 
         <Select
           label="Attribute"
           placeholder="Select an attribute"
-          data={numericAttributes}
-          value={attribute}
-          onChange={setAttribute}
+          data={attributes.map((a) => ({ value: a.name, label: a.name }))}
+          value={attribute?.name ?? null}
+          onChange={(name) => setAttribute(attributes.find((a) => a.name === name) ?? null)}
+          disabled={eventType === null}
           clearable
           searchable
           style={{ minWidth: 200 }}
         />
       </Group>
 
-      {attribute && values ? (
-        <DistributionChart
-          key={`${attribute}-${activity}`}
-          title={attribute}
-          subtitle={activity ?? "All activities"}
-          data={{ values: values.values, missingCount: values.missing_count }}
+      {eventType && attribute ? (
+        <AttributeDistributionChart
+          key={`${eventType}-${attribute.name}`}
+          ocelId={ocelId}
+          eventType={eventType}
+          attribute={attribute.name}
+          attributeType={attribute.type}
         />
       ) : (
         <ChartCard title="Distribution">
           <Center h="100%">
             <Text c="dimmed" size="sm">
-              Select an attribute to view its distribution.
+              Select an event type and an attribute to view its distribution.
             </Text>
           </Center>
         </ChartCard>

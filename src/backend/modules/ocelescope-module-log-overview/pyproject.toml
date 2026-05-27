@@ -2,7 +2,11 @@
 name = "ocelescope-module-log-overview"
 version = "0.1.0"
 requires-python = ">=3.11"
-dependencies = ["fastapi", "ocelescope-backend"]
+dependencies = [
+    "fastapi",
+    "ocelescope-backend",
+    "scipy>=1.17.1",
+]
 
 [project.entry-points."ocelescope_backend.modules"]
 logOverviewV1 = "ocelescope_module_log_overview.module:LogOverview"

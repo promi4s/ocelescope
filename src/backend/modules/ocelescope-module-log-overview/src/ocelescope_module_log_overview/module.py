@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from ocelescope_backend.app.modules import Module, ModuleMeta
 from packaging.version import Version
 
-from ocelescope_module_log_overview.routes import router
+from ocelescope_module_log_overview.api.routes import router
 
 
 class LogOverview(Module):

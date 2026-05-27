@@ -1679,12 +1679,14 @@ source = { editable = "src/backend/modules/ocelescope-module-log-overview" }
 dependencies = [
     { name = "fastapi" },
     { name = "ocelescope-backend" },
+    { name = "scipy" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "fastapi" },
     { name = "ocelescope-backend", editable = "src/backend/ocelescope-backend" },
+    { name = "scipy", specifier = ">=1.17.1" },
 ]
 
 [[package]]

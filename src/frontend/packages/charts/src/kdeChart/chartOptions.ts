@@ -37,7 +37,6 @@ export function kdeChartOption(points: LinePoint[]): EChartsOption {
       {
         type: "line",
         data: points.map((p) => [p.x, p.y]),
-        smooth: true,
         areaStyle: {},
         symbol: "none",
       },
