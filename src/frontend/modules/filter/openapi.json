@@ -26,7 +26,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OCELFilterBody"
+                  "$ref": "#/components/schemas/GroupedOCELFilter"
                 }
               }
             }
@@ -62,7 +62,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OCELFilterBody"
+                "$ref": "#/components/schemas/GroupedOCELFilter"
               }
             }
           }
@@ -92,6 +92,70 @@
   },
   "components": {
     "schemas": {
+      "GroupedOCELFilter": {
+        "properties": {
+          "activity": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NativeActivityFilter"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "object_type": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NativeObjectTypeFilter"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "time_frame": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NativeTimeFrameFilter"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "event_attribute": {
+            "items": {
+              "$ref": "#/components/schemas/NativeEventAttributeFilter"
+            },
+            "type": "array",
+            "title": "Event Attribute"
+          },
+          "object_attribute": {
+            "items": {
+              "$ref": "#/components/schemas/NativeObjectAttributeFilter"
+            },
+            "type": "array",
+            "title": "Object Attribute"
+          },
+          "e2o_count": {
+            "items": {
+              "$ref": "#/components/schemas/NativeE2OCountFilter"
+            },
+            "type": "array",
+            "title": "E2O Count"
+          },
+          "o2o_count": {
+            "items": {
+              "$ref": "#/components/schemas/NativeO2OCountFilter"
+            },
+            "type": "array",
+            "title": "O2O Count"
+          }
+        },
+        "type": "object",
+        "title": "GroupedOCELFilter"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -213,15 +277,15 @@
           "type": {
             "type": "string",
             "const": "e2o_count",
-            "title": "Type"
+            "title": "Type",
+            "default": "e2o_count"
           }
         },
         "type": "object",
         "required": [
           "source",
           "target",
-          "range",
-          "type"
+          "range"
         ],
         "title": "NativeE2OCountFilter"
       },
@@ -348,7 +412,7 @@
           },
           "type": {
             "type": "string",
-            "const": "event_attributes",
+            "const": "event_attribute",
             "title": "Type"
           }
         },
@@ -666,56 +730,6 @@
           "type"
         ],
         "title": "NativeTimeFrameFilter"
-      },
-      "OCELFilterBody": {
-        "properties": {
-          "pipeline": {
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/NativeE2OCountFilter"
-                },
-                {
-                  "$ref": "#/components/schemas/NativeO2OCountFilter"
-                },
-                {
-                  "$ref": "#/components/schemas/NativeActivityFilter"
-                },
-                {
-                  "$ref": "#/components/schemas/NativeObjectTypeFilter"
-                },
-                {
-                  "$ref": "#/components/schemas/NativeEventAttributeFilter"
-                },
-                {
-                  "$ref": "#/components/schemas/NativeObjectAttributeFilter"
-                },
-                {
-                  "$ref": "#/components/schemas/NativeTimeFrameFilter"
-                }
-              ],
-              "discriminator": {
-                "propertyName": "type",
-                "mapping": {
-                  "activity": "#/components/schemas/NativeActivityFilter",
-                  "e2o_count": "#/components/schemas/NativeE2OCountFilter",
-                  "event_attributes": "#/components/schemas/NativeEventAttributeFilter",
-                  "o2o_count": "#/components/schemas/NativeO2OCountFilter",
-                  "object_attribute": "#/components/schemas/NativeObjectAttributeFilter",
-                  "object_type": "#/components/schemas/NativeObjectTypeFilter",
-                  "time_frame": "#/components/schemas/NativeTimeFrameFilter"
-                }
-              }
-            },
-            "type": "array",
-            "title": "Pipeline"
-          }
-        },
-        "type": "object",
-        "required": [
-          "pipeline"
-        ],
-        "title": "OCELFilterBody"
       },
       "ValidationError": {
         "properties": {
