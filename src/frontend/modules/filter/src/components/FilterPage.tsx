@@ -1,14 +1,21 @@
 import { defineModuleRoute, useCurrentOcel } from "@ocelescope/core";
-import { useState } from "react";
+import { useGetFilter } from "../api/base";
 import FilterForm from "../components/FilterForm";
-import type { FilterType } from "../types/filter";
 
 const FilterPage = () => {
   const { id: ocelId } = useCurrentOcel();
 
-  const [currentFilter, setCurrentFilter] = useState<FilterType>("activity");
+  const { data: filterPipeline } = useGetFilter(ocelId ?? "", {
+    query: { enabled: !!ocelId },
+  });
 
-  return <FilterForm ocelId={ocelId as string} selectedType={currentFilter} />;
+  return (
+    <>
+      {filterPipeline && (
+        <FilterForm ocelId={ocelId as string} currentFilter={filterPipeline} />
+      )}
+    </>
+  );
 };
 
 export default defineModuleRoute({

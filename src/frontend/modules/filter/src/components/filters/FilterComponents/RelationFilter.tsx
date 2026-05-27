@@ -25,7 +25,6 @@ const RelationFilter: React.FC<{
   targetRelations?: RelationCountSummary[];
   control: Control<OCELFilter>;
   relationType: Extract<FilterType, "o2o_count" | "e2o_count">;
-
   index: number;
   remove: () => void;
 }> = memo(
