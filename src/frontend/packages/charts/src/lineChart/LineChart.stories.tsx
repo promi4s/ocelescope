@@ -1,5 +1,35 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+
 import { LineChart } from "./LineChart";
+import type { LineSeries } from "./types";
+
+function makeLCG(seed: number) {
+  let s = seed >>> 0;
+  return () => {
+    s = Math.imul(s, 1664525) + 1013904223;
+    s >>>= 0;
+    return s / 0x100000000;
+  };
+}
+
+function makeKDE(mu: number, sigma: number, n = 100): LineSeries {
+  const points = Array.from({ length: n }, (_, i) => {
+    const x = mu - 4 * sigma + (i / (n - 1)) * 8 * sigma;
+    const y = Math.exp(-0.5 * ((x - mu) / sigma) ** 2) / (sigma * Math.sqrt(2 * Math.PI));
+    return { x, y };
+  });
+  return { name: `μ=${mu}, σ=${sigma}`, points, smooth: true, area: true };
+}
+
+function makeSine(amplitude: number, frequency: number, phase: number, n = 80): LineSeries {
+  const rng = makeLCG(42);
+  const points = Array.from({ length: n }, (_, i) => {
+    const x = (i / (n - 1)) * 4 * Math.PI;
+    const y = amplitude * Math.sin(frequency * x + phase) + (rng() - 0.5) * amplitude * 0.2;
+    return { x, y };
+  });
+  return { name: `A=${amplitude} f=${frequency}`, points, smooth: true };
+}
 
 const meta = {
   title: "Charts/LineChart",
@@ -10,78 +40,30 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const AttributeDevelopment: Story = {
+export const SingleKDE: Story = {
   args: {
-    title: "Order value over time",
-    xType: "time",
-    unit: "€",
-    series: [
-      {
-        name: "Order-001",
-        data: [
-          ["2024-01-01T08:00:00", 0],
-          ["2024-01-03T10:30:00", 150],
-          ["2024-01-07T14:00:00", 320],
-          ["2024-01-10T09:15:00", 320],
-          ["2024-01-12T16:45:00", 480],
-        ],
-      },
-      {
-        name: "Order-002",
-        data: [
-          ["2024-01-02T11:00:00", 0],
-          ["2024-01-05T08:45:00", 200],
-          ["2024-01-08T13:30:00", 200],
-          ["2024-01-11T10:00:00", 550],
-        ],
-      },
-      {
-        name: "Order-003",
-        data: [
-          ["2024-01-04T09:00:00", 0],
-          ["2024-01-06T15:00:00", 90],
-          ["2024-01-09T11:30:00", 310],
-          ["2024-01-13T08:00:00", 310],
-        ],
-      },
-    ],
+    title: "Density estimate — processing time",
+    series: [makeKDE(120, 25)],
   },
 };
 
-export const NumericX: Story = {
+export const MultiKDE: Story = {
   args: {
-    title: "Queue length over iterations",
-    xType: "value",
-    xLabel: "Iteration",
-    yLabel: "Queue length",
-    series: [
-      {
-        name: "Worker A",
-        data: Array.from({ length: 20 }, (_, i) => [i, Math.round(5 + Math.sin(i * 0.5) * 4)] as [number, number]),
-      },
-      {
-        name: "Worker B",
-        data: Array.from({ length: 20 }, (_, i) => [i, Math.round(3 + Math.cos(i * 0.4) * 3)] as [number, number]),
-      },
-    ],
+    title: "Density estimates — two activity modes",
+    series: [makeKDE(30, 6), makeKDE(90, 10)],
   },
 };
 
-export const SingleSeries: Story = {
+export const SmoothLine: Story = {
   args: {
-    title: "Package weight development",
-    xType: "time",
-    unit: "kg",
-    series: [
-      {
-        name: "Package-007",
-        data: [
-          ["2024-02-01T08:00:00", 2.4],
-          ["2024-02-03T12:00:00", 5.1],
-          ["2024-02-05T09:30:00", 5.1],
-          ["2024-02-07T14:00:00", 8.3],
-        ],
-      },
-    ],
+    title: "Metric over time",
+    series: [makeSine(1, 1, 0, 60), makeSine(0.8, 1.5, Math.PI / 4, 60)],
+  },
+};
+
+export const AreaFill: Story = {
+  args: {
+    title: "KDE with area fill",
+    series: [{ ...makeKDE(100, 20), area: true, smooth: true }],
   },
 };

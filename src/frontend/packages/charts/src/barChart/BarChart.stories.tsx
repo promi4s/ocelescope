@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+
 import { BarChart } from "./BarChart";
 
 const meta = {
@@ -10,47 +11,65 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Grouped: Story = {
+export const SingleSeries: Story = {
   args: {
-    title: "Activity executions per object type",
-    categories: ["Order", "Item", "Package", "Customer"],
-    valueLabel: "Executions",
-    series: [
-      { name: "Place Order", data: [400, 0, 0, 380] },
-      { name: "Pick Item", data: [350, 350, 210, 0] },
-      { name: "Send Package", data: [270, 0, 280, 0] },
-      { name: "Pay Order", data: [170, 0, 0, 165] },
-    ],
+    title: "Events per activity",
+    data: {
+      categories: ["Create Order", "Pack Items", "Ship Order", "Deliver", "Return"],
+      series: [{ name: "Count", data: [412, 398, 380, 371, 42] }],
+    },
+  },
+};
+
+export const MultiSeries: Story = {
+  args: {
+    title: "Events per activity by object type",
+    data: {
+      categories: ["Create Order", "Pack Items", "Ship Order", "Deliver", "Return"],
+      series: [
+        { name: "Orders", data: [412, 398, 380, 371, 42] },
+        { name: "Items", data: [824, 810, 795, 780, 91] },
+        { name: "Packages", data: [380, 372, 369, 360, 38] },
+      ],
+    },
   },
 };
 
 export const Stacked: Story = {
   args: {
-    ...Grouped.args,
-    title: "Activity executions per object type (stacked)",
+    title: "Events per activity (stacked)",
+    data: {
+      categories: ["Create Order", "Pack Items", "Ship Order", "Deliver", "Return"],
+      series: [
+        { name: "Orders", data: [412, 398, 380, 371, 42] },
+        { name: "Items", data: [824, 810, 795, 780, 91] },
+        { name: "Packages", data: [380, 372, 369, 360, 38] },
+      ],
+    },
     stacked: true,
   },
 };
 
-export const StackedHorizontal: Story = {
+export const Horizontal: Story = {
   args: {
-    title: "Object type combinations",
-    stacked: true,
-    orientation: "horizontal",
-    categories: ["Order+Item", "Order+Package", "Order+Item+Package"],
-    categoryMeta: ["Order, Item", "Order, Package", "Order, Item, Package"],
-    valueLabel: "Events",
-    series: [
-      { name: "Pick Item", data: [350, 0, 120] },
-      { name: "Send Package", data: [0, 280, 120] },
-    ],
+    title: "Top object types",
+    data: {
+      categories: ["Orders", "Items", "Packages", "Suppliers", "Warehouses"],
+      series: [{ name: "Count", data: [1240, 5820, 980, 45, 12] }],
+    },
+    horizontal: true,
   },
 };
 
-export const Single: Story = {
+export const ManyCategories: Story = {
   args: {
-    title: "Events per activity",
-    categories: ["Place Order", "Pick Item", "Send Package", "Pay Order"],
-    series: [{ name: "Count", data: [400, 350, 280, 170] }],
+    title: "Attribute value distribution",
+    data: {
+      categories: Array.from({ length: 15 }, (_, i) => `Category ${i + 1}`),
+      series: [
+        { name: "Series A", data: Array.from({ length: 15 }, (_, i) => Math.round(100 + i * 17 - (i * i) / 2)) },
+        { name: "Series B", data: Array.from({ length: 15 }, (_, i) => Math.round(200 - i * 10)) },
+      ],
+    },
   },
 };

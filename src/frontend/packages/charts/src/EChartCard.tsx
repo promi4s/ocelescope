@@ -31,7 +31,7 @@ export function EChartCard({
   title,
   subtitle,
   info,
-  filename,
+  filename = "chart",
   controls,
   settings,
   actions,

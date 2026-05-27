@@ -1,85 +1,13 @@
-import type { EChartsOption } from "echarts";
-import { EChartCard } from "../EChartCard";
+import { EChartCard, type EChartCardProps } from "../EChartCard";
+import { barChartOption } from "./chartOptions";
+import type { BarChartData } from "./types";
 
-export interface BarSeries {
-  name: string;
-  data: number[];
-  isOverflow?: boolean;
-}
-
-export interface BarChartProps {
-  title: string;
-  categories: string[];
-  series: BarSeries[];
+export interface BarChartProps extends Omit<EChartCardProps, "option"> {
+  data: BarChartData;
   stacked?: boolean;
-  orientation?: "vertical" | "horizontal";
-  categoryLabel?: string;
-  valueLabel?: string;
-  /** Full labels for tooltip when categories are abbreviated. */
-  categoryMeta?: string[];
-  info?: string;
-  height?: number | string;
-  filename?: string;
+  horizontal?: boolean;
 }
 
-export function BarChart({
-  title,
-  categories,
-  series,
-  stacked = false,
-  orientation = "vertical",
-  categoryLabel,
-  valueLabel,
-  categoryMeta,
-  info,
-  height = 340,
-  filename = "bar-chart",
-}: BarChartProps) {
-  const isHorizontal = orientation === "horizontal";
-
-  const categoryAxis = {
-    type: "category" as const,
-    data: categories,
-    name: categoryLabel,
-    axisLabel: { overflow: "truncate" as const, width: 120 },
-  };
-
-  const valueAxis = {
-    type: "value" as const,
-    name: valueLabel,
-    nameLocation: "middle" as const,
-    nameGap: 44,
-  };
-
-  const option: EChartsOption = {
-    grid: { containLabel: true, left: 16, right: 16, bottom: 36, top: series.length > 1 ? 28 : 12 },
-    legend: series.length > 1 ? { show: true, top: 0 } : undefined,
-    tooltip: {
-      trigger: "axis",
-      axisPointer: { type: "shadow" },
-      formatter: (params: unknown) => {
-        const arr = params as Array<{ dataIndex: number; seriesName: string; value: number; marker: string }>;
-        const idx = arr[0]?.dataIndex ?? 0;
-        const label = categoryMeta?.[idx] ?? categories[idx] ?? "";
-        const rows = arr
-          .filter((p) => p.value > 0)
-          .map((p) => `${p.marker}${p.seriesName}: <b>${p.value.toLocaleString("en-US")}</b>`)
-          .join("<br/>");
-        return `<strong>${label}</strong><br/>${rows}`;
-      },
-    },
-    xAxis: isHorizontal ? valueAxis : categoryAxis,
-    yAxis: isHorizontal ? categoryAxis : valueAxis,
-    series: series.map((s) => ({
-      name: s.name,
-      type: "bar",
-      stack: stacked ? "total" : undefined,
-      data: s.data,
-      itemStyle: s.isOverflow ? { opacity: 0.65 } : undefined,
-    })),
-  };
-
-  return (
-    <EChartCard title={title} info={info} filename={filename} height={height} option={option} />
-  );
+export function BarChart({ data, stacked = false, horizontal = false, ...cardProps }: BarChartProps) {
+  return <EChartCard {...cardProps} option={barChartOption(data, { stacked, horizontal })} />;
 }

@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { DistributionChart } from "./DistributionChart";
+
+import { Histogram } from "./Histogram";
+import type { HistogramBin } from "./types";
 
 function makeLCG(seed: number) {
   let s = seed >>> 0;
@@ -27,11 +29,29 @@ function genNormal(n: number, mu: number, sigma: number, seed: number) {
   return out.slice(0, n);
 }
 
+function toBins(values: number[], binCount = 20): HistogramBin[] {
+  const sorted = [...values].sort((a, b) => a - b);
+  const min = sorted[0]!;
+  const max = sorted[sorted.length - 1]!;
+  if (min === max) return [{ start: min - 0.5, end: max + 0.5, count: values.length }];
+  const width = (max - min) / binCount;
+  const bins: HistogramBin[] = Array.from({ length: binCount }, (_, i) => ({
+    start: min + i * width,
+    end: min + (i + 1) * width,
+    count: 0,
+  }));
+  for (const v of values) {
+    const idx = Math.min(Math.floor((v - min) / width), binCount - 1);
+    bins[idx]!.count++;
+  }
+  return bins;
+}
+
 const meta = {
-  title: "Charts/DistributionChart",
-  component: DistributionChart,
+  title: "Charts/Histogram",
+  component: Histogram,
   tags: ["autodocs"],
-} satisfies Meta<typeof DistributionChart>;
+} satisfies Meta<typeof Histogram>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -39,59 +59,27 @@ type Story = StoryObj<typeof meta>;
 export const Normal: Story = {
   args: {
     title: "Processing time",
-    data: {
-      values: genNormal(400, 120, 25, 1),
-      missingCount: 12,
-    },
+    bins: toBins(genNormal(400, 120, 25, 1)),
   },
 };
 
 export const Bimodal: Story = {
   args: {
     title: "Two activity modes",
-    data: {
-      values: [...genNormal(200, 30, 6, 2), ...genNormal(200, 90, 10, 3)],
-      missingCount: 0,
-    },
+    bins: toBins([...genNormal(200, 30, 6, 2), ...genNormal(200, 90, 10, 3)]),
   },
 };
 
 export const RightSkewed: Story = {
   args: {
     title: "Cost distribution",
-    data: {
-      values: genNormal(350, 0, 0.8, 4).map((z) => Math.exp(5 + z)),
-      missingCount: 28,
-    },
-  },
-};
-
-export const Uniform: Story = {
-  args: {
-    title: "Random delays",
-    data: {
-      values: Array.from({ length: 300 }, (_, i) => makeLCG(5 + i * 17)() * 60),
-      missingCount: 0,
-    },
+    bins: toBins(genNormal(350, 0, 0.8, 4).map((z) => Math.exp(5 + z)), 25),
   },
 };
 
 export const AllMissing: Story = {
   args: {
     title: "No values",
-    data: {
-      values: [],
-      missingCount: 50,
-    },
-  },
-};
-
-export const SingleValue: Story = {
-  args: {
-    title: "Single distinct value",
-    data: {
-      values: Array(100).fill(42) as number[],
-      missingCount: 0,
-    },
+    bins: [],
   },
 };
