@@ -9,23 +9,21 @@ import {
   TextInput,
 } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
-import type { OCELFilter, TypedAttribute } from "@ocelescope/api-base";
+import type { TypedAttribute } from "@ocelescope/api-base";
 import { useEventAttributes, useObjectAttributes } from "@ocelescope/api-base";
 import { PlusIcon, XIcon } from "lucide-react";
 import { memo, type ReactNode, useMemo } from "react";
-import {
-  type Control,
-  Controller,
-  useFieldArray,
-  useWatch,
-} from "react-hook-form";
-import type { FilterPageComponentProps } from "..";
+import { type Control, Controller, useFieldArray } from "react-hook-form";
+import type { GroupedOCELFilter } from "../../api/base";
 
 type AttributeFilterProps = {
-  control: Control<OCELFilter>;
+  control: Control<GroupedOCELFilter>;
   attributes: TypedAttribute[];
   index: number;
-  attributeType: Extract<FilterType, "event_attributes" | "object_attributes">;
+  attributeType: Extract<
+    keyof GroupedOCELFilter,
+    "event_attribute" | "object_attribute"
+  >;
 };
 
 type AttributeTypeInput = (
@@ -38,9 +36,7 @@ const attributeTypeToInput: {
   [K in TypedAttribute["type"]]: AttributeTypeInput;
 } = {
   bool: () => <Grid.Col span={6}>{"Not Implemented"}</Grid.Col>,
-  date_mixed: () => <Grid.Col span={6}>{"Not Implemented"}</Grid.Col>,
   empty: () => <Grid.Col span={6}>{"Not Implemented"}</Grid.Col>,
-  mixed: () => <Grid.Col span={6}>{"Not Implemented"}</Grid.Col>,
   object: () => <Grid.Col span={6}>{"Not Implemented"}</Grid.Col>,
   numeric: () => <Grid.Col span={6}>{"Not Implemented"}</Grid.Col>,
   date: ({ control, index, attribute, attributeType }) => {
@@ -149,40 +145,6 @@ const AttributeFilter: React.FC<AttributeFilterProps> = ({
   attributeType,
   index,
 }) => {
-  const value = useWatch({ control, name: `${attributeType}.${index}` });
-
-  const { attributeNames, targetNames, currentAttribute } = useMemo(() => {
-    if (!value) {
-      return {};
-    }
-
-    const attributeNames = Array.from(
-      new Set(
-        attributes
-          .filter(
-            ({ entity_type }) =>
-              !value.target_type || value.target_type === entity_type,
-          )
-          .map(({ name }) => name),
-      ),
-    );
-
-    const targetNames = Array.from(
-      new Set(
-        attributes
-          .filter(({ name }) => !value.attribute || value.attribute === name)
-          .map(({ entity_type }) => entity_type),
-      ),
-    );
-
-    const currentAttribute = attributes.find(
-      ({ entity_type, name }) =>
-        entity_type === value.target_type && value.attribute === name,
-    );
-
-    return { attributeNames, targetNames, currentAttribute };
-  }, [value, attributes]);
-
   return (
     <Grid>
       <Grid.Col span={3}>
@@ -277,54 +239,63 @@ export const EventAttributeFilter: React.FC<FilterPageComponentProps> = memo(
     );
   },
 );
-export const ObjectAttributeFilter: React.FC<FilterPageComponentProps> = memo(
-  ({ ocelId, control }) => {
-    const { data: attributes = [] } = useObjectAttributes(ocelId, {
-      ocel_version: "original",
-    });
+export const ObjectAttributeFilter: React.FC<{
+  ocelId: string;
+  control: Control<GroupedOCELFilter>;
+}> = memo(({ ocelId, control }) => {
+  const { data: attributes } = useObjectAttributes(ocelId, {
+    ocel_version: "original",
+  });
 
-    const { fields, append, remove } = useFieldArray({
-      name: "object_attributes",
-      control,
-    });
+  const { fields, append, remove } = useFieldArray({
+    name: "event_attribute",
+    control,
+  });
 
-    return (
-      <Stack>
-        {fields.map((field, index) => (
-          <Paper shadow="xs" p="md" key={field.id}>
-            <Grid gutter={0}>
-              <Grid.Col
-                style={{ display: "flex", justifyContent: "end" }}
-                offset={11}
-                span={1}
-              >
-                <Button
-                  variant="subtle"
-                  color="red"
-                  onClick={() => remove(index)}
-                >
-                  <XIcon color="red" />
-                </Button>
-              </Grid.Col>
-              <Grid.Col span={12}>
-                <AttributeFilter
-                  key={field.id}
-                  attributeType="object_attributes"
-                  control={control}
-                  attributes={attributes}
-                  index={index}
-                />
-              </Grid.Col>
-            </Grid>
-          </Paper>
-        ))}
-        <Button
-          onClick={() => append({ attribute: "", target_type: "" })}
-          leftSection={<PlusIcon height={30} />}
-        >
-          Add Filter
-        </Button>
-      </Stack>
+  const availableAttributes = useMemo(() => {
+    const allAttributes = (attributes ?? []).filter(
+      ({ distinct_values, name, entity_type }) =>
+        distinct_values > 1 &&
+        fields.some(
+          ({ type, attribute }) => name !== attribute && entity_type !== type,
+        ),
     );
-  },
-);
+
+    return allAttributes;
+  }, [attributes, fields]);
+
+  return (
+    <Stack>
+      {fields.map((field, index) => (
+        <Paper shadow="xs" p="md" key={field.id}>
+          <Grid gutter={0}>
+            <Grid.Col
+              style={{ display: "flex", justifyContent: "end" }}
+              offset={11}
+              span={1}
+            >
+              <Button
+                variant="subtle"
+                color="red"
+                onClick={() => remove(index)}
+              >
+                <XIcon color="red" />
+              </Button>
+            </Grid.Col>
+            <Grid.Col span={12}>
+              <Controller />
+              <AttributeFilter
+                key={field.id}
+                attributeType=""
+                control={control}
+                attributes={availableAttributes}
+                index={index}
+              />
+            </Grid.Col>
+          </Grid>
+        </Paper>
+      ))}
+      <Button leftSection={<PlusIcon height={30} />}>Add Filter</Button>
+    </Stack>
+  );
+});
