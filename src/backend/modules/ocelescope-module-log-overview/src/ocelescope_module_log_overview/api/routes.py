@@ -2,27 +2,21 @@ from fastapi import APIRouter, HTTPException
 
 from ocelescope_module_log_overview.api.schemas import (
     AttributeInfoSchema,
-    CategoricalBody,
-    CategoricalSchema,
+    EventInstancesBody,
+    EventInstancesSchema,
     HistogramBody,
     HistogramSchema,
-    KdeBody,
-    KdeSchema,
-    ViolinBody,
-    ViolinSchema,
 )
 from ocelescope_module_log_overview.dependencies import (
-    ComputeEventCategoricalDep,
     ComputeEventHistogramDep,
-    ComputeEventKdeDep,
-    ComputeEventViolinDep,
     ListEventAttributesDep,
+    ListEventInstancesDep,
 )
 
 router = APIRouter()
 
 
-@router.post("/{ocel_id}/events/attributes")
+@router.get("/{ocel_id}/events/attributes", operation_id="eventAttributes")
 def event_attributes(
     use_case: ListEventAttributesDep,
 ) -> dict[str, list[AttributeInfoSchema]]:
@@ -33,7 +27,10 @@ def event_attributes(
     }
 
 
-@router.post("/{ocel_id}/events/{event_type}/{attribute}/histogram")
+@router.post(
+    "/{ocel_id}/events/{event_type}/{attribute}/histogram",
+    operation_id="eventAttributeHistogram",
+)
 def event_attribute_histogram(
     use_case: ComputeEventHistogramDep,
     event_type: str,
@@ -41,51 +38,36 @@ def event_attribute_histogram(
     body: HistogramBody,
 ) -> HistogramSchema:
     try:
-        result = use_case.execute(event_type, attribute, bins=body.bins)
+        result = use_case.execute(
+            event_type,
+            attribute,
+            range_min=body.range.min if body.range else None,
+            range_max=body.range.max if body.range else None,
+            bins=body.bins,
+        )
     except KeyError as e:
         raise HTTPException(status_code=404, detail=str(e))
     return HistogramSchema.from_domain(result)
 
 
-@router.post("/{ocel_id}/events/{event_type}/{attribute}/categorical")
-def event_attribute_categorical(
-    use_case: ComputeEventCategoricalDep,
+@router.post(
+    "/{ocel_id}/events/{event_type}/{attribute}/instances",
+    operation_id="eventAttributeInstances",
+)
+def event_attribute_instances(
+    use_case: ListEventInstancesDep,
     event_type: str,
     attribute: str,
-    body: CategoricalBody,
-) -> CategoricalSchema:
-    try:
-        result = use_case.execute(event_type, attribute, top_k=body.top_k)
-    except KeyError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    return CategoricalSchema.from_domain(result)
-
-
-@router.post("/{ocel_id}/events/{event_type}/{attribute}/kde")
-def event_attribute_kde(
-    use_case: ComputeEventKdeDep,
-    event_type: str,
-    attribute: str,
-    body: KdeBody,
-) -> KdeSchema:
+    body: EventInstancesBody,
+) -> EventInstancesSchema:
     try:
         result = use_case.execute(
-            event_type, attribute, n_points=body.n_points, bandwidth=body.bandwidth
+            event_type,
+            attribute,
+            range_min=body.range.min if body.range else None,
+            range_max=body.range.max if body.range else None,
+            limit=body.limit,
         )
     except KeyError as e:
         raise HTTPException(status_code=404, detail=str(e))
-    return KdeSchema.from_domain(result)
-
-
-@router.post("/{ocel_id}/events/{event_type}/{attribute}/violin")
-def event_attribute_violin(
-    use_case: ComputeEventViolinDep,
-    event_type: str,
-    attribute: str,
-    body: ViolinBody,
-) -> ViolinSchema:
-    try:
-        result = use_case.execute(event_type, attribute, n_points=body.n_points)
-    except KeyError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    return ViolinSchema.from_domain(result)
+    return EventInstancesSchema.from_domain(result)

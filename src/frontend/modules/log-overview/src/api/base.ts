@@ -20,99 +20,104 @@ import type {
 } from '@tanstack/react-query';
 
 import { customFetch } from '../lib/fetcher';
-export type AttributeInfoType = typeof AttributeInfoType[keyof typeof AttributeInfoType];
+export type AttributeInfoSchemaType = typeof AttributeInfoSchemaType[keyof typeof AttributeInfoSchemaType];
 
 
-export const AttributeInfoType = {
+export const AttributeInfoSchemaType = {
   numeric: 'numeric',
   categorical: 'categorical',
 } as const;
 
-export interface AttributeInfo {
+export interface AttributeInfoSchema {
   name: string;
-  type: AttributeInfoType;
+  type: AttributeInfoSchemaType;
 }
 
-export interface HistogramBody {
-  bins?: number | null;
+export interface EventInstanceSchema {
+  id: string;
+  timestamp: string;
+  value: number | null;
 }
 
-export interface HistogramBin {
+/**
+ * Request range. Either endpoint may be omitted for an open range.
+ */
+export interface RangeInput {
+  min?: number | null;
+  max?: number | null;
+}
+
+export interface EventInstancesBody {
+  range?: RangeInput | null;
+  /**
+   * @minimum 1
+   * @maximum 500
+   */
+  limit?: number;
+}
+
+export interface EventInstancesSchema {
+  instances: EventInstanceSchema[];
+  matching_count: number;
+  truncated: boolean;
+}
+
+export type ValidationErrorCtx = { [key: string]: unknown };
+
+export interface ValidationError {
+  loc: (string | number)[];
+  msg: string;
+  type: string;
+  input?: unknown;
+  ctx?: ValidationErrorCtx;
+}
+
+export interface HTTPValidationError {
+  detail?: ValidationError[];
+}
+
+export interface HistogramBinSchema {
   start: number;
   end: number;
   count: number;
 }
 
-export interface Histogram {
-  bins: HistogramBin[];
-  missing_count: number;
-  total_count: number;
+export interface HistogramBody {
+  range?: RangeInput | null;
+  bins?: number | null;
 }
 
-export interface CategoricalBody {
-  top_k?: number | null;
+export interface HistogramCountsSchema {
+  covered: number;
+  missing: number;
+  total: number;
 }
 
-export interface CategoricalEntry {
-  value: string;
-  count: number;
-}
-
-export interface Categorical {
-  value_counts: CategoricalEntry[];
-  missing_count: number;
-  total_count: number;
-  truncated: boolean;
-}
-
-export interface KdeBody {
-  /**
-   * @minimum 10
-   * @maximum 1000
-   */
-  n_points?: number;
-  /**
-   * @minimum 0.1
-   * @maximum 5
-   */
-  bandwidth?: number;
-}
-
-export interface KdePoint {
-  x: number;
-  y: number;
-}
-
-export interface Kde {
-  points: KdePoint[];
-  missing_count: number;
-  total_count: number;
-}
-
-export interface ViolinBody {
-  /**
-   * @minimum 10
-   * @maximum 1000
-   */
-  n_points?: number;
-}
-
-export interface ViolinStats {
+export interface RangeSchema {
   min: number;
   max: number;
-  q1: number;
-  median: number;
-  q3: number;
 }
 
-export interface Violin {
-  kde_points: KdePoint[];
-  stats: ViolinStats | null;
-  missing_count: number;
-  total_count: number;
+export interface HistogramSchema {
+  bins: HistogramBinSchema[];
+  domain: RangeSchema | null;
+  covered: RangeSchema | null;
+  counts: HistogramCountsSchema;
 }
 
-export type EventAttributes200 = {[key: string]: AttributeInfo[]};
+export type EventAttributesParams = {
+ocel_version?: 'original' | 'filtered' | null;
+};
+
+export type EventAttributes200 = {[key: string]: AttributeInfoSchema[]};
+
+export type EventAttributeHistogramParams = {
+ocel_version?: 'original' | 'filtered' | null;
+};
+
+export type EventAttributeInstancesParams = {
+ocel_version?: 'original' | 'filtered' | null;
+};
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
@@ -122,13 +127,15 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
  * @summary Event Attributes
  */
 export const eventAttributes = (
-    ocelId: string,
+    ocelId: string | null,
+    params?: EventAttributesParams,
  options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
 ) => {
       
       
       return customFetch<EventAttributes200>(
-      {url: `/api/external/modules/log-overview/v1/${ocelId}/events/attributes`, method: 'POST', signal
+      {url: `/api/external/modules/log-overview/v1/${ocelId}/events/attributes`, method: 'GET',
+        params, signal
     },
       options);
     }
@@ -136,23 +143,25 @@ export const eventAttributes = (
 
 
 
-export const getEventAttributesQueryKey = (ocelId: string,) => {
+export const getEventAttributesQueryKey = (ocelId: string | null,
+    params?: EventAttributesParams,) => {
     return [
-    `/api/external/modules/log-overview/v1/${ocelId}/events/attributes`
+    `/api/external/modules/log-overview/v1/${ocelId}/events/attributes`, ...(params ? [params] : [])
     ] as const;
     }
 
     
-export const getEventAttributesQueryOptions = <TData = Awaited<ReturnType<typeof eventAttributes>>, TError = unknown>(ocelId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getEventAttributesQueryOptions = <TData = Awaited<ReturnType<typeof eventAttributes>>, TError = HTTPValidationError>(ocelId: string | null,
+    params?: EventAttributesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getEventAttributesQueryKey(ocelId);
+  const queryKey =  queryOptions?.queryKey ?? getEventAttributesQueryKey(ocelId,params);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof eventAttributes>>> = ({ signal }) => eventAttributes(ocelId, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof eventAttributes>>> = ({ signal }) => eventAttributes(ocelId,params, requestOptions, signal);
 
       
 
@@ -162,11 +171,12 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type EventAttributesQueryResult = NonNullable<Awaited<ReturnType<typeof eventAttributes>>>
-export type EventAttributesQueryError = unknown
+export type EventAttributesQueryError = HTTPValidationError
 
 
-export function useEventAttributes<TData = Awaited<ReturnType<typeof eventAttributes>>, TError = unknown>(
- ocelId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributes>>, TError, TData>> & Pick<
+export function useEventAttributes<TData = Awaited<ReturnType<typeof eventAttributes>>, TError = HTTPValidationError>(
+ ocelId: string | null,
+    params: undefined |  EventAttributesParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributes>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof eventAttributes>>,
           TError,
@@ -175,8 +185,9 @@ export function useEventAttributes<TData = Awaited<ReturnType<typeof eventAttrib
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEventAttributes<TData = Awaited<ReturnType<typeof eventAttributes>>, TError = unknown>(
- ocelId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributes>>, TError, TData>> & Pick<
+export function useEventAttributes<TData = Awaited<ReturnType<typeof eventAttributes>>, TError = HTTPValidationError>(
+ ocelId: string | null,
+    params?: EventAttributesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributes>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof eventAttributes>>,
           TError,
@@ -185,20 +196,22 @@ export function useEventAttributes<TData = Awaited<ReturnType<typeof eventAttrib
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEventAttributes<TData = Awaited<ReturnType<typeof eventAttributes>>, TError = unknown>(
- ocelId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export function useEventAttributes<TData = Awaited<ReturnType<typeof eventAttributes>>, TError = HTTPValidationError>(
+ ocelId: string | null,
+    params?: EventAttributesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Event Attributes
  */
 
-export function useEventAttributes<TData = Awaited<ReturnType<typeof eventAttributes>>, TError = unknown>(
- ocelId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export function useEventAttributes<TData = Awaited<ReturnType<typeof eventAttributes>>, TError = HTTPValidationError>(
+ ocelId: string | null,
+    params?: EventAttributesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getEventAttributesQueryOptions(ocelId,options)
+  const queryOptions = getEventAttributesQueryOptions(ocelId,params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -213,18 +226,20 @@ export function useEventAttributes<TData = Awaited<ReturnType<typeof eventAttrib
  * @summary Event Attribute Histogram
  */
 export const eventAttributeHistogram = (
-    ocelId: string,
+    ocelId: string | null,
     eventType: string,
     attribute: string,
     histogramBody: HistogramBody,
+    params?: EventAttributeHistogramParams,
  options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
 ) => {
       
       
-      return customFetch<Histogram>(
+      return customFetch<HistogramSchema>(
       {url: `/api/external/modules/log-overview/v1/${ocelId}/events/${eventType}/${attribute}/histogram`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: histogramBody, signal
+      data: histogramBody,
+        params, signal
     },
       options);
     }
@@ -232,29 +247,31 @@ export const eventAttributeHistogram = (
 
 
 
-export const getEventAttributeHistogramQueryKey = (ocelId: string,
+export const getEventAttributeHistogramQueryKey = (ocelId: string | null,
     eventType: string,
     attribute: string,
-    histogramBody?: HistogramBody,) => {
+    histogramBody?: HistogramBody,
+    params?: EventAttributeHistogramParams,) => {
     return [
-    `/api/external/modules/log-overview/v1/${ocelId}/events/${eventType}/${attribute}/histogram`, histogramBody
+    `/api/external/modules/log-overview/v1/${ocelId}/events/${eventType}/${attribute}/histogram`, ...(params ? [params] : []), histogramBody
     ] as const;
     }
 
     
-export const getEventAttributeHistogramQueryOptions = <TData = Awaited<ReturnType<typeof eventAttributeHistogram>>, TError = void>(ocelId: string,
+export const getEventAttributeHistogramQueryOptions = <TData = Awaited<ReturnType<typeof eventAttributeHistogram>>, TError = HTTPValidationError>(ocelId: string | null,
     eventType: string,
     attribute: string,
-    histogramBody: HistogramBody, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributeHistogram>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+    histogramBody: HistogramBody,
+    params?: EventAttributeHistogramParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributeHistogram>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getEventAttributeHistogramQueryKey(ocelId,eventType,attribute,histogramBody);
+  const queryKey =  queryOptions?.queryKey ?? getEventAttributeHistogramQueryKey(ocelId,eventType,attribute,histogramBody,params);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof eventAttributeHistogram>>> = ({ signal }) => eventAttributeHistogram(ocelId,eventType,attribute,histogramBody, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof eventAttributeHistogram>>> = ({ signal }) => eventAttributeHistogram(ocelId,eventType,attribute,histogramBody,params, requestOptions, signal);
 
       
 
@@ -264,14 +281,15 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type EventAttributeHistogramQueryResult = NonNullable<Awaited<ReturnType<typeof eventAttributeHistogram>>>
-export type EventAttributeHistogramQueryError = void
+export type EventAttributeHistogramQueryError = HTTPValidationError
 
 
-export function useEventAttributeHistogram<TData = Awaited<ReturnType<typeof eventAttributeHistogram>>, TError = void>(
- ocelId: string,
+export function useEventAttributeHistogram<TData = Awaited<ReturnType<typeof eventAttributeHistogram>>, TError = HTTPValidationError>(
+ ocelId: string | null,
     eventType: string,
     attribute: string,
-    histogramBody: HistogramBody, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributeHistogram>>, TError, TData>> & Pick<
+    histogramBody: HistogramBody,
+    params: undefined |  EventAttributeHistogramParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributeHistogram>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof eventAttributeHistogram>>,
           TError,
@@ -280,11 +298,12 @@ export function useEventAttributeHistogram<TData = Awaited<ReturnType<typeof eve
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEventAttributeHistogram<TData = Awaited<ReturnType<typeof eventAttributeHistogram>>, TError = void>(
- ocelId: string,
+export function useEventAttributeHistogram<TData = Awaited<ReturnType<typeof eventAttributeHistogram>>, TError = HTTPValidationError>(
+ ocelId: string | null,
     eventType: string,
     attribute: string,
-    histogramBody: HistogramBody, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributeHistogram>>, TError, TData>> & Pick<
+    histogramBody: HistogramBody,
+    params?: EventAttributeHistogramParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributeHistogram>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof eventAttributeHistogram>>,
           TError,
@@ -293,26 +312,28 @@ export function useEventAttributeHistogram<TData = Awaited<ReturnType<typeof eve
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEventAttributeHistogram<TData = Awaited<ReturnType<typeof eventAttributeHistogram>>, TError = void>(
- ocelId: string,
+export function useEventAttributeHistogram<TData = Awaited<ReturnType<typeof eventAttributeHistogram>>, TError = HTTPValidationError>(
+ ocelId: string | null,
     eventType: string,
     attribute: string,
-    histogramBody: HistogramBody, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributeHistogram>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+    histogramBody: HistogramBody,
+    params?: EventAttributeHistogramParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributeHistogram>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Event Attribute Histogram
  */
 
-export function useEventAttributeHistogram<TData = Awaited<ReturnType<typeof eventAttributeHistogram>>, TError = void>(
- ocelId: string,
+export function useEventAttributeHistogram<TData = Awaited<ReturnType<typeof eventAttributeHistogram>>, TError = HTTPValidationError>(
+ ocelId: string | null,
     eventType: string,
     attribute: string,
-    histogramBody: HistogramBody, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributeHistogram>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+    histogramBody: HistogramBody,
+    params?: EventAttributeHistogramParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributeHistogram>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getEventAttributeHistogramQueryOptions(ocelId,eventType,attribute,histogramBody,options)
+  const queryOptions = getEventAttributeHistogramQueryOptions(ocelId,eventType,attribute,histogramBody,params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -324,21 +345,23 @@ export function useEventAttributeHistogram<TData = Awaited<ReturnType<typeof eve
 
 
 /**
- * @summary Event Attribute Categorical
+ * @summary Event Attribute Instances
  */
-export const eventAttributeCategorical = (
-    ocelId: string,
+export const eventAttributeInstances = (
+    ocelId: string | null,
     eventType: string,
     attribute: string,
-    categoricalBody: CategoricalBody,
+    eventInstancesBody: EventInstancesBody,
+    params?: EventAttributeInstancesParams,
  options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
 ) => {
       
       
-      return customFetch<Categorical>(
-      {url: `/api/external/modules/log-overview/v1/${ocelId}/events/${eventType}/${attribute}/categorical`, method: 'POST',
+      return customFetch<EventInstancesSchema>(
+      {url: `/api/external/modules/log-overview/v1/${ocelId}/events/${eventType}/${attribute}/instances`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: categoricalBody, signal
+      data: eventInstancesBody,
+        params, signal
     },
       options);
     }
@@ -346,315 +369,93 @@ export const eventAttributeCategorical = (
 
 
 
-export const getEventAttributeCategoricalQueryKey = (ocelId: string,
+export const getEventAttributeInstancesQueryKey = (ocelId: string | null,
     eventType: string,
     attribute: string,
-    categoricalBody?: CategoricalBody,) => {
+    eventInstancesBody?: EventInstancesBody,
+    params?: EventAttributeInstancesParams,) => {
     return [
-    `/api/external/modules/log-overview/v1/${ocelId}/events/${eventType}/${attribute}/categorical`, categoricalBody
+    `/api/external/modules/log-overview/v1/${ocelId}/events/${eventType}/${attribute}/instances`, ...(params ? [params] : []), eventInstancesBody
     ] as const;
     }
 
     
-export const getEventAttributeCategoricalQueryOptions = <TData = Awaited<ReturnType<typeof eventAttributeCategorical>>, TError = void>(ocelId: string,
+export const getEventAttributeInstancesQueryOptions = <TData = Awaited<ReturnType<typeof eventAttributeInstances>>, TError = HTTPValidationError>(ocelId: string | null,
     eventType: string,
     attribute: string,
-    categoricalBody: CategoricalBody, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributeCategorical>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+    eventInstancesBody: EventInstancesBody,
+    params?: EventAttributeInstancesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributeInstances>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getEventAttributeCategoricalQueryKey(ocelId,eventType,attribute,categoricalBody);
+  const queryKey =  queryOptions?.queryKey ?? getEventAttributeInstancesQueryKey(ocelId,eventType,attribute,eventInstancesBody,params);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof eventAttributeCategorical>>> = ({ signal }) => eventAttributeCategorical(ocelId,eventType,attribute,categoricalBody, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof eventAttributeInstances>>> = ({ signal }) => eventAttributeInstances(ocelId,eventType,attribute,eventInstancesBody,params, requestOptions, signal);
 
       
 
       
 
-   return  { queryKey, queryFn, enabled: !!(ocelId && eventType && attribute),  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof eventAttributeCategorical>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, enabled: !!(ocelId && eventType && attribute),  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof eventAttributeInstances>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type EventAttributeCategoricalQueryResult = NonNullable<Awaited<ReturnType<typeof eventAttributeCategorical>>>
-export type EventAttributeCategoricalQueryError = void
+export type EventAttributeInstancesQueryResult = NonNullable<Awaited<ReturnType<typeof eventAttributeInstances>>>
+export type EventAttributeInstancesQueryError = HTTPValidationError
 
 
-export function useEventAttributeCategorical<TData = Awaited<ReturnType<typeof eventAttributeCategorical>>, TError = void>(
- ocelId: string,
+export function useEventAttributeInstances<TData = Awaited<ReturnType<typeof eventAttributeInstances>>, TError = HTTPValidationError>(
+ ocelId: string | null,
     eventType: string,
     attribute: string,
-    categoricalBody: CategoricalBody, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributeCategorical>>, TError, TData>> & Pick<
+    eventInstancesBody: EventInstancesBody,
+    params: undefined |  EventAttributeInstancesParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributeInstances>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof eventAttributeCategorical>>,
+          Awaited<ReturnType<typeof eventAttributeInstances>>,
           TError,
-          Awaited<ReturnType<typeof eventAttributeCategorical>>
+          Awaited<ReturnType<typeof eventAttributeInstances>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEventAttributeCategorical<TData = Awaited<ReturnType<typeof eventAttributeCategorical>>, TError = void>(
- ocelId: string,
+export function useEventAttributeInstances<TData = Awaited<ReturnType<typeof eventAttributeInstances>>, TError = HTTPValidationError>(
+ ocelId: string | null,
     eventType: string,
     attribute: string,
-    categoricalBody: CategoricalBody, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributeCategorical>>, TError, TData>> & Pick<
+    eventInstancesBody: EventInstancesBody,
+    params?: EventAttributeInstancesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributeInstances>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof eventAttributeCategorical>>,
+          Awaited<ReturnType<typeof eventAttributeInstances>>,
           TError,
-          Awaited<ReturnType<typeof eventAttributeCategorical>>
+          Awaited<ReturnType<typeof eventAttributeInstances>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEventAttributeCategorical<TData = Awaited<ReturnType<typeof eventAttributeCategorical>>, TError = void>(
- ocelId: string,
+export function useEventAttributeInstances<TData = Awaited<ReturnType<typeof eventAttributeInstances>>, TError = HTTPValidationError>(
+ ocelId: string | null,
     eventType: string,
     attribute: string,
-    categoricalBody: CategoricalBody, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributeCategorical>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+    eventInstancesBody: EventInstancesBody,
+    params?: EventAttributeInstancesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributeInstances>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary Event Attribute Categorical
+ * @summary Event Attribute Instances
  */
 
-export function useEventAttributeCategorical<TData = Awaited<ReturnType<typeof eventAttributeCategorical>>, TError = void>(
- ocelId: string,
+export function useEventAttributeInstances<TData = Awaited<ReturnType<typeof eventAttributeInstances>>, TError = HTTPValidationError>(
+ ocelId: string | null,
     eventType: string,
     attribute: string,
-    categoricalBody: CategoricalBody, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributeCategorical>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+    eventInstancesBody: EventInstancesBody,
+    params?: EventAttributeInstancesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributeInstances>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getEventAttributeCategoricalQueryOptions(ocelId,eventType,attribute,categoricalBody,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
-
-
-
-
-
-/**
- * @summary Event Attribute KDE
- */
-export const eventAttributeKde = (
-    ocelId: string,
-    eventType: string,
-    attribute: string,
-    kdeBody: KdeBody,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
-) => {
-      
-      
-      return customFetch<Kde>(
-      {url: `/api/external/modules/log-overview/v1/${ocelId}/events/${eventType}/${attribute}/kde`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: kdeBody, signal
-    },
-      options);
-    }
-  
-
-
-
-export const getEventAttributeKdeQueryKey = (ocelId: string,
-    eventType: string,
-    attribute: string,
-    kdeBody?: KdeBody,) => {
-    return [
-    `/api/external/modules/log-overview/v1/${ocelId}/events/${eventType}/${attribute}/kde`, kdeBody
-    ] as const;
-    }
-
-    
-export const getEventAttributeKdeQueryOptions = <TData = Awaited<ReturnType<typeof eventAttributeKde>>, TError = void>(ocelId: string,
-    eventType: string,
-    attribute: string,
-    kdeBody: KdeBody, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributeKde>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getEventAttributeKdeQueryKey(ocelId,eventType,attribute,kdeBody);
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof eventAttributeKde>>> = ({ signal }) => eventAttributeKde(ocelId,eventType,attribute,kdeBody, requestOptions, signal);
-
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(ocelId && eventType && attribute),  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof eventAttributeKde>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type EventAttributeKdeQueryResult = NonNullable<Awaited<ReturnType<typeof eventAttributeKde>>>
-export type EventAttributeKdeQueryError = void
-
-
-export function useEventAttributeKde<TData = Awaited<ReturnType<typeof eventAttributeKde>>, TError = void>(
- ocelId: string,
-    eventType: string,
-    attribute: string,
-    kdeBody: KdeBody, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributeKde>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof eventAttributeKde>>,
-          TError,
-          Awaited<ReturnType<typeof eventAttributeKde>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEventAttributeKde<TData = Awaited<ReturnType<typeof eventAttributeKde>>, TError = void>(
- ocelId: string,
-    eventType: string,
-    attribute: string,
-    kdeBody: KdeBody, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributeKde>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof eventAttributeKde>>,
-          TError,
-          Awaited<ReturnType<typeof eventAttributeKde>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEventAttributeKde<TData = Awaited<ReturnType<typeof eventAttributeKde>>, TError = void>(
- ocelId: string,
-    eventType: string,
-    attribute: string,
-    kdeBody: KdeBody, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributeKde>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-/**
- * @summary Event Attribute KDE
- */
-
-export function useEventAttributeKde<TData = Awaited<ReturnType<typeof eventAttributeKde>>, TError = void>(
- ocelId: string,
-    eventType: string,
-    attribute: string,
-    kdeBody: KdeBody, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributeKde>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getEventAttributeKdeQueryOptions(ocelId,eventType,attribute,kdeBody,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
-
-
-
-
-
-/**
- * @summary Event Attribute Violin
- */
-export const eventAttributeViolin = (
-    ocelId: string,
-    eventType: string,
-    attribute: string,
-    violinBody: ViolinBody,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
-) => {
-      
-      
-      return customFetch<Violin>(
-      {url: `/api/external/modules/log-overview/v1/${ocelId}/events/${eventType}/${attribute}/violin`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: violinBody, signal
-    },
-      options);
-    }
-  
-
-
-
-export const getEventAttributeViolinQueryKey = (ocelId: string,
-    eventType: string,
-    attribute: string,
-    violinBody?: ViolinBody,) => {
-    return [
-    `/api/external/modules/log-overview/v1/${ocelId}/events/${eventType}/${attribute}/violin`, violinBody
-    ] as const;
-    }
-
-    
-export const getEventAttributeViolinQueryOptions = <TData = Awaited<ReturnType<typeof eventAttributeViolin>>, TError = void>(ocelId: string,
-    eventType: string,
-    attribute: string,
-    violinBody: ViolinBody, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributeViolin>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getEventAttributeViolinQueryKey(ocelId,eventType,attribute,violinBody);
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof eventAttributeViolin>>> = ({ signal }) => eventAttributeViolin(ocelId,eventType,attribute,violinBody, requestOptions, signal);
-
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(ocelId && eventType && attribute),  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof eventAttributeViolin>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type EventAttributeViolinQueryResult = NonNullable<Awaited<ReturnType<typeof eventAttributeViolin>>>
-export type EventAttributeViolinQueryError = void
-
-
-export function useEventAttributeViolin<TData = Awaited<ReturnType<typeof eventAttributeViolin>>, TError = void>(
- ocelId: string,
-    eventType: string,
-    attribute: string,
-    violinBody: ViolinBody, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributeViolin>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof eventAttributeViolin>>,
-          TError,
-          Awaited<ReturnType<typeof eventAttributeViolin>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEventAttributeViolin<TData = Awaited<ReturnType<typeof eventAttributeViolin>>, TError = void>(
- ocelId: string,
-    eventType: string,
-    attribute: string,
-    violinBody: ViolinBody, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributeViolin>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof eventAttributeViolin>>,
-          TError,
-          Awaited<ReturnType<typeof eventAttributeViolin>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEventAttributeViolin<TData = Awaited<ReturnType<typeof eventAttributeViolin>>, TError = void>(
- ocelId: string,
-    eventType: string,
-    attribute: string,
-    violinBody: ViolinBody, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributeViolin>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-/**
- * @summary Event Attribute Violin
- */
-
-export function useEventAttributeViolin<TData = Awaited<ReturnType<typeof eventAttributeViolin>>, TError = void>(
- ocelId: string,
-    eventType: string,
-    attribute: string,
-    violinBody: ViolinBody, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributeViolin>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getEventAttributeViolinQueryOptions(ocelId,eventType,attribute,violinBody,options)
+  const queryOptions = getEventAttributeInstancesQueryOptions(ocelId,eventType,attribute,eventInstancesBody,params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

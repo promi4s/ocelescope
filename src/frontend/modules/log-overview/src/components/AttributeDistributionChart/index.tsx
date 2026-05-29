@@ -1,63 +1,63 @@
-import { useState } from "react";
+import type { HistogramBin, HistogramRange } from "@ocelescope/charts";
+import { Histogram } from "@ocelescope/charts";
+import { keepPreviousData } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
 
-import type { AttributeInfoType } from "../../api/base";
-import { CategoricalFetcher } from "./CategoricalFetcher";
-import { ChartTypeSelect } from "./ChartTypeSelect";
-import { HistogramFetcher } from "./HistogramFetcher";
-import { KdeFetcher } from "./KdeFetcher";
-import type { ChartType, FetcherProps } from "./types";
-import { ViolinFetcher } from "./ViolinFetcher";
-
-const FETCHERS: Record<ChartType, (props: FetcherProps) => React.ReactElement> = {
-  histogram: HistogramFetcher,
-  kde: KdeFetcher,
-  violin: ViolinFetcher,
-  categorical: CategoricalFetcher,
-};
-
-const TYPE_OPTIONS: Record<AttributeInfoType, readonly { value: ChartType; label: string }[]> = {
-  numeric: [
-    { value: "histogram", label: "Histogram" },
-    { value: "kde", label: "KDE" },
-    { value: "violin", label: "Violin" },
-  ],
-  categorical: [{ value: "categorical", label: "Bar Chart" }],
-};
-
-const DEFAULT_TYPE: Record<AttributeInfoType, ChartType> = {
-  numeric: "histogram",
-  categorical: "categorical",
-};
+import { useEventAttributeHistogram } from "../../api/base";
+import { AttributeDrillDown } from "./AttributeDrillDown";
+import { toHistogramData } from "./mapper";
 
 interface Props {
   ocelId: string;
   eventType: string;
   attribute: string;
-  attributeType: AttributeInfoType;
 }
+
+const EMPTY_RANGE: HistogramRange = { min: null, max: null };
 
 export function AttributeDistributionChart({
   ocelId,
   eventType,
   attribute,
-  attributeType,
 }: Props) {
-  const [chartType, setChartType] = useState<ChartType>(DEFAULT_TYPE[attributeType]);
+  const [range, setRange] = useState<HistogramRange>(EMPTY_RANGE);
+  const [bins, setBins] = useState<number | null>(null);
+  const [selectedBin, setSelectedBin] = useState<HistogramBin | null>(null);
 
-  const options = TYPE_OPTIONS[attributeType];
-  const controls =
-    options.length > 1 ? (
-      <ChartTypeSelect options={options} value={chartType} onChange={setChartType} />
-    ) : null;
+  const { data, isLoading } = useEventAttributeHistogram(
+    ocelId,
+    eventType,
+    attribute,
+    { range, bins },
+    undefined,
+    { query: { placeholderData: keepPreviousData } },
+  );
 
-  const Fetcher = FETCHERS[chartType];
+  const chartData = useMemo(
+    () => (data ? toHistogramData(data) : null),
+    [data],
+  );
 
   return (
-    <Fetcher
-      ocelId={ocelId}
-      eventType={eventType}
-      attribute={attribute}
-      sharedProps={{ title: eventType, subtitle: attribute, controls }}
+    <Histogram
+      title={eventType}
+      subtitle={attribute}
+      filename={`${eventType}-${attribute}-histogram`}
+      data={isLoading ? null : chartData}
+      bins={bins}
+      range={range}
+      onBinsChange={setBins}
+      onRangeChange={setRange}
+      selectedBin={selectedBin}
+      onSelectedBinChange={setSelectedBin}
+      renderDrillDown={(bin) => (
+        <AttributeDrillDown
+          ocelId={ocelId}
+          eventType={eventType}
+          attribute={attribute}
+          bin={bin}
+        />
+      )}
     />
   );
 }

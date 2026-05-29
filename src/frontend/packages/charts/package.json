@@ -23,6 +23,7 @@
   },
   "peerDependencies": {
     "@mantine/core": "catalog:",
+    "@mantine/hooks": "catalog:",
     "@ocelescope/api-base": "workspace:*",
     "echarts": "catalog:",
     "echarts-for-react": "catalog:",
@@ -32,6 +33,7 @@
   },
   "devDependencies": {
     "@mantine/core": "catalog:",
+    "@mantine/hooks": "catalog:",
     "@storybook/react-vite": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",

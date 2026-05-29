@@ -6,7 +6,7 @@
   },
   "paths": {
     "/modules/log-overview/v1/{ocel_id}/events/attributes": {
-      "post": {
+      "get": {
         "summary": "Event Attributes",
         "operationId": "eventAttributes",
         "parameters": [
@@ -14,7 +14,38 @@
             "name": "ocel_id",
             "in": "path",
             "required": true,
-            "schema": { "type": "string", "title": "Ocel Id" }
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
           }
         ],
         "responses": {
@@ -26,9 +57,21 @@
                   "type": "object",
                   "additionalProperties": {
                     "type": "array",
-                    "items": { "$ref": "#/components/schemas/AttributeInfo" }
+                    "items": {
+                      "$ref": "#/components/schemas/AttributeInfoSchema"
+                    }
                   },
-                  "title": "EventAttributes"
+                  "title": "Response Eventattributes"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -41,15 +84,69 @@
         "summary": "Event Attribute Histogram",
         "operationId": "eventAttributeHistogram",
         "parameters": [
-          { "name": "ocel_id", "in": "path", "required": true, "schema": { "type": "string" } },
-          { "name": "event_type", "in": "path", "required": true, "schema": { "type": "string" } },
-          { "name": "attribute", "in": "path", "required": true, "schema": { "type": "string" } }
+          {
+            "name": "event_type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Event Type"
+            }
+          },
+          {
+            "name": "attribute",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Attribute"
+            }
+          },
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
         ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/HistogramBody" }
+              "schema": {
+                "$ref": "#/components/schemas/HistogramBody"
+              }
             }
           }
         },
@@ -57,27 +154,94 @@
           "200": {
             "description": "Successful Response",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/Histogram" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistogramSchema"
+                }
+              }
             }
           },
-          "404": { "description": "Not Found" }
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
         }
       }
     },
-    "/modules/log-overview/v1/{ocel_id}/events/{event_type}/{attribute}/categorical": {
+    "/modules/log-overview/v1/{ocel_id}/events/{event_type}/{attribute}/instances": {
       "post": {
-        "summary": "Event Attribute Categorical",
-        "operationId": "eventAttributeCategorical",
+        "summary": "Event Attribute Instances",
+        "operationId": "eventAttributeInstances",
         "parameters": [
-          { "name": "ocel_id", "in": "path", "required": true, "schema": { "type": "string" } },
-          { "name": "event_type", "in": "path", "required": true, "schema": { "type": "string" } },
-          { "name": "attribute", "in": "path", "required": true, "schema": { "type": "string" } }
+          {
+            "name": "event_type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Event Type"
+            }
+          },
+          {
+            "name": "attribute",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Attribute"
+            }
+          },
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
         ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/CategoricalBody" }
+              "schema": {
+                "$ref": "#/components/schemas/EventInstancesBody"
+              }
             }
           }
         },
@@ -85,219 +249,347 @@
           "200": {
             "description": "Successful Response",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/Categorical" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventInstancesSchema"
+                }
+              }
             }
           },
-          "404": { "description": "Not Found" }
-        }
-      }
-    },
-    "/modules/log-overview/v1/{ocel_id}/events/{event_type}/{attribute}/kde": {
-      "post": {
-        "summary": "Event Attribute KDE",
-        "operationId": "eventAttributeKde",
-        "parameters": [
-          { "name": "ocel_id", "in": "path", "required": true, "schema": { "type": "string" } },
-          { "name": "event_type", "in": "path", "required": true, "schema": { "type": "string" } },
-          { "name": "attribute", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/KdeBody" }
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
             }
           }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/Kde" } }
-            }
-          },
-          "404": { "description": "Not Found" }
-        }
-      }
-    },
-    "/modules/log-overview/v1/{ocel_id}/events/{event_type}/{attribute}/violin": {
-      "post": {
-        "summary": "Event Attribute Violin",
-        "operationId": "eventAttributeViolin",
-        "parameters": [
-          { "name": "ocel_id", "in": "path", "required": true, "schema": { "type": "string" } },
-          { "name": "event_type", "in": "path", "required": true, "schema": { "type": "string" } },
-          { "name": "attribute", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/ViolinBody" }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/Violin" } }
-            }
-          },
-          "404": { "description": "Not Found" }
         }
       }
     }
   },
   "components": {
     "schemas": {
-      "AttributeInfo": {
-        "type": "object",
-        "required": ["name", "type"],
+      "AttributeInfoSchema": {
         "properties": {
-          "name": { "type": "string", "title": "Name" },
-          "type": { "type": "string", "enum": ["numeric", "categorical"], "title": "Type" }
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "numeric",
+              "categorical"
+            ],
+            "title": "Type"
+          }
         },
-        "title": "AttributeInfo"
+        "type": "object",
+        "required": [
+          "name",
+          "type"
+        ],
+        "title": "AttributeInfoSchema"
+      },
+      "EventInstanceSchema": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "timestamp",
+          "value"
+        ],
+        "title": "EventInstanceSchema"
+      },
+      "EventInstancesBody": {
+        "properties": {
+          "range": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RangeInput"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "limit": {
+            "type": "integer",
+            "maximum": 500.0,
+            "minimum": 1.0,
+            "title": "Limit",
+            "default": 100
+          }
+        },
+        "type": "object",
+        "title": "EventInstancesBody"
+      },
+      "EventInstancesSchema": {
+        "properties": {
+          "instances": {
+            "items": {
+              "$ref": "#/components/schemas/EventInstanceSchema"
+            },
+            "type": "array",
+            "title": "Instances"
+          },
+          "matching_count": {
+            "type": "integer",
+            "title": "Matching Count"
+          },
+          "truncated": {
+            "type": "boolean",
+            "title": "Truncated"
+          }
+        },
+        "type": "object",
+        "required": [
+          "instances",
+          "matching_count",
+          "truncated"
+        ],
+        "title": "EventInstancesSchema"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HistogramBinSchema": {
+        "properties": {
+          "start": {
+            "type": "number",
+            "title": "Start"
+          },
+          "end": {
+            "type": "number",
+            "title": "End"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "start",
+          "end",
+          "count"
+        ],
+        "title": "HistogramBinSchema"
       },
       "HistogramBody": {
-        "type": "object",
         "properties": {
+          "range": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RangeInput"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "bins": {
-            "anyOf": [{ "type": "integer", "minimum": 1, "maximum": 500 }, { "type": "null" }],
-            "default": null,
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 500.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Bins"
           }
         },
+        "type": "object",
         "title": "HistogramBody"
       },
-      "HistogramBin": {
-        "type": "object",
-        "required": ["start", "end", "count"],
+      "HistogramCountsSchema": {
         "properties": {
-          "start": { "type": "number" },
-          "end": { "type": "number" },
-          "count": { "type": "integer" }
-        },
-        "title": "HistogramBin"
-      },
-      "Histogram": {
-        "type": "object",
-        "required": ["bins", "missing_count", "total_count"],
-        "properties": {
-          "bins": { "type": "array", "items": { "$ref": "#/components/schemas/HistogramBin" } },
-          "missing_count": { "type": "integer" },
-          "total_count": { "type": "integer" }
-        },
-        "title": "Histogram"
-      },
-      "CategoricalBody": {
-        "type": "object",
-        "properties": {
-          "top_k": {
-            "anyOf": [{ "type": "integer", "minimum": 1, "maximum": 200 }, { "type": "null" }],
-            "default": 20,
-            "title": "Top K"
+          "covered": {
+            "type": "integer",
+            "title": "Covered"
+          },
+          "missing": {
+            "type": "integer",
+            "title": "Missing"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
           }
         },
-        "title": "CategoricalBody"
-      },
-      "CategoricalEntry": {
         "type": "object",
-        "required": ["value", "count"],
-        "properties": {
-          "value": { "type": "string" },
-          "count": { "type": "integer" }
-        },
-        "title": "CategoricalEntry"
+        "required": [
+          "covered",
+          "missing",
+          "total"
+        ],
+        "title": "HistogramCountsSchema"
       },
-      "Categorical": {
-        "type": "object",
-        "required": ["value_counts", "missing_count", "total_count", "truncated"],
+      "HistogramSchema": {
         "properties": {
-          "value_counts": { "type": "array", "items": { "$ref": "#/components/schemas/CategoricalEntry" } },
-          "missing_count": { "type": "integer" },
-          "total_count": { "type": "integer" },
-          "truncated": { "type": "boolean" }
-        },
-        "title": "Categorical"
-      },
-      "KdeBody": {
-        "type": "object",
-        "properties": {
-          "n_points": {
-            "type": "integer",
-            "minimum": 10,
-            "maximum": 1000,
-            "default": 200,
-            "title": "N Points"
+          "bins": {
+            "items": {
+              "$ref": "#/components/schemas/HistogramBinSchema"
+            },
+            "type": "array",
+            "title": "Bins"
           },
-          "bandwidth": {
+          "domain": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RangeSchema"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "covered": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RangeSchema"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "counts": {
+            "$ref": "#/components/schemas/HistogramCountsSchema"
+          }
+        },
+        "type": "object",
+        "required": [
+          "bins",
+          "domain",
+          "covered",
+          "counts"
+        ],
+        "title": "HistogramSchema"
+      },
+      "RangeInput": {
+        "properties": {
+          "min": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min"
+          },
+          "max": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max"
+          }
+        },
+        "type": "object",
+        "title": "RangeInput",
+        "description": "Request range. Either endpoint may be omitted for an open range."
+      },
+      "RangeSchema": {
+        "properties": {
+          "min": {
             "type": "number",
-            "minimum": 0.1,
-            "maximum": 5.0,
-            "default": 1.0,
-            "title": "Bandwidth"
-          }
-        },
-        "title": "KdeBody"
-      },
-      "KdePoint": {
-        "type": "object",
-        "required": ["x", "y"],
-        "properties": {
-          "x": { "type": "number" },
-          "y": { "type": "number" }
-        },
-        "title": "KdePoint"
-      },
-      "Kde": {
-        "type": "object",
-        "required": ["points", "missing_count", "total_count"],
-        "properties": {
-          "points": { "type": "array", "items": { "$ref": "#/components/schemas/KdePoint" } },
-          "missing_count": { "type": "integer" },
-          "total_count": { "type": "integer" }
-        },
-        "title": "Kde"
-      },
-      "ViolinBody": {
-        "type": "object",
-        "properties": {
-          "n_points": {
-            "type": "integer",
-            "minimum": 10,
-            "maximum": 1000,
-            "default": 200,
-            "title": "N Points"
-          }
-        },
-        "title": "ViolinBody"
-      },
-      "ViolinStats": {
-        "type": "object",
-        "required": ["min", "max", "q1", "median", "q3"],
-        "properties": {
-          "min": { "type": "number" },
-          "max": { "type": "number" },
-          "q1": { "type": "number" },
-          "median": { "type": "number" },
-          "q3": { "type": "number" }
-        },
-        "title": "ViolinStats"
-      },
-      "Violin": {
-        "type": "object",
-        "required": ["kde_points", "stats", "missing_count", "total_count"],
-        "properties": {
-          "kde_points": { "type": "array", "items": { "$ref": "#/components/schemas/KdePoint" } },
-          "stats": {
-            "anyOf": [{ "$ref": "#/components/schemas/ViolinStats" }, { "type": "null" }]
+            "title": "Min"
           },
-          "missing_count": { "type": "integer" },
-          "total_count": { "type": "integer" }
+          "max": {
+            "type": "number",
+            "title": "Max"
+          }
         },
-        "title": "Violin"
+        "type": "object",
+        "required": [
+          "min",
+          "max"
+        ],
+        "title": "RangeSchema"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
       }
     }
   }

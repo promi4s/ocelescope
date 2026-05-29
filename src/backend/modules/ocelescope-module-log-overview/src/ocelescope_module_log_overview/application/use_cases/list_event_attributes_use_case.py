@@ -1,10 +1,9 @@
 from ocelescope import OCEL
+from ocelescope.ocel.constants import ACTIVITY_COL, ATTRIBUTE_COL, ValueType
 
 from ocelescope_module_log_overview.domain.models import AttributeInfo
-from ocelescope_module_log_overview.infrastructure.ocel_helpers import (
-    detect_attribute_type,
-    iter_event_attribute_columns,
-)
+
+_NUMERIC_VALUE_TYPES = {ValueType.INT, ValueType.FLOAT}
 
 
 class ListEventAttributesUseCase:
@@ -12,8 +11,18 @@ class ListEventAttributesUseCase:
         self._ocel = ocel
 
     def execute(self) -> dict[str, list[AttributeInfo]]:
+        summary = self._ocel.attributes.get_activity_summary()
+        if summary.empty:
+            return {}
+
+        rows = summary.reset_index()[[ATTRIBUTE_COL, ACTIVITY_COL, "type"]]
         result: dict[str, list[AttributeInfo]] = {}
-        for event_type, name, series in iter_event_attribute_columns(self._ocel):
-            attrs = result.setdefault(event_type, [])
-            attrs.append(AttributeInfo(name=name, type=detect_attribute_type(series)))
+        for activity, group in rows.groupby(ACTIVITY_COL):
+            result[str(activity)] = [
+                AttributeInfo(
+                    name=str(row[ATTRIBUTE_COL]),
+                    type="numeric" if row["type"] in _NUMERIC_VALUE_TYPES else "categorical",
+                )
+                for _, row in group.iterrows()
+            ]
         return result

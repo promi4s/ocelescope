@@ -19,6 +19,7 @@
       "@ocelescope/core/styles": ["../packages/core/src/styles/styles.ts"],
       "@ocelescope/management": ["../modules/management/src/index.ts"],
       "@ocelescope/log-overview": ["../modules/log-overview/src/index.ts"],
+      "@ocelsecope/charts": ["../packages/charts/src/index.ts"],
       "@ocelescope/ocelot": ["../modules/ocelot/src/index.ts"],
       "@ocelescope/ocelot/styles.css": ["../modules/ocelot/src/styles.css"],
     },

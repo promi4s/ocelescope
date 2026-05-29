@@ -1,6 +1,6 @@
 import type { EChartsOption } from "echarts";
 
-import type { HistogramBin } from "./types";
+import type { HistogramData } from "./types";
 
 function fmtNum(value: number): string {
   if (!Number.isFinite(value)) return String(value);
@@ -11,9 +11,18 @@ function fmtNum(value: number): string {
   return value.toPrecision(4).replace(/\.?0+$/, "");
 }
 
-export function histogramOption(bins: HistogramBin[]): EChartsOption {
-  const total = bins.reduce((sum, b) => sum + b.count, 0);
-  const rotate = bins.length > 10 ? 35 : 0;
+export function histogramOption(data: HistogramData): EChartsOption {
+  const { bins, domain, counts } = data;
+  const totalNonMissing = counts.total - counts.missing;
+
+  // Bars on a numeric x-axis: each bar is placed at its bin center with an
+  // explicit width spanning the bin extent. Numeric axis means dataZoom emits
+  // real values, not bin indices.
+  const seriesData = bins.map((b) => {
+    const center = (b.start + b.end) / 2;
+    const width = Math.max(b.end - b.start, Number.EPSILON);
+    return { value: [center, b.count, width, b.start, b.end] };
+  });
 
   return {
     grid: {
@@ -27,22 +36,30 @@ export function histogramOption(bins: HistogramBin[]): EChartsOption {
       trigger: "axis",
       axisPointer: { type: "shadow" },
       formatter: (params: unknown) => {
-        const [{ dataIndex = 0 } = {}] = params as Array<{ dataIndex: number }>;
-        const bin = bins[dataIndex];
+        const items = params as Array<{
+          dataIndex: number;
+          marker: string;
+        }>;
+        const item = items[0];
+        if (!item) return "";
+        const bin = bins[item.dataIndex];
         if (!bin) return "";
-        const pct = total > 0 ? ((bin.count / total) * 100).toFixed(1) : "0.0";
+        const pct =
+          totalNonMissing > 0
+            ? ((bin.count / totalNonMissing) * 100).toFixed(1)
+            : "0.0";
         return [
           `<strong>[${fmtNum(bin.start)}, ${fmtNum(bin.end)})</strong>`,
-          `Count: <b>${bin.count.toLocaleString("en-US")}</b>`,
+          `${item.marker}Count: <b>${bin.count.toLocaleString("en-US")}</b>`,
           `Share: <b>${pct}%</b>`,
         ].join("<br/>");
       },
     },
     xAxis: {
-      type: "category",
-      data: bins.map((b) => fmtNum(b.start)),
-      axisLabel: { rotate, overflow: "truncate", width: 100 },
-      axisTick: { alignWithLabel: true },
+      type: "value",
+      min: domain.min,
+      max: domain.max,
+      axisLabel: { formatter: fmtNum },
     },
     yAxis: {
       type: "value",
@@ -52,10 +69,40 @@ export function histogramOption(bins: HistogramBin[]): EChartsOption {
     },
     series: [
       {
+        id: "histogram-bars",
         name: "Histogram",
-        type: "bar",
-        data: bins.map((b) => b.count),
-        barCategoryGap: "0%",
+        type: "custom",
+        renderItem: (_params, api) => {
+          const xCenter = api.value(0) as number;
+          const yValue = api.value(1) as number;
+          const width = api.value(2) as number;
+          const start = api.value(3) as number;
+          const end = api.value(4) as number;
+
+          const leftBottom = api.coord([start, 0]);
+          const rightTop = api.coord([end, yValue]);
+
+          const x = leftBottom[0]!;
+          const y = rightTop[1]!;
+          const w = rightTop[0]! - leftBottom[0]!;
+          const h = leftBottom[1]! - rightTop[1]!;
+
+          void xCenter;
+          void width;
+
+          return {
+            type: "rect" as const,
+            shape: { x, y, width: w, height: h },
+            style: api.style({
+              fill: "#228be6",
+              stroke: "#1864ab",
+              lineWidth: 0.5,
+            }),
+            emphasisDisabled: false,
+          };
+        },
+        encode: { x: 0, y: 1, tooltip: [1] },
+        data: seriesData,
       },
     ],
   };

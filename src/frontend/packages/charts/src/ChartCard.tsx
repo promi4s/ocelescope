@@ -74,11 +74,13 @@ export function ChartCard({
             {settings && (
               <Popover
                 opened={settingsOpen}
-                onClose={() => setSettingsOpen(false)}
+                onChange={setSettingsOpen}
                 position="bottom-end"
                 withArrow
                 shadow="md"
-                clickOutsideEvents={["mousedown"]}
+                closeOnClickOutside
+                closeOnEscape
+                trapFocus={false}
               >
                 <Popover.Target>
                   <ActionIcon
