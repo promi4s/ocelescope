@@ -1,0 +1,30 @@
+[
+  {
+    "name": "PM4PY Discovery",
+    "description": "Discover object-centric process models through the discovery algorithms of the [PM4PY](https://processintelligence.solutions/pm4py) python library",
+    "repo": "Grkmr/pm4py-discovery",
+    "repo_url": "https://github.com/Grkmr/pm4py-discovery",
+    "download_url": "https://github.com/Grkmr/pm4py-discovery/releases/download/v1.0.3/Pm4pyDiscovery.zip"
+  },
+  {
+    "name": "TOTeM",
+    "description": "Generate Temporal Object Type Models ([:material-book-open-variant: TOTeM](https://doi.org/10.1007/978-3-031-70418-5_7)) to uncover type-level temporal and cardinality relations in event logs",
+    "repo": "Grkmr/TOTeM",
+    "repo_url": "https://github.com/Grkmr/TOTeM",
+    "download_url": "https://github.com/Grkmr/TOTeM/releases/download/v1.6/Totem.zip"
+  },
+  {
+    "name": "OC-DECLARE",
+    "description": "Discover and check **object-centric declarative process constraints** ([:material-book-open-variant: OC-DECLARE](https://doi.org/10.1007/978-3-032-02867-9_11)) from object-centric event logs. Proof of concept for using **Rust via Python bindings** in Ocelescope plugins.",
+    "repo": "Grkmr/OC-Declare",
+    "repo_url": "https://github.com/Grkmr/OC-Declare",
+    "download_url": "https://github.com/Grkmr/OC-Declare/releases/download/v1.0.4/OcDeclare.zip"
+  },
+  {
+    "name": "OCEL Graph",
+    "description": "Result of the **plugin development tutorial**: generates an **OCEL Graph** (spanning tree) from a selected object/event root to visualize relationships in an event log. Follow the tutorial [here](./plugins/tutorial.md).",
+    "repo": "Grkmr/OcelGraph",
+    "repo_url": "https://github.com/Grkmr/OcelGraph",
+    "download_url": "https://github.com/Grkmr/OcelGraph/releases/download/v1.0.2/OcelGraphDiscovery.zip"
+  }
+]
