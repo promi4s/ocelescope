@@ -1,5 +1,4 @@
 import json
-import subprocess
 import tomllib
 from pathlib import Path
 
@@ -19,22 +18,11 @@ def generate_environment_list() -> list[str]:
 
 
 def generate_freeze_list() -> list[str]:
-    package_dir = Path("src") / "ocelescope"
+    freeze = Path("docs") / "data" / "pluginEnviroment.txt"
 
-    output = subprocess.check_output(
-        [
-            "uv",
-            "run",
-            "--package",
-            "ocelescope",
-            "pip",
-            "freeze",
-        ],
-        cwd=package_dir,
-        text=True,
+    return sorted(
+        line.strip() for line in freeze.read_text().splitlines() if line.strip()
     )
-
-    return sorted(line.strip() for line in output.splitlines() if line.strip())
 
 
 def generate_plugins():

@@ -9,7 +9,7 @@ The following sections show the packages available in the Ocelescope environment
 The first list shows the packages defined for the environment.
 The second list shows the complete installed package set, including transitive dependencies.
 
-If you need a package that is not available in the environment, please contact us at [ocelescope@pads.rwth-aachen.de](mailto:ocelescope@pads.rwth-aachen.de).
+If you need a package that is not available in the plugin environment, please [open a package request on GitHub](https://github.com/promi4s/ocelescope/issues/new?template=plugin-package-request.yml).
 
 ??? info "Packages defined for the Ocelescope environment"
     {% for dep in env_list %}
