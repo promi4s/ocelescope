@@ -56,33 +56,17 @@ Here are some example plugins you can explore and use with Ocelescope
 
 <div class="grid cards" markdown>
 
-* :simple-github:{ .lg .middle } **[PM4PY Discovery](https://github.com/Grkmr/pm4py-discovery)**
+{% for plugin in plugins %}
+
+* :simple-github:{ .lg .middle } **[{{ plugin.name }}]({{ plugin.repo_url }})**
 
     ---
-    Discover object-centric process models through the discovery algorithms of the [PM4PY](https://processintelligence.solutions/pm4py) python library
+    {{ plugin.description }}
 
-    [:material-download: Download](https://github.com/Grkmr/pm4py-discovery/releases/download/v1.0.3/Pm4pyDiscovery.zip){ .md-button }
+    {% if plugin.download_url %}
+    [:material-download: Download]({{ plugin.download_url }}){ .md-button }
+    {% endif %}
 
-* :simple-github:{ .lg .middle } **[TOTeM](https://github.com/Grkmr/TOTeM)**
-
-    ---
-
-    Generate Temporal Object Type Models ([:material-book-open-variant: TOTeM](https://doi.org/10.1007/978-3-031-70418-5_7)) to uncover type-level temporal and cardinality relations in event logs
-
-    [:material-download: Download](https://github.com/Grkmr/TOTeM/releases/download/v1.6/Totem.zip){ .md-button }
-
-* :simple-github:{ .lg .middle } **[OC-DECLARE](https://github.com/Grkmr/OC-Declare)**
-
-    ---
-    Discover and check **object-centric declarative process constraints** ([:material-book-open-variant: OC-DECLARE](https://doi.org/10.1007/978-3-032-02867-9_11)) from object-centric event logs. Proof of concept for using **Rust via Python bindings** in Ocelescope plugins.
-
-    [:material-download: Download](https://github.com/Grkmr/OC-Declare/releases/download/v1.0.4/OcDeclare.zip){ .md-button }
-
-* :simple-github:{ .lg .middle } **[OCEL Graph](https://github.com/Grkmr/OcelGraph)**
-
-    ---
-    Result of the **plugin development tutorial**: generates an **OCEL Graph** (spanning tree) from a selected object/event root to visualize relationships in an event log. Follow the tutorial [here](./plugins/tutorial.md).
-
-    [:material-download: Download](https://github.com/Grkmr/OcelGraph/releases/download/v1.0.2/OcelGraphDiscovery.zip){ .md-button }
+{% endfor %}
 
 </div>

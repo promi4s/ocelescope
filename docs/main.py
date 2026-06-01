@@ -1,3 +1,4 @@
+import json
 import subprocess
 import tomllib
 from pathlib import Path
@@ -36,6 +37,14 @@ def generate_freeze_list() -> list[str]:
     return sorted(line.strip() for line in output.splitlines() if line.strip())
 
 
+def generate_plugins():
+    json_file = Path("docs/data/plugins.json")
+    plugins = json.loads(json_file.read_text(encoding="utf-8"))
+
+    return plugins
+
+
 def define_env(env):
     env.variables["env_list"] = generate_environment_list()
     env.variables["freeze_list"] = generate_freeze_list()
+    env.variables["plugins"] = generate_plugins()
