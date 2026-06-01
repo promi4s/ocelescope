@@ -16,7 +16,7 @@
     "api:generate": "pnpm -r --if-present --parallel run generate:api",
     "api:sync": "pnpm run api:generate && pnpm run build:frontend",
     "docs:dev": "uv sync --group docs && uv run mkdocs serve --livereload",
-    "docs:update": "uv run scripts/update_plugins.py",
+    "docs:update": "uv run scripts/update_plugins.py && uv run --package ocelescope pip freeze >> docs/data/pluginEnviroment.txt",
     "dev:deps": "pnpm -r --parallel --filter \"!@ocelescope/app\" run dev",
     "dev:frontend": "pnpm -r --parallel --filter \"@ocelescope/app\" run dev",
     "dev:backend": "uv run ocelescope-backend serve --reload --reload-dir src/backend/ --env-file src/backend/.env",
