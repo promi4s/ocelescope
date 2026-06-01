@@ -28,4 +28,4 @@ body:
       description: A short, friendly explanation of what you want to do with it
       placeholder: We would like to use this package in a plugin for ...
     validations:
-      required: true
+      required: false
