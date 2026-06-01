@@ -1,0 +1,31 @@
+name: Plugin environment package request
+description: Request a Python package to be added to the Ocelescope plugin environment
+labels:
+  - package-request
+body:
+  - type: input
+    id: package_name
+    attributes:
+      label: Package name
+      description: Name of the Python package on PyPI
+      placeholder: e.g. pandas
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version (optional)
+      description: Optional version or version constraint
+      placeholder: e.g. >=2.0,<3.0
+    validations:
+      required: false
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: Why would you like this package added?
+      description: A short, friendly explanation of what you want to do with it
+      placeholder: We would like to use this package in a plugin for ...
+    validations:
+      required: false
