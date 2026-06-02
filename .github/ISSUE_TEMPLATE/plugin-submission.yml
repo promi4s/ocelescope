@@ -1,5 +1,5 @@
 name: Plugin submission
-description: Submit an Ocelescope plugin for review
+description: Submit an Ocelescope plugin to be added to the Ocelescope page
 labels:
   - plugin-submission
 body:
