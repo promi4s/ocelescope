@@ -77,3 +77,11 @@ Here are some example plugins you can explore and use with Ocelescope.
 Want to add your plugin to this page?
 
 [:material-file-document-edit: Submit your plugin](https://github.com/promi4s/ocelescope/issues/new?template=plugin-submission.yml){ .md-button .md-button--primary }
+
+## Report Issues & Request Features
+
+For bug reports, feature requests, and plugin environment package requests, please use our GitHub issue templates:
+
+* [Report a bug](https://github.com/promi4s/ocelescope/issues/new?template=bug-report.yml)
+* [Request a feature](https://github.com/promi4s/ocelescope/issues/new?template=feature-request.yml)
+* [Request a plugin environment package](https://github.com/promi4s/ocelescope/issues/new?template=plugin-package-request.yml)
