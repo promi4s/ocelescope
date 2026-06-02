@@ -31,3 +31,42 @@ pip install "ocelescope[plugin]"
 ```
 
 This is the recommended way to install packages that are intended to be available in the shared plugin environment.
+
+## Bundling wheel files inside a plugin
+
+If your plugin needs a dependency that is **not** available in the shared plugin environment, you can bundle wheel files directly inside the plugin.
+
+This is especially useful for compiled packages such as **Rust bindings**.
+
+Store the wheels inside a `wheels/` folder in your plugin package:
+
+```sh
+my-plugin/
+├── src/
+│   └── my_plugin/
+│       ├── __init__.py
+│       ├── plugin.py
+│       └── wheels/
+│           ├── some_package-1.0.0-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+│           └── some_package-1.0.0-cp313-cp313-manylinux_2_17_aarch64.manylinux2014_aarch64.whl
+└── pyproject.toml
+```
+
+After building, the plugin ZIP should look like this:
+
+```sh
+MyPlugin.zip/
+└── my_plugin/
+    ├── __init__.py
+    ├── plugin.py
+    └── wheels/
+        ├── some_package-1.0.0-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+        └── some_package-1.0.0-cp313-cp313-manylinux_2_17_aarch64.manylinux2014_aarch64.whl
+```
+
+Build wheels that are compatible with **Python 3.13**.
+If you want to support both **amd64** and **arm64**, include one wheel for each platform.
+
+!!! warning "Bundle self-contained wheels"
+    Bundled wheels should not rely on additional wheels being loaded in a specific order.
+    If you use bundled wheels, they should already contain everything needed to be imported successfully in the plugin environment.
