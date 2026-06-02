@@ -1,9 +1,10 @@
+
 # Getting Started
 
 !!! note "System Requirements"
     To run Ocelescope locally, you must have [Docker](https://docs.docker.com/get-docker/){target="_blank"} and [Docker Compose](https://docs.docker.com/compose/install/){target="_blank"} installed on your system.
 
-To get Ocelescope running docker compose. To run ocelescope you can just use the below docker compose script.
+To get Ocelescope running with Docker Compose, you can use the configuration below.
 
 ```yaml title="docker-compose.yaml"
 services:
@@ -12,7 +13,7 @@ services:
     volumes:
       - plugins_store:/plugins
     restart: unless-stopped
-  frontend: 
+  frontend:
     image: ghcr.io/promi4s/ocelescope-frontend:latest
     ports:
       - "3000:3000"
@@ -24,7 +25,7 @@ volumes:
 
 [:material-download: Download](./assets/docker-compose.yaml){ .md-button download="docker-compose.yaml" }
 
-### Starting the Services
+## Starting the Services
 
 Run the following command in the same directory as your `docker-compose.yml`:
 
@@ -34,7 +35,7 @@ docker compose up -d
 
 This will start both the **backend** (API) and **frontend** (web interface).
 
-### Uploading Plugins
+## Uploading Plugins
 
 You can upload plugins directly from the **web interface** at:
 
@@ -42,7 +43,7 @@ You can upload plugins directly from the **web interface** at:
 
 Uploaded plugins will be stored in the `plugins_store` volume and made available for execution.
 
-### Stopping Ocelescope
+## Stopping Ocelescope
 
 To stop the services, run:
 
@@ -50,9 +51,9 @@ To stop the services, run:
 docker compose down
 ```
 
-### Example Plugins
+## Example Plugins
 
-Here are some example plugins you can explore and use with Ocelescope
+Here are some example plugins you can explore and use with Ocelescope.
 
 <div class="grid cards" markdown>
 
@@ -70,3 +71,9 @@ Here are some example plugins you can explore and use with Ocelescope
 {% endfor %}
 
 </div>
+
+## Submit Your Plugin
+
+Want to add your plugin to this page?
+
+[:material-file-document-edit: Submit your plugin](https://github.com/promi4s/ocelescope/issues/new?template=plugin-submission.yml){ .md-button .md-button--primary }
