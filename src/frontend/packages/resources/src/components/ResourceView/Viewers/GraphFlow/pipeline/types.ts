@@ -5,7 +5,17 @@ export type GraphVisualization = VisualizationByType<"graph">;
 export type BackendGraphNode = NonNullable<GraphVisualization["nodes"]>[number];
 export type BackendGraphEdge = NonNullable<GraphVisualization["edges"]>[number];
 
-export type GraphEdgeRouting = "SPLINES" | "ORTHOGONAL" | "POLYLINE";
+//TODO: Check why this is necessary and if we can remove it by improving the typing of GraphVisualization
+export const SUPPORTED_EDGE_ROUTING = [
+  "SPLINES",
+  "ORTHOGONAL",
+  "POLYLINE",
+] as const;
+
+export type GraphEdgeRouting = (typeof SUPPORTED_EDGE_ROUTING)[number];
+
+export const isGraphEdgeRouting = (value: string): value is GraphEdgeRouting =>
+  (SUPPORTED_EDGE_ROUTING as readonly string[]).includes(value);
 
 export type GraphPoint = { x: number; y: number };
 

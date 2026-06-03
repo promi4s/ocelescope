@@ -27,24 +27,12 @@ export const normalizeEdgeRouting = (value: unknown): GraphEdgeRouting => {
 export const getConfiguredEdgeRouting = (
   elkOptions: Record<string, string | number | boolean>,
 ): GraphEdgeRouting => {
-  const configured = EDGE_ROUTING_KEYS.flatMap((key) =>
-    key in elkOptions ? [{ key, value: elkOptions[key] }] : [],
-  );
+  const configured = EDGE_ROUTING_KEYS.find((key) => {
+    const value = elkOptions[key];
+    return typeof value === "string" && isGraphEdgeRouting(value.toUpperCase());
+  });
 
-  if (configured.length === 0) {
-    return "POLYLINE";
-  }
-
-  const routings = configured.map(({ value }) => normalizeEdgeRouting(value));
-  const distinct = new Set(routings);
-
-  if (distinct.size > 1) {
-    throw new GraphVisualizationError("Conflicting ELK edge routing options.", [
-      configured.map(({ key, value }) => `${key}=${String(value)}`).join(", "),
-    ]);
-  }
-
-  return routings[0] ?? "POLYLINE";
+  return configured ? normalizeEdgeRouting(elkOptions[configured]) : "POLYLINE";
 };
 
 export const normalizeElkOptions = (
