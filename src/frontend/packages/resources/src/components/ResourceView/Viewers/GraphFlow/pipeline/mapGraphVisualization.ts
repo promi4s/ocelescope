@@ -1,5 +1,5 @@
 import type { Edge, Node } from "@xyflow/react";
-import { DEFAULT_COLORS, DEFAULT_NODE_POSITION } from "../constants/graphFlow";
+import { DEFAULT_NODE_POSITION } from "../constants/graphFlow";
 import type { GraphFlowEdgeType } from "../edges/types";
 import type { GraphFlowNodeType } from "../nodes/types";
 import type {
@@ -27,19 +27,7 @@ const mapNode = (node: BackendGraphNode): GraphFlowNodeType => ({
   type: "node",
   position: getNodePosition(node),
   data: {
-    label: node.label ?? null,
-    shape: node.shape ?? "rectangle",
-    color: node.color ?? DEFAULT_COLORS.transition,
-    borderColor: node.border_color ?? null,
-    doubleBorder: node.style?.double_border ?? null,
-    innerSymbol: node.style?.inner_symbol ?? null,
-    initialTokens: node.style?.initial_tokens ?? null,
-    finalTokens: node.style?.final_tokens ?? null,
-    labelPos: node.label_pos ?? "center",
-    width: node.width ?? null,
-    height: node.height ?? null,
-    rank: node.rank ?? null,
-    annotation: node.annotation ?? null,
+    ...node,
   },
 });
 
@@ -49,15 +37,7 @@ const mapEdge = (edge: BackendGraphEdge): GraphFlowEdgeType => ({
   target: edge.target,
   type: "graphflow",
   data: {
-    color: edge.color ?? DEFAULT_COLORS.edge,
-    label: edge.label ?? null,
-    dashed: edge.style?.dashed ?? false,
-    bold: edge.style?.bold ?? false,
-    startArrow: edge.start_arrow ?? null,
-    endArrow: edge.end_arrow ?? null,
-    startLabel: edge.start_label ?? null,
-    endLabel: edge.end_label ?? null,
-    annotation: edge.annotation ?? null,
+    ...edge,
   },
 });
 

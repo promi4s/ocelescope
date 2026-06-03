@@ -1,14 +1,11 @@
 import type { Edge, Node } from "@xyflow/react";
-import {
-  applyEdgeLayouts,
-  applyNodePositions,
-} from "../applyGraphLayout";
-import { createGraphFlowModel } from "../createGraphFlowModel";
+import { applyEdgeLayouts, applyNodePositions } from "../applyGraphLayout";
 import { layoutGraphFlowModel } from "../layoutGraphFlowModel";
+import { mapGraphVisualization } from "../mapGraphVisualization";
 import {
   type GraphFlowModel,
-  GraphVisualizationError,
   type GraphVisualization,
+  GraphVisualizationError,
 } from "../types";
 
 export type GraphFlowLayoutSnapshot = {
@@ -40,7 +37,8 @@ export const measuredNodesMatchModel = (
 export const createInitialLayoutSnapshot = (
   visualization: GraphVisualization,
 ): GraphFlowLayoutSnapshot => {
-  const model = createGraphFlowModel(visualization);
+  const model = mapGraphVisualization(visualization);
+
   const layoutReady =
     model.layoutPlan.type === "fixed-positions" || model.nodes.length === 0;
 
@@ -76,7 +74,7 @@ export const canRunElkLayout = ({
   nodesInitialized: boolean;
   measuredNodes: Node[];
 }) =>
-  Boolean(model) &&
+  !!model &&
   !error &&
   model?.layoutPlan.type === "elk" &&
   (!hasNodes || nodesInitialized) &&
