@@ -58,8 +58,7 @@ Common tasks are exposed as `pnpm` scripts at the repository root.
 | `pnpm run dev:frontend` | Run the app dev server |
 | `pnpm run dev:app` | Run backend + app dev servers together |
 | `pnpm run dev:deps` | Run dev servers for all frontend packages **except** the app |
-| `pnpm run docker:dev` | Run the Docker-based development stack (`docker-compose.dev.yml`) |
-| `pnpm run docker:prod` | Build and run the production stack (`docker-compose.yml`) |
+| `pnpm run docker:up` | Build and run the production stack (`docker-compose.yml`) |
 | `pnpm run docker:down` | Stop containers (`docker compose down`) |
 | `pnpm run lint` | Lint backend (ruff) + frontend (biome) |
 | `pnpm run format` | Format backend (ruff) + frontend (biome) |

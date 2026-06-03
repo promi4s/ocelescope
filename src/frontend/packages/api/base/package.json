@@ -31,13 +31,15 @@
     "dev": "tsdown --watch",
     "typecheck": "tsc --noEmit",
     "release": "bumpp && pnpm publish",
-    "prepublishOnly": "pnpm run build"
+    "prepublishOnly": "pnpm run build",
+    "api:generate": "uv run ocelescope-backend openapi"
   },
   "peerDependencies": {
     "@ocelescope/api-client": "workspace:*",
     "@tanstack/react-query": "catalog:",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "axios": "catalog:"
   },
   "devDependencies": {
     "@ocelescope/api-config": "workspace:*",

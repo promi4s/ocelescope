@@ -1,0 +1,60 @@
+name: Bug report
+description: Report a bug in Ocelescope
+labels:
+  - bug
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: What part of Ocelescope is affected?
+      options:
+        - Python library
+        - Ocelescope tool
+        - Plugins
+    validations:
+      required: true
+
+  - type: input
+    id: summary
+    attributes:
+      label: Short summary
+      placeholder: A short description of the issue
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the problem and what you expected to happen
+      placeholder: When I try to ..., the following happens ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Go to ...
+        2. Run ...
+        3. Observe ...
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: Ocelescope version
+      placeholder: e.g. 0.2.0
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or screenshots
+      description: Optional logs, screenshots, or additional context
+    validations:
+      required: false

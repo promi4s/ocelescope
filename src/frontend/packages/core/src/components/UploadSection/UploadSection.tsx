@@ -7,7 +7,7 @@ import {
 import { ContainerIcon } from "lucide-react";
 import { DataTable } from "mantine-datatable";
 import { useCallback, useState } from "react";
-import useInvalidate from "../../hooks/useInvalidate";
+import { useInvalidate } from "../../hooks/useInvalidate";
 import FileDropzone from "../Dropzone/Dropzone";
 
 const DefaultOcels: React.FC<{
@@ -87,7 +87,9 @@ const FileUploadZone: React.FC<{
   );
 };
 
-const UploadSection: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }) => {
+export const UploadSection: React.FC<{ onSuccess?: () => void }> = ({
+  onSuccess,
+}) => {
   const [isPending, setIsPending] = useState(false);
   const invalidate = useInvalidate();
 
@@ -108,5 +110,3 @@ const UploadSection: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }) => {
     </Stack>
   );
 };
-
-export default UploadSection;
