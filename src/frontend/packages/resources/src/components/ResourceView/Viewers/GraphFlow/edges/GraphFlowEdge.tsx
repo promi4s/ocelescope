@@ -6,19 +6,20 @@ import { EdgeMarkers, getMarkerIds } from "./components/EdgeMarkers";
 import { resolveEdgePath } from "./layout/edgePath";
 import type { GraphFlowEdgeType } from "./types";
 
-const GraphFlowEdge = memo((props: EdgeProps<GraphFlowEdgeType>) => {
+const GraphFlowEdge: React.FC<EdgeProps<GraphFlowEdgeType>> = memo((props) => {
   const { id, source, target, data, sourceX, sourceY, targetX, targetY } =
     props;
+
   const sourceNode = useInternalNode(source);
   const targetNode = useInternalNode(target);
 
   if (!data) return null;
 
   const color = data.color ?? "#555";
-  const dashed = data.dashed ?? false;
-  const bold = data.bold ?? false;
-  const startArrow = data.startArrow ?? null;
-  const endArrow = data.endArrow ?? null;
+  const dashed = data.style?.dashed ?? false;
+  const bold = data.style?.bold ?? false;
+  const startArrow = data.start_arrow ?? null;
+  const endArrow = data.end_arrow ?? null;
   const { startMarkerId, endMarkerId } = getMarkerIds({
     color,
     startArrow,
@@ -57,18 +58,18 @@ const GraphFlowEdge = memo((props: EdgeProps<GraphFlowEdgeType>) => {
           y={edgePath.labelY}
         />
       )}
-      {data.startLabel && (
+      {data.start_label && (
         <EdgeEndLabel
-          label={data.startLabel}
+          label={data.start_label}
           x={startPos.x}
           y={startPos.y}
           offsetX={8}
           offsetY={-10}
         />
       )}
-      {data.endLabel && (
+      {data.end_label && (
         <EdgeEndLabel
-          label={data.endLabel}
+          label={data.end_label}
           x={endPos.x}
           y={endPos.y}
           offsetX={8}
