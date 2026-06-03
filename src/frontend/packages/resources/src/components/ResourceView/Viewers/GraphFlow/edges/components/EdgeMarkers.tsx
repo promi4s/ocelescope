@@ -7,8 +7,8 @@ export const getMarkerIds = ({
   endArrow,
 }: {
   color: string;
-  startArrow?: EdgeArrow;
-  endArrow?: EdgeArrow;
+  startArrow: EdgeArrow | null;
+  endArrow?: EdgeArrow | null;
 }) => {
   const colorKey = colorToId(color);
   return {
@@ -17,6 +17,7 @@ export const getMarkerIds = ({
   };
 };
 
+//TODO: Fix the null mess
 export const EdgeMarkers = ({
   color,
   startArrow,
@@ -25,13 +26,13 @@ export const EdgeMarkers = ({
   endMarkerId,
 }: {
   color: string;
-  startArrow: EdgeArrow;
-  endArrow: EdgeArrow;
+  startArrow: EdgeArrow | null;
+  endArrow: EdgeArrow | null;
   startMarkerId: string | null;
   endMarkerId: string | null;
 }) => (
   <defs>
-    {endMarkerId && (
+    {endMarkerId && endArrow && (
       <ArrowMarker
         id={endMarkerId}
         type={endArrow}
@@ -39,7 +40,7 @@ export const EdgeMarkers = ({
         isStart={false}
       />
     )}
-    {startMarkerId && (
+    {startMarkerId && startArrow && (
       <ArrowMarker id={startMarkerId} type={startArrow} color={color} isStart />
     )}
   </defs>
