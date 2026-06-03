@@ -1,5 +1,6 @@
 import type { GraphEdge } from "@ocelescope/api-base";
 import type { Edge } from "@xyflow/react";
+import type { GraphPoint } from "../pipeline/types";
 
 type Point = {
   x: number;
@@ -8,10 +9,10 @@ type Point = {
 
 export type GraphFlowEdgeType = Edge<
   (GraphEdge & {
-    startPoint: Point;
-    endPoint: Point;
-    path: string;
-    labelPosition: Point;
+    startPoint?: GraphPoint | null;
+    endPoint?: GraphPoint | null;
+    path?: string | null;
+    labelPosition?: Point | null;
   }) &
     Record<string, unknown>,
   "graphflow"
