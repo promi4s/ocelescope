@@ -4,12 +4,7 @@ import type { VisualizationByType } from "../../../../../types";
 export type GraphVisualization = VisualizationByType<"graph">;
 export type BackendGraphNode = NonNullable<GraphVisualization["nodes"]>[number];
 export type BackendGraphEdge = NonNullable<GraphVisualization["edges"]>[number];
-export type BackendVisualization = { type?: string } | null;
 
-export type GraphNodeShape = NonNullable<BackendGraphNode["shape"]>;
-export type GraphLabelPosition = NonNullable<BackendGraphNode["label_pos"]>;
-export type GraphNodeRank = NonNullable<BackendGraphNode["rank"]>;
-export type GraphEdgeArrow = NonNullable<BackendGraphEdge["end_arrow"]>;
 export type GraphEdgeRouting = "SPLINES" | "ORTHOGONAL" | "POLYLINE";
 
 export type GraphPoint = { x: number; y: number };
