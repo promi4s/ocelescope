@@ -1,4 +1,5 @@
 import { Text } from "@mantine/core";
+import type { GraphNode } from "@ocelescope/api-base";
 import type { NodeProps } from "@xyflow/react";
 import { memo } from "react";
 import { HiddenHandles } from "../components/HiddenHandles";
@@ -8,7 +9,7 @@ import {
   MARKING_DOT_SIZE,
 } from "../constants/graphFlow";
 import { NodeAnnotation } from "./NodeAnnotation";
-import type { GraphFlowNodeData, GraphFlowNodeType } from "./types";
+import type { GraphFlowNodeType } from "./types";
 
 // ─── Inner symbol ─────────────────────────────────────────────────────────────
 
@@ -46,42 +47,30 @@ const InnerSymbol = ({
 
 // ─── Circle shape ─────────────────────────────────────────────────────────────
 
-const CLIP_PATH: Partial<Record<GraphFlowNodeData["shape"], string>> = {
+const CLIP_PATH: Partial<Record<GraphNode["shape"], string>> = {
   triangle: "polygon(50% 0, 100% 100%, 0 100%)",
   diamond: "polygon(50% 0, 100% 50%, 50% 100%, 0 50%)",
   hexagon: "polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%)",
 };
 
-const CircleShape = ({
+const CircleShape: React.FC<GraphNode> = ({
   width,
   height,
   color,
-  borderColor,
-  doubleBorder,
-  innerSymbol,
-  initialTokens,
-  finalTokens,
-  centerLabel,
-}: {
-  width: number;
-  height: number;
-  color: string;
-  borderColor: string | null;
-  doubleBorder: boolean | null;
-  innerSymbol: "triangle" | "square" | null;
-  initialTokens: number | null;
-  finalTokens: number | null;
-  centerLabel: string | null;
+  border_color,
+  style,
+  label,
+  label_pos,
 }) => (
   <div
     style={{
       position: "relative",
       boxSizing: "border-box",
-      width,
-      height,
+      width: width ?? undefined,
+      height: height ?? undefined,
       borderRadius: "50%",
-      backgroundColor: color,
-      border: borderColor ? `2px solid ${borderColor}` : "none",
+      backgroundColor: color ?? undefined,
+      border: border_color ? `2px solid ${border_color}` : "none",
       boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
       display: "flex",
       flexDirection: "column",
@@ -90,20 +79,20 @@ const CircleShape = ({
       gap: 2,
     }}
   >
-    {doubleBorder && (
+    {style?.double_border && (
       <div
         style={{
           position: "absolute",
           inset: 5,
           borderRadius: "50%",
-          border: borderColor ? `2px solid ${borderColor}` : "none",
+          border: border_color ? `2px solid ${border_color}` : "none",
           pointerEvents: "none",
         }}
       />
     )}
-    {initialTokens &&
-      !innerSymbol &&
-      (initialTokens === 1 ? (
+    {style?.initial_tokens &&
+      !style.inner_symbol &&
+      (style.initial_tokens === 1 ? (
         <div
           style={{
             width: MARKING_DOT_SIZE,
@@ -121,10 +110,10 @@ const CircleShape = ({
             lineHeight: 1,
           }}
         >
-          {initialTokens}
+          {style.initial_tokens}
         </span>
       ))}
-    {finalTokens && finalTokens > 1 && (
+    {style?.final_tokens && style.final_tokens > 1 && (
       <span
         style={{
           position: "absolute",
@@ -136,16 +125,16 @@ const CircleShape = ({
           lineHeight: 1,
         }}
       >
-        {finalTokens}
+        {style.final_tokens}
       </span>
     )}
-    {innerSymbol && (
-      <InnerSymbol symbol={innerSymbol} color={borderColor ?? "#111"} />
+    {style?.inner_symbol && (
+      <InnerSymbol symbol={style.inner_symbol} color={border_color ?? "#111"} />
     )}
-    {centerLabel && (
+    {label_pos === "center" && label && (
       <span
         style={{
-          maxWidth: width - 6,
+          maxWidth: width ? width - 6 : undefined,
           color: "#111",
           fontSize: 10,
           fontWeight: 600,
@@ -156,7 +145,7 @@ const CircleShape = ({
           whiteSpace: "nowrap",
         }}
       >
-        {centerLabel}
+        {label}
       </span>
     )}
   </div>
@@ -164,27 +153,17 @@ const CircleShape = ({
 
 // ─── Box shape (rectangle, triangle, diamond, hexagon) ────────────────────────
 
-const BoxShape = ({
+const BoxShape: React.FC<GraphNode & { children: React.ReactNode }> = ({
   shape,
   color,
-  borderColor,
-  doubleBorder,
-  innerSymbol,
+  border_color,
+  style,
   width,
   height,
   children,
-}: {
-  shape: Exclude<GraphFlowNodeData["shape"], "circle">;
-  color: string;
-  borderColor: string | null;
-  doubleBorder: boolean | null;
-  innerSymbol: "triangle" | "square" | null;
-  width: number | null;
-  height: number | null;
-  children?: React.ReactNode;
 }) => {
   const clipPath = CLIP_PATH[shape];
-  const hasBorder = borderColor != null;
+  const hasBorder = border_color != null;
 
   return (
     <div
@@ -194,7 +173,7 @@ const BoxShape = ({
         width: width ?? undefined,
         height: height ?? undefined,
         padding: hasBorder ? 2 : 0,
-        backgroundColor: borderColor ?? "transparent",
+        backgroundColor: border_color ?? "transparent",
         borderRadius: shape === "rectangle" ? 5 : 0,
         clipPath,
         boxShadow: "0 2px 6px rgba(0,0,0,0.10), 0 0 0 0.5px rgba(0,0,0,0.06)",
@@ -205,7 +184,7 @@ const BoxShape = ({
           boxSizing: "border-box",
           width: "100%",
           height: "100%",
-          backgroundColor: color,
+          backgroundColor: color ?? undefined,
           borderRadius: shape === "rectangle" ? 3 : 0,
           clipPath,
           display: "flex",
@@ -214,18 +193,18 @@ const BoxShape = ({
           overflow: "hidden",
         }}
       >
-        {innerSymbol && !children ? (
-          <InnerSymbol symbol={innerSymbol} color="#111" />
+        {style?.inner_symbol && !children ? (
+          <InnerSymbol symbol={style.inner_symbol} color="#111" />
         ) : (
           children
         )}
       </div>
-      {doubleBorder && (
+      {style?.double_border && (
         <div
           style={{
             position: "absolute",
             inset: 6,
-            border: borderColor ? `1.5px solid ${borderColor}` : "none",
+            border: border_color ? `1.5px solid ${border_color}` : "none",
             borderRadius: shape === "rectangle" ? 3 : 0,
             clipPath,
             pointerEvents: "none",
@@ -239,20 +218,7 @@ const BoxShape = ({
 // ─── Node ─────────────────────────────────────────────────────────────────────
 
 const GraphFlowNode = memo(({ data }: NodeProps<GraphFlowNodeType>) => {
-  const {
-    shape,
-    label,
-    color,
-    borderColor,
-    doubleBorder,
-    innerSymbol,
-    annotation,
-    labelPos,
-    width,
-    height,
-    initialTokens,
-    finalTokens,
-  } = data;
+  const { shape, label, annotation, labelPos, width, height } = data;
 
   const isExternalLabel = Boolean(
     label && labelPos !== "center" && labelPos != null,
@@ -264,7 +230,9 @@ const GraphFlowNode = memo(({ data }: NodeProps<GraphFlowNodeType>) => {
   // Subtract 4px for the border simulation padding in BoxShape.
   // When height is null the node auto-sizes, so no clamping needed.
   const maxLabelLines =
-    height != null ? Math.max(1, Math.floor((height - 4) / (14 * 1.2))) : undefined;
+    height != null
+      ? Math.max(1, Math.floor((height - 4) / (14 * 1.2)))
+      : undefined;
 
   return (
     <div
@@ -282,27 +250,9 @@ const GraphFlowNode = memo(({ data }: NodeProps<GraphFlowNodeType>) => {
         </NodeLabel>
       )}
       {shape === "circle" ? (
-        <CircleShape
-          width={width as number}
-          height={height as number}
-          color={color}
-          borderColor={borderColor ?? null}
-          doubleBorder={doubleBorder ?? null}
-          innerSymbol={innerSymbol ?? null}
-          initialTokens={initialTokens ?? null}
-          finalTokens={finalTokens ?? null}
-          centerLabel={labelPos === "center" ? (label ?? null) : null}
-        />
+        <CircleShape {...data} />
       ) : (
-        <BoxShape
-          shape={shape}
-          color={color}
-          borderColor={borderColor ?? null}
-          doubleBorder={doubleBorder ?? null}
-          innerSymbol={innerSymbol ?? null}
-          width={width ?? null}
-          height={height ?? null}
-        >
+        <BoxShape {...data}>
           {!isExternalLabel && label && (
             <Text
               size="sm"
