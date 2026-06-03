@@ -1,6 +1,7 @@
 from types import ModuleType
 from typing import Any, Optional, TypedDict
 from ocelescope import OCEL, Resource, Plugin, PluginMethod
+from ocelescope_backend.app.internal.discovery import register_discovery_methods_from_module
 from ocelescope_backend.app.internal.model.plugin import PluginApi
 
 
@@ -27,6 +28,7 @@ class PluginRegistry:
             for existing_plugin in self._registry.values()
         ):
             self._registry[module.__name__] = plugin()
+            register_discovery_methods_from_module(module)
             return self._registry[module.__name__]
 
     def list_plugins(self) -> list[PluginApi]:

@@ -1,20 +1,20 @@
-from __future__ import annotations
+from typing import Any, Hashable, Sequence, cast
 
-from typing import TYPE_CHECKING, Any, Hashable, Sequence, cast
-
-from ocelescope import Resource
-from ocelescope.discovery import discovery_registry
 from pydantic import BaseModel, Field
 
-from app.internal.exceptions import BadRequest
-from app.internal.model.discovery import DiscoveryRequest
-from app.internal.model.resource import ResourceStore
-from app.internal.tasks.base import TaskBase, TaskState, TaskSummary
-from app.internal.util.hashing import generate_tuple_hash
-from app.sse_manager import ResourceLink, SystemNotification, sse_manager
-
-if TYPE_CHECKING:
-    from app.internal.session import Session
+from ocelescope import Resource
+from ocelescope_backend.app.internal.discovery import discovery_registry
+from ocelescope_backend.app.internal.exceptions import BadRequest
+from ocelescope_backend.app.internal.model.discovery import DiscoveryRequest
+from ocelescope_backend.app.internal.model.resource import ResourceStore
+from ocelescope_backend.app.internal.session import Session
+from ocelescope_backend.app.internal.tasks.base import TaskBase, TaskState, TaskSummary
+from ocelescope_backend.app.internal.util.hashing import generate_tuple_hash
+from ocelescope_backend.app.sse_manager import (
+    ResourceLink,
+    SystemNotification,
+    sse_manager,
+)
 
 
 class DiscoveryOutput(BaseModel):
@@ -48,7 +48,9 @@ class DiscoveryTask(TaskBase):
         try:
             try:
                 info = discovery_registry.get(self.request.method_id)
-                parameters = info.parse_parameters(cast(dict[str, Any], self.request.parameters))
+                parameters = info.parse_parameters(
+                    cast(dict[str, Any], self.request.parameters)
+                )
                 resource = cast(
                     Resource,
                     info.run(

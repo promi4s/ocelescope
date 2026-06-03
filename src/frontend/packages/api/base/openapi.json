@@ -1667,6 +1667,83 @@
         }
       }
     },
+    "/ocels/{ocel_id}/download/xes": {
+      "get": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Download OCEL as a xes",
+        "operationId": "downloadFlatLog",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "object_type_name",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Object Type Name"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/discovery/ocels/{ocel_id}/tasks": {
       "post": {
         "tags": [
@@ -1738,84 +1815,6 @@
                   },
                   "type": "array",
                   "title": "Response Listdiscoverymethods"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/tasks/system": {
-    "/ocels/{ocel_id}/download/xes": {
-      "get": {
-        "tags": [
-          "ocels"
-        ],
-        "summary": "Download OCEL as a xes",
-        "operationId": "downloadFlatLog",
-        "parameters": [
-          {
-            "name": "ocel_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Ocel Id"
-            }
-          },
-          {
-            "name": "object_type_name",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Object Type Name"
-            }
-          },
-          {
-            "name": "ocel_version",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "enum": [
-                    "original",
-                    "filtered"
-                  ],
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "default": "filtered",
-              "title": "Ocel Version"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -3158,11 +3157,6 @@
             ],
             "title": "Description"
           },
-          "inputSchema": {
-            "additionalProperties": true,
-            "type": "object",
-            "title": "Inputschema"
-          },
           "variants": {
             "items": {
               "$ref": "#/components/schemas/DiscoveryVariant"
@@ -3174,7 +3168,6 @@
         "type": "object",
         "required": [
           "name",
-          "inputSchema",
           "variants"
         ],
         "title": "DiscoveryMethodMeta"
@@ -3242,12 +3235,18 @@
           "resourceType": {
             "type": "string",
             "title": "Resourcetype"
+          },
+          "inputSchema": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Inputschema"
           }
         },
         "type": "object",
         "required": [
           "methodId",
-          "resourceType"
+          "resourceType",
+          "inputSchema"
         ],
         "title": "DiscoveryVariant"
       },

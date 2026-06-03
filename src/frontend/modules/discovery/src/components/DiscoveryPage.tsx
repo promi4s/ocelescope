@@ -122,7 +122,12 @@ const DiscoveryPageContent = ({
     [methods, selectedMethodId],
   );
 
-  const selectedSchema = (selectedMethod?.inputSchema ?? {}) as DiscoverySchema;
+  const selectedVariant = useMemo(
+    () => selectedMethod?.variants.find((v) => v.methodId === selectedMethodId) ?? null,
+    [selectedMethod, selectedMethodId],
+  );
+
+  const selectedSchema = (selectedVariant?.inputSchema ?? {}) as DiscoverySchema;
 
   // Initialize form data defaults when a method is first selected
   useEffect(() => {

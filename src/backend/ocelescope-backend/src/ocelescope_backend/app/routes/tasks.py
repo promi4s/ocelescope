@@ -8,6 +8,10 @@ from fastapi.routing import APIRouter
 from ocelescope_backend.app.dependencies import ApiSession
 from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.tasks.base import TaskState
+from ocelescope_backend.app.internal.tasks.discovery_task import (
+    DiscoveryTask,
+    DiscoveryTaskSummary,
+)
 from ocelescope_backend.app.internal.tasks.plugin import PluginTask, PluginTaskSummary
 from ocelescope_backend.app.internal.tasks.system import SystemTask, SystemTaskSummary
 

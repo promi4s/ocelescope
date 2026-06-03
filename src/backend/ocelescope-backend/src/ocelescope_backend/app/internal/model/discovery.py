@@ -2,7 +2,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from app.internal.model.base import ApiBaseModel, RequestBody
+from ocelescope_backend.app.internal.model.base import ApiBaseModel, RequestBody
 
 
 class DiscoveryRequest(BaseModel):
@@ -21,10 +21,10 @@ class CreateDiscoveryTaskBody(RequestBody):
 class DiscoveryVariant(ApiBaseModel):
     method_id: str
     resource_type: str
+    input_schema: dict[str, Any]
 
 
 class DiscoveryMethodMeta(ApiBaseModel):
     name: str
     description: str | None = None
-    input_schema: dict[str, Any]
     variants: list[DiscoveryVariant]

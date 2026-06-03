@@ -1,15 +1,15 @@
 from fastapi import APIRouter, HTTPException
-from ocelescope.discovery import discovery_registry
 from pydantic import ValidationError
 
-from app.dependencies import ApiSession
-from app.internal.model.discovery import (
+from ocelescope_backend.app.dependencies import ApiSession
+from ocelescope_backend.app.internal.discovery import discovery_registry
+from ocelescope_backend.app.internal.model.discovery import (
     CreateDiscoveryTaskBody,
     DiscoveryMethodMeta,
     DiscoveryRequest,
     DiscoveryVariant,
 )
-from app.internal.tasks.discovery_task import DiscoveryTask
+from ocelescope_backend.app.internal.tasks.discovery_task import DiscoveryTask
 
 discovery_router = APIRouter(prefix="/discovery", tags=["discovery"])
 
@@ -58,11 +58,11 @@ def list_discovery_methods() -> list[DiscoveryMethodMeta]:
         DiscoveryMethodMeta(
             name=group.name,
             description=group.description,
-            input_schema=group.parameters_schema(),
             variants=[
                 DiscoveryVariant(
                     method_id=v.method_id,
                     resource_type=v.resource_type.get_type(),
+                    input_schema=v.parameters_schema(),
                 )
                 for v in group.variants
             ],
