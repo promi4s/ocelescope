@@ -1,6 +1,5 @@
 import { colorToId } from "../../utils/color";
-import { ArrowMarker } from "./ArrowMarker";
-import type { EdgeArrow } from "../types";
+import { ArrowMarker, type EdgeArrow } from "./ArrowMarker";
 
 export const getMarkerIds = ({
   color,
@@ -8,8 +7,8 @@ export const getMarkerIds = ({
   endArrow,
 }: {
   color: string;
-  startArrow: EdgeArrow;
-  endArrow: EdgeArrow;
+  startArrow?: EdgeArrow;
+  endArrow?: EdgeArrow;
 }) => {
   const colorKey = colorToId(color);
   return {
@@ -33,7 +32,12 @@ export const EdgeMarkers = ({
 }) => (
   <defs>
     {endMarkerId && (
-      <ArrowMarker id={endMarkerId} type={endArrow} color={color} isStart={false} />
+      <ArrowMarker
+        id={endMarkerId}
+        type={endArrow}
+        color={color}
+        isStart={false}
+      />
     )}
     {startMarkerId && (
       <ArrowMarker id={startMarkerId} type={startArrow} color={color} isStart />
