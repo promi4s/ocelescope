@@ -53,7 +53,8 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-hook-form": "catalog:",
-    "uniqolor": "catalog:"
+    "uniqolor": "catalog:",
+    "zustand": "catalog:"
   },
   "devDependencies": {
     "@apidevtools/json-schema-ref-parser": "catalog:",

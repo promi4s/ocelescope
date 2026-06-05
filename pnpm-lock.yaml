@@ -306,6 +306,9 @@ importers:
       uniqolor:
         specifier: 'catalog:'
         version: 1.1.1
+      zustand:
+        specifier: 'catalog:'
+        version: 5.0.11(@types/react@19.2.14)(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
     devDependencies:
       '@apidevtools/json-schema-ref-parser':
         specifier: 'catalog:'
@@ -2352,13 +2355,11 @@ packages:
   '@types/plotly.js@3.0.10':
     resolution: {integrity: sha512-q+MgO4aajC2HrO7FllTYWzrpdfbTjboSMfjkz/aXKjg1v7HNo1zMEFfAW7quKfk6SL+bH74A5ThBEps/7hZxOA==}
 
-  '@types/raf@3.4.3':
-    resolution: {integrity: sha512-c4YAvMedbPZ5tEyxzQdMoOhhJ4RD3rngZIdwC2/qDN3d7JpEhB6fiBRKVY1lg5B7Wk+uPBjn5f39j1/2MY1oOw==}
   '@types/qs@6.15.1':
     resolution: {integrity: sha512-GZHUBZR9hckSUhrxmp1nG6NwdpM9fCunJwyThLW1X3AyHgd9IlHb6VANpQQqDr2o/qQp6McZ3y/IA2rVzKzSbw==}
 
-  '@types/react-cytoscapejs@1.2.6':
-    resolution: {integrity: sha512-Nivfky/kuzT4BtIXpv5hV79Kfn+DUiBiftQeCvFCLUhqxz2ADgUxMYdHtxAUpfHiYZYuU9CWM8tGBTaybTH5+A==}
+  '@types/raf@3.4.3':
+    resolution: {integrity: sha512-c4YAvMedbPZ5tEyxzQdMoOhhJ4RD3rngZIdwC2/qDN3d7JpEhB6fiBRKVY1lg5B7Wk+uPBjn5f39j1/2MY1oOw==}
 
   '@types/react-dom@19.2.3':
     resolution: {integrity: sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==}
@@ -6122,14 +6123,10 @@ snapshots:
 
   '@types/plotly.js@3.0.10': {}
 
-  '@types/raf@3.4.3':
-    optional: true
   '@types/qs@6.15.1': {}
 
-  '@types/react-cytoscapejs@1.2.6':
-    dependencies:
-      '@types/react': 19.2.14
-      cytoscape: 3.33.1
+  '@types/raf@3.4.3':
+    optional: true
 
   '@types/react-dom@19.2.3(@types/react@19.2.14)':
     dependencies:

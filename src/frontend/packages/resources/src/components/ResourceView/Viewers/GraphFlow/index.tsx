@@ -20,19 +20,22 @@ import { DownloadIcon, Maximize2Icon } from "lucide-react";
 import { computeAutoFitBounds } from "./utils/bounds";
 import { downloadPdf, downloadPng, downloadSvg } from "./utils/download";
 
-import type { VisualizationByType } from "../../../../types";
-import { FIT_VIEW_PADDING } from "./constants/graphFlow";
-import { useGraphFlowLayout } from "./hooks/useGraphFlowLayout";
-import { edgeTypes, nodeTypes } from "./utils/reactFlowTypes";
+import { FIT_VIEW_PADDING, type GraphVisualization } from "./model/types";
+import { useLayout } from "./hooks/useLayout";
+import GraphFlowEdge from "./render/Edge";
+import GraphFlowNode from "./render/Node";
+
+const nodeTypes = { node: GraphFlowNode };
+const edgeTypes = { graphflow: GraphFlowEdge };
 
 type GraphFlowProps = {
-  visualization: VisualizationByType<"graph">;
+  visualization: GraphVisualization;
   isPreview?: boolean | undefined;
 };
 
 const GraphFlowCanvas = ({ visualization, isPreview }: GraphFlowProps) => {
   const { nodes, edges, layoutReady, error, onNodesChange } =
-    useGraphFlowLayout(visualization);
+    useLayout(visualization);
 
   const { fitBounds, getNodes, getEdges, getNodesBounds } = useReactFlow();
   const wrapperRef = useRef<HTMLDivElement>(null);

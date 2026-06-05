@@ -1797,6 +1797,31 @@
         }
       }
     },
+    "/discovery/filters": {
+      "get": {
+        "tags": [
+          "discovery"
+        ],
+        "summary": "List filters available to discovery tasks",
+        "operationId": "listDiscoveryFilters",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DiscoveryFilterSchema"
+                  },
+                  "type": "array",
+                  "title": "Response Listdiscoveryfilters"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/discovery/methods": {
       "get": {
         "tags": [
@@ -3056,6 +3081,13 @@
             "additionalProperties": true,
             "type": "object",
             "title": "Parameters"
+          },
+          "filters": {
+            "items": {
+              "$ref": "#/components/schemas/FilterEnvelope"
+            },
+            "type": "array",
+            "title": "Filters"
           }
         },
         "type": "object",
@@ -3139,6 +3171,25 @@
         ],
         "title": "DefaultOCEL",
         "description": "Definition of a default OCEL on the server, for quick access. Supports pre-loading the OCEL on backend init."
+      },
+      "DiscoveryFilterSchema": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "json_schema": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Json Schema"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "json_schema"
+        ],
+        "title": "DiscoveryFilterSchema"
       },
       "DiscoveryMethodMeta": {
         "properties": {
@@ -3567,6 +3618,24 @@
         ],
         "title": "EventTypeFilter"
       },
+      "FilterEnvelope": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Payload"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "FilterEnvelope"
+      },
       "GetResourceResponse": {
         "properties": {
           "resource": {
@@ -3630,20 +3699,17 @@
               "$ref": "#/components/schemas/GraphNode"
             },
             "type": "array",
-            "title": "Nodes",
-            "default": []
+            "title": "Nodes"
           },
           "edges": {
             "items": {
               "$ref": "#/components/schemas/GraphEdge"
             },
             "type": "array",
-            "title": "Edges",
-            "default": []
+            "title": "Edges"
           },
           "layout_config": {
-            "$ref": "#/components/schemas/LayoutConfig",
-            "default": {}
+            "$ref": "#/components/schemas/LayoutConfig"
           }
         },
         "type": "object",

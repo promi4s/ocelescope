@@ -1,103 +1,51 @@
-import { Box, Center, LoadingOverlay, Text } from "@mantine/core";
+import { ActionIcon, Box, Center, Drawer, LoadingOverlay, Text, Tooltip } from "@mantine/core";
+import { useLocalStorage } from "@mantine/hooks";
 import {
   useCreateDiscoveryTask,
   useEventCounts,
   useGetDiscoveryTask,
+  useListDiscoveryFilters,
   useListDiscoveryMethods,
   useObjectCounts,
 } from "@ocelescope/api-base";
 import { defineModuleRoute, useCurrentOcel } from "@ocelescope/core";
 import { ResourceViewer } from "@ocelescope/resources";
-import type { MouseEvent as ReactMouseEvent } from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
-import type { DiscoverySchema } from "../types";
-import { DiscoverySettingsContent } from "./DiscoverySettingsContent";
-import { DiscoverySettingsPanel } from "./DiscoverySettingsPanel";
+import { SettingsIcon } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import {
-  getInitialFormData,
-  getSettingsKey,
-  loadPanelState,
-  loadStoredSettings,
-  normalizeFormData,
-  PANEL_KEY,
-  PANEL_MAX,
-  PANEL_MIN,
-} from "../utils/discoveryState";
+  selectOcelFormState,
+  useDiscoveryStore,
+} from "../stores/discoveryStore";
+import type { DiscoverySchema } from "../types";
+import { getInitialFormData, normalizeFormData } from "../utils/discoveryState";
+import { DiscoverySettingsContent } from "./DiscoverySettingsContent";
 
-const DiscoveryPageContent = ({
-  ocelId,
-  panelWidth,
-  setPanelWidth,
-  isPanelCollapsed,
-  setIsPanelCollapsed,
-}: {
-  ocelId: string;
-  panelWidth: number;
-  setPanelWidth: (w: number) => void;
-  isPanelCollapsed: boolean;
-  setIsPanelCollapsed: (v: boolean) => void;
-}) => {
-  const initialSettings = loadStoredSettings(ocelId);
+const PANEL_OPEN_KEY = "ocelescope:discovery:panel-open";
 
-  const [selectedMethodId, setSelectedMethodId] = useState<string | null>(
-    initialSettings.selectedMethodId ??
-      initialSettings.selectedMethodType ??
-      null,
+const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
+  const { selectedMethodId, formDataByMethod, filters } = useDiscoveryStore(
+    selectOcelFormState(ocelId),
   );
-  const [formDataByMethod, setFormDataByMethod] = useState<
-    Partial<Record<string, Record<string, unknown>>>
-  >(initialSettings.formDataByMethod ?? {});
+  const setSelectedMethodId = useDiscoveryStore((s) => s.setSelectedMethodId);
+  const setFormData = useDiscoveryStore((s) => s.setFormData);
+  const setFiltersInStore = useDiscoveryStore((s) => s.setFilters);
 
   const [taskId, setTaskId] = useState<string>();
   const [latestResourceId, setLatestResourceId] = useState<string>();
   const [submitError, setSubmitError] = useState<string>();
 
-  const dragRef = useRef<{ startX: number; startWidth: number } | null>(null);
-
-  // Persist settings whenever they change
-  useEffect(() => {
-    try {
-      localStorage.setItem(
-        getSettingsKey(ocelId),
-        JSON.stringify({ selectedMethodId, formDataByMethod }),
-      );
-    } catch {}
-  }, [ocelId, selectedMethodId, formDataByMethod]);
-
-  const handleResizeStart = (e: ReactMouseEvent) => {
-    e.preventDefault();
-    dragRef.current = { startX: e.clientX, startWidth: panelWidth };
-
-    const onMove = (ev: globalThis.MouseEvent) => {
-      if (!dragRef.current) return;
-      const delta = dragRef.current.startX - ev.clientX;
-      setPanelWidth(
-        Math.max(
-          PANEL_MIN,
-          Math.min(PANEL_MAX, dragRef.current.startWidth + delta),
-        ),
-      );
-    };
-
-    const onUp = () => {
-      dragRef.current = null;
-      document.removeEventListener("mousemove", onMove);
-      document.removeEventListener("mouseup", onUp);
-      document.body.style.cursor = "";
-      document.body.style.userSelect = "";
-    };
-
-    document.addEventListener("mousemove", onMove);
-    document.addEventListener("mouseup", onUp);
-    document.body.style.cursor = "col-resize";
-    document.body.style.userSelect = "none";
-  };
+  const [panelOpen, setPanelOpen] = useLocalStorage<boolean>({
+    key: PANEL_OPEN_KEY,
+    defaultValue: true,
+  });
 
   const {
     data: methods = [],
     isLoading: isMethodsLoading,
     error: methodsError,
   } = useListDiscoveryMethods();
+
+  const { data: availableFilters = [] } = useListDiscoveryFilters();
 
   const { data: eventCounts = {} } = useEventCounts(ocelId, undefined, {
     query: { enabled: true },
@@ -110,20 +58,27 @@ const DiscoveryPageContent = ({
   useEffect(() => {
     if (selectedMethodId || methods.length === 0) return;
     setSelectedMethodId(
-      methods.flatMap((m) => m.variants).find((v) => v.resourceType === "DirectlyFollowsGraph")
-        ?.methodId ??
+      ocelId,
+      methods
+        .flatMap((m) => m.variants)
+        .find((v) => v.resourceType === "DirectlyFollowsGraph")?.methodId ??
         methods[0]?.variants[0]?.methodId ??
         null,
     );
-  }, [methods, selectedMethodId]);
+  }, [methods, selectedMethodId, ocelId, setSelectedMethodId]);
 
   const selectedMethod = useMemo(
-    () => methods.find((m) => m.variants.some((v) => v.methodId === selectedMethodId)) ?? null,
+    () =>
+      methods.find((m) =>
+        m.variants.some((v) => v.methodId === selectedMethodId),
+      ) ?? null,
     [methods, selectedMethodId],
   );
 
   const selectedVariant = useMemo(
-    () => selectedMethod?.variants.find((v) => v.methodId === selectedMethodId) ?? null,
+    () =>
+      selectedMethod?.variants.find((v) => v.methodId === selectedMethodId) ??
+      null,
     [selectedMethod, selectedMethodId],
   );
 
@@ -132,14 +87,16 @@ const DiscoveryPageContent = ({
   // Initialize form data defaults when a method is first selected
   useEffect(() => {
     if (!selectedMethodId || !selectedMethod) return;
-    setFormDataByMethod((current) => {
-      if (current[selectedMethodId]) return current;
-      return {
-        ...current,
-        [selectedMethodId]: getInitialFormData(selectedSchema),
-      };
-    });
-  }, [selectedMethod, selectedMethodId, selectedSchema]);
+    if (formDataByMethod[selectedMethodId]) return;
+    setFormData(ocelId, selectedMethodId, getInitialFormData(selectedSchema));
+  }, [
+    selectedMethod,
+    selectedMethodId,
+    selectedSchema,
+    formDataByMethod,
+    ocelId,
+    setFormData,
+  ]);
 
   const activeFormData = selectedMethodId
     ? (formDataByMethod[selectedMethodId] ?? {})
@@ -183,8 +140,8 @@ const DiscoveryPageContent = ({
   );
 
   const requestSignature = useMemo(
-    () => JSON.stringify({ selectedMethodId, requestPayload, ocelId }),
-    [ocelId, requestPayload, selectedMethodId],
+    () => JSON.stringify({ selectedMethodId, requestPayload, ocelId, filters }),
+    [ocelId, requestPayload, selectedMethodId, filters],
   );
 
   useEffect(() => {
@@ -195,6 +152,7 @@ const DiscoveryPageContent = ({
         data: {
           methodId: selectedMethodId,
           parameters: requestPayload,
+          filters,
         },
       });
     }, 650);
@@ -205,6 +163,7 @@ const DiscoveryPageContent = ({
     requestSignature,
     requestPayload,
     selectedMethodId,
+    filters,
   ]);
 
   const isDiscovering =
@@ -220,33 +179,11 @@ const DiscoveryPageContent = ({
       ? "The backend discovery task failed."
       : undefined);
 
-  const settingsProps = {
-    methods,
-    selectedMethodId,
-    setSelectedMethodId,
-    selectedMethod,
-    selectedSchema,
-    activeFormData,
-    setFormDataByMethod,
-    eventCounts,
-    objectCounts,
-    errorMessage,
-  };
-
   return (
-    <Box
-      pos="relative"
-      h="100%"
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        overflow: "hidden",
-      }}
-    >
+    <Box pos="relative" h="100%" style={{ overflow: "hidden" }}>
       <LoadingOverlay visible={isMethodsLoading} />
 
-      {/* Canvas area */}
-      <Box pos="relative" flex={1} style={{ overflow: "hidden" }}>
+      <Box pos="relative" h="100%">
         <LoadingOverlay visible={Boolean(isDiscovering && latestResourceId)} />
         {latestResourceId ? (
           <Box h="100%" p="sm">
@@ -261,49 +198,65 @@ const DiscoveryPageContent = ({
             </Text>
           </Center>
         )}
+
+        {!panelOpen && (
+          <Tooltip label="Open settings" position="left" withArrow>
+            <ActionIcon
+              variant="default"
+              size="lg"
+              radius="md"
+              onClick={() => setPanelOpen(true)}
+              style={{ position: "absolute", top: 12, right: 12, zIndex: 5 }}
+            >
+              <SettingsIcon size={16} />
+            </ActionIcon>
+          </Tooltip>
+        )}
       </Box>
 
-      <DiscoverySettingsPanel
-        width={panelWidth}
-        collapsed={isPanelCollapsed}
-        onCollapseChange={setIsPanelCollapsed}
-        onResizeStart={handleResizeStart}
+      <Drawer
+        opened={panelOpen}
+        onClose={() => setPanelOpen(false)}
+        position="right"
+        title="Discovery settings"
+        size={380}
+        withOverlay={false}
+        lockScroll={false}
+        trapFocus={false}
+        returnFocus={false}
+        withinPortal={false}
+        styles={{
+          root: { position: "absolute", inset: 0 },
+          inner: { position: "absolute", inset: 0 },
+          content: { height: "100%" },
+        }}
       >
-        <DiscoverySettingsContent {...settingsProps} />
-      </DiscoverySettingsPanel>
+        <DiscoverySettingsContent
+          methods={methods}
+          selectedMethodId={selectedMethodId}
+          setSelectedMethodId={(id) => setSelectedMethodId(ocelId, id)}
+          selectedMethod={selectedMethod}
+          selectedSchema={selectedSchema}
+          activeFormData={activeFormData}
+          setActiveFormData={(data) =>
+            selectedMethodId && setFormData(ocelId, selectedMethodId, data)
+          }
+          eventCounts={eventCounts}
+          objectCounts={objectCounts}
+          errorMessage={errorMessage}
+          availableFilters={availableFilters}
+          filters={filters}
+          setFilters={(next) => setFiltersInStore(ocelId, next)}
+        />
+      </Drawer>
     </Box>
   );
 };
 
 const DiscoveryPage = () => {
   const { id: ocelId } = useCurrentOcel();
-
-  const [panelWidth, setPanelWidth] = useState(() => loadPanelState().width);
-  const [isPanelCollapsed, setIsPanelCollapsed] = useState(
-    () => loadPanelState().collapsed,
-  );
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(
-        PANEL_KEY,
-        JSON.stringify({ width: panelWidth, collapsed: isPanelCollapsed }),
-      );
-    } catch {}
-  }, [panelWidth, isPanelCollapsed]);
-
   if (!ocelId) return <LoadingOverlay visible />;
-
-  return (
-    <DiscoveryPageContent
-      key={ocelId}
-      ocelId={ocelId}
-      panelWidth={panelWidth}
-      setPanelWidth={setPanelWidth}
-      isPanelCollapsed={isPanelCollapsed}
-      setIsPanelCollapsed={setIsPanelCollapsed}
-    />
-  );
+  return <DiscoveryPageContent key={ocelId} ocelId={ocelId} />;
 };
 
 export default defineModuleRoute({

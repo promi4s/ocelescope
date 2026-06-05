@@ -1,22 +1,26 @@
-import { Alert, Box, Select, Stack, Text } from "@mantine/core";
-import type { DiscoveryMethodMeta } from "@ocelescope/api-base";
-import type { Dispatch, SetStateAction } from "react";
-import type { DiscoverySchema } from "../types";
+import { Alert, Box, Divider, Select, Stack, Text } from "@mantine/core";
+import type {
+  DiscoveryFilterSchema,
+  DiscoveryMethodMeta,
+} from "@ocelescope/api-base";
+import type { DiscoverySchema, FilterEntry } from "../types";
 import { DiscoveryField } from "./DiscoveryField";
+import { DiscoveryFiltersSection } from "./DiscoveryFiltersSection";
 
 type DiscoverySettingsContentProps = {
   methods: DiscoveryMethodMeta[];
   selectedMethodId: string | null;
-  setSelectedMethodId: (v: string | null) => void;
+  setSelectedMethodId: (id: string | null) => void;
   selectedMethod: DiscoveryMethodMeta | null;
   selectedSchema: DiscoverySchema;
   activeFormData: Record<string, unknown>;
-  setFormDataByMethod: Dispatch<
-    SetStateAction<Partial<Record<string, Record<string, unknown>>>>
-  >;
+  setActiveFormData: (data: Record<string, unknown>) => void;
   eventCounts: Record<string, unknown>;
   objectCounts: Record<string, unknown>;
   errorMessage: string | undefined;
+  availableFilters: DiscoveryFilterSchema[];
+  filters: FilterEntry[];
+  setFilters: (filters: FilterEntry[]) => void;
 };
 
 export const DiscoverySettingsContent = ({
@@ -26,10 +30,13 @@ export const DiscoverySettingsContent = ({
   selectedMethod,
   selectedSchema,
   activeFormData,
-  setFormDataByMethod,
+  setActiveFormData,
   eventCounts,
   objectCounts,
   errorMessage,
+  availableFilters,
+  filters,
+  setFilters,
 }: DiscoverySettingsContentProps) => {
   const selectedVariants = selectedMethod?.variants ?? [];
 
@@ -71,17 +78,21 @@ export const DiscoverySettingsContent = ({
             eventTypeOptions={Object.keys(eventCounts)}
             objectTypeOptions={Object.keys(objectCounts)}
             onChange={(value) =>
-              setFormDataByMethod((current) => ({
-                ...current,
-                [selectedMethodId as string]: {
-                  ...((selectedMethodId && current[selectedMethodId]) ?? {}),
-                  [name]: value,
-                },
-              }))
+              setActiveFormData({ ...activeFormData, [name]: value })
             }
           />
         </Box>
       ))}
+      <Divider />
+
+      <DiscoveryFiltersSection
+        availableFilters={availableFilters}
+        filters={filters}
+        onFiltersChange={setFilters}
+        eventTypeOptions={Object.keys(eventCounts)}
+        objectTypeOptions={Object.keys(objectCounts)}
+      />
+
       {errorMessage && (
         <Alert color="red" title="Discovery failed">
           {errorMessage}

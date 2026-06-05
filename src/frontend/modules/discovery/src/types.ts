@@ -16,10 +16,7 @@ export type DiscoverySchemaProperty = {
   ["x-ui-meta"]?: { field_type?: string };
 };
 
-export type PanelState = { width: number; collapsed: boolean };
-
-export type StoredSettings = {
-  selectedMethodId?: string | null;
-  selectedMethodType?: string | null;
-  formDataByMethod?: Partial<Record<string, Record<string, unknown>>>;
+export type FilterEntry = {
+  name: string;
+  payload: Record<string, unknown>;
 };

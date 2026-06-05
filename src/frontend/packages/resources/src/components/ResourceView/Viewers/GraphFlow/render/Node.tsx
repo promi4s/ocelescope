@@ -1,14 +1,79 @@
-import { Text } from "@mantine/core";
-import type { NodeProps } from "@xyflow/react";
+import { Badge, Text } from "@mantine/core";
+import type { GraphNode } from "@ocelescope/api-base";
+import { Handle, type NodeProps, Position } from "@xyflow/react";
 import { memo } from "react";
-import { HiddenHandles } from "../components/HiddenHandles";
-import { NodeLabel } from "../components/NodeLabel";
 import {
+  DEFAULT_COLORS,
   EXTERNAL_NODE_LABEL_HEIGHT,
   MARKING_DOT_SIZE,
-} from "../constants/graphFlow";
-import { NodeAnnotation } from "./NodeAnnotation";
-import type { GraphFlowNodeData, GraphFlowNodeType } from "./types";
+  type GraphFlowNodeType,
+} from "../model/types";
+
+// ─── Hidden handles ───────────────────────────────────────────────────────────
+
+const HIDDEN_HANDLE_STYLE = { opacity: 0, pointerEvents: "none" } as const;
+
+const HiddenHandles = () => (
+  <>
+    <Handle
+      type="target"
+      position={Position.Left}
+      style={HIDDEN_HANDLE_STYLE}
+    />
+    <Handle
+      type="source"
+      position={Position.Right}
+      style={HIDDEN_HANDLE_STYLE}
+    />
+  </>
+);
+
+// ─── Annotation badge ─────────────────────────────────────────────────────────
+
+const AnnotationBadge = () => (
+  <Badge
+    size="xs"
+    variant="filled"
+    color="gray"
+    title="This graph element has an annotation visualization."
+    style={{ pointerEvents: "none" }}
+  >
+    i
+  </Badge>
+);
+
+const NodeAnnotation = () => (
+  <div style={{ position: "absolute", right: -8, top: -8 }}>
+    <AnnotationBadge />
+  </div>
+);
+
+// ─── External label (top / bottom) ────────────────────────────────────────────
+
+const ExternalLabel = ({
+  children,
+  top,
+}: {
+  children: string;
+  top: number;
+}) => (
+  <Text
+    size="xs"
+    fw={600}
+    style={{
+      position: "absolute",
+      top,
+      left: "50%",
+      transform: "translateX(-50%)",
+      whiteSpace: "nowrap",
+      color: DEFAULT_COLORS.text,
+      pointerEvents: "none",
+      letterSpacing: "0.01em",
+    }}
+  >
+    {children}
+  </Text>
+);
 
 // ─── Inner symbol ─────────────────────────────────────────────────────────────
 
@@ -44,9 +109,7 @@ const InnerSymbol = ({
   );
 };
 
-// ─── Circle shape ─────────────────────────────────────────────────────────────
-
-const CLIP_PATH: Partial<Record<GraphFlowNodeData["shape"], string>> = {
+const CLIP_PATH: Partial<Record<GraphNode["shape"], string>> = {
   triangle: "polygon(50% 0, 100% 100%, 0 100%)",
   diamond: "polygon(50% 0, 100% 50%, 50% 100%, 0 50%)",
   hexagon: "polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%)",
@@ -161,8 +224,6 @@ const CircleShape = ({
   </div>
 );
 
-// ─── Box shape (rectangle, triangle, diamond, hexagon) ────────────────────────
-
 const BoxShape = ({
   shape,
   color,
@@ -173,7 +234,7 @@ const BoxShape = ({
   height,
   children,
 }: {
-  shape: Exclude<GraphFlowNodeData["shape"], "circle">;
+  shape: Exclude<GraphNode["shape"], "circle">;
   color: string;
   borderColor: string | null;
   doubleBorder: boolean | null;
@@ -234,26 +295,25 @@ const BoxShape = ({
   );
 };
 
-// ─── Node ─────────────────────────────────────────────────────────────────────
-
 const GraphFlowNode = memo(({ data }: NodeProps<GraphFlowNodeType>) => {
   const {
     shape,
     label,
     color,
-    borderColor,
-    doubleBorder,
-    innerSymbol,
+    border_color,
     annotation,
-    labelPos,
+    label_pos,
     width,
     height,
-    initialTokens,
-    finalTokens,
+    style,
   } = data;
+  const doubleBorder = style?.double_border ?? null;
+  const innerSymbol = style?.inner_symbol ?? null;
+  const initialTokens = style?.initial_tokens ?? null;
+  const finalTokens = style?.final_tokens ?? null;
 
   const isExternalLabel = Boolean(
-    label && labelPos !== "center" && labelPos != null,
+    label && label_pos !== "center" && label_pos != null,
   );
   const bottomLabelTop =
     height != null ? EXTERNAL_NODE_LABEL_HEIGHT + height + 4 : null;
@@ -262,7 +322,9 @@ const GraphFlowNode = memo(({ data }: NodeProps<GraphFlowNodeType>) => {
   // Subtract 4px for the border simulation padding in BoxShape.
   // When height is null the node auto-sizes, so no clamping needed.
   const maxLabelLines =
-    height != null ? Math.max(1, Math.floor((height - 4) / (14 * 1.2))) : undefined;
+    height != null
+      ? Math.max(1, Math.floor((height - 4) / (14 * 1.2)))
+      : undefined;
 
   return (
     <div
@@ -274,30 +336,28 @@ const GraphFlowNode = memo(({ data }: NodeProps<GraphFlowNodeType>) => {
       }}
     >
       <HiddenHandles />
-      {isExternalLabel && labelPos === "top" && (
-        <NodeLabel absolute top={0}>
-          {label as string}
-        </NodeLabel>
+      {isExternalLabel && label_pos === "top" && (
+        <ExternalLabel top={0}>{label as string}</ExternalLabel>
       )}
       {shape === "circle" ? (
         <CircleShape
           width={width as number}
           height={height as number}
-          color={color}
-          borderColor={borderColor ?? null}
-          doubleBorder={doubleBorder ?? null}
-          innerSymbol={innerSymbol ?? null}
-          initialTokens={initialTokens ?? null}
-          finalTokens={finalTokens ?? null}
-          centerLabel={labelPos === "center" ? (label ?? null) : null}
+          color={color ?? DEFAULT_COLORS.transition}
+          borderColor={border_color ?? null}
+          doubleBorder={doubleBorder}
+          innerSymbol={innerSymbol}
+          initialTokens={initialTokens}
+          finalTokens={finalTokens}
+          centerLabel={label_pos === "center" ? (label ?? null) : null}
         />
       ) : (
         <BoxShape
           shape={shape}
-          color={color}
-          borderColor={borderColor ?? null}
-          doubleBorder={doubleBorder ?? null}
-          innerSymbol={innerSymbol ?? null}
+          color={color ?? DEFAULT_COLORS.transition}
+          borderColor={border_color ?? null}
+          doubleBorder={doubleBorder}
+          innerSymbol={innerSymbol}
           width={width ?? null}
           height={height ?? null}
         >
@@ -314,8 +374,6 @@ const GraphFlowNode = memo(({ data }: NodeProps<GraphFlowNodeType>) => {
                 boxSizing: "border-box",
                 overflow: "hidden",
                 overflowWrap: "anywhere",
-                // Multi-line clamp: fill the node with wrapped text, ellipsis only
-                // when the text still exceeds the node height after wrapping.
                 ...(maxLabelLines != null
                   ? ({
                       display: "-webkit-box",
@@ -330,10 +388,8 @@ const GraphFlowNode = memo(({ data }: NodeProps<GraphFlowNodeType>) => {
           )}
         </BoxShape>
       )}
-      {isExternalLabel && labelPos === "bottom" && bottomLabelTop != null && (
-        <NodeLabel absolute top={bottomLabelTop}>
-          {label as string}
-        </NodeLabel>
+      {isExternalLabel && label_pos === "bottom" && bottomLabelTop != null && (
+        <ExternalLabel top={bottomLabelTop}>{label as string}</ExternalLabel>
       )}
       {annotation && <NodeAnnotation />}
     </div>
@@ -343,3 +399,4 @@ const GraphFlowNode = memo(({ data }: NodeProps<GraphFlowNodeType>) => {
 GraphFlowNode.displayName = "GraphFlowNode";
 
 export default GraphFlowNode;
+export { AnnotationBadge };

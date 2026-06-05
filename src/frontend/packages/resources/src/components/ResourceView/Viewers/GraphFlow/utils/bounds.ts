@@ -4,7 +4,10 @@ export type Rect = { x: number; y: number; width: number; height: number };
 
 function nodeBoundsFromData(nodes: Node[]): Rect {
   if (nodes.length === 0) return { x: 0, y: 0, width: 0, height: 0 };
-  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  let minX = Infinity,
+    minY = Infinity,
+    maxX = -Infinity,
+    maxY = -Infinity;
   for (const node of nodes) {
     const x = node.position.x;
     const y = node.position.y;
@@ -21,11 +24,14 @@ function nodeBoundsFromData(nodes: Node[]): Rect {
 }
 
 // All numbers in our ELK paths (M/L polylines and M/C splines) are x,y
-// coordinates — no non-coordinate numbers like arc flags or radii appear.
+// coordinates - no non-coordinate numbers like arc flags or radii appear.
 function svgPathBounds(d: string): Rect | null {
   const nums = (d.match(/-?[\d.]+(?:e[+-]?\d+)?/gi) ?? []).map(parseFloat);
   if (nums.length < 2) return null;
-  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  let minX = Infinity,
+    minY = Infinity,
+    maxX = -Infinity,
+    maxY = -Infinity;
   for (let i = 0; i + 1 < nums.length; i += 2) {
     minX = Math.min(minX, nums[i]!);
     minY = Math.min(minY, nums[i + 1]!);
