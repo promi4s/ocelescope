@@ -51,12 +51,12 @@ class DiscoveryTask(TaskBase):
                 parameters = info.parse_parameters(
                     cast(dict[str, Any], self.request.parameters)
                 )
+                ocel = self.session.get_ocel(self.request.ocel_id)
+                if self.request.filters:
+                    ocel = ocel.filter(self.request.filters)
                 resource = cast(
                     Resource,
-                    info.run(
-                        ocel=self.session.get_ocel(self.request.ocel_id),
-                        parameters=parameters,
-                    ),
+                    info.run(ocel=ocel, parameters=parameters),
                 )
             except KeyError as exc:
                 raise BadRequest(str(exc)) from exc

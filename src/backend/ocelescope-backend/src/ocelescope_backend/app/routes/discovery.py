@@ -1,6 +1,15 @@
-from fastapi import APIRouter, HTTPException
-from pydantic import ValidationError
+from typing import Any
 
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel, ValidationError
+
+from ocelescope import (
+    EventTypeFilter,
+    EventTypeFrequencyFilter,
+    ObjectTypeFilter,
+    ObjectTypeFrequencyFilter,
+)
+from ocelescope.ocel.filter.base import BaseFilter
 from ocelescope_backend.app.dependencies import ApiSession
 from ocelescope_backend.app.internal.discovery import discovery_registry
 from ocelescope_backend.app.internal.model.discovery import (
@@ -10,6 +19,24 @@ from ocelescope_backend.app.internal.model.discovery import (
     DiscoveryVariant,
 )
 from ocelescope_backend.app.internal.tasks.discovery_task import DiscoveryTask
+
+
+_DISCOVERY_FILTER_TYPES: list[type[BaseFilter]] = [
+    EventTypeFilter,
+    ObjectTypeFilter,
+    EventTypeFrequencyFilter,
+    ObjectTypeFrequencyFilter,
+]
+
+_DISCOVERY_FILTERS_BY_NAME: dict[str, type[BaseFilter]] = {
+    cls.__name__: cls for cls in _DISCOVERY_FILTER_TYPES
+}
+
+
+class DiscoveryFilterSchema(BaseModel):
+    name: str
+    json_schema: dict[str, Any]
+
 
 discovery_router = APIRouter(prefix="/discovery", tags=["discovery"])
 
@@ -36,6 +63,19 @@ def create_discovery_task(
     except ValidationError as exc:
         raise HTTPException(status_code=422, detail=exc.errors()) from exc
 
+    filter_pipeline: list[BaseFilter] = []
+    for envelope in body.filters:
+        filter_cls = _DISCOVERY_FILTERS_BY_NAME.get(envelope.name)
+        if filter_cls is None:
+            raise HTTPException(
+                status_code=422,
+                detail=f"Unknown discovery filter '{envelope.name}'",
+            )
+        try:
+            filter_pipeline.append(filter_cls.model_validate(envelope.payload))
+        except ValidationError as exc:
+            raise HTTPException(status_code=422, detail=exc.errors()) from exc
+
     return DiscoveryTask.create_discovery_task(
         session=session,
         request=DiscoveryRequest(
@@ -44,8 +84,24 @@ def create_discovery_task(
             name=info.name,
             resource_type=info.resource_type.get_type(),
             parameters=parameters,
+            filters=filter_pipeline,
         ),
     )
+
+
+@discovery_router.get(
+    "/filters",
+    summary="List filters available to discovery tasks",
+    operation_id="listDiscoveryFilters",
+)
+def list_discovery_filters() -> list[DiscoveryFilterSchema]:
+    return [
+        DiscoveryFilterSchema(
+            name=filter_cls.__name__,
+            json_schema=filter_cls.model_json_schema(),
+        )
+        for filter_cls in _DISCOVERY_FILTER_TYPES
+    ]
 
 
 @discovery_router.get(

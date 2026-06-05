@@ -157,6 +157,6 @@ class Graph(Visualization):
     """
 
     type: Literal["graph"] = "graph"
-    nodes: list[GraphNode] = []
-    edges: list[GraphEdge] = []
-    layout_config: LayoutConfig = LayoutConfig()
+    nodes: list[GraphNode] = Field(default_factory=list)
+    edges: list[GraphEdge] = Field(default_factory=list)
+    layout_config: LayoutConfig = Field(default_factory=LayoutConfig)

@@ -9,7 +9,7 @@ from pydantic import BaseModel
 def normalize(obj: Any) -> Any:
     """Recursively convert objects into JSON-serializable, deterministic forms."""
     if isinstance(obj, BaseModel):
-        return normalize(obj.model_dump())
+        return normalize(obj.model_dump(serialize_as_any=True))
 
     if dataclasses.is_dataclass(obj) and not isinstance(obj, type):
         return normalize(dataclasses.asdict(obj))
