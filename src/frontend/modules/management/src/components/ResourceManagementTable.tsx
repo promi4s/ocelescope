@@ -23,6 +23,7 @@ import {
   UploadSection,
   useDownloadOCEL,
   useDownloadResource,
+  useDownloadResourceAsPnml,
   useInvalidate,
 } from "@ocelescope/core";
 import { ResourceModal } from "@ocelescope/resources";
@@ -71,6 +72,7 @@ const ResourceManagementTable: React.FC = () => {
 
   const { download: downloadOCEL } = useDownloadOCEL();
   const { download: downloadResource } = useDownloadResource();
+  const { download: downloadResourceAsPnml } = useDownloadResourceAsPnml();
 
   const { data: resourceMeta = {} } = useGetResourceMeta();
 
@@ -309,21 +311,11 @@ const ResourceManagementTable: React.FC = () => {
                             </Menu.Sub.Item>
                           </Menu.Sub.Target>
                           <Menu.Sub.Dropdown>
-                            <Menu.Item
-                              onClick={() =>
-                                downloadFile(
-                                  `/resources/resource/${id}/download`,
-                                )
-                              }
-                            >
+                            <Menu.Item onClick={() => downloadResource(id)}>
                               .ocelescope
                             </Menu.Item>
                             <Menu.Item
-                              onClick={() =>
-                                downloadFile(
-                                  `/resources/resource/${id}/download/pnml`,
-                                )
-                              }
+                              onClick={() => downloadResourceAsPnml(id)}
                             >
                               .pnml
                             </Menu.Item>

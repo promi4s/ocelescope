@@ -82,7 +82,6 @@ const CircleShape = ({
       borderRadius: "50%",
       backgroundColor: color,
       border: borderColor ? `2px solid ${borderColor}` : "none",
-      boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
@@ -197,7 +196,6 @@ const BoxShape = ({
         backgroundColor: borderColor ?? "transparent",
         borderRadius: shape === "rectangle" ? 5 : 0,
         clipPath,
-        boxShadow: "0 2px 6px rgba(0,0,0,0.10), 0 0 0 0.5px rgba(0,0,0,0.06)",
       }}
     >
       <div

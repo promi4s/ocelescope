@@ -59,6 +59,34 @@ export const DiscoveryField = ({
     );
   }
 
+  if (property.type === "string" && fieldType === "object_type") {
+    return (
+      <Select
+        label={label}
+        description={description}
+        value={(value as string | undefined) ?? null}
+        onChange={onChange}
+        data={objectTypeOptions}
+        searchable
+        allowDeselect={false}
+      />
+    );
+  }
+
+  if (property.type === "string" && fieldType === "event_type") {
+    return (
+      <Select
+        label={label}
+        description={description}
+        value={(value as string | undefined) ?? null}
+        onChange={onChange}
+        data={eventTypeOptions}
+        searchable
+        allowDeselect={false}
+      />
+    );
+  }
+
   if (property.type === "string" && property.enum) {
     return (
       <Select

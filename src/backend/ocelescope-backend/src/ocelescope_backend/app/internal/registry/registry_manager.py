@@ -8,6 +8,7 @@ from typing_extensions import TypedDict
 from ocelescope import DirectlyFollowsGraph, PetriNet, Plugin, Resource
 
 from ocelescope_backend.app.internal.config import config
+from ocelescope_backend.app.internal.discovery import register_discovery_methods_from_module
 from ocelescope_backend.app.internal.model.plugin import PluginApi
 from ocelescope_backend.app.internal.model.resource import ResourceStore
 from ocelescope_backend.app.internal.registry.extension import ExtensionRegistry
@@ -147,6 +148,11 @@ class RegistryManager:
                                 self._resource_registry.register_resource(
                                     id, resource_type
                                 )
+
+                        for info in register_discovery_methods_from_module(module):
+                            self._resource_registry.register_resource(
+                                id, info.resource_type
+                            )
 
                         loaded_plugins.append(id)
                     except Exception as e:
