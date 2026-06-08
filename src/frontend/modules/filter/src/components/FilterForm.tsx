@@ -1,10 +1,7 @@
 import { Tabs } from "@mantine/core";
 import { type Control, useForm } from "react-hook-form";
 import type { GroupedOCELFilter } from "../api/base";
-import {
-  ActivityFilter,
-  ObjectTypeFilter,
-} from "./FilterComponents/ActivityForm";
+import { ActivityFilter, ObjectTypeFilter } from "./FilterComponents/TypeForm";
 
 const FilterMap: Record<
   keyof GroupedOCELFilter,
