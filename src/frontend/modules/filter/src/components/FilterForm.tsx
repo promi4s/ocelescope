@@ -1,6 +1,7 @@
 import { Tabs } from "@mantine/core";
 import { type Control, useForm } from "react-hook-form";
 import type { GroupedOCELFilter } from "../api/base";
+import TimeFrameFilter from "./FilterComponents/TimeFrameFilter";
 import { ActivityFilter, ObjectTypeFilter } from "./FilterComponents/TypeForm";
 
 const FilterMap: Record<
@@ -9,7 +10,7 @@ const FilterMap: Record<
 > = {
   activity: ActivityFilter,
   object_type: ObjectTypeFilter,
-  time_frame: () => <></>,
+  time_frame: TimeFrameFilter,
   e2o_count: () => <></>,
   o2o_count: () => <></>,
   event_attribute: () => <></>,
