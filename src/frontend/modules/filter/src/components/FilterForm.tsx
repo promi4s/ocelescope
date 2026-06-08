@@ -1,6 +1,10 @@
 import { Tabs } from "@mantine/core";
 import { type Control, useForm } from "react-hook-form";
 import type { GroupedOCELFilter } from "../api/base";
+import {
+  EventAttributeFilter,
+  ObjectAttributeFilter,
+} from "./FilterComponents/AttributeFilter";
 import TimeFrameFilter from "./FilterComponents/TimeFrameFilter";
 import { ActivityFilter, ObjectTypeFilter } from "./FilterComponents/TypeForm";
 
@@ -13,8 +17,8 @@ const FilterMap: Record<
   time_frame: TimeFrameFilter,
   e2o_count: () => <></>,
   o2o_count: () => <></>,
-  event_attribute: () => <></>,
-  object_attribute: () => <></>,
+  event_attribute: EventAttributeFilter,
+  object_attribute: ObjectAttributeFilter,
 };
 
 const TAB_TITLES: Record<keyof GroupedOCELFilter, string> = {

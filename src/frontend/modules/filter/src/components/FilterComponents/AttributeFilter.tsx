@@ -1,301 +1,234 @@
-//TODO: Refactor this whole file :(
-import {
-  Button,
-  Grid,
-  NumberInput,
-  Paper,
-  Select,
-  Stack,
-  TextInput,
-} from "@mantine/core";
+import { Button, RangeSlider, TextInput } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
-import type { TypedAttribute } from "@ocelescope/api-base";
-import { useEventAttributes, useObjectAttributes } from "@ocelescope/api-base";
-import { PlusIcon, XIcon } from "lucide-react";
-import { memo, type ReactNode, useMemo } from "react";
+import {
+  type TypedAttribute,
+  useEventAttributes,
+  useObjectAttributes,
+} from "@ocelescope/api-base";
+import { DataTable } from "mantine-datatable";
 import { type Control, Controller, useFieldArray } from "react-hook-form";
-import type { GroupedOCELFilter } from "../../api/base";
+import type {
+  GroupedOCELFilter,
+  NativeEventAttributeFilter,
+  NativeObjectAttributeFilter,
+} from "../../api/base";
 
 type AttributeFilterProps = {
-  control: Control<GroupedOCELFilter>;
-  attributes: TypedAttribute[];
-  index: number;
-  attributeType: Extract<
-    keyof GroupedOCELFilter,
-    "event_attribute" | "object_attribute"
-  >;
-};
-
-type AttributeTypeInput = (
-  props: Omit<AttributeFilterProps, "attributes"> & {
-    attribute: TypedAttribute;
-  },
-) => ReactNode;
-
-const attributeTypeToInput: {
-  [K in TypedAttribute["type"]]: AttributeTypeInput;
-} = {
-  bool: () => <Grid.Col span={6}>{"Not Implemented"}</Grid.Col>,
-  empty: () => <Grid.Col span={6}>{"Not Implemented"}</Grid.Col>,
-  object: () => <Grid.Col span={6}>{"Not Implemented"}</Grid.Col>,
-  numeric: () => <Grid.Col span={6}>{"Not Implemented"}</Grid.Col>,
-  date: ({ control, index, attribute, attributeType }) => {
-    const { min, max } = attribute as { min: string; max: string };
-    return (
-      <Grid.Col span={6}>
-        <Controller
-          control={control}
-          name={`${attributeType}.${index}.time_range`}
-          render={({ field: { onChange, value } }) => (
-            <DatePickerInput
-              label={"Date Range"}
-              value={[value?.[0] ?? min, value?.[1] as string]}
-              onChange={([a, b]) => onChange([a ?? undefined, b ?? undefined])}
-              type="range"
-              minDate={min}
-              maxDate={max}
-            />
-          )}
-        />
-      </Grid.Col>
-    );
-  },
-  float: ({ attribute, attributeType, index, control }) => {
-    const { min, max } = attribute as { min: number; max: number };
-    return (
-      <Controller
-        control={control}
-        name={`${attributeType}.${index}.number_range`}
-        render={({ field: { onChange, value } }) => (
-          <>
-            <Grid.Col span={3}>
-              <NumberInput
-                label={"min"}
-                min={min}
-                max={value?.[1] ? Number.parseFloat(`${value[1]}`) : max}
-                value={value?.[0] ?? min}
-                onChange={(newMin) => onChange([newMin, value?.[1] ?? null])}
-              />
-            </Grid.Col>
-            <Grid.Col span={3}>
-              <NumberInput
-                label={"max"}
-                min={value?.[0] ? Number.parseFloat(`${value[0]}`) : min}
-                max={max}
-                value={value?.[1] ?? max}
-                onChange={(newMax) => onChange([value?.[0] ?? null, newMax])}
-              />
-            </Grid.Col>
-          </>
-        )}
-      />
-    );
-  },
-  int: ({ attribute, attributeType, control, index }) => {
-    const { min, max } = attribute as { min: number; max: number };
-    return (
-      <Controller
-        control={control}
-        name={`${attributeType}.${index}.number_range`}
-        render={({ field: { onChange, value } }) => (
-          <>
-            <Grid.Col span={3}>
-              <NumberInput
-                label={"min"}
-                min={min}
-                max={value?.[1] ? Number.parseInt(`${value[1]}`, 10) : max}
-                value={value?.[0] ?? min}
-                onChange={(newMin) => onChange([newMin, value?.[1] ?? null])}
-              />
-            </Grid.Col>
-            <Grid.Col span={3}>
-              <NumberInput
-                label={"max"}
-                min={value?.[0] ? Number.parseInt(`${value[0]}`, 10) : min}
-                max={max}
-                value={value?.[1] ?? max}
-                onChange={(newMax) => onChange([value?.[0] ?? null, newMax])}
-              />
-            </Grid.Col>
-          </>
-        )}
-      />
-    );
-  },
-  string: ({ index, attributeType, control }) => (
-    <Controller
-      control={control}
-      name={`${attributeType}.${index}.regex`}
-      render={({ field }) => (
-        <Grid.Col span={6}>
-          <TextInput
-            label={"Regex"}
-            value={field.value ?? undefined}
-            onChange={field.onChange}
-          />
-        </Grid.Col>
-      )}
-    />
-  ),
-};
-
-const AttributeFilter: React.FC<AttributeFilterProps> = ({
-  attributes,
-  control,
-  attributeType,
-  index,
-}) => {
-  return (
-    <Grid>
-      <Grid.Col span={3}>
-        <Controller
-          control={control}
-          name={`${attributeType}.${index}.target_type`}
-          rules={{ required: "The target is Required" }}
-          render={({ field }) => (
-            <Select
-              data={targetNames}
-              label={"Type"}
-              onChange={field.onChange}
-              value={field?.value}
-            />
-          )}
-        />
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <Controller
-          control={control}
-          name={`${attributeType}.${index}.attribute`}
-          rules={{ required: "The target is Required" }}
-          render={({ field }) => (
-            <Select
-              label={"Attribute Name"}
-              data={attributeNames}
-              value={field.value}
-              onChange={field.onChange}
-            />
-          )}
-        />
-      </Grid.Col>
-      {currentAttribute &&
-        attributeTypeToInput[currentAttribute.type]({
-          attribute: currentAttribute,
-          control,
-          attributeType,
-          index,
-        })}
-    </Grid>
-  );
-};
-
-export const EventAttributeFilter: React.FC<FilterPageComponentProps> = memo(
-  ({ ocelId, control }) => {
-    const { data: attributes = [] } = useEventAttributes(ocelId, {
-      ocel_version: "original",
-    });
-
-    const { fields, append, remove } = useFieldArray({
-      control,
-      name: "event_attributes",
-    });
-
-    return (
-      <Stack>
-        {fields.map((field, index) => (
-          <Paper shadow="xs" p="md" key={field.id}>
-            <Grid gutter={0}>
-              <Grid.Col
-                style={{ display: "flex", justifyContent: "end" }}
-                offset={11}
-                span={1}
-              >
-                <Button
-                  variant="subtle"
-                  color="red"
-                  onClick={() => remove(index)}
-                >
-                  <XIcon color="red" />
-                </Button>
-              </Grid.Col>
-              <Grid.Col span={12}>
-                <AttributeFilter
-                  key={field.id}
-                  attributeType="event_attributes"
-                  control={control}
-                  attributes={attributes}
-                  index={index}
-                />
-              </Grid.Col>
-            </Grid>
-          </Paper>
-        ))}
-        <Button
-          onClick={() => append({ attribute: "", target_type: "" })}
-          leftSection={<PlusIcon height={30} />}
-        >
-          Add Filter
-        </Button>
-      </Stack>
-    );
-  },
-);
-export const ObjectAttributeFilter: React.FC<{
   ocelId: string;
   control: Control<GroupedOCELFilter>;
-}> = memo(({ ocelId, control }) => {
-  const { data: attributes } = useObjectAttributes(ocelId, {
-    ocel_version: "original",
-  });
+};
 
-  const { fields, append, remove } = useFieldArray({
-    name: "event_attribute",
-    control,
-  });
+const getInitalFilter: (
+  attribute: TypedAttribute,
+) => Omit<
+  NativeEventAttributeFilter | NativeObjectAttributeFilter,
+  "target_type" | "type" | "attribute"
+> = (attribute: TypedAttribute) => {
+  switch (attribute.type) {
+    case "string":
+      return { regex: "" };
+    case "int":
+      return {
+        number_range: [
+          Number.parseInt(`${attribute.min}`),
+          Number.parseInt(`${attribute.max}`),
+        ],
+      };
+    case "float":
+      return {
+        number_range: [
+          Number.parseInt(`${attribute.min}`),
+          Number.parseInt(`${attribute.max}`),
+        ],
+      };
+    case "date":
+      return {
+        time_range: [
+          `${attribute.min.toString()}`,
+          `${attribute.max.toString()}`,
+        ],
+      };
+    default:
+      return {};
+  }
+};
 
-  const availableAttributes = useMemo(() => {
-    const allAttributes = (attributes ?? []).filter(
-      ({ distinct_values, name, entity_type }) =>
-        distinct_values > 1 &&
-        fields.some(
-          ({ type, attribute }) => name !== attribute && entity_type !== type,
-        ),
-    );
+const AttributeInputField = ({
+  control,
+  record,
+  index,
+  path,
+}: {
+  control: Control<GroupedOCELFilter>;
+  index: number;
+  path: "event_attribute" | "object_attribute";
+  record: TypedAttribute;
+}) => {
+  switch (record.type) {
+    case "string":
+      return (
+        <Controller
+          name={`${path}.${index}.regex`}
+          control={control}
+          render={({ field }) => (
+            <TextInput
+              label={"Regex"}
+              value={field.value ?? undefined}
+              onChange={field.onChange}
+            />
+          )}
+        />
+      );
+    case "int":
+      return (
+        <Controller
+          name={`${path}.${index}.number_range`}
+          control={control}
+          render={({ field }) => (
+            <RangeSlider
+              value={[field.value?.[0] ?? 0, field.value?.[1] ?? 0]}
+              min={Number.parseInt(`${record.min}`, 10)}
+              max={Number.parseInt(`${record.max}`, 10)}
+              minRange={1}
+              onChange={field.onChange}
+            />
+          )}
+        />
+      );
+    case "float": {
+      const min = Number.parseFloat(`${record.min}`);
+      const max = Number.parseFloat(`${record.max}`);
+      const range = max - min;
 
-    return allAttributes;
-  }, [attributes, fields]);
+      const step =
+        range <= 0.001
+          ? 0.000001
+          : range <= 0.01
+            ? 0.0001
+            : range <= 1
+              ? 0.001
+              : 0.01;
 
-  return (
-    <Stack>
-      {fields.map((field, index) => (
-        <Paper shadow="xs" p="md" key={field.id}>
-          <Grid gutter={0}>
-            <Grid.Col
-              style={{ display: "flex", justifyContent: "end" }}
-              offset={11}
-              span={1}
-            >
-              <Button
-                variant="subtle"
-                color="red"
-                onClick={() => remove(index)}
-              >
-                <XIcon color="red" />
-              </Button>
-            </Grid.Col>
-            <Grid.Col span={12}>
-              <Controller />
-              <AttributeFilter
-                key={field.id}
-                attributeType=""
-                control={control}
-                attributes={availableAttributes}
-                index={index}
+      const precision =
+        step === 0.000001 ? 6 : step === 0.0001 ? 4 : step === 0.001 ? 3 : 2;
+
+      return (
+        <Controller
+          name={`${path}.${index}.number_range`}
+          control={control}
+          render={({ field }) => (
+            <RangeSlider
+              value={[field.value?.[0] ?? min, field.value?.[1] ?? max]}
+              min={min}
+              max={max}
+              step={step}
+              minRange={step}
+              precision={precision}
+              label={(value) => value.toFixed(precision)}
+              onChange={field.onChange}
+            />
+          )}
+        />
+      );
+    }
+    case "date":
+      return (
+        <Controller
+          control={control}
+          name={`${path}.${index}.time_range`}
+          render={({ field: { onChange, value } }) => {
+            const min = record.min.toString();
+            const max = record.max.toString();
+
+            return (
+              <DatePickerInput
+                label={"Date Range"}
+                value={[value?.[0] ?? min, value?.[1] ?? max]}
+                onChange={onChange}
+                type="range"
+                minDate={min}
+                maxDate={max}
               />
-            </Grid.Col>
-          </Grid>
-        </Paper>
-      ))}
-      <Button leftSection={<PlusIcon height={30} />}>Add Filter</Button>
-    </Stack>
-  );
-});
+            );
+          }}
+        />
+      );
+    default:
+      return <>Not Implemented</>;
+  }
+};
+
+const AttributeFilter =
+  (entityType: "objects" | "events") =>
+  ({ ocelId, control }: AttributeFilterProps) => {
+    const isEvent = entityType === "events";
+    const fieldName = isEvent ? "event_attribute" : "object_attribute";
+
+    const { fields, append } = useFieldArray({
+      name: fieldName,
+      control,
+    });
+
+    const { data: attributes } = (
+      isEvent ? useEventAttributes : useObjectAttributes
+    )(ocelId);
+
+    return (
+      <DataTable
+        idAccessor={(record) => `${record.entity_type}-${record.name}`}
+        columns={[
+          { accessor: "name" },
+          { accessor: "entity_type" },
+          {
+            accessor: "filter",
+            render: ({ entity_type, name }) => {
+              const isFiltered = fields.find(
+                (f) => f.attribute === name && f.target_type === entity_type,
+              );
+              return isFiltered ? <>A</> : <Button>Add Filter</Button>;
+            },
+          },
+        ]}
+        records={attributes ?? []}
+        onRowClick={({ record }) => {
+          if (
+            !fields.some(
+              (f) =>
+                f.attribute === record.name &&
+                f.target_type === record.entity_type,
+            )
+          ) {
+            append({
+              attribute: record.name,
+              target_type: record.entity_type,
+              type: isEvent ? "event_attribute" : "object_attribute",
+              ...getInitalFilter(record),
+            });
+          }
+        }}
+        rowExpansion={{
+          content: ({ record }) => {
+            const fieldIndex = fields.findIndex(
+              (f) =>
+                f.attribute === record.name &&
+                f.target_type === record.entity_type,
+            );
+
+            if (fieldIndex < 0) return null;
+
+            return (
+              <AttributeInputField
+                control={control}
+                index={fieldIndex}
+                record={record}
+                path={fieldName}
+              />
+            );
+          },
+        }}
+      />
+    );
+  };
+
+export const EventAttributeFilter = AttributeFilter("events");
+export const ObjectAttributeFilter = AttributeFilter("objects");

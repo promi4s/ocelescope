@@ -62,6 +62,7 @@
     "typescript": "catalog:"
   },
   "dependencies": {
-    "@tanstack/react-form": "catalog:"
+    "@tanstack/react-form": "catalog:",
+    "mantine-datatable": "catalog:"
   }
 }
