@@ -139,9 +139,25 @@ const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
     [activeFormData],
   );
 
+  const activeFilters = useMemo(
+    () =>
+      filters.filter((entry) =>
+        Object.values(entry.payload).every(
+          (v) => !Array.isArray(v) || v.length > 0,
+        ),
+      ),
+    [filters],
+  );
+
   const requestSignature = useMemo(
-    () => JSON.stringify({ selectedMethodId, requestPayload, ocelId, filters }),
-    [ocelId, requestPayload, selectedMethodId, filters],
+    () =>
+      JSON.stringify({
+        selectedMethodId,
+        requestPayload,
+        ocelId,
+        filters: activeFilters,
+      }),
+    [ocelId, requestPayload, selectedMethodId, activeFilters],
   );
 
   useEffect(() => {
@@ -152,7 +168,7 @@ const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
         data: {
           methodId: selectedMethodId,
           parameters: requestPayload,
-          filters,
+          filters: activeFilters,
         },
       });
     }, 650);
@@ -163,7 +179,7 @@ const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
     requestSignature,
     requestPayload,
     selectedMethodId,
-    filters,
+    activeFilters,
   ]);
 
   const isDiscovering =
@@ -226,9 +242,9 @@ const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
         returnFocus={false}
         withinPortal={false}
         styles={{
-          root: { position: "absolute", inset: 0 },
-          inner: { position: "absolute", inset: 0 },
-          content: { height: "100%" },
+          root: { position: "absolute", inset: 0, pointerEvents: "none" },
+          inner: { position: "absolute", inset: 0, pointerEvents: "none" },
+          content: { height: "100%", pointerEvents: "auto" },
         }}
       >
         <DiscoverySettingsContent

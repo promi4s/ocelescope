@@ -17,6 +17,11 @@ const initialPayload = (schema: DiscoverySchema) => {
   for (const [name, property] of Object.entries(schema.properties ?? {})) {
     if (property.default !== undefined) payload[name] = property.default;
     else if (property.type === "array") payload[name] = [];
+    else if (
+      (property.type === "number" || property.type === "integer") &&
+      property.minimum !== undefined
+    )
+      payload[name] = property.minimum;
   }
   return payload;
 };
