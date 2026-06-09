@@ -5,6 +5,7 @@
   "dependencyDashboard": true,
   "prConcurrentLimit": 10,
   "prHourlyLimit": 2,
+  "ignorePaths": ["docs/**"],
   "lockFileMaintenance": {
     "enabled": true
   },
