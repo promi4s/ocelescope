@@ -67,8 +67,8 @@ catalogs:
       specifier: ^2.0.8
       version: 2.0.8
     '@tsdown/css':
-      specifier: ^0.21.4
-      version: 0.21.4
+      specifier: ^0.22.0
+      version: 0.22.2
     '@types/css-modules':
       specifier: ^1.0.5
       version: 1.0.5
@@ -133,8 +133,8 @@ catalogs:
       specifier: ^6.0.1
       version: 6.0.1
     html-to-image:
-      specifier: 1.11.11
-      version: 1.11.11
+      specifier: 1.11.13
+      version: 1.11.13
     json-schema-traverse:
       specifier: ^1.0.0
       version: 1.0.0
@@ -309,7 +309,7 @@ importers:
         version: 19.2.3(@types/react@19.2.14)
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.21.4)(typescript@5.9.3)(unrun@0.2.32)
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -349,7 +349,7 @@ importers:
     devDependencies:
       '@tsdown/css':
         specifier: 'catalog:'
-        version: 0.21.4(jiti@2.6.1)(postcss@8.5.15)(tsdown@0.22.2)(yaml@2.8.2)
+        version: 0.22.2(jiti@2.6.1)(postcss@8.5.15)(tsdown@0.22.2)(yaml@2.8.2)
       '@types/css-modules':
         specifier: 'catalog:'
         version: 1.0.5
@@ -364,7 +364,7 @@ importers:
         version: 19.2.3(@types/react@19.2.14)
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.21.4)(typescript@5.9.3)(unrun@0.2.32)
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -404,7 +404,7 @@ importers:
     devDependencies:
       '@tsdown/css':
         specifier: 'catalog:'
-        version: 0.21.4(jiti@2.6.1)(postcss@8.5.15)(tsdown@0.22.2)(yaml@2.8.2)
+        version: 0.22.2(jiti@2.6.1)(postcss@8.5.15)(tsdown@0.22.2)(yaml@2.8.2)
       '@types/css-modules':
         specifier: 'catalog:'
         version: 1.0.5
@@ -419,7 +419,7 @@ importers:
         version: 19.2.3(@types/react@19.2.14)
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.21.4)(typescript@5.9.3)(unrun@0.2.32)
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -464,7 +464,7 @@ importers:
         version: 2.0.5
       html-to-image:
         specifier: 'catalog:'
-        version: 1.11.11
+        version: 1.11.13
       lucide-react:
         specifier: 'catalog:'
         version: 0.563.0(react@19.2.3)
@@ -486,7 +486,7 @@ importers:
         version: link:../../packages/api/config
       '@tsdown/css':
         specifier: 'catalog:'
-        version: 0.21.4(jiti@2.6.1)(postcss@8.5.15)(tsdown@0.22.2)(yaml@2.8.2)
+        version: 0.22.2(jiti@2.6.1)(postcss@8.5.15)(tsdown@0.22.2)(yaml@2.8.2)
       '@types/css-modules':
         specifier: 'catalog:'
         version: 1.0.5
@@ -504,7 +504,7 @@ importers:
         version: 19.2.3(@types/react@19.2.14)
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.21.4)(typescript@5.9.3)(unrun@0.2.32)
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -592,7 +592,7 @@ importers:
         version: 1.0.0
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.21.4)(typescript@5.9.3)(unrun@0.2.32)
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -632,7 +632,7 @@ importers:
         version: 10.4.1
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.21.4)(typescript@5.9.3)(unrun@0.2.32)
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -669,7 +669,7 @@ importers:
         version: 10.4.1
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.21.4)(typescript@5.9.3)(unrun@0.2.32)
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -700,7 +700,7 @@ importers:
         version: 10.4.1
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.21.4)(typescript@5.9.3)(unrun@0.2.32)
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -773,7 +773,7 @@ importers:
         version: 8.3.16(@mantine/core@8.3.16(@mantine/hooks@8.3.16(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/hooks@8.3.16(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@tsdown/css':
         specifier: 'catalog:'
-        version: 0.21.4(jiti@2.6.1)(postcss@8.5.15)(tsdown@0.22.2)(yaml@2.8.2)
+        version: 0.22.2(jiti@2.6.1)(postcss@8.5.15)(tsdown@0.22.2)(yaml@2.8.2)
       '@types/css-modules':
         specifier: 'catalog:'
         version: 1.0.5
@@ -800,7 +800,7 @@ importers:
         version: 6.15.1
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.21.4)(typescript@5.9.3)(unrun@0.2.32)
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -858,7 +858,7 @@ importers:
     devDependencies:
       '@tsdown/css':
         specifier: 'catalog:'
-        version: 0.21.4(jiti@2.6.1)(postcss@8.5.15)(tsdown@0.22.2)(yaml@2.8.2)
+        version: 0.22.2(jiti@2.6.1)(postcss@8.5.15)(tsdown@0.22.2)(yaml@2.8.2)
       '@types/file-saver':
         specifier: 'catalog:'
         version: 2.0.7
@@ -885,7 +885,7 @@ importers:
         version: 10.4.1
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.21.4)(typescript@5.9.3)(unrun@0.2.32)
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -925,7 +925,7 @@ importers:
         version: 10.3.5(@testing-library/dom@10.4.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.21.4)(typescript@5.9.3)(unrun@0.2.32)
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -1120,17 +1120,11 @@ packages:
   '@emnapi/core@1.10.0':
     resolution: {integrity: sha512-yq6OkJ4p82CAfPl0u9mQebQHKPJkY7WrIuk205cTYnYe+k2Z8YBh11FrbRG/H6ihirqcacOgl2BIO8oyMQLeXw==}
 
-  '@emnapi/core@1.8.1':
-    resolution: {integrity: sha512-AvT9QFpxK0Zd8J0jopedNm+w/2fIzvtPKPjqyw9jwvBaReTTqPBk9Hixaz7KbjimP+QNz605/XnjFcDAL2pqBg==}
-
   '@emnapi/runtime@1.10.0':
     resolution: {integrity: sha512-ewvYlk86xUoGI0zQRNq/mC+16R1QeDlKQy21Ki3oSYXNgLb45GV1P6A0M+/s6nyCuNDqe5VpaY84BzXGwVbwFA==}
 
   '@emnapi/runtime@1.8.1':
     resolution: {integrity: sha512-mehfKSMWjjNol8659Z8KxEMrdSJDDot5SXMq00dM8BN4o+CLNXQ0xH2V7EchNHV4RmbZLmmPdEaXZc5H2FXmDg==}
-
-  '@emnapi/wasi-threads@1.1.0':
-    resolution: {integrity: sha512-WI0DdZ8xFSbgMjR1sFsKABJ/C5OnRrjT06JXbZKexJGrDuPTzZdDYfFlsgcCXCyf+suG5QU2e/y1Wo2V/OapLQ==}
 
   '@emnapi/wasi-threads@1.2.1':
     resolution: {integrity: sha512-uTII7OYF+/Mes/MrcIOYp5yOtSMLBWSIoLPpcgwipoiKbli6k322tcoFsxoIIxPDqW01SQGAgko4EzZi2BNv2w==}
@@ -1605,9 +1599,6 @@ packages:
 
   '@marko19907/string-to-color@1.0.2':
     resolution: {integrity: sha512-kADXIfypDWoCnqvqAjvgTm7curpHoigUpPVXKQY5fP2hUFfX72xx5H7ga4T7CwdBmIbYrbvU4zU/Al2NWPD+qQ==}
-
-  '@napi-rs/wasm-runtime@1.1.1':
-    resolution: {integrity: sha512-p64ah1M1ld8xjWv3qbvFwHiFVWrq1yFvV4f7w+mzaqiR4IlSgkqhcRdHwsGgomwzBH51sRY4NEowLxnaBjcW/A==}
 
   '@napi-rs/wasm-runtime@1.1.4':
     resolution: {integrity: sha512-3NQNNgA1YSlJb/kMH1ildASP9HW7/7kYnRI2szWJaofaS1hWmbGI4H+d3+22aGzXXN9IJ+n+GiFVcGipJP18ow==}
@@ -2226,16 +2217,16 @@ packages:
   '@tsconfig/strictest@2.0.8':
     resolution: {integrity: sha512-XnQ7vNz5HRN0r88GYf1J9JJjqtZPiHt2woGJOo2dYqyHGGcd6OLGqSlBB6p1j9mpzja6Oe5BoPqWmeDx6X9rLw==}
 
-  '@tsdown/css@0.21.4':
-    resolution: {integrity: sha512-2aU44SVyShHmL6VSefFBB0H8OXPqGqd6KwZ4+SP88DyyM+kZ1nBqzs65xf+HCyL/1NnidQtpA1wWkZLKgLv2SA==}
-    engines: {node: '>=20.19.0'}
+  '@tsdown/css@0.22.2':
+    resolution: {integrity: sha512-Go3Im9TaQnoX68vfU8Jv0OVzlxAkbKcAhTHBSkO0oC3ULClKcKETFqF4GN3P5Tcsu43NlyzOnob5po5zKSFNCA==}
+    engines: {node: ^22.18.0 || >=24.0.0}
     peerDependencies:
       postcss: ^8.4.0
       postcss-import: ^16.0.0
       postcss-modules: ^6.0.0
       sass: '*'
       sass-embedded: '*'
-      tsdown: 0.21.4
+      tsdown: 0.22.2
     peerDependenciesMeta:
       postcss:
         optional: true
@@ -2262,9 +2253,6 @@ packages:
 
   '@turf/meta@7.3.4':
     resolution: {integrity: sha512-tlmw9/Hs1p2n0uoHVm1w3ugw1I6L8jv9YZrcdQa4SH5FX5UY0ATrKeIvfA55FlL//PGuYppJp+eyg/0eb4goqw==}
-
-  '@tybys/wasm-util@0.10.1':
-    resolution: {integrity: sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg==}
 
   '@tybys/wasm-util@0.10.2':
     resolution: {integrity: sha512-RoBvJ2X0wuKlWFIjrwffGw1IqZHKQqzIchKaadZZfnNpsAYp2mM0h36JtPCjNDAHGgYez/15uMBpfGwchhiMgg==}
@@ -3381,8 +3369,8 @@ packages:
   hookable@6.1.1:
     resolution: {integrity: sha512-U9LYDy1CwhMCnprUfeAZWZGByVbhd54hwepegYTK7Pi5NvqEj63ifz5z+xukznehT7i6NIZRu89Ay1AZmRsLEQ==}
 
-  html-to-image@1.11.11:
-    resolution: {integrity: sha512-9gux8QhvjRO/erSnDPv28noDZcPZmYE7e1vFsBLKLlRlKDSqNJYebj6Qz1TGd5lsRV+X+xYyjCKjuZdABinWjA==}
+  html-to-image@1.11.13:
+    resolution: {integrity: sha512-cuOPoI7WApyhBElTTb9oqsawRvZ0rHhaHwghRLlTuffoD1B2aDemlCruLeZrUIIdvG7gs9xeELEPm6PhuASqrg==}
 
   human-signals@8.0.1:
     resolution: {integrity: sha512-eKCa6bwnJhvxj14kZk5NCPc6Hb6BdsU9DZcOnmQKSnO1VKrfV0zCvtttPZUsBvjmNDn8rpcJfpwSYnHBjc95MQ==}
@@ -5068,23 +5056,12 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
-  '@emnapi/core@1.8.1':
-    dependencies:
-      '@emnapi/wasi-threads': 1.1.0
-      tslib: 2.8.1
-    optional: true
-
   '@emnapi/runtime@1.10.0':
     dependencies:
       tslib: 2.8.1
     optional: true
 
   '@emnapi/runtime@1.8.1':
-    dependencies:
-      tslib: 2.8.1
-    optional: true
-
-  '@emnapi/wasi-threads@1.1.0':
     dependencies:
       tslib: 2.8.1
     optional: true
@@ -5441,13 +5418,6 @@ snapshots:
     dependencies:
       esm-seedrandom: 3.0.5-esm.2
 
-  '@napi-rs/wasm-runtime@1.1.1':
-    dependencies:
-      '@emnapi/core': 1.8.1
-      '@emnapi/runtime': 1.8.1
-      '@tybys/wasm-util': 0.10.1
-    optional: true
-
   '@napi-rs/wasm-runtime@1.1.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
     dependencies:
       '@emnapi/core': 1.10.0
@@ -5603,7 +5573,8 @@ snapshots:
       - supports-color
       - typescript
 
-  '@oxc-project/types@0.115.0': {}
+  '@oxc-project/types@0.115.0':
+    optional: true
 
   '@oxc-project/types@0.127.0': {}
 
@@ -5821,9 +5792,12 @@ snapshots:
       '@napi-rs/wasm-runtime': 1.1.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
     optional: true
 
-  '@rolldown/binding-wasm32-wasi@1.0.0-rc.9':
+  '@rolldown/binding-wasm32-wasi@1.0.0-rc.9(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
     dependencies:
-      '@napi-rs/wasm-runtime': 1.1.1
+      '@napi-rs/wasm-runtime': 1.1.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
+    transitivePeerDependencies:
+      - '@emnapi/core'
+      - '@emnapi/runtime'
     optional: true
 
   '@rolldown/binding-wasm32-wasi@1.1.0':
@@ -5853,7 +5827,8 @@ snapshots:
 
   '@rolldown/pluginutils@1.0.0-rc.17': {}
 
-  '@rolldown/pluginutils@1.0.0-rc.9': {}
+  '@rolldown/pluginutils@1.0.0-rc.9':
+    optional: true
 
   '@rolldown/pluginutils@1.0.1': {}
 
@@ -6033,12 +6008,12 @@ snapshots:
 
   '@tsconfig/strictest@2.0.8': {}
 
-  '@tsdown/css@0.21.4(jiti@2.6.1)(postcss@8.5.15)(tsdown@0.22.2)(yaml@2.8.2)':
+  '@tsdown/css@0.22.2(jiti@2.6.1)(postcss@8.5.15)(tsdown@0.22.2)(yaml@2.8.2)':
     dependencies:
       lightningcss: 1.32.0
       postcss-load-config: 6.0.1(jiti@2.6.1)(postcss@8.5.15)(yaml@2.8.2)
-      rolldown: 1.0.0-rc.9
-      tsdown: 0.22.2(@tsdown/css@0.21.4)(typescript@5.9.3)(unrun@0.2.32)
+      rolldown: 1.1.0
+      tsdown: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
     optionalDependencies:
       postcss: 8.5.15
     transitivePeerDependencies:
@@ -6077,11 +6052,6 @@ snapshots:
       '@turf/helpers': 7.3.4
       '@types/geojson': 7946.0.16
       tslib: 2.8.1
-
-  '@tybys/wasm-util@0.10.1':
-    dependencies:
-      tslib: 2.8.1
-    optional: true
 
   '@tybys/wasm-util@0.10.2':
     dependencies:
@@ -7267,7 +7237,7 @@ snapshots:
 
   hookable@6.1.1: {}
 
-  html-to-image@1.11.11: {}
+  html-to-image@1.11.13: {}
 
   human-signals@8.0.1: {}
 
@@ -8206,7 +8176,7 @@ snapshots:
       '@rolldown/binding-win32-arm64-msvc': 1.0.0-rc.17
       '@rolldown/binding-win32-x64-msvc': 1.0.0-rc.17
 
-  rolldown@1.0.0-rc.9:
+  rolldown@1.0.0-rc.9(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0):
     dependencies:
       '@oxc-project/types': 0.115.0
       '@rolldown/pluginutils': 1.0.0-rc.9
@@ -8223,9 +8193,13 @@ snapshots:
       '@rolldown/binding-linux-x64-gnu': 1.0.0-rc.9
       '@rolldown/binding-linux-x64-musl': 1.0.0-rc.9
       '@rolldown/binding-openharmony-arm64': 1.0.0-rc.9
-      '@rolldown/binding-wasm32-wasi': 1.0.0-rc.9
+      '@rolldown/binding-wasm32-wasi': 1.0.0-rc.9(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
       '@rolldown/binding-win32-arm64-msvc': 1.0.0-rc.9
       '@rolldown/binding-win32-x64-msvc': 1.0.0-rc.9
+    transitivePeerDependencies:
+      - '@emnapi/core'
+      - '@emnapi/runtime'
+    optional: true
 
   rolldown@1.1.0:
     dependencies:
@@ -8516,7 +8490,7 @@ snapshots:
       minimist: 1.2.8
       strip-bom: 3.0.0
 
-  tsdown@0.22.2(@tsdown/css@0.21.4)(typescript@5.9.3)(unrun@0.2.32):
+  tsdown@0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)):
     dependencies:
       ansis: 4.3.1
       cac: 7.0.0
@@ -8534,9 +8508,9 @@ snapshots:
       tree-kill: 1.2.2
       unconfig-core: 7.5.0
     optionalDependencies:
-      '@tsdown/css': 0.21.4(jiti@2.6.1)(postcss@8.5.15)(tsdown@0.22.2)(yaml@2.8.2)
+      '@tsdown/css': 0.22.2(jiti@2.6.1)(postcss@8.5.15)(tsdown@0.22.2)(yaml@2.8.2)
       typescript: 5.9.3
-      unrun: 0.2.32
+      unrun: 0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
     transitivePeerDependencies:
       - '@ts-macro/tsc'
       - '@typescript/native-preview'
@@ -8599,9 +8573,12 @@ snapshots:
 
   unquote@1.1.1: {}
 
-  unrun@0.2.32:
+  unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0):
     dependencies:
-      rolldown: 1.0.0-rc.9
+      rolldown: 1.0.0-rc.9(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
+    transitivePeerDependencies:
+      - '@emnapi/core'
+      - '@emnapi/runtime'
     optional: true
 
   update-browserslist-db@1.2.3(browserslist@4.28.2):
