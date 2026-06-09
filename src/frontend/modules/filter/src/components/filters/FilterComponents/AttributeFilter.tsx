@@ -70,28 +70,7 @@ const attributeTypeToInput: {
       <Controller
         control={control}
         name={`${attributeType}.${index}.number_range`}
-        render={({ field: { onChange, value } }) => (
-          <>
-            <Grid.Col span={3}>
-              <NumberInput
-                label={"min"}
-                min={min}
-                max={value?.[1] ? Number.parseFloat(`${value[1]}`) : max}
-                value={value?.[0] ?? min}
-                onChange={(newMin) => onChange([newMin, value?.[1] ?? null])}
-              />
-            </Grid.Col>
-            <Grid.Col span={3}>
-              <NumberInput
-                label={"max"}
-                min={value?.[0] ? Number.parseFloat(`${value[0]}`) : min}
-                max={max}
-                value={value?.[1] ?? max}
-                onChange={(newMax) => onChange([value?.[0] ?? null, newMax])}
-              />
-            </Grid.Col>
-          </>
-        )}
+        render={({ field: { onChange, value } }) => <></>}
       />
     );
   },

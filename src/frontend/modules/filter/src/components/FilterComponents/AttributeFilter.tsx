@@ -1,10 +1,11 @@
-import { Button, RangeSlider, TextInput } from "@mantine/core";
-import { DatePickerInput } from "@mantine/dates";
+import { ActionIcon, RangeSlider, TextInput } from "@mantine/core";
+import { DateTimePicker } from "@mantine/dates";
 import {
   type TypedAttribute,
   useEventAttributes,
   useObjectAttributes,
 } from "@ocelescope/api-base";
+import { PlusIcon, XIcon } from "lucide-react";
 import { DataTable } from "mantine-datatable";
 import { type Control, Controller, useFieldArray } from "react-hook-form";
 import type {
@@ -72,7 +73,6 @@ const AttributeInputField = ({
           control={control}
           render={({ field }) => (
             <TextInput
-              label={"Regex"}
               value={field.value ?? undefined}
               onChange={field.onChange}
             />
@@ -141,11 +141,10 @@ const AttributeInputField = ({
             const max = record.max.toString();
 
             return (
-              <DatePickerInput
+              <DateTimePicker
                 label={"Date Range"}
                 value={[value?.[0] ?? min, value?.[1] ?? max]}
                 onChange={onChange}
-                type="range"
                 minDate={min}
                 maxDate={max}
               />
@@ -164,7 +163,7 @@ const AttributeFilter =
     const isEvent = entityType === "events";
     const fieldName = isEvent ? "event_attribute" : "object_attribute";
 
-    const { fields, append } = useFieldArray({
+    const { fields, append, remove } = useFieldArray({
       name: fieldName,
       control,
     });
@@ -177,55 +176,70 @@ const AttributeFilter =
       <DataTable
         idAccessor={(record) => `${record.entity_type}-${record.name}`}
         columns={[
-          { accessor: "name" },
-          { accessor: "entity_type" },
+          { accessor: "name", title: "AttributeName" },
+          {
+            accessor: "entity_type",
+            title: isEvent ? "Activity" : "Object Type",
+          },
           {
             accessor: "filter",
-            render: ({ entity_type, name }) => {
-              const isFiltered = fields.find(
-                (f) => f.attribute === name && f.target_type === entity_type,
+            render: (attribute) => {
+              const filterIndex = fields.findIndex(
+                (f) =>
+                  f.attribute === attribute.name &&
+                  f.target_type === attribute.entity_type,
               );
-              return isFiltered ? <>A</> : <Button>Add Filter</Button>;
+              return filterIndex < 0 ? (
+                "No Filter Applied"
+              ) : (
+                <AttributeInputField
+                  record={attribute}
+                  control={control}
+                  index={filterIndex}
+                  path={fieldName}
+                />
+              );
+            },
+          },
+          {
+            accessor: "action",
+            title: "",
+            render: (record) => {
+              const filterIndex = fields.findIndex(
+                (f) =>
+                  f.attribute === record.name &&
+                  f.target_type === record.entity_type,
+              );
+
+              return filterIndex < 0 ? (
+                <ActionIcon
+                  color="green"
+                  onClick={() =>
+                    append({
+                      attribute: record.name,
+                      target_type: record.entity_type,
+                      type: isEvent ? "event_attribute" : "object_attribute",
+                      ...getInitalFilter(record),
+                    })
+                  }
+                >
+                  <PlusIcon />
+                </ActionIcon>
+              ) : (
+                <ActionIcon
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    remove(filterIndex);
+                  }}
+                  color="red"
+                >
+                  <XIcon />
+                </ActionIcon>
+              );
             },
           },
         ]}
         records={attributes ?? []}
-        onRowClick={({ record }) => {
-          if (
-            !fields.some(
-              (f) =>
-                f.attribute === record.name &&
-                f.target_type === record.entity_type,
-            )
-          ) {
-            append({
-              attribute: record.name,
-              target_type: record.entity_type,
-              type: isEvent ? "event_attribute" : "object_attribute",
-              ...getInitalFilter(record),
-            });
-          }
-        }}
-        rowExpansion={{
-          content: ({ record }) => {
-            const fieldIndex = fields.findIndex(
-              (f) =>
-                f.attribute === record.name &&
-                f.target_type === record.entity_type,
-            );
-
-            if (fieldIndex < 0) return null;
-
-            return (
-              <AttributeInputField
-                control={control}
-                index={fieldIndex}
-                record={record}
-                path={fieldName}
-              />
-            );
-          },
-        }}
       />
     );
   };
