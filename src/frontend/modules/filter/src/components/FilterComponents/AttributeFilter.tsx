@@ -89,15 +89,13 @@ const NumberFilterField = memo(function NumberFilterField({
   name,
   min,
   max,
-  step,
-  precision,
+  allowDecimals,
 }: {
   control: Control<GroupedOCELFilter>;
   name: `${FilterPath}.${number}.number_range`;
   min: number;
   max: number;
-  step?: number;
-  precision?: number;
+  allowDecimals?: boolean;
 }) {
   return (
     <Controller
@@ -119,6 +117,7 @@ const NumberFilterField = memo(function NumberFilterField({
               onChange={(nextMin) => {
                 field.onChange([nextMin, currentMax]);
               }}
+              allowDecimal={allowDecimals}
               style={{ flex: 1 }}
             />
 
@@ -130,8 +129,8 @@ const NumberFilterField = memo(function NumberFilterField({
               value={currentMax}
               min={currentMin ?? min}
               max={max}
-              step={step}
               clampBehavior="strict"
+              allowDecimal={allowDecimals}
               onChange={(nextMax) => {
                 field.onChange([currentMin, nextMax]);
               }}
@@ -146,52 +145,52 @@ const NumberFilterField = memo(function NumberFilterField({
 
 const DateFilterField = memo(function DateFilterField({
   control,
-  index,
-  path,
-  record,
+  name,
+  min,
+  max,
 }: {
   control: Control<GroupedOCELFilter>;
-  index: number;
-  path: FilterPath;
-  record: TypedAttribute;
+  name: `${FilterPath}.${number}.time_range`;
+  min: string;
+  max: string;
+  allowDecimals?: boolean;
 }) {
-  const minDate = new Date(String(record.min));
-  const maxDate = new Date(String(record.max));
-
   return (
-    <Group grow align="end">
-      <Controller
-        control={control}
-        name={`${path}.${index}.time_range.0`}
-        render={({ field }) => (
-          <DateTimePicker
-            label="From"
-            value={field.value ? new Date(field.value) : minDate}
-            onChange={(value) =>
-              field.onChange(value ? value.toISOString() : "")
-            }
-            minDate={minDate}
-            maxDate={maxDate}
-          />
-        )}
-      />
+    <Controller
+      name={name}
+      control={control}
+      render={({ field }) => {
+        return (
+          <Group wrap="nowrap" align="end" gap="xs">
+            <DateTimePicker
+              value={field.value?.[0] ?? undefined}
+              minDate={min}
+              maxDate={field.value?.[1] ?? max}
+              withSeconds
+              onChange={(nextMin) => {
+                field.onChange([nextMin, field.value?.[1] ?? max]);
+              }}
+              style={{ flex: 1 }}
+            />
 
-      <Controller
-        control={control}
-        name={`${path}.${index}.time_range.1`}
-        render={({ field }) => (
-          <DateTimePicker
-            label="To"
-            value={field.value ? new Date(field.value) : maxDate}
-            onChange={(value) =>
-              field.onChange(value ? value.toISOString() : "")
-            }
-            minDate={minDate}
-            maxDate={maxDate}
-          />
-        )}
-      />
-    </Group>
+            <Text c="dimmed" size="sm" pb={8}>
+              -
+            </Text>
+
+            <DateTimePicker
+              value={field.value?.[1] ?? undefined}
+              minDate={field.value?.[0] ?? min}
+              maxDate={max}
+              withSeconds
+              onChange={(nextMax) => {
+                field.onChange([field.value?.[0] ?? min, nextMax]);
+              }}
+              style={{ flex: 1 }}
+            />
+          </Group>
+        );
+      }}
+    />
   );
 });
 
@@ -211,7 +210,6 @@ const AttributeInputField = memo(function AttributeInputField({
       return (
         <StringFilterField control={control} name={`${path}.${index}.regex`} />
       );
-
     case "int":
       return (
         <NumberFilterField
@@ -219,45 +217,26 @@ const AttributeInputField = memo(function AttributeInputField({
           name={`${path}.${index}.number_range`}
           min={Number.parseInt(`${record.min}`, 10)}
           max={Number.parseInt(`${record.max}`, 10)}
+          allowDecimals={false}
         />
       );
-
     case "float": {
-      const min = Number.parseFloat(`${record.min}`);
-      const max = Number.parseFloat(`${record.max}`);
-      const range = max - min;
-
-      const step =
-        range <= 0.001
-          ? 0.000001
-          : range <= 0.01
-            ? 0.0001
-            : range <= 1
-              ? 0.001
-              : 0.01;
-
-      const precision =
-        step === 0.000001 ? 6 : step === 0.0001 ? 4 : step === 0.001 ? 3 : 2;
-
       return (
         <NumberFilterField
           control={control}
           name={`${path}.${index}.number_range`}
-          min={min}
-          max={max}
-          step={step}
-          precision={precision}
+          min={Number.parseFloat(`${record.min}`)}
+          max={Number.parseFloat(`${record.max}`)}
         />
       );
     }
-
     case "date":
       return (
         <DateFilterField
           control={control}
-          index={index}
-          path={path}
-          record={record}
+          name={`${path}.${index}.time_range`}
+          min={record.min.toString()}
+          max={record.max.toString()}
         />
       );
 
