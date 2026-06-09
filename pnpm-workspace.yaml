@@ -64,7 +64,7 @@ catalog:
   recharts: ^2.15.3
   rolldown: 1.0.0-rc.6
   storybook: ^10.3.5
-  tsdown: ^0.21.4
+  tsdown: ^0.22.0
   typescript: ^5.9.3
   uniqolor: ^1.1.1
   zod: ^4.3.6
