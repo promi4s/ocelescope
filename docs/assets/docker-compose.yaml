@@ -1,11 +1,11 @@
 services:
   backend:
-    image: ghcr.io/promi4s/ocelescope-backend:latest@sha256:cb8fa49b399482b85aeb95b802827853fce10871f86d032cdb22600c44267ff4
+    image: ghcr.io/promi4s/ocelescope-backend:latest
     volumes:
       - plugins_store:/plugins
     restart: unless-stopped
-  frontend: 
-    image: ghcr.io/promi4s/ocelescope-frontend:latest@sha256:70931aab1783d62f65a345f0c759bffdd9199ea3003197360c427faecb17d6c1
+  frontend:
+    image: ghcr.io/promi4s/ocelescope-frontend:latest
     ports:
       - "3000:3000"
     restart: unless-stopped
