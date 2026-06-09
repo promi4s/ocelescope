@@ -25,7 +25,7 @@ catalog:
   '@tanstack/react-query': ^5.90.21
   '@tanstack/react-query-devtools': ^5.91.3
   '@tsconfig/strictest': ^2.0.8
-  '@tsdown/css': ^0.21.4
+  '@tsdown/css': ^0.22.0
   '@types/css-modules': ^1.0.5
   '@types/file-saver': ^2.0.7
   '@types/lodash': ^4.17.23
@@ -64,7 +64,7 @@ catalog:
   recharts: ^2.15.3
   rolldown: 1.1.0
   storybook: ^10.3.5
-  tsdown: ^0.21.4
+  tsdown: ^0.22.0
   typescript: ^5.9.3
   uniqolor: ^1.1.1
   zod: ^4.3.6
