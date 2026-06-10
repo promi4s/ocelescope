@@ -9,60 +9,18 @@ catalogs:
     '@apidevtools/json-schema-ref-parser':
       specifier: ^15.3.1
       version: 15.3.1
-    '@dagrejs/dagre':
-      specifier: ^2.0.4
-      version: 2.0.4
     '@faker-js/faker':
       specifier: ^10.4.0
       version: 10.4.0
-    '@floating-ui/react':
-      specifier: ^0.27.18
-      version: 0.27.19
-    '@hpcc-js/wasm-graphviz':
-      specifier: ^1.21.0
-      version: 1.21.1
-    '@mantine/carousel':
-      specifier: ^8.3.15
-      version: 8.3.16
-    '@mantine/charts':
-      specifier: ^8.1.1
-      version: 8.3.16
-    '@mantine/core':
-      specifier: ^8.3.14
-      version: 8.3.16
-    '@mantine/dates':
-      specifier: ^8.3.15
-      version: 8.3.16
-    '@mantine/dropzone':
-      specifier: ^8.3.14
-      version: 8.3.16
-    '@mantine/hooks':
-      specifier: ^8.3.14
-      version: 8.3.16
     '@mantine/notifications':
       specifier: ^8.3.15
       version: 8.3.16
-    '@marko19907/string-to-color':
-      specifier: ^1.0.2
-      version: 1.0.2
-    '@rjsf/core':
-      specifier: ^6.3.1
-      version: 6.3.1
     '@rjsf/mantine':
-      specifier: ^6.3.1
-      version: 6.3.1
-    '@rjsf/utils':
-      specifier: ^6.3.1
-      version: 6.3.1
-    '@rjsf/validator-ajv8':
       specifier: ^6.3.1
       version: 6.3.1
     '@storybook/react-vite':
       specifier: ^10.3.5
       version: 10.3.5
-    '@tanstack/react-query':
-      specifier: ^5.90.21
-      version: 5.90.21
     '@tsconfig/strictest':
       specifier: ^2.0.8
       version: 2.0.8
@@ -93,36 +51,12 @@ catalogs:
     '@types/react-plotly.js':
       specifier: ^2.6.4
       version: 2.6.4
-    '@xyflow/react':
-      specifier: ^12.10.1
-      version: 12.10.1
     axios:
       specifier: ^1.16.0
       version: 1.16.0
     bumpp:
       specifier: ^10.3.2
       version: 10.4.1
-    clsx:
-      specifier: ^2.1.1
-      version: 2.1.1
-    content-disposition-attachment:
-      specifier: ^0.3.1
-      version: 0.3.1
-    dayjs:
-      specifier: ^1.11.19
-      version: 1.11.19
-    elkjs:
-      specifier: ^0.11.0
-      version: 0.11.1
-    embla-carousel:
-      specifier: ^8.6.0
-      version: 8.6.0
-    embla-carousel-react:
-      specifier: ^8.6.0
-      version: 8.6.0
-    file-saver:
-      specifier: ^2.0.5
-      version: 2.0.5
     flat:
       specifier: ^6.0.1
       version: 6.0.1
@@ -135,15 +69,6 @@ catalogs:
     jspdf:
       specifier: ^4.2.1
       version: 4.2.1
-    lodash:
-      specifier: ^4.17.23
-      version: 4.17.23
-    lucide-react:
-      specifier: ^0.577.0
-      version: 0.577.0
-    mantine-datatable:
-      specifier: ^8.3.13
-      version: 8.3.13
     next:
       specifier: ^16.1.6
       version: 16.1.6
@@ -159,18 +84,6 @@ catalogs:
     react-dom:
       specifier: ^19.2.0
       version: 19.2.3
-    react-hook-form:
-      specifier: ^7.71.2
-      version: 7.71.2
-    react-plotly.js:
-      specifier: ^2.6.0
-      version: 2.6.0
-    react-zoom-pan-pinch:
-      specifier: ^3.7.0
-      version: 3.7.0
-    recharts:
-      specifier: ^2.15.3
-      version: 2.15.4
     storybook:
       specifier: ^10.3.5
       version: 10.3.5
@@ -180,15 +93,6 @@ catalogs:
     typescript:
       specifier: ^5.9.3
       version: 5.9.3
-    uniqolor:
-      specifier: ^1.1.1
-      version: 1.1.1
-    zod:
-      specifier: ^4.3.6
-      version: 4.3.6
-    zustand:
-      specifier: ^5.0.11
-      version: 5.0.11
 
 importers:
 
@@ -336,7 +240,7 @@ importers:
         version: 1.0.0
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -400,7 +304,7 @@ importers:
         version: 19.2.3(@types/react@19.2.14)
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -455,7 +359,7 @@ importers:
         version: 19.2.3(@types/react@19.2.14)
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -510,7 +414,7 @@ importers:
         version: 19.2.3(@types/react@19.2.14)
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -595,7 +499,7 @@ importers:
         version: 19.2.3(@types/react@19.2.14)
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -683,7 +587,7 @@ importers:
         version: 1.0.0
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -723,7 +627,7 @@ importers:
         version: 10.4.1
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -760,7 +664,7 @@ importers:
         version: 10.4.1
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -791,7 +695,7 @@ importers:
         version: 10.4.1
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -891,7 +795,7 @@ importers:
         version: 6.15.1
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -979,7 +883,7 @@ importers:
         version: 10.4.1
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -1019,7 +923,7 @@ importers:
         version: 10.3.5(@testing-library/dom@10.4.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -1696,6 +1600,12 @@ packages:
 
   '@napi-rs/wasm-runtime@1.1.4':
     resolution: {integrity: sha512-3NQNNgA1YSlJb/kMH1ildASP9HW7/7kYnRI2szWJaofaS1hWmbGI4H+d3+22aGzXXN9IJ+n+GiFVcGipJP18ow==}
+    peerDependencies:
+      '@emnapi/core': ^1.7.1
+      '@emnapi/runtime': ^1.7.1
+
+  '@napi-rs/wasm-runtime@1.1.5':
+    resolution: {integrity: sha512-AWPoBRJ9tsnVhor4sjO7rkni+7p+2IAEFj6cx06UgP10jkQHqay/36uRV/bFkgrh18D9vb4cr8Q0Pthskgzy+Q==}
     peerDependencies:
       '@emnapi/core': ^1.7.1
       '@emnapi/runtime': ^1.7.1
@@ -5571,6 +5481,13 @@ snapshots:
       '@tybys/wasm-util': 0.10.2
     optional: true
 
+  '@napi-rs/wasm-runtime@1.1.5(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
+    dependencies:
+      '@emnapi/core': 1.10.0
+      '@emnapi/runtime': 1.10.0
+      '@tybys/wasm-util': 0.10.2
+    optional: true
+
   '@next/env@16.1.6': {}
 
   '@next/swc-darwin-arm64@16.1.6':
@@ -5935,12 +5852,12 @@ snapshots:
     dependencies:
       '@emnapi/core': 1.10.0
       '@emnapi/runtime': 1.10.0
-      '@napi-rs/wasm-runtime': 1.1.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
+      '@napi-rs/wasm-runtime': 1.1.5(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
     optional: true
 
   '@rolldown/binding-wasm32-wasi@1.0.0-rc.9(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
     dependencies:
-      '@napi-rs/wasm-runtime': 1.1.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
+      '@napi-rs/wasm-runtime': 1.1.5(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
     transitivePeerDependencies:
       - '@emnapi/core'
       - '@emnapi/runtime'
@@ -6159,7 +6076,7 @@ snapshots:
       lightningcss: 1.32.0
       postcss-load-config: 6.0.1(jiti@2.6.1)(postcss@8.5.15)(yaml@2.8.2)
       rolldown: 1.1.0
-      tsdown: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
+      tsdown: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
     optionalDependencies:
       postcss: 8.5.15
     transitivePeerDependencies:
@@ -8702,7 +8619,7 @@ snapshots:
       minimist: 1.2.8
       strip-bom: 3.0.0
 
-  tsdown@0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)):
+  tsdown@0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32):
     dependencies:
       ansis: 4.3.1
       cac: 7.0.0
