@@ -1,7 +1,7 @@
 {
   "name": "ocelescope-workspace",
   "private": "true",
-  "packageManager": "pnpm@10.30.1",
+  "packageManager": "pnpm@10.34.1",
   "scripts": {
     "init:backend": "uv sync --all-packages",
     "init:frontend": "pnpm i && pnpm run build:frontend",
@@ -26,7 +26,7 @@
     "notebook": "uv run --with jupyterlab --with jupyter-ruff jupyter lab notebooks/"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.2",
+    "@biomejs/biome": "2.4.16",
     "@tsconfig/strictest": "catalog:",
     "orval": "catalog:"
   }
