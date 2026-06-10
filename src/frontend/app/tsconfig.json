@@ -16,6 +16,8 @@
     "paths": {
       "@/*": ["./*"],
       "@ocelescope/core": ["../packages/core/src/index.ts"],
+      "@ocelescope/resources": ["../packages/resources/src/index.ts"],
+      "@ocelescope/discovery": ["../modules/discovery/src/index.ts"],
       "@ocelescope/core/styles": ["../packages/core/src/styles/styles.ts"],
       "@ocelescope/management": ["../modules/management/src/index.ts"],
       "@ocelescope/ocelot": ["../modules/ocelot/src/index.ts"],

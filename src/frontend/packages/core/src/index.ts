@@ -11,6 +11,7 @@ export {
   useDownloadFlatOCEL,
   useDownloadOCEL,
   useDownloadResource,
+  useDownloadResourceAsPnml,
 } from "./hooks/useDownload";
 export { useInvalidate } from "./hooks/useInvalidate";
 export * from "./lib/config";

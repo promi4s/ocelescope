@@ -4,12 +4,18 @@ from ocelescope.ocel.filter.filters.entity_type import (
     EventTypeFilter,
     ObjectTypeFilter,
 )
+from ocelescope.ocel.filter.filters.frequency import (
+    EventTypeFrequencyFilter,
+    ObjectTypeFrequencyFilter,
+)
 from ocelescope.ocel.filter.filters.relation_count import E2OCountFilter, O2OCountFilter
 from ocelescope.ocel.filter.filters.time_range import TimeFrameFilter
 
 __all__ = [
     "ObjectTypeFilter",
     "EventTypeFilter",
+    "ObjectTypeFrequencyFilter",
+    "EventTypeFrequencyFilter",
     "ObjectAttributeFilter",
     "EventAttributeFilter",
     "O2OCountFilter",

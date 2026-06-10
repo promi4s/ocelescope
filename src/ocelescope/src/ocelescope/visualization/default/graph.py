@@ -3,7 +3,6 @@ from typing import Generic, Literal, TypeVar
 from pydantic import BaseModel, Field
 
 from ocelescope.util.pydantic import uuid_factory
-from ocelescope.visualization.default.dot import GraphvizLayoutEngineName
 from ocelescope.visualization.visualization import Visualization
 
 T = TypeVar("T", bound=Visualization)
@@ -34,6 +33,34 @@ EdgeArrow = (
 )
 
 
+class NodeStyle(BaseModel):
+    """Visual style options for a `GraphNode`.
+
+    Attributes:
+        double_border: Renders a second border inside the node (e.g. final-marking places).
+        inner_symbol: Optional symbol rendered inside the node shape.
+        initial_tokens: Optional initial token count rendered inside a place node.
+        final_tokens: Optional final token count rendered inside a place node.
+    """
+
+    double_border: bool = False
+    inner_symbol: Literal["triangle", "square"] | None = None
+    initial_tokens: int | None = None
+    final_tokens: int | None = None
+
+
+class EdgeStyle(BaseModel):
+    """Visual style options for a `GraphEdge`.
+
+    Attributes:
+        dashed: Renders the edge as a dashed line.
+        bold: Renders the edge as a bold line.
+    """
+
+    dashed: bool = False
+    bold: bool = False
+
+
 class GraphNode(AnnotatedElement):
     """A node in a `Graph` visualization.
 
@@ -51,9 +78,9 @@ class GraphNode(AnnotatedElement):
         x: Optional x-coordinate after layouting.
         y: Optional y-coordinate after layouting.
         border_color: Optional border/stroke color.
+        style: Visual style options.
         label_pos: Label position relative to the node.
         rank: Optional layout constraint (source/sink or numeric rank).
-        layout_attrs: Additional Graphviz attributes for this node.
         annotation: Optional attached visualization.
     """
 
@@ -66,10 +93,10 @@ class GraphNode(AnnotatedElement):
     x: float | None = None
     y: float | None = None
     border_color: str | None = None
+    style: NodeStyle = NodeStyle()
     label_pos: Literal["top", "center", "bottom"] = "center"
 
     rank: Literal["source", "sink"] | int | None = None
-    layout_attrs: dict[str, str | int | float | bool] | None = None
 
 
 class GraphEdge(AnnotatedElement):
@@ -83,11 +110,11 @@ class GraphEdge(AnnotatedElement):
         target: Target node id.
         color: Optional edge color.
         label: Optional label shown along the edge.
+        style: Visual style options.
         start_arrow: Optional arrowhead style at the start of the edge.
         end_arrow: Optional arrowhead style at the end of the edge.
         start_label: Optional label shown near the source.
         end_label: Optional label shown near the target.
-        layout_attrs: Additional Graphviz attributes for this edge.
         annotation: Optional attached visualization.
     """
 
@@ -96,47 +123,40 @@ class GraphEdge(AnnotatedElement):
     target: str
     color: str | None = None
     label: str | None = None
+    style: EdgeStyle = EdgeStyle()
     start_arrow: EdgeArrow = None
     end_arrow: EdgeArrow = None
     start_label: str | None = None
     end_label: str | None = None
 
-    layout_attrs: dict[str, str | int | float | bool] | None = None
 
-
-class GraphvizLayoutConfig(BaseModel):
-    """Layout configuration for `Graph` rendering via Graphviz.
-
-    This config selects the Graphviz layout engine and allows you to define default
-    Graphviz attributes for the graph, nodes, and edges.
+class LayoutConfig(BaseModel):
+    """ELK-based layout configuration for a `Graph` visualization.
 
     Attributes:
-        engine: Graphviz layout engine name.
-        graphAttrs: Global Graphviz graph attributes.
-        nodeAttrs: Default Graphviz node attributes.
-        edgeAttrs: Default Graphviz edge attributes.
+        elk_options: Additional ELK layout options passed directly to the renderer.
+            Keys and values mirror the ELK option format (e.g. ``{"elk.algorithm": "force"}``).
+
+            For all available options see https://eclipse.dev/elk/reference/options.html.
     """
 
-    engine: GraphvizLayoutEngineName = "dot"
-    graphAttrs: dict[str, str | int | float | bool] | None = None
-    nodeAttrs: dict[str, str | int | float | bool] | None = None
-    edgeAttrs: dict[str, str | int | float | bool] | None = None
+    elk_options: dict[str, str | int | float | bool] | None = None
 
 
 class Graph(Visualization):
     """Graph visualization composed of nodes and directed edges.
 
     This visualization is meant for model-like structures (for example Petri nets
-    or directly-follows graphs). Layout and rendering are performed using Graphviz.
+    or directly-follows graphs). Layout is performed by the frontend renderer (ELK).
 
     Attributes:
         type: Fixed discriminator `"graph"`.
         nodes: List of nodes.
         edges: List of edges.
-        layout_config: Graphviz layout configuration.
+        layout_config: Layout hints consumed by the renderer.
     """
 
     type: Literal["graph"] = "graph"
-    nodes: list[GraphNode] = []
-    edges: list[GraphEdge] = []
-    layout_config: GraphvizLayoutConfig = GraphvizLayoutConfig()
+    nodes: list[GraphNode] = Field(default_factory=list)
+    edges: list[GraphEdge] = Field(default_factory=list)
+    layout_config: LayoutConfig = Field(default_factory=LayoutConfig)
