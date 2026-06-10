@@ -6,12 +6,12 @@ import {
   ScrollArea,
   Text,
 } from "@mantine/core";
-import { XIcon } from "lucide-react";
 import type { GraphNode } from "@ocelescope/api-base";
 import { Handle, type NodeProps, Position } from "@xyflow/react";
+import { XIcon } from "lucide-react";
 import { memo, useCallback, useState } from "react";
-import { Visualization } from "../../../index";
 import type { VisulizationsType } from "../../../../../types";
+import { Visualization } from "../../../index";
 import {
   DEFAULT_COLORS,
   EXTERNAL_NODE_LABEL_HEIGHT,
@@ -69,7 +69,8 @@ const NodeAnnotation = ({ annotation }: { annotation: VisulizationsType }) => {
       shadow="md"
     >
       <Popover.Target>
-        <div
+        <button
+          type="button"
           className="nodrag nopan"
           style={{
             position: "absolute",
@@ -78,12 +79,15 @@ const NodeAnnotation = ({ annotation }: { annotation: VisulizationsType }) => {
             cursor: "pointer",
             pointerEvents: "all",
             zIndex: 10,
+            background: "none",
+            border: "none",
+            padding: 0,
           }}
           onClick={toggle}
           onMouseDown={(e) => e.stopPropagation()}
         >
           <AnnotationBadge />
-        </div>
+        </button>
       </Popover.Target>
       <Popover.Dropdown style={{ minWidth: 200, maxWidth: 400 }}>
         <Group justify="flex-end" mb={4}>

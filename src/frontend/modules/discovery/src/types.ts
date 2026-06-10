@@ -13,7 +13,7 @@ export type DiscoverySchemaProperty = {
   default?: unknown;
   minimum?: number;
   maximum?: number;
-  ["x-ui-meta"]?: { field_type?: string };
+  "x-ui-meta"?: { field_type?: string };
 };
 
 export type FilterEntry = {
