@@ -2,7 +2,6 @@ import type { GraphEdge, GraphNode } from "@ocelescope/api-base";
 import type { Edge, Node } from "@xyflow/react";
 import {
   DEFAULT_NODE_POSITION,
-  GraphVisualizationError,
   type GraphEdgeRouting,
   type GraphFlowEdgeData,
   type GraphFlowEdgeType,
@@ -11,6 +10,7 @@ import {
   type GraphFlowNodeType,
   type GraphLayoutPlan,
   type GraphVisualization,
+  GraphVisualizationError,
 } from "./types";
 
 const EDGE_ROUTING_VALUES = [

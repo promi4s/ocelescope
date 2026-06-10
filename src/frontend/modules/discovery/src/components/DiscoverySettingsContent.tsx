@@ -69,20 +69,22 @@ export const DiscoverySettingsContent = ({
           {selectedMethod.description}
         </Text>
       )}
-      {Object.entries(selectedSchema.properties ?? {}).map(([name, property]) => (
-        <Box key={name}>
-          <DiscoveryField
-            name={name}
-            property={property}
-            value={activeFormData[name]}
-            eventTypeOptions={Object.keys(eventCounts)}
-            objectTypeOptions={Object.keys(objectCounts)}
-            onChange={(value) =>
-              setActiveFormData({ ...activeFormData, [name]: value })
-            }
-          />
-        </Box>
-      ))}
+      {Object.entries(selectedSchema.properties ?? {}).map(
+        ([name, property]) => (
+          <Box key={name}>
+            <DiscoveryField
+              name={name}
+              property={property}
+              value={activeFormData[name]}
+              eventTypeOptions={Object.keys(eventCounts)}
+              objectTypeOptions={Object.keys(objectCounts)}
+              onChange={(value) =>
+                setActiveFormData({ ...activeFormData, [name]: value })
+              }
+            />
+          </Box>
+        ),
+      )}
       <Divider />
 
       <DiscoveryFiltersSection

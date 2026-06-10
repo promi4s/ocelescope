@@ -80,7 +80,10 @@ class DiscoveryRegistry:
         parameter_type = _build_parameter_model(meta.func)
 
         for existing in self._methods.values():
-            if existing.name == meta.name and existing.resource_type is meta.resource_type:
+            if (
+                existing.name == meta.name
+                and existing.resource_type is meta.resource_type
+            ):
                 raise TypeError(
                     f"Discovery method '{meta.name}' is already registered for resource "
                     f"type '{meta.resource_type.get_type()}'."
@@ -125,7 +128,9 @@ class DiscoveryRegistry:
 discovery_registry = DiscoveryRegistry()
 
 
-def register_discovery_methods_from_module(module: ModuleType) -> list[DiscoveryMethodInfo]:
+def register_discovery_methods_from_module(
+    module: ModuleType,
+) -> list[DiscoveryMethodInfo]:
     """Scan a module for functions tagged with `__discovery_meta__` and register them."""
     registered: list[DiscoveryMethodInfo] = []
     for value in vars(module).values():

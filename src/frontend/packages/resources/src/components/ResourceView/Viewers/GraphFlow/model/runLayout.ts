@@ -3,17 +3,17 @@ import type { Edge, Node } from "@xyflow/react";
 import ELK from "elkjs/lib/elk.bundled.js";
 import { normalizeEdgeRouting } from "./buildModel";
 import {
-  EXTERNAL_NODE_LABEL_HEIGHT,
-  GraphVisualizationError,
   type ElkEdgeLabel,
   type ElkEdgeResult,
   type ElkEdgeSection,
   type ElkPoint,
+  EXTERNAL_NODE_LABEL_HEIGHT,
   type GraphEdgeRouting,
   type GraphFlowModel,
   type GraphLayoutPlan,
   type GraphLayoutResult,
   type GraphPoint,
+  GraphVisualizationError,
 } from "./types";
 
 const buildPolylinePath = (points: ElkPoint[]): string | null => {

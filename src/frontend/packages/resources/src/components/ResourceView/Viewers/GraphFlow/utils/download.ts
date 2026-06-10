@@ -1,8 +1,8 @@
 import type { Node } from "@xyflow/react";
-import type { Rect } from "./bounds";
 import { saveAs } from "file-saver";
 import { toPng, toSvg } from "html-to-image";
 import { jsPDF } from "jspdf";
+import type { Rect } from "./bounds";
 import { getContentBounds } from "./bounds";
 
 const MAX_PX = 2048;

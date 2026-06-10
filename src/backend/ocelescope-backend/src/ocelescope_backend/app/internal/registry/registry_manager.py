@@ -8,7 +8,9 @@ from typing_extensions import TypedDict
 from ocelescope import DirectlyFollowsGraph, PetriNet, Plugin, Resource
 
 from ocelescope_backend.app.internal.config import config
-from ocelescope_backend.app.internal.discovery import register_discovery_methods_from_module
+from ocelescope_backend.app.internal.discovery import (
+    register_discovery_methods_from_module,
+)
 from ocelescope_backend.app.internal.model.plugin import PluginApi
 from ocelescope_backend.app.internal.model.resource import ResourceStore
 from ocelescope_backend.app.internal.registry.extension import ExtensionRegistry

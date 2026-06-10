@@ -5,8 +5,8 @@ import { memo } from "react";
 import {
   DEFAULT_COLORS,
   EXTERNAL_NODE_LABEL_HEIGHT,
-  MARKING_DOT_SIZE,
   type GraphFlowNodeType,
+  MARKING_DOT_SIZE,
 } from "../model/types";
 
 // ─── Hidden handles ───────────────────────────────────────────────────────────

@@ -1,4 +1,12 @@
-import { ActionIcon, Box, Center, Drawer, LoadingOverlay, Text, Tooltip } from "@mantine/core";
+import {
+  ActionIcon,
+  Box,
+  Center,
+  Drawer,
+  LoadingOverlay,
+  Text,
+  Tooltip,
+} from "@mantine/core";
 import { useLocalStorage } from "@mantine/hooks";
 import {
   useCreateDiscoveryTask,
@@ -82,7 +90,8 @@ const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
     [selectedMethod, selectedMethodId],
   );
 
-  const selectedSchema = (selectedVariant?.inputSchema ?? {}) as DiscoverySchema;
+  const selectedSchema = (selectedVariant?.inputSchema ??
+    {}) as DiscoverySchema;
 
   // Initialize form data defaults when a method is first selected
   useEffect(() => {

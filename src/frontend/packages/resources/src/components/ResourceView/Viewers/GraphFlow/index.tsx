@@ -15,15 +15,14 @@ import {
   Menu,
   Stack,
 } from "@mantine/core";
-import { useCallback, useEffect, useRef } from "react";
 import { DownloadIcon, Maximize2Icon } from "lucide-react";
-import { computeAutoFitBounds } from "./utils/bounds";
-import { downloadPdf, downloadPng, downloadSvg } from "./utils/download";
-
-import { FIT_VIEW_PADDING, type GraphVisualization } from "./model/types";
+import { useCallback, useEffect, useRef } from "react";
 import { useLayout } from "./hooks/useLayout";
+import { FIT_VIEW_PADDING, type GraphVisualization } from "./model/types";
 import GraphFlowEdge from "./render/Edge";
 import GraphFlowNode from "./render/Node";
+import { computeAutoFitBounds } from "./utils/bounds";
+import { downloadPdf, downloadPng, downloadSvg } from "./utils/download";
 
 const nodeTypes = { node: GraphFlowNode };
 const edgeTypes = { graphflow: GraphFlowEdge };

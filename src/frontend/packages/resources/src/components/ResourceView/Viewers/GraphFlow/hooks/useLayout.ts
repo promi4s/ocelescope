@@ -13,10 +13,10 @@ import {
   measuredNodesMatchModel,
   toGraphError,
 } from "../model/runLayout";
-import {
-  type GraphFlowModel,
+import type {
+  GraphFlowModel,
+  GraphVisualization,
   GraphVisualizationError,
-  type GraphVisualization,
 } from "../model/types";
 
 type BuildResult =

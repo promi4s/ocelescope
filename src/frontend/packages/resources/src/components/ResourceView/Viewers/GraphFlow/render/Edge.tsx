@@ -17,6 +17,7 @@ import {
 } from "../model/types";
 
 type EdgeArrow = GraphEdge["end_arrow"];
+
 import { AnnotationBadge } from "./Node";
 
 const placeBounds = (node: InternalNode) => {

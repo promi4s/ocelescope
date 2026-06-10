@@ -18,7 +18,7 @@ function nodeBoundsFromData(nodes: Node[]): Rect {
     maxX = Math.max(maxX, x + w);
     maxY = Math.max(maxY, y + h);
   }
-  return isFinite(minX)
+  return Number.isFinite(minX)
     ? { x: minX, y: minY, width: maxX - minX, height: maxY - minY }
     : { x: 0, y: 0, width: 0, height: 0 };
 }
@@ -38,7 +38,7 @@ function svgPathBounds(d: string): Rect | null {
     maxX = Math.max(maxX, nums[i]!);
     maxY = Math.max(maxY, nums[i + 1]!);
   }
-  return isFinite(minX)
+  return Number.isFinite(minX)
     ? { x: minX, y: minY, width: maxX - minX, height: maxY - minY }
     : null;
 }
