@@ -41,17 +41,22 @@ class Resource(BaseModel, ABC):
             Optional[Visualization]: A visualization object or ``None``.
         """
 
-        return
+        ...
 
 
 T = TypeVar("T", bound=Resource)
 
 
 class Annotated(BaseModel, Generic[T]):
-    annotation: list[T | str] = []
+    annotation: list[T] | str = []
 
     def get_annotation_str(self):
         return self.annotation if type(self.annotation) is str else None
 
     def get_annotation_visualization(self):
-        return self.annotation.visualize() if isinstance(self.annotation, Resource) else None
+        if not isinstance(self.annotation, list) or len(self.annotation) != 1:
+            return None
+        resource = self.annotation[0]
+        if not isinstance(resource, Resource):
+            return None
+        return resource.visualize()

@@ -6,16 +6,17 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
   "cachetools>=6.1.0",
-  "networkx>=3.5",
+  "graphviz>=0.21",
+  "matplotlib>=3.10.9",
   "numpy>=2.3.2",
   "orjson>=3.11.7",
   "pandas>=2.3.1",
   "plotly>=6.3.1",
   "pm4py~=2.7.22",
+  "polars>=1.40.1",
   "pydantic>=2.11.7",
   "r4pm[polars]>=0.5.3",
 ]
-
 
 [project.scripts]
 ocelescope = "ocelescope.tools.cli:main"
@@ -23,12 +24,11 @@ ocelescope = "ocelescope.tools.cli:main"
 [tool.uv]
 package = true
 
-[dependency-groups]
-dev = [
-  "black>=25.1.0",
-  "pandas-stubs>=3.0.0.260204",
-  "pre-commit>=4.2.0",
-  "ruff>=0.12.7",
+[project.optional-dependencies]
+plugin = [
+    "more-itertools>=11.1.0",
+    "networkx>=3.5",
+    "scikit-learn>=1.9.0",
 ]
 
 [build-system]

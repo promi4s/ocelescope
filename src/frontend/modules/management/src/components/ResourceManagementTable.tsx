@@ -23,6 +23,7 @@ import {
   UploadSection,
   useDownloadOCEL,
   useDownloadResource,
+  useDownloadResourceAsPnml,
   useInvalidate,
 } from "@ocelescope/core";
 import { ResourceModal } from "@ocelescope/resources";
@@ -42,6 +43,7 @@ import { XESExportWindow } from "./XESExportWindow";
 
 type Entity = {
   type: "ocel" | "resource";
+  resourceType?: string;
   entityTypes: string[];
   id: string;
   name: string;
@@ -70,6 +72,7 @@ const ResourceManagementTable: React.FC = () => {
 
   const { download: downloadOCEL } = useDownloadOCEL();
   const { download: downloadResource } = useDownloadResource();
+  const { download: downloadResourceAsPnml } = useDownloadResourceAsPnml();
 
   const { data: resourceMeta = {} } = useGetResourceMeta();
 
@@ -137,6 +140,7 @@ const ResourceManagementTable: React.FC = () => {
         name,
         entityTypes: [resourceMeta[type]?.label ?? type],
         type: "resource" as const,
+        resourceType: type,
         createdAt: formatDateTime(dayjs(created_at).toISOString()),
       }),
     );
@@ -241,7 +245,7 @@ const ResourceManagementTable: React.FC = () => {
               textAlign: "right",
               width: "0%",
               //TODO: Maybe put this into its own component it is getting way to big
-              render: ({ type, id, name, isUploading }) =>
+              render: ({ type, resourceType, id, name, isUploading }) =>
                 isUploading ? (
                   <Loader size={20} />
                 ) : (
@@ -294,6 +298,26 @@ const ResourceManagementTable: React.FC = () => {
                               onClick={() => setExportOcelId(id)}
                             >
                               {".xes"}
+                            </Menu.Item>
+                          </Menu.Sub.Dropdown>
+                        </Menu.Sub>
+                      ) : resourceType === "PetriNet" ? (
+                        <Menu.Sub position="right-start">
+                          <Menu.Sub.Target>
+                            <Menu.Sub.Item
+                              leftSection={<DownloadIcon size={16} />}
+                            >
+                              Download
+                            </Menu.Sub.Item>
+                          </Menu.Sub.Target>
+                          <Menu.Sub.Dropdown>
+                            <Menu.Item onClick={() => downloadResource(id)}>
+                              .ocelescope
+                            </Menu.Item>
+                            <Menu.Item
+                              onClick={() => downloadResourceAsPnml(id)}
+                            >
+                              .pnml
                             </Menu.Item>
                           </Menu.Sub.Dropdown>
                         </Menu.Sub>

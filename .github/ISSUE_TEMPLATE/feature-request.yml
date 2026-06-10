@@ -1,0 +1,55 @@
+name: Feature request
+description: Suggest a feature or improvement for Ocelescope
+labels:
+  - enhancement
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: What part of Ocelescope is this request for?
+      options:
+        - Python library
+        - Plugins
+        - Ocelescope tool
+    validations:
+      required: true
+
+  - type: input
+    id: summary
+    attributes:
+      label: Short summary
+      placeholder: A short title for the request
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+      description: What are you trying to do?
+      placeholder: We would like to ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the feature or improvement you would like to see
+      placeholder: It would be helpful if ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Optional notes, examples, or references
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        Feature requests will only be considered if they align with the goals and scope of the project.

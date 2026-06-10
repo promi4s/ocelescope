@@ -1,0 +1,47 @@
+name: Plugin submission
+description: Submit an Ocelescope plugin to be added to the Ocelescope page
+labels:
+  - plugin-submission
+body:
+  - type: input
+    id: plugin_name
+    attributes:
+      label: Plugin name
+      placeholder: e.g. OCEL Graph
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Short description of what the plugin does
+      placeholder: This plugin provides ...
+    validations:
+      required: true
+
+  - type: input
+    id: repository_url
+    attributes:
+      label: Repository URL
+      description: Link to the plugin source repository
+      placeholder: https://github.com/your-name/your-plugin
+    validations:
+      required: false
+
+  - type: input
+    id: ocelescope_version
+    attributes:
+      label: Tested with Ocelescope version
+      placeholder: e.g. 0.2.0
+    validations:
+      required: false
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Optional additional information for reviewers
+      placeholder: Anything else we should know?
+    validations:
+      required: false

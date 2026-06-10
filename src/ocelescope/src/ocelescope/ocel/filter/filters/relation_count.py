@@ -104,7 +104,7 @@ class E2OCountFilter(BaseFilter, RelationCountFilterConfig):
         entity_type_column = source_column
 
         mask = filter_by_relation_counts(
-            relation_table=ocel.e2o,
+            relation_table=ocel.ocel.relations,
             source_column=source_column,
             target_column=target_column,
             source_id_column=source_id_column,

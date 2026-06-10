@@ -5,8 +5,12 @@ from typing import Any, Dict
 
 from typing_extensions import TypedDict
 
-from ocelescope import Plugin, Resource
+from ocelescope import DirectlyFollowsGraph, PetriNet, Plugin, Resource
+
 from ocelescope_backend.app.internal.config import config
+from ocelescope_backend.app.internal.discovery import (
+    register_discovery_methods_from_module,
+)
 from ocelescope_backend.app.internal.model.plugin import PluginApi
 from ocelescope_backend.app.internal.model.resource import ResourceStore
 from ocelescope_backend.app.internal.registry.extension import ExtensionRegistry
@@ -24,10 +28,19 @@ class ResourceInfo(TypedDict):
 
 
 class RegistryManager:
+    _CORE_RESOURCE_NAMESPACE = "__core__"
+
     def __init__(self):
         self._plugin_registry = PluginRegistry()
         self._resource_registry = ResourceRegistry()
         self._extension_registry = ExtensionRegistry()
+        self._register_core_resources()
+
+    def _register_core_resources(self):
+        for resource_class in (PetriNet, DirectlyFollowsGraph):
+            self._resource_registry.register_resource(
+                self._CORE_RESOURCE_NAMESPACE, resource_class
+            )
 
     def list_plugins(self) -> list[PluginApi]:
         return self._plugin_registry.list_plugins()
@@ -38,6 +51,13 @@ class RegistryManager:
     def get_plugin_method(self, plugin_id: str, method_name: str):
         return self._plugin_registry.get_method(
             plugin_id=plugin_id, method_name=method_name
+        )
+
+    def get_resource_class(
+        self, resource_type: str, plugin_id: str | None = None
+    ) -> type[Resource] | None:
+        return self._resource_registry.get_resource_class(
+            resource_type, plugin_id=plugin_id
         )
 
     def _hydrate(self, data: Any, plugin_id: str | None = None):
@@ -130,6 +150,11 @@ class RegistryManager:
                                 self._resource_registry.register_resource(
                                     id, resource_type
                                 )
+
+                        for info in register_discovery_methods_from_module(module):
+                            self._resource_registry.register_resource(
+                                id, info.resource_type
+                            )
 
                         loaded_plugins.append(id)
                     except Exception as e:

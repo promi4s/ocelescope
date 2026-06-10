@@ -4,7 +4,7 @@ services:
     volumes:
       - plugins_store:/plugins
     restart: unless-stopped
-  frontend: 
+  frontend:
     image: ghcr.io/promi4s/ocelescope-frontend:latest
     ports:
       - "3000:3000"

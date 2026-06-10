@@ -29,6 +29,8 @@ docs = [
   "mkdocs-material>=9.7.6",
   "mkdocs-minify-plugin>=0.8.0",
   "mkdocstrings-python>=2.0.3",
+  "mkdocs-macros-plugin>=1.0.5",
+  "pygithub>=2.9.1",
 ]
 
 repl = ["ipython>=9.11.0", "ipython-autotime>=0.3.2"]
