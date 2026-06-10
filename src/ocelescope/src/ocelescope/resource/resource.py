@@ -54,6 +54,9 @@ class Annotated(BaseModel, Generic[T]):
         return self.annotation if type(self.annotation) is str else None
 
     def get_annotation_visualization(self):
-        if not isinstance(self.annotation, Resource):
+        if not isinstance(self.annotation, list) or len(self.annotation) != 1:
             return None
-        return self.annotation.visualize()
+        resource = self.annotation[0]
+        if not isinstance(resource, Resource):
+            return None
+        return resource.visualize()

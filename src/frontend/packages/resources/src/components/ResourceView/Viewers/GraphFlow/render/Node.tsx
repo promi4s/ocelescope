@@ -1,7 +1,17 @@
-import { Badge, Text } from "@mantine/core";
+import {
+  ActionIcon,
+  Badge,
+  Group,
+  Popover,
+  ScrollArea,
+  Text,
+} from "@mantine/core";
+import { XIcon } from "lucide-react";
 import type { GraphNode } from "@ocelescope/api-base";
 import { Handle, type NodeProps, Position } from "@xyflow/react";
-import { memo } from "react";
+import { memo, useCallback, useState } from "react";
+import { Visualization } from "../../../index";
+import type { VisulizationsType } from "../../../../../types";
 import {
   DEFAULT_COLORS,
   EXTERNAL_NODE_LABEL_HEIGHT,
@@ -36,17 +46,63 @@ const AnnotationBadge = () => (
     variant="filled"
     color="gray"
     title="This graph element has an annotation visualization."
-    style={{ pointerEvents: "none" }}
   >
     i
   </Badge>
 );
 
-const NodeAnnotation = () => (
-  <div style={{ position: "absolute", right: -8, top: -8 }}>
-    <AnnotationBadge />
-  </div>
-);
+const NodeAnnotation = ({ annotation }: { annotation: VisulizationsType }) => {
+  const [opened, setOpened] = useState(false);
+
+  const toggle = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    setOpened((o) => !o);
+  }, []);
+
+  return (
+    <Popover
+      opened={opened}
+      onClose={() => setOpened(false)}
+      position="right"
+      withArrow
+      withinPortal
+      shadow="md"
+    >
+      <Popover.Target>
+        <div
+          className="nodrag nopan"
+          style={{
+            position: "absolute",
+            right: -8,
+            top: -8,
+            cursor: "pointer",
+            pointerEvents: "all",
+            zIndex: 10,
+          }}
+          onClick={toggle}
+          onMouseDown={(e) => e.stopPropagation()}
+        >
+          <AnnotationBadge />
+        </div>
+      </Popover.Target>
+      <Popover.Dropdown style={{ minWidth: 200, maxWidth: 400 }}>
+        <Group justify="flex-end" mb={4}>
+          <ActionIcon
+            size="xs"
+            variant="subtle"
+            color="gray"
+            onClick={() => setOpened(false)}
+          >
+            <XIcon size={12} />
+          </ActionIcon>
+        </Group>
+        <ScrollArea.Autosize mah={300}>
+          <Visualization visualization={annotation} />
+        </ScrollArea.Autosize>
+      </Popover.Dropdown>
+    </Popover>
+  );
+};
 
 // ─── External label (top / bottom) ────────────────────────────────────────────
 
@@ -391,7 +447,9 @@ const GraphFlowNode = memo(({ data }: NodeProps<GraphFlowNodeType>) => {
       {isExternalLabel && label_pos === "bottom" && bottomLabelTop != null && (
         <ExternalLabel top={bottomLabelTop}>{label as string}</ExternalLabel>
       )}
-      {annotation && <NodeAnnotation />}
+      {annotation && (
+        <NodeAnnotation annotation={annotation as VisulizationsType} />
+      )}
     </div>
   );
 });
