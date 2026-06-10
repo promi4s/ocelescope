@@ -154,6 +154,7 @@ export function EChartCard({
   const [expanded, setExpanded] = useState(false);
   const [hasSelection, setHasSelection] = useState(false);
   const chartRef = useRef<ReactEChartsType>(null);
+  const modalChartRef = useRef<ReactEChartsType>(null);
 
   // Track the last viewport we emitted so we can suppress echoes from
   // programmatic option updates that re-fire `datazoom`.
@@ -188,60 +189,66 @@ export function EChartCard({
     return merged;
   }, [option, zoom, brush, viewport]);
 
-  const events = useMemo(() => {
-    const handlers: Record<string, (...args: unknown[]) => void> = {};
+  const makeEvents = useCallback(
+    (ref: React.RefObject<ReactEChartsType | null>) => {
+      const handlers: Record<string, (...args: unknown[]) => void> = {};
 
-    if (zoom && onViewportChange) {
-      handlers.datazoom = () => {
-        const instance = chartRef.current?.getEchartsInstance();
-        if (!instance) return;
-        const fullOpt = instance.getOption() as { dataZoom?: DataZoomEventBatch[] };
-        const dz = fullOpt.dataZoom?.[0];
-        if (!dz || dz.startValue == null || dz.endValue == null) return;
+      if (zoom && onViewportChange) {
+        handlers.datazoom = () => {
+          const instance = ref.current?.getEchartsInstance();
+          if (!instance) return;
+          const fullOpt = instance.getOption() as { dataZoom?: DataZoomEventBatch[] };
+          const dz = fullOpt.dataZoom?.[0];
+          if (!dz || dz.startValue == null || dz.endValue == null) return;
 
-        const newViewport: ChartViewport = {
-          x: { min: dz.startValue, max: dz.endValue },
+          const newViewport: ChartViewport = {
+            x: { min: dz.startValue, max: dz.endValue },
+          };
+
+          if (approxEqRange(lastEmittedViewport.current, newViewport)) return;
+          lastEmittedViewport.current = newViewport;
+          onViewportChange(newViewport);
         };
+      }
 
-        if (approxEqRange(lastEmittedViewport.current, newViewport)) return;
-        lastEmittedViewport.current = newViewport;
-        onViewportChange(newViewport);
-      };
-    }
+      if (brush && onSelection) {
+        handlers.brushEnd = (...args: unknown[]) => {
+          const params = args[0] as { areas?: BrushBatch["areas"] };
+          const area = params.areas?.[0];
+          if (!area?.coordRange) {
+            setHasSelection(false);
+            onSelection(null);
+            return;
+          }
+          const [a, b] = area.coordRange;
+          const min = Math.min(a, b);
+          const max = Math.max(a, b);
+          setHasSelection(true);
+          onSelection(
+            brush.axis === "y" ? { y: { min, max } } : { x: { min, max } },
+          );
+        };
+      }
 
-    if (brush && onSelection) {
-      handlers.brushEnd = (...args: unknown[]) => {
-        const params = args[0] as { areas?: BrushBatch["areas"] };
-        const area = params.areas?.[0];
-        if (!area?.coordRange) {
-          setHasSelection(false);
-          onSelection(null);
-          return;
-        }
-        const [a, b] = area.coordRange;
-        const min = Math.min(a, b);
-        const max = Math.max(a, b);
-        setHasSelection(true);
-        onSelection(
-          brush.axis === "y" ? { y: { min, max } } : { x: { min, max } },
-        );
-      };
-    }
+      if (onPointClick) {
+        handlers.click = (...args: unknown[]) => {
+          const params = args[0] as ChartClickParams;
+          if (params == null || params.dataIndex == null) return;
+          onPointClick({
+            dataIndex: params.dataIndex,
+            value: params.value,
+            seriesName: params.seriesName,
+          });
+        };
+      }
 
-    if (onPointClick) {
-      handlers.click = (...args: unknown[]) => {
-        const params = args[0] as ChartClickParams;
-        if (params == null || params.dataIndex == null) return;
-        onPointClick({
-          dataIndex: params.dataIndex,
-          value: params.value,
-          seriesName: params.seriesName,
-        });
-      };
-    }
+      return handlers;
+    },
+    [zoom, brush, onViewportChange, onSelection, onPointClick],
+  );
 
-    return handlers;
-  }, [zoom, brush, onViewportChange, onSelection, onPointClick]);
+  const events = useMemo(() => makeEvents(chartRef), [makeEvents]);
+  const modalEvents = useMemo(() => makeEvents(modalChartRef), [makeEvents]);
 
   // Keep our memory of the last emitted viewport in sync with the prop, so
   // controlled re-renders do not echo back through `onViewportChange`.
@@ -345,6 +352,7 @@ export function EChartCard({
       <Modal
         opened={expanded}
         onClose={() => setExpanded(false)}
+        onEnterTransitionEnd={() => modalChartRef.current?.getEchartsInstance()?.resize()}
         title={title}
         size="90vw"
         centered
@@ -356,10 +364,12 @@ export function EChartCard({
         )}
 
         <ReactECharts
+          ref={modalChartRef}
           option={mergedOption}
           notMerge={false}
           lazyUpdate
           style={{ width: "100%", height: expandedHeight }}
+          onEvents={modalEvents}
         />
       </Modal>
     </>
