@@ -3,10 +3,10 @@ from typing import Literal
 
 from pydantic import BaseModel, Field, model_validator
 
-from ocelescope_module_log_overview.application.use_cases.list_event_instances_use_case import (
+from ocelescope_module_exploration.application.use_cases.list_event_instances_use_case import (
     EventInstancesResult,
 )
-from ocelescope_module_log_overview.domain.models import HistogramResult, Range
+from ocelescope_module_exploration.domain.models import HistogramResult, Range
 
 
 class AttributeInfoSchema(BaseModel):

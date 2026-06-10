@@ -1,11 +1,11 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Log Overview",
+    "title": "Exploration",
     "version": "1.0"
   },
   "paths": {
-    "/modules/log-overview/v1/{ocel_id}/events/attributes": {
+    "/modules/exploration/v1/{ocel_id}/events/attributes": {
       "get": {
         "summary": "Event Attributes",
         "operationId": "eventAttributes",
@@ -79,7 +79,7 @@
         }
       }
     },
-    "/modules/log-overview/v1/{ocel_id}/events/{event_type}/{attribute}/histogram": {
+    "/modules/exploration/v1/{ocel_id}/events/{event_type}/{attribute}/histogram": {
       "post": {
         "summary": "Event Attribute Histogram",
         "operationId": "eventAttributeHistogram",
@@ -174,7 +174,7 @@
         }
       }
     },
-    "/modules/log-overview/v1/{ocel_id}/events/{event_type}/{attribute}/instances": {
+    "/modules/exploration/v1/{ocel_id}/events/{event_type}/{attribute}/instances": {
       "post": {
         "summary": "Event Attribute Instances",
         "operationId": "eventAttributeInstances",

@@ -1,5 +1,5 @@
 [project]
-name = "ocelescope-module-log-overview"
+name = "ocelescope-module-exploration"
 version = "0.1.0"
 requires-python = ">=3.11"
 dependencies = [
@@ -9,7 +9,7 @@ dependencies = [
 ]
 
 [project.entry-points."ocelescope_backend.modules"]
-logOverviewV1 = "ocelescope_module_log_overview.module:LogOverview"
+logOverviewV1 = "ocelescope_module_exploration.module:Exploration"
 
 
 [build-system]

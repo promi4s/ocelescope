@@ -1,7 +1,7 @@
-from ocelescope import OCEL
 from ocelescope.ocel.constants import ACTIVITY_COL, ATTRIBUTE_COL, ValueType
 
-from ocelescope_module_log_overview.domain.models import AttributeInfo
+from ocelescope import OCEL
+from ocelescope_module_exploration.domain.models import AttributeInfo
 
 _NUMERIC_VALUE_TYPES = {ValueType.INT, ValueType.FLOAT}
 
@@ -21,7 +21,9 @@ class ListEventAttributesUseCase:
             result[str(activity)] = [
                 AttributeInfo(
                     name=str(row[ATTRIBUTE_COL]),
-                    type="numeric" if row["type"] in _NUMERIC_VALUE_TYPES else "categorical",
+                    type="numeric"
+                    if row["type"] in _NUMERIC_VALUE_TYPES
+                    else "categorical",
                 )
                 for _, row in group.iterrows()
             ]

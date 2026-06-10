@@ -1,15 +1,15 @@
 import math
 
 import numpy as np
-from ocelescope import OCEL
 
-from ocelescope_module_log_overview.domain.models import (
+from ocelescope import OCEL
+from ocelescope_module_exploration.domain.models import (
     HistogramBin,
     HistogramCounts,
     HistogramResult,
     Range,
 )
-from ocelescope_module_log_overview.infrastructure.ocel_helpers import (
+from ocelescope_module_exploration.infrastructure.ocel_helpers import (
     extract_attribute,
     to_finite_numeric_array,
 )
@@ -53,7 +53,9 @@ class ComputeEventHistogramUseCase:
         )
         full_arr = to_finite_numeric_array(non_null) if len(non_null) > 0 else None
 
-        empty_counts = HistogramCounts(covered=0, missing=missing_count, total=total_count)
+        empty_counts = HistogramCounts(
+            covered=0, missing=missing_count, total=total_count
+        )
 
         if full_arr is None or len(full_arr) == 0:
             return HistogramResult(

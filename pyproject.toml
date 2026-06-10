@@ -10,7 +10,7 @@ members = [
   "src/ocelescope",
   "src/backend/ocelescope-backend",
   "src/backend/modules/ocelescope-module-ocelot",
-  "src/backend/modules/ocelescope-module-log-overview",
+  "src/backend/modules/ocelescope-module-exploration",
 ]
 
 [tool.ruff.lint]

@@ -349,7 +349,7 @@ importers:
         version: 1.0.0
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -413,7 +413,7 @@ importers:
         version: 19.2.3(@types/react@19.2.14)
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -489,7 +489,7 @@ importers:
         version: 8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -544,7 +544,7 @@ importers:
         version: 19.2.3(@types/react@19.2.14)
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -629,7 +629,7 @@ importers:
         version: 19.2.3(@types/react@19.2.14)
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -717,7 +717,7 @@ importers:
         version: 1.0.0
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -757,7 +757,7 @@ importers:
         version: 10.4.1
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -794,7 +794,7 @@ importers:
         version: 10.4.1
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -825,7 +825,7 @@ importers:
         version: 10.4.1
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -868,13 +868,13 @@ importers:
         version: 3.0.6(echarts@5.6.0)(react@19.2.3)
       lucide-react:
         specifier: 'catalog:'
-        version: 0.563.0(react@19.2.3)
+        version: 0.577.0(react@19.2.3)
       storybook:
         specifier: 'catalog:'
         version: 10.3.5(@testing-library/dom@10.4.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       tsdown:
         specifier: 'catalog:'
-        version: 0.21.4(@tsdown/css@0.21.4)(typescript@5.9.3)
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -974,7 +974,7 @@ importers:
         version: 6.15.1
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -1062,7 +1062,7 @@ importers:
         version: 10.4.1
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -1102,7 +1102,7 @@ importers:
         version: 10.3.5(@testing-library/dom@10.4.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -6260,7 +6260,7 @@ snapshots:
       lightningcss: 1.32.0
       postcss-load-config: 6.0.1(jiti@2.6.1)(postcss@8.5.15)(yaml@2.8.2)
       rolldown: 1.1.0
-      tsdown: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))
+      tsdown: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
     optionalDependencies:
       postcss: 8.5.15
     transitivePeerDependencies:
@@ -8817,7 +8817,7 @@ snapshots:
       minimist: 1.2.8
       strip-bom: 3.0.0
 
-  tsdown@0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)):
+  tsdown@0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32):
     dependencies:
       ansis: 4.3.1
       cac: 7.0.0

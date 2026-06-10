@@ -1,13 +1,13 @@
 from fastapi import APIRouter, HTTPException
 
-from ocelescope_module_log_overview.api.schemas import (
+from ocelescope_module_exploration.api.schemas import (
     AttributeInfoSchema,
     EventInstancesBody,
     EventInstancesSchema,
     HistogramBody,
     HistogramSchema,
 )
-from ocelescope_module_log_overview.dependencies import (
+from ocelescope_module_exploration.dependencies import (
     ComputeEventHistogramDep,
     ListEventAttributesDep,
     ListEventInstancesDep,

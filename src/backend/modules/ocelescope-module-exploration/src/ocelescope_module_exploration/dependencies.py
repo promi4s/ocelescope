@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import Depends
 from ocelescope_backend.app.dependencies import ApiOcel
 
-from ocelescope_module_log_overview.application.use_cases import (
+from ocelescope_module_exploration.application.use_cases import (
     ComputeEventHistogramUseCase,
     ListEventAttributesUseCase,
     ListEventInstancesUseCase,

@@ -17,7 +17,7 @@ resolution-markers = [
 members = [
     "ocelescope",
     "ocelescope-backend",
-    "ocelescope-module-log-overview",
+    "ocelescope-module-exploration",
     "ocelescope-module-ocelot",
     "ocelescope-workspace",
 ]
@@ -1763,9 +1763,9 @@ requires-dist = [
 ]
 
 [[package]]
-name = "ocelescope-module-log-overview"
+name = "ocelescope-module-exploration"
 version = "0.1.0"
-source = { editable = "src/backend/modules/ocelescope-module-log-overview" }
+source = { editable = "src/backend/modules/ocelescope-module-exploration" }
 dependencies = [
     { name = "fastapi" },
     { name = "ocelescope-backend" },

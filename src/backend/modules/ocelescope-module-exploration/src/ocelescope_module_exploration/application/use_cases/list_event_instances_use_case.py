@@ -2,10 +2,10 @@ from dataclasses import dataclass
 from datetime import datetime
 
 import pandas as pd
-from ocelescope import OCEL
 from ocelescope.ocel.constants.pm4py import ACTIVITY_COL, EID_COL, TIMESTAMP_COL
 
-from ocelescope_module_log_overview.infrastructure.ocel_helpers import (
+from ocelescope import OCEL
+from ocelescope_module_exploration.infrastructure.ocel_helpers import (
     get_event_attribute_series,
 )
 
