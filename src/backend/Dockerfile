@@ -24,7 +24,7 @@ COPY src/ocelescope /app/src/ocelescope
 RUN --mount=type=cache,target=/root/.cache/uv \
   uv sync --frozen --no-dev --all-packages
 
-FROM python:3.13-slim-bookworm@sha256:e4fa1f978c539608a10cdf74700ac32a3f719dfc6e8b6b6001da82deb36302a2 AS runtime
+FROM python:3.13-slim-bookworm@sha256:9f4de3ee03d58c34b21ee3cf29c3cda61a5bb396cbfd9c5c056205532d391936 AS runtime
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
   graphviz \
