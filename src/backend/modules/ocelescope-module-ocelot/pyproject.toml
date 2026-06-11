@@ -9,7 +9,7 @@ ocelotV1 = "ocelescope_module_ocelot.module:Ocelot"
 
 
 [build-system]
-requires = ["uv_build>=0.8.4,<0.9.0"]
+requires = ["uv_build>=0.11.20,<0.12.0"]
 build-backend = "uv_build"
 
 [tool.uv]
