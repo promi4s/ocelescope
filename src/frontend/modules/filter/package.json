@@ -50,7 +50,8 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-hook-form": "catalog:",
-    "recharts": "catalog:"
+    "recharts": "catalog:",
+    "mantine-datatable": "catalog:"
   },
   "devDependencies": {
     "@mantine/notifications": "catalog:",
@@ -60,9 +61,5 @@
     "@types/react-dom": "catalog:",
     "tsdown": "catalog:",
     "typescript": "catalog:"
-  },
-  "dependencies": {
-    "@tanstack/react-form": "catalog:",
-    "mantine-datatable": "catalog:"
   }
 }
