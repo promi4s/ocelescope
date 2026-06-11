@@ -1,7 +1,7 @@
 import { useEventCounts, useObjectCounts } from "@ocelescope/api-base";
 import { type Control, Controller } from "react-hook-form";
 import type { GroupedOCELFilter } from "../../api/base";
-import { EntityTypeFilterInput } from "../Inputs/EntityTypeFilter";
+import { EntityTypeFilterInput } from "../inputs/EntityTypeFilter";
 
 const EntityFilter: (entityType: "events" | "objects") => React.FC<{
   ocelId: string;

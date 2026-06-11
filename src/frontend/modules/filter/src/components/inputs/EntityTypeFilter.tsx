@@ -1,5 +1,5 @@
 import { MultiSelect, Stack } from "@mantine/core";
-import BarChartSelect from "../BarChartSelect";
+import BarChartSelect from "./BarChartSelect";
 
 export const EntityTypeFilterInput: React.FC<{
   selectedEntityTypes: string[];
