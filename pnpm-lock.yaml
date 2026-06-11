@@ -12,24 +12,6 @@ catalogs:
     '@faker-js/faker':
       specifier: ^10.4.0
       version: 10.4.0
-    '@floating-ui/react':
-      specifier: ^0.27.18
-      version: 0.27.19
-    '@hpcc-js/wasm-graphviz':
-      specifier: ^1.21.0
-      version: 1.21.1
-    '@mantine/carousel':
-      specifier: ^8.3.15
-      version: 8.3.16
-    '@mantine/core':
-      specifier: ^8.3.14
-      version: 8.3.16
-    '@mantine/dropzone':
-      specifier: ^8.3.14
-      version: 8.3.16
-    '@mantine/hooks':
-      specifier: ^8.3.14
-      version: 8.3.16
     '@mantine/notifications':
       specifier: ^8.3.15
       version: 8.3.16
@@ -39,12 +21,6 @@ catalogs:
     '@storybook/react-vite':
       specifier: ^10.3.5
       version: 10.3.5
-    '@tanstack/react-form':
-      specifier: ^1.32.0
-      version: 1.32.0
-    '@tanstack/react-query':
-      specifier: ^5.90.21
-      version: 5.90.21
     '@tsconfig/strictest':
       specifier: ^2.0.8
       version: 2.0.8
@@ -289,31 +265,18 @@ importers:
       '@ocelescope/api-base':
         specifier: workspace:*
         version: link:../../packages/api/base
-      '@ocelescope/api-client':
-        specifier: workspace:*
-        version: link:../../packages/api/client
       '@ocelescope/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@tanstack/react-form':
-        specifier: 'catalog:'
-        version: 1.32.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@tanstack/react-query':
         specifier: 'catalog:'
         version: 5.90.21(react@19.2.3)
-      axios:
-        specifier: 'catalog:'
-        version: 1.16.0
       dayjs:
         specifier: 'catalog:'
         version: 1.11.19
       lucide-react:
         specifier: 'catalog:'
         version: 0.577.0(react@19.2.3)
-        version: 0.563.0(react@19.2.3)
-      mantine-datatable:
-        specifier: 'catalog:'
-        version: 8.3.13(@mantine/core@8.3.16(@mantine/hooks@8.3.16(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/hooks@8.3.16(react@19.2.3))(clsx@2.1.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       react:
         specifier: 'catalog:'
         version: 19.2.3
@@ -330,9 +293,6 @@ importers:
       '@mantine/notifications':
         specifier: 'catalog:'
         version: 8.3.16(@mantine/core@8.3.16(@mantine/hooks@8.3.16(react@19.2.3))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/hooks@8.3.16(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-      '@ocelescope/api-config':
-        specifier: workspace:*
-        version: link:../../packages/api/config
       '@types/node':
         specifier: 'catalog:'
         version: 25.3.3
@@ -2227,32 +2187,11 @@ packages:
   '@swc/helpers@0.5.15':
     resolution: {integrity: sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g==}
 
-  '@tanstack/devtools-event-client@0.4.3':
-    resolution: {integrity: sha512-OZI6QyULw0FI0wjgmeYzCIfbgPsOEzwJtCpa69XrfLMtNXLGnz3d/dIabk7frg0TmHo+Ah49w5I4KC7Tufwsvw==}
-    engines: {node: '>=18'}
-    hasBin: true
-
-  '@tanstack/form-core@1.32.0':
-    resolution: {integrity: sha512-Tn5VRDSjyqjmaet2tJMuEWDRFyrCaon03vxXPlSSaiSs6C/N7lCIwGCXJbZXEUq1kTj8jYN9qyXHbsz4LQHcow==}
-
-  '@tanstack/pacer-lite@0.1.1':
-    resolution: {integrity: sha512-y/xtNPNt/YeyoVxE/JCx+T7yjEzpezmbb+toK8DDD1P4m7Kzs5YR956+7OKexG3f8aXgC3rLZl7b1V+yNUSy5w==}
-    engines: {node: '>=18'}
-
   '@tanstack/query-core@5.90.20':
     resolution: {integrity: sha512-OMD2HLpNouXEfZJWcKeVKUgQ5n+n3A2JFmBaScpNDUqSrQSjiveC7dKMe53uJUg1nDG16ttFPz2xfilz6i2uVg==}
 
   '@tanstack/query-devtools@5.93.0':
     resolution: {integrity: sha512-+kpsx1NQnOFTZsw6HAFCW3HkKg0+2cepGtAWXjiiSOJJ1CtQpt72EE2nyZb+AjAbLRPoeRmPJ8MtQd8r8gsPdg==}
-
-  '@tanstack/react-form@1.32.0':
-    resolution: {integrity: sha512-6WP5SQTA6/H9crCpvpq3ZppYWqtrdE5NjOy6ebABi6uAQPqhfTzrdjS9t40mCZCFtGI5585OhJV6zBP/KN2zcw==}
-    peerDependencies:
-      '@tanstack/react-start': '*'
-      react: ^17.0.0 || ^18.0.0 || ^19.0.0
-    peerDependenciesMeta:
-      '@tanstack/react-start':
-        optional: true
 
   '@tanstack/react-query-devtools@5.91.3':
     resolution: {integrity: sha512-nlahjMtd/J1h7IzOOfqeyDh5LNfG0eULwlltPEonYy0QL+nqrBB+nyzJfULV+moL7sZyxc2sHdNJki+vLA9BSA==}
@@ -2264,15 +2203,6 @@ packages:
     resolution: {integrity: sha512-0Lu6y5t+tvlTJMTO7oh5NSpJfpg/5D41LlThfepTixPYkJ0sE2Jj0m0f6yYqujBwIXlId87e234+MxG3D3g7kg==}
     peerDependencies:
       react: ^18 || ^19
-
-  '@tanstack/react-store@0.9.3':
-    resolution: {integrity: sha512-y2iHd/N9OkoQbFJLUX1T9vbc2O9tjH0pQRgTcx1/Nz4IlwLvkgpuglXUx+mXt0g5ZDFrEeDnONPqkbfxXJKwRg==}
-    peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-
-  '@tanstack/store@0.9.3':
-    resolution: {integrity: sha512-8reSzl/qGWGGVKhBoxXPMWzATSbZLZFWhwBAFO9NAyp0TxzfBP0mIrGb8CP8KrQTmvzXlR/vFPPUrHTLBGyFyw==}
 
   '@testing-library/dom@10.4.1':
     resolution: {integrity: sha512-o4PXJQidqJl82ckFaXUeoAW+XysPLauYI43Abki5hABd853iMhitooc6znOnczgbTYmEP6U6/y1ZyKAIsvMKGg==}
@@ -6027,27 +5957,9 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@tanstack/devtools-event-client@0.4.3': {}
-
-  '@tanstack/form-core@1.32.0':
-    dependencies:
-      '@tanstack/devtools-event-client': 0.4.3
-      '@tanstack/pacer-lite': 0.1.1
-      '@tanstack/store': 0.9.3
-
-  '@tanstack/pacer-lite@0.1.1': {}
-
   '@tanstack/query-core@5.90.20': {}
 
   '@tanstack/query-devtools@5.93.0': {}
-
-  '@tanstack/react-form@1.32.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
-    dependencies:
-      '@tanstack/form-core': 1.32.0
-      '@tanstack/react-store': 0.9.3(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-      react: 19.2.3
-    transitivePeerDependencies:
-      - react-dom
 
   '@tanstack/react-query-devtools@5.91.3(@tanstack/react-query@5.90.21(react@19.2.3))(react@19.2.3)':
     dependencies:
@@ -6059,15 +5971,6 @@ snapshots:
     dependencies:
       '@tanstack/query-core': 5.90.20
       react: 19.2.3
-
-  '@tanstack/react-store@0.9.3(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
-    dependencies:
-      '@tanstack/store': 0.9.3
-      react: 19.2.3
-      react-dom: 19.2.3(react@19.2.3)
-      use-sync-external-store: 1.6.0(react@19.2.3)
-
-  '@tanstack/store@0.9.3': {}
 
   '@testing-library/dom@10.4.1':
     dependencies:
