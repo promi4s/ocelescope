@@ -101,18 +101,54 @@ const AttributeFilter =
       direction: "asc",
     });
 
+    const [selectedEntityTypeNames, setSelectedEntityTypeNames] = useState<
+      string[]
+    >([]);
+
+    const [selectedAttributeNames, setSelectedAttributeNames] = useState<
+      string[]
+    >([]);
+
     const sortedAttributes = useMemo(() => {
       return sortRecords(
         attributes ?? [],
         sortStatus.columnAccessor as keyof TypedAttribute,
         sortStatus.direction,
+      ).filter(
+        ({ name, entity_type }) =>
+          (selectedEntityTypeNames.length === 0 ||
+            selectedEntityTypeNames.includes(entity_type)) &&
+          (selectedAttributeNames.length === 0 ||
+            selectedAttributeNames.includes(name)),
       );
-    }, [attributes, sortStatus]);
+    }, [
+      attributes,
+      sortStatus,
+      selectedEntityTypeNames,
+      selectedAttributeNames,
+    ]);
 
     const columns = useMemo(
       () =>
         [
-          { accessor: "name", title: "Attribute Name", sortable: true },
+          {
+            accessor: "name",
+            title: "Attribute Name",
+            sortable: true,
+            filter: () => (
+              <MultiSelect
+                data={Array.from(new Set(attributes?.map(({ name }) => name)))}
+                value={selectedAttributeNames}
+                onChange={(newAttributeNameSelection) =>
+                  setSelectedAttributeNames(newAttributeNameSelection)
+                }
+                comboboxProps={{ withinPortal: false }}
+                clearable
+                searchable
+              />
+            ),
+            filtering: selectedAttributeNames.length > 0,
+          },
           {
             accessor: "entity_type",
             title: isEvent ? "Activity" : "Object Type",
@@ -122,8 +158,16 @@ const AttributeFilter =
                 data={Array.from(
                   new Set(attributes?.map(({ entity_type }) => entity_type)),
                 )}
+                value={selectedEntityTypeNames}
+                onChange={(newEntityTypeNameSelection) =>
+                  setSelectedEntityTypeNames(newEntityTypeNameSelection)
+                }
+                comboboxProps={{ withinPortal: false }}
+                clearable
+                searchable
               />
             ),
+            filtering: selectedEntityTypeNames.length > 0,
           },
           {
             accessor: "filter",
@@ -193,7 +237,17 @@ const AttributeFilter =
             },
           },
         ] satisfies DataTableColumn<TypedAttribute>[],
-      [append, control, fieldName, filterIndexMap, isEvent, remove],
+      [
+        append,
+        control,
+        fieldName,
+        filterIndexMap,
+        isEvent,
+        remove,
+        selectedEntityTypeNames,
+        selectedAttributeNames,
+        attributes,
+      ],
     );
 
     return (
