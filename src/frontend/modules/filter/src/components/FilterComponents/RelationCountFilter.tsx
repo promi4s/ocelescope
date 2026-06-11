@@ -1,8 +1,13 @@
-import { useE2o, useO2o } from "@ocelescope/api-base";
+import {
+  type RelationCountSummary,
+  useE2o,
+  useO2o,
+} from "@ocelescope/api-base";
 import { DataTable } from "mantine-datatable";
 import type { Control } from "react-hook-form";
 import type { GroupedOCELFilter } from "../../api/base";
 import { useDatatable } from "../../hooks/useDatatable";
+import { useFilterColumns } from "../../hooks/useFilterColumn";
 
 type RelationCountFilterProps = {
   ocelId: string;
@@ -24,10 +29,26 @@ const RelationCountFilter =
       defaultSorted: "source",
     });
 
+    const { filterColumn } = useFilterColumns({
+      control,
+      path: isE2O ? "e2o_count" : "o2o_count",
+      generateFilterId: ({ source, target, qualifier }) =>
+        `${source}-${qualifier}-${target}`,
+      generateRecordId: ({ source, target, qualifier }) =>
+        `${source}-${qualifier}-${target}`,
+      generateInitialFilter: (record: RelationCountSummary) => ({
+        type: isE2O ? ("e2o_count" as const) : ("o2o_count" as const),
+        source: record.source,
+        target: record.target,
+        qualifier: record.qualifier,
+        range: [record.min_count, record.max_count] as [number, number],
+      }),
+    });
+
     return (
       <DataTable
         records={records}
-        columns={columns}
+        columns={[...columns, ...filterColumn]}
         sortStatus={sortStatus}
         onSortStatusChange={setSortStatus}
       />
