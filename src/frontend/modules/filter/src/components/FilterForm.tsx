@@ -5,6 +5,10 @@ import {
   EventAttributeFilter,
   ObjectAttributeFilter,
 } from "./FilterComponents/AttributeFilter";
+import {
+  E2OCountFilter,
+  O2OCountFilter,
+} from "./FilterComponents/RelationCountFilter";
 import TimeFrameFilter from "./FilterComponents/TimeFrameFilter";
 import { ActivityFilter, ObjectTypeFilter } from "./FilterComponents/TypeForm";
 
@@ -15,8 +19,8 @@ const FilterMap: Record<
   activity: ActivityFilter,
   object_type: ObjectTypeFilter,
   time_frame: TimeFrameFilter,
-  e2o_count: () => <></>,
-  o2o_count: () => <></>,
+  e2o_count: E2OCountFilter,
+  o2o_count: O2OCountFilter,
   event_attribute: EventAttributeFilter,
   object_attribute: ObjectAttributeFilter,
 };
