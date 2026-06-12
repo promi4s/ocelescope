@@ -1,7 +1,7 @@
 import { ActionIcon, Text } from "@mantine/core";
 import { PlusIcon, XIcon } from "lucide-react";
 import type { DataTableColumn } from "mantine-datatable";
-import { useMemo } from "react";
+import { type ComponentType, useMemo } from "react";
 import {
   type Control,
   type FieldArray,
@@ -24,6 +24,11 @@ type UseFilterColumnsProps<
   generateRecordId: (record: T) => string;
   generateFilterId: (filter: FilterElement<K>) => string;
   generateInitialFilter: (record: T) => FilterElement<K>;
+  FilterComponent: ComponentType<{
+    control: Control<GroupedOCELFilter>;
+    path: `${K}.${number}`;
+    record: T;
+  }>;
 };
 
 export const useFilterColumns = <
@@ -35,6 +40,7 @@ export const useFilterColumns = <
   generateRecordId,
   generateFilterId,
   generateInitialFilter,
+  FilterComponent,
 }: UseFilterColumnsProps<T, K>) => {
   const { fields, append, remove } = useFieldArray<GroupedOCELFilter, K>({
     name: path,
@@ -65,7 +71,11 @@ export const useFilterColumns = <
               No filter applied
             </Text>
           ) : (
-            <></>
+            <FilterComponent
+              record={record}
+              control={control}
+              path={`${path}.${filterIndex}`}
+            />
           );
         },
       },
