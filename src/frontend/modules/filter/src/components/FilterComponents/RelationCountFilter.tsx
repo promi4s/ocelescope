@@ -24,7 +24,7 @@ const RelationCountFilter =
       ocel_version: "original",
     });
 
-    const { records, columns, sortStatus, setSortStatus } = useDatatable({
+    const { records, columns, tableProps } = useDatatable({
       data: relationSummary,
       columnNames: ["source", "qualifier", "target"],
       defaultSorted: "source",
@@ -100,8 +100,10 @@ const RelationCountFilter =
       <DataTable
         records={records}
         columns={[...columns, ...filterColumns]}
-        sortStatus={sortStatus}
-        onSortStatusChange={setSortStatus}
+        minHeight={500}
+        withTableBorder
+        noRecordsText="No relations to filter"
+        {...tableProps}
       />
     );
   };

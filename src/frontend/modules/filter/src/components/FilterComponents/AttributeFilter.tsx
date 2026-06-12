@@ -64,11 +64,11 @@ const AttributeFilter =
   ({ ocelId, control }: AttributeFilterProps) => {
     const isEvent = entityType === "events";
 
-    const { data: attributes } = (
+    const { data: attributes, isLoading } = (
       isEvent ? useEventAttributes : useObjectAttributes
     )(ocelId);
 
-    const { columns, records, setSortStatus, sortStatus } = useDatatable({
+    const { columns, records, tableProps } = useDatatable({
       data: attributes,
       columnNames: ["name", "entity_type"],
       defaultSorted: "name",
@@ -98,14 +98,13 @@ const AttributeFilter =
 
     return (
       <DataTable
-        idAccessor={(record: TypedAttribute) =>
-          `${record.entity_type}-${record.name}`
-        }
         columns={[...columns, ...filterColumns]}
         withTableBorder
         records={records}
-        sortStatus={sortStatus}
-        onSortStatusChange={setSortStatus}
+        noRecordsText="No attributes to filter"
+        minHeight={500}
+        {...tableProps}
+        fetching={isLoading}
       />
     );
   };
