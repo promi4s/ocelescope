@@ -157,7 +157,7 @@ const TimeFrameFilter: React.FC<{
                     onChange={(newStart) => {
                       field.onChange([newStart, field.value?.[1]]);
                     }}
-                    value={field.value?.[0]}
+                    value={field.value?.[0] ?? timeInfo.start_time}
                   />
                 </Grid.Col>
                 <Grid.Col span={6}>
@@ -175,7 +175,7 @@ const TimeFrameFilter: React.FC<{
                     onChange={(newEnd) => {
                       field.onChange([field.value?.[0], newEnd]);
                     }}
-                    value={field.value?.[1]}
+                    value={field.value?.[1] ?? timeInfo.end_time}
                   />
                 </Grid.Col>
               </>
