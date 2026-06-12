@@ -185,7 +185,7 @@
               "include"
             ],
             "title": "Mode",
-            "default": "include"
+            "default": "exclude"
           },
           "type": {
             "type": "string",
@@ -664,7 +664,7 @@
               "include"
             ],
             "title": "Mode",
-            "default": "include"
+            "default": "exclude"
           },
           "type": {
             "type": "string",

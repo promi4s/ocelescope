@@ -114,7 +114,9 @@ class Session:
 
     # endregion
     # region Resource management
-    def get_filter(self, ocel_id: str, module_source: str) -> list[ModuleFilter]:
+    def get_filter(
+        self, ocel_id: str, module_source: str | None = None
+    ) -> list[ModuleFilter]:
         if ocel_id not in self.ocels:
             raise NotFound(f"OCEL with id {ocel_id} not found")
 

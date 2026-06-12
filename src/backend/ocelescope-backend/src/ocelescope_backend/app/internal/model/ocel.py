@@ -44,11 +44,12 @@ class SessionOCEL:
     def ocel(self):
         return self._filtered_ocel
 
-    def get_filters(self, module_source: str) -> list[ModuleFilter]:
+    def get_filters(self, module_source: str | None) -> list[ModuleFilter]:
         return [
             filterItem
             for filterItem in self._applied_filter
-            if filterItem.OcelescopeModuleSource == module_source
+            if module_source is None
+            or filterItem.OcelescopeModuleSource == module_source
         ]
 
     def set_filters(self, module_source: str, pipeline: Sequence[ModuleFilter]):
@@ -76,7 +77,6 @@ class Attribute(BaseModel):
 
     @classmethod
     def from_df_row(cls, row: tuple[Hashable, pd.Series]) -> Self:
-
         attribute_name = cast(str, row[0])
         series = row[1]
 
@@ -99,7 +99,6 @@ class AggregatedAttribute(Attribute):
 
     @classmethod
     def from_df_row(cls, row: tuple[Hashable, pd.Series]) -> Self:
-
         base = Attribute.from_df_row(row)
 
         return cls(

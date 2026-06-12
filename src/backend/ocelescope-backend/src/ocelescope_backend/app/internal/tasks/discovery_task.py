@@ -154,7 +154,7 @@ class DiscoveryTask(TaskBase):
         session: Session,
         request: DiscoveryRequest,
     ) -> str:
-        filters = session.get_ocel_filters(request.ocel_id)
+        filters = session.get_filter(request.ocel_id)
         key = cls._dedupe_key(request=request, filters=filters)
 
         existing_id = session._dedupe_keys.get(key)
