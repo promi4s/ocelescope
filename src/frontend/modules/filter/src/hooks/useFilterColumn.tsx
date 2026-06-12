@@ -112,5 +112,5 @@ export const useFilterColumns = <
     [append, remove, filterIndexMap, generateRecordId, generateInitialFilter],
   );
 
-  return { filterColumn: filterColumns };
+  return { filterColumns };
 };

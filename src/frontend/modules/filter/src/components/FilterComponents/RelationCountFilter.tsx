@@ -30,7 +30,7 @@ const RelationCountFilter =
       defaultSorted: "source",
     });
 
-    const { filterColumn } = useFilterColumns({
+    const { filterColumns } = useFilterColumns({
       control,
       path: isE2O ? "e2o_count" : "o2o_count",
       generateFilterId: ({ source, target, qualifier }) =>
@@ -99,7 +99,7 @@ const RelationCountFilter =
     return (
       <DataTable
         records={records}
-        columns={[...columns, ...filterColumn]}
+        columns={[...columns, ...filterColumns]}
         sortStatus={sortStatus}
         onSortStatusChange={setSortStatus}
       />

@@ -144,24 +144,20 @@ const DateFilterField = memo(function DateFilterField({
 export const AttributeInputField = memo(function AttributeInputField({
   control,
   record,
-  index,
   path,
 }: {
   control: Control<GroupedOCELFilter>;
-  index: number;
-  path: FilterPath;
+  path: `${FilterPath}.${number}`;
   record: TypedAttribute;
 }) {
   switch (record.type) {
     case "string":
-      return (
-        <StringFilterField control={control} name={`${path}.${index}.regex`} />
-      );
+      return <StringFilterField control={control} name={`${path}.regex`} />;
     case "int":
       return (
         <NumberFilterField
           control={control}
-          name={`${path}.${index}.number_range`}
+          name={`${path}.number_range`}
           min={Number.parseInt(`${record.min}`, 10)}
           max={Number.parseInt(`${record.max}`, 10)}
           allowDecimals={false}
@@ -171,7 +167,7 @@ export const AttributeInputField = memo(function AttributeInputField({
       return (
         <NumberFilterField
           control={control}
-          name={`${path}.${index}.number_range`}
+          name={`${path}.number_range`}
           min={Number.parseFloat(`${record.min}`)}
           max={Number.parseFloat(`${record.max}`)}
         />
@@ -181,7 +177,7 @@ export const AttributeInputField = memo(function AttributeInputField({
       return (
         <DateFilterField
           control={control}
-          name={`${path}.${index}.time_range`}
+          name={`${path}.time_range`}
           min={record.min.toString()}
           max={record.max.toString()}
         />

@@ -7,7 +7,6 @@ type useDatatableProps<T extends Record<string, any>> = {
   data?: T[];
   columnNames: (keyof T)[];
   defaultSorted: keyof T;
-  pageSize?: number;
 };
 
 export const useDatatable = <T extends Record<string, any>>({
