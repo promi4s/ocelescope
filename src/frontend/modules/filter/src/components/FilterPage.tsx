@@ -1,19 +1,34 @@
+import { LoadingOverlay } from "@mantine/core";
 import { defineModuleRoute, useCurrentOcel } from "@ocelescope/core";
-import { useGetFilter } from "../api/base";
+import hash from "object-hash";
+import { useGetFilter, useSetFilter } from "../api/base";
 import FilterForm from "../components/FilterForm";
 
 const FilterPage = () => {
   const { id: ocelId } = useCurrentOcel();
 
-  const { data: filterPipeline } = useGetFilter(ocelId ?? "", {
+  const { data: filterPipeline, refetch } = useGetFilter(ocelId ?? "", {
     query: { enabled: !!ocelId },
   });
 
+  const { mutate, status } = useSetFilter({
+    mutation: {
+      onSuccess: () => {
+        refetch();
+      },
+    },
+  });
   return (
     <>
       {filterPipeline && ocelId && (
-        <FilterForm ocelId={ocelId as string} currentFilter={filterPipeline} />
+        <FilterForm
+          ocelId={ocelId as string}
+          key={hash(filterPipeline)}
+          currentFilter={filterPipeline}
+          onSubmit={(filter) => mutate({ ocelId, data: filter })}
+        />
       )}
+      <LoadingOverlay visible={status === "pending"} />
     </>
   );
 };

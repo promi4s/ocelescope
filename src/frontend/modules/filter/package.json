@@ -47,16 +47,18 @@
     "axios": "catalog:",
     "dayjs": "catalog:",
     "lucide-react": "catalog:",
+    "mantine-datatable": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-hook-form": "catalog:",
     "recharts": "catalog:",
-    "mantine-datatable": "catalog:"
+    "object-hash": "catalog:"
   },
   "devDependencies": {
     "@mantine/notifications": "catalog:",
     "@ocelescope/api-config": "workspace:*",
     "@types/node": "catalog:",
+    "@types/object-hash": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "tsdown": "catalog:",
