@@ -11,7 +11,7 @@ const FilterPage = () => {
 
   return (
     <>
-      {filterPipeline && (
+      {filterPipeline && ocelId && (
         <FilterForm ocelId={ocelId as string} currentFilter={filterPipeline} />
       )}
     </>

@@ -26,7 +26,45 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GroupedOCELFilter"
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/NativeActivityFilter"
+                      },
+                      {
+                        "$ref": "#/components/schemas/NativeObjectTypeFilter"
+                      },
+                      {
+                        "$ref": "#/components/schemas/NativeTimeFrameFilter"
+                      },
+                      {
+                        "$ref": "#/components/schemas/NativeEventAttributeFilter"
+                      },
+                      {
+                        "$ref": "#/components/schemas/NativeObjectAttributeFilter"
+                      },
+                      {
+                        "$ref": "#/components/schemas/NativeE2OCountFilter"
+                      },
+                      {
+                        "$ref": "#/components/schemas/NativeO2OCountFilter"
+                      }
+                    ],
+                    "discriminator": {
+                      "propertyName": "type",
+                      "mapping": {
+                        "activity": "#/components/schemas/NativeActivityFilter",
+                        "object_type": "#/components/schemas/NativeObjectTypeFilter",
+                        "time_frame": "#/components/schemas/NativeTimeFrameFilter",
+                        "event_attribute": "#/components/schemas/NativeEventAttributeFilter",
+                        "object_attribute": "#/components/schemas/NativeObjectAttributeFilter",
+                        "e2o_count": "#/components/schemas/NativeE2OCountFilter",
+                        "o2o_count": "#/components/schemas/NativeO2OCountFilter"
+                      }
+                    }
+                  },
+                  "title": "Response Getfilter"
                 }
               }
             }
@@ -62,7 +100,45 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/GroupedOCELFilter"
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/NativeActivityFilter"
+                    },
+                    {
+                      "$ref": "#/components/schemas/NativeObjectTypeFilter"
+                    },
+                    {
+                      "$ref": "#/components/schemas/NativeTimeFrameFilter"
+                    },
+                    {
+                      "$ref": "#/components/schemas/NativeEventAttributeFilter"
+                    },
+                    {
+                      "$ref": "#/components/schemas/NativeObjectAttributeFilter"
+                    },
+                    {
+                      "$ref": "#/components/schemas/NativeE2OCountFilter"
+                    },
+                    {
+                      "$ref": "#/components/schemas/NativeO2OCountFilter"
+                    }
+                  ],
+                  "discriminator": {
+                    "propertyName": "type",
+                    "mapping": {
+                      "activity": "#/components/schemas/NativeActivityFilter",
+                      "object_type": "#/components/schemas/NativeObjectTypeFilter",
+                      "time_frame": "#/components/schemas/NativeTimeFrameFilter",
+                      "event_attribute": "#/components/schemas/NativeEventAttributeFilter",
+                      "object_attribute": "#/components/schemas/NativeObjectAttributeFilter",
+                      "e2o_count": "#/components/schemas/NativeE2OCountFilter",
+                      "o2o_count": "#/components/schemas/NativeO2OCountFilter"
+                    }
+                  }
+                },
+                "title": "Body"
               }
             }
           }
@@ -92,70 +168,6 @@
   },
   "components": {
     "schemas": {
-      "GroupedOCELFilter": {
-        "properties": {
-          "activity": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/NativeActivityFilter"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "object_type": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/NativeObjectTypeFilter"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "time_frame": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/NativeTimeFrameFilter"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "event_attribute": {
-            "items": {
-              "$ref": "#/components/schemas/NativeEventAttributeFilter"
-            },
-            "type": "array",
-            "title": "Event Attribute"
-          },
-          "object_attribute": {
-            "items": {
-              "$ref": "#/components/schemas/NativeObjectAttributeFilter"
-            },
-            "type": "array",
-            "title": "Object Attribute"
-          },
-          "e2o_count": {
-            "items": {
-              "$ref": "#/components/schemas/NativeE2OCountFilter"
-            },
-            "type": "array",
-            "title": "E2O Count"
-          },
-          "o2o_count": {
-            "items": {
-              "$ref": "#/components/schemas/NativeO2OCountFilter"
-            },
-            "type": "array",
-            "title": "O2O Count"
-          }
-        },
-        "type": "object",
-        "title": "GroupedOCELFilter"
-      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -277,15 +289,15 @@
           "type": {
             "type": "string",
             "const": "e2o_count",
-            "title": "Type",
-            "default": "e2o_count"
+            "title": "Type"
           }
         },
         "type": "object",
         "required": [
           "source",
           "target",
-          "range"
+          "range",
+          "type"
         ],
         "title": "NativeE2OCountFilter"
       },

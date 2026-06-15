@@ -1,13 +1,11 @@
 import { useEventCounts, useObjectCounts } from "@ocelescope/api-base";
-import { type Control, Controller } from "react-hook-form";
-import type { GroupedOCELFilter } from "../../api/base";
+import { Controller } from "react-hook-form";
+import type { FilterView, FilterViewType } from "../../types/filter";
 import { EntityTypeFilterInput } from "../inputs/EntityTypeFilter";
-import type { FilterViewType } from ".";
 
-const EntityFilter: (entityType: "events" | "objects") => React.FC<{
-  ocelId: string;
-  control: Control<GroupedOCELFilter>;
-}> =
+const EntityFilter: (
+  entityType: "events" | "objects",
+) => FilterView<"activity" | "object_type"> =
   (entityType) =>
   ({ ocelId, control }) => {
     const isEvents = entityType === "events";
@@ -20,7 +18,11 @@ const EntityFilter: (entityType: "events" | "objects") => React.FC<{
     return (
       <form>
         <Controller
-          name={isEvents ? "activity.event_types" : "object_type.object_types"}
+          name={
+            isEvents
+              ? `activity.${0}.event_types`
+              : `object_type.${0}.object_types`
+          }
           control={control}
           render={({ field }) => (
             <EntityTypeFilterInput
@@ -41,11 +43,11 @@ const EntityFilter: (entityType: "events" | "objects") => React.FC<{
 export const ActivityFilter: FilterViewType<"activity"> = {
   title: "Activity",
   ViewComponent: EntityFilter("events"),
-  generateDefault: () => ({ type: "activity", event_types: [] }),
+  generateDefault: () => [{ type: "activity", event_types: [] }],
 };
 
 export const ObjectTypeFilter: FilterViewType<"object_type"> = {
   title: "Object Type",
   ViewComponent: EntityFilter("objects"),
-  generateDefault: () => ({ type: "object_type", object_types: [] }),
+  generateDefault: () => [{ type: "object_type", object_types: [] }],
 };

@@ -1,21 +1,13 @@
-import type { ComponentType } from "react";
-import type { Control } from "react-hook-form";
-import type { GroupedOCELFilter } from "../../api/base";
+import type {
+  FilterKey,
+  FilterViewType,
+  GroupedFilter,
+  NativeFilter,
+} from "../../types/filter";
 import { EventAttributeFilter, ObjectAttributeFilter } from "./AttributeFilter";
 import { E2OCountFilter, O2OCountFilter } from "./RelationCountFilter";
 import { TimeFrameFilter } from "./TimeFrameFilter";
 import { ActivityFilter, ObjectTypeFilter } from "./TypeForm";
-
-type FilterKey = NonNullable<keyof GroupedOCELFilter>;
-
-export type FilterViewType<T extends FilterKey> = {
-  title: string;
-  ViewComponent: ComponentType<{
-    ocelId: string;
-    control: Control<GroupedOCELFilter>;
-  }>;
-  generateDefault: () => GroupedOCELFilter[T];
-};
 
 export const FILTER_MAP: { [T in FilterKey]: FilterViewType<T> } = {
   activity: ActivityFilter,
@@ -27,15 +19,27 @@ export const FILTER_MAP: { [T in FilterKey]: FilterViewType<T> } = {
   o2o_count: O2OCountFilter,
 } as const;
 
-type FilterPairs = {
-  [K in FilterKey]: [K, GroupedOCELFilter[K]];
-}[FilterKey];
+export const generateDefaultFilter = (currentFilters: NativeFilter[]) => {
+  const groupedFilter = currentFilters.reduce(
+    (acc, curr) => {
+      return {
+        ...acc,
+        [curr.type]: acc[curr.type]
+          ? [...(acc[curr.type] ?? []), curr]
+          : [curr],
+      };
+    },
+    {} as Partial<GroupedFilter>,
+  );
 
-export const generateDefaultFilter = (currentFilter: GroupedOCELFilter) => {
-  return Object.fromEntries(
-    (Object.entries(currentFilter) as FilterPairs[]).map(
-      ([type, filter]) =>
-        [type, filter ?? FILTER_MAP[type].generateDefault()] as const,
+  const missingFilterKeys = Object.keys(FILTER_MAP).filter(
+    (key) => !(key in groupedFilter),
+  ) as FilterKey[];
+
+  return {
+    ...groupedFilter,
+    ...Object.fromEntries(
+      missingFilterKeys.map((key) => [key, FILTER_MAP[key].generateDefault()]),
     ),
-  ) as GroupedOCELFilter;
+  } as GroupedFilter;
 };

@@ -4,22 +4,15 @@ import {
   useObjectAttributes,
 } from "@ocelescope/api-base";
 import { DataTable } from "mantine-datatable";
-import type { Control } from "react-hook-form";
 
 import type {
-  GroupedOCELFilter,
   NativeEventAttributeFilter,
   NativeObjectAttributeFilter,
 } from "../../api/base";
 import { useDatatable } from "../../hooks/useDatatable";
 import { useFilterColumns } from "../../hooks/useFilterColumn";
+import type { FilterView, FilterViewType } from "../../types/filter";
 import { AttributeInputField } from "../inputs/AttributeInputField";
-import type { FilterViewType } from ".";
-
-type AttributeFilterProps = {
-  ocelId: string;
-  control: Control<GroupedOCELFilter>;
-};
 
 type FilterRecord = Omit<
   NativeEventAttributeFilter | NativeObjectAttributeFilter,
@@ -60,9 +53,11 @@ const getInitialFilter = (attribute: TypedAttribute): FilterRecord => {
   }
 };
 
-const AttributeFilter =
-  (entityType: "objects" | "events") =>
-  ({ ocelId, control }: AttributeFilterProps) => {
+const AttributeFilter: (
+  entityType: "objects" | "events",
+) => FilterView<"event_attribute" | "object_attribute"> =
+  (entityType) =>
+  ({ ocelId, control }) => {
     const isEvent = entityType === "events";
 
     const { data: attributes, isLoading } = (

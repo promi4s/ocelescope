@@ -8,24 +8,24 @@ import {
   type FieldArrayPath,
   useFieldArray,
 } from "react-hook-form";
-import type { GroupedOCELFilter } from "../api/base";
+import type { GroupedFilter } from "../types/filter";
 
-type FilterElement<K extends FieldArrayPath<GroupedOCELFilter>> = FieldArray<
-  GroupedOCELFilter,
+type FilterElement<K extends FieldArrayPath<GroupedFilter>> = FieldArray<
+  GroupedFilter,
   K
 >;
 
 type UseFilterColumnsProps<
   T extends Record<string, any>,
-  K extends FieldArrayPath<GroupedOCELFilter>,
+  K extends FieldArrayPath<GroupedFilter>,
 > = {
-  control: Control<GroupedOCELFilter>;
+  control: Control<GroupedFilter>;
   path: K;
   generateRecordId: (record: T) => string;
   generateFilterId: (filter: FilterElement<K>) => string;
   generateInitialFilter: (record: T) => FilterElement<K>;
   FilterComponent: ComponentType<{
-    control: Control<GroupedOCELFilter>;
+    control: Control<GroupedFilter>;
     path: `${K}.${number}`;
     record: T;
   }>;
@@ -33,7 +33,7 @@ type UseFilterColumnsProps<
 
 export const useFilterColumns = <
   T extends Record<string, any>,
-  K extends FieldArrayPath<GroupedOCELFilter>,
+  K extends FieldArrayPath<GroupedFilter>,
 >({
   path,
   control,
@@ -42,7 +42,7 @@ export const useFilterColumns = <
   generateInitialFilter,
   FilterComponent,
 }: UseFilterColumnsProps<T, K>) => {
-  const { fields, append, remove } = useFieldArray<GroupedOCELFilter, K>({
+  const { fields, append, remove } = useFieldArray<GroupedFilter, K>({
     name: path,
     control,
   });

@@ -4,10 +4,9 @@ import { DateTimePicker } from "@mantine/dates";
 import type { EntityTimeInfo } from "@ocelescope/api-base";
 import { useTimeInfo } from "@ocelescope/api-base";
 import { memo, useMemo } from "react";
-import { type Control, Controller, Watch } from "react-hook-form";
-import type { GroupedOCELFilter } from "../../api/base";
+import { Controller, Watch } from "react-hook-form";
+import type { FilterView, FilterViewType } from "../../types/filter";
 import dayjs from "../../util/dayjs";
-import type { FilterViewType } from ".";
 
 const TimeGraph: React.FC<{
   timeInfo: EntityTimeInfo;
@@ -114,83 +113,84 @@ const TimeFrameSlider: React.FC<{
   );
 };
 
-const TimeFrameFilterView: React.FC<{
-  ocelId: string;
-  control: Control<GroupedOCELFilter>;
-}> = memo(({ ocelId, control }) => {
-  const { data: timeInfo, isLoading } = useTimeInfo(ocelId, {
-    periods: 100,
-    ocel_version: "original",
-  });
+const TimeFrameFilterView: FilterView<"time_frame"> = memo(
+  ({ ocelId, control }) => {
+    const { data: timeInfo, isLoading } = useTimeInfo(ocelId, {
+      periods: 100,
+      ocel_version: "original",
+    });
 
-  return (
-    <Box pos={"relative"} w={"100%"} h={"100%"}>
-      <LoadingOverlay visible={isLoading} />
-      {timeInfo && (
-        <Grid justify="center" align="center">
-          <Grid.Col span={12}>
-            <Watch
+    return (
+      <Box pos={"relative"} w={"100%"} h={"100%"}>
+        <LoadingOverlay visible={isLoading} />
+        {timeInfo && (
+          <Grid justify="center" align="center">
+            <Grid.Col span={12}>
+              <Watch
+                control={control}
+                name={
+                  [
+                    "time_frame.0.time_range.0",
+                    "time_frame.0.time_range.1",
+                  ] as const
+                }
+                render={([startTime, endTime]) => {
+                  return (
+                    <TimeGraph
+                      timeInfo={timeInfo}
+                      startDate={startTime ?? undefined}
+                      endDate={endTime ?? undefined}
+                    />
+                  );
+                }}
+              />
+            </Grid.Col>
+            <Controller
               control={control}
-              name={
-                ["time_frame.time_range.0", "time_frame.time_range.1"] as const
-              }
-              render={([startTime, endTime]) => {
-                return (
-                  <TimeGraph
-                    timeInfo={timeInfo}
-                    startDate={startTime ?? undefined}
-                    endDate={endTime ?? undefined}
-                  />
-                );
-              }}
+              name={"time_frame.0.time_range"}
+              defaultValue={[timeInfo.start_time, timeInfo.end_time]}
+              render={({ field }) => (
+                <>
+                  <Grid.Col span={3}>
+                    <DateTimePicker
+                      minDate={timeInfo.start_time}
+                      maxDate={field.value?.[1] ?? timeInfo.end_time}
+                      onChange={(newStart) => {
+                        field.onChange([newStart, field.value?.[1]]);
+                      }}
+                      value={field.value?.[0] ?? timeInfo.start_time}
+                    />
+                  </Grid.Col>
+                  <Grid.Col span={6}>
+                    <TimeFrameSlider
+                      onChange={field.onChange}
+                      timeInfo={timeInfo}
+                      startTime={field.value?.[0] ?? timeInfo.start_time}
+                      endTime={field.value?.[1] ?? timeInfo.end_time}
+                    />
+                  </Grid.Col>
+                  <Grid.Col span={3}>
+                    <DateTimePicker
+                      minDate={field.value?.[0] ?? timeInfo.start_time}
+                      maxDate={timeInfo.end_time}
+                      onChange={(newEnd) => {
+                        field.onChange([field.value?.[0], newEnd]);
+                      }}
+                      value={field.value?.[1] ?? timeInfo.end_time}
+                    />
+                  </Grid.Col>
+                </>
+              )}
             />
-          </Grid.Col>
-          <Controller
-            control={control}
-            name={"time_frame.time_range"}
-            defaultValue={[timeInfo.start_time, timeInfo.end_time]}
-            render={({ field }) => (
-              <>
-                <Grid.Col span={3}>
-                  <DateTimePicker
-                    minDate={timeInfo.start_time}
-                    maxDate={field.value?.[1] ?? timeInfo.end_time}
-                    onChange={(newStart) => {
-                      field.onChange([newStart, field.value?.[1]]);
-                    }}
-                    value={field.value?.[0] ?? timeInfo.start_time}
-                  />
-                </Grid.Col>
-                <Grid.Col span={6}>
-                  <TimeFrameSlider
-                    onChange={field.onChange}
-                    timeInfo={timeInfo}
-                    startTime={field.value?.[0] ?? timeInfo.start_time}
-                    endTime={field.value?.[1] ?? timeInfo.end_time}
-                  />
-                </Grid.Col>
-                <Grid.Col span={3}>
-                  <DateTimePicker
-                    minDate={field.value?.[0] ?? timeInfo.start_time}
-                    maxDate={timeInfo.end_time}
-                    onChange={(newEnd) => {
-                      field.onChange([field.value?.[0], newEnd]);
-                    }}
-                    value={field.value?.[1] ?? timeInfo.end_time}
-                  />
-                </Grid.Col>
-              </>
-            )}
-          />
-        </Grid>
-      )}
-    </Box>
-  );
-});
+          </Grid>
+        )}
+      </Box>
+    );
+  },
+);
 
 export const TimeFrameFilter: FilterViewType<"time_frame"> = {
   title: "Timeframe",
-  field: "time_frame",
   ViewComponent: TimeFrameFilterView,
-  generateDefault: () => ({ type: "time_frame", time_range: [null, null] }),
+  generateDefault: () => [{ type: "time_frame", time_range: [null, null] }],
 };

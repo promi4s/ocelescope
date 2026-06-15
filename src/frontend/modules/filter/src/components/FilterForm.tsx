@@ -1,11 +1,11 @@
-import { Tabs } from "@mantine/core";
+import { Group, Tabs } from "@mantine/core";
 import { useForm } from "react-hook-form";
-import type { GroupedOCELFilter } from "../api/base";
+import type { NativeFilter } from "../types/filter";
 import { FILTER_MAP, generateDefaultFilter } from "./FilterViews";
 
 const FilterForm: React.FC<{
   ocelId: string;
-  currentFilter: GroupedOCELFilter;
+  currentFilter: NativeFilter[];
 }> = ({ ocelId, currentFilter }) => {
   const { control } = useForm({
     defaultValues: generateDefaultFilter(currentFilter),
@@ -13,13 +13,15 @@ const FilterForm: React.FC<{
 
   return (
     <Tabs defaultValue={"activity"}>
-      <Tabs.List>
-        {Object.entries(FILTER_MAP).map(([key, { title }]) => (
-          <Tabs.Tab key={key} value={key}>
-            {title}
-          </Tabs.Tab>
-        ))}
-      </Tabs.List>
+      <Group>
+        <Tabs.List>
+          {Object.entries(FILTER_MAP).map(([key, { title }]) => (
+            <Tabs.Tab key={key} value={key}>
+              {title}
+            </Tabs.Tab>
+          ))}
+        </Tabs.List>
+      </Group>
 
       {Object.entries(FILTER_MAP).map(([key, { ViewComponent }]) => (
         <Tabs.Panel key={key} value={key} p={"md"}>

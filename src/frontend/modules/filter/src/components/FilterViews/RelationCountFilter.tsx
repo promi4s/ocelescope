@@ -5,20 +5,16 @@ import {
   useO2o,
 } from "@ocelescope/api-base";
 import { DataTable } from "mantine-datatable";
-import { type Control, Controller } from "react-hook-form";
-import type { GroupedOCELFilter } from "../../api/base";
+import { Controller } from "react-hook-form";
 import { useDatatable } from "../../hooks/useDatatable";
 import { useFilterColumns } from "../../hooks/useFilterColumn";
-import type { FilterViewType } from ".";
+import type { FilterView, FilterViewType } from "../../types/filter";
 
-type RelationCountFilterProps = {
-  ocelId: string;
-  control: Control<GroupedOCELFilter>;
-};
-
-const RelationCountFilter =
-  (relationType: "e2o" | "o2o") =>
-  ({ ocelId, control }: RelationCountFilterProps) => {
+const RelationCountFilter: (
+  relationType: "e2o" | "o2o",
+) => FilterView<"e2o_count" | "o2o_count"> =
+  (relationType) =>
+  ({ ocelId, control }) => {
     const isE2O = relationType === "e2o";
 
     const { data: relationSummary } = (isE2O ? useE2o : useO2o)(ocelId, {
