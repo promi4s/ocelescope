@@ -43,3 +43,30 @@ export const generateDefaultFilter = (currentFilters: NativeFilter[]) => {
     ),
   } as GroupedFilter;
 };
+
+const defaultFilter = <T extends NativeFilter>(filters?: T[]) => {
+  if (!filters || filters.length === 0) {
+    return [];
+  }
+
+  return filters;
+};
+
+const cleanUpFilterByKey = <K extends FilterKey>(
+  key: K,
+  filters: GroupedFilter[K],
+) => {
+  const cleanUp = FILTER_MAP[key].cleanUpFilters ?? defaultFilter;
+  return cleanUp(filters);
+};
+
+export const cleanUpFilters = (filter: Partial<GroupedFilter>) => {
+  return (Object.keys(filter) as FilterKey[])
+    .flatMap((key) => {
+      const filters = filter[key];
+      if (!filters) return [];
+
+      return cleanUpFilterByKey(key, filters);
+    })
+    .filter((filter) => !!filter);
+};

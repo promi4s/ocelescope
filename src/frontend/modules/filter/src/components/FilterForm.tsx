@@ -1,13 +1,18 @@
-import { Group, Tabs } from "@mantine/core";
+import { ActionIcon, Group, Tabs } from "@mantine/core";
+import { CheckIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import type { NativeFilter } from "../types/filter";
-import { FILTER_MAP, generateDefaultFilter } from "./FilterViews";
+import {
+  cleanUpFilters,
+  FILTER_MAP,
+  generateDefaultFilter,
+} from "./FilterViews";
 
 const FilterForm: React.FC<{
   ocelId: string;
   currentFilter: NativeFilter[];
 }> = ({ ocelId, currentFilter }) => {
-  const { control } = useForm({
+  const { control, handleSubmit } = useForm({
     defaultValues: generateDefaultFilter(currentFilter),
   });
 
@@ -21,6 +26,14 @@ const FilterForm: React.FC<{
             </Tabs.Tab>
           ))}
         </Tabs.List>
+
+        <ActionIcon
+          onClick={handleSubmit((data) => {
+            console.log(cleanUpFilters(data));
+          })}
+        >
+          <CheckIcon />
+        </ActionIcon>
       </Group>
 
       {Object.entries(FILTER_MAP).map(([key, { ViewComponent }]) => (

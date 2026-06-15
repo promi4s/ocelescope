@@ -20,4 +20,5 @@ export type FilterViewType<T extends FilterKey> = {
   title: string;
   ViewComponent: FilterView<T>;
   generateDefault: () => GroupedFilter[T];
+  cleanUpFilters?: (filter: GroupedFilter[T]) => GroupedFilter[T];
 };

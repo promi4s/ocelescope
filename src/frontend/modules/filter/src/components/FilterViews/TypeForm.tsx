@@ -44,10 +44,22 @@ export const ActivityFilter: FilterViewType<"activity"> = {
   title: "Activity",
   ViewComponent: EntityFilter("events"),
   generateDefault: () => [{ type: "activity", event_types: [] }],
+  cleanUpFilters: (filter) => {
+    if (!filter[0] || filter[0].event_types.length === 0) {
+      return [];
+    }
+    return [filter[0]];
+  },
 };
 
 export const ObjectTypeFilter: FilterViewType<"object_type"> = {
   title: "Object Type",
   ViewComponent: EntityFilter("objects"),
   generateDefault: () => [{ type: "object_type", object_types: [] }],
+  cleanUpFilters: (filter) => {
+    if (!filter[0] || filter[0].object_types.length === 0) {
+      return [];
+    }
+    return [filter[0]];
+  },
 };

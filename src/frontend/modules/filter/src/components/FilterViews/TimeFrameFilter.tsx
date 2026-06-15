@@ -193,4 +193,15 @@ export const TimeFrameFilter: FilterViewType<"time_frame"> = {
   title: "Timeframe",
   ViewComponent: TimeFrameFilterView,
   generateDefault: () => [{ type: "time_frame", time_range: [null, null] }],
+  cleanUpFilters: (currentFilter) => {
+    if (
+      !currentFilter[0] ||
+      (currentFilter[0].time_range[0] == null &&
+        currentFilter[0].time_range[1] == null)
+    ) {
+      return [];
+    }
+
+    return [currentFilter[0]];
+  },
 };
