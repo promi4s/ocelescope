@@ -38,12 +38,14 @@ const EntityFilter: (entityType: "events" | "objects") => React.FC<{
     );
   };
 
-export const ActivityFilter: FilterViewType = {
+export const ActivityFilter: FilterViewType<"activity"> = {
   title: "Activity",
   ViewComponent: EntityFilter("events"),
+  generateDefault: () => ({ type: "activity", event_types: [] }),
 };
 
-export const ObjectTypeFilter: FilterViewType = {
+export const ObjectTypeFilter: FilterViewType<"object_type"> = {
   title: "Object Type",
   ViewComponent: EntityFilter("objects"),
+  generateDefault: () => ({ type: "object_type", object_types: [] }),
 };

@@ -110,11 +110,14 @@ const AttributeFilter =
     );
   };
 
-export const EventAttributeFilter: FilterViewType = {
+export const EventAttributeFilter: FilterViewType<"event_attribute"> = {
   title: "Event Attribute",
   ViewComponent: AttributeFilter("events"),
+  generateDefault: () => [],
 };
-export const ObjectAttributeFilter: FilterViewType = {
+
+export const ObjectAttributeFilter: FilterViewType<"object_attribute"> = {
   title: "Object Attribute",
   ViewComponent: AttributeFilter("objects"),
+  generateDefault: () => [],
 };

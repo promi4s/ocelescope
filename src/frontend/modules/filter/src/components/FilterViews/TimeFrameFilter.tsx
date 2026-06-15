@@ -188,7 +188,9 @@ const TimeFrameFilterView: React.FC<{
   );
 });
 
-export const TimeFrameFilter: FilterViewType = {
+export const TimeFrameFilter: FilterViewType<"time_frame"> = {
   title: "Timeframe",
+  field: "time_frame",
   ViewComponent: TimeFrameFilterView,
+  generateDefault: () => ({ type: "time_frame", time_range: [null, null] }),
 };
