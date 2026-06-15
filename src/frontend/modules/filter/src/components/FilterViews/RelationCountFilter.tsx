@@ -9,6 +9,7 @@ import { type Control, Controller } from "react-hook-form";
 import type { GroupedOCELFilter } from "../../api/base";
 import { useDatatable } from "../../hooks/useDatatable";
 import { useFilterColumns } from "../../hooks/useFilterColumn";
+import type { FilterViewType } from ".";
 
 type RelationCountFilterProps = {
   ocelId: string;
@@ -108,5 +109,11 @@ const RelationCountFilter =
     );
   };
 
-export const E2OCountFilter = RelationCountFilter("e2o");
-export const O2OCountFilter = RelationCountFilter("o2o");
+export const E2OCountFilter: FilterViewType = {
+  title: "E2O Count",
+  ViewComponent: RelationCountFilter("e2o"),
+};
+export const O2OCountFilter: FilterViewType = {
+  title: "O2O Count",
+  ViewComponent: RelationCountFilter("o2o"),
+};

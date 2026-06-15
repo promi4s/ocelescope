@@ -7,6 +7,7 @@ import { memo, useMemo } from "react";
 import { type Control, Controller, Watch } from "react-hook-form";
 import type { GroupedOCELFilter } from "../../api/base";
 import dayjs from "../../util/dayjs";
+import type { FilterViewType } from ".";
 
 const TimeGraph: React.FC<{
   timeInfo: EntityTimeInfo;
@@ -113,7 +114,7 @@ const TimeFrameSlider: React.FC<{
   );
 };
 
-const TimeFrameFilter: React.FC<{
+const TimeFrameFilterView: React.FC<{
   ocelId: string;
   control: Control<GroupedOCELFilter>;
 }> = memo(({ ocelId, control }) => {
@@ -187,4 +188,7 @@ const TimeFrameFilter: React.FC<{
   );
 });
 
-export default TimeFrameFilter;
+export const TimeFrameFilter: FilterViewType = {
+  title: "Timeframe",
+  ViewComponent: TimeFrameFilterView,
+};

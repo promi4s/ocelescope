@@ -14,6 +14,7 @@ import type {
 import { useDatatable } from "../../hooks/useDatatable";
 import { useFilterColumns } from "../../hooks/useFilterColumn";
 import { AttributeInputField } from "../inputs/AttributeInputField";
+import type { FilterViewType } from ".";
 
 type AttributeFilterProps = {
   ocelId: string;
@@ -109,5 +110,11 @@ const AttributeFilter =
     );
   };
 
-export const EventAttributeFilter = AttributeFilter("events");
-export const ObjectAttributeFilter = AttributeFilter("objects");
+export const EventAttributeFilter: FilterViewType = {
+  title: "Event Attribute",
+  ViewComponent: AttributeFilter("events"),
+};
+export const ObjectAttributeFilter: FilterViewType = {
+  title: "Object Attribute",
+  ViewComponent: AttributeFilter("objects"),
+};

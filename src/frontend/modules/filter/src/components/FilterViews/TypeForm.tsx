@@ -2,6 +2,7 @@ import { useEventCounts, useObjectCounts } from "@ocelescope/api-base";
 import { type Control, Controller } from "react-hook-form";
 import type { GroupedOCELFilter } from "../../api/base";
 import { EntityTypeFilterInput } from "../inputs/EntityTypeFilter";
+import type { FilterViewType } from ".";
 
 const EntityFilter: (entityType: "events" | "objects") => React.FC<{
   ocelId: string;
@@ -37,5 +38,12 @@ const EntityFilter: (entityType: "events" | "objects") => React.FC<{
     );
   };
 
-export const ActivityFilter = EntityFilter("events");
-export const ObjectTypeFilter = EntityFilter("objects");
+export const ActivityFilter: FilterViewType = {
+  title: "Activity",
+  ViewComponent: EntityFilter("events"),
+};
+
+export const ObjectTypeFilter: FilterViewType = {
+  title: "Object Type",
+  ViewComponent: EntityFilter("objects"),
+};
