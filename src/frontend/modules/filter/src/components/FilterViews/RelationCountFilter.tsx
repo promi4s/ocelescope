@@ -5,6 +5,7 @@ import {
   useO2o,
 } from "@ocelescope/api-base";
 import { DataTable } from "mantine-datatable";
+import { useMemo } from "react";
 import { Controller } from "react-hook-form";
 import { useDatatable } from "../../hooks/useDatatable";
 import { useFilterColumns } from "../../hooks/useFilterColumn";
@@ -24,8 +25,16 @@ const RelationCountFilter: (
       },
     );
 
+    const nonTrivialRelations = useMemo(
+      () =>
+        relationSummary?.filter(
+          ({ max_count, min_count }) => min_count < max_count,
+        ),
+      [relationSummary],
+    );
+
     const { records, columns, tableProps } = useDatatable({
-      data: relationSummary,
+      data: nonTrivialRelations,
       columnNames: ["source", "qualifier", "target"],
       defaultSorted: "source",
     });

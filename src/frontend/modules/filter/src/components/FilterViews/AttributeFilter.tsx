@@ -4,7 +4,7 @@ import {
   useObjectAttributes,
 } from "@ocelescope/api-base";
 import { DataTable } from "mantine-datatable";
-
+import { useMemo } from "react";
 import type {
   NativeEventAttributeFilter,
   NativeObjectAttributeFilter,
@@ -64,8 +64,13 @@ const AttributeFilter: (
       isEvent ? useEventAttributes : useObjectAttributes
     )(ocelId);
 
+    const nonTrivialAttributes = useMemo(
+      () => attributes?.filter(({ distinct_values }) => distinct_values > 1),
+      [attributes],
+    );
+
     const { columns, records, tableProps } = useDatatable({
-      data: attributes,
+      data: nonTrivialAttributes,
       columnNames: ["name", "entity_type"],
       defaultSorted: "name",
     });

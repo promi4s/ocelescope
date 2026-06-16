@@ -8,6 +8,7 @@ type useDatatableProps<T extends Record<string, any>> = {
   columnNames: (keyof T)[];
   defaultSorted: keyof T;
   pageSize?: number;
+  additionalFilter?: (data: T) => boolean;
 };
 
 const DEFAULT_PAGE_SIZE = 15;
