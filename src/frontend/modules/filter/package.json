@@ -52,7 +52,8 @@
     "react-dom": "catalog:",
     "react-hook-form": "catalog:",
     "recharts": "catalog:",
-    "object-hash": "catalog:"
+    "object-hash": "catalog:",
+    "next": "catalog:"
   },
   "devDependencies": {
     "@mantine/notifications": "catalog:",

@@ -1,7 +1,8 @@
 import { ActionIcon, ActionIconGroup, Group, Tabs } from "@mantine/core";
 import { CheckIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
-import type { NativeFilter } from "../types/filter";
+import { useCurrentFilterTab } from "../hooks/useSearchParams";
+import type { FilterKey, NativeFilter } from "../types/filter";
 import {
   cleanUpFilters,
   FILTER_MAP,
@@ -19,8 +20,18 @@ const FilterForm = ({ ocelId, currentFilter, onSubmit }: FilterFormProps) => {
     defaultValues: generateDefaultFilter(currentFilter),
   });
 
+  const { currentTab, setCurrentTab } = useCurrentFilterTab({
+    tabs: Object.keys(FILTER_MAP) as FilterKey[],
+    defaultTab: "activity",
+    queryKey: "tab",
+  });
+
+  console.log(currentTab);
   return (
-    <Tabs defaultValue={"activity"}>
+    <Tabs
+      value={currentTab}
+      onChange={(newTab) => setCurrentTab(newTab as FilterKey)}
+    >
       <Group>
         <Tabs.List flex={1}>
           {Object.entries(FILTER_MAP).map(([key, { title }]) => (

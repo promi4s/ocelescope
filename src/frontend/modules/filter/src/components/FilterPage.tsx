@@ -1,5 +1,9 @@
 import { LoadingOverlay } from "@mantine/core";
-import { defineModuleRoute, useCurrentOcel } from "@ocelescope/core";
+import {
+  defineModuleRoute,
+  useCurrentOcel,
+  useInvalidate,
+} from "@ocelescope/core";
 import hash from "object-hash";
 import { useGetFilter, useSetFilter } from "../api/base";
 import FilterForm from "../components/FilterForm";
@@ -11,10 +15,13 @@ const FilterPage = () => {
     query: { enabled: !!ocelId },
   });
 
+  const invalidate = useInvalidate();
+
   const { mutate, status } = useSetFilter({
     mutation: {
-      onSuccess: () => {
+      onSuccess: async () => {
         refetch();
+        await invalidate(["ocels"]);
       },
     },
   });
