@@ -26,11 +26,11 @@ const FilterForm = ({ ocelId, currentFilter, onSubmit }: FilterFormProps) => {
     queryKey: "tab",
   });
 
-  console.log(currentTab);
   return (
     <Tabs
       value={currentTab}
       onChange={(newTab) => setCurrentTab(newTab as FilterKey)}
+      keepMounted={false}
     >
       <Group>
         <Tabs.List flex={1}>
@@ -46,15 +46,17 @@ const FilterForm = ({ ocelId, currentFilter, onSubmit }: FilterFormProps) => {
             onClick={handleSubmit((data) => {
               onSubmit?.(cleanUpFilters(data));
             })}
+            color="green"
           >
             <CheckIcon />
           </ActionIcon>
           <ActionIcon
+            color="yellow"
             onClick={() => reset(generateDefaultFilter(currentFilter))}
           >
             <CheckIcon />
           </ActionIcon>
-          <ActionIcon onClick={() => onSubmit?.([])}>
+          <ActionIcon color="red" onClick={() => onSubmit?.([])}>
             <CheckIcon />
           </ActionIcon>
         </ActionIconGroup>

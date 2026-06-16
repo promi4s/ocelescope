@@ -17,9 +17,12 @@ const RelationCountFilter: (
   ({ ocelId, control }) => {
     const isE2O = relationType === "e2o";
 
-    const { data: relationSummary } = (isE2O ? useE2o : useO2o)(ocelId, {
-      ocel_version: "original",
-    });
+    const { data: relationSummary, isLoading } = (isE2O ? useE2o : useO2o)(
+      ocelId,
+      {
+        ocel_version: "original",
+      },
+    );
 
     const { records, columns, tableProps } = useDatatable({
       data: relationSummary,
@@ -101,6 +104,7 @@ const RelationCountFilter: (
         withTableBorder
         noRecordsText="No relations to filter"
         {...tableProps}
+        fetching={isLoading}
       />
     );
   };
