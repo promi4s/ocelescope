@@ -63,36 +63,6 @@ class E2OManager(BaseManager):
         )
 
     # ---------------------------------------------------------
-    # Typed / Enriched E2O Table
-    # ---------------------------------------------------------
-    @property
-    @instance_lru_cache()
-    def typed_df(self) -> pd.DataFrame:
-        """
-        Return the E2O relation table enriched with:
-            - Event activity (from EventsManager)
-            - Object type (from ObjectsManager)
-
-        Columns added:
-            - E2O_ACTIVITY
-            - E2O_OBJECT_TYPE
-
-        Returns:
-            DataFrame: Type- and activity-enriched E2O table.
-        """
-        df = self.df.copy()
-
-        # Join activity (via EventsManager)
-        activity_by_id = self._ocel.events.activity_by_id
-        df = df.join(activity_by_id.rename(E2O_ACTIVITY), on=E2O_EVENT_ID)
-
-        # Join object type (via ObjectsManager)
-        type_by_id = self._ocel.objects.type_by_id
-        df = df.join(type_by_id.rename(E2O_OBJECT_TYPE), on=E2O_OBJECT_ID)
-
-        return df
-
-    # ---------------------------------------------------------
     # Summary
     # ---------------------------------------------------------
     @instance_lru_cache()

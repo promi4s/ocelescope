@@ -81,7 +81,7 @@ class E2OCountFilter(BaseFilter, RelationCountFilterConfig):
 
         mask = filter_by_relation_counts(
             entity_df=ocel.events.df if is_source else ocel.objects.df,
-            relation_df=ocel.e2o.typed_df,
+            relation_df=ocel.e2o.df,
             source=self.source,
             target=self.target,
             qualifier=self.qualifier,
