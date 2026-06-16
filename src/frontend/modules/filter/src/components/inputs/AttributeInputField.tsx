@@ -59,7 +59,6 @@ const NumberFilterField = memo(function NumberFilterField({
               value={currentMin}
               min={min}
               max={currentMax ?? max}
-              clampBehavior="strict"
               onChange={(nextMin) => {
                 field.onChange([nextMin, currentMax]);
               }}
@@ -75,7 +74,6 @@ const NumberFilterField = memo(function NumberFilterField({
               value={currentMax}
               min={currentMin ?? min}
               max={max}
-              clampBehavior="strict"
               allowDecimal={allowDecimals}
               onChange={(nextMax) => {
                 field.onChange([currentMin, nextMax]);
