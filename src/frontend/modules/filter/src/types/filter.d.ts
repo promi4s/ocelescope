@@ -7,11 +7,7 @@ type FilterKey = NonNullable<NativeFilter["type"]>;
 
 type GroupedFilter = { [T in FilterKey]: Extract<NativeFilter, { type: T }>[] };
 
-type FilterPairs = {
-  [K in FilterKey]: [K, GroupedFilter[K]];
-}[FilterKey];
-
-export type FilterView<T extends FilterKey> = ComponentType<{
+export type FilterView<_T extends FilterKey> = ComponentType<{
   ocelId: string;
   control: Control<GroupedFilter>;
 }>;

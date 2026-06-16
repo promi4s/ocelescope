@@ -4,8 +4,7 @@ import type { TypedAttribute } from "@ocelescope/api-base";
 
 import { memo } from "react";
 import { type Control, Controller } from "react-hook-form";
-
-import type { GroupedOCELFilter } from "../../api/base";
+import type { GroupedFilter } from "../../types/filter";
 
 type FilterPath = "event_attribute" | "object_attribute";
 
@@ -13,7 +12,7 @@ const StringFilterField = memo(function StringFilterField({
   control,
   name,
 }: {
-  control: Control<GroupedOCELFilter>;
+  control: Control<GroupedFilter>;
   name: `${FilterPath}.${number}.regex`;
 }) {
   return (
@@ -38,7 +37,7 @@ const NumberFilterField = memo(function NumberFilterField({
   max,
   allowDecimals,
 }: {
-  control: Control<GroupedOCELFilter>;
+  control: Control<GroupedFilter>;
   name: `${FilterPath}.${number}.number_range`;
   min: number;
   max: number;
@@ -96,7 +95,7 @@ const DateFilterField = memo(function DateFilterField({
   min,
   max,
 }: {
-  control: Control<GroupedOCELFilter>;
+  control: Control<GroupedFilter>;
   name: `${FilterPath}.${number}.time_range`;
   min: string;
   max: string;
@@ -146,7 +145,7 @@ export const AttributeInputField = memo(function AttributeInputField({
   record,
   path,
 }: {
-  control: Control<GroupedOCELFilter>;
+  control: Control<GroupedFilter>;
   path: `${FilterPath}.${number}`;
   record: TypedAttribute;
 }) {
