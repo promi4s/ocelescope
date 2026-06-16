@@ -1,4 +1,4 @@
-from typing import Annotated, ClassVar, Literal
+from typing import Annotated, Literal
 
 from ocelescope_backend.app.modules import ModuleFilter
 from pydantic import Field
@@ -16,7 +16,6 @@ from ocelescope import (
 
 class NativeFilterBase(ModuleFilter):
     OcelescopeModuleSource = "FilterV1"
-    NativeFilterType: ClassVar[str]
 
 
 class NativeE2OCountFilter(NativeFilterBase, E2OCountFilter):
