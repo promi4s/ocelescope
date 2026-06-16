@@ -1,5 +1,5 @@
 import { ActionIcon, ActionIconGroup, Group, Tabs } from "@mantine/core";
-import { CheckIcon } from "lucide-react";
+import { CheckIcon, RotateCcwIcon, Trash2Icon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useCurrentFilterTab } from "../hooks/useSearchParams";
 import type { FilterKey, NativeFilter } from "../types/filter";
@@ -16,7 +16,7 @@ type FilterFormProps = {
 };
 
 const FilterForm = ({ ocelId, currentFilter, onSubmit }: FilterFormProps) => {
-  const { control, handleSubmit, reset } = useForm({
+  const { control, handleSubmit, reset, formState } = useForm({
     defaultValues: generateDefaultFilter(currentFilter),
   });
 
@@ -42,23 +42,31 @@ const FilterForm = ({ ocelId, currentFilter, onSubmit }: FilterFormProps) => {
         </Tabs.List>
 
         <ActionIconGroup>
-          <ActionIcon
-            onClick={handleSubmit((data) => {
-              onSubmit?.(cleanUpFilters(data));
-            })}
-            color="green"
-          >
-            <CheckIcon />
-          </ActionIcon>
-          <ActionIcon
-            color="yellow"
-            onClick={() => reset(generateDefaultFilter(currentFilter))}
-          >
-            <CheckIcon />
-          </ActionIcon>
-          <ActionIcon color="red" onClick={() => onSubmit?.([])}>
-            <CheckIcon />
-          </ActionIcon>
+          {formState.isDirty && (
+            <>
+              <ActionIcon
+                onClick={handleSubmit((data) => {
+                  onSubmit?.(cleanUpFilters(data));
+                })}
+                size={"lg"}
+                color="green"
+              >
+                <CheckIcon size={24} />
+              </ActionIcon>
+              <ActionIcon
+                size={"lg"}
+                color="yellow"
+                onClick={() => reset(generateDefaultFilter(currentFilter))}
+              >
+                <RotateCcwIcon size={24} />
+              </ActionIcon>
+            </>
+          )}
+          {currentFilter.length > 0 && (
+            <ActionIcon size={"lg"} color="red" onClick={() => onSubmit?.([])}>
+              <Trash2Icon size={24} />
+            </ActionIcon>
+          )}
         </ActionIconGroup>
       </Group>
 
