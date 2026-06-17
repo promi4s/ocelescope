@@ -39,7 +39,7 @@ const EntityTable: React.FC<{
     [entities],
   );
 
-  const transformeColumns: DataTableColumn[] = useMemo(
+  const transformedColumns: DataTableColumn[] = useMemo(
     () =>
       columns.map((column) => ({
         ...column,
@@ -55,7 +55,7 @@ const EntityTable: React.FC<{
       recordsPerPage={entities.page_size}
       onPageChange={onPageChange}
       withColumnBorders
-      columns={transformeColumns}
+      columns={transformedColumns}
       records={records}
       recordsPerPageOptions={[20, 40, 50]}
       onRecordsPerPageChange={onPageSizeChange}
