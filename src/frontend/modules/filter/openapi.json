@@ -222,22 +222,6 @@
             "type": "string",
             "title": "Target"
           },
-          "mode": {
-            "anyOf": [
-              {
-                "type": "string",
-                "enum": [
-                  "include",
-                  "exclude"
-                ]
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Mode",
-            "default": "include"
-          },
           "range": {
             "prefixItems": [
               {
@@ -445,22 +429,6 @@
           "target": {
             "type": "string",
             "title": "Target"
-          },
-          "mode": {
-            "anyOf": [
-              {
-                "type": "string",
-                "enum": [
-                  "include",
-                  "exclude"
-                ]
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Mode",
-            "default": "include"
           },
           "range": {
             "prefixItems": [
