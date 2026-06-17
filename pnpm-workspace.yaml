@@ -47,6 +47,7 @@ catalog:
   bumpp: ^11.0.0
   clsx: ^2.1.1
   content-disposition-attachment: ^0.3.1
+  cspell: ^10.0.1
   cytoscape: ^3.33.1
   dayjs: ^1.11.19
   elkjs: ^0.11.0
