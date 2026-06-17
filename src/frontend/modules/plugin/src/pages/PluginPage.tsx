@@ -24,7 +24,7 @@ const MethodCard: React.FC<{ pluginId: string; method: PluginMethod }> = ({
         extension ? extensionMeta[extension]?.label : undefined,
     );
 
-    const inputResoures = Object.values(method.input_resources ?? {}).map(
+    const inputResources = Object.values(method.input_resources ?? {}).map(
       ([resourceName]) => resourceMeta[resourceName]?.label ?? resourceName,
     );
 
@@ -36,7 +36,7 @@ const MethodCard: React.FC<{ pluginId: string; method: PluginMethod }> = ({
       );
 
     return Array.from(
-      new Set([...inputResoures, ...resultNames, ...extensions]),
+      new Set([...inputResources, ...resultNames, ...extensions]),
     ).filter((tag) => !!tag) as string[];
   }, [resourceMeta, extensionMeta, method]);
 
