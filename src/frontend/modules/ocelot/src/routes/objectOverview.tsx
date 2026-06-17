@@ -20,7 +20,7 @@ const ObjectGraph = () => {
   const { data: objectCounts } = useObjectCounts(ocelId);
 
   const [searchValue, setSearchValue] = useDebouncedState("", 200);
-  const [vizualization, setVizualization] = useState<"graph" | "cards">(
+  const [visualization, setVisualization] = useState<"graph" | "cards">(
     "graph",
   );
 
@@ -51,7 +51,7 @@ const ObjectGraph = () => {
   return (
     <Stack w={"100%"} h={"100%"}>
       <Group justify="end">
-        {vizualization === "cards" && (
+        {visualization === "cards" && (
           <Input
             leftSection={<SearchIcon />}
             defaultValue={searchValue}
@@ -60,16 +60,16 @@ const ObjectGraph = () => {
         )}
         <SegmentedControl
           onChange={(newViz) =>
-            setVizualization(newViz as typeof vizualization)
+            setVisualization(newViz as typeof visualization)
           }
-          value={vizualization}
+          value={visualization}
           data={[
             { label: "Graph", value: "graph" },
             { label: "Cards", value: "cards" },
           ]}
         />
       </Group>
-      {vizualization === "graph" && o2o && objectAttributes && (
+      {visualization === "graph" && o2o && objectAttributes && (
         <Graph
           key={ocelId}
           initialNodes={nodes}
@@ -93,7 +93,7 @@ const ObjectGraph = () => {
           }}
         />
       )}
-      {vizualization === "cards" && objectCounts && (
+      {visualization === "cards" && objectCounts && (
         <EntityOverview
           entityCounts={objectCounts}
           attributes={objectAttributes}
