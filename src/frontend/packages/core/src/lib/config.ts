@@ -23,6 +23,10 @@ export type ModuleRouteDefinition = {
 
 export type OcelescopeConfig = {
   modules?: readonly ModuleDefinition[];
+  navbarGroups?: {
+    title?: string;
+    modulesNames: string[];
+  }[];
 };
 
 export const defineModule = (def: ModuleDefinition) => def;
