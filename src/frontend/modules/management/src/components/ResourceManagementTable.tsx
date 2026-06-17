@@ -120,7 +120,7 @@ const ResourceManagementTable: React.FC = () => {
     { id: string; value: string } | undefined
   >(undefined);
 
-  const [viewedResouce, setViewedResource] = useState<string | undefined>();
+  const [viewedResource, setViewedResource] = useState<string | undefined>();
 
   const entities: Entity[] = useMemo(() => {
     const ocelEntities = ocels.map<Entity>(
@@ -159,9 +159,9 @@ const ResourceManagementTable: React.FC = () => {
 
   return (
     <>
-      {viewedResouce && (
+      {viewedResource && (
         <ResourceModal
-          id={viewedResouce}
+          id={viewedResource}
           onClose={() => setViewedResource(undefined)}
         />
       )}
