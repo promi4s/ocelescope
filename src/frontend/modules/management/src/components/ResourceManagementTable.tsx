@@ -103,7 +103,7 @@ const ResourceManagementTable: React.FC = () => {
     },
     [deleteResource, deleteOcel],
   );
-  const renameEntitiy = useCallback(
+  const renameEntity = useCallback(
     (id: string, entityType: Entity["type"], newName: string) => {
       switch (entityType) {
         case "ocel":
@@ -116,7 +116,7 @@ const ResourceManagementTable: React.FC = () => {
     [renameOcel, renameResource],
   );
 
-  const [renamedEntitiy, setRenamedEntitiy] = useState<
+  const [renamedEntity, setRenamedEntity] = useState<
     { id: string; value: string } | undefined
   >(undefined);
 
@@ -180,16 +180,16 @@ const ResourceManagementTable: React.FC = () => {
               accessor: "name",
               render: ({ id, type, name }) => (
                 <>
-                  {renamedEntitiy?.id === id ? (
+                  {renamedEntity?.id === id ? (
                     <Group>
                       <TextInput
                         variant={"unstyled"}
-                        value={renamedEntitiy.value}
+                        value={renamedEntity.value}
                         style={{
                           borderBottom: "1px solid #9ca3af",
                         }}
                         onChange={(e) => {
-                          setRenamedEntitiy({ id, value: e.target.value });
+                          setRenamedEntity({ id, value: e.target.value });
                         }}
                       />
                       <Group gap={"xs"}>
@@ -197,8 +197,8 @@ const ResourceManagementTable: React.FC = () => {
                           color="green"
                           m={0}
                           onClick={() => {
-                            renameEntitiy(id, type, renamedEntitiy.value);
-                            setRenamedEntitiy(undefined);
+                            renameEntity(id, type, renamedEntity.value);
+                            setRenamedEntity(undefined);
                           }}
                         >
                           <CheckIcon size={16} />
@@ -207,7 +207,7 @@ const ResourceManagementTable: React.FC = () => {
                           color="red"
                           m={0}
                           onClick={() => {
-                            setRenamedEntitiy(undefined);
+                            setRenamedEntity(undefined);
                           }}
                         >
                           <XIcon size={16} />
@@ -261,7 +261,7 @@ const ResourceManagementTable: React.FC = () => {
                     <Menu.Dropdown onClick={(e) => e.stopPropagation()}>
                       <Menu.Item
                         leftSection={<PencilIcon size={16} />}
-                        onClick={() => setRenamedEntitiy({ id, value: name })}
+                        onClick={() => setRenamedEntity({ id, value: name })}
                       >
                         Rename
                       </Menu.Item>
