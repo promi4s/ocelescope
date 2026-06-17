@@ -11,12 +11,11 @@ COPY src/frontend/app ./src/frontend/app
 COPY src/frontend/packages ./src/frontend/packages
 COPY src/frontend/modules ./src/frontend/modules
 
-RUN corepack enable && corepack prepare pnpm@10.30.1 --activate
-RUN pnpm install --frozen-lockfile
+RUN corepack enable && pnpm install --frozen-lockfile
 
 FROM node:${NODE_VERSION} AS builder
 WORKDIR /repo
-RUN corepack enable && corepack prepare pnpm@10.30.1 --activate
+RUN corepack enable 
 
 COPY --from=deps /repo/node_modules ./node_modules
 COPY --from=deps /repo/pnpm-lock.yaml ./pnpm-lock.yaml
@@ -29,8 +28,7 @@ COPY src/frontend/modules ./src/frontend/modules
 
 ENV EXTERNAL_API_BASE_URL="http://backend:8000"
 
-RUN pnpm install --frozen-lockfile
-RUN pnpm --filter "@ocelescope/app..." build
+RUN pnpm install --frozen-lockfile && pnpm --filter "@ocelescope/app..." build
 
 FROM node:${NODE_VERSION} AS runner
 WORKDIR /app

@@ -3,6 +3,12 @@ packages:
   - src/frontend/packages/**/*
   - src/frontend/modules/**/*
 
+allowBuilds:
+  core-js: true
+  es5-ext: true
+  esbuild: true
+  sharp: true
+
 catalog:
   "@apidevtools/json-schema-ref-parser": ^15.3.1
   "@dagrejs/dagre": ^3.0.0
