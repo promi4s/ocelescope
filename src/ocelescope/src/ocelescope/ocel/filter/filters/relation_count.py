@@ -1,123 +1,103 @@
-from typing import Literal, Optional, cast
+from typing import Literal, Optional
 
 import pandas as pd
-from pandas.core.frame import DataFrame
-from pandas.core.series import Series
 from pydantic import BaseModel
 
-from ocelescope.ocel.constants.pm4py import OID_COL
+from ocelescope.ocel.constants.pm4py import (
+    ACTIVITY_COL,
+    E2O_ACTIVITY,
+    E2O_EVENT_ID,
+    E2O_OBJECT_ID,
+    E2O_OBJECT_TYPE,
+    E2O_QUALIFIER,
+    EID_COL,
+    O2O_QUALIFIER,
+    O2O_SOURCE_ID,
+    O2O_SOURCE_TYPE,
+    O2O_TARGET_ID,
+    O2O_TARGET_TYPE,
+    OID_COL,
+    OTYPE_COL,
+)
 from ocelescope.ocel.filter.base import BaseFilter, FilterResult
-from ocelescope.ocel.util.relations import getO2OWithTypes
 
 
 class RelationCountFilterConfig(BaseModel):
     source: str
     target: str
-    mode: Optional[Literal["include", "exclude"]] = "include"
     range: tuple[Optional[int], Optional[int]]
     qualifier: Optional[str] = None
 
 
 def filter_by_relation_counts(
-    relation_table: pd.DataFrame,
-    source_id_column: str,
-    source_column: str,
-    target_column: str,
-    qualifier_column: str,
-    entity_id_column: str,
-    entity_type_column: str,
-    source_df: pd.DataFrame,
-    config: RelationCountFilterConfig,
-):
-    # Get o2o with types if not provided
-    relation_table = cast(
-        DataFrame,
-        relation_table[
-            (relation_table[source_column] == config.source)
-            & (relation_table[target_column] == config.target)
-        ],
-    )
+    source: str,
+    target: str,
+    entity_df: pd.DataFrame,
+    relation_df: pd.DataFrame,
+    source_type_name: str,
+    target_type_name: str,
+    qualifier_field_name: str,
+    counted_id_name: str,
+    counted_type_value: str,
+    type_name: str,
+    id_name: str,
+    qualifier: str | None,
+    min_count: int | None,
+    max_count: int | None,
+) -> pd.Series:
+    mask = relation_df[source_type_name].eq(source) & relation_df[target_type_name].eq(target)
 
-    if config.qualifier is not None:
-        relation_table = cast(
-            DataFrame,
-            relation_table[relation_table[qualifier_column] == config.qualifier],
-        )
+    if qualifier is not None:
+        mask &= relation_df[qualifier_field_name].eq(qualifier)
 
-    # Count how many times each target appears
-    entity_counts = cast(Series, relation_table.groupby(source_id_column).size()).reset_index(
-        name="entity_count"
-    )
+    relation_count: pd.Series = relation_df.loc[mask].groupby(counted_id_name).size()
 
-    min_count, max_count = config.range
+    all_counted_ids = entity_df.loc[entity_df[type_name].eq(counted_type_value), id_name].to_list()
+
+    relation_count = relation_count.reindex(all_counted_ids, fill_value=0)
+
+    relation_mask = pd.Series(True, index=relation_count.index, dtype=bool)
 
     if min_count is not None:
-        entity_counts = entity_counts[entity_counts["entity_count"] >= min_count]
+        relation_mask = relation_mask & relation_count.ge(min_count)
+
     if max_count is not None:
-        entity_counts = entity_counts[entity_counts["entity_count"] <= max_count]
-    entity_counts = cast(Series, entity_counts[source_id_column])
+        relation_mask = relation_mask & relation_count.le(max_count)
 
-    if min_count == 0:
-        merged = pd.merge(
-            source_df[source_df[entity_type_column] == config.source],
-            relation_table,
-            left_on=entity_id_column,
-            right_on=source_id_column,
-            how="left",
-            indicator=True,
-        )
-        entities_with_no_relations = merged.loc[merged["_merge"] == "left_only", entity_id_column]
+    matching_ids = relation_count.index[relation_mask].to_list()
 
-        entity_counts = pd.concat([entity_counts, entities_with_no_relations])
+    is_counted_entity = entity_df[type_name].eq(counted_type_value)
+    is_matching_entity = entity_df[id_name].isin(matching_ids)
 
-    # Mask for non-target-type objects (always kept)
-    is_not_target_type = source_df[entity_type_column] != config.source
-
-    # Mask for objects meeting the relation count condition
-    is_in_filtered_ids = source_df[entity_id_column].isin(entity_counts)
-
-    # Invert if in exclude mode
-    if config.mode == "exclude":
-        is_in_filtered_ids = ~is_in_filtered_ids
-
-    # Final mask: keep non-target-type or qualifying objects
-    final_mask = cast(Series, is_not_target_type | is_in_filtered_ids)
-
-    return final_mask
+    return ~is_counted_entity | is_matching_entity
 
 
 class E2OCountFilter(BaseFilter, RelationCountFilterConfig):
     direction: Literal["source", "target"] = "source"
 
     def filter(self, ocel):
-        source_column = (
-            ocel.ocel.event_activity if self.direction == "source" else ocel.ocel.object_type_column
-        )
-        target_column = (
-            ocel.ocel.object_type_column if self.direction == "source" else ocel.ocel.event_activity
-        )
-        source_id_column = (
-            ocel.ocel.event_id_column if self.direction == "source" else ocel.ocel.object_id_column
-        )
-        entity_id_column = source_id_column
-        qualifier_column = ocel.ocel.qualifier
-        entity_type_column = source_column
+
+        is_source = self.direction == "source"
 
         mask = filter_by_relation_counts(
-            relation_table=ocel.ocel.relations,
-            source_column=source_column,
-            target_column=target_column,
-            source_id_column=source_id_column,
-            qualifier_column=qualifier_column,
-            entity_id_column=entity_id_column,
-            entity_type_column=entity_type_column,
-            source_df=ocel.events.df if self.direction == "source" else ocel.objects.df,
-            config=RelationCountFilterConfig(**self.model_dump()),
+            entity_df=ocel.events.df if is_source else ocel.objects.df,
+            relation_df=ocel.e2o.df,
+            source=self.source,
+            target=self.target,
+            qualifier=self.qualifier,
+            source_type_name=E2O_ACTIVITY,
+            target_type_name=E2O_OBJECT_TYPE,
+            qualifier_field_name=E2O_QUALIFIER,
+            counted_id_name=E2O_EVENT_ID if is_source else E2O_OBJECT_ID,
+            counted_type_value=self.source if is_source else self.target,
+            id_name=EID_COL if is_source else OID_COL,
+            type_name=ACTIVITY_COL if is_source else OTYPE_COL,
+            min_count=self.range[0],
+            max_count=self.range[1],
         )
 
         return FilterResult(
-            events=mask if self.direction == "source" else None,
-            objects=mask if self.direction == "target" else None,
+            events=mask if is_source else None, objects=mask if not is_source else None
         )
 
 
@@ -125,18 +105,23 @@ class O2OCountFilter(BaseFilter, RelationCountFilterConfig):
     direction: Literal["source", "target"] = "source"
 
     def filter(self, ocel):
-        o2oTable = getO2OWithTypes(ocel.ocel, direction=self.direction)
+        is_source = self.direction == "source"
 
         mask = filter_by_relation_counts(
-            relation_table=o2oTable,
-            source_column="source_type",
-            target_column="target_type",
-            source_id_column="source",
-            qualifier_column="qualifier",
-            entity_id_column=OID_COL,
-            entity_type_column=OID_COL,
-            source_df=ocel.objects.df,
-            config=RelationCountFilterConfig(**self.model_dump()),
+            entity_df=ocel.objects.df,
+            relation_df=ocel.o2o.typed_df,
+            source=self.source,
+            target=self.target,
+            qualifier=self.qualifier,
+            source_type_name=O2O_SOURCE_TYPE,
+            target_type_name=O2O_TARGET_TYPE,
+            qualifier_field_name=O2O_QUALIFIER,
+            counted_id_name=O2O_SOURCE_ID if is_source else O2O_TARGET_ID,
+            counted_type_value=self.source if is_source else self.target,
+            id_name=OID_COL,
+            type_name=OTYPE_COL,
+            min_count=self.range[0],
+            max_count=self.range[1],
         )
 
         return FilterResult(objects=mask)

@@ -1,7 +1,7 @@
 import { BarChart } from "@mantine/charts";
 import { Paper, Text } from "@mantine/core";
 import { memo, useMemo } from "react";
-import assignUniqueColors from "../util/color";
+import assignUniqueColors from "../../util/color";
 
 type BarChartSelectProps = {
   values: {

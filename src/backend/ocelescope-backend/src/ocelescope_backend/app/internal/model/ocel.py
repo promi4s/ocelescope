@@ -1,23 +1,15 @@
-from typing import Hashable, Self, cast
+from typing import Hashable, Self, Sequence, cast
 
 import pandas as pd
 from ocelescope.ocel.constants import ValueType
 from pydantic.main import BaseModel
-from typing_extensions import TypedDict
 
 from ocelescope import (
     OCEL,
-    BaseFilter,
-    E2OCountFilter,
-    EventAttributeFilter,
-    EventTypeFilter,
-    O2OCountFilter,
-    ObjectAttributeFilter,
-    ObjectTypeFilter,
-    TimeFrameFilter,
 )
 from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.registry.extension import OCELExtensionDescription
+from ocelescope_backend.app.modules.base import ModuleFilter
 
 
 class OcelMetadata(BaseModel):
@@ -42,34 +34,38 @@ class OcelMetadata(BaseModel):
         )
 
 
-# TODO: Remove this concept completly
-class OCELFilter(TypedDict, total=False):
-    object_types: ObjectTypeFilter
-    event_type: EventTypeFilter
-    time_range: TimeFrameFilter
-    o2o_count: list[O2OCountFilter]
-    e2o_count: list[E2OCountFilter]
-    event_attributes: list[EventAttributeFilter]
-    object_attributes: list[ObjectAttributeFilter]
-
-
 class SessionOCEL:
     def __init__(self, ocel: OCEL):
         self.origin: OCEL = ocel
-        self.applied_filter: list[BaseFilter] = []
+        self._applied_filter: list[ModuleFilter] = []
         self._filtered_ocel: OCEL = ocel
 
     @property
     def ocel(self):
         return self._filtered_ocel
 
-    def apply_filter(self, pipeline: list[BaseFilter]):
-        self.applied_filter = pipeline
-        self._filtered_ocel = (
-            self.origin.filter(self.applied_filter)
-            if len(self.applied_filter) >= 0
-            else self.origin
-        )
+    def get_filters(self, module_source: str | None) -> list[ModuleFilter]:
+        return [
+            filterItem
+            for filterItem in self._applied_filter
+            if module_source is None
+            or filterItem.OcelescopeModuleSource == module_source
+        ]
+
+    def set_filters(self, module_source: str, pipeline: Sequence[ModuleFilter]):
+        new_pipeline = [
+            filter
+            for filter in self._applied_filter
+            if filter.OcelescopeModuleSource != module_source
+        ] + [
+            module_filter
+            for module_filter in pipeline
+            if module_filter.OcelescopeModuleSource == module_source
+        ]
+
+        self._filtered_ocel = self.origin.filter(pipeline)
+
+        self._applied_filter = new_pipeline
 
 
 class Attribute(BaseModel):
@@ -81,7 +77,6 @@ class Attribute(BaseModel):
 
     @classmethod
     def from_df_row(cls, row: tuple[Hashable, pd.Series]) -> Self:
-
         attribute_name = cast(str, row[0])
         series = row[1]
 
@@ -104,7 +99,6 @@ class AggregatedAttribute(Attribute):
 
     @classmethod
     def from_df_row(cls, row: tuple[Hashable, pd.Series]) -> Self:
-
         base = Attribute.from_df_row(row)
 
         return cls(

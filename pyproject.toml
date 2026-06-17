@@ -9,7 +9,7 @@ requires-python = ">=3.11"
 members = [
   "src/ocelescope",
   "src/backend/ocelescope-backend",
-  "src/backend/modules/ocelescope-module-ocelot",
+  "src/backend/modules/*",
 ]
 
 [tool.ruff.lint]

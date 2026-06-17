@@ -3,7 +3,7 @@ from __future__ import annotations
 import warnings
 from os import PathLike
 from pathlib import Path
-from typing import Any
+from typing import Any, Sequence
 
 import pandas as pd
 import pm4py
@@ -78,7 +78,7 @@ class OCEL:
         self.attributes = AttributeManager(self)
         self.executions = ExecutionsManager(self)
 
-    def filter(self, pipeline: list[BaseFilter]) -> OCEL:
+    def filter(self, pipeline: Sequence[BaseFilter]) -> OCEL:
         """
         Apply a sequence of filters to this OCEL instance.
 
