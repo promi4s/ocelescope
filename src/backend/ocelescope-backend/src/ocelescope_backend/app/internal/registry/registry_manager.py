@@ -101,7 +101,9 @@ class RegistryManager:
     def get_loaded_extensions(self):
         return self._extension_registry.get_loaded_extensions()
 
-    def load_plugins(self, plugin_ids: list[str]) -> list[str]:
+    def load_plugins(
+        self, plugin_ids: list[str], ignore_errors: bool = True
+    ) -> list[str]:
         if not config.PLUGIN_DIR:
             raise RuntimeError("Plugin directory is not set")
 
@@ -157,13 +159,16 @@ class RegistryManager:
                             )
 
                         loaded_plugins.append(id)
-                    except Exception as e:
+                    except Exception:
                         self.unload_plugins([id])
-                        raise e
+                        raise
                 else:
-                    raise Exception()
+                    raise
             except Exception:
                 shutil.rmtree(module_path, ignore_errors=True)
+
+                if not ignore_errors:
+                    raise
 
         return loaded_plugins
 
