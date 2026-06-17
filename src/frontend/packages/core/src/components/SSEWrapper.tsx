@@ -42,7 +42,7 @@ const SSEWrapper = () => {
             autoClose: 60000,
             message: (
               <Stack gap={6} align="flex-start">
-                <Text size="sm" style={{ flex: 1 }}>
+                <Text size="sm" style={{ flex: 1 }} lineClamp={2}>
                   {message.message}
                 </Text>
 
