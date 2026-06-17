@@ -151,7 +151,9 @@ const NavBar: React.FC<{ config: OcelescopeConfig }> = ({ config }) => {
     return [
       ...navbarGroups.map(({ modulesNames, title }) => ({
         title,
-        modules: modules.filter(({ name }) => modulesNames.includes(name)),
+        modules: modulesNames
+          .map((moduleName) => modules.find(({ name }) => name === moduleName))
+          .filter((module) => !!module),
       })),
       ...(ungroupedModules.length > 0
         ? [
