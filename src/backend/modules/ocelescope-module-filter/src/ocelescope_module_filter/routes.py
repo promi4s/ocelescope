@@ -12,7 +12,7 @@ router = APIRouter()
 
 
 @router.get("/{ocel_id}/filter", operation_id="getFilter")
-def getFitler(
+def getFilter(
     ocel_id: str,
     session: ApiSession,
 ) -> list[NativeFilter]:
