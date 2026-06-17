@@ -53,7 +53,7 @@ type Entity = {
 };
 
 //TODO: sync with api
-const ocelExtenisions = [".sqlite", ".xml", ".json"] as const;
+const ocelExtensions = [".sqlite", ".xml", ".json"] as const;
 
 const ResourceManagementTable: React.FC = () => {
   const { data: ocels = [] } = useGetOcels();
@@ -283,7 +283,7 @@ const ResourceManagementTable: React.FC = () => {
                             </Menu.Sub.Item>
                           </Menu.Sub.Target>
                           <Menu.Sub.Dropdown>
-                            {ocelExtenisions.map((extension) => (
+                            {ocelExtensions.map((extension) => (
                               <Menu.Item
                                 key={extension}
                                 onClick={() =>
