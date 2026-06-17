@@ -4,9 +4,9 @@ from typing import Annotated, Literal, Optional
 
 import pandas as pd
 from fastapi import APIRouter, Query, Response
-from ocelescope import RelationCountSummary
 from ocelescope.ocel.constants.misc import OCELFileExtensions
 
+from ocelescope import RelationCountSummary
 from ocelescope_backend.app.dependencies import ApiOcel, ApiSession
 from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.model.base import PaginatedResponse
@@ -16,7 +16,6 @@ from ocelescope_backend.app.internal.model.events import (
 )
 from ocelescope_backend.app.internal.model.ocel import (
     AggregatedAttribute,
-    OCELFilter,
     OcelMetadata,
     QuantityInfo,
     TypedAttribute,
@@ -30,7 +29,6 @@ from ocelescope_backend.app.internal.ocel.default_ocel import (
 )
 from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.registry.extension import OCELExtensionDescription
-from ocelescope_backend.app.internal.util.filters import merge_filters, unmerge_filter
 from ocelescope_backend.app.internal.util.pandas import search_paginated_dataframe
 
 ocels_router = APIRouter(prefix="/ocels", tags=["ocels"])
@@ -333,28 +331,6 @@ def get_object_ids(
     return PaginatedResponse(
         response=object_ids, page=page, page_size=size, total_items=len(ocel.objects.df)
     )
-
-
-# endregion
-# region Filters
-@ocels_router.get(
-    "/{ocel_id}/filter",
-    operation_id="getFilters",
-)
-def get_filter(ocel: ApiOcel, session: ApiSession) -> Optional[OCELFilter]:
-    return merge_filters(session.get_ocel_filters(ocel.meta.id))
-
-
-@ocels_router.post(
-    "/{ocel_id}/filter",
-    operation_id="setFilters",
-)
-def set_filter(
-    ocel: ApiOcel, session: ApiSession, filter: Optional[OCELFilter]
-) -> Optional[OCELFilter]:
-    session.filter_ocel(ocel.meta.id, unmerge_filter(filter or {}))
-
-    return merge_filters(session.get_ocel_filters(ocel.meta.id))
 
 
 # endregion

@@ -5,8 +5,8 @@ import type { EntityTimeInfo } from "@ocelescope/api-base";
 import { useTimeInfo } from "@ocelescope/api-base";
 import { memo, useMemo } from "react";
 import { Controller, Watch } from "react-hook-form";
-import dayjs from "../../../util/dayjs";
-import type { FilterPageComponentProps } from "..";
+import type { FilterView, FilterViewType } from "../../types/filter";
+import dayjs from "../../util/dayjs";
 
 const TimeGraph: React.FC<{
   timeInfo: EntityTimeInfo;
@@ -113,7 +113,7 @@ const TimeFrameSlider: React.FC<{
   );
 };
 
-const TimeFrameFilter: React.FC<FilterPageComponentProps> = memo(
+const TimeFrameFilterView: FilterView<"time_frame"> = memo(
   ({ ocelId, control }) => {
     const { data: timeInfo, isLoading } = useTimeInfo(ocelId, {
       periods: 100,
@@ -130,8 +130,8 @@ const TimeFrameFilter: React.FC<FilterPageComponentProps> = memo(
                 control={control}
                 name={
                   [
-                    "time_range.time_range.0",
-                    "time_range.time_range.1",
+                    "time_frame.0.time_range.0",
+                    "time_frame.0.time_range.1",
                   ] as const
                 }
                 render={([startTime, endTime]) => {
@@ -147,7 +147,7 @@ const TimeFrameFilter: React.FC<FilterPageComponentProps> = memo(
             </Grid.Col>
             <Controller
               control={control}
-              name={"time_range.time_range"}
+              name={"time_frame.0.time_range"}
               defaultValue={[timeInfo.start_time, timeInfo.end_time]}
               render={({ field }) => (
                 <>
@@ -158,7 +158,7 @@ const TimeFrameFilter: React.FC<FilterPageComponentProps> = memo(
                       onChange={(newStart) => {
                         field.onChange([newStart, field.value?.[1]]);
                       }}
-                      value={field.value?.[0]}
+                      value={field.value?.[0] ?? timeInfo.start_time}
                     />
                   </Grid.Col>
                   <Grid.Col span={6}>
@@ -176,7 +176,7 @@ const TimeFrameFilter: React.FC<FilterPageComponentProps> = memo(
                       onChange={(newEnd) => {
                         field.onChange([field.value?.[0], newEnd]);
                       }}
-                      value={field.value?.[1]}
+                      value={field.value?.[1] ?? timeInfo.end_time}
                     />
                   </Grid.Col>
                 </>
@@ -189,4 +189,19 @@ const TimeFrameFilter: React.FC<FilterPageComponentProps> = memo(
   },
 );
 
-export default TimeFrameFilter;
+export const TimeFrameFilter: FilterViewType<"time_frame"> = {
+  title: "Timeframe",
+  ViewComponent: TimeFrameFilterView,
+  generateDefault: () => [{ type: "time_frame", time_range: [null, null] }],
+  cleanUpFilters: (currentFilter) => {
+    if (
+      !currentFilter[0] ||
+      (currentFilter[0].time_range[0] == null &&
+        currentFilter[0].time_range[1] == null)
+    ) {
+      return [];
+    }
+
+    return [currentFilter[0]];
+  },
+};

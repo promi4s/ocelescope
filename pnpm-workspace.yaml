@@ -30,6 +30,7 @@ catalog:
   "@types/file-saver": ^2.0.7
   "@types/lodash": ^4.17.23
   "@types/node": ^25.0.3
+  '@types/object-hash': ^3.0.6
   "@types/qs": ^6.15.1
   "@types/react": ^19.2.7
   "@types/react-cytoscapejs": ^1.2.6
@@ -47,13 +48,14 @@ catalog:
   embla-carousel-react: ^8.6.0
   file-saver: ^2.0.5
   flat: ^6.0.1
-  jspdf: ^4.2.1
   html-to-image: 1.11.13
   json-schema-traverse: ^1.0.0
+  jspdf: ^4.2.1
   lodash: ^4.17.23
   lucide-react: ^0.577.0
   mantine-datatable: ^8.3.13
   next: ^16.1.6
+  object-hash: ^3.0.0
   orval: ^8.5.2
   qs: ^6.15.1
   react: ^19.2.0
@@ -73,6 +75,7 @@ catalog:
 catalogMode: prefer
 
 ignoredBuiltDependencies:
+  - core-js
   - es5-ext
   - esbuild
   - sharp
