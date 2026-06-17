@@ -26,7 +26,7 @@ const LogOverviewPage = () => {
         </Grid.Col>
         <Grid.Col span={6}>
           <Stack>
-            <Title order={2}>Actitvities</Title>
+            <Title order={2}>Activities</Title>
             <EntityBarList type="events" ocelId={id} />
           </Stack>
         </Grid.Col>

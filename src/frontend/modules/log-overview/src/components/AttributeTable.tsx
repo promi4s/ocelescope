@@ -62,12 +62,11 @@ const AttributesTable: React.FC<{
         discriminator: "aggr",
         object_types:
           selectedEntityType === "activity" ? [] : attribute.object_types,
-        actitvities:
-          selectedEntityType === "object" ? [] : attribute.actitvities,
+        activities: selectedEntityType === "object" ? [] : attribute.activities,
       }))
-      .filter(({ actitvities, object_types }) => {
+      .filter(({ activities, object_types }) => {
         const count =
-          (selectedEntityType === "object" ? 0 : actitvities.length) +
+          (selectedEntityType === "object" ? 0 : activities.length) +
           (selectedEntityType === "activity" ? 0 : object_types.length);
 
         return count > 1;
@@ -138,7 +137,7 @@ const AttributesTable: React.FC<{
         title: "",
         render: (attribute) => {
           const collapsible = isAggregatedAttribute(attribute)
-            ? attribute.object_types.length + attribute.actitvities.length > 1
+            ? attribute.object_types.length + attribute.activities.length > 1
             : false;
           return (
             <>
@@ -174,8 +173,8 @@ const AttributesTable: React.FC<{
         render: (attribute) => {
           if (isAggregatedAttribute(attribute)) {
             return [
-              ...(attribute.actitvities.length > 0
-                ? [`${attribute.actitvities.length} Activities`]
+              ...(attribute.activities.length > 0
+                ? [`${attribute.activities.length} Activities`]
                 : []),
               ...(attribute.object_types.length > 0
                 ? [`${attribute.object_types.length} Object Types`]
