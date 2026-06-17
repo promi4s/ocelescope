@@ -26,7 +26,7 @@
     "notebook": "uv run --with jupyterlab --with jupyter-ruff jupyter lab notebooks/"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.16",
+    "@biomejs/biome": "2.5.0",
     "@tsconfig/strictest": "catalog:",
     "orval": "catalog:"
   }
