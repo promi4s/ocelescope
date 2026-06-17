@@ -184,8 +184,8 @@ catalogs:
       specifier: ^0.22.0
       version: 0.22.2
     typescript:
-      specifier: ^5.9.3
-      version: 5.9.3
+      specifier: ^6.0.0
+      version: 6.0.3
     uniqolor:
       specifier: ^1.1.1
       version: 1.1.1
@@ -208,7 +208,7 @@ importers:
         version: 2.0.8
       orval:
         specifier: 'catalog:'
-        version: 8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)
+        version: 8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)
 
   src/frontend/app:
     dependencies:
@@ -254,7 +254,7 @@ importers:
         version: 19.2.3(@types/react@19.2.14)
       typescript:
         specifier: 'catalog:'
-        version: 5.9.3
+        version: 6.0.3
 
   src/frontend/modules/discovery:
     dependencies:
@@ -342,10 +342,10 @@ importers:
         version: 1.0.0
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@6.0.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
-        version: 5.9.3
+        version: 6.0.3
 
   src/frontend/modules/filter:
     dependencies:
@@ -427,10 +427,10 @@ importers:
         version: 19.2.3(@types/react@19.2.14)
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@6.0.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
-        version: 5.9.3
+        version: 6.0.3
 
   src/frontend/modules/log-overview:
     dependencies:
@@ -482,10 +482,10 @@ importers:
         version: 19.2.3(@types/react@19.2.14)
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@6.0.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
-        version: 5.9.3
+        version: 6.0.3
 
   src/frontend/modules/management:
     dependencies:
@@ -537,10 +537,10 @@ importers:
         version: 19.2.3(@types/react@19.2.14)
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@6.0.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
-        version: 5.9.3
+        version: 6.0.3
 
   src/frontend/modules/ocelot:
     dependencies:
@@ -622,10 +622,10 @@ importers:
         version: 19.2.3(@types/react@19.2.14)
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@6.0.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
-        version: 5.9.3
+        version: 6.0.3
 
   src/frontend/modules/plugin:
     dependencies:
@@ -710,10 +710,10 @@ importers:
         version: 1.0.0
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@6.0.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
-        version: 5.9.3
+        version: 6.0.3
 
   src/frontend/packages/api/base:
     dependencies:
@@ -750,10 +750,10 @@ importers:
         version: 11.1.0
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@6.0.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
-        version: 5.9.3
+        version: 6.0.3
 
   src/frontend/packages/api/client:
     dependencies:
@@ -787,16 +787,16 @@ importers:
         version: 11.1.0
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@6.0.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
-        version: 5.9.3
+        version: 6.0.3
 
   src/frontend/packages/api/config:
     dependencies:
       orval:
         specifier: ^8.4.0
-        version: 8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)
+        version: 8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)
       react:
         specifier: 'catalog:'
         version: 19.2.3
@@ -818,10 +818,10 @@ importers:
         version: 11.1.0
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@6.0.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
-        version: 5.9.3
+        version: 6.0.3
 
   src/frontend/packages/core:
     dependencies:
@@ -918,10 +918,10 @@ importers:
         version: 6.15.1
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@6.0.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
-        version: 5.9.3
+        version: 6.0.3
 
   src/frontend/packages/resources:
     dependencies:
@@ -1006,10 +1006,10 @@ importers:
         version: 11.1.0
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@6.0.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
-        version: 5.9.3
+        version: 6.0.3
 
   src/frontend/packages/variants:
     dependencies:
@@ -1028,7 +1028,7 @@ importers:
         version: 10.4.0
       '@storybook/react-vite':
         specifier: 'catalog:'
-        version: 10.3.5(esbuild@0.27.3)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(storybook@10.3.5(@testing-library/dom@10.4.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(typescript@5.9.3)(vite@8.0.10(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(yaml@2.9.0))
+        version: 10.3.5(esbuild@0.27.3)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(storybook@10.3.5(@testing-library/dom@10.4.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(typescript@6.0.3)(vite@8.0.10(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(yaml@2.9.0))
       '@types/css-modules':
         specifier: 'catalog:'
         version: 1.0.5
@@ -1046,10 +1046,10 @@ importers:
         version: 10.3.5(@testing-library/dom@10.4.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
+        version: 0.22.2(@tsdown/css@0.22.2)(typescript@6.0.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
-        version: 5.9.3
+        version: 6.0.3
 
 packages:
 
@@ -4700,8 +4700,8 @@ packages:
     peerDependencies:
       typescript: 5.0.x || 5.1.x || 5.2.x || 5.3.x || 5.4.x || 5.5.x || 5.6.x || 5.7.x || 5.8.x || 5.9.x
 
-  typescript@5.9.3:
-    resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
+  typescript@6.0.3:
+    resolution: {integrity: sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==}
     engines: {node: '>=14.17'}
     hasBin: true
 
@@ -5396,13 +5396,13 @@ snapshots:
   '@img/sharp-win32-x64@0.34.5':
     optional: true
 
-  '@joshwooding/vite-plugin-react-docgen-typescript@0.7.0(typescript@5.9.3)(vite@8.0.10(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(yaml@2.9.0))':
+  '@joshwooding/vite-plugin-react-docgen-typescript@0.7.0(typescript@6.0.3)(vite@8.0.10(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(yaml@2.9.0))':
     dependencies:
       glob: 13.0.6
-      react-docgen-typescript: 2.4.0(typescript@5.9.3)
+      react-docgen-typescript: 2.4.0(typescript@6.0.3)
       vite: 8.0.10(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(yaml@2.9.0)
     optionalDependencies:
-      typescript: 5.9.3
+      typescript: 6.0.3
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
@@ -5583,23 +5583,23 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.20.1
 
-  '@orval/angular@8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)':
+  '@orval/angular@8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)':
     dependencies:
-      '@orval/core': 8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)
+      '@orval/core': 8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)
     transitivePeerDependencies:
       - '@faker-js/faker'
       - supports-color
       - typescript
 
-  '@orval/axios@8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)':
+  '@orval/axios@8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)':
     dependencies:
-      '@orval/core': 8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)
+      '@orval/core': 8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)
     transitivePeerDependencies:
       - '@faker-js/faker'
       - supports-color
       - typescript
 
-  '@orval/core@8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)':
+  '@orval/core@8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)':
     dependencies:
       '@scalar/openapi-types': 0.5.3
       acorn: 8.16.0
@@ -5610,26 +5610,26 @@ snapshots:
       fs-extra: 11.3.4
       globby: 16.1.0
       remeda: 2.33.6
-      typedoc: 0.28.17(typescript@5.9.3)
+      typedoc: 0.28.17(typescript@6.0.3)
     optionalDependencies:
       '@faker-js/faker': 10.4.0
     transitivePeerDependencies:
       - supports-color
       - typescript
 
-  '@orval/fetch@8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)':
+  '@orval/fetch@8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)':
     dependencies:
-      '@orval/core': 8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)
+      '@orval/core': 8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)
       '@scalar/openapi-types': 0.5.3
     transitivePeerDependencies:
       - '@faker-js/faker'
       - supports-color
       - typescript
 
-  '@orval/hono@8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)':
+  '@orval/hono@8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)':
     dependencies:
-      '@orval/core': 8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)
-      '@orval/zod': 8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)
+      '@orval/core': 8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)
+      '@orval/zod': 8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)
       fs-extra: 11.3.4
       remeda: 2.33.6
     transitivePeerDependencies:
@@ -5637,56 +5637,56 @@ snapshots:
       - supports-color
       - typescript
 
-  '@orval/mcp@8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)':
+  '@orval/mcp@8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)':
     dependencies:
-      '@orval/core': 8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)
-      '@orval/fetch': 8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)
-      '@orval/zod': 8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)
+      '@orval/core': 8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)
+      '@orval/fetch': 8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)
+      '@orval/zod': 8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)
     transitivePeerDependencies:
       - '@faker-js/faker'
       - supports-color
       - typescript
 
-  '@orval/mock@8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)':
+  '@orval/mock@8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)':
     dependencies:
-      '@orval/core': 8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)
+      '@orval/core': 8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)
       remeda: 2.33.6
     transitivePeerDependencies:
       - '@faker-js/faker'
       - supports-color
       - typescript
 
-  '@orval/query@8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)':
+  '@orval/query@8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)':
     dependencies:
-      '@orval/core': 8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)
-      '@orval/fetch': 8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)
+      '@orval/core': 8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)
+      '@orval/fetch': 8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)
       remeda: 2.33.6
     transitivePeerDependencies:
       - '@faker-js/faker'
       - supports-color
       - typescript
 
-  '@orval/solid-start@8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)':
+  '@orval/solid-start@8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)':
     dependencies:
-      '@orval/core': 8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)
+      '@orval/core': 8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)
       '@scalar/openapi-types': 0.5.3
     transitivePeerDependencies:
       - '@faker-js/faker'
       - supports-color
       - typescript
 
-  '@orval/swr@8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)':
+  '@orval/swr@8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)':
     dependencies:
-      '@orval/core': 8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)
-      '@orval/fetch': 8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)
+      '@orval/core': 8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)
+      '@orval/fetch': 8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)
     transitivePeerDependencies:
       - '@faker-js/faker'
       - supports-color
       - typescript
 
-  '@orval/zod@8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)':
+  '@orval/zod@8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)':
     dependencies:
-      '@orval/core': 8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)
+      '@orval/core': 8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)
       remeda: 2.33.6
     transitivePeerDependencies:
       - '@faker-js/faker'
@@ -6047,12 +6047,12 @@ snapshots:
       react-dom: 19.2.3(react@19.2.3)
       storybook: 10.3.5(@testing-library/dom@10.4.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
 
-  '@storybook/react-vite@10.3.5(esbuild@0.27.3)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(storybook@10.3.5(@testing-library/dom@10.4.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(typescript@5.9.3)(vite@8.0.10(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(yaml@2.9.0))':
+  '@storybook/react-vite@10.3.5(esbuild@0.27.3)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(storybook@10.3.5(@testing-library/dom@10.4.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(typescript@6.0.3)(vite@8.0.10(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(yaml@2.9.0))':
     dependencies:
-      '@joshwooding/vite-plugin-react-docgen-typescript': 0.7.0(typescript@5.9.3)(vite@8.0.10(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(yaml@2.9.0))
+      '@joshwooding/vite-plugin-react-docgen-typescript': 0.7.0(typescript@6.0.3)(vite@8.0.10(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(yaml@2.9.0))
       '@rollup/pluginutils': 5.3.0
       '@storybook/builder-vite': 10.3.5(esbuild@0.27.3)(storybook@10.3.5(@testing-library/dom@10.4.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(vite@8.0.10(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(yaml@2.9.0))
-      '@storybook/react': 10.3.5(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(storybook@10.3.5(@testing-library/dom@10.4.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(typescript@5.9.3)
+      '@storybook/react': 10.3.5(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(storybook@10.3.5(@testing-library/dom@10.4.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(typescript@6.0.3)
       empathic: 2.0.0
       magic-string: 0.30.21
       react: 19.2.3
@@ -6069,17 +6069,17 @@ snapshots:
       - typescript
       - webpack
 
-  '@storybook/react@10.3.5(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(storybook@10.3.5(@testing-library/dom@10.4.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(typescript@5.9.3)':
+  '@storybook/react@10.3.5(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(storybook@10.3.5(@testing-library/dom@10.4.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(typescript@6.0.3)':
     dependencies:
       '@storybook/global': 5.0.0
       '@storybook/react-dom-shim': 10.3.5(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(storybook@10.3.5(@testing-library/dom@10.4.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))
       react: 19.2.3
       react-docgen: 8.0.3
-      react-docgen-typescript: 2.4.0(typescript@5.9.3)
+      react-docgen-typescript: 2.4.0(typescript@6.0.3)
       react-dom: 19.2.3(react@19.2.3)
       storybook: 10.3.5(@testing-library/dom@10.4.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
     optionalDependencies:
-      typescript: 5.9.3
+      typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
 
@@ -6133,7 +6133,7 @@ snapshots:
       lightningcss: 1.32.0
       postcss-load-config: 6.0.1(jiti@2.6.1)(postcss@8.5.15)(yaml@2.9.0)
       rolldown: 1.1.0
-      tsdown: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
+      tsdown: 0.22.2(@tsdown/css@0.22.2)(typescript@6.0.3)(unrun@0.2.32)
     optionalDependencies:
       postcss: 8.5.15
     transitivePeerDependencies:
@@ -7773,20 +7773,20 @@ snapshots:
       is-inside-container: 1.0.0
       wsl-utils: 0.1.0
 
-  orval@8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3):
+  orval@8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3):
     dependencies:
       '@commander-js/extra-typings': 14.0.0(commander@14.0.3)
-      '@orval/angular': 8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)
-      '@orval/axios': 8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)
-      '@orval/core': 8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)
-      '@orval/fetch': 8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)
-      '@orval/hono': 8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)
-      '@orval/mcp': 8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)
-      '@orval/mock': 8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)
-      '@orval/query': 8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)
-      '@orval/solid-start': 8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)
-      '@orval/swr': 8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)
-      '@orval/zod': 8.5.2(@faker-js/faker@10.4.0)(typescript@5.9.3)
+      '@orval/angular': 8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)
+      '@orval/axios': 8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)
+      '@orval/core': 8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)
+      '@orval/fetch': 8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)
+      '@orval/hono': 8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)
+      '@orval/mcp': 8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)
+      '@orval/mock': 8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)
+      '@orval/query': 8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)
+      '@orval/solid-start': 8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)
+      '@orval/swr': 8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)
+      '@orval/zod': 8.5.2(@faker-js/faker@10.4.0)(typescript@6.0.3)
       '@scalar/json-magic': 0.11.7
       '@scalar/openapi-parser': 0.24.17
       '@scalar/openapi-types': 0.5.3
@@ -7800,10 +7800,10 @@ snapshots:
       js-yaml: 4.1.1
       remeda: 2.33.6
       string-argv: 0.3.2
-      tsconfck: 3.1.6(typescript@5.9.3)
-      typedoc: 0.28.17(typescript@5.9.3)
-      typedoc-plugin-coverage: 4.0.2(typedoc@0.28.17(typescript@5.9.3))
-      typedoc-plugin-markdown: 4.10.0(typedoc@0.28.17(typescript@5.9.3))
+      tsconfck: 3.1.6(typescript@6.0.3)
+      typedoc: 0.28.17(typescript@6.0.3)
+      typedoc-plugin-coverage: 4.0.2(typedoc@0.28.17(typescript@6.0.3))
+      typedoc-plugin-markdown: 4.10.0(typedoc@0.28.17(typescript@6.0.3))
     transitivePeerDependencies:
       - '@faker-js/faker'
       - supports-color
@@ -7995,9 +7995,9 @@ snapshots:
     dependencies:
       performance-now: 2.1.0
 
-  react-docgen-typescript@2.4.0(typescript@5.9.3):
+  react-docgen-typescript@2.4.0(typescript@6.0.3):
     dependencies:
-      typescript: 5.9.3
+      typescript: 6.0.3
 
   react-docgen@8.0.3:
     dependencies:
@@ -8239,7 +8239,7 @@ snapshots:
 
   right-now@1.0.0: {}
 
-  rolldown-plugin-dts@0.25.2(rolldown@1.1.0)(typescript@5.9.3):
+  rolldown-plugin-dts@0.25.2(rolldown@1.1.0)(typescript@6.0.3):
     dependencies:
       '@babel/generator': 8.0.0-rc.6
       '@babel/helper-validator-identifier': 8.0.0-rc.6
@@ -8251,7 +8251,7 @@ snapshots:
       obug: 2.1.1
       rolldown: 1.1.0
     optionalDependencies:
-      typescript: 5.9.3
+      typescript: 6.0.3
     transitivePeerDependencies:
       - oxc-resolver
 
@@ -8582,9 +8582,9 @@ snapshots:
 
   ts-dedent@2.2.0: {}
 
-  tsconfck@3.1.6(typescript@5.9.3):
+  tsconfck@3.1.6(typescript@6.0.3):
     optionalDependencies:
-      typescript: 5.9.3
+      typescript: 6.0.3
 
   tsconfig-paths@4.2.0:
     dependencies:
@@ -8592,7 +8592,7 @@ snapshots:
       minimist: 1.2.8
       strip-bom: 3.0.0
 
-  tsdown@0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32):
+  tsdown@0.22.2(@tsdown/css@0.22.2)(typescript@6.0.3)(unrun@0.2.32):
     dependencies:
       ansis: 4.3.1
       cac: 7.0.0
@@ -8603,7 +8603,7 @@ snapshots:
       obug: 2.1.1
       picomatch: 4.0.4
       rolldown: 1.1.0
-      rolldown-plugin-dts: 0.25.2(rolldown@1.1.0)(typescript@5.9.3)
+      rolldown-plugin-dts: 0.25.2(rolldown@1.1.0)(typescript@6.0.3)
       semver: 7.8.3
       tinyexec: 1.2.4
       tinyglobby: 0.2.17
@@ -8611,7 +8611,7 @@ snapshots:
       unconfig-core: 7.5.0
     optionalDependencies:
       '@tsdown/css': 0.22.2(jiti@2.6.1)(postcss@8.5.15)(tsdown@0.22.2)(yaml@2.9.0)
-      typescript: 5.9.3
+      typescript: 6.0.3
       unrun: 0.2.32(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
     transitivePeerDependencies:
       - '@ts-macro/tsc'
@@ -8632,24 +8632,24 @@ snapshots:
 
   typedarray@0.0.6: {}
 
-  typedoc-plugin-coverage@4.0.2(typedoc@0.28.17(typescript@5.9.3)):
+  typedoc-plugin-coverage@4.0.2(typedoc@0.28.17(typescript@6.0.3)):
     dependencies:
-      typedoc: 0.28.17(typescript@5.9.3)
+      typedoc: 0.28.17(typescript@6.0.3)
 
-  typedoc-plugin-markdown@4.10.0(typedoc@0.28.17(typescript@5.9.3)):
+  typedoc-plugin-markdown@4.10.0(typedoc@0.28.17(typescript@6.0.3)):
     dependencies:
-      typedoc: 0.28.17(typescript@5.9.3)
+      typedoc: 0.28.17(typescript@6.0.3)
 
-  typedoc@0.28.17(typescript@5.9.3):
+  typedoc@0.28.17(typescript@6.0.3):
     dependencies:
       '@gerrit0/mini-shiki': 3.23.0
       lunr: 2.3.9
       markdown-it: 14.1.1
       minimatch: 9.0.9
-      typescript: 5.9.3
+      typescript: 6.0.3
       yaml: 2.8.2
 
-  typescript@5.9.3: {}
+  typescript@6.0.3: {}
 
   uc.micro@2.1.0: {}
 

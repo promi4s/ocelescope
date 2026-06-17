@@ -67,7 +67,7 @@ catalog:
   recharts: ^2.15.3
   storybook: ^10.3.5
   tsdown: ^0.22.0
-  typescript: ^5.9.3
+  typescript: ^6.0.0
   uniqolor: ^1.1.1
   zod: ^4.3.6
   zustand: ^5.0.11
