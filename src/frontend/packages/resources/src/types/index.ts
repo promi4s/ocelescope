@@ -6,17 +6,17 @@ type RequireType<T> = T extends {
   ? Omit<T, "type"> & { type: L }
   : T;
 
-export type VisulizationsType = RequireType<
+export type VisualizationsType = RequireType<
   NonNullable<GetResourceResponse["visualization"]>
 >;
-export type VisulizationsTypes = NonNullable<VisulizationsType["type"]>;
+export type VisualizationsTypes = NonNullable<VisualizationsType["type"]>;
 
-export type VisualizationByType<T extends VisulizationsTypes> = Extract<
-  VisulizationsType,
+export type VisualizationByType<T extends VisualizationsTypes> = Extract<
+  VisualizationsType,
   { type: T }
 >;
 
-export type VisualizationProps<T extends VisulizationsTypes> = {
+export type VisualizationProps<T extends VisualizationsTypes> = {
   visualization: VisualizationByType<T>;
   isPreview?: boolean;
 };

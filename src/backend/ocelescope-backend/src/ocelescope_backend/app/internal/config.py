@@ -4,7 +4,7 @@ from pydantic import DirectoryPath, Field
 from pydantic_settings import BaseSettings
 
 """
-This file containes a Config class defining all environment parameters, including types, default values and descriptions.
+This file contains a Config class defining all environment parameters, including types, default values and descriptions.
 .env.example (and the structure of .env) should be generated using the `export_settings_as_dotenv` util function.
 """
 

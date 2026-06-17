@@ -7,7 +7,7 @@
   "paths": {
     "/modules/filter/v1/{ocel_id}/filter": {
       "get": {
-        "summary": "Getfitler",
+        "summary": "Getfilter",
         "operationId": "getFilter",
         "parameters": [
           {

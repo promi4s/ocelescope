@@ -104,18 +104,18 @@ class PluginTask(TaskBase, Generic[P]):
                 if not isinstance(item, list):
                     item = [item]
 
-                for entitiy_index, entitiy in enumerate(item):
-                    if isinstance(entitiy, OCEL):
-                        entitiy.meta.extra["name"] = (
-                            f"{plugin.meta().name if plugin else self.plugin_id}_{self.method_name}_{item_index}_{entitiy_index}"
+                for entity_index, entity in enumerate(item):
+                    if isinstance(entity, OCEL):
+                        entity.meta.extra["name"] = (
+                            f"{plugin.meta().name if plugin else self.plugin_id}_{self.method_name}_{item_index}_{entity_index}"
                         )
-                        self.result.ocel_ids.append(self.session.add_ocel(entitiy))
-                    if isinstance(entitiy, Resource):
+                        self.result.ocel_ids.append(self.session.add_ocel(entity))
+                    if isinstance(entity, Resource):
                         self.result.resource_ids.append(
                             self.session.add_resource(
                                 ResourceStore(
-                                    name=f"{plugin.meta().name if plugin else self.plugin_id}_{self.method_name}_{item_index}_{entitiy_index}",
-                                    type=entitiy.get_type(),
+                                    name=f"{plugin.meta().name if plugin else self.plugin_id}_{self.method_name}_{item_index}_{entity_index}",
+                                    type=entity.get_type(),
                                     source={
                                         "task_id": self.id,
                                         "method_name": self.method_name,
@@ -124,7 +124,7 @@ class PluginTask(TaskBase, Generic[P]):
                                     }
                                     if plugin
                                     else None,
-                                    data=entitiy.model_dump(),
+                                    data=entity.model_dump(),
                                 ),
                             )
                         )

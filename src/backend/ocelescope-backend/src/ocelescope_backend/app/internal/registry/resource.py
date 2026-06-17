@@ -1,12 +1,11 @@
-from ocelescope import Resource
-
+import hashlib
+import json
 from dataclasses import dataclass
 from typing import Type, TypeVar
-import hashlib
 
-import json
 from pydantic.main import BaseModel
 
+from ocelescope import Resource
 
 T = TypeVar("T", bound=Resource)
 
@@ -14,7 +13,7 @@ T = TypeVar("T", bound=Resource)
 @dataclass
 class ResourceRegistryEntry:
     type: str
-    shema_hash: str
+    schema_hash: str
     model_classes: list[tuple[str, Type[Resource]]]
     label: str | None = None
     description: str | None = None
@@ -34,7 +33,7 @@ class ResourceRegistry:
 
         if (
             resource_type in self.resources
-            and self.resources[resource_type].shema_hash != resource_hash
+            and self.resources[resource_type].schema_hash != resource_hash
         ):
             raise ValueError(
                 f"Conflicting output definition for type '{resource_hash}'.\n"
@@ -46,7 +45,7 @@ class ResourceRegistry:
                 type=resource_type,
                 label=resource_class.label,
                 description=resource_class.description,
-                shema_hash=resource_hash,
+                schema_hash=resource_hash,
                 model_classes=[(plugin_id, resource_class)],
             )
         elif not any(

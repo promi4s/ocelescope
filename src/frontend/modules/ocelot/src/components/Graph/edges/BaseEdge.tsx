@@ -24,7 +24,7 @@ export const EdgeLabel: React.FC<{
   );
 };
 
-const customMarkes = ["url('#double-rect')", "url('#rect')"];
+const customMarkers = ["url('#double-rect')", "url('#rect')"];
 
 const BaseEdge: React.FC<
   { labels?: ComponentProps<typeof EdgeLabel>[] } & ComponentProps<
@@ -91,7 +91,7 @@ const BaseEdge: React.FC<
       <FlowBaseEdge
         path={path}
         markerEnd={
-          customMarkes.includes(markerEnd ?? "")
+          customMarkers.includes(markerEnd ?? "")
             ? markerEnd?.replace("rect", "rect-end")
             : markerEnd
         }

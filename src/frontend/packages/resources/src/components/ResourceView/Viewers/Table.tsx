@@ -33,7 +33,7 @@ const TableView: React.FC<{ visualization: Table; isPreview?: boolean }> = ({
 }) => {
   const [pageSize, setPageSize] = useState<number>(PAGE_SIZES[0]);
 
-  //TODO: Make everthing sortable and searchable
+  //TODO: Make everything sortable and searchable
   const columns: DataTableColumn[] = useMemo(
     () =>
       visualization.columns.map((col) => ({
