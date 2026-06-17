@@ -10,7 +10,7 @@ from packaging import tags
 from packaging.utils import parse_wheel_filename
 
 
-# TODO: Use packiging to make this more normed
+# TODO: Use packaging to make this more normed
 def import_wheel_dynamically(wheel_path: Path):
     """
     Dynamically loads a wheel (.whl) file if not already installed or imported.
