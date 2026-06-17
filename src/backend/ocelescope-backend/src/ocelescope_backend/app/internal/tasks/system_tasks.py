@@ -1,6 +1,7 @@
 import json
 import shutil
 import tempfile
+import traceback
 import zipfile
 from datetime import datetime
 from pathlib import Path
@@ -18,6 +19,7 @@ from ocelescope_backend.app.internal.session import Session
 from ocelescope_backend.app.internal.tasks.system import system_task
 from ocelescope_backend.app.internal.util.stream_to_tempfile import stream_to_tempfile
 from ocelescope_backend.app.sse_manager import (
+    ErrorNotification,
     InvalidationRequest,
     OcelLink,
     SystemNotification,
@@ -128,7 +130,17 @@ def import_plugin(
                 shutil.move(plugin_candidate, config.PLUGIN_DIR / plugin_id)
                 added_plugin_ids.append(plugin_id)
 
-    registry_manager.load_plugins(added_plugin_ids)
+    try:
+        registry_manager.load_plugins(added_plugin_ids, ignore_errors=False)
+    except Exception as e:
+        return [
+            ErrorNotification(
+                type="error",
+                title=f"Error while uploading plugin {metadata['fileName']}",
+                message=str(e),
+                trace=traceback.format_exc(),
+            )
+        ]
 
     return [
         SystemNotification(
