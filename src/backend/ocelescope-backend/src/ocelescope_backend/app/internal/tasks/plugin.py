@@ -11,7 +11,7 @@ from pydantic.fields import Field
 from pydantic.main import BaseModel
 from typing_extensions import TypedDict
 
-from ocelescope import OCEL, BaseFilter, Resource
+from ocelescope import OCEL, Resource
 from ocelescope_backend.app.internal.model.resource import ResourceStore
 from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.tasks.base import (
@@ -21,6 +21,7 @@ from ocelescope_backend.app.internal.tasks.base import (
     _call_with_known_params,
 )
 from ocelescope_backend.app.internal.util.hashing import generate_tuple_hash
+from ocelescope_backend.app.modules.base import ModuleFilter
 from ocelescope_backend.app.sse_manager import (
     PluginLink,
     SystemNotification,
@@ -166,7 +167,7 @@ class PluginTask(TaskBase, Generic[P]):
         plugin_name: str,
         method_name: str,
         input: PluginInput,
-        filter: dict[str, list[BaseFilter]],
+        filter: dict[str, list[ModuleFilter]],
     ) -> Hashable:
         return generate_tuple_hash("plugin", plugin_name, method_name, input, filter)
 
@@ -179,8 +180,7 @@ class PluginTask(TaskBase, Generic[P]):
         input: PluginInput,
     ) -> str:
         filters = {
-            ocel_id: session.get_ocel_filters(ocel_id)
-            for ocel_id in input["ocels"].values()
+            ocel_id: session.get_filter(ocel_id) for ocel_id in input["ocels"].values()
         }
 
         key = cls._dedupe_key(plugin_id, method_name, input, filters)
