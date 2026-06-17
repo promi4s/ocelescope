@@ -10,7 +10,7 @@ import type { GraphNode } from "@ocelescope/api-base";
 import { Handle, type NodeProps, Position } from "@xyflow/react";
 import { XIcon } from "lucide-react";
 import { memo, useCallback, useState } from "react";
-import type { VisulizationsType } from "../../../../../types";
+import type { VisualizationsType } from "../../../../../types";
 import { Visualization } from "../../../index";
 import {
   DEFAULT_COLORS,
@@ -51,7 +51,7 @@ const AnnotationBadge = () => (
   </Badge>
 );
 
-const NodeAnnotation = ({ annotation }: { annotation: VisulizationsType }) => {
+const NodeAnnotation = ({ annotation }: { annotation: VisualizationsType }) => {
   const [opened, setOpened] = useState(false);
 
   const toggle = useCallback((e: React.MouseEvent) => {
@@ -452,7 +452,7 @@ const GraphFlowNode = memo(({ data }: NodeProps<GraphFlowNodeType>) => {
         <ExternalLabel top={bottomLabelTop}>{label as string}</ExternalLabel>
       )}
       {annotation && (
-        <NodeAnnotation annotation={annotation as VisulizationsType} />
+        <NodeAnnotation annotation={annotation as VisualizationsType} />
       )}
     </div>
   );
