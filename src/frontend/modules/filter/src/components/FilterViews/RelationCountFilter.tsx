@@ -32,14 +32,7 @@ const RelationCountFilter: (
         ),
       [relationSummary],
     );
-
-    const { records, columns, tableProps } = useDatatable({
-      data: nonTrivialRelations,
-      columnNames: ["source", "qualifier", "target"],
-      defaultSorted: "source",
-    });
-
-    const { filterColumns } = useFilterColumns({
+    const { filterColumns, recordFilter } = useFilterColumns({
       control,
       path: isE2O ? "e2o_count" : "o2o_count",
       generateFilterId: ({ source, target, qualifier }) =>
@@ -103,6 +96,13 @@ const RelationCountFilter: (
           />
         );
       },
+    });
+
+    const { records, columns, tableProps } = useDatatable({
+      data: nonTrivialRelations,
+      columnNames: ["source", "qualifier", "target"],
+      defaultSorted: "source",
+      additionalFilter: recordFilter,
     });
 
     return (

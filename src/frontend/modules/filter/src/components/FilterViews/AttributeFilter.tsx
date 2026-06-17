@@ -69,13 +69,7 @@ const AttributeFilter: (
       [attributes],
     );
 
-    const { columns, records, tableProps } = useDatatable({
-      data: nonTrivialAttributes,
-      columnNames: ["name", "entity_type"],
-      defaultSorted: "name",
-    });
-
-    const { filterColumns } = useFilterColumns({
+    const { filterColumns, recordFilter } = useFilterColumns({
       control,
       path: isEvent ? "event_attribute" : "object_attribute",
       generateFilterId: ({ attribute, target_type }) =>
@@ -95,6 +89,13 @@ const AttributeFilter: (
           <AttributeInputField control={control} path={path} record={record} />
         );
       },
+    });
+
+    const { columns, records, tableProps } = useDatatable({
+      data: nonTrivialAttributes,
+      columnNames: ["name", "entity_type"],
+      defaultSorted: "name",
+      additionalFilter: recordFilter,
     });
 
     return (

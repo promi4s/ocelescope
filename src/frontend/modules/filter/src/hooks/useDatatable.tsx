@@ -18,6 +18,7 @@ export const useDatatable = <T extends Record<string, any>>({
   columnNames,
   defaultSorted,
   pageSize = DEFAULT_PAGE_SIZE,
+  additionalFilter,
 }: useDatatableProps<T>) => {
   const [sortStatus, setSortStatus] = useState<DataTableSortStatus<T>>({
     columnAccessor: defaultSorted,
@@ -32,20 +33,23 @@ export const useDatatable = <T extends Record<string, any>>({
 
   const { records, totalRecords } = useMemo(() => {
     const filteredRecords = sortRecords(
-      data,
+      data.filter(
+        (record) =>
+          Object.entries(columnSelection).every(
+            ([a, b]) => !b || b.length === 0 || b.includes(record[a]),
+          ) &&
+          (!additionalFilter || additionalFilter(record)),
+      ),
+
       sortStatus.columnAccessor as keyof T,
       sortStatus.direction,
-    ).filter((record) =>
-      Object.entries(columnSelection).every(
-        ([a, b]) => !b || b.length === 0 || b.includes(record[a]),
-      ),
     );
 
     return {
       records: filteredRecords.slice((page - 1) * pageSize, page * pageSize),
       totalRecords: filteredRecords.length,
     };
-  }, [sortStatus, columnSelection, data, page, pageSize]);
+  }, [sortStatus, columnSelection, data, page, pageSize, additionalFilter]);
 
   const columns = useMemo(
     () =>

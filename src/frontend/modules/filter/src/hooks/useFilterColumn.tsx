@@ -1,7 +1,7 @@
-import { ActionIcon, Text } from "@mantine/core";
+import { ActionIcon, Checkbox, Text } from "@mantine/core";
 import { PlusIcon, XIcon } from "lucide-react";
 import type { DataTableColumn } from "mantine-datatable";
-import { type ComponentType, useMemo } from "react";
+import { type ComponentType, useCallback, useMemo, useState } from "react";
 import {
   type Control,
   type FieldArray,
@@ -57,6 +57,8 @@ export const useFilterColumns = <
     return map;
   }, [fields, generateFilterId]);
 
+  const [showOnlyFilteredRows, setShowOnlyFilteredRows] = useState(false);
+
   const filterColumns = useMemo<DataTableColumn<T>[]>(
     () => [
       {
@@ -78,10 +80,23 @@ export const useFilterColumns = <
             />
           );
         },
+        filter: () => {
+          return (
+            <Checkbox
+              label="Only show rows with filters"
+              checked={showOnlyFilteredRows}
+              onChange={(event) =>
+                setShowOnlyFilteredRows(event.currentTarget.checked)
+              }
+            />
+          );
+        },
+        filtering: showOnlyFilteredRows,
       },
       {
         accessor: "action",
         title: "",
+        width: "50px",
         render: (record: T) => {
           const key = generateRecordId(record);
           const filterIndex = filterIndexMap.get(key) ?? -1;
@@ -109,8 +124,24 @@ export const useFilterColumns = <
         },
       },
     ],
-    [append, remove, filterIndexMap, generateRecordId, generateInitialFilter],
+    [
+      append,
+      remove,
+      filterIndexMap,
+      generateRecordId,
+      generateInitialFilter,
+      showOnlyFilteredRows,
+    ],
   );
 
-  return { filterColumns };
+  const recordFilter = useCallback(
+    (record: T) =>
+      fields.some((a) => generateRecordId(record) === generateFilterId(a)),
+    [fields],
+  );
+
+  return {
+    filterColumns,
+    recordFilter: showOnlyFilteredRows ? recordFilter : undefined,
+  };
 };
