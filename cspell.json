@@ -128,7 +128,14 @@
     "mypkg",
     "abstractmethods",
     "mcolors",
-    "cmap"
+    "cmap",
+    "unflatten",
+    "subschema",
+    "graphflow",
+    "BRANDES",
+    "KOEPF",
+    "purpur",
+    "ophal"
   ],
   "ignorePaths": [
     "pnpm-lock.yaml",
@@ -143,7 +150,8 @@
     "**/dist/**",
     "**/*.svg",
     "**/*.min.js",
-    "docs/data/pluginEnviroment.txt"
+    "docs/data/pluginEnviroment.txt",
+    "**/api/base.ts"
   ],
   "ignoreRegExpList": ["\\{%[\\s\\S]*?%\\}", "\\{\\{[\\s\\S]*?\\}\\}"]
 }

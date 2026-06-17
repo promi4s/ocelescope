@@ -15,7 +15,7 @@ const useCurrentOcelStore = create<CurrentOcelStore>()(
       setOcel: (id) => set({ ocelId: id }),
       clearOcel: () => set({ ocelId: null }),
     }),
-    // TODO: Get this from the environment varibales
+    // TODO: Get this from the environment variables
     { name: env.current_ocel_id },
   ),
 );
