@@ -28,30 +28,38 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsdown",
-    "dev": "tsdown --watch",
-    "typecheck": "tsc --noEmit"
+    "build": "orval && tsdown",
+    "dev": "tsdown --watch ./src",
+    "typecheck": "tsc --noEmit",
+    "generate:api": "uv run ocelescope-backend openapi --module filter & orval"
   },
   "peerDependencies": {
     "@dagrejs/dagre": "catalog:",
     "@mantine/charts": "catalog:",
     "@mantine/core": "catalog:",
+    "@mantine/dates": "catalog:",
     "@mantine/hooks": "catalog:",
     "@mantine/notifications": "catalog:",
-    "@mantine/dates": "catalog:",
     "@ocelescope/api-base": "workspace:*",
+    "@ocelescope/api-client": "workspace:*",
     "@ocelescope/core": "workspace:*",
     "@tanstack/react-query": "catalog:",
+    "axios": "catalog:",
     "dayjs": "catalog:",
     "lucide-react": "catalog:",
+    "mantine-datatable": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-hook-form": "catalog:",
-    "recharts": "catalog:"
+    "recharts": "catalog:",
+    "object-hash": "catalog:",
+    "next": "catalog:"
   },
   "devDependencies": {
     "@mantine/notifications": "catalog:",
+    "@ocelescope/api-config": "workspace:*",
     "@types/node": "catalog:",
+    "@types/object-hash": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "tsdown": "catalog:",

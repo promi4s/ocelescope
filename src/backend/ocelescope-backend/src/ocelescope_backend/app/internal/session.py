@@ -2,13 +2,14 @@ from __future__ import annotations
 
 import json
 import uuid
-from typing import Any, Callable, Hashable, Type, TypeVar, cast
+from typing import Any, Callable, Hashable, Sequence, Type, TypeVar, cast
 
-from ocelescope import OCEL, BaseFilter
+from ocelescope import OCEL
 from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.model.ocel import SessionOCEL
 from ocelescope_backend.app.internal.model.resource import ResourceApi, ResourceStore
 from ocelescope_backend.app.internal.tasks.base import TaskBase
+from ocelescope_backend.app.modules.base import ModuleFilter
 from ocelescope_backend.app.sse_manager import InvalidationRequest, sse_manager
 
 S = TypeVar("S", bound=TaskBase)
@@ -111,21 +112,23 @@ class Session:
         self.ocels.pop(ocel_id, None)
         sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
 
-    def get_ocel_filters(self, ocel_id: str) -> list[BaseFilter]:
+    # endregion
+    # region Resource management
+    def get_filter(
+        self, ocel_id: str, module_source: str | None = None
+    ) -> list[ModuleFilter]:
         if ocel_id not in self.ocels:
             raise NotFound(f"OCEL with id {ocel_id} not found")
 
-        return self.ocels[ocel_id].applied_filter
+        return self.ocels[ocel_id].get_filters(module_source)
 
-    def filter_ocel(self, ocel_id: str, pipeline: list[BaseFilter]) -> list[BaseFilter]:
+    def set_filter(
+        self, ocel_id: str, module_source: str, pipeline: Sequence[ModuleFilter]
+    ):
         if ocel_id not in self.ocels:
             raise NotFound(f"OCEL with id {ocel_id} not found")
 
-        self.ocels[ocel_id].apply_filter(pipeline)
-
-        sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
-
-        return self.ocels[ocel_id].applied_filter
+        self.ocels[ocel_id].set_filters(module_source, pipeline)
 
     # endregion
     # region Resource management

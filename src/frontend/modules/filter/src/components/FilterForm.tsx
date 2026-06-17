@@ -1,142 +1,80 @@
-import { Button, ButtonGroup, Group, Tabs } from "@mantine/core";
-import type { OCELFilter } from "@ocelescope/api-base";
-import { CheckIcon, RotateCcwIcon, XIcon } from "lucide-react";
-import { useEffect, useMemo } from "react";
+import { ActionIcon, ActionIconGroup, Group, Tabs } from "@mantine/core";
+import { CheckIcon, RotateCcwIcon, Trash2Icon } from "lucide-react";
 import { useForm } from "react-hook-form";
-import type { FilterType } from "../types/filter";
-import { filterMap } from "./filters";
+import { useCurrentFilterTab } from "../hooks/useSearchParams";
+import type { FilterKey, NativeFilter } from "../types/filter";
+import {
+  cleanUpFilters,
+  FILTER_MAP,
+  generateDefaultFilter,
+} from "./FilterViews";
 
-function cleanObject(obj: any): any {
-  if (Array.isArray(obj)) {
-    const cleanedArray = obj
-      .map(cleanObject)
-      .filter(
-        (item) =>
-          item !== undefined &&
-          !(Array.isArray(item) && item.length === 0) &&
-          !(
-            typeof item === "object" &&
-            item !== null &&
-            Object.keys(item).length === 0
-          ),
-      );
-    return cleanedArray;
-  }
-
-  if (typeof obj === "object" && obj !== null) {
-    const cleanedObj: Record<string, any> = {};
-    for (const [key, value] of Object.entries(obj)) {
-      const cleanedValue = cleanObject(value);
-      const isEmptyObject =
-        typeof cleanedValue === "object" &&
-        cleanedValue !== null &&
-        !Array.isArray(cleanedValue) &&
-        Object.keys(cleanedValue).length === 0;
-      const isEmptyArray =
-        Array.isArray(cleanedValue) && cleanedValue.length === 0;
-
-      if (cleanedValue !== undefined && !isEmptyObject && !isEmptyArray) {
-        cleanedObj[key] = cleanedValue;
-      }
-    }
-    return cleanedObj;
-  }
-
-  return obj;
-}
-
-//TODO: End slop this a little
-const FilterForm: React.FC<{
-  filter: OCELFilter;
+type FilterFormProps = {
   ocelId: string;
-  onSubmit: (value: OCELFilter) => void;
-  onResetRef?: (resetFn: (data: OCELFilter) => void) => void;
-}> = ({ filter, ocelId, onSubmit, onResetRef }) => {
-  const {
-    control,
-    handleSubmit,
-    reset,
-    formState: { isValid, isDirty },
-  } = useForm<OCELFilter>({
-    defaultValues: filter,
-    resetOptions: { keepDirty: false },
+  currentFilter: NativeFilter[];
+  onSubmit?: (filters: NativeFilter[]) => void;
+};
+
+const FilterForm = ({ ocelId, currentFilter, onSubmit }: FilterFormProps) => {
+  const { control, handleSubmit, reset, formState } = useForm({
+    defaultValues: generateDefaultFilter(currentFilter),
   });
 
-  const isFormEmpty = useMemo(
-    () => Object.entries(filter).length === 0,
-    [filter],
-  );
-
-  useEffect(() => {
-    onResetRef?.((data) => {
-      return reset(
-        {
-          event_attributes: [],
-          object_attributes: [],
-          o2o_count: [],
-          e2o_count: [],
-          ...cleanObject(data ?? {}),
-        },
-        { keepDirty: false },
-      );
-    });
-  }, [reset, onResetRef]);
+  const { currentTab, setCurrentTab } = useCurrentFilterTab({
+    tabs: Object.keys(FILTER_MAP) as FilterKey[],
+    defaultTab: "activity",
+    queryKey: "tab",
+  });
 
   return (
-    <Tabs keepMounted={false} defaultValue={Object.keys(filterMap)[0]}>
-      <Group gap={0}>
-        <Tabs.List grow flex={1}>
-          {Object.keys(filterMap).map((filterType) => (
-            <Tabs.Tab value={filterType} key={filterType}>
-              {filterMap[filterType as FilterType]?.label}
+    <Tabs
+      value={currentTab}
+      onChange={(newTab) => setCurrentTab(newTab as FilterKey)}
+      keepMounted={false}
+    >
+      <Group>
+        <Tabs.List flex={1}>
+          {Object.entries(FILTER_MAP).map(([key, { title }]) => (
+            <Tabs.Tab key={key} value={key}>
+              {title}
             </Tabs.Tab>
           ))}
         </Tabs.List>
-        <ButtonGroup>
-          {!isFormEmpty && (
-            <Button color={"red"} px={8} onClick={() => onSubmit({})}>
-              <XIcon />
-            </Button>
+
+        <ActionIconGroup>
+          {formState.isDirty && (
+            <>
+              <ActionIcon
+                onClick={handleSubmit((data) => {
+                  onSubmit?.(cleanUpFilters(data));
+                })}
+                size={"lg"}
+                color="green"
+              >
+                <CheckIcon size={24} />
+              </ActionIcon>
+              <ActionIcon
+                size={"lg"}
+                color="yellow"
+                onClick={() => reset(generateDefaultFilter(currentFilter))}
+              >
+                <RotateCcwIcon size={24} />
+              </ActionIcon>
+            </>
           )}
-          {isDirty && (
-            <Button
-              color={"yellow"}
-              px={8}
-              onClick={() =>
-                reset(
-                  {
-                    event_attributes: [],
-                    object_attributes: [],
-                    o2o_count: [],
-                    e2o_count: [],
-                    ...cleanObject(filter),
-                  },
-                  { keepDirty: false },
-                )
-              }
-            >
-              <RotateCcwIcon />
-            </Button>
+          {currentFilter.length > 0 && (
+            <ActionIcon size={"lg"} color="red" onClick={() => onSubmit?.([])}>
+              <Trash2Icon size={24} />
+            </ActionIcon>
           )}
-          {isValid && isDirty && (
-            <Button
-              color={"green"}
-              px={8}
-              onClick={handleSubmit((data) => onSubmit(cleanObject(data)))}
-            >
-              <CheckIcon />
-            </Button>
-          )}
-        </ButtonGroup>
+        </ActionIconGroup>
       </Group>
-      {Object.entries(filterMap).map(([filterType, { filterPage }]) => {
-        const Component = filterPage;
-        return (
-          <Tabs.Panel key={filterType} value={filterType} p={"md"}>
-            <Component control={control} ocelId={ocelId as string} />
-          </Tabs.Panel>
-        );
-      })}
+
+      {Object.entries(FILTER_MAP).map(([key, { ViewComponent }]) => (
+        <Tabs.Panel key={key} value={key} p={"md"}>
+          <ViewComponent control={control} ocelId={ocelId} />
+        </Tabs.Panel>
+      ))}
     </Tabs>
   );
 };

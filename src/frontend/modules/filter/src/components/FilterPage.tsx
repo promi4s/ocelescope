@@ -1,54 +1,42 @@
-import { Box, LoadingOverlay } from "@mantine/core";
-import { showNotification } from "@mantine/notifications";
-import type { OCELFilter } from "@ocelescope/api-base";
-import { useGetFilters, useSetFilters } from "@ocelescope/api-base";
-import { defineModuleRoute, useCurrentOcel } from "@ocelescope/core";
-import { useRef } from "react";
+import { LoadingOverlay } from "@mantine/core";
+import {
+  defineModuleRoute,
+  useCurrentOcel,
+  useInvalidate,
+} from "@ocelescope/core";
+import hash from "object-hash";
+import { useGetFilter, useSetFilter } from "../api/base";
 import FilterForm from "../components/FilterForm";
 
 const FilterPage = () => {
   const { id: ocelId } = useCurrentOcel();
 
-  const {
-    data: filter,
-    isLoading: isFilterLoading,
-    refetch,
-  } = useGetFilters(ocelId, undefined, { query: { enabled: !!ocelId } });
+  const { data: filterPipeline, refetch } = useGetFilter(ocelId ?? "", {
+    query: { enabled: !!ocelId },
+  });
 
-  const resetFormRef = useRef<(filter: OCELFilter) => void>(() => {});
+  const invalidate = useInvalidate();
 
-  const { mutate: applyFilter, isPending: isApplying } = useSetFilters({
+  const { mutate, status } = useSetFilter({
     mutation: {
-      onSuccess: async (data) => {
-        await refetch();
-        resetFormRef.current?.(data as OCELFilter);
-        showNotification({
-          message: "Filter successfully applied",
-          color: "green",
-        });
+      onSuccess: async () => {
+        refetch();
+        await invalidate(["ocels"]);
       },
     },
   });
-
   return (
-    <Box pos={"relative"}>
-      <LoadingOverlay visible={!ocelId || isApplying || isFilterLoading} />
-      {!isFilterLoading && (
+    <>
+      {filterPipeline && ocelId && (
         <FilterForm
           ocelId={ocelId as string}
-          filter={filter ?? {}}
-          onSubmit={(value) =>
-            applyFilter({
-              ocelId: ocelId,
-              data: value,
-            })
-          }
-          onResetRef={(fn) => {
-            resetFormRef.current = fn;
-          }}
+          key={hash(filterPipeline)}
+          currentFilter={filterPipeline}
+          onSubmit={(filter) => mutate({ ocelId, data: filter })}
         />
       )}
-    </Box>
+      <LoadingOverlay visible={status === "pending"} />
+    </>
   );
 };
 
