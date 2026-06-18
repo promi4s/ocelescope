@@ -66,6 +66,5 @@
     "json-schema-traverse": "catalog:",
     "tsdown": "catalog:",
     "typescript": "catalog:"
-  },
-  "dependencies": {}
+  }
 }
