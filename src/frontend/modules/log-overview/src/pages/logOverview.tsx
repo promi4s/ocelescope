@@ -32,7 +32,7 @@ const LogOverviewPage = () => {
         </Grid.Col>
         <Grid.Col span={6}>
           <Stack>
-            <Title order={2}>Objects</Title>
+            <Title order={2}>Object Types</Title>
             <EntityBarList type="objects" ocelId={id} />
           </Stack>
         </Grid.Col>
