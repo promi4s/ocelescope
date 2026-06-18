@@ -94,16 +94,14 @@ class Attribute(BaseModel):
 
 
 class AggregatedAttribute(Attribute):
-    object_types: list[str]
-    activities: list[str]
+    entity_type_names: list[str]
 
     @classmethod
     def from_df_row(cls, row: tuple[Hashable, pd.Series]) -> Self:
         base = Attribute.from_df_row(row)
 
         return cls(
-            object_types=row[1]["object_types"],
-            activities=row[1]["activities"],
+            entity_type_names=row[1]["object_types"] + row[1]["activities"],
             **base.model_dump(),
         )
 

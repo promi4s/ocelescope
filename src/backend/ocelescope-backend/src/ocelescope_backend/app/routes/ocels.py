@@ -48,7 +48,6 @@ ocels_router = APIRouter(prefix="/ocels", tags=["ocels"])
 def getOcels(
     session: ApiSession, extension_name: Optional[str] = None
 ) -> list[OcelMetadata]:
-
     return [
         OcelMetadata.from_ocel(value.ocel)
         for value in session.ocels.values()
@@ -154,11 +153,32 @@ def rename_ocel(ocel: ApiOcel, new_name: str):
 # region Info
 @ocels_router.get(
     "/{ocel_id}/attributes",
-    response_model=list[AggregatedAttribute],
     operation_id="AggregatedAttributes",
 )
-def get_aggr_attributes(ocel: ApiOcel):
-    return AggregatedAttribute.from_df(ocel.attributes.get_aggr_summary())
+def get_aggr_object_attributes(
+    ocel: ApiOcel,
+    page: Annotated[int, Query(ge=1)] = 1,
+    page_size: Annotated[int, Query()] = 10,
+    entity_type: Annotated[Literal["events", "objects"], Query()] = "events",
+) -> PaginatedResponse[list[AggregatedAttribute]]:
+    attribute_names = (
+        ocel.events.attribute_names
+        if entity_type == "events"
+        else ocel.objects.attribute_names
+    )
+
+    attribute_summary = ocel.attributes.get_aggr_summary(
+        activities=[] if entity_type == "objects" else None,
+        object_types=[] if entity_type == "events" else None,
+        attributes=attribute_names[(page - 1) * page_size : page * page_size],
+    )
+
+    return PaginatedResponse(
+        page=page,
+        total_items=len(attribute_names),
+        response=AggregatedAttribute.from_df(attribute_summary),
+        page_size=page_size,
+    )
 
 
 @ocels_router.get(
