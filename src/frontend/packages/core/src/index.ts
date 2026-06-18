@@ -1,3 +1,4 @@
+export { FileDropzone } from "./components/Dropzone/Dropzone";
 export { sseHandler } from "./components/EventHandler";
 export { createModulesPage } from "./components/ModulePage";
 export { OcelescopeApp } from "./components/OcelescopeApp";
@@ -15,4 +16,5 @@ export {
 } from "./hooks/useDownload";
 export { useInvalidate } from "./hooks/useInvalidate";
 export * from "./lib/config";
+export { env } from "./lib/env";
 export { getModuleRoute } from "./lib/getModuleRoute";

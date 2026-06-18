@@ -23,6 +23,7 @@
       "@ocelescope/ocelot": ["../modules/ocelot/src/index.ts"],
       "@ocelescope/ocelot/styles.css": ["../modules/ocelot/src/styles.css"],
       "@ocelescope/filter": ["../modules/filter/src/index.ts"],
+      "@ocelescope/plugin": ["../modules/plugin/src/index.ts"],
       "@ocelescope/filter/styles.css": ["../modules/filter/src/styles.css"]
     }
   },

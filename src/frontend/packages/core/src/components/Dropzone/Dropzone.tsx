@@ -4,7 +4,7 @@ import { DownloadIcon, UploadIcon, XIcon } from "lucide-react";
 import { type ComponentProps, useRef } from "react";
 import classes from "./Dropzone.module.css";
 
-const FileDropzone: React.FC<{
+export const FileDropzone: React.FC<{
   onUpload: (files: FileWithPath[]) => void;
   accept?: ComponentProps<typeof Dropzone>["accept"];
   content: {
@@ -68,5 +68,3 @@ const FileDropzone: React.FC<{
     </div>
   );
 };
-
-export default FileDropzone;

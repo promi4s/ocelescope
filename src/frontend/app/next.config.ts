@@ -12,6 +12,7 @@ const nextConfig: NextConfig = {
     "@ocelescope/core",
     "@ocelescope/resources",
     "@ocelescope/ocelot",
+    "@ocelescope/plugin",
     "@ocelescope/api-base",
     "@ocelescope/api-client",
     "@ocelescope/filter",
