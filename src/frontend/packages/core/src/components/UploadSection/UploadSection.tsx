@@ -8,7 +8,7 @@ import { ContainerIcon } from "lucide-react";
 import { DataTable } from "mantine-datatable";
 import { useCallback, useState } from "react";
 import { useInvalidate } from "../../hooks/useInvalidate";
-import FileDropzone from "../Dropzone/Dropzone";
+import { FileDropzone } from "../Dropzone/Dropzone";
 
 const DefaultOcels: React.FC<{
   onSuccess: () => void;

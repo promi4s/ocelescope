@@ -1,3 +1,4 @@
+export { FileDropzone } from "./components/Dropzone/Dropzone";
 export { sseHandler } from "./components/EventHandler";
 export { createModulesPage } from "./components/ModulePage";
 export { OcelescopeApp } from "./components/OcelescopeApp";
