@@ -42,7 +42,8 @@
     "dayjs": "catalog:",
     "lucide-react": "catalog:",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "@tanstack/react-query": "catalog:"
   },
   "devDependencies": {
     "@tsdown/css": "catalog:",
