@@ -195,7 +195,6 @@ const AttributesTable: React.FC<{
       records={data?.response}
       columns={columns}
       withTableBorder
-      height={500}
       fetching={isFetching}
       totalRecords={data?.total_items ?? 0}
       page={currentPage}
