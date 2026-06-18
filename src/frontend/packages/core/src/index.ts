@@ -16,4 +16,5 @@ export {
 } from "./hooks/useDownload";
 export { useInvalidate } from "./hooks/useInvalidate";
 export * from "./lib/config";
+export { env } from "./lib/env";
 export { getModuleRoute } from "./lib/getModuleRoute";
