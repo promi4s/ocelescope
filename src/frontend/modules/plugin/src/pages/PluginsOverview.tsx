@@ -1,5 +1,6 @@
-import { SimpleGrid, Stack, Text, Title } from "@mantine/core";
+import { Anchor, SimpleGrid, Stack, Text, Title } from "@mantine/core";
 import { usePlugins } from "@ocelescope/api-base";
+import { env } from "@ocelescope/core";
 import {
   PluginCard,
   UploadPluginCard,
@@ -10,9 +11,24 @@ const PluginsOverview: React.FC = () => {
   const { data: plugins } = usePlugins();
 
   return (
-    <Stack>
-      <Title order={2}>Plugin Overview</Title>
-      <Text></Text>
+    <Stack gap="md">
+      <div style={{ maxWidth: 720 }}>
+        <Title order={2}>Plugin Overview</Title>
+        <Text c="dimmed" size="sm" mt={4}>
+          Upload plugins to extend Ocelescope with custom process mining
+          functionality. Plugins are packaged as .zip files. Documentation for
+          writing your own plugins is available on the{" "}
+          <Anchor
+            href={env.projectPage}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            project page
+          </Anchor>
+          .
+        </Text>
+      </div>
+
       {plugins && plugins.length === 0 ? (
         <PluginUploadSection />
       ) : (
