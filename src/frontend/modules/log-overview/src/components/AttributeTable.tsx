@@ -1,17 +1,115 @@
+import { ThemeIcon } from "@mantine/core";
 import {
   type AggregatedAttribute,
+  type TypedAttribute,
   useAggregatedAttributes,
+  useEventAttributes,
+  useObjectAttributes,
 } from "@ocelescope/api-base";
-
 import { keepPreviousData } from "@tanstack/react-query";
+import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
 import { DataTable, type DataTableColumn } from "mantine-datatable";
 import { useMemo, useState } from "react";
 import { formatAttributeValue } from "../util/attributes";
 
+const PAGE_SIZE = 10;
+
+const COLUMN_WIDTHS = {
+  selector: 30,
+  name: 200,
+  entityType: 200,
+  type: 100,
+  range: 200,
+  distinctValues: 120,
+};
+
+const SubAttributeTable: React.FC<{
+  ocelId: string;
+  attributeName: string;
+  entityType?: "events" | "objects";
+  hideRange?: boolean;
+  hideValues?: boolean;
+  extraColumns?: DataTableColumn<TypedAttribute>[];
+}> = ({ ocelId, entityType = "objects", attributeName, extraColumns = [] }) => {
+  const isEvent = entityType === "events";
+
+  const { data, isFetching } = (
+    isEvent ? useEventAttributes : useObjectAttributes
+  )(
+    ocelId,
+    {
+      attribute_names: [attributeName],
+    },
+    { query: { placeholderData: keepPreviousData } },
+  );
+
+  const columns: DataTableColumn<TypedAttribute>[] = useMemo(
+    () =>
+      [
+        {
+          accessor: "selector",
+          title: "",
+          width: COLUMN_WIDTHS.selector,
+        },
+        {
+          accessor: "",
+          title: "Attribute Name",
+          width: COLUMN_WIDTHS.name,
+        },
+        {
+          accessor: "entity_type",
+          title: isEvent ? "Activity" : "Object Type",
+          width: COLUMN_WIDTHS.entityType,
+        },
+        {
+          accessor: "type",
+          title: "Attribute Type",
+          width: COLUMN_WIDTHS.type,
+          noWrap: true,
+        },
+        {
+          accessor: "range",
+          width: COLUMN_WIDTHS.range,
+          render: ({ type, min, max }) =>
+            `${formatAttributeValue(type, min)} - ${formatAttributeValue(type, max)}`,
+        },
+        {
+          accessor: "distinct_values",
+          title: "Values",
+          width: COLUMN_WIDTHS.distinctValues,
+        },
+        ...extraColumns,
+      ] satisfies DataTableColumn<TypedAttribute>[],
+    [data, extraColumns],
+  );
+
+  return (
+    <DataTable
+      noHeader
+      idAccessor={"entity_type"}
+      records={data ?? []}
+      columns={columns}
+      fetching={isFetching}
+      backgroundColor={{ light: "gray.0", dark: "dark.6" }}
+    />
+  );
+};
+
 const AttributesTable: React.FC<{
   ocelId: string;
   entityType?: "events" | "objects";
-}> = ({ ocelId, entityType = "objects" }) => {
+  extraColumns?: DataTableColumn<AggregatedAttribute>[];
+  subTableExtraColumns?: DataTableColumn<TypedAttribute>[];
+  hideRange?: boolean;
+  hideValues?: boolean;
+}> = ({
+  ocelId,
+  entityType = "objects",
+  extraColumns = [],
+  hideRange = false,
+  hideValues = false,
+  subTableExtraColumns,
+}) => {
   const isEvent = entityType === "events";
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -21,10 +119,12 @@ const AttributesTable: React.FC<{
     {
       entity_type: entityType,
       page: currentPage,
-      page_size: 10,
+      page_size: PAGE_SIZE,
     },
     { query: { placeholderData: keepPreviousData } },
   );
+
+  const [selectedAttributes, setSelectedAttributes] = useState<string[]>([]);
 
   const columns: DataTableColumn<AggregatedAttribute>[] = useMemo(
     () =>
@@ -32,39 +132,94 @@ const AttributesTable: React.FC<{
         {
           accessor: "selector",
           title: "",
+          textAlign: "center",
+          render: ({ entity_type_names, name }) => {
+            if (entity_type_names.length === 1) {
+              return null;
+            }
+            return (
+              <ThemeIcon
+                size={"sm"}
+                variant="transparent"
+                style={{ display: "flex" }}
+              >
+                {selectedAttributes.includes(name) ? (
+                  <ChevronDownIcon size={16} />
+                ) : (
+                  <ChevronRightIcon size={16} />
+                )}
+              </ThemeIcon>
+            );
+          },
+          width: COLUMN_WIDTHS.selector,
+          cellsStyle: () => ({ padding: 5 }),
         },
         {
           accessor: "name",
           title: "Attribute Name",
+          width: COLUMN_WIDTHS.name,
         },
         {
           accessor: "entityTypeField",
           title: isEvent ? "Activity" : "Object Type",
+          width: COLUMN_WIDTHS.entityType,
           render: ({ entity_type_names }) =>
-            `${entity_type_names.slice(0, 3).join(", ")}${entity_type_names.length > 3 ? `... (${entity_type_names.length} total)` : ""}`,
+            `${entity_type_names.slice(0, 2).join(", ")}${entity_type_names.length > 3 ? `, ... (${entity_type_names.length} total)` : ""}`,
         },
-        { accessor: "type", title: "Attribute Type" },
+        {
+          accessor: "type",
+          title: "Attribute Type",
+          width: COLUMN_WIDTHS.type,
+        },
         {
           accessor: "range",
+          width: COLUMN_WIDTHS.range,
           render: ({ type, min, max }) =>
             `${formatAttributeValue(type, min)} - ${formatAttributeValue(type, max)}`,
+          hidden: hideRange,
         },
-        { accessor: "distinct_values", title: "Values" },
+        {
+          accessor: "distinct_values",
+          title: "Values",
+          width: COLUMN_WIDTHS.distinctValues,
+          hidden: hideValues,
+        },
+        ...extraColumns,
       ] satisfies DataTableColumn<AggregatedAttribute>[],
-    [data],
+    [data, selectedAttributes, extraColumns],
   );
 
   return (
     <DataTable
+      idAccessor={"name"}
       records={data?.response}
       columns={columns}
       withTableBorder
       height={500}
       fetching={isFetching}
-      totalRecords={data?.total_items ?? 1}
-      page={data?.page ?? 1}
-      recordsPerPage={data?.page_size ?? 1}
-      onPageChange={(page) => setCurrentPage(page)}
+      totalRecords={data?.total_items ?? 0}
+      page={currentPage}
+      recordsPerPage={PAGE_SIZE}
+      onPageChange={setCurrentPage}
+      rowExpansion={{
+        allowMultiple: false,
+        expandable: ({ record: { entity_type_names } }) =>
+          entity_type_names.length > 1,
+        expanded: {
+          recordIds: selectedAttributes,
+          onRecordIdsChange: setSelectedAttributes,
+        },
+        content: ({ record }) => (
+          <SubAttributeTable
+            entityType={entityType}
+            attributeName={record.name}
+            ocelId={ocelId}
+            extraColumns={subTableExtraColumns}
+            hideRange={hideRange}
+            hideValues={hideValues}
+          />
+        ),
+      }}
     />
   );
 };

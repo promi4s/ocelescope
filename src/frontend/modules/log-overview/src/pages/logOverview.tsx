@@ -1,4 +1,11 @@
-import { Container, Grid, LoadingOverlay, Stack, Title } from "@mantine/core";
+import {
+  Container,
+  Grid,
+  LoadingOverlay,
+  Stack,
+  Tabs,
+  Title,
+} from "@mantine/core";
 import { defineModuleRoute, useCurrentOcel } from "@ocelescope/core";
 import AttributeTable from "../components/AttributeTable";
 import { EntityBarList } from "../components/EntityBarList/EntityBarList";
@@ -21,7 +28,18 @@ const LogOverviewPage = () => {
         <Grid.Col span={12}>
           <Stack>
             <Title order={2}>Attribute Info</Title>
-            <AttributeTable ocelId={id} />
+            <Tabs defaultValue={"events"} keepMounted={false}>
+              <Tabs.List>
+                <Tabs.Tab value="events">Events</Tabs.Tab>
+                <Tabs.Tab value="objects">Objects</Tabs.Tab>
+              </Tabs.List>
+              <Tabs.Panel value="events">
+                <AttributeTable ocelId={id} entityType="events" />
+              </Tabs.Panel>
+              <Tabs.Panel value="objects">
+                <AttributeTable ocelId={id} entityType="objects" />
+              </Tabs.Panel>
+            </Tabs>
           </Stack>
         </Grid.Col>
         <Grid.Col span={6}>
