@@ -14,7 +14,7 @@ const LogOverviewPage = () => {
       <Grid>
         <Grid.Col span={12}>
           <Stack>
-            <Title order={2}>Overview</Title>
+            <Title order={2}>Overviewer</Title>
             <OCELInfo ocelId={id} />
           </Stack>
         </Grid.Col>

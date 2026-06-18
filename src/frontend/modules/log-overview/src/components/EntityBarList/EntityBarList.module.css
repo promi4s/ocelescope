@@ -22,7 +22,7 @@
   position: relative;
 }
 
-.label-inside {
+.labelInside {
   display: inline-block;
   padding: 0 0.4em;
   color: white;
@@ -30,7 +30,7 @@
   font-size: 0.9em;
 }
 
-.label-outside {
+.labelOutside {
   display: inline-block;
   margin-left: 0.5em;
   color: #111;
