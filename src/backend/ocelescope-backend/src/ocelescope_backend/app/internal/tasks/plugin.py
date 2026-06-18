@@ -1,3 +1,4 @@
+import traceback
 from copy import deepcopy
 from typing import (
     TYPE_CHECKING,
@@ -23,6 +24,7 @@ from ocelescope_backend.app.internal.tasks.base import (
 from ocelescope_backend.app.internal.util.hashing import generate_tuple_hash
 from ocelescope_backend.app.modules.base import ModuleFilter
 from ocelescope_backend.app.sse_manager import (
+    ErrorNotification,
     PluginLink,
     SystemNotification,
     sse_manager,
@@ -131,27 +133,37 @@ class PluginTask(TaskBase, Generic[P]):
 
             if self.state != TaskState.CANCELLED:
                 self.state = TaskState.SUCCESS
-        except Exception as exc:
-            self.error = exc
+
+                sse_manager.send_safe(
+                    session_id=self.session.id,
+                    message=SystemNotification(
+                        type="notification",
+                        title="Plugin successfully run",
+                        message=f"Successfully run plugin {self.plugin_id} {self.method_name}",
+                        notification_type="info",
+                        link=PluginLink(
+                            type="plugin",
+                            method=self.method_name,
+                            id=self.plugin_id,
+                            task_id=self.id,
+                        ),
+                    ),
+                )
+
+        except Exception as e:
+            self.error = e
             self.state = TaskState.FAILURE
-            raise
-        finally:
-            self.session.running_tasks.pop(self.id, None)
             sse_manager.send_safe(
                 session_id=self.session.id,
-                message=SystemNotification(
-                    type="notification",
-                    title="Plugin successfully run",
-                    message=f"Successfully run plugin {self.plugin_id} {self.method_name}",
-                    notification_type="info",
-                    link=PluginLink(
-                        type="plugin",
-                        method=self.method_name,
-                        id=self.plugin_id,
-                        task_id=self.id,
-                    ),
+                message=ErrorNotification(
+                    type="error",
+                    title=f"Error while running plugin {self.plugin_id} {self.method_name}",
+                    message=str(e),
+                    trace=traceback.format_exc(),
                 ),
             )
+        finally:
+            self.session.running_tasks.pop(self.id, None)
 
     def summarize(self) -> PluginTaskSummary:
         return PluginTaskSummary(

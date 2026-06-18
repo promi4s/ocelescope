@@ -1,15 +1,10 @@
 import shutil
-import tempfile
-import zipfile
-from pathlib import Path
 from typing import Any, Optional
-from uuid import uuid4
 
-from fastapi.datastructures import UploadFile
 from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
-from ocelescope import OCEL, PluginMethod, Resource
 
+from ocelescope import OCEL, PluginMethod, Resource
 from ocelescope_backend.app.dependencies import ApiSession
 from ocelescope_backend.app.internal.config import config
 from ocelescope_backend.app.internal.model.plugin import PluginApi
@@ -18,7 +13,10 @@ from ocelescope_backend.app.internal.model.plugin import PluginApi
 from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.tasks.base import _call_with_known_params
 from ocelescope_backend.app.internal.tasks.plugin import PluginTask
-from ocelescope_backend.app.sse_manager import InvalidationRequest, sse_manager
+from ocelescope_backend.app.sse_manager import (
+    InvalidationRequest,
+    sse_manager,
+)
 
 plugin_router = APIRouter(prefix="/plugins", tags=["plugins"])
 
@@ -109,35 +107,6 @@ def get_computed(
         return _call_with_known_params(fn, **kwargs)
     except Exception:
         return []
-
-
-@plugin_router.post("", operation_id="uploadPlugin")
-def upload_plugin(file: UploadFile, session: ApiSession):
-    file_name = file.filename
-    if not file_name or not file_name.endswith(".zip"):
-        raise HTTPException(status_code=400, detail="Only zip files are supported")
-
-    added_plugin_ids = []
-
-    with tempfile.TemporaryDirectory() as temp_dir:
-        try:
-            with zipfile.ZipFile(file.file, "r") as zip_ref:
-                zip_ref.extractall(temp_dir)
-        except zipfile.BadZipFile:
-            raise HTTPException(status_code=400, detail="Invalid zip file")
-
-        temp_path = Path(temp_dir)
-
-        for plugin_candidate in temp_path.iterdir():
-            if (
-                plugin_candidate.is_dir()
-                and (plugin_candidate / "__init__.py").exists()
-            ):
-                plugin_id = f"plugin_{str(uuid4())}"
-                shutil.move(plugin_candidate, config.PLUGIN_DIR / plugin_id)
-                added_plugin_ids.append(plugin_id)
-
-    registry_manager.load_plugins(added_plugin_ids)
 
 
 @plugin_router.delete("/{plugin_id}", operation_id="deletePlugin")

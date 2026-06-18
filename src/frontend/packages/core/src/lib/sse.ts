@@ -36,7 +36,15 @@ const InvalidationRequest = z.object({
   routes: z.array(z.enum(["ocels", "resources", "tasks", "plugins"])),
 });
 
+const ErrorNotification = z.object({
+  type: z.literal("error"),
+  title: z.string(),
+  message: z.string(),
+  trace: z.string(),
+});
+
 export const ServerEventMessage = z.discriminatedUnion("type", [
   SystemNotification,
   InvalidationRequest,
+  ErrorNotification,
 ]);
