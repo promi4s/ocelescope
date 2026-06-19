@@ -30,7 +30,9 @@ RENAME_MAP = {
 SPECIAL_NAMES = ["concept:name", "time:timestamp", OTYPE_COL]
 
 
-def create_ocel_from_xml(path: str, fallback_object_name: str = "LogObject") -> pm4py.OCEL:
+def create_ocel_from_xml(
+    path: str, fallback_object_name: str = "LogObject"
+) -> dict[str, pl.DataFrame]:
 
     log, meta = r4pm.df.import_xes(path)
 
@@ -75,11 +77,7 @@ def create_ocel_from_xml(path: str, fallback_object_name: str = "LogObject") -> 
         pl.lit(None, dtype=pl.String).alias(E2O_QUALIFIER)
     )
 
-    return pm4py.OCEL(
-        events=event_table.to_pandas(),
-        objects=object_table.to_pandas(),
-        relations=e2o_table.to_pandas(),
-    )
+    return {"events": event_table, "objects": object_table, "relations": e2o_table}
 
 
 def write_ocel_to_xes(ocel: "OCEL", object_type: str, path: str | Path):
