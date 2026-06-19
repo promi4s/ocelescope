@@ -1,20 +1,22 @@
-from typing import TYPE_CHECKING, Optional, Sequence, cast
+from typing import TYPE_CHECKING, Sequence
 
-import pandas as pd
-import pm4py
-
-from ocelescope.ocel.constants.pm4py import OID_COL
+from ocelescope.ocel.constants.pm4py import O2O_SOURCE_ID, O2O_TARGET_ID
 from ocelescope.ocel.filter.base import BaseFilter, FilterResult
+from ocelescope.ocel.util.integrity import clean_ocel
 
 if TYPE_CHECKING:
     from ocelescope.ocel.core.ocel import OCEL
 
 
 def compute_combined_masks(ocel: "OCEL", filters: Sequence[BaseFilter]) -> FilterResult:
-    combined = FilterResult(
-        events=pd.Series(True, index=ocel.events.df.index),
-        objects=pd.Series(True, index=ocel.objects.df.index),
-    )
+    """Run every filter against `ocel` and AND-merge their masks together.
+
+    Starts from an empty `FilterResult` rather than seeding all-True masks:
+    `and_merge` already falls through to whichever side is non-None, so a
+    table that no filter touches just stays `None` (no filtering applied)
+    without ever materializing a dummy mask for it.
+    """
+    combined = FilterResult()
 
     for filter in filters:
         combined = combined.and_merge(filter.filter(ocel))
@@ -23,39 +25,45 @@ def compute_combined_masks(ocel: "OCEL", filters: Sequence[BaseFilter]) -> Filte
 
 
 def apply_filters(ocel: "OCEL", filters: Sequence[BaseFilter]) -> "OCEL":
+    """
+    Apply a sequence of filters to `ocel` and return a new, integrity-clean OCEL.
+
+    Each filter contributes a boolean mask (pandas or polars) over events,
+    objects, e2o relations, and/or o2o relations; the masks are AND-merged
+    (normalized to polars, the OCEL's native storage type) and applied
+    directly to the polars tables (no PM4PY filter functions involved, and
+    no pandas round-trip). `clean_ocel` then drops any rows that became
+    dangling as a result.
+    """
     from ocelescope.ocel.core.ocel import OCEL
 
     masks = compute_combined_masks(ocel, filters)
 
-    filtered_event_ids: Optional[pd.Series] = (
-        cast(pd.Series, ocel.events.df[ocel.ocel.event_id_column][masks.events])
-        if masks.events is not None
-        else None
+    events_pl = ocel.events.pl if masks.events is None else ocel.events.pl.filter(masks.events)
+    objects_pl = ocel.objects.pl if masks.objects is None else ocel.objects.pl.filter(masks.objects)
+    relations_pl = ocel.e2o.pl if masks.e2o is None else ocel.e2o.pl.filter(masks.e2o)
+    o2o_pl = ocel.o2o.pl if masks.o2o is None else ocel.o2o.pl.filter(masks.o2o)
+
+    # o2o is stored under canonical column names (O2O_SOURCE_ID/O2O_TARGET_ID);
+    # r4pm_dict/clean_ocel expect PM4PY's raw names, same rename r4pm_dict applies.
+    o2o_pl = o2o_pl.rename({O2O_SOURCE_ID: "ocel:oid", O2O_TARGET_ID: "ocel:oid_2"})
+
+    ocel_dict = clean_ocel(
+        {
+            **ocel.r4pm_dict,
+            "events": events_pl,
+            "objects": objects_pl,
+            "relations": relations_pl,
+            "o2o": o2o_pl,
+        }
     )
 
-    filtered_object_ids: Optional[pd.Series] = (
-        cast(pd.Series, ocel.objects.df[OID_COL][masks.objects])
-        if masks.objects is not None
-        else None
+    return OCEL(
+        ocel=ocel_dict,
+        meta=ocel.meta,
+        quantityExtension=(
+            (ocel.quantities.oqty, ocel.quantities.qop, ocel.quantities.properties)
+            if ocel.quantities.is_populated()
+            else None
+        ),
     )
-
-    filtered_ocel = ocel.ocel
-
-    if filtered_event_ids is not None:
-        filtered_ocel = pm4py.filter_ocel_events(filtered_ocel, filtered_event_ids, positive=True)
-
-    if filtered_object_ids is not None:
-        filtered_ocel = pm4py.filter_ocel_objects(filtered_ocel, filtered_object_ids, positive=True)
-
-    # TODO: Don't do this step
-    filtered_ocel = OCEL(
-        filtered_ocel,
-        ocel.meta,
-        # TODO: Clean up quantities
-        quantityExtension=(ocel.quantities.oqty, ocel.quantities.qop, ocel.quantities.properties)
-        if ocel.quantities.is_populated
-        else None,
-    )
-    filtered_ocel.meta = ocel.meta
-
-    return filtered_ocel
