@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Dict, TypeVar
 
 from ocelescope.ocel.extensions.base_extension import OCELExtension
+from ocelescope.ocel.managers.base import BaseManager
 
 if TYPE_CHECKING:
     from ocelescope.ocel.core.ocel import OCEL
@@ -12,7 +13,7 @@ if TYPE_CHECKING:
 T = TypeVar("T", bound=OCELExtension)
 
 
-class ExtensionManager:
+class ExtensionManager(BaseManager):
     """Manage loading, storing, and exporting OCEL file extensions.
 
     The ExtensionManager is responsible for:
@@ -27,7 +28,8 @@ class ExtensionManager:
     """
 
     def __init__(self, ocel: "OCEL"):
-        self.ocel = ocel
+        super().__init__(ocel)
+
         self._extensions: Dict[type[OCELExtension], OCELExtension] = {}
 
     def load(self, extensions: list[type[OCELExtension]]):
@@ -43,16 +45,16 @@ class ExtensionManager:
             extensions: A list of OCELExtension subclasses to check for and load.
         """
 
-        if not self.ocel.meta.path:
+        if not self._ocel.meta.path:
             return
 
-        path = Path(self.ocel.meta.path)
+        path = Path(self._ocel.meta.path)
 
         for ext_cls in extensions:
             try:
                 if path.suffix in getattr(ext_cls, "supported_extensions", []):
                     if ext_cls.has_extension(path):
-                        instance = ext_cls.import_extension(self.ocel, path)
+                        instance = ext_cls.import_extension(self._ocel, path)
                         self._extensions[ext_cls] = instance
             except Exception as exc:
                 print(f"[ExtensionManager] Failed to load {ext_cls.__name__}: {exc}")

@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import pandas as pd
+import polars as pl
 
 from ocelescope.ocel.constants.pm4py import (
     O2O_QUALIFIER,
@@ -26,33 +29,69 @@ class O2OManager(BaseManager):
         - Type-enriched O2O relations (joining object types)
         - Aggregated summaries of O2O relation multiplicities
 
-    This manager acts as a typed and normalized facade over the
-    PM4PY O2O relation table.
+    Stores the O2O relation table internally as a polars DataFrame, using
+    canonical column names, and exposes it as a typed and normalized
+    pandas-compatible facade.
     """
+
+    def __init__(self, ocel, o2o_df: pl.DataFrame | None):
+        """
+        Args:
+            ocel: The owning OCEL instance.
+            o2o_df: Initial O2O relation table, using PM4PY's raw column
+                names ("ocel:oid", "ocel:oid_2"). Renamed to canonical
+                constants on construction. Defaults to an empty table.
+        """
+        super().__init__(ocel)
+
+        # TODO: Fix this properly and give oid columns real values
+        self._o2o_df = (
+            o2o_df.rename(
+                {
+                    "ocel:oid": O2O_SOURCE_ID,
+                    "ocel:oid_2": O2O_TARGET_ID,
+                }
+            )
+            if o2o_df is not None
+            else pl.DataFrame(
+                schema={
+                    O2O_SOURCE_ID: pl.String,
+                    O2O_TARGET_ID: pl.String,
+                    O2O_QUALIFIER: pl.String,
+                }
+            )
+        )
 
     @property
     def df(self) -> pd.DataFrame:
         """
-        Return the O2O relation table with normalized column names.
+        Return the O2O relation table as a pandas DataFrame, converted from
+        the internal polars representation.
 
         PM4PY uses mixed naming conventions for O2O relations
-        (e.g., "ocel:oid" and "ocel:oid_2").
-        This property maps these raw names to canonical constants:
-
-            - O2O_SOURCE_ID
-            - O2O_TARGET_ID
+        (e.g., "ocel:oid" and "ocel:oid_2"). These raw names are mapped to
+        canonical constants (O2O_SOURCE_ID, O2O_TARGET_ID) once, at
+        construction time.
 
         Returns:
             DataFrame: A normalized O2O relation table.
         """
-        raw = self._ocel.ocel.o2o
+        return self._o2o_df.to_pandas()
 
-        return raw.rename(
-            columns={
-                "ocel:oid": O2O_SOURCE_ID,
-                "ocel:oid_2": O2O_TARGET_ID,
-            }
-        )
+    @df.setter
+    def df(self, value: pd.DataFrame) -> None:
+        """Replace the O2O relation table, converting it back to polars internally.
+
+        Expects canonical column names (O2O_SOURCE_ID, O2O_TARGET_ID), matching
+        what the `df` getter returns.
+        """
+        self._o2o_df = pl.from_pandas(value)
+        self.cache.clear()
+
+    @property
+    def pl(self) -> pl.DataFrame:
+        """Return the O2O relation table as a polars DataFrame (the internal representation)."""
+        return self._o2o_df
 
     @property
     @instance_lru_cache()

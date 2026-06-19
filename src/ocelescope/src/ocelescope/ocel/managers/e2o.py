@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import pandas as pd
+import polars as pl
 
 from ocelescope.ocel.constants.pm4py import (
     E2O_ACTIVITY,
@@ -29,9 +32,34 @@ class E2OManager(BaseManager):
         - Enriched E2O table including activity and object type information
         - Aggregated multiplicity summaries for E2O relations
 
-    This manager acts as a typed and normalized façade over the
-    PM4PY E2O relations.
+    Stores the E2O relation table internally as a polars DataFrame, using
+    canonical column names, and exposes it as a typed and normalized
+    pandas-compatible facade.
     """
+
+    def __init__(self, ocel, e2o_df: pl.DataFrame | None = None):
+        """
+        Args:
+            ocel: The owning OCEL instance.
+            e2o_df: Initial E2O relation table, using canonical column names.
+                Defaults to an empty table.
+        """
+        super().__init__(ocel)
+
+        self._e2o_df = (
+            e2o_df
+            if e2o_df is not None
+            else pl.DataFrame(
+                schema={
+                    E2O_EVENT_ID: pl.String,
+                    E2O_ACTIVITY: pl.String,
+                    TIMESTAMP_COL: pl.Datetime,
+                    E2O_OBJECT_ID: pl.String,
+                    E2O_OBJECT_TYPE: pl.String,
+                    E2O_QUALIFIER: pl.String,
+                }
+            )
+        )
 
     # ---------------------------------------------------------
     # Raw → Normalized E2O DataFrame
@@ -39,32 +67,28 @@ class E2OManager(BaseManager):
     @property
     def df(self) -> pd.DataFrame:
         """
-        Return the E2O relation table with normalized column names.
+        Return the E2O relation table as a pandas DataFrame, converted from
+        the internal polars representation.
 
-        PM4PY uses the following columns:
-            - "ocel:eid"
-            - "ocel:oid"
-            - "ocel:type"
-            - "ocel:qualifier"
-
-        This property renames them to canonical constants:
-            - E2O_EVENT_ID
-            - E2O_OBJECT_ID
-            - E2O_OBJECT_TYPE
+        Columns already use canonical constant names (E2O_EVENT_ID,
+        E2O_OBJECT_ID, E2O_OBJECT_TYPE, ...), since the underlying PM4PY
+        column names coincide with these constants.
 
         Returns:
             DataFrame: Normalized E2O relation table.
         """
-        raw = self._ocel.ocel.relations
+        return self._e2o_df.to_pandas()
 
-        return raw.rename(
-            columns={
-                "ocel:eid": E2O_EVENT_ID,
-                "ocel:oid": E2O_OBJECT_ID,
-                "ocel:type": E2O_OBJECT_TYPE,
-                "ocel:activity": E2O_ACTIVITY,
-            }
-        )
+    @df.setter
+    def df(self, value: pd.DataFrame) -> None:
+        """Replace the E2O relation table, converting it back to polars internally."""
+        self._e2o_df = pl.from_pandas(value)
+        self.cache.clear()
+
+    @property
+    def pl(self) -> pl.DataFrame:
+        """Return the E2O relation table as a polars DataFrame (the internal representation)."""
+        return self._e2o_df
 
     # ---------------------------------------------------------
     # Summary

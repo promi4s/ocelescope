@@ -7,10 +7,13 @@ from typing import Any, Sequence
 
 import pandas as pd
 import pm4py
+import polars as pl
 import r4pm
 from pm4py.objects.ocel.obj import OCEL as PM4PYOCEL
 from pm4py.objects.ocel.obj import deepcopy
+from polars import DataFrame
 
+from ocelescope.ocel.constants.pm4py import O2O_SOURCE_ID, O2O_TARGET_ID
 from ocelescope.ocel.extensions.manager import ExtensionManager
 from ocelescope.ocel.filter.base import BaseFilter
 from ocelescope.ocel.managers import (
@@ -24,6 +27,7 @@ from ocelescope.ocel.managers.attributes import AttributeManager
 from ocelescope.ocel.managers.executions import ExecutionsManager
 from ocelescope.ocel.managers.quantities.util.io import read_quantity_extension
 from ocelescope.ocel.models.meta import OCELMeta
+from ocelescope.ocel.util import clean_ocel
 from ocelescope.ocel.util.io import pretty_print_json, pretty_print_xml
 from ocelescope.ocel.util.xes import create_ocel_from_xml, write_ocel_to_xes
 
@@ -39,8 +43,9 @@ class OCEL:
 
     Attributes:
         ocel (PM4PYOCEL):
-            The underlying PM4PY OCEL object containing the raw OCEL data
-            (events, objects, relations).
+            Computed property that rebuilds a PM4PY OCEL object from the
+            current state of the managers (events, objects, relations) on
+            each access.
         meta (OCELMeta):
             Metadata associated with this OCEL instance, including file path,
             unique ID, and any additional user-defined information.
@@ -63,20 +68,56 @@ class OCEL:
 
     def __init__(
         self,
-        ocel: PM4PYOCEL,
+        ocel: dict[str, DataFrame],
         meta: OCELMeta | None = None,
         quantityExtension: tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame] | None = None,
     ):
-        self.ocel = ocel
         self.meta = meta or OCELMeta()
         self.extensions = ExtensionManager(self)
-        self.objects = ObjectsManager(self)
-        self.events = EventsManager(self)
+        self.objects = ObjectsManager(
+            self,
+            objects_df=ocel.get("objects"),
+            changes_df=ocel.get("object_changes"),
+        )
+
+        self.events = EventsManager(self, events_df=ocel.get("events"))
+        self.e2o = E2OManager(self, e2o_df=ocel.get("relations"))
+        self.o2o = O2OManager(self, o2o_df=ocel.get("o2o"))
         self.quantities = QuantityManager(self, quantityExtension)
-        self.e2o = E2OManager(self)
-        self.o2o = O2OManager(self)
         self.attributes = AttributeManager(self)
         self.executions = ExecutionsManager(self)
+
+    @property
+    def r4pm_dict(self) -> dict[str, pl.DataFrame]:
+        """
+        Assemble the current state of all managers into the dict-of-polars-DataFrames
+        shape expected by r4pm (and accepted by the `OCEL` constructor).
+
+        The O2O table is renamed back to PM4PY's raw column names
+        ("ocel:oid", "ocel:oid_2"), the inverse of the rename `O2OManager`
+        applies on construction.
+
+        Returns:
+            dict[str, pl.DataFrame]: Keys "events", "objects", "object_changes",
+            "relations", and "o2o".
+        """
+        return {
+            "events": self.events.pl,
+            "objects": self.objects.pl,
+            "object_changes": self.objects.changes_pl,
+            "relations": self.e2o.pl,
+            "o2o": self.o2o.pl.rename(
+                {
+                    O2O_SOURCE_ID: "ocel:oid",
+                    O2O_TARGET_ID: "ocel:oid_2",
+                }
+            ),
+        }
+
+    @property
+    def ocel(self) -> PM4PYOCEL:
+        """Rebuild a PM4PY OCEL object from `r4pm_dict`, reflecting the current state."""
+        return r4pm.df.rs_ocel_to_pm4py(self.r4pm_dict)
 
     def filter(self, pipeline: Sequence[BaseFilter]) -> OCEL:
         """
@@ -119,19 +160,10 @@ class OCEL:
         path = Path(path)
 
         with warnings.catch_warnings(record=True):
-            match path.suffix:
-                case ".sqlite":
-                    pm4py_ocel = pm4py.read.read_ocel2_sqlite(str(path))
-                case ".xmlocel" | ".xml":
-                    pm4py_ocel = r4pm.df.import_ocel_xml_pm4py(str(path))
-                case ".jsonocel" | ".json":
-                    pm4py_ocel = r4pm.df.import_ocel_json_pm4py(str(path))
-                case _:
-                    raise ValueError(f"Unsupported extension: {path.suffix}")
-
-        quantity_table = read_quantity_extension(path)
+            ocel_dict = clean_ocel(r4pm.df.import_ocel(str(path)))
+            quantity_table = read_quantity_extension(path)
         return OCEL(
-            ocel=pm4py_ocel, meta=OCELMeta(path=path, extra=meta), quantityExtension=quantity_table
+            ocel=ocel_dict, meta=OCELMeta(path=path, extra=meta), quantityExtension=quantity_table
         )
 
     def write(self, path: str | Path):
@@ -156,11 +188,11 @@ class OCEL:
         match path.suffix:
             case ".xmlocel" | ".xml":
                 xml_path = path.with_suffix(".xml")
-                r4pm.df.export_ocel_pm4py(self.ocel, str(xml_path))
+                r4pm.df.export_ocel(self.r4pm_dict, str(xml_path))
                 pretty_print_xml(xml_path)
             case ".jsonocel" | ".json":
                 json_path = path.with_suffix(".json")
-                r4pm.df.export_ocel_pm4py(self.ocel, str(json_path))
+                r4pm.df.export_ocel(self.r4pm_dict, str(json_path))
                 pretty_print_json(json_path)
             case ".sqlite":
                 pm4py.write_ocel2_sqlite(self.ocel, str(path))
@@ -181,7 +213,6 @@ class OCEL:
         Returns:
             None
         """
-
         write_ocel_to_xes(ocel=self, object_type=object_type, path=path)
 
     @staticmethod
@@ -189,10 +220,9 @@ class OCEL:
         return OCEL(ocel=create_ocel_from_xml(str(path), fallback_object_name))
 
     def __deepcopy__(self, memo: dict[int, Any]):
-        # TODO revisit this. Are the underlying DataFrames mutable? If not, might optimize this
-        pm4py_ocel = deepcopy(self.ocel, memo)
+        ocel_dict = deepcopy(self.r4pm_dict, memo)
         ocel = OCEL(
-            ocel=pm4py_ocel,
+            ocel=ocel_dict,
             meta=OCELMeta(extra=deepcopy(self.meta.extra, memo)),
             quantityExtension=(
                 self.quantities.oqty.copy(),

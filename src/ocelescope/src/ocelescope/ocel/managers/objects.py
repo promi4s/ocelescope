@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 from typing import Any, Iterable, cast
 
 import pandas as pd
+import polars as pl
 
-from ocelescope.ocel.constants.pm4py import OID_COL, OTYPE_COL, TIMESTAMP_COL
+from ocelescope.ocel.constants.pm4py import OBJECT_CHANGED_FIELD, OID_COL, OTYPE_COL, TIMESTAMP_COL
 from ocelescope.ocel.managers.base import BaseManager
 from ocelescope.util.cache import instance_lru_cache
 
@@ -18,18 +21,64 @@ class ObjectsManager(BaseManager):
     - object attribute names
     - per-object lookup helpers such as type-by-id
 
-    Acts as a facade over the underlying PM4PY OCEL object.
+    Stores the objects and object_changes tables internally as polars
+    DataFrames, exposing pandas-compatible accessors as a facade.
     """
+
+    def __init__(
+        self,
+        ocel,
+        objects_df: pl.DataFrame | None = None,
+        changes_df: pl.DataFrame | None = None,
+    ):
+        """
+        Args:
+            ocel: The owning OCEL instance.
+            objects_df: Initial objects table. Defaults to an empty table.
+            changes_df: Initial object_changes table. Defaults to an empty table.
+        """
+
+        super().__init__(ocel)
+
+        self._objects_df = (
+            objects_df
+            if objects_df is not None
+            else pl.DataFrame(schema={OID_COL: pl.String, OTYPE_COL: pl.String})
+        )
+        self._changes_df = (
+            changes_df
+            if changes_df is not None
+            else pl.DataFrame(
+                schema={
+                    OID_COL: pl.String,
+                    OTYPE_COL: pl.String,
+                    TIMESTAMP_COL: pl.Datetime,
+                    OBJECT_CHANGED_FIELD: pl.String,
+                }
+            )
+        )
 
     @property
     def df(self) -> pd.DataFrame:
         """
-        Return the object table from the underlying OCEL.
+        Return the objects table as a pandas DataFrame, converted from the
+        internal polars representation.
 
         Returns:
             DataFrame: A pandas DataFrame containing all objects and their static attributes.
         """
-        return self._ocel.ocel.objects
+        return self._objects_df.to_pandas()
+
+    @df.setter
+    def df(self, value: pd.DataFrame) -> None:
+        """Replace the objects table, converting it back to polars internally."""
+        self._objects_df = pl.from_pandas(value)
+        self.cache.clear()
+
+    @property
+    def pl(self) -> pl.DataFrame:
+        """Return the objects table as a polars DataFrame (the internal representation)."""
+        return self._objects_df
 
     @property
     def changes(self) -> pd.DataFrame:
@@ -39,7 +88,18 @@ class ObjectsManager(BaseManager):
         Returns:
             DataFrame: A pandas DataFrame containing all dynamic updates to object attributes.
         """
-        return self._ocel.ocel.object_changes
+        return self._changes_df.to_pandas()
+
+    @changes.setter
+    def changes(self, value: pd.DataFrame) -> None:
+        """Replace the object_changes table, converting it back to polars internally."""
+        self._changes_df = pl.from_pandas(value)
+        self.cache.clear()
+
+    @property
+    def changes_pl(self) -> pl.DataFrame:
+        """Return the object_changes table as a polars DataFrame (the internal representation)."""
+        return self._changes_df
 
     @property
     @instance_lru_cache()
