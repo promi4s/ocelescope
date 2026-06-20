@@ -49,7 +49,9 @@ def getOcels(
     session: ApiSession, extension_name: Optional[str] = None
 ) -> list[OcelMetadata]:
     return [
-        OcelMetadata.from_ocel(value.ocel)
+        OcelMetadata.from_ocel(
+            value.ocel, filter_applied=len(value._applied_filter) > 0
+        )
         for value in session.ocels.values()
         if extension_name is None
         or extension_name
@@ -119,8 +121,11 @@ def get_extension_meta() -> dict[str, OCELExtensionDescription]:
 @ocels_router.get(
     "/{ocel_id}", summary="Get general information about a OCEL", operation_id="getOcel"
 )
-def get_ocel(ocel: ApiOcel) -> OcelMetadata:
-    return OcelMetadata.from_ocel(ocel)
+def get_ocel(ocel: ApiOcel, session: ApiSession) -> OcelMetadata:
+
+    return OcelMetadata.from_ocel(
+        ocel,
+    )
 
 
 @ocels_router.post(
