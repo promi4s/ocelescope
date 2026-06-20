@@ -161,6 +161,7 @@ def get_aggr_object_attributes(
     page_size: Annotated[int, Query()] = 10,
     entity_type: Annotated[Literal["events", "objects"], Query()] = "events",
     attribute_names: Annotated[list[str] | None, Query()] = None,
+    entity_names: Annotated[list[str] | None, Query()] = None,
 ) -> PaginatedResponse[list[AggregatedAttribute]]:
     attribute_names = (
         (
@@ -173,8 +174,8 @@ def get_aggr_object_attributes(
     )
 
     attribute_summary = ocel.attributes.get_aggr_summary(
-        activities=[] if entity_type == "objects" else None,
-        object_types=[] if entity_type == "events" else None,
+        activities=[] if entity_type == "objects" else entity_names,
+        object_types=[] if entity_type == "events" else entity_names,
         attributes=attribute_names[(page - 1) * page_size : page * page_size],
     )
 
@@ -219,6 +220,14 @@ def get_object_attributes(
 
 
 @ocels_router.get(
+    "/{ocel_id}/objects/types",
+    operation_id="objectTypes",
+)
+def get_object_types(ocel: ApiOcel) -> list[str]:
+    return ocel.objects.types
+
+
+@ocels_router.get(
     "/{ocel_id}/events/attributes",
     response_model=list[TypedAttribute],
     operation_id="eventAttributes",
@@ -242,6 +251,16 @@ def get_event_counts(
     ocel: ApiOcel,
 ) -> dict[str, int]:
     return ocel.events.activity_counts.to_dict()
+
+
+@ocels_router.get(
+    "/{ocel_id}/events/activityNames",
+    operation_id="Activities",
+)
+def get_activities(
+    ocel: ApiOcel,
+) -> list[str]:
+    return ocel.events.activities
 
 
 @ocels_router.get(
