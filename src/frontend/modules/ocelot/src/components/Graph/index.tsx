@@ -109,6 +109,23 @@ const InnerFlow: React.FC<Props> = ({
     }),
   );
 
+  useEffect(() => {
+    setNodes((prev) => {
+      const prevById = new Map(prev.map((node) => [node.id, node]));
+      return initialNodes.map((node) => {
+        const existing = prevById.get(node.id);
+        if (existing) {
+          return { ...existing, data: node.data };
+        }
+        return {
+          ...node,
+          type: node.data.type,
+          position: { x: 0, y: 0 },
+        };
+      });
+    });
+  }, [initialNodes]);
+
   const onNodesChange = useCallback(
     (changes: NodeChange[]) => {
       const positionChange = changes.filter(
