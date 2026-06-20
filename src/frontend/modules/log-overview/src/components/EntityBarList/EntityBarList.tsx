@@ -1,4 +1,4 @@
-import { Table, Text } from "@mantine/core";
+import { Table } from "@mantine/core";
 import { useEventCounts, useObjectCounts } from "@ocelescope/api-base";
 import { useMemo } from "react";
 import styles from "./EntityBarList.module.css";
@@ -18,17 +18,15 @@ export const EntityBarList: React.FC<{
 
   return (
     <Table variant="vertical" layout="fixed" withTableBorder>
-      <Table.Thead>
+      <Table.Thead className={styles.head}>
         <Table.Tr>
           <Table.Th>
-            <Text size={"md"} fw={500}>
-              {type === "events" ? "Actitivty" : "Object type"}
-            </Text>
+            <span className={styles.headLabel}>
+              {type === "events" ? "Activity" : "Object type"}
+            </span>
           </Table.Th>
           <Table.Th>
-            <Text size={"md"} fw={500}>
-              Frequency
-            </Text>
+            <span className={styles.headLabel}>Frequency</span>
           </Table.Th>
         </Table.Tr>
       </Table.Thead>
