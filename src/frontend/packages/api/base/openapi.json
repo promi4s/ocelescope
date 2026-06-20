@@ -1408,10 +1408,7 @@
                   "enum": [
                     "source",
                     "target",
-                    "qualifier",
-                    "min",
-                    "max",
-                    "sum"
+                    "qualifier"
                   ],
                   "type": "string"
                 },
@@ -1621,10 +1618,7 @@
                   "enum": [
                     "source",
                     "target",
-                    "qualifier",
-                    "min",
-                    "max",
-                    "sum"
+                    "qualifier"
                   ],
                   "type": "string"
                 },

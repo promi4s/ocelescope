@@ -30,6 +30,10 @@ from ocelescope_backend.app.internal.ocel.default_ocel import (
 from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.registry.extension import OCELExtensionDescription
 from ocelescope_backend.app.internal.util.pandas import search_paginated_dataframe
+from ocelescope_backend.app.internal.util.relations import (
+    RelationSortField,
+    relation_summary,
+)
 
 ocels_router = APIRouter(prefix="/ocels", tags=["ocels"])
 
@@ -339,45 +343,6 @@ def get_object_counts(
     return ocel.objects.counts.to_dict()
 
 
-RelationSortField = Literal["source", "target", "qualifier", "min", "max", "sum"]
-
-_RELATION_SORT_LEVELS = {"source": 0, "target": 1, "qualifier": 2}
-_RELATION_SORT_COLUMNS = {"min": "min", "max": "max", "sum": "sum"}
-
-
-def _paginate_relation_summary(
-    summary: pd.DataFrame,
-    sort_by: RelationSortField | None,
-    order: Literal["asc", "desc"],
-    page: int | None,
-    page_size: int | None,
-) -> PaginatedResponse[list[RelationCountSummary]]:
-    total_items = len(summary)
-    ascending = order == "asc"
-
-    if sort_by in _RELATION_SORT_COLUMNS:
-        summary = summary.sort_values(
-            _RELATION_SORT_COLUMNS[sort_by], ascending=ascending
-        )
-    elif sort_by in _RELATION_SORT_LEVELS:
-        summary = summary.sort_index(
-            level=_RELATION_SORT_LEVELS[sort_by], ascending=ascending
-        )
-
-    effective_page = page or 1
-    effective_page_size = page_size or total_items or 1
-
-    start = (effective_page - 1) * effective_page_size
-    summary = summary.iloc[start : start + effective_page_size]
-
-    return PaginatedResponse(
-        response=RelationCountSummary.from_summary(summary),
-        page=effective_page,
-        page_size=effective_page_size,
-        total_items=total_items,
-    )
-
-
 @ocels_router.get(
     "/{ocel_id}/relations/e2o",
     operation_id="e2o",
@@ -393,18 +358,17 @@ def get_e2o(
     page: Annotated[int | None, Query(ge=1)] = None,
     page_size: Annotated[int | None, Query(ge=1)] = None,
 ) -> PaginatedResponse[list[RelationCountSummary]]:
-    filter_df = None
-    if source_types or target_types or qualifiers:
-        filter_df = ocel.e2o.combinations(
-            direction,
-            tuple(source_types or ()),
-            tuple(target_types or ()),
-            tuple(qualifiers or ()),
-        )
-
-    summary = ocel.e2o.summary(direction=direction, filter_df=filter_df)
-
-    return _paginate_relation_summary(summary, sort_by, order, page, page_size)
+    return relation_summary(
+        ocel.e2o,
+        direction,
+        source_types,
+        target_types,
+        qualifiers,
+        sort_by,
+        order,
+        page,
+        page_size,
+    )
 
 
 @ocels_router.get(
@@ -422,18 +386,17 @@ def get_object_relations(
     page: Annotated[int | None, Query(ge=1)] = None,
     page_size: Annotated[int | None, Query(ge=1)] = None,
 ) -> PaginatedResponse[list[RelationCountSummary]]:
-    filter_df = None
-    if source_types or target_types or qualifiers:
-        filter_df = ocel.o2o.combinations(
-            direction,
-            tuple(source_types or ()),
-            tuple(target_types or ()),
-            tuple(qualifiers or ()),
-        )
-
-    summary = ocel.o2o.summary(direction=direction, filter_df=filter_df)
-
-    return _paginate_relation_summary(summary, sort_by, order, page, page_size)
+    return relation_summary(
+        ocel.o2o,
+        direction,
+        source_types,
+        target_types,
+        qualifiers,
+        sort_by,
+        order,
+        page,
+        page_size,
+    )
 
 
 @ocels_router.get("/{ocel_id}/events/ids", operation_id="eventIds")
