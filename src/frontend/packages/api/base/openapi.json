@@ -4080,6 +4080,17 @@
             },
             "type": "array",
             "title": "Extensions"
+          },
+          "filter_applied": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filter Applied"
           }
         },
         "type": "object",
@@ -4087,7 +4098,8 @@
           "id",
           "name",
           "created_at",
-          "extensions"
+          "extensions",
+          "filter_applied"
         ],
         "title": "OcelMetadata"
       },

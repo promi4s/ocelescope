@@ -7,6 +7,7 @@ import {
   MenuItem,
   TextInput,
   Title,
+  Tooltip,
 } from "@mantine/core";
 import { generateColor } from "@marko19907/string-to-color";
 import {
@@ -32,6 +33,7 @@ import {
   DownloadIcon,
   EllipsisVerticalIcon,
   EyeIcon,
+  FilterIcon,
   PencilIcon,
   TrashIcon,
   XIcon,
@@ -49,6 +51,7 @@ type Entity = {
   name: string;
   createdAt: string;
   downloadFormats?: string[];
+  isFiltered?: boolean;
   isUploading?: boolean;
 };
 
@@ -124,13 +127,14 @@ const ResourceManagementTable: React.FC = () => {
 
   const entities: Entity[] = useMemo(() => {
     const ocelEntities = ocels.map<Entity>(
-      ({ name, created_at, id, extensions }) => ({
+      ({ name, created_at, id, extensions, filter_applied }) => ({
         id,
         name,
         type: "ocel" as const,
         entityTypes: extensions.map(({ label }) => label),
         createdAt: formatDateTime(created_at),
         downloadFormats: [".xml", ".json", ".sqlite"],
+        isFiltered: !!filter_applied,
       }),
     );
 
@@ -178,7 +182,7 @@ const ResourceManagementTable: React.FC = () => {
           columns={[
             {
               accessor: "name",
-              render: ({ id, type, name }) => (
+              render: ({ id, type, name, isFiltered }) => (
                 <>
                   {renamedEntity?.id === id ? (
                     <Group>
@@ -215,7 +219,17 @@ const ResourceManagementTable: React.FC = () => {
                       </Group>
                     </Group>
                   ) : (
-                    name
+                    <Group gap={6} wrap="nowrap">
+                      {name}
+                      {isFiltered && (
+                        <Tooltip label="This log has been filtered">
+                          <FilterIcon
+                            size={14}
+                            color="var(--mantine-color-blue-6)"
+                          />
+                        </Tooltip>
+                      )}
+                    </Group>
                   )}
                 </>
               ),
