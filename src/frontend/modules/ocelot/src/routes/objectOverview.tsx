@@ -73,15 +73,17 @@ const ObjectGraph = () => {
         <Graph
           key={ocelId}
           initialNodes={nodes}
-          initialEdges={o2o.map(({ source, target, sum, qualifier }) => ({
-            source,
-            target,
-            markerEnd: { type: MarkerType.ArrowClosed },
-            style: {
-              strokeWidth: "2px",
-            },
-            data: { mid: `${qualifier} (${sum})` },
-          }))}
+          initialEdges={o2o.response.map(
+            ({ source, target, sum, qualifier }) => ({
+              source,
+              target,
+              markerEnd: { type: MarkerType.ArrowClosed },
+              style: {
+                strokeWidth: "2px",
+              },
+              data: { mid: `${qualifier} (${sum})` },
+            }),
+          )}
           layoutOptions={{
             type: "elk",
             options: {
@@ -97,7 +99,7 @@ const ObjectGraph = () => {
         <EntityOverview
           entityCounts={objectCounts}
           attributes={objectAttributes}
-          relations={o2o ?? []}
+          relations={o2o?.response ?? []}
           search={searchValue}
         />
       )}
