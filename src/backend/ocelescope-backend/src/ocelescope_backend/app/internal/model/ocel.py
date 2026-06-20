@@ -17,9 +17,10 @@ class OcelMetadata(BaseModel):
     name: str
     created_at: str
     extensions: list[OCELExtensionDescription]
+    filter_applied: bool | None
 
     @classmethod
-    def from_ocel(cls, ocel: OCEL):
+    def from_ocel(cls, ocel: OCEL, filter_applied: bool | None = None):
         extension_descriptions = registry_manager.get_extension_descriptions()
 
         return cls(
@@ -31,6 +32,7 @@ class OcelMetadata(BaseModel):
                 for extension in ocel.extensions.all()
                 if extension.__class__.__name__ in extension_descriptions
             ],
+            filter_applied=filter_applied,
         )
 
 
