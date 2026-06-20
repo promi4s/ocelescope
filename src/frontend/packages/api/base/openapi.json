@@ -731,6 +731,25 @@
             }
           },
           {
+            "name": "names",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Names"
+            }
+          },
+          {
             "name": "ocel_version",
             "in": "query",
             "required": false,
@@ -889,6 +908,25 @@
               },
               "default": [],
               "title": "Attribute Names"
+            }
+          },
+          {
+            "name": "names",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Names"
             }
           },
           {

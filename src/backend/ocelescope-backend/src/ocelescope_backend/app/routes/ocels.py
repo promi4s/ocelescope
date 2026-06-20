@@ -210,11 +210,14 @@ def get_attribute_names(
     operation_id="objectAttributes",
 )
 def get_object_attributes(
-    ocel: ApiOcel, attribute_names: Annotated[list[str], Query()] = []
+    ocel: ApiOcel,
+    attribute_names: Annotated[list[str], Query()] = [],
+    names: Annotated[list[str] | None, Query()] = None,
 ):
     return TypedAttribute.from_df(
         ocel.attributes.get_object_summary(
-            attributes=None if len(attribute_names) == 0 else attribute_names
+            attributes=None if len(attribute_names) == 0 else attribute_names,
+            object_types=names,
         )
     )
 
@@ -233,11 +236,14 @@ def get_object_types(ocel: ApiOcel) -> list[str]:
     operation_id="eventAttributes",
 )
 def get_event_attributes(
-    ocel: ApiOcel, attribute_names: Annotated[list[str], Query()] = []
+    ocel: ApiOcel,
+    attribute_names: Annotated[list[str], Query()] = [],
+    names: Annotated[list[str] | None, Query()] = None,
 ):
     return TypedAttribute.from_df(
         ocel.attributes.get_activity_summary(
-            attributes=None if len(attribute_names) == 0 else attribute_names
+            attributes=None if len(attribute_names) == 0 else attribute_names,
+            activities=names,
         )
     )
 

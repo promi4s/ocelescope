@@ -2,10 +2,12 @@ import { MultiSelect, ThemeIcon } from "@mantine/core";
 import {
   type AggregatedAttribute,
   type TypedAttribute,
+  useActivities,
   useAggregatedAttributes,
   useAttributeNames,
   useEventAttributes,
   useObjectAttributes,
+  useObjectTypes,
 } from "@ocelescope/api-base";
 import { keepPreviousData } from "@tanstack/react-query";
 import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
@@ -28,10 +30,17 @@ const SubAttributeTable: React.FC<{
   ocelId: string;
   attributeName: string;
   entityType?: "events" | "objects";
+  entityNames?: string[];
   hideRange?: boolean;
   hideValues?: boolean;
   extraColumns?: DataTableColumn<TypedAttribute>[];
-}> = ({ ocelId, entityType = "objects", attributeName, extraColumns = [] }) => {
+}> = ({
+  ocelId,
+  entityType = "objects",
+  attributeName,
+  entityNames,
+  extraColumns = [],
+}) => {
   const isEvent = entityType === "events";
 
   const { data, isFetching } = (
@@ -40,6 +49,7 @@ const SubAttributeTable: React.FC<{
     ocelId,
     {
       attribute_names: [attributeName],
+      names: entityNames,
     },
     { query: { placeholderData: keepPreviousData } },
   );
@@ -121,14 +131,24 @@ const AttributesTable: React.FC<{
 
   const [filteredAttributes, setFilteredAttributes] = useState<string[]>([]);
 
+  const { data: entityNames } = (isEvent ? useActivities : useObjectTypes)(
+    ocelId,
+  );
+
+  const [filteredEntityNames, setFilteredEntityNames] = useState<string[]>([]);
+
   const { data, isFetching } = useAggregatedAttributes(
     ocelId,
     {
       entity_type: entityType,
       page: currentPage,
       page_size: PAGE_SIZE,
-      attribute_names:
-        filteredAttributes.length > 0 ? filteredAttributes : undefined,
+      ...(filteredAttributes.length > 0 && {
+        attribute_names: filteredAttributes,
+      }),
+      ...(filteredEntityNames.length > 0 && {
+        entity_names: filteredEntityNames,
+      }),
     },
     { query: { placeholderData: keepPreviousData } },
   );
@@ -176,6 +196,7 @@ const AttributesTable: React.FC<{
               searchable
             />
           ),
+          filtering: filteredAttributes.length > 0,
         },
         {
           accessor: "entityTypeField",
@@ -183,6 +204,17 @@ const AttributesTable: React.FC<{
           width: COLUMN_WIDTHS.entityType,
           render: ({ entity_type_names }) =>
             `${entity_type_names.slice(0, 2).join(", ")}${entity_type_names.length > 3 ? `, ... (${entity_type_names.length} total)` : ""}`,
+          filter: () => (
+            <MultiSelect
+              data={entityNames}
+              value={filteredEntityNames}
+              onChange={(newSelection) => setFilteredEntityNames(newSelection)}
+              comboboxProps={{ withinPortal: false }}
+              clearable
+              searchable
+            />
+          ),
+          filtering: filteredEntityNames.length > 0,
         },
         {
           accessor: "type",
@@ -206,6 +238,8 @@ const AttributesTable: React.FC<{
       ] satisfies DataTableColumn<AggregatedAttribute>[],
     [
       data,
+      entityNames,
+      filteredEntityNames,
       selectedAttributes,
       filteredAttributes,
       attributeNames,
@@ -243,6 +277,9 @@ const AttributesTable: React.FC<{
             extraColumns={subTableExtraColumns}
             hideRange={hideRange}
             hideValues={hideValues}
+            {...(filteredEntityNames.length > 0 && {
+              entityNames: filteredEntityNames,
+            })}
           />
         ),
       }}
