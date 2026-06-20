@@ -16,17 +16,31 @@ export const EntityBarList: React.FC<{
 
   const max = useMemo(() => Math.max(...Object.values(counts)), [counts]);
 
+  const typeCount = Object.keys(counts).length;
+  const totalFrequency = useMemo(
+    () => Object.values(counts).reduce((sum, count) => sum + count, 0),
+    [counts],
+  );
+
   return (
     <Table variant="vertical" layout="fixed" withTableBorder>
       <Table.Thead className={styles.head}>
         <Table.Tr>
           <Table.Th>
             <span className={styles.headLabel}>
-              {type === "events" ? "Activity" : "Object type"}
+              {type === "events" ? "Activity" : "Object type"}{" "}
+              <span className={styles.headCount}>
+                ({typeCount.toLocaleString()})
+              </span>
             </span>
           </Table.Th>
           <Table.Th>
-            <span className={styles.headLabel}>Frequency</span>
+            <span className={styles.headLabel}>
+              Frequency{" "}
+              <span className={styles.headCount}>
+                ({totalFrequency.toLocaleString()})
+              </span>
+            </span>
           </Table.Th>
         </Table.Tr>
       </Table.Thead>

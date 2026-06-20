@@ -5,11 +5,18 @@
 }
 
 .headLabel {
+  display: block;
   font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--mantine-color-dimmed);
+}
+
+.headCount {
+  color: var(--mantine-color-blue-4);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
 .barCell {
