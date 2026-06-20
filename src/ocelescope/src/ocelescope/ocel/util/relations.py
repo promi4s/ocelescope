@@ -2,8 +2,6 @@ from typing import Literal, cast
 
 import pandas as pd
 
-from ocelescope.ocel.models.relations import RelationCountSummary
-
 SUMMARY_DIRECTION = Literal["source", "target"]
 
 
@@ -112,29 +110,3 @@ def get_relation_combination(
             + ([qualifier_field] if qualifier_field is not None else [])
         ].drop_duplicates(),
     )
-
-
-def to_relation_count_summaries(summary: pd.DataFrame) -> list[RelationCountSummary]:
-    """
-    Convert a :func:`summarize_relation` result into ``RelationCountSummary`` models.
-
-    The summary is read positionally from its index: level 0 is the source type,
-    level 1 the target type, and level 2 (if present) the qualifier.
-    """
-    has_qualifier = summary.index.nlevels >= 3
-
-    summaries: list[RelationCountSummary] = []
-    for index, row in summary.iterrows():
-        key = cast("tuple[str, ...]", index if isinstance(index, tuple) else (index,))
-        summaries.append(
-            RelationCountSummary(
-                source=cast(str, key[0]),
-                target=cast(str, key[1]),
-                qualifier=cast(str, key[2]) if has_qualifier else "",
-                min_count=cast(int, row["min"]),
-                max_count=cast(int, row["max"]),
-                sum=cast(int, row["sum"]),
-            )
-        )
-
-    return summaries

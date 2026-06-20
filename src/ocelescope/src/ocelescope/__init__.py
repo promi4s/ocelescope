@@ -12,7 +12,6 @@ from ocelescope.ocel import (
     ObjectTypeFilter,
     ObjectTypeFrequencyFilter,
     OCELExtension,
-    RelationCountSummary,
     TimeFrameFilter,
 )
 from ocelescope.plugin import (
@@ -57,7 +56,6 @@ __all__ = [
     "ObjectTypeFilter",
     "ObjectTypeFrequencyFilter",
     "TimeFrameFilter",
-    "RelationCountSummary",
     "Visualization",
     "PetriNet",
     "DirectlyFollowsGraph",

@@ -1342,6 +1342,135 @@
             }
           },
           {
+            "name": "source_types",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Source Types"
+            }
+          },
+          {
+            "name": "target_types",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Target Types"
+            }
+          },
+          {
+            "name": "qualifiers",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Qualifiers"
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "source",
+                    "target",
+                    "qualifier",
+                    "min",
+                    "max",
+                    "sum"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sort By"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "type": "string",
+              "default": "asc",
+              "title": "Order"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Page"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Page Size"
+            }
+          },
+          {
             "name": "ocel_version",
             "in": "query",
             "required": false,
@@ -1369,11 +1498,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/RelationCountSummary"
-                  },
-                  "title": "Response E2O"
+                  "$ref": "#/components/schemas/PaginatedResponse_list_RelationCountSummary__"
                 }
               }
             }
@@ -1430,6 +1555,135 @@
             }
           },
           {
+            "name": "source_types",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Source Types"
+            }
+          },
+          {
+            "name": "target_types",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Target Types"
+            }
+          },
+          {
+            "name": "qualifiers",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Qualifiers"
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "source",
+                    "target",
+                    "qualifier",
+                    "min",
+                    "max",
+                    "sum"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sort By"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "type": "string",
+              "default": "asc",
+              "title": "Order"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Page"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Page Size"
+            }
+          },
+          {
             "name": "ocel_version",
             "in": "query",
             "required": false,
@@ -1457,11 +1711,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/RelationCountSummary"
-                  },
-                  "title": "Response O2O"
+                  "$ref": "#/components/schemas/PaginatedResponse_list_RelationCountSummary__"
                 }
               }
             }
@@ -4140,6 +4390,43 @@
         ],
         "title": "PaginatedResponse[list[AggregatedAttribute]]"
       },
+      "PaginatedResponse_list_RelationCountSummary__": {
+        "properties": {
+          "response": {
+            "items": {
+              "$ref": "#/components/schemas/RelationCountSummary"
+            },
+            "type": "array",
+            "title": "Response"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "page_size": {
+            "type": "integer",
+            "title": "Page Size"
+          },
+          "total_items": {
+            "type": "integer",
+            "title": "Total Items"
+          },
+          "total_pages": {
+            "type": "integer",
+            "title": "Total Pages",
+            "readOnly": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "response",
+          "page",
+          "page_size",
+          "total_items",
+          "total_pages"
+        ],
+        "title": "PaginatedResponse[list[RelationCountSummary]]"
+      },
       "PaginatedResponse_list_str__": {
         "properties": {
           "response": {
@@ -4513,7 +4800,7 @@
           "sum"
         ],
         "title": "RelationCountSummary",
-        "description": "Summary statistics for relationship multiplicities in O2O or E2O relations.\n\nThis structure captures how many related objects (or events) occur for each\ncombination of source type, target type, and qualifier. It is typically used\nin relation summaries such as those produced by O2OManager.summary or\nE2OManager.summary.\n\nAttributes:\n    qualifier (str):\n        The relation qualifier (e.g., role, relationship type) used in the\n        OCEL relation. For O2O this is often empty; for E2O this may describe\n        the nature of the event–object link.\n    source (str):\n        The source object or event type associated with the relation.\n    target (str):\n        The target object or event type associated with the relation.\n    min_count (int):\n        The minimum number of related items observed for any source instance.\n    max_count (int):\n        The maximum number of related items observed for any source instance.\n    sum (int):\n        The total number of relation occurrences across all instances."
+        "description": "Summary statistics for relationship multiplicities in O2O or E2O relations.\n\nCaptures, for each combination of source type, target type and qualifier,\nhow many related items occur per source instance.\n\nAttributes:\n    qualifier: The relation qualifier (empty string when none applies).\n    source: The source object or event type.\n    target: The target object or event type.\n    min_count: The minimum number of related items for any source instance.\n    max_count: The maximum number of related items for any source instance.\n    sum: The total number of relation occurrences across all instances."
       },
       "Resource": {
         "properties": {
