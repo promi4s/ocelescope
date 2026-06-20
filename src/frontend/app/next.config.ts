@@ -17,6 +17,8 @@ const nextConfig: NextConfig = {
     "@ocelescope/api-client",
     "@ocelescope/filter",
     "@ocelescope/discovery",
+    "@ocelescope/log-overview",
+    "@ocelescope/management",
   ],
   rewrites: async () => {
     return [

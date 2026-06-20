@@ -48,7 +48,6 @@ ocels_router = APIRouter(prefix="/ocels", tags=["ocels"])
 def getOcels(
     session: ApiSession, extension_name: Optional[str] = None
 ) -> list[OcelMetadata]:
-
     return [
         OcelMetadata.from_ocel(value.ocel)
         for value in session.ocels.values()
@@ -154,11 +153,55 @@ def rename_ocel(ocel: ApiOcel, new_name: str):
 # region Info
 @ocels_router.get(
     "/{ocel_id}/attributes",
-    response_model=list[AggregatedAttribute],
     operation_id="AggregatedAttributes",
 )
-def get_aggr_attributes(ocel: ApiOcel):
-    return AggregatedAttribute.from_df(ocel.attributes.get_aggr_summary())
+def get_aggr_object_attributes(
+    ocel: ApiOcel,
+    page: Annotated[int, Query(ge=1)] = 1,
+    page_size: Annotated[int, Query()] = 10,
+    entity_type: Annotated[Literal["events", "objects"], Query()] = "events",
+    attribute_names: Annotated[list[str] | None, Query()] = None,
+    entity_names: Annotated[list[str] | None, Query()] = None,
+) -> PaginatedResponse[list[AggregatedAttribute]]:
+    attribute_names = (
+        (
+            ocel.events.attribute_names
+            if entity_type == "events"
+            else ocel.objects.attribute_names
+        )
+        if attribute_names is None
+        else sorted(attribute_names)
+    )
+
+    attribute_summary = ocel.attributes.get_aggr_summary(
+        activities=[] if entity_type == "objects" else entity_names,
+        object_types=[] if entity_type == "events" else entity_names,
+        attributes=attribute_names[(page - 1) * page_size : page * page_size],
+    )
+
+    return PaginatedResponse(
+        page=page,
+        total_items=len(attribute_names),
+        response=AggregatedAttribute.from_df(attribute_summary),
+        page_size=page_size,
+    )
+
+
+@ocels_router.get("/{ocel_id}/attribute/names", operation_id="AttributeNames")
+def get_attribute_names(
+    ocel: ApiOcel,
+    entity_type: Annotated[Literal["events", "objects"] | None, Query()] = None,
+) -> list[str]:
+
+    attribute_names = []
+
+    if entity_type != "events":
+        attribute_names += ocel.objects.attribute_names
+
+    if entity_type != "objects":
+        attribute_names += ocel.events.attribute_names
+
+    return attribute_names
 
 
 @ocels_router.get(
@@ -167,13 +210,24 @@ def get_aggr_attributes(ocel: ApiOcel):
     operation_id="objectAttributes",
 )
 def get_object_attributes(
-    ocel: ApiOcel, attribute_names: Annotated[list[str], Query()] = []
+    ocel: ApiOcel,
+    attribute_names: Annotated[list[str], Query()] = [],
+    names: Annotated[list[str] | None, Query()] = None,
 ):
     return TypedAttribute.from_df(
         ocel.attributes.get_object_summary(
-            attributes=None if len(attribute_names) == 0 else attribute_names
+            attributes=None if len(attribute_names) == 0 else attribute_names,
+            object_types=names,
         )
     )
+
+
+@ocels_router.get(
+    "/{ocel_id}/objects/types",
+    operation_id="objectTypes",
+)
+def get_object_types(ocel: ApiOcel) -> list[str]:
+    return ocel.objects.types
 
 
 @ocels_router.get(
@@ -182,11 +236,14 @@ def get_object_attributes(
     operation_id="eventAttributes",
 )
 def get_event_attributes(
-    ocel: ApiOcel, attribute_names: Annotated[list[str], Query()] = []
+    ocel: ApiOcel,
+    attribute_names: Annotated[list[str], Query()] = [],
+    names: Annotated[list[str] | None, Query()] = None,
 ):
     return TypedAttribute.from_df(
         ocel.attributes.get_activity_summary(
-            attributes=None if len(attribute_names) == 0 else attribute_names
+            attributes=None if len(attribute_names) == 0 else attribute_names,
+            activities=names,
         )
     )
 
@@ -200,6 +257,16 @@ def get_event_counts(
     ocel: ApiOcel,
 ) -> dict[str, int]:
     return ocel.events.activity_counts.to_dict()
+
+
+@ocels_router.get(
+    "/{ocel_id}/events/activityNames",
+    operation_id="Activities",
+)
+def get_activities(
+    ocel: ApiOcel,
+) -> list[str]:
+    return ocel.events.activities
 
 
 @ocels_router.get(

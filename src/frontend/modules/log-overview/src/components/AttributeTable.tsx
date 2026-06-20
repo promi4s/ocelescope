@@ -1,252 +1,287 @@
-import { Group, Radio, ThemeIcon, Tooltip } from "@mantine/core";
+import { MultiSelect, ThemeIcon } from "@mantine/core";
 import {
   type AggregatedAttribute,
   type TypedAttribute,
+  useActivities,
   useAggregatedAttributes,
+  useAttributeNames,
   useEventAttributes,
   useObjectAttributes,
+  useObjectTypes,
 } from "@ocelescope/api-base";
-import {
-  BoxIcon,
-  Calendar1Icon,
-  ChevronDown,
-  ChevronRight,
-} from "lucide-react";
-import {
-  DataTable,
-  type DataTableColumn,
-  type DataTableRowClickHandler,
-} from "mantine-datatable";
-import { useCallback, useMemo, useState } from "react";
+import { keepPreviousData } from "@tanstack/react-query";
+import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
+import { DataTable, type DataTableColumn } from "mantine-datatable";
+import { useMemo, useState } from "react";
 import { formatAttributeValue } from "../util/attributes";
 
-const entityMap = {
-  activity: Calendar1Icon,
-  object: BoxIcon,
+const PAGE_SIZE = 10;
+
+const COLUMN_WIDTHS = {
+  selector: 30,
+  name: 200,
+  entityType: 200,
+  type: 100,
+  range: 200,
+  distinctValues: 120,
 };
 
-type Attribute =
-  | (AggregatedAttribute & { discriminator: "aggr" })
-  | (TypedAttribute & { discriminator: "activity" | "object" });
-
-export const isAggregatedAttribute = (
-  attribute: Attribute,
-): attribute is AggregatedAttribute & { discriminator: "aggr" } => {
-  return attribute.discriminator === "aggr";
-};
-
-const AttributesTable: React.FC<{
+const SubAttributeTable: React.FC<{
   ocelId: string;
-}> = ({ ocelId }) => {
-  const { data: attributes, isLoading: isAttributesLoading } =
-    useAggregatedAttributes(ocelId);
+  attributeName: string;
+  entityType?: "events" | "objects";
+  entityNames?: string[];
+  hideRange?: boolean;
+  hideValues?: boolean;
+  extraColumns?: DataTableColumn<TypedAttribute>[];
+}> = ({
+  ocelId,
+  entityType = "objects",
+  attributeName,
+  entityNames,
+  extraColumns = [],
+}) => {
+  const isEvent = entityType === "events";
 
-  const { data: objectAttributes, isLoading: isObjectAttributesLoading } =
-    useObjectAttributes(ocelId);
-  const { data: eventAttributes, isLoading: isActivityAttributesLoading } =
-    useEventAttributes(ocelId);
-
-  const [selection, setSelection] = useState<string[]>([]);
-
-  const [selectedEntityType, setSelectedEntityType] =
-    useState<Attribute["discriminator"]>("aggr");
-
-  const records = useMemo(() => {
-    if (!attributes || !objectAttributes || !eventAttributes) {
-      return [];
-    }
-
-    const filteredAggregatedAttributes = attributes
-      .map<Extract<Attribute, { discriminator: "aggr" }>>((attribute) => ({
-        ...attribute,
-        discriminator: "aggr",
-        object_types:
-          selectedEntityType === "activity" ? [] : attribute.object_types,
-        activities: selectedEntityType === "object" ? [] : attribute.activities,
-      }))
-      .filter(({ activities, object_types }) => {
-        const count =
-          (selectedEntityType === "object" ? 0 : activities.length) +
-          (selectedEntityType === "activity" ? 0 : object_types.length);
-
-        return count > 1;
-      });
-
-    const uniqueAttributes = attributes
-      .filter(
-        ({ name }) =>
-          !filteredAggregatedAttributes.some(
-            ({ name: filteredName }) => name === filteredName,
-          ),
-      )
-      .map(({ name }) => name);
-
-    const filteredObjectAttributes = (
-      selectedEntityType !== "activity" ? objectAttributes : []
-    )
-      .map<Attribute>((attribute) => ({
-        ...attribute,
-        discriminator: "object",
-      }))
-      .filter(
-        ({ name }) =>
-          uniqueAttributes.includes(name) || selection.includes(name),
-      );
-
-    const filteredActivityAttributes = (
-      selectedEntityType !== "object" ? eventAttributes : []
-    )
-      .map<Attribute>((attribute) => ({
-        ...attribute,
-        discriminator: "activity",
-      }))
-      .filter(
-        ({ name }) =>
-          uniqueAttributes.includes(name) || selection.includes(name),
-      );
-
-    return [
-      ...filteredAggregatedAttributes,
-      ...filteredObjectAttributes,
-      ...filteredActivityAttributes,
-    ].sort((attribute1, attribute2) => {
-      const byAttributeName = attribute1.name.localeCompare(attribute2.name);
-
-      if (byAttributeName !== 0) return byAttributeName;
-
-      if (
-        isAggregatedAttribute(attribute1) ||
-        isAggregatedAttribute(attribute2)
-      )
-        return isAggregatedAttribute(attribute1) ? -1 : 1;
-
-      return attribute1.entity_type.localeCompare(attribute2.entity_type);
-    });
-  }, [
-    attributes,
-    objectAttributes,
-    eventAttributes,
-    selection,
-    selectedEntityType,
-  ]);
-
-  const columns: DataTableColumn<Attribute>[] = useMemo(
-    () => [
-      {
-        accessor: "selector",
-        title: "",
-        render: (attribute) => {
-          const collapsible = isAggregatedAttribute(attribute)
-            ? attribute.object_types.length + attribute.activities.length > 1
-            : false;
-          return (
-            <>
-              {collapsible && (
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <ThemeIcon size={"xs"} variant="subtle">
-                    {selection.includes(attribute.name) ? (
-                      <ChevronDown />
-                    ) : (
-                      <ChevronRight />
-                    )}
-                  </ThemeIcon>
-                </div>
-              )}
-            </>
-          );
-        },
-      },
-      {
-        accessor: "name",
-        title: "Attribute Name",
-      },
-      { accessor: "type", title: "Attribute Type" },
-      {
-        accessor: "entityTypeField",
-        title: "Type",
-        render: (attribute) => {
-          if (isAggregatedAttribute(attribute)) {
-            return [
-              ...(attribute.activities.length > 0
-                ? [`${attribute.activities.length} Activities`]
-                : []),
-              ...(attribute.object_types.length > 0
-                ? [`${attribute.object_types.length} Object Types`]
-                : []),
-            ].join(", ");
-          }
-
-          const Icon = entityMap[attribute.discriminator];
-
-          return (
-            <Group>
-              <Tooltip label={attribute.discriminator}>
-                <ThemeIcon size={"xs"} variant="subtle">
-                  <Icon />
-                </ThemeIcon>
-              </Tooltip>
-              {attribute.entity_type}
-            </Group>
-          );
-        },
-        filter: () => (
-          <Radio.Group
-            value={selectedEntityType}
-            label="Visible Types"
-            onChange={(newValue) =>
-              setSelectedEntityType(newValue as Attribute["discriminator"])
-            }
-          >
-            <Group mt="xs">
-              <Radio value={"aggr"} label="All" />
-              <Radio value={"activity"} label="Events" />
-              <Radio value={"object"} label="Objects" />
-            </Group>
-          </Radio.Group>
-        ),
-        filtering: selectedEntityType !== "aggr",
-      },
-      {
-        accessor: "range",
-        render: ({ type, min, max }) =>
-          `${formatAttributeValue(type, min)} - ${formatAttributeValue(type, max)}`,
-      },
-      { accessor: "distinct_values", title: "Values" },
-    ],
-    [selection, setSelectedEntityType],
+  const { data, isFetching } = (
+    isEvent ? useEventAttributes : useObjectAttributes
+  )(
+    ocelId,
+    {
+      attribute_names: [attributeName],
+      names: entityNames,
+    },
+    { query: { placeholderData: keepPreviousData } },
   );
 
-  const onRowClick: DataTableRowClickHandler<Attribute> = useCallback(
-    ({ record }) => {
-      if (isAggregatedAttribute(record)) {
-        setSelection((prev) =>
-          prev.includes(record.name)
-            ? prev.filter((attrName) => attrName !== record.name)
-            : [...prev, record.name],
-        );
-      }
-    },
-    [setSelection],
+  const columns: DataTableColumn<TypedAttribute>[] = useMemo(
+    () =>
+      [
+        {
+          accessor: "selector",
+          title: "",
+          width: COLUMN_WIDTHS.selector,
+        },
+        {
+          accessor: "",
+          title: "Attribute Name",
+          width: COLUMN_WIDTHS.name,
+        },
+        {
+          accessor: "entity_type",
+          title: isEvent ? "Activity" : "Object Type",
+          width: COLUMN_WIDTHS.entityType,
+        },
+        {
+          accessor: "type",
+          title: "Attribute Type",
+          width: COLUMN_WIDTHS.type,
+          noWrap: true,
+        },
+        {
+          accessor: "range",
+          width: COLUMN_WIDTHS.range,
+          render: ({ type, min, max }) =>
+            `${formatAttributeValue(type, min)} - ${formatAttributeValue(type, max)}`,
+        },
+        {
+          accessor: "distinct_values",
+          title: "Values",
+          width: COLUMN_WIDTHS.distinctValues,
+        },
+        ...extraColumns,
+      ] satisfies DataTableColumn<TypedAttribute>[],
+    [data, extraColumns],
   );
 
   return (
     <DataTable
-      minHeight={150}
+      noHeader
+      idAccessor={"entity_type"}
+      records={data ?? []}
       columns={columns}
-      records={records}
-      highlightOnHover
-      onRowClick={onRowClick}
-      fetching={
-        isActivityAttributesLoading ||
-        isObjectAttributesLoading ||
-        isAttributesLoading
-      }
+      fetching={isFetching}
+      backgroundColor={{ light: "gray.0", dark: "dark.6" }}
+    />
+  );
+};
+
+const AttributesTable: React.FC<{
+  ocelId: string;
+  entityType?: "events" | "objects";
+  extraColumns?: DataTableColumn<AggregatedAttribute>[];
+  subTableExtraColumns?: DataTableColumn<TypedAttribute>[];
+  hideRange?: boolean;
+  hideValues?: boolean;
+}> = ({
+  ocelId,
+  entityType = "objects",
+  extraColumns = [],
+  hideRange = false,
+  hideValues = false,
+  subTableExtraColumns,
+}) => {
+  const isEvent = entityType === "events";
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const { data: attributeNames } = useAttributeNames(ocelId, {
+    entity_type: entityType,
+  });
+
+  const [filteredAttributes, setFilteredAttributes] = useState<string[]>([]);
+
+  const { data: entityNames } = (isEvent ? useActivities : useObjectTypes)(
+    ocelId,
+  );
+
+  const [filteredEntityNames, setFilteredEntityNames] = useState<string[]>([]);
+
+  const { data, isFetching } = useAggregatedAttributes(
+    ocelId,
+    {
+      entity_type: entityType,
+      page: currentPage,
+      page_size: PAGE_SIZE,
+      ...(filteredAttributes.length > 0 && {
+        attribute_names: filteredAttributes,
+      }),
+      ...(filteredEntityNames.length > 0 && {
+        entity_names: filteredEntityNames,
+      }),
+    },
+    { query: { placeholderData: keepPreviousData } },
+  );
+  const [selectedAttributes, setSelectedAttributes] = useState<string[]>([]);
+
+  const columns: DataTableColumn<AggregatedAttribute>[] = useMemo(
+    () =>
+      [
+        {
+          accessor: "selector",
+          title: "",
+          textAlign: "center",
+          render: ({ entity_type_names, name }) => {
+            if (entity_type_names.length === 1) {
+              return null;
+            }
+            return (
+              <ThemeIcon
+                size={"sm"}
+                variant="transparent"
+                style={{ display: "flex" }}
+              >
+                {selectedAttributes.includes(name) ? (
+                  <ChevronDownIcon size={16} />
+                ) : (
+                  <ChevronRightIcon size={16} />
+                )}
+              </ThemeIcon>
+            );
+          },
+          width: COLUMN_WIDTHS.selector,
+          cellsStyle: () => ({ padding: 5 }),
+        },
+        {
+          accessor: "name",
+          title: "Attribute Name",
+          width: COLUMN_WIDTHS.name,
+          filter: () => (
+            <MultiSelect
+              data={attributeNames}
+              value={filteredAttributes}
+              onChange={(newSelection) => setFilteredAttributes(newSelection)}
+              comboboxProps={{ withinPortal: false }}
+              clearable
+              searchable
+            />
+          ),
+          filtering: filteredAttributes.length > 0,
+        },
+        {
+          accessor: "entityTypeField",
+          title: isEvent ? "Activity" : "Object Type",
+          width: COLUMN_WIDTHS.entityType,
+          render: ({ entity_type_names }) =>
+            `${entity_type_names.slice(0, 2).join(", ")}${entity_type_names.length > 3 ? `, ... (${entity_type_names.length} total)` : ""}`,
+          filter: () => (
+            <MultiSelect
+              data={entityNames}
+              value={filteredEntityNames}
+              onChange={(newSelection) => setFilteredEntityNames(newSelection)}
+              comboboxProps={{ withinPortal: false }}
+              clearable
+              searchable
+            />
+          ),
+          filtering: filteredEntityNames.length > 0,
+        },
+        {
+          accessor: "type",
+          title: "Attribute Type",
+          width: COLUMN_WIDTHS.type,
+        },
+        {
+          accessor: "range",
+          width: COLUMN_WIDTHS.range,
+          render: ({ type, min, max }) =>
+            `${formatAttributeValue(type, min)} - ${formatAttributeValue(type, max)}`,
+          hidden: hideRange,
+        },
+        {
+          accessor: "distinct_values",
+          title: "Values",
+          width: COLUMN_WIDTHS.distinctValues,
+          hidden: hideValues,
+        },
+        ...extraColumns,
+      ] satisfies DataTableColumn<AggregatedAttribute>[],
+    [
+      data,
+      entityNames,
+      filteredEntityNames,
+      selectedAttributes,
+      filteredAttributes,
+      attributeNames,
+      extraColumns,
+    ],
+  );
+
+  return (
+    <DataTable
+      idAccessor={"name"}
+      records={data?.response}
+      columns={columns}
+      withTableBorder
+      fetching={isFetching}
+      totalRecords={data?.total_items ?? 0}
+      page={currentPage}
+      recordsPerPage={PAGE_SIZE}
+      onPageChange={setCurrentPage}
+      noRecordsText="No attributes found"
+      height={500}
+      rowExpansion={{
+        allowMultiple: false,
+        expandable: ({ record: { entity_type_names } }) =>
+          entity_type_names.length > 1,
+        expanded: {
+          recordIds: selectedAttributes,
+          onRecordIdsChange: setSelectedAttributes,
+        },
+        content: ({ record }) => (
+          <SubAttributeTable
+            entityType={entityType}
+            attributeName={record.name}
+            ocelId={ocelId}
+            extraColumns={subTableExtraColumns}
+            hideRange={hideRange}
+            hideValues={hideValues}
+            {...(filteredEntityNames.length > 0 && {
+              entityNames: filteredEntityNames,
+            })}
+          />
+        ),
+      }}
     />
   );
 };
