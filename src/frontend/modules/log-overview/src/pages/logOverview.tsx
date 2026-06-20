@@ -4,6 +4,7 @@ import {
   LoadingOverlay,
   Stack,
   Tabs,
+  Text,
   Title,
 } from "@mantine/core";
 import { defineModuleRoute, useCurrentOcel } from "@ocelescope/core";
@@ -26,8 +27,17 @@ const LogOverviewPage = () => {
           </Stack>
         </Grid.Col>
         <Grid.Col span={12}>
-          <Stack>
-            <Title order={2}>Attribute Info</Title>
+          <Stack gap={"xs"}>
+            <Stack gap={4}>
+              <Title order={2}>Attribute Info</Title>
+              <Text c="dimmed" size="sm">
+                Summarizes the attributes attached to events and objects in the
+                log. For each attribute you can see its value type, range, and
+                how many distinct values occur per activity or object type. Use
+                the filters to narrow the table down by attribute name and by
+                activity or object type.
+              </Text>
+            </Stack>
             <Tabs defaultValue={"events"} keepMounted={false}>
               <Tabs.List>
                 <Tabs.Tab value="events">Events</Tabs.Tab>

@@ -259,7 +259,7 @@ const AttributesTable: React.FC<{
       recordsPerPage={PAGE_SIZE}
       onPageChange={setCurrentPage}
       noRecordsText="No attributes found"
-      height={600}
+      height={500}
       rowExpansion={{
         allowMultiple: false,
         expandable: ({ record: { entity_type_names } }) =>
