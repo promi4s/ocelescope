@@ -181,6 +181,23 @@ def get_aggr_object_attributes(
     )
 
 
+@ocels_router.get("/{ocel_id}/attribute/names", operation_id="AttributeNames")
+def get_attribute_names(
+    ocel: ApiOcel,
+    entity_type: Annotated[Literal["events", "objects"] | None, Query()] = None,
+) -> list[str]:
+
+    attribute_names = []
+
+    if entity_type != "events":
+        attribute_names += ocel.objects.attribute_names
+
+    if entity_type != "objects":
+        attribute_names += ocel.events.attribute_names
+
+    return attribute_names
+
+
 @ocels_router.get(
     "/{ocel_id}/objects/attributes",
     response_model=list[TypedAttribute],
