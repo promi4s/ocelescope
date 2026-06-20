@@ -19,6 +19,21 @@
   font-variant-numeric: tabular-nums;
 }
 
+.toggleRow {
+  display: block;
+  width: 100%;
+  padding: 0.55em var(--mantine-spacing-sm);
+  text-align: center;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--mantine-color-blue-6);
+  transition: background-color 100ms ease;
+}
+
+.toggleRow:hover {
+  background-color: var(--mantine-color-blue-light);
+}
+
 .barCell {
   display: flex;
   align-items: center;

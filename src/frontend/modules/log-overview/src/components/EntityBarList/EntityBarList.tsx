@@ -1,6 +1,6 @@
-import { Table } from "@mantine/core";
+import { Table, UnstyledButton } from "@mantine/core";
 import { useEventCounts, useObjectCounts } from "@ocelescope/api-base";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import styles from "./EntityBarList.module.css";
 
 const countHook = {
@@ -11,16 +11,30 @@ const countHook = {
 export const EntityBarList: React.FC<{
   ocelId: string;
   type: keyof typeof countHook;
-}> = ({ ocelId, type }) => {
+  maxVisibleItems?: number;
+}> = ({ ocelId, type, maxVisibleItems = 8 }) => {
   const { data: counts = {} } = countHook[type](ocelId);
+  const [expanded, setExpanded] = useState(false);
 
-  const max = useMemo(() => Math.max(...Object.values(counts)), [counts]);
-
-  const typeCount = Object.keys(counts).length;
-  const totalFrequency = useMemo(
-    () => Object.values(counts).reduce((sum, count) => sum + count, 0),
+  const entries = useMemo(
+    () => Object.entries(counts).sort((a, b) => b[1] - a[1]),
     [counts],
   );
+
+  const max = useMemo(
+    () => Math.max(0, ...entries.map(([, c]) => c)),
+    [entries],
+  );
+
+  const typeCount = entries.length;
+  const totalFrequency = useMemo(
+    () => entries.reduce((sum, [, count]) => sum + count, 0),
+    [entries],
+  );
+
+  const hasOverflow = typeCount > maxVisibleItems;
+  const visibleEntries =
+    hasOverflow && !expanded ? entries.slice(0, maxVisibleItems) : entries;
 
   return (
     <Table variant="vertical" layout="fixed" withTableBorder>
@@ -45,8 +59,8 @@ export const EntityBarList: React.FC<{
         </Table.Tr>
       </Table.Thead>
       <Table.Tbody>
-        {Object.entries(counts).map(([name, count]) => {
-          const percentage = Math.ceil((count / max) * 100);
+        {visibleEntries.map(([name, count]) => {
+          const percentage = max > 0 ? Math.ceil((count / max) * 100) : 0;
 
           return (
             <Table.Tr key={name}>
@@ -69,6 +83,20 @@ export const EntityBarList: React.FC<{
             </Table.Tr>
           );
         })}
+        {hasOverflow && (
+          <Table.Tr>
+            <Table.Td colSpan={2} p={0}>
+              <UnstyledButton
+                className={styles.toggleRow}
+                onClick={() => setExpanded((prev) => !prev)}
+              >
+                {expanded
+                  ? "Show less"
+                  : `Show ${typeCount - maxVisibleItems} more`}
+              </UnstyledButton>
+            </Table.Td>
+          </Table.Tr>
+        )}
       </Table.Tbody>
     </Table>
   );
