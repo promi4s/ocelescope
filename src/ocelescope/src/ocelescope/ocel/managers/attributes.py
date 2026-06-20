@@ -91,7 +91,7 @@ class AttributeManager(BaseManager):
             changes_keep = [col for col in changes_keep if col in allowed]
             event_keep = [col for col in event_keep if col in allowed]
 
-        return pd.concat(
+        merged = pd.concat(
             [
                 table
                 for table in [
@@ -103,6 +103,11 @@ class AttributeManager(BaseManager):
             ],
             ignore_index=True,
         )
+
+        # Row filters (object_types/activities) keep columns belonging to
+        # other entities, which become entirely empty after filtering. Drop
+        # them so downstream summaries don't emit empty attribute rows.
+        return merged.dropna(axis=1, how="all")
 
     def get_aggr_summary(
         self,
