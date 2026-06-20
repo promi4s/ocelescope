@@ -14,7 +14,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { LogOutIcon, PackageIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import useModulePath from "../../../hooks/useModulePath";
 import type { ModuleDefinition, OcelescopeConfig } from "../../../lib/config";
 import { getModuleRoute } from "../../../lib/getModuleRoute";
@@ -171,7 +171,7 @@ const NavBar: React.FC<{ config: OcelescopeConfig }> = ({ config }) => {
       <Stack justify="space-between" h={"100%"} gap={0}>
         <Stack gap={0} flex={1}>
           {moduleGroups.map(({ modules, title }, index) => (
-            <>
+            <Fragment key={index}>
               {index > 0 && (
                 <Divider label={title} my={!title ? 9 : undefined} />
               )}
@@ -180,7 +180,7 @@ const NavBar: React.FC<{ config: OcelescopeConfig }> = ({ config }) => {
                 isOcelAvailable={isOcelAvailable}
                 modulePath={modulePath}
               />
-            </>
+            </Fragment>
           ))}
         </Stack>
         <Divider />
