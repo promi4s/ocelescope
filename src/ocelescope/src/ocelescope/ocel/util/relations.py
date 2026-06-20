@@ -1,146 +1,140 @@
 from typing import Literal, cast
 
 import pandas as pd
-from pm4py.objects.ocel.obj import OCEL
 
 from ocelescope.ocel.models.relations import RelationCountSummary
 
 SUMMARY_DIRECTION = Literal["source", "target"]
 
 
-def getO2OWithTypes(ocel, direction: SUMMARY_DIRECTION = "source"):
-    o2o_with_types = pd.merge(
-        ocel.o2o,
-        ocel.objects[[ocel.object_id_column, ocel.object_type_column]],
-        how="left",
-    )
-    o2o_with_types = pd.merge(
-        o2o_with_types,
-        ocel.objects[[ocel.object_id_column, ocel.object_type_column]],
-        how="left",
-        left_on=f"{ocel.object_id_column}_2",
-        right_on=ocel.object_id_column,
-        suffixes=["", "_new"],  # type:ignore
-    )
-    o2o_with_types = o2o_with_types[
-        [
-            ocel.object_id_column,
-            f"{ocel.object_id_column}_2",
-            ocel.qualifier,
-            ocel.object_type_column,
-            f"{ocel.object_type_column}_new",
-        ]
-    ]
-    rename_map = {
-        ocel.object_id_column: direction,
-        f"{ocel.object_id_column}_2": "target" if direction == "source" else "source",
-        ocel.qualifier: "qualifier",
-        ocel.object_type_column: f"{direction}_type",
-        f"{ocel.object_type_column}_new": f"{'target' if direction == 'source' else 'source'}_type",
-    }
-    return o2o_with_types.rename(columns=rename_map)  # type:ignore
-
-
-def summarize_relation_counts(
+def summarize_relation(
     relation_table: pd.DataFrame,
-    qualifier_col: str,
-    source_type_col: str,
-    target_type_col: str,
-    source_id_col: str,
-    source_df: pd.DataFrame,
-) -> list[RelationCountSummary]:
-    grouped_relations = (
-        relation_table.groupby([source_id_col, qualifier_col, source_type_col, target_type_col])
-        .size()
-        .reset_index()
-        .rename(columns={0: "count"})
+    source_id_field: str,
+    target_id_field: str,
+    source_type_field: str,
+    target_type_field: str,
+    source_type_map: pd.Series,
+    qualifier_field: str | None = None,
+    filter_df: pd.DataFrame | None = None,
+) -> pd.DataFrame:
+    """
+    Summarize relation multiplicities per (source_type, target_type[, qualifier]).
+
+    For each combination, computes the ``min``/``max``/``sum`` number of targets a
+    single source instance is related to. Source instances that have no matching
+    relation are absent from the table, so ``source_type_map`` (an id → type Series
+    covering every source instance) is used to detect them and set ``min`` to 0.
+
+    Args:
+        relation_table: Type-enriched relation table.
+        source_id_field: Column holding the source instance id.
+        target_id_field: Column holding the target instance id.
+        source_type_field: Column holding the source type.
+        target_type_field: Column holding the target type.
+        source_type_map: Series indexed by source id with the source type as value.
+        qualifier_field: Optional qualifier column to break the summary down by.
+        filter_df: Optional table to inner/right-join against to restrict the rows.
+
+    Returns:
+        DataFrame indexed by (source_type, target_type[, qualifier]) with the
+        columns ``min``, ``max`` and ``sum``.
+    """
+    filtered_relations = relation_table
+
+    if filter_df is not None:
+        filtered_relations = filtered_relations.merge(filter_df, how="right")
+
+    group_fields = [source_id_field, source_type_field, target_type_field]
+    summary_fields = [source_type_field, target_type_field]
+
+    if qualifier_field is not None:
+        group_fields.append(qualifier_field)
+        summary_fields.append(qualifier_field)
+
+    relation_counts = filtered_relations.groupby(group_fields)[target_id_field].size()
+
+    summary = relation_counts.groupby(summary_fields).agg(["min", "max", "sum"])
+
+    # Source instances with no matching relation are absent from relation_counts,
+    # so per combination compare the number of contributing source instances to
+    # the total instances of that source type; if some are missing, min is 0.
+    contributing = relation_counts.groupby(summary_fields).size()
+    totals_by_type = source_type_map.value_counts()
+    expected = summary.index.get_level_values(source_type_field).map(totals_by_type)
+
+    summary.loc[contributing.to_numpy() < expected.to_numpy(), "min"] = 0
+
+    return cast(pd.DataFrame, summary)
+
+
+def get_relation_combination(
+    relation_table: pd.DataFrame,
+    source_type_field: str,
+    target_type_field: str,
+    qualifier_field: str | None = None,
+    source_types: list[str] = [],
+    target_types: list[str] = [],
+    qualifiers: list[str] = [],
+) -> pd.DataFrame:
+    """
+    Return the distinct (source_type, target_type[, qualifier]) combinations.
+
+    Optionally restricts the result to the given source types, target types and
+    qualifiers before deduplicating.
+
+    Args:
+        relation_table: Type-enriched relation table.
+        source_type_field: Column holding the source type.
+        target_type_field: Column holding the target type.
+        qualifier_field: Optional qualifier column to include.
+        source_types: Source types to keep (all if empty).
+        target_types: Target types to keep (all if empty).
+        qualifiers: Qualifiers to keep (all if empty).
+
+    Returns:
+        DataFrame with one row per distinct combination.
+    """
+    filter_mask = pd.Series(data=True, index=relation_table.index)
+
+    if len(source_types) > 0:
+        filter_mask &= relation_table[source_type_field].isin(source_types)
+
+    if len(target_types) > 0:
+        filter_mask &= relation_table[target_type_field].isin(target_types)
+
+    if len(qualifiers) > 0 and qualifier_field is not None:
+        filter_mask &= relation_table[qualifier_field].isin(qualifiers)
+
+    return cast(
+        pd.DataFrame,
+        relation_table.loc[filter_mask][
+            [source_type_field, target_type_field]
+            + ([qualifier_field] if qualifier_field is not None else [])
+        ].drop_duplicates(),
     )
 
-    summary = (
-        grouped_relations.groupby([qualifier_col, source_type_col, target_type_col])["count"]
-        .agg(["min", "max", "sum"])
-        .reset_index()
-        .rename(columns={"min": "min_count", "max": "max_count"})
-    )
 
-    # Check if any relations are optional
-    source_ids_with_possible_relations = pd.merge(
-        source_df[[source_id_col, source_type_col]],
-        summary[[source_type_col, qualifier_col, target_type_col]],
-        on=source_type_col,
-    )
-    source_ids_with_relations = pd.merge(
-        source_ids_with_possible_relations,
-        relation_table[[source_id_col, qualifier_col, target_type_col]],
-        on=[source_id_col, qualifier_col, target_type_col],
-        how="left",
-        indicator=True,
-    )
-    unmatched_relations = source_ids_with_relations[
-        source_ids_with_relations["_merge"] == "left_only"
-    ]
+def to_relation_count_summaries(summary: pd.DataFrame) -> list[RelationCountSummary]:
+    """
+    Convert a :func:`summarize_relation` result into ``RelationCountSummary`` models.
 
-    unmatched_relations = set(
-        unmatched_relations[[source_type_col, qualifier_col, target_type_col]]
-        .drop_duplicates()  # type:ignore
-        .itertuples(index=False, name=None)
-    )
+    The summary is read positionally from its index: level 0 is the source type,
+    level 1 the target type, and level 2 (if present) the qualifier.
+    """
+    has_qualifier = summary.index.nlevels >= 3
 
-    summaries = [
-        RelationCountSummary(
-            qualifier=cast(str, row[qualifier_col]),
-            source=cast(str, row[source_type_col]),
-            target=cast(str, row[target_type_col]),
-            min_count=(
-                0
-                if (row[source_type_col], row[qualifier_col], row[target_type_col])
-                in unmatched_relations
-                else cast(int, row["min_count"])
-            ),
-            max_count=cast(int, row["max_count"]),
-            sum=cast(int, row["sum"]),
+    summaries: list[RelationCountSummary] = []
+    for index, row in summary.iterrows():
+        key = cast("tuple[str, ...]", index if isinstance(index, tuple) else (index,))
+        summaries.append(
+            RelationCountSummary(
+                source=cast(str, key[0]),
+                target=cast(str, key[1]),
+                qualifier=cast(str, key[2]) if has_qualifier else "",
+                min_count=cast(int, row["min"]),
+                max_count=cast(int, row["max"]),
+                sum=cast(int, row["sum"]),
+            )
         )
-        for _, row in summary.iterrows()
-    ]
 
     return summaries
-
-
-def summarize_e2o_counts(
-    ocel: OCEL, direction: SUMMARY_DIRECTION = "source"
-) -> list[RelationCountSummary]:
-    source_id_col = ocel.event_id_column if direction == "source" else ocel.object_id_column
-    source_type_col = ocel.event_activity if direction == "source" else ocel.object_type_column
-
-    source_df = ocel.events if direction == "source" else ocel.objects
-
-    target_type_col = ocel.object_type_column if direction == "source" else ocel.event_activity
-
-    return summarize_relation_counts(
-        relation_table=ocel.relations,
-        qualifier_col=ocel.qualifier,
-        source_type_col=source_type_col,
-        target_type_col=target_type_col,
-        source_id_col=source_id_col,
-        source_df=source_df,
-    )
-
-
-def summarize_o2o_counts(
-    ocel: OCEL, direction: SUMMARY_DIRECTION = "source"
-) -> list[RelationCountSummary]:
-    o2o = getO2OWithTypes(ocel, direction=direction or "source")
-
-    return summarize_relation_counts(
-        relation_table=o2o,
-        qualifier_col="qualifier",
-        source_type_col="source_type",
-        target_type_col="target_type",
-        source_id_col="source",
-        source_df=ocel.objects.rename(
-            columns={
-                ocel.object_id_column: "source",
-                ocel.object_type_column: "source_type",
-            }
-        ),
-    )
