@@ -160,11 +160,16 @@ def get_aggr_object_attributes(
     page: Annotated[int, Query(ge=1)] = 1,
     page_size: Annotated[int, Query()] = 10,
     entity_type: Annotated[Literal["events", "objects"], Query()] = "events",
+    attribute_names: Annotated[list[str] | None, Query()] = None,
 ) -> PaginatedResponse[list[AggregatedAttribute]]:
     attribute_names = (
-        ocel.events.attribute_names
-        if entity_type == "events"
-        else ocel.objects.attribute_names
+        (
+            ocel.events.attribute_names
+            if entity_type == "events"
+            else ocel.objects.attribute_names
+        )
+        if attribute_names is None
+        else sorted(attribute_names)
     )
 
     attribute_summary = ocel.attributes.get_aggr_summary(

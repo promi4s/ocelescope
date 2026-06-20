@@ -1,8 +1,9 @@
-import { ThemeIcon } from "@mantine/core";
+import { MultiSelect, ThemeIcon } from "@mantine/core";
 import {
   type AggregatedAttribute,
   type TypedAttribute,
   useAggregatedAttributes,
+  useAttributeNames,
   useEventAttributes,
   useObjectAttributes,
 } from "@ocelescope/api-base";
@@ -114,16 +115,23 @@ const AttributesTable: React.FC<{
 
   const [currentPage, setCurrentPage] = useState(1);
 
+  const { data: attributeNames } = useAttributeNames(ocelId, {
+    entity_type: entityType,
+  });
+
+  const [filteredAttributes, setFilteredAttributes] = useState<string[]>([]);
+
   const { data, isFetching } = useAggregatedAttributes(
     ocelId,
     {
       entity_type: entityType,
       page: currentPage,
       page_size: PAGE_SIZE,
+      attribute_names:
+        filteredAttributes.length > 0 ? filteredAttributes : undefined,
     },
     { query: { placeholderData: keepPreviousData } },
   );
-
   const [selectedAttributes, setSelectedAttributes] = useState<string[]>([]);
 
   const columns: DataTableColumn<AggregatedAttribute>[] = useMemo(
@@ -158,6 +166,16 @@ const AttributesTable: React.FC<{
           accessor: "name",
           title: "Attribute Name",
           width: COLUMN_WIDTHS.name,
+          filter: () => (
+            <MultiSelect
+              data={attributeNames}
+              value={filteredAttributes}
+              onChange={(newSelection) => setFilteredAttributes(newSelection)}
+              comboboxProps={{ withinPortal: false }}
+              clearable
+              searchable
+            />
+          ),
         },
         {
           accessor: "entityTypeField",
@@ -186,7 +204,13 @@ const AttributesTable: React.FC<{
         },
         ...extraColumns,
       ] satisfies DataTableColumn<AggregatedAttribute>[],
-    [data, selectedAttributes, extraColumns],
+    [
+      data,
+      selectedAttributes,
+      filteredAttributes,
+      attributeNames,
+      extraColumns,
+    ],
   );
 
   return (
@@ -200,6 +224,9 @@ const AttributesTable: React.FC<{
       page={currentPage}
       recordsPerPage={PAGE_SIZE}
       onPageChange={setCurrentPage}
+      noRecordsText="No attributes found"
+      minHeight={300}
+      maxHeight={600}
       rowExpansion={{
         allowMultiple: false,
         expandable: ({ record: { entity_type_names } }) =>

@@ -516,6 +516,25 @@
             }
           },
           {
+            "name": "attribute_names",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Attribute Names"
+            }
+          },
+          {
             "name": "ocel_version",
             "in": "query",
             "required": false,
