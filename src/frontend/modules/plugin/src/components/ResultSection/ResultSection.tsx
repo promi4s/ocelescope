@@ -18,7 +18,7 @@ import {
   useObjectCounts,
   useResource,
 } from "@ocelescope/api-base";
-import { useDownloadFile } from "@ocelescope/core";
+import { useDownloadOCEL, useDownloadResource } from "@ocelescope/core";
 import { ResourceModal, ResourceViewer } from "@ocelescope/resources";
 import { Download, DownloadIcon } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -28,7 +28,7 @@ const ResourceCard: React.FC<{
   onClick: (resourceId: string) => void;
 }> = ({ id: resourceId, onClick }) => {
   const { data: resource } = useResource(resourceId);
-  const downloadFile = useDownloadFile();
+  const { download } = useDownloadResource();
 
   return (
     <Card shadow="sm" padding="lg" radius="md" withBorder>
@@ -56,10 +56,7 @@ const ResourceCard: React.FC<{
           component={"a"}
           variant="subtle"
           size={34}
-          onClick={() =>
-            //TODO: Make this somehow typesafe
-            downloadFile(`/resources/resource/${resourceId}/download`)
-          }
+          onClick={() => download(resourceId)}
         >
           <Download />
         </ActionIcon>
@@ -85,7 +82,7 @@ export const OCELCard: React.FC<{ id: string }> = ({ id }) => {
   const { data: objectCounts } = useObjectCounts(id);
   const { data: eventCounts } = useEventCounts(id);
 
-  const downloadFile = useDownloadFile();
+  const { download } = useDownloadOCEL();
 
   const objectSummary = useMemo(
     () => summarizeCount(objectCounts),
@@ -121,7 +118,7 @@ export const OCELCard: React.FC<{ id: string }> = ({ id }) => {
           </Text>
         </Stack>
         <Button
-          onClick={() => downloadFile(`/ocels/${id}/download`)}
+          onClick={() => download(id)}
           leftSection={<DownloadIcon />}
           disabled={!ready}
         >
