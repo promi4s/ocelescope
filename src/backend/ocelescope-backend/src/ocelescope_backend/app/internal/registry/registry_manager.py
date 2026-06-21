@@ -163,7 +163,7 @@ class RegistryManager:
                         self.unload_plugins([id])
                         raise
                 else:
-                    raise
+                    raise ImportError(f"Could not create module spec for plugin {id!r}")
             except Exception:
                 shutil.rmtree(module_path, ignore_errors=True)
 
