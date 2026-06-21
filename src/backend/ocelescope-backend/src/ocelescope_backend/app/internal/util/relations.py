@@ -18,23 +18,32 @@ def relation_summary(
     order: Literal["asc", "desc"],
     page: int | None,
     page_size: int | None,
+    with_qualifier: bool = True,
 ) -> PaginatedResponse[list[RelationCountSummary]]:
     """Build a paginated relation-count summary for an E2O/O2O manager.
 
-    The paginated rows are the distinct (source, target, qualifier) combinations.
-    They are sorted and sliced first so only the current page gets summarized,
-    which keeps the groupby small on large OCELs.
+    The paginated rows are the distinct (source, target[, qualifier]) combinations.
+    When ``with_qualifier`` is ``False`` the rows are aggregated per
+    (source, target) across all qualifiers. They are sorted and sliced first so
+    only the current page gets summarized, which keeps the groupby small on large
+    OCELs.
     """
     ascending = order == "asc"
+    # The qualifier level only exists when grouping with qualifiers.
+    effective_sort_by = (
+        None if not with_qualifier and sort_by == "qualifier" else sort_by
+    )
+
     combinations = relations.combinations(
         direction,
         tuple(source_types or ()),
         tuple(target_types or ()),
         tuple(qualifiers or ()),
+        with_qualifier=with_qualifier,
     )
 
-    if sort_by in _RELATION_SORT_LEVELS:
-        sort_column = combinations.columns[_RELATION_SORT_LEVELS[sort_by]]
+    if effective_sort_by in _RELATION_SORT_LEVELS:
+        sort_column = combinations.columns[_RELATION_SORT_LEVELS[effective_sort_by]]
         combinations = combinations.sort_values(sort_column, ascending=ascending)
 
     total_items = len(combinations)
@@ -43,11 +52,14 @@ def relation_summary(
     start = (effective_page - 1) * effective_page_size
     combinations = combinations.iloc[start : start + effective_page_size]
 
-    summary = relations.summary(direction=direction, filter_df=combinations)
+    summary = relations.summary(
+        direction=direction, filter_df=combinations, with_qualifier=with_qualifier
+    )
 
-    if sort_by in _RELATION_SORT_LEVELS:
+    # TODO: Fix this double sorting
+    if effective_sort_by in _RELATION_SORT_LEVELS:
         summary = summary.sort_index(
-            level=_RELATION_SORT_LEVELS[sort_by], ascending=ascending
+            level=_RELATION_SORT_LEVELS[effective_sort_by], ascending=ascending
         )
 
     return PaginatedResponse(

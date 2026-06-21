@@ -357,6 +357,7 @@ def get_e2o(
     order: Annotated[Literal["asc", "desc"], Query()] = "asc",
     page: Annotated[int | None, Query(ge=1)] = None,
     page_size: Annotated[int | None, Query(ge=1)] = None,
+    with_qualifier: Annotated[bool, Query()] = True,
 ) -> PaginatedResponse[list[RelationCountSummary]]:
     return relation_summary(
         ocel.e2o,
@@ -368,6 +369,7 @@ def get_e2o(
         order,
         page,
         page_size,
+        with_qualifier=with_qualifier,
     )
 
 
@@ -385,6 +387,7 @@ def get_object_relations(
     order: Annotated[Literal["asc", "desc"], Query()] = "asc",
     page: Annotated[int | None, Query(ge=1)] = None,
     page_size: Annotated[int | None, Query(ge=1)] = None,
+    with_qualifier: Annotated[bool, Query()] = True,
 ) -> PaginatedResponse[list[RelationCountSummary]]:
     return relation_summary(
         ocel.o2o,
@@ -396,6 +399,7 @@ def get_object_relations(
         order,
         page,
         page_size,
+        with_qualifier=with_qualifier,
     )
 
 

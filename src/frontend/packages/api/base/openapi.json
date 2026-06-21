@@ -1468,6 +1468,16 @@
             }
           },
           {
+            "name": "with_qualifier",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true,
+              "title": "With Qualifier"
+            }
+          },
+          {
             "name": "ocel_version",
             "in": "query",
             "required": false,
@@ -1675,6 +1685,16 @@
                 }
               ],
               "title": "Page Size"
+            }
+          },
+          {
+            "name": "with_qualifier",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true,
+              "title": "With Qualifier"
             }
           },
           {
