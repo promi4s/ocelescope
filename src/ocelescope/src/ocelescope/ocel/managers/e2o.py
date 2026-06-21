@@ -73,6 +73,7 @@ class E2OManager(BaseManager):
         self,
         direction: SUMMARY_DIRECTION = "source",
         filter_df: pd.DataFrame | None = None,
+        with_qualifier: bool = True,
     ) -> pd.DataFrame:
         """
         Compute summary statistics for E2O relationships.
@@ -91,11 +92,15 @@ class E2OManager(BaseManager):
                 A combination table (as returned by :meth:`combinations`) used to
                 restrict the summary to those (source_type, target_type, qualifier)
                 combinations. ``None`` means no restriction.
+            with_qualifier (bool, optional):
+                Whether to break the summary down by qualifier. When ``False`` the
+                summary is aggregated per (source_type, target_type) across all
+                qualifiers. Defaults to ``True``.
 
 
         Returns:
             DataFrame:
-                Indexed by (source_type, target_type, qualifier) with the
+                Indexed by (source_type, target_type[, qualifier]) with the
                 ``min``, ``max`` and ``sum`` of related items per source instance.
         """
         is_source = direction == "source"
@@ -109,7 +114,7 @@ class E2OManager(BaseManager):
             source_type_map=(
                 self._ocel.events.activity_by_id if is_source else self._ocel.objects.type_by_id
             ),
-            qualifier_field=E2O_QUALIFIER,
+            qualifier_field=E2O_QUALIFIER if with_qualifier else None,
             filter_df=filter_df,
         )
 
@@ -120,9 +125,10 @@ class E2OManager(BaseManager):
         source_types: tuple[str, ...] = (),
         target_types: tuple[str, ...] = (),
         qualifiers: tuple[str, ...] = (),
+        with_qualifier: bool = True,
     ) -> pd.DataFrame:
         """
-        Return the distinct (source_type, target_type, qualifier) combinations
+        Return the distinct (source_type, target_type[, qualifier]) combinations
         present in the E2O relations.
 
         For ``direction="source"`` the source type is the event activity and the
@@ -135,6 +141,9 @@ class E2OManager(BaseManager):
             source_types: Optional source types to keep (all if empty).
             target_types: Optional target types to keep (all if empty).
             qualifiers: Optional qualifiers to keep (all if empty).
+            with_qualifier: Whether to include the qualifier in the combinations.
+                When ``False`` combinations are deduplicated per
+                (source_type, target_type). Defaults to ``True``.
 
         Returns:
             DataFrame: One row per distinct relation combination.
@@ -145,7 +154,7 @@ class E2OManager(BaseManager):
             relation_table=self.df,
             source_type_field=E2O_ACTIVITY if is_source else E2O_OBJECT_TYPE,
             target_type_field=E2O_OBJECT_TYPE if is_source else E2O_ACTIVITY,
-            qualifier_field=E2O_QUALIFIER,
+            qualifier_field=E2O_QUALIFIER if with_qualifier else None,
             source_types=list(source_types),
             target_types=list(target_types),
             qualifiers=list(qualifiers),
