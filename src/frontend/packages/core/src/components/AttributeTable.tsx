@@ -13,7 +13,7 @@ import { keepPreviousData } from "@tanstack/react-query";
 import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
 import { DataTable, type DataTableColumn } from "mantine-datatable";
 import { useMemo, useState } from "react";
-import { formatAttributeValue } from "../util/attributes";
+import { formatAttributeValue } from "../lib/attributes";
 
 const PAGE_SIZE = 10;
 
@@ -26,6 +26,8 @@ const COLUMN_WIDTHS = {
   distinctValues: 120,
 };
 
+type OcelVersion = "original" | "filtered";
+
 const SubAttributeTable: React.FC<{
   ocelId: string;
   attributeName: string;
@@ -33,12 +35,16 @@ const SubAttributeTable: React.FC<{
   entityNames?: string[];
   hideRange?: boolean;
   hideValues?: boolean;
+  ocelVersion?: OcelVersion;
   extraColumns?: DataTableColumn<TypedAttribute>[];
 }> = ({
   ocelId,
   entityType = "objects",
   attributeName,
   entityNames,
+  hideRange = false,
+  hideValues = false,
+  ocelVersion,
   extraColumns = [],
 }) => {
   const isEvent = entityType === "events";
@@ -50,6 +56,7 @@ const SubAttributeTable: React.FC<{
     {
       attribute_names: [attributeName],
       names: entityNames,
+      ocel_version: ocelVersion,
     },
     { query: { placeholderData: keepPreviousData } },
   );
@@ -83,15 +90,17 @@ const SubAttributeTable: React.FC<{
           width: COLUMN_WIDTHS.range,
           render: ({ type, min, max }) =>
             `${formatAttributeValue(type, min)} - ${formatAttributeValue(type, max)}`,
+          hidden: hideRange,
         },
         {
           accessor: "distinct_values",
           title: "Values",
           width: COLUMN_WIDTHS.distinctValues,
+          hidden: hideValues,
         },
         ...extraColumns,
       ] satisfies DataTableColumn<TypedAttribute>[],
-    [data, extraColumns],
+    [isEvent, hideRange, hideValues, extraColumns],
   );
 
   return (
@@ -113,6 +122,8 @@ const AttributesTable: React.FC<{
   subTableExtraColumns?: DataTableColumn<TypedAttribute>[];
   hideRange?: boolean;
   hideValues?: boolean;
+  ocelVersion?: OcelVersion;
+  alwaysExpandable?: boolean;
 }> = ({
   ocelId,
   entityType = "objects",
@@ -120,6 +131,8 @@ const AttributesTable: React.FC<{
   hideRange = false,
   hideValues = false,
   subTableExtraColumns,
+  ocelVersion,
+  alwaysExpandable = false,
 }) => {
   const isEvent = entityType === "events";
 
@@ -127,12 +140,14 @@ const AttributesTable: React.FC<{
 
   const { data: attributeNames } = useAttributeNames(ocelId, {
     entity_type: entityType,
+    ocel_version: ocelVersion,
   });
 
   const [filteredAttributes, setFilteredAttributes] = useState<string[]>([]);
 
   const { data: entityNames } = (isEvent ? useActivities : useObjectTypes)(
     ocelId,
+    { ocel_version: ocelVersion },
   );
 
   const [filteredEntityNames, setFilteredEntityNames] = useState<string[]>([]);
@@ -143,6 +158,7 @@ const AttributesTable: React.FC<{
       entity_type: entityType,
       page: currentPage,
       page_size: PAGE_SIZE,
+      ocel_version: ocelVersion,
       ...(filteredAttributes.length > 0 && {
         attribute_names: filteredAttributes,
       }),
@@ -162,7 +178,7 @@ const AttributesTable: React.FC<{
           title: "",
           textAlign: "center",
           render: ({ entity_type_names, name }) => {
-            if (entity_type_names.length === 1) {
+            if (!alwaysExpandable && entity_type_names.length === 1) {
               return null;
             }
             return (
@@ -237,13 +253,16 @@ const AttributesTable: React.FC<{
         ...extraColumns,
       ] satisfies DataTableColumn<AggregatedAttribute>[],
     [
-      data,
+      isEvent,
       entityNames,
       filteredEntityNames,
       selectedAttributes,
       filteredAttributes,
       attributeNames,
       extraColumns,
+      hideRange,
+      hideValues,
+      alwaysExpandable,
     ],
   );
 
@@ -263,7 +282,7 @@ const AttributesTable: React.FC<{
       rowExpansion={{
         allowMultiple: false,
         expandable: ({ record: { entity_type_names } }) =>
-          entity_type_names.length > 1,
+          alwaysExpandable || entity_type_names.length > 1,
         expanded: {
           recordIds: selectedAttributes,
           onRecordIdsChange: setSelectedAttributes,
@@ -276,6 +295,7 @@ const AttributesTable: React.FC<{
             extraColumns={subTableExtraColumns}
             hideRange={hideRange}
             hideValues={hideValues}
+            ocelVersion={ocelVersion}
             {...(filteredEntityNames.length > 0 && {
               entityNames: filteredEntityNames,
             })}
