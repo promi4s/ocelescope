@@ -17,6 +17,7 @@ const RelationCountFilter: (
     return (
       <RelationTable
         ocelId={ocelId}
+        ocelVersion={"original"}
         relationType={relationType}
         extraColumns={filterColumns}
         subTableExtraColumns={filterColumns}

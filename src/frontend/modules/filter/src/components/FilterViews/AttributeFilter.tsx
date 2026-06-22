@@ -16,6 +16,7 @@ const AttributeFilter: (
       <AttributesTable
         ocelId={ocelId}
         entityType={entityType}
+        ocelVersion={"original"}
         extraColumns={filterColumns}
         subTableExtraColumns={filterColumns}
         visibleAttributes={visibleAttributes}
