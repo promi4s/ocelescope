@@ -288,7 +288,14 @@
       "NativeEventAttributeFilter": {
         "properties": {
           "target_type": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Target Type"
           },
           "attribute": {
@@ -414,7 +421,6 @@
         },
         "type": "object",
         "required": [
-          "target_type",
           "attribute",
           "type"
         ],
@@ -496,7 +502,14 @@
       "NativeObjectAttributeFilter": {
         "properties": {
           "target_type": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Target Type"
           },
           "attribute": {
@@ -622,7 +635,6 @@
         },
         "type": "object",
         "required": [
-          "target_type",
           "attribute",
           "type"
         ],

@@ -135,7 +135,8 @@
     "BRANDES",
     "KOEPF",
     "purpur",
-    "ophal"
+    "ophal",
+    "nlevels "
   ],
   "ignorePaths": [
     "pnpm-lock.yaml",

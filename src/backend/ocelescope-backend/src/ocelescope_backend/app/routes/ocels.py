@@ -6,10 +6,13 @@ import pandas as pd
 from fastapi import APIRouter, Query, Response
 from ocelescope.ocel.constants.misc import OCELFileExtensions
 
-from ocelescope import RelationCountSummary
 from ocelescope_backend.app.dependencies import ApiOcel, ApiSession
 from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.model.base import PaginatedResponse
+from ocelescope_backend.app.internal.model.relations import (
+    RelationCombination,
+    RelationCountSummary,
+)
 from ocelescope_backend.app.internal.model.events import (
     Date_Distribution_Item,
     Entity_Time_Info,
@@ -30,6 +33,10 @@ from ocelescope_backend.app.internal.ocel.default_ocel import (
 from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.registry.extension import OCELExtensionDescription
 from ocelescope_backend.app.internal.util.pandas import search_paginated_dataframe
+from ocelescope_backend.app.internal.util.relations import (
+    RelationSortField,
+    relation_summary,
+)
 
 ocels_router = APIRouter(prefix="/ocels", tags=["ocels"])
 
@@ -341,24 +348,88 @@ def get_object_counts(
 
 @ocels_router.get(
     "/{ocel_id}/relations/e2o",
-    response_model=list[RelationCountSummary],
     operation_id="e2o",
 )
 def get_e2o(
-    ocel: ApiOcel, direction: Literal["source", "target"] = "source"
-) -> list[RelationCountSummary]:
-    return ocel.e2o.summary(direction=direction)
+    ocel: ApiOcel,
+    direction: Literal["source", "target"] = "source",
+    source_types: Annotated[list[str] | None, Query()] = None,
+    target_types: Annotated[list[str] | None, Query()] = None,
+    qualifiers: Annotated[list[str] | None, Query()] = None,
+    sort_by: Annotated[RelationSortField | None, Query()] = None,
+    order: Annotated[Literal["asc", "desc"], Query()] = "asc",
+    page: Annotated[int | None, Query(ge=1)] = None,
+    page_size: Annotated[int | None, Query(ge=1)] = None,
+    with_qualifier: Annotated[bool, Query()] = True,
+) -> PaginatedResponse[list[RelationCountSummary]]:
+    return relation_summary(
+        ocel.e2o,
+        direction,
+        source_types,
+        target_types,
+        qualifiers,
+        sort_by,
+        order,
+        page,
+        page_size,
+        with_qualifier=with_qualifier,
+    )
 
 
 @ocels_router.get(
     "/{ocel_id}/relations/o2o",
-    response_model=list[RelationCountSummary],
     operation_id="o2o",
 )
 def get_object_relations(
-    ocel: ApiOcel, direction: Literal["source", "target"] = "source"
-) -> list[RelationCountSummary]:
-    return ocel.o2o.summary(direction=direction)
+    ocel: ApiOcel,
+    direction: Literal["source", "target"] = "source",
+    source_types: Annotated[list[str] | None, Query()] = None,
+    target_types: Annotated[list[str] | None, Query()] = None,
+    qualifiers: Annotated[list[str] | None, Query()] = None,
+    sort_by: Annotated[RelationSortField | None, Query()] = None,
+    order: Annotated[Literal["asc", "desc"], Query()] = "asc",
+    page: Annotated[int | None, Query(ge=1)] = None,
+    page_size: Annotated[int | None, Query(ge=1)] = None,
+    with_qualifier: Annotated[bool, Query()] = True,
+) -> PaginatedResponse[list[RelationCountSummary]]:
+    return relation_summary(
+        ocel.o2o,
+        direction,
+        source_types,
+        target_types,
+        qualifiers,
+        sort_by,
+        order,
+        page,
+        page_size,
+        with_qualifier=with_qualifier,
+    )
+
+
+@ocels_router.get(
+    "/{ocel_id}/relations/e2o/combinations",
+    operation_id="e2oCombinations",
+)
+def get_e2o_combinations(
+    ocel: ApiOcel,
+    direction: Literal["source", "target"] = "source",
+) -> list[RelationCombination]:
+    return RelationCombination.from_combinations(
+        ocel.e2o.combinations(direction, with_qualifier=True)
+    )
+
+
+@ocels_router.get(
+    "/{ocel_id}/relations/o2o/combinations",
+    operation_id="o2oCombinations",
+)
+def get_o2o_combinations(
+    ocel: ApiOcel,
+    direction: Literal["source", "target"] = "source",
+) -> list[RelationCombination]:
+    return RelationCombination.from_combinations(
+        ocel.o2o.combinations(direction, with_qualifier=True)
+    )
 
 
 @ocels_router.get("/{ocel_id}/events/ids", operation_id="eventIds")

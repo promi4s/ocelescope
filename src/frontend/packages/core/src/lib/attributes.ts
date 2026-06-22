@@ -1,5 +1,5 @@
 import type { ValueType } from "@ocelescope/api-base";
-import { formatTime } from "./dayjs";
+import { formatDateTime } from "./dayjs";
 
 export const formatAttributeValue = (
   type: ValueType,
@@ -11,7 +11,7 @@ export const formatAttributeValue = (
     case "float":
       return value.toLocaleString("en-US");
     case "date":
-      return formatTime(value as string);
+      return formatDateTime(value as string);
     default:
       return value;
   }

@@ -1,112 +1,27 @@
-import {
-  type TypedAttribute,
-  useEventAttributes,
-  useObjectAttributes,
-} from "@ocelescope/api-base";
-import { DataTable } from "mantine-datatable";
-import { useMemo } from "react";
-import type {
-  NativeEventAttributeFilter,
-  NativeObjectAttributeFilter,
-} from "../../api/base";
-import { useDatatable } from "../../hooks/useDatatable";
-import { useFilterColumns } from "../../hooks/useFilterColumn";
+import { AttributesTable } from "@ocelescope/core";
+import { useAttributeFilter } from "../../hooks/useAttributeFilterColumns";
 import type { FilterView, FilterViewType } from "../../types/filter";
-import { AttributeInputField } from "../inputs/AttributeInputField";
-
-type FilterRecord = Omit<
-  NativeEventAttributeFilter | NativeObjectAttributeFilter,
-  "target_type" | "type" | "attribute"
->;
-
-const getFilterKey = (targetType: string, attribute: string) =>
-  `${targetType}::${attribute}`;
-
-const getInitialFilter = (attribute: TypedAttribute): FilterRecord => {
-  switch (attribute.type) {
-    case "string":
-      return { regex: "" };
-
-    case "int":
-      return {
-        number_range: [
-          Number.parseInt(`${attribute.min}`, 10),
-          Number.parseInt(`${attribute.max}`, 10),
-        ],
-      };
-
-    case "float":
-      return {
-        number_range: [
-          Number.parseFloat(`${attribute.min}`),
-          Number.parseFloat(`${attribute.max}`),
-        ],
-      };
-
-    case "date":
-      return {
-        time_range: [String(attribute.min), String(attribute.max)],
-      };
-
-    default:
-      return {};
-  }
-};
 
 const AttributeFilter: (
   entityType: "objects" | "events",
 ) => FilterView<"event_attribute" | "object_attribute"> =
   (entityType) =>
   ({ ocelId, control }) => {
-    const isEvent = entityType === "events";
-
-    const { data: attributes, isLoading } = (
-      isEvent ? useEventAttributes : useObjectAttributes
-    )(ocelId);
-
-    const nonTrivialAttributes = useMemo(
-      () => attributes?.filter(({ distinct_values }) => distinct_values > 1),
-      [attributes],
-    );
-
-    const { filterColumns, recordFilter } = useFilterColumns({
+    const { filterColumns, visibleAttributes } = useAttributeFilter({
       control,
-      path: isEvent ? "event_attribute" : "object_attribute",
-      generateFilterId: ({ attribute, target_type }) =>
-        getFilterKey(target_type, attribute),
-      generateRecordId: ({ entity_type, name }) =>
-        getFilterKey(entity_type, name),
-      generateInitialFilter: (record: TypedAttribute) => ({
-        attribute: record.name,
-        type: isEvent
-          ? ("event_attribute" as const)
-          : ("object_attribute" as const),
-        target_type: record.entity_type,
-        ...getInitialFilter(record),
-      }),
-      FilterComponent: ({ control, path, record }) => {
-        return (
-          <AttributeInputField control={control} path={path} record={record} />
-        );
-      },
-    });
-
-    const { columns, records, tableProps } = useDatatable({
-      data: nonTrivialAttributes,
-      columnNames: ["name", "entity_type"],
-      defaultSorted: "name",
-      additionalFilter: recordFilter,
+      path: entityType === "events" ? "event_attribute" : "object_attribute",
     });
 
     return (
-      <DataTable
-        columns={[...columns, ...filterColumns]}
-        withTableBorder
-        records={records}
-        noRecordsText="No attributes to filter"
-        minHeight={500}
-        {...tableProps}
-        fetching={isLoading}
+      <AttributesTable
+        ocelId={ocelId}
+        entityType={entityType}
+        ocelVersion={"original"}
+        extraColumns={filterColumns}
+        subTableExtraColumns={filterColumns}
+        visibleAttributes={visibleAttributes}
+        hideRange
+        hideValues
       />
     );
   };
