@@ -12,7 +12,7 @@ from ..base import BaseFilter, FilterResult
 
 
 class AttributeFilterConfig(BaseModel):
-    target_type: str
+    target_type: Optional[str] = None
     attribute: str
 
     # Range filters
@@ -29,7 +29,8 @@ def filter_by_attribute(attribute_df: DataFrame, type_column: str, config: Attri
     col = config.attribute
 
     if col not in df.columns:
-        raise ValueError(f"Attribute '{col}' not found in {config.target_type} data")
+        scope = config.target_type if config.target_type is not None else "any"
+        raise ValueError(f"Attribute '{col}' not found in {scope} data")
 
     series = cast(Series, df[col])
     mask = pd.Series(True, index=series.index)
@@ -65,9 +66,17 @@ def filter_by_attribute(attribute_df: DataFrame, type_column: str, config: Attri
     if config.regex is not None:
         mask &= series.astype(str).str.contains(config.regex, regex=True, na=False)
 
-    is_not_target_type = attribute_df[type_column] != config.target_type
+    # Rows the filter does not touch are kept untouched. With an explicit
+    # target_type only that type is affected; without one (a "general" filter)
+    # every type that actually has the attribute is affected, while types that
+    # never define it are left untouched.
+    if config.target_type is not None:
+        is_unaffected = attribute_df[type_column] != config.target_type
+    else:
+        types_with_attribute = attribute_df.loc[series.notna(), type_column].unique()
+        is_unaffected = ~attribute_df[type_column].isin(types_with_attribute)
 
-    final_mask = cast(Series, is_not_target_type | mask)
+    final_mask = cast(Series, is_unaffected | mask)
     return final_mask
 
 
