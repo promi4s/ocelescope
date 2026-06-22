@@ -81,7 +81,7 @@ const SubAttributeTable: React.FC<{
         },
         {
           accessor: "type",
-          title: "Attribute Type",
+          title: "Data Type",
           width: COLUMN_WIDTHS.type,
           noWrap: true,
         },
@@ -124,6 +124,7 @@ const AttributesTable: React.FC<{
   hideValues?: boolean;
   ocelVersion?: OcelVersion;
   alwaysExpandable?: boolean;
+  visibleAttributes?: string[];
 }> = ({
   ocelId,
   entityType = "objects",
@@ -133,6 +134,7 @@ const AttributesTable: React.FC<{
   subTableExtraColumns,
   ocelVersion,
   alwaysExpandable = false,
+  visibleAttributes,
 }) => {
   const isEvent = entityType === "events";
 
@@ -152,6 +154,33 @@ const AttributesTable: React.FC<{
 
   const [filteredEntityNames, setFilteredEntityNames] = useState<string[]>([]);
 
+  // `visibleAttributes` is an external constraint: undefined = no constraint
+  // (show all), a defined array = show only those (an empty array shows none).
+  const isConstrained = visibleAttributes !== undefined;
+
+  const attributeNameOptions = useMemo(() => {
+    if (!isConstrained) {
+      return attributeNames ?? [];
+    }
+    return (attributeNames ?? []).filter((name) =>
+      visibleAttributes.includes(name),
+    );
+  }, [attributeNames, isConstrained, visibleAttributes]);
+
+  const effectiveAttributeNames = useMemo(() => {
+    if (!isConstrained) {
+      return filteredAttributes;
+    }
+    const base =
+      filteredAttributes.length > 0 ? filteredAttributes : visibleAttributes;
+    return base.filter((name) => visibleAttributes.includes(name));
+  }, [filteredAttributes, isConstrained, visibleAttributes]);
+
+  // When constrained to an empty set, show nothing instead of querying with no
+  // `attribute_names` (which the API would treat as "all").
+  const showNoAttributes =
+    isConstrained && effectiveAttributeNames.length === 0;
+
   const { data, isFetching } = useAggregatedAttributes(
     ocelId,
     {
@@ -159,14 +188,16 @@ const AttributesTable: React.FC<{
       page: currentPage,
       page_size: PAGE_SIZE,
       ocel_version: ocelVersion,
-      ...(filteredAttributes.length > 0 && {
-        attribute_names: filteredAttributes,
+      ...(effectiveAttributeNames.length > 0 && {
+        attribute_names: effectiveAttributeNames,
       }),
       ...(filteredEntityNames.length > 0 && {
         entity_names: filteredEntityNames,
       }),
     },
-    { query: { placeholderData: keepPreviousData } },
+    {
+      query: { placeholderData: keepPreviousData, enabled: !showNoAttributes },
+    },
   );
   const [selectedAttributes, setSelectedAttributes] = useState<string[]>([]);
 
@@ -204,7 +235,7 @@ const AttributesTable: React.FC<{
           width: COLUMN_WIDTHS.name,
           filter: () => (
             <MultiSelect
-              data={attributeNames}
+              data={attributeNameOptions}
               value={filteredAttributes}
               onChange={(newSelection) => setFilteredAttributes(newSelection)}
               comboboxProps={{ withinPortal: false }}
@@ -234,7 +265,7 @@ const AttributesTable: React.FC<{
         },
         {
           accessor: "type",
-          title: "Attribute Type",
+          title: "Data Type",
           width: COLUMN_WIDTHS.type,
         },
         {
@@ -258,7 +289,7 @@ const AttributesTable: React.FC<{
       filteredEntityNames,
       selectedAttributes,
       filteredAttributes,
-      attributeNames,
+      attributeNameOptions,
       extraColumns,
       hideRange,
       hideValues,
@@ -269,11 +300,11 @@ const AttributesTable: React.FC<{
   return (
     <DataTable
       idAccessor={"name"}
-      records={data?.response}
+      records={showNoAttributes ? [] : data?.response}
       columns={columns}
       withTableBorder
       fetching={isFetching}
-      totalRecords={data?.total_items ?? 0}
+      totalRecords={showNoAttributes ? 0 : (data?.total_items ?? 0)}
       page={currentPage}
       recordsPerPage={PAGE_SIZE}
       onPageChange={setCurrentPage}

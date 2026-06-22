@@ -145,7 +145,7 @@ export const AttributeInputField = memo(function AttributeInputField({
 }: {
   control: Control<GroupedFilter>;
   path: `${FilterPath}.${number}`;
-  record: TypedAttribute;
+  record: Omit<TypedAttribute, "name" | "entity_type">;
 }) {
   switch (record.type) {
     case "string":
