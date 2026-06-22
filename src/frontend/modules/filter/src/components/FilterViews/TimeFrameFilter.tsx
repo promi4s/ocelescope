@@ -191,6 +191,8 @@ const TimeFrameFilterView: FilterView<"time_frame"> = memo(
 
 export const TimeFrameFilter: FilterViewType<"time_frame"> = {
   title: "Timeframe",
+  description:
+    "Filters events by their timestamp, keeping only those that occur within the selected time range. Use the date pickers or drag the range slider to set the start and end; the bar chart shows the event distribution over time, with events inside the range highlighted and events outside it dimmed.",
   ViewComponent: TimeFrameFilterView,
   generateDefault: () => [{ type: "time_frame", time_range: [null, null] }],
   cleanUpFilters: (currentFilter) => {

@@ -28,12 +28,16 @@ const AttributeFilter: (
 
 export const EventAttributeFilter: FilterViewType<"event_attribute"> = {
   title: "Event Attribute",
+  description:
+    "Filters events by the values of their attributes. For each attribute you can define a condition (e.g. a value range or an allowed set of values), and only events whose attribute values satisfy every condition are kept. Attributes without a condition are ignored.",
   ViewComponent: AttributeFilter("events"),
   generateDefault: () => [],
 };
 
 export const ObjectAttributeFilter: FilterViewType<"object_attribute"> = {
   title: "Object Attribute",
+  description:
+    "Filters objects by the values of their attributes. For each attribute you can define a condition (e.g. a value range or an allowed set of values), and only objects whose attribute values satisfy every condition are kept. Attributes without a condition are ignored.",
   ViewComponent: AttributeFilter("objects"),
   generateDefault: () => [],
 };
