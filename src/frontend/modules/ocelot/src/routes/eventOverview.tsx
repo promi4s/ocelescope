@@ -1,4 +1,4 @@
-import { Input, LoadingOverlay, Stack } from "@mantine/core";
+import { Input, LoadingOverlay, Stack, Text, Title } from "@mantine/core";
 import { useDebouncedState } from "@mantine/hooks";
 import {
   useE2o,
@@ -21,6 +21,12 @@ const EventOverview = () => {
     <>
       <LoadingOverlay visible={isEventCountsLoading} />
       <Stack>
+        <Title order={2}>Event Overview</Title>
+        <Text c="dimmed" size="sm">
+          Get an overview of all event types in this log. Search through them
+          and see how often each type occurs, what attributes it carries, and
+          which objects it has a relation with.
+        </Text>
         <Input
           leftSection={<SearchIcon />}
           defaultValue={searchValue}

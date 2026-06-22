@@ -1,4 +1,4 @@
-import { Flex } from "@mantine/core";
+import { Flex, Text, Title } from "@mantine/core";
 import { useEventCounts, useObjectCounts } from "@ocelescope/api-base";
 import { keepPreviousData } from "@tanstack/react-query";
 import type { DataTableSortStatus } from "mantine-datatable";
@@ -12,10 +12,12 @@ import {
 import EntityTable from "./EntityTable";
 import SingleLineTabs from "./SingleLineTabs/SingleLineTabs";
 
-const EntityPage: React.FC<{ ocelId: string; type: "events" | "objects" }> = ({
-  ocelId,
-  type,
-}) => {
+const EntityPage: React.FC<{
+  ocelId: string;
+  type: "events" | "objects";
+  title?: string;
+  description?: string;
+}> = ({ ocelId, type, title, description }) => {
   const areEntitiesEvents = type === "events";
 
   const { data: entityCounts } = (
@@ -75,6 +77,12 @@ const EntityPage: React.FC<{ ocelId: string; type: "events" | "objects" }> = ({
 
   return (
     <Flex direction={"column"} h={"100%"}>
+      {title && <Title order={2}>{title}</Title>}
+      {description && (
+        <Text c="dimmed" size="sm" mb="xs">
+          {description}
+        </Text>
+      )}
       <SingleLineTabs
         tabs={Object.entries(entityCounts ?? {}).map(([entityName, count]) => ({
           value: entityName,
