@@ -35,7 +35,6 @@ class RelationCombination(BaseModel):
         ]
 
 
-# TODO: Fix this slop
 class RelationCountSummary(BaseModel):
     """
     Summary statistics for relationship multiplicities in O2O or E2O relations.

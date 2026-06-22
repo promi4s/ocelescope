@@ -72,7 +72,8 @@ def relation_summary(
         direction=direction, filter_df=combinations, with_qualifier=with_qualifier
     )
 
-    # TODO: Fix this double sorting
+    # `combinations` was sorted to pick the right page, but `summary`'s groupby
+    # re-orders the rows, so the page has to be re-sorted on the same level.
     if effective_sort_by in _RELATION_SORT_LEVELS:
         summary = summary.sort_index(
             level=_RELATION_SORT_LEVELS[effective_sort_by], ascending=ascending
