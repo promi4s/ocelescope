@@ -1,10 +1,10 @@
 import { MultiSelect, ThemeIcon } from "@mantine/core";
 import {
   type RelationCountSummary,
-  useActivities,
   useE2o,
+  useE2oCombinations,
   useO2o,
-  useObjectTypes,
+  useO2oCombinations,
 } from "@ocelescope/api-base";
 import { keepPreviousData } from "@tanstack/react-query";
 import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
@@ -17,6 +17,7 @@ const COLUMN_WIDTHS = {
   selector: 30,
   source: 220,
   target: 220,
+  qualifier: 220,
   range: 160,
   total: 120,
 };
@@ -72,9 +73,21 @@ const SubRelationTable: React.FC<{
           width: COLUMN_WIDTHS.selector,
         },
         {
+          accessor: "source",
+          title: "",
+          width: COLUMN_WIDTHS.source,
+          render: () => null,
+        },
+        {
+          accessor: "target",
+          title: "",
+          width: COLUMN_WIDTHS.target,
+          render: () => null,
+        },
+        {
           accessor: "qualifier",
           title: "Qualifier",
-          width: COLUMN_WIDTHS.source + COLUMN_WIDTHS.target,
+          width: COLUMN_WIDTHS.qualifier,
           render: ({ qualifier }) => qualifier || <i>No qualifier</i>,
         },
         {
@@ -116,6 +129,7 @@ const RelationTable: React.FC<{
   hideRange?: boolean;
   hideTotal?: boolean;
   ocelVersion?: OcelVersion;
+  visibleRelations?: { source: string; target: string }[];
 }> = ({
   ocelId,
   relationType = "o2o",
@@ -125,31 +139,30 @@ const RelationTable: React.FC<{
   hideRange = false,
   hideTotal = false,
   ocelVersion,
+  visibleRelations,
 }) => {
   const isE2O = relationType === "e2o";
   const isSource = direction === "source";
 
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { data: objectTypes = [] } = useObjectTypes(ocelId, {
-    ocel_version: ocelVersion,
-  });
-  const { data: activities = [] } = useActivities(ocelId, {
-    ocel_version: ocelVersion,
-  });
+  const { data: combinations = [] } = (
+    isE2O ? useE2oCombinations : useO2oCombinations
+  )(ocelId, { direction, ocel_version: ocelVersion });
 
-  // For E2O the source side is the activity and the target side the object type
-  // (swapped when reading from the target perspective). O2O is object→object.
-  const sourceOptions = isE2O
-    ? isSource
-      ? activities
-      : objectTypes
-    : objectTypes;
-  const targetOptions = isE2O
-    ? isSource
-      ? objectTypes
-      : activities
-    : objectTypes;
+  const sourceOptions = useMemo(
+    () => Array.from(new Set(combinations.map(({ source }) => source))),
+    [combinations],
+  );
+  const targetOptions = useMemo(
+    () => Array.from(new Set(combinations.map(({ target }) => target))),
+    [combinations],
+  );
+  const qualifierOptions = useMemo(
+    () => Array.from(new Set(combinations.map(({ qualifier }) => qualifier))),
+    [combinations],
+  );
+
   const sourceTitle = isE2O
     ? isSource
       ? "Activity"
@@ -163,6 +176,49 @@ const RelationTable: React.FC<{
 
   const [filteredSources, setFilteredSources] = useState<string[]>([]);
   const [filteredTargets, setFilteredTargets] = useState<string[]>([]);
+  const [filteredQualifiers, setFilteredQualifiers] = useState<string[]>([]);
+
+  const isConstrained = visibleRelations !== undefined;
+
+  const visibleSources = useMemo(
+    () =>
+      isConstrained
+        ? Array.from(new Set(visibleRelations.map(({ source }) => source)))
+        : [],
+    [isConstrained, visibleRelations],
+  );
+  const visibleTargets = useMemo(
+    () =>
+      isConstrained
+        ? Array.from(new Set(visibleRelations.map(({ target }) => target)))
+        : [],
+    [isConstrained, visibleRelations],
+  );
+
+  const sourceSelectOptions = isConstrained
+    ? sourceOptions.filter((option) => visibleSources.includes(option))
+    : sourceOptions;
+  const targetSelectOptions = isConstrained
+    ? targetOptions.filter((option) => visibleTargets.includes(option))
+    : targetOptions;
+
+  const effectiveSources = useMemo(() => {
+    if (!isConstrained) return filteredSources;
+    return filteredSources.length > 0
+      ? filteredSources.filter((source) => visibleSources.includes(source))
+      : visibleSources;
+  }, [isConstrained, filteredSources, visibleSources]);
+
+  const effectiveTargets = useMemo(() => {
+    if (!isConstrained) return filteredTargets;
+    return filteredTargets.length > 0
+      ? filteredTargets.filter((target) => visibleTargets.includes(target))
+      : visibleTargets;
+  }, [isConstrained, filteredTargets, visibleTargets]);
+
+  const showNoRelations =
+    isConstrained &&
+    (effectiveSources.length === 0 || effectiveTargets.length === 0);
 
   const useRelations = isE2O ? useE2o : useO2o;
 
@@ -174,10 +230,13 @@ const RelationTable: React.FC<{
       page_size: PAGE_SIZE,
       with_qualifier: false,
       ocel_version: ocelVersion,
-      ...(filteredSources.length > 0 && { source_types: filteredSources }),
-      ...(filteredTargets.length > 0 && { target_types: filteredTargets }),
+      ...(effectiveSources.length > 0 && { source_types: effectiveSources }),
+      ...(effectiveTargets.length > 0 && { target_types: effectiveTargets }),
+      ...(filteredQualifiers.length > 0 && { qualifiers: filteredQualifiers }),
     },
-    { query: { placeholderData: keepPreviousData } },
+    {
+      query: { placeholderData: keepPreviousData, enabled: !showNoRelations },
+    },
   );
 
   const [selectedRelations, setSelectedRelations] = useState<string[]>([]);
@@ -191,19 +250,24 @@ const RelationTable: React.FC<{
           textAlign: "center",
           width: COLUMN_WIDTHS.selector,
           cellsStyle: () => ({ padding: 5 }),
-          render: (record) => (
-            <ThemeIcon
-              size={"sm"}
-              variant="transparent"
-              style={{ display: "flex" }}
-            >
-              {selectedRelations.includes(relationId(record)) ? (
-                <ChevronDownIcon size={16} />
-              ) : (
-                <ChevronRightIcon size={16} />
-              )}
-            </ThemeIcon>
-          ),
+          render: (record) => {
+            if ((record.qualifiers?.length ?? 0) <= 1) {
+              return null;
+            }
+            return (
+              <ThemeIcon
+                size={"sm"}
+                variant="transparent"
+                style={{ display: "flex" }}
+              >
+                {selectedRelations.includes(relationId(record)) ? (
+                  <ChevronDownIcon size={16} />
+                ) : (
+                  <ChevronRightIcon size={16} />
+                )}
+              </ThemeIcon>
+            );
+          },
         },
         {
           accessor: "source",
@@ -211,7 +275,7 @@ const RelationTable: React.FC<{
           width: COLUMN_WIDTHS.source,
           filter: () => (
             <MultiSelect
-              data={sourceOptions}
+              data={sourceSelectOptions}
               value={filteredSources}
               onChange={setFilteredSources}
               comboboxProps={{ withinPortal: false }}
@@ -227,7 +291,7 @@ const RelationTable: React.FC<{
           width: COLUMN_WIDTHS.target,
           filter: () => (
             <MultiSelect
-              data={targetOptions}
+              data={targetSelectOptions}
               value={filteredTargets}
               onChange={setFilteredTargets}
               comboboxProps={{ withinPortal: false }}
@@ -236,6 +300,28 @@ const RelationTable: React.FC<{
             />
           ),
           filtering: filteredTargets.length > 0,
+        },
+        {
+          accessor: "qualifiers",
+          title: "Qualifiers",
+          width: COLUMN_WIDTHS.qualifier,
+          render: ({ qualifiers = [] }) => {
+            const labels = qualifiers.map(
+              (qualifier) => qualifier || "No qualifier",
+            );
+            return `${labels.slice(0, 2).join(", ")}${labels.length > 2 ? `, ... (${labels.length})` : ""}`;
+          },
+          filter: () => (
+            <MultiSelect
+              data={qualifierOptions}
+              value={filteredQualifiers}
+              onChange={setFilteredQualifiers}
+              comboboxProps={{ withinPortal: false }}
+              clearable
+              searchable
+            />
+          ),
+          filtering: filteredQualifiers.length > 0,
         },
         {
           accessor: "range",
@@ -255,10 +341,12 @@ const RelationTable: React.FC<{
     [
       sourceTitle,
       targetTitle,
-      sourceOptions,
-      targetOptions,
+      sourceSelectOptions,
+      targetSelectOptions,
+      qualifierOptions,
       filteredSources,
       filteredTargets,
+      filteredQualifiers,
       selectedRelations,
       hideRange,
       hideTotal,
@@ -269,11 +357,11 @@ const RelationTable: React.FC<{
   return (
     <DataTable
       idAccessor={relationId}
-      records={data?.response}
+      records={showNoRelations ? [] : data?.response}
       columns={columns}
       withTableBorder
       fetching={isFetching}
-      totalRecords={data?.total_items ?? 0}
+      totalRecords={showNoRelations ? 0 : (data?.total_items ?? 0)}
       page={currentPage}
       recordsPerPage={PAGE_SIZE}
       onPageChange={setCurrentPage}
@@ -281,6 +369,7 @@ const RelationTable: React.FC<{
       height={500}
       rowExpansion={{
         allowMultiple: false,
+        expandable: ({ record }) => (record.qualifiers?.length ?? 0) > 1,
         expanded: {
           recordIds: selectedRelations,
           onRecordIdsChange: setSelectedRelations,
