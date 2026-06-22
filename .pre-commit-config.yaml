@@ -33,3 +33,9 @@ repos:
         language: system
         pass_filenames: false
         files: ^src/backend/
+      - id: typecheck
+        name: Typecheck (backend + frontend)
+        entry: pnpm run typecheck
+        language: system
+        pass_filenames: false
+        always_run: true

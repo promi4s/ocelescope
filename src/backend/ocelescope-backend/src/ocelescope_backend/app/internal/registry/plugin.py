@@ -62,7 +62,7 @@ class PluginRegistry:
 
         method = plugin.method_map()[method_name]
 
-        method._method = method._method.__get__(plugin, type(plugin))
+        method._method = method._method.__get__(plugin, type(plugin))  # ty: ignore[unresolved-attribute]
 
         return method
 

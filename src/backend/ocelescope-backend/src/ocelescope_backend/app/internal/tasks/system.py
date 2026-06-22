@@ -148,7 +148,7 @@ def system_task(
     name: Optional[str] = None, dedupe: bool = False, run_once: bool = False
 ) -> Callable[[Callable[P, Sequence[SSEMessage]]], Callable[P, str]]:
     def decorator(fn: Callable[P, Sequence[SSEMessage]]) -> Callable[P, str]:
-        task_name = name or fn.__name__
+        task_name = name or fn.__name__  # ty: ignore[unresolved-attribute]
 
         @functools.wraps(fn)
         def wrapper(
