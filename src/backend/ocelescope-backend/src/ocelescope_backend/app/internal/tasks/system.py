@@ -1,4 +1,5 @@
 import functools
+import traceback
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -18,6 +19,7 @@ from ocelescope_backend.app.internal.tasks.base import (
     make_hashable,
 )
 from ocelescope_backend.app.sse_manager import (
+    ErrorNotification,
     SSEMessage,
     sse_manager,
 )
@@ -71,7 +73,14 @@ class SystemTask(TaskBase, Generic[P]):
         except Exception as exc:
             self.error = exc
             self.state = TaskState.FAILURE
-            raise
+            self.result = [
+                ErrorNotification(
+                    type="error",
+                    title=f"Task '{self.name}' failed",
+                    message=str(exc),
+                    trace=traceback.format_exc(),
+                )
+            ]
         finally:
             self.session.running_tasks.pop(self.id, None)
             for result in self.result:

@@ -28,7 +28,7 @@ const SystemNotification = z.object({
   title: z.string(),
   message: z.string(),
   notification_type: z.enum(["warning", "info", "error"]),
-  link: z.optional(SystemLink),
+  link: SystemLink.nullish(),
 });
 
 const InvalidationRequest = z.object({
