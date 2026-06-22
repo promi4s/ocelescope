@@ -8,6 +8,7 @@ const ObjectPage: React.FC = () => {
       key={id}
       ocelId={id ?? ""}
       type="objects"
+      title="Object Inspector"
       description="Browse the individual objects in this log. Pick an object type to see its records in a table, with their attributes and the objects they have a relation with."
     />
   );

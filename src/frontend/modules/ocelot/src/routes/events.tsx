@@ -8,6 +8,7 @@ const EventPage: React.FC = () => {
       key={id}
       ocelId={id ?? ""}
       type="events"
+      title="Event Inspector"
       description="Browse the individual events in this log. Pick an event type to see its records in a table, with their attributes and the objects they have a relation with."
     />
   );
