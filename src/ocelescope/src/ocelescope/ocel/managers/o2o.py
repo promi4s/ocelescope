@@ -124,6 +124,17 @@ class O2OManager(BaseManager):
             filter_df=filter_df,
         )
 
+    @property
+    @instance_lru_cache()
+    def qualifiers(self) -> list[str]:
+        """
+        Return the list of all qualifiers present in the O2O relations.
+
+        Returns:
+            list[str]: Sorted list of unique qualifier names.
+        """
+        return sorted(self.df[O2O_QUALIFIER].dropna().unique().tolist())
+
     @instance_lru_cache()
     def combinations(
         self,

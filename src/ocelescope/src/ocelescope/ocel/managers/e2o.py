@@ -160,6 +160,17 @@ class E2OManager(BaseManager):
             qualifiers=list(qualifiers),
         )
 
+    @property
+    @instance_lru_cache()
+    def qualifiers(self) -> list[str]:
+        """
+        Return the list of all qualifiers present in the E2O relations.
+
+        Returns:
+            list[str]: Sorted list of unique qualifier names.
+        """
+        return sorted(self.df[E2O_QUALIFIER].dropna().unique().tolist())
+
     def get_events_of_object(self, object_id: str):
         return self.df.loc[self.df[OID_COL].eq(object_id), EID_COL].dropna().unique()
 
