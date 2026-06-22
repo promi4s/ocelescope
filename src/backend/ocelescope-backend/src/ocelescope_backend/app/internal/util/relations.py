@@ -34,13 +34,29 @@ def relation_summary(
         None if not with_qualifier and sort_by == "qualifier" else sort_by
     )
 
-    combinations = relations.combinations(
-        direction,
-        tuple(source_types or ()),
-        tuple(target_types or ()),
-        tuple(qualifiers or ()),
-        with_qualifier=with_qualifier,
-    )
+    if not with_qualifier and qualifiers:
+        # In aggregated mode the qualifier is dropped from the combinations, which
+        # also drops the qualifier filter. Apply it via the qualifier-aware
+        # combinations and reduce to the matching (source, target) pairs.
+        combinations = (
+            relations.combinations(
+                direction,
+                tuple(source_types or ()),
+                tuple(target_types or ()),
+                tuple(qualifiers),
+                with_qualifier=True,
+            )
+            .iloc[:, :2]
+            .drop_duplicates()
+        )
+    else:
+        combinations = relations.combinations(
+            direction,
+            tuple(source_types or ()),
+            tuple(target_types or ()),
+            tuple(qualifiers or ()),
+            with_qualifier=with_qualifier,
+        )
 
     if effective_sort_by in _RELATION_SORT_LEVELS:
         sort_column = combinations.columns[_RELATION_SORT_LEVELS[effective_sort_by]]
@@ -62,9 +78,41 @@ def relation_summary(
             level=_RELATION_SORT_LEVELS[effective_sort_by], ascending=ascending
         )
 
+    qualifiers_map: dict[tuple[str, str], list[str]] | None = None
+    if not with_qualifier and total_items > 0:
+        qualifiers_map = _qualifiers_by_pair(relations, direction, combinations)
+
     return PaginatedResponse(
-        response=RelationCountSummary.from_summary(summary),
+        response=RelationCountSummary.from_summary(summary, qualifiers_map),
         page=effective_page,
         page_size=effective_page_size,
         total_items=total_items,
     )
+
+
+def _qualifiers_by_pair(
+    relations,  # ocel.e2o or ocel.o2o
+    direction: Literal["source", "target"],
+    page_combinations,  # the (source, target) combinations for the current page
+) -> dict[tuple[str, str], list[str]]:
+    """Map each (source, target) pair on the page to its sorted list of qualifiers.
+
+    Columns are read positionally: 0 = source type, 1 = target type, 2 = qualifier.
+    """
+    page_sources = tuple(str(value) for value in page_combinations.iloc[:, 0].unique())
+    page_targets = tuple(str(value) for value in page_combinations.iloc[:, 1].unique())
+
+    qualifier_combinations = relations.combinations(
+        direction,
+        page_sources,
+        page_targets,
+        (),
+        with_qualifier=True,
+    )
+
+    qualifiers_map: dict[tuple[str, str], list[str]] = {}
+    for _, row in qualifier_combinations.iterrows():
+        key = (str(row.iloc[0]), str(row.iloc[1]))
+        qualifiers_map.setdefault(key, []).append(str(row.iloc[2]))
+
+    return {pair: sorted(qualifiers) for pair, qualifiers in qualifiers_map.items()}

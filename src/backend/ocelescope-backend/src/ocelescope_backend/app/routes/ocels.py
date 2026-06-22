@@ -9,7 +9,10 @@ from ocelescope.ocel.constants.misc import OCELFileExtensions
 from ocelescope_backend.app.dependencies import ApiOcel, ApiSession
 from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.model.base import PaginatedResponse
-from ocelescope_backend.app.internal.model.relations import RelationCountSummary
+from ocelescope_backend.app.internal.model.relations import (
+    RelationCombination,
+    RelationCountSummary,
+)
 from ocelescope_backend.app.internal.model.events import (
     Date_Distribution_Item,
     Entity_Time_Info,
@@ -400,6 +403,32 @@ def get_object_relations(
         page,
         page_size,
         with_qualifier=with_qualifier,
+    )
+
+
+@ocels_router.get(
+    "/{ocel_id}/relations/e2o/combinations",
+    operation_id="e2oCombinations",
+)
+def get_e2o_combinations(
+    ocel: ApiOcel,
+    direction: Literal["source", "target"] = "source",
+) -> list[RelationCombination]:
+    return RelationCombination.from_combinations(
+        ocel.e2o.combinations(direction, with_qualifier=True)
+    )
+
+
+@ocels_router.get(
+    "/{ocel_id}/relations/o2o/combinations",
+    operation_id="o2oCombinations",
+)
+def get_o2o_combinations(
+    ocel: ApiOcel,
+    direction: Literal["source", "target"] = "source",
+) -> list[RelationCombination]:
+    return RelationCombination.from_combinations(
+        ocel.o2o.combinations(direction, with_qualifier=True)
     )
 
 

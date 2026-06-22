@@ -1743,6 +1743,182 @@
         }
       }
     },
+    "/ocels/{ocel_id}/relations/e2o/combinations": {
+      "get": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Get E2O Combinations",
+        "operationId": "e2oCombinations",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "source",
+                "target"
+              ],
+              "type": "string",
+              "default": "source",
+              "title": "Direction"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelationCombination"
+                  },
+                  "title": "Response E2Ocombinations"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ocels/{ocel_id}/relations/o2o/combinations": {
+      "get": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Get O2O Combinations",
+        "operationId": "o2oCombinations",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "source",
+                "target"
+              ],
+              "type": "string",
+              "default": "source",
+              "title": "Direction"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelationCombination"
+                  },
+                  "title": "Response O2Ocombinations"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/ocels/{ocel_id}/events/ids": {
       "get": {
         "tags": [
@@ -4777,11 +4953,43 @@
         ],
         "title": "QuantityInfo"
       },
+      "RelationCombination": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "target": {
+            "type": "string",
+            "title": "Target"
+          },
+          "qualifier": {
+            "type": "string",
+            "title": "Qualifier"
+          }
+        },
+        "type": "object",
+        "required": [
+          "source",
+          "target",
+          "qualifier"
+        ],
+        "title": "RelationCombination",
+        "description": "A distinct (source, target, qualifier) combination of a relation.\n\nAttributes:\n    source: The source object or event type.\n    target: The target object or event type.\n    qualifier: The relation qualifier (empty string when none applies)."
+      },
       "RelationCountSummary": {
         "properties": {
           "qualifier": {
             "type": "string",
             "title": "Qualifier"
+          },
+          "qualifiers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Qualifiers",
+            "default": []
           },
           "source": {
             "type": "string",
@@ -4814,7 +5022,7 @@
           "sum"
         ],
         "title": "RelationCountSummary",
-        "description": "Summary statistics for relationship multiplicities in O2O or E2O relations.\n\nCaptures, for each combination of source type, target type and qualifier,\nhow many related items occur per source instance.\n\nAttributes:\n    qualifier: The relation qualifier (empty string when none applies).\n    source: The source object or event type.\n    target: The target object or event type.\n    min_count: The minimum number of related items for any source instance.\n    max_count: The maximum number of related items for any source instance.\n    sum: The total number of relation occurrences across all instances."
+        "description": "Summary statistics for relationship multiplicities in O2O or E2O relations.\n\nCaptures, for each combination of source type, target type and qualifier,\nhow many related items occur per source instance.\n\nAttributes:\n    qualifier: The relation qualifier (empty string when none applies).\n    qualifiers: The qualifiers aggregated under a (source, target) pair. For\n        aggregated rows (``with_qualifier=False``) this lists every qualifier;\n        for per-qualifier rows it is the single-element list ``[qualifier]``.\n    source: The source object or event type.\n    target: The target object or event type.\n    min_count: The minimum number of related items for any source instance.\n    max_count: The maximum number of related items for any source instance.\n    sum: The total number of relation occurrences across all instances."
       },
       "Resource": {
         "properties": {
