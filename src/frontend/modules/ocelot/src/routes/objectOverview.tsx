@@ -1,4 +1,4 @@
-import { Group, Input, SegmentedControl, Stack } from "@mantine/core";
+import { Group, Input, SegmentedControl, Stack, Text } from "@mantine/core";
 import { useDebouncedState } from "@mantine/hooks";
 import {
   useO2o,
@@ -50,6 +50,11 @@ const ObjectGraph = () => {
 
   return (
     <Stack w={"100%"} h={"100%"}>
+      <Text c="dimmed" size="sm">
+        Get an overview of all object types in this log. Switch between an
+        interactive graph and a card grid to see how many objects of each type
+        exist, what attributes they have, and how they relate to one another.
+      </Text>
       <Group justify="end">
         {visualization === "cards" && (
           <Input
