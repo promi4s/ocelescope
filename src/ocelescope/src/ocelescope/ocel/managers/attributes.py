@@ -109,6 +109,21 @@ class AttributeManager(BaseManager):
         # them so downstream summaries don't emit empty attribute rows.
         return merged.dropna(axis=1, how="all")
 
+    def attribute_names(
+        self,
+        object_types: list[str] | None = None,
+        activities: list[str] | None = None,
+    ) -> list[str]:
+        """Return the attribute names present for the selected entities.
+
+        Mirrors the row selection of :meth:`get_aggr_summary`: attributes that
+        are entirely empty for the selected ``object_types``/``activities`` are
+        excluded, so the result only lists attributes those entities actually
+        carry.
+        """
+        table = self._merged_att_table(object_types=object_types, activities=activities)
+        return sorted(column for column in table.columns if column not in (ACTIVITY_COL, OTYPE_COL))
+
     def get_aggr_summary(
         self,
         object_types: list[str] | None = None,
