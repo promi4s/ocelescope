@@ -18,21 +18,29 @@ const EntityFilter: (
     return (
       <form>
         <Controller
-          name={
-            isEvents
-              ? `activity.${0}.event_types`
-              : `object_type.${0}.object_types`
-          }
+          name={isEvents ? `activity.${0}.mode` : `object_type.${0}.mode`}
           control={control}
-          render={({ field }) => (
-            <EntityTypeFilterInput
-              entityTypes={Object.entries(entityCounts ?? {}).map(
-                ([activity, count]) => ({ key: activity, value: count }),
+          render={({ field: modeField }) => (
+            <Controller
+              name={
+                isEvents
+                  ? `activity.${0}.event_types`
+                  : `object_type.${0}.object_types`
+              }
+              control={control}
+              render={({ field }) => (
+                <EntityTypeFilterInput
+                  entityTypes={Object.entries(entityCounts ?? {}).map(
+                    ([activity, count]) => ({ key: activity, value: count }),
+                  )}
+                  selectedEntityTypes={field.value ?? []}
+                  mode={modeField.value ?? "exclude"}
+                  onModeChange={modeField.onChange}
+                  showGraph
+                  label={isEvents ? "Activities" : "Object Types"}
+                  onChange={field.onChange}
+                />
               )}
-              selectedEntityTypes={field.value ?? []}
-              showGraph
-              label={isEvents ? "Activities" : "Object Types"}
-              onChange={field.onChange}
             />
           )}
         />
@@ -43,7 +51,9 @@ const EntityFilter: (
 export const ActivityFilter: FilterViewType<"activity"> = {
   title: "Activity",
   ViewComponent: EntityFilter("events"),
-  generateDefault: () => [{ type: "activity", event_types: [] }],
+  generateDefault: () => [
+    { type: "activity", event_types: [], mode: "exclude" },
+  ],
   cleanUpFilters: (filter) => {
     if (!filter[0] || filter[0].event_types.length === 0) {
       return [];
@@ -55,7 +65,9 @@ export const ActivityFilter: FilterViewType<"activity"> = {
 export const ObjectTypeFilter: FilterViewType<"object_type"> = {
   title: "Object Type",
   ViewComponent: EntityFilter("objects"),
-  generateDefault: () => [{ type: "object_type", object_types: [] }],
+  generateDefault: () => [
+    { type: "object_type", object_types: [], mode: "exclude" },
+  ],
   cleanUpFilters: (filter) => {
     if (!filter[0] || filter[0].object_types.length === 0) {
       return [];
