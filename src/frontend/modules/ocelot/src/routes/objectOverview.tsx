@@ -38,6 +38,7 @@ const ObjectGraph = () => {
                 key={objectName}
                 count={count}
                 name={objectName}
+                maw={300}
                 attributeSummaries={objectAttributes.filter(
                   ({ entity_type }) => entity_type === objectName,
                 )}

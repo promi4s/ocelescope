@@ -9,6 +9,7 @@ type EntityCardProps = {
   count: number;
   attributeSummaries?: TypedAttribute[];
   relationSummaries?: RelationCountSummary[];
+  maw?: number;
 };
 
 const EntityCard: React.FC<EntityCardProps> = ({
@@ -16,6 +17,7 @@ const EntityCard: React.FC<EntityCardProps> = ({
   count,
   attributeSummaries = [],
   relationSummaries = [],
+  maw,
 }) => {
   return (
     <Flex
@@ -23,7 +25,7 @@ const EntityCard: React.FC<EntityCardProps> = ({
       bd={"1px solid black"}
       bg={"white"}
       miw={200}
-      maw={300}
+      maw={maw}
       mih={100}
       direction={"column"}
     >
@@ -68,7 +70,7 @@ const EntityCard: React.FC<EntityCardProps> = ({
                   <Table.Td style={{ wordBreak: "break-word" }}>
                     {qualifier ?? "None"}
                   </Table.Td>
-                  <Table.Td>
+                  <Table.Td ta={"end"} w={70} style={{ whiteSpace: "nowrap" }}>
                     {min_count < max_count
                       ? `${min_count}-${max_count}`
                       : min_count}
