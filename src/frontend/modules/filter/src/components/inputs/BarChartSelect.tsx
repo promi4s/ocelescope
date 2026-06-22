@@ -12,6 +12,8 @@ type BarChartSelectProps = {
   onSelect: (selectedValue: string) => void;
 };
 
+export const BAR_HEIGHT = 30;
+
 const BarChartSelect: React.FC<BarChartSelectProps> = memo(
   ({ values, selected, onSelect }) => {
     const colorMap = useMemo(() => {
@@ -22,7 +24,7 @@ const BarChartSelect: React.FC<BarChartSelectProps> = memo(
 
     return (
       <BarChart
-        h={30 * values.length}
+        h={BAR_HEIGHT * values.length}
         data={values.map(({ value, key }) => ({
           key,
           value,
