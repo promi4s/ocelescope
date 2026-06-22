@@ -9,8 +9,48 @@ permissions:
   contents: read
 
 jobs:
+  changes:
+    name: Detect changed paths
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      python: ${{ steps.filter.outputs.python }}
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+
+      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
+        id: filter
+        with:
+          filters: |
+            python:
+              - '.github/workflows/ci.yml'
+              - 'src/**/*.py'
+              - 'scripts/**/*.py'
+              - '**/pyproject.toml'
+              - 'uv.lock'
+              - '.python-version'
+            backend:
+              - '.github/workflows/ci.yml'
+              - 'src/backend/**'
+              - 'src/ocelescope/**'
+              - 'uv.lock'
+              - '.python-version'
+            frontend:
+              - '.github/workflows/ci.yml'
+              - 'src/frontend/**'
+              - 'biome.json'
+              - '**/package.json'
+              - '**/tsconfig*.json'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+
   python-ruff:
     name: Python - ruff (lint + format check)
+    needs: changes
+    if: ${{ needs.changes.outputs.python == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
@@ -25,8 +65,32 @@ jobs:
         with:
           args: "format --check --diff ./src"
 
+  python-ty:
+    name: Python - ty (typecheck)
+    needs: changes
+    if: ${{ needs.changes.outputs.python == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6
+        with:
+          python-version-file: ".python-version"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
+
+      - name: Install the project
+        run: uv sync --locked --all-packages
+
+      - name: ty check
+        run: uv run ty check ./src/
+
   frontend-biome:
     name: Frontend - biome (lint + format check)
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
@@ -36,6 +100,45 @@ jobs:
 
       - name: Biome CI
         run: biome ci
+
+  frontend-typecheck:
+    name: Frontend - tsc (typecheck)
+    needs: changes
+    # The API client is generated from the backend, so backend changes can
+    # affect the frontend types too.
+    if: ${{ needs.changes.outputs.frontend == 'true' || needs.changes.outputs.backend == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6
+        with:
+          python-version-file: ".python-version"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
+
+      - name: Install backend (needed to generate the API client)
+        run: uv sync --locked --all-packages
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
+
+      - name: Set up Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "22"
+          cache: pnpm
+
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate API client and build packages
+        run: pnpm run api:sync
+
+      - name: Typecheck
+        run: pnpm run typecheck:frontend
 
   spellcheck:
     runs-on: ubuntu-latest

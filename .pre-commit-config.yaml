@@ -10,7 +10,6 @@ repos:
         exclude: ^template/
       - id: trailing-whitespace
         files: .*\.py$
-        exclude: ^template/
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.7
     hooks:
@@ -33,3 +32,17 @@ repos:
         language: system
         pass_filenames: false
         files: ^src/backend/
+      - id: typecheck-backend
+        name: Typecheck (backend)
+        entry: pnpm run typecheck:backend
+        language: system
+        pass_filenames: false
+        files: \.py$
+        exclude: ^template/
+      - id: typecheck-frontend
+        name: Typecheck (frontend)
+        entry: pnpm run typecheck:frontend
+        language: system
+        pass_filenames: false
+        types_or: [ts, tsx, javascript, jsx]
+        exclude: ^template/

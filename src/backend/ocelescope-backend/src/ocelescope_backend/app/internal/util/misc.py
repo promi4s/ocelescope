@@ -112,7 +112,7 @@ def example_settings_to_dotenv(
         # This prints `int` instead of `<class int>
         from typing import _type_repr as type_repr
     except ImportError:
-        type_repr = repr  # type: ignore[assignment]
+        type_repr = repr  # type: ignore[assignment]  # ty: ignore[invalid-assignment]
 
     output = []
     env_prefix = settings_class.model_config["env_prefix"]  # type: ignore

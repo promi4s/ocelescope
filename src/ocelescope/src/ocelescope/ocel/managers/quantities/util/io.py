@@ -236,7 +236,7 @@ def write_extension_to_json(
         JSON_QUANTITIES: renamed_oqty.to_dict(orient="records"),
         JSON_OPERATIONS: renamed_qop.to_dict(orient="records"),
         JSON_PROPERTIES: orjson.loads(
-            renamed_properties.to_json(orient="records", date_format="iso")
+            renamed_properties.to_json(orient="records", date_format="iso")  # ty: ignore[invalid-argument-type]
         ),
     }
 

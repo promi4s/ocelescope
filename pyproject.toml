@@ -15,10 +15,19 @@ members = [
 [tool.ruff.lint]
 ignore = ["E731"]
 
+[tool.ty.rules]
+# Existing `# type: ignore` comments target mypy/pyright; ty uses its own
+# `# ty: ignore` directive, so it sees those as unused. Don't warn on them.
+unused-type-ignore-comment = "ignore"
+# Casts that ty considers redundant are kept for the other type checkers.
+redundant-cast = "ignore"
+
 [dependency-groups]
-dev = [{ include-group = "lint" }]
+dev = [{ include-group = "lint" }, { include-group = "typecheck" }]
 
 lint = ["ruff>=0.15.7"]
+
+typecheck = ["ty>=0.0.51"]
 
 docs = [
   "mkdocs>=1.6.1",

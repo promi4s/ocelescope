@@ -29,7 +29,8 @@
   },
   "scripts": {
     "build": "tsdown",
-    "dev": "tsdown --watch ./src"
+    "dev": "tsdown --watch ./src",
+    "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
     "@mantine/core": "catalog:",

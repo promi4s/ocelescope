@@ -110,7 +110,7 @@ def get_resource(session: ApiSession, resource_id: str) -> GetResourceResponse:
             id=resource_id,
             **resource.model_dump(),
         ),
-        visualization=resource_instance.visualize()
+        visualization=resource_instance.visualize()  # ty: ignore[invalid-argument-type]
         if resource_instance is not None
         else None,
     )

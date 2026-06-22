@@ -136,7 +136,7 @@ def plugin_method(
     """
 
     def decorator(func: Callable[..., PluginReturnType]):
-        plugin_method_meta = PluginMethod(name=func.__name__, label=label, description=description)
+        plugin_method_meta = PluginMethod(name=func.__name__, label=label, description=description)  # ty: ignore[unresolved-attribute]
         method_hints = get_type_hints(func, include_extras=True)
 
         for arg_name, hint in method_hints.items():

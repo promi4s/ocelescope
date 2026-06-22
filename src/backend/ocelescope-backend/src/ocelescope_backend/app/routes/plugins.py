@@ -111,6 +111,9 @@ def get_computed(
 
 @plugin_router.delete("/{plugin_id}", operation_id="deletePlugin")
 def delete_plugin(plugin_id: str, session: ApiSession):
+    if not config.PLUGIN_DIR:
+        raise HTTPException(status_code=404, detail="Plugin files not found")
+
     plugin_path = config.PLUGIN_DIR / plugin_id
 
     if not plugin_path.exists():

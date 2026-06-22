@@ -34,8 +34,8 @@ def _build_parameter_model(func: Callable[..., Resource]) -> type[BaseModel]:
         arbitrary_types_allowed=True,
     )
 
-    model_name = f"{func.__name__.title().replace('_', '')}Parameters"
-    return create_model(model_name, __config__=config, **fields)  # type: ignore[call-overload]
+    model_name = f"{func.__name__.title().replace('_', '')}Parameters"  # ty: ignore[unresolved-attribute]
+    return create_model(model_name, __config__=config, **fields)  # type: ignore[call-overload]  # ty: ignore[no-matching-overload]
 
 
 @dataclass
