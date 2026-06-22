@@ -23,49 +23,51 @@ const EntityCard: React.FC<EntityCardProps> = ({
       bd={"1px solid black"}
       bg={"white"}
       miw={200}
+      maw={300}
       mih={100}
       direction={"column"}
     >
-      <Text fw={700} size="sm" ta="center" py={"4"}>
+      <Text
+        fw={700}
+        size="sm"
+        ta="center"
+        py={"4"}
+        px={"xs"}
+        style={{ wordBreak: "break-word" }}
+      >
         {`${name} (${count})`}
       </Text>
       <Divider c={"black"} size={"md"} />
       {attributeSummaries.length !== 0 && (
-        <Table
-          withRowBorders={false}
-          captionSide="top"
-          style={{
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}
-        >
+        <Table withRowBorders={false} captionSide="top" layout="fixed">
           <Table.Caption mb={0}>Attributes</Table.Caption>
           <Table.Tbody>
             {attributeSummaries.map((attribute) => (
               <Table.Tr key={attribute.name}>
-                <Table.Td> {attribute.name}</Table.Td>
-                <Table.Td ta={"end"}>{attribute.type}</Table.Td>
+                <Table.Td style={{ wordBreak: "break-word" }}>
+                  {attribute.name}
+                </Table.Td>
+                <Table.Td ta={"end"} style={{ wordBreak: "break-word" }}>
+                  {attribute.type}
+                </Table.Td>
               </Table.Tr>
             ))}
           </Table.Tbody>
         </Table>
       )}
       {relationSummaries.length !== 0 && (
-        <Table
-          withRowBorders={false}
-          captionSide="top"
-          style={{
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}
-        >
+        <Table withRowBorders={false} captionSide="top" layout="fixed">
           <Table.Caption mb={0}>Relations</Table.Caption>
           <Table.Tbody>
             {relationSummaries.map(
               ({ target, qualifier, min_count, max_count }) => (
                 <Table.Tr key={`${target}-${qualifier}`}>
-                  <Table.Td>{target}</Table.Td>
-                  <Table.Td>{qualifier ?? "None"}</Table.Td>
+                  <Table.Td style={{ wordBreak: "break-word" }}>
+                    {target}
+                  </Table.Td>
+                  <Table.Td style={{ wordBreak: "break-word" }}>
+                    {qualifier ?? "None"}
+                  </Table.Td>
                   <Table.Td>
                     {min_count < max_count
                       ? `${min_count}-${max_count}`
