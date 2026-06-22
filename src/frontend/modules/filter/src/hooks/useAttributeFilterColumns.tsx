@@ -51,12 +51,13 @@ const getInitialFilter = (
   }
 };
 
-const getEntityType = (attribute: AttributeUnion) => {
-  return "entity_type_names" in attribute
-    ? attribute.entity_type_names[0] && attribute.entity_type_names.length === 1
-      ? attribute.entity_type_names[0]
-      : undefined
-    : attribute.entity_type;
+const getEntityType = (attribute: AttributeUnion): string | undefined => {
+  if (!("entity_type_names" in attribute)) {
+    return attribute.entity_type;
+  }
+  return attribute.entity_type_names.length === 1
+    ? attribute.entity_type_names[0]
+    : undefined;
 };
 
 const generateRecordId = (attribute: AttributeUnion) => {

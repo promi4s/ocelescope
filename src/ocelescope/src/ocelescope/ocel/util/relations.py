@@ -49,7 +49,7 @@ def summarize_relation(
         group_fields.append(qualifier_field)
         summary_fields.append(qualifier_field)
 
-    relation_counts = filtered_relations.groupby(group_fields)[target_id_field].size()
+    relation_counts = filtered_relations.groupby(group_fields)[target_id_field].count()
 
     summary = relation_counts.groupby(summary_fields).agg(["min", "max", "sum"])
 
@@ -70,9 +70,9 @@ def get_relation_combination(
     source_type_field: str,
     target_type_field: str,
     qualifier_field: str | None = None,
-    source_types: list[str] = [],
-    target_types: list[str] = [],
-    qualifiers: list[str] = [],
+    source_types: list[str] | None = None,
+    target_types: list[str] | None = None,
+    qualifiers: list[str] | None = None,
 ) -> pd.DataFrame:
     """
     Return the distinct (source_type, target_type[, qualifier]) combinations.
@@ -94,13 +94,13 @@ def get_relation_combination(
     """
     filter_mask = pd.Series(data=True, index=relation_table.index)
 
-    if len(source_types) > 0:
+    if source_types:
         filter_mask &= relation_table[source_type_field].isin(source_types)
 
-    if len(target_types) > 0:
+    if target_types:
         filter_mask &= relation_table[target_type_field].isin(target_types)
 
-    if len(qualifiers) > 0 and qualifier_field is not None:
+    if qualifiers and qualifier_field is not None:
         filter_mask &= relation_table[qualifier_field].isin(qualifiers)
 
     return cast(
