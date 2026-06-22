@@ -35,7 +35,6 @@ def filter_by_attribute(attribute_df: DataFrame, type_column: str, config: Attri
     series = cast(Series, df[col])
     mask = pd.Series(True, index=series.index)
 
-    # Handle numeric filtering
     if config.number_range is not None:
         if is_numeric_dtype(series):
             numeric_series = series
@@ -47,7 +46,6 @@ def filter_by_attribute(attribute_df: DataFrame, type_column: str, config: Attri
         if config.number_range[1] is not None:
             mask &= numeric_series <= float(config.number_range[1])  # type:ignore
 
-    # Handle date filtering
     elif config.time_range is not None:
         if is_datetime64_any_dtype(series):
             date_series = series
@@ -59,17 +57,12 @@ def filter_by_attribute(attribute_df: DataFrame, type_column: str, config: Attri
         if config.time_range[1] is not None:
             mask &= date_series <= pd.to_datetime(config.time_range[1])
 
-    # Handle nominal filtering
     if config.values is not None:
         mask &= series.isin(config.values)
 
     if config.regex is not None:
         mask &= series.astype(str).str.contains(config.regex, regex=True, na=False)
 
-    # Rows the filter does not touch are kept untouched. With an explicit
-    # target_type only that type is affected; without one (a "general" filter)
-    # every type that actually has the attribute is affected, while types that
-    # never define it are left untouched.
     if config.target_type is not None:
         is_unaffected = attribute_df[type_column] != config.target_type
     else:
