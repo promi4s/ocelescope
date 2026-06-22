@@ -1,4 +1,11 @@
-import { ActionIcon, ActionIconGroup, Group, Tabs } from "@mantine/core";
+import {
+  ActionIcon,
+  ActionIconGroup,
+  Group,
+  Stack,
+  Tabs,
+  Text,
+} from "@mantine/core";
 import { CheckIcon, RotateCcwIcon, Trash2Icon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useCurrentFilterTab } from "../hooks/useSearchParams";
@@ -70,11 +77,21 @@ const FilterForm = ({ ocelId, currentFilter, onSubmit }: FilterFormProps) => {
         </ActionIconGroup>
       </Group>
 
-      {Object.entries(FILTER_MAP).map(([key, { ViewComponent }]) => (
-        <Tabs.Panel key={key} value={key} p={"md"}>
-          <ViewComponent control={control} ocelId={ocelId} />
-        </Tabs.Panel>
-      ))}
+      {Object.entries(FILTER_MAP).map(
+        ([key, { ViewComponent, description }]) => (
+          <Tabs.Panel key={key} value={key} p={"md"}>
+            <Stack gap={"md"}>
+              <Text size="sm" c="dimmed">
+                {description} Afterwards the log is cleaned up automatically:
+                relations whose source or target is missing are removed, events
+                without at least one E2O relation are filtered out, and objects
+                without any E2O or O2O relation are filtered out too.
+              </Text>
+              <ViewComponent control={control} ocelId={ocelId} />
+            </Stack>
+          </Tabs.Panel>
+        ),
+      )}
     </Tabs>
   );
 };

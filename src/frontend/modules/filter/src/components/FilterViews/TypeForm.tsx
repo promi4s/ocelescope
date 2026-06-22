@@ -50,6 +50,8 @@ const EntityFilter: (
 
 export const ActivityFilter: FilterViewType<"activity"> = {
   title: "Activity",
+  description:
+    "Filters the event log by activity (the event type). In include mode only events of the selected activities are kept; in exclude mode the selected activities are dropped and everything else is kept. The bar chart shows how many events exist per activity to help you decide what to keep.",
   ViewComponent: EntityFilter("events"),
   generateDefault: () => [
     { type: "activity", event_types: [], mode: "exclude" },
@@ -64,6 +66,8 @@ export const ActivityFilter: FilterViewType<"activity"> = {
 
 export const ObjectTypeFilter: FilterViewType<"object_type"> = {
   title: "Object Type",
+  description:
+    "Filters the log by object type. In include mode only objects of the selected types are kept; in exclude mode the selected types are dropped and everything else is kept. The bar chart shows how many objects exist per type to help you decide what to keep.",
   ViewComponent: EntityFilter("objects"),
   generateDefault: () => [
     { type: "object_type", object_types: [], mode: "exclude" },
