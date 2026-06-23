@@ -36,14 +36,14 @@ export const SvgPanWrapper: React.FC<{
               {children}
             </TransformComponent>
             <ButtonGroup orientation="vertical" pos={"absolute"} bottom={0}>
-              <Button px="xs">
-                <MaximizeIcon width={18} onClick={() => resetTransform(0)} />
+              <Button px="xs" onClick={() => resetTransform(0)}>
+                <MaximizeIcon width={18} />
               </Button>
-              <Button px="xs">
-                <PlusIcon width={18} onClick={() => zoomIn()} />
+              <Button px="xs" onClick={() => zoomIn()}>
+                <PlusIcon width={18} />
               </Button>
-              <Button px="xs">
-                <MinusIcon width={18} onClick={() => zoomOut()} />
+              <Button px="xs" onClick={() => zoomOut()}>
+                <MinusIcon width={18} />
               </Button>
               <Button px="xs" onClick={onDownload}>
                 <DownloadIcon width={18} />
