@@ -28,6 +28,11 @@ from ocelescope.plugin import (
 )
 from ocelescope.resource import DirectlyFollowsGraph, PetriNet, Resource
 from ocelescope.visualization import (
+    DIRECTED_ELK_GRAPH_LAYOUT,
+    DIRECTED_GRAPH_LAYOUT,
+    FORCE_GRAPH_LAYOUT,
+    ORDERED_TREE_LAYOUT,
+    RADIAL_GRAPH_LAYOUT,
     DotVis,
     EdgeArrow,
     ElkLayoutConfig,
@@ -41,12 +46,7 @@ from ocelescope.visualization import (
     Table,
     TableColumn,
     Visualization,
-    directed_elk_graph_layout,
-    directed_graph_layout,
-    force_graph_layout,
     generate_color_map,
-    ordered_tree_layout,
-    radial_graph_layout,
 )
 
 matplotlib.use("Agg")
@@ -91,11 +91,11 @@ __all__ = [
     "ElkLayoutConfig",
     "GraphvizLayoutConfig",
     "GraphShapes",
-    "directed_elk_graph_layout",
-    "directed_graph_layout",
-    "force_graph_layout",
-    "ordered_tree_layout",
-    "radial_graph_layout",
+    "DIRECTED_ELK_GRAPH_LAYOUT",
+    "DIRECTED_GRAPH_LAYOUT",
+    "FORCE_GRAPH_LAYOUT",
+    "ORDERED_TREE_LAYOUT",
+    "RADIAL_GRAPH_LAYOUT",
     # Table
     "Table",
     "TableColumn",
