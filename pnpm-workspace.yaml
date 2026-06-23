@@ -70,7 +70,7 @@ catalog:
   react-dom: ^19.2.0
   react-hook-form: ^7.71.2
   react-plotly.js: ^2.6.0
-  react-zoom-pan-pinch: ^3.7.0
+  react-zoom-pan-pinch: ^4.0.0
   recharts: ^2.15.3
   storybook: ^10.3.5
   tsdown: ^0.22.0
