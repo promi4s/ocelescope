@@ -8,7 +8,13 @@ export type GraphEdgeRouting = "SPLINES" | "ORTHOGONAL" | "POLYLINE";
 export type GraphPoint = { x: number; y: number };
 
 export type GraphLayoutPlan =
-  | { type: "fixed-positions" }
+  | {
+      type: "graphviz";
+      engine: string;
+      graphAttrs: Record<string, string | number | boolean>;
+      nodeAttrs: Record<string, string | number | boolean>;
+      edgeAttrs: Record<string, string | number | boolean>;
+    }
   | {
       type: "elk";
       elkOptions: Record<string, string | number | boolean>;
@@ -83,7 +89,6 @@ export type ElkEdgeResult = {
   layoutOptions?: Record<string, unknown>;
 };
 
-export const DEFAULT_NODE_POSITION = { x: 0, y: 0 } as const;
 export const DEFAULT_COLORS = {
   edge: "#555555",
   place: "#aec6e8",
@@ -93,4 +98,3 @@ export const DEFAULT_COLORS = {
 } as const;
 export const MARKING_DOT_SIZE = 12;
 export const FIT_VIEW_PADDING = 0.15;
-export const EXTERNAL_NODE_LABEL_HEIGHT = 22;

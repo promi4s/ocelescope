@@ -7,8 +7,8 @@ from ocelescope.visualization.default.graph import (
     Graph,
     GraphEdge,
     GraphNode,
-    LayoutConfig,
     NodeStyle,
+    directed_elk_graph_layout,
 )
 from ocelescope.visualization.util.color import generate_color_map
 
@@ -219,11 +219,5 @@ class DirectlyFollowsGraph(Resource):
         return Graph(
             nodes=activity_nodes + start_nodes + end_nodes,
             edges=edges,
-            layout_config=LayoutConfig(
-                elk_options={
-                    "elk.direction": "RIGHT",
-                    "elk.algorithm": "layered",
-                    "elk.edgeRouting": "SPLINES",
-                }
-            ),
+            layout_config=directed_elk_graph_layout(),
         )

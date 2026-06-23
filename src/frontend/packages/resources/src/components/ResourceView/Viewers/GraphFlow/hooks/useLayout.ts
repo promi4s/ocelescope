@@ -3,25 +3,29 @@ import {
   type Edge,
   type Node,
   type NodeChange,
-  useNodes,
-  useNodesInitialized,
 } from "@xyflow/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { buildGraphFlowModel } from "../model/buildModel";
-import {
-  composeGraphLayout,
-  measuredNodesMatchModel,
-  toGraphError,
-} from "../model/runLayout";
+import { toGraphError } from "../model/runLayout";
 import type {
   GraphFlowModel,
   GraphVisualization,
   GraphVisualizationError,
 } from "../model/types";
+import { type ElkGraphFlowModel, useElkLayout } from "./useElkLayout";
+import {
+  type GraphvizGraphFlowModel,
+  useGraphvizLayout,
+} from "./useGraphvizLayout";
 
 type BuildResult =
   | { model: GraphFlowModel; buildError: null }
   | { model: null; buildError: GraphVisualizationError };
+
+type LayoutResult = {
+  nodes: Node[];
+  edges: Edge[];
+};
 
 const buildSafely = (visualization: GraphVisualization): BuildResult => {
   try {
@@ -31,11 +35,20 @@ const buildSafely = (visualization: GraphVisualization): BuildResult => {
   }
 };
 
+const isElkModel = (model: GraphFlowModel): model is ElkGraphFlowModel =>
+  model.layoutPlan.type === "elk";
+
+const isGraphvizModel = (
+  model: GraphFlowModel,
+): model is GraphvizGraphFlowModel => model.layoutPlan.type === "graphviz";
+
 export const useLayout = (visualization: GraphVisualization) => {
   const { model, buildError } = useMemo(
     () => buildSafely(visualization),
     [visualization],
   );
+  const runElkLayout = useElkLayout();
+  const runGraphvizLayout = useGraphvizLayout(visualization);
 
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
@@ -43,39 +56,24 @@ export const useLayout = (visualization: GraphVisualization) => {
   const [layoutError, setLayoutError] =
     useState<GraphVisualizationError | null>(null);
 
-  // Reset whenever the model changes (new prop, or rebuild).
   useEffect(() => {
     setLayoutError(null);
-    if (!model) {
-      setNodes([]);
-      setEdges([]);
-      setLayoutReady(true);
-      return;
-    }
-    setNodes(model.nodes);
-    setEdges(model.edges);
-    setLayoutReady(
-      model.layoutPlan.type === "fixed-positions" || model.nodes.length === 0,
-    );
+    setNodes(model?.nodes ?? []);
+    setEdges(model?.edges ?? []);
+    setLayoutReady(!model || model.nodes.length === 0);
   }, [model]);
 
-  // Wait for React Flow to measure nodes, then run ELK.
-  const measuredNodes = useNodes();
-  const nodesInitialized = useNodesInitialized();
-
   useEffect(() => {
-    if (
-      !model ||
-      layoutReady ||
-      model.layoutPlan.type !== "elk" ||
-      !nodesInitialized ||
-      !measuredNodesMatchModel(measuredNodes, model)
-    ) {
-      return;
-    }
+    if (!model || buildError || layoutReady) return;
 
     let cancelled = false;
-    composeGraphLayout({ model, measuredNodes, edges: model.edges }).then(
+    const layoutPromise: Promise<LayoutResult | null> = isElkModel(model)
+      ? runElkLayout(model)
+      : isGraphvizModel(model)
+        ? runGraphvizLayout(model)
+        : Promise.resolve(null);
+
+    layoutPromise.then(
       (result) => {
         if (cancelled || !result) return;
         setNodes(result.nodes);
@@ -92,7 +90,7 @@ export const useLayout = (visualization: GraphVisualization) => {
     return () => {
       cancelled = true;
     };
-  }, [model, layoutReady, nodesInitialized, measuredNodes]);
+  }, [model, buildError, layoutReady, runElkLayout, runGraphvizLayout]);
 
   const onNodesChange = useCallback(
     (changes: NodeChange[]) =>
@@ -104,7 +102,7 @@ export const useLayout = (visualization: GraphVisualization) => {
     nodes,
     edges,
     layoutReady,
-    error: layoutError ?? buildError,
+    error: buildError ?? layoutError,
     onNodesChange,
   };
 };

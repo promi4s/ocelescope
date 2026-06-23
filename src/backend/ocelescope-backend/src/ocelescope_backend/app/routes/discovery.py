@@ -1,6 +1,7 @@
 from typing import Any
 
 from fastapi import APIRouter, HTTPException
+from ocelescope.ocel.filter.base import BaseFilter
 from pydantic import BaseModel, ValidationError
 
 from ocelescope import (
@@ -9,7 +10,6 @@ from ocelescope import (
     ObjectTypeFilter,
     ObjectTypeFrequencyFilter,
 )
-from ocelescope.ocel.filter.base import BaseFilter
 from ocelescope_backend.app.dependencies import ApiSession
 from ocelescope_backend.app.internal.discovery import discovery_registry
 from ocelescope_backend.app.internal.model.discovery import (
@@ -19,7 +19,6 @@ from ocelescope_backend.app.internal.model.discovery import (
     DiscoveryVariant,
 )
 from ocelescope_backend.app.internal.tasks.discovery_task import DiscoveryTask
-
 
 _DISCOVERY_FILTER_TYPES: list[type[BaseFilter]] = [
     EventTypeFilter,
@@ -135,11 +134,13 @@ def list_discovery_methods() -> list[DiscoveryMethodMeta]:
     return [
         DiscoveryMethodMeta(
             name=group.name,
-            description=group.description,
             variants=[
                 DiscoveryVariant(
                     method_id=v.method_id,
-                    resource_type=v.resource_type.get_type(),
+                    resource_type=v.resource_type.label
+                    if v.resource_type.label is not None
+                    else v.resource_type.get_type(),
+                    description=v.description,
                     input_schema=v.parameters_schema(),
                 )
                 for v in group.variants

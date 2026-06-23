@@ -6,11 +6,18 @@ from pydantic import Field
 from ocelescope.visualization.default.dot import DotVis
 from ocelescope.visualization.default.graph import (
     EdgeArrow,
+    ElkLayoutConfig,
     Graph,
     GraphEdge,
     GraphNode,
     GraphShapes,
+    GraphvizLayoutConfig,
     LayoutConfig,
+    directed_elk_graph_layout,
+    directed_graph_layout,
+    force_graph_layout,
+    ordered_tree_layout,
+    radial_graph_layout,
 )
 from ocelescope.visualization.default.plotly import Plotly
 from ocelescope.visualization.default.svg import SVGVis
@@ -31,7 +38,14 @@ __all__ = [
     "GraphEdge",
     "EdgeArrow",
     "LayoutConfig",
+    "ElkLayoutConfig",
+    "GraphvizLayoutConfig",
     "GraphShapes",
+    "directed_elk_graph_layout",
+    "directed_graph_layout",
+    "force_graph_layout",
+    "ordered_tree_layout",
+    "radial_graph_layout",
     # Table
     "Table",
     "TableColumn",

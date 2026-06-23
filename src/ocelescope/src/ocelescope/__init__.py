@@ -30,16 +30,23 @@ from ocelescope.resource import DirectlyFollowsGraph, PetriNet, Resource
 from ocelescope.visualization import (
     DotVis,
     EdgeArrow,
+    ElkLayoutConfig,
     Graph,
     GraphEdge,
     GraphNode,
     GraphShapes,
+    GraphvizLayoutConfig,
     LayoutConfig,
     SVGVis,
     Table,
     TableColumn,
     Visualization,
+    directed_elk_graph_layout,
+    directed_graph_layout,
+    force_graph_layout,
     generate_color_map,
+    ordered_tree_layout,
+    radial_graph_layout,
 )
 
 matplotlib.use("Agg")
@@ -81,7 +88,14 @@ __all__ = [
     "GraphEdge",
     "EdgeArrow",
     "LayoutConfig",
+    "ElkLayoutConfig",
+    "GraphvizLayoutConfig",
     "GraphShapes",
+    "directed_elk_graph_layout",
+    "directed_graph_layout",
+    "force_graph_layout",
+    "ordered_tree_layout",
+    "radial_graph_layout",
     # Table
     "Table",
     "TableColumn",
