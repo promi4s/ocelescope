@@ -67,7 +67,7 @@ export const DiscoverySettingsContent = ({
             />
             <Text size="sm" c="dimmed">
               {
-                selectedVariants.find((v) => v.methodId == selectedMethodId)
+                selectedVariants.find((v) => v.methodId === selectedMethodId)
                   ?.description
               }
             </Text>
