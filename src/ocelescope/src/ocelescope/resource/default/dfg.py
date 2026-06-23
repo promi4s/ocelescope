@@ -4,11 +4,11 @@ from pydantic import Field
 
 from ocelescope.resource.resource import Annotated, Resource
 from ocelescope.visualization.default.graph import (
+    DIRECTED_ELK_GRAPH_LAYOUT,
     Graph,
     GraphEdge,
     GraphNode,
     NodeStyle,
-    directed_elk_graph_layout,
 )
 from ocelescope.visualization.util.color import generate_color_map
 
@@ -219,5 +219,5 @@ class DirectlyFollowsGraph(Resource):
         return Graph(
             nodes=activity_nodes + start_nodes + end_nodes,
             edges=edges,
-            layout_config=directed_elk_graph_layout(),
+            layout_config=DIRECTED_ELK_GRAPH_LAYOUT,
         )

@@ -12,12 +12,12 @@ if TYPE_CHECKING:
 
 from ocelescope.resource.resource import Annotated, Resource
 from ocelescope.visualization.default.graph import (
+    DIRECTED_ELK_GRAPH_LAYOUT,
     EdgeStyle,
     Graph,
     GraphEdge,
     GraphNode,
     NodeStyle,
-    directed_elk_graph_layout,
 )
 from ocelescope.visualization.util.color import generate_color_map
 
@@ -288,7 +288,7 @@ class PetriNet(Resource):
         return Graph(
             nodes=nodes,
             edges=edges,
-            layout_config=directed_elk_graph_layout(),
+            layout_config=DIRECTED_ELK_GRAPH_LAYOUT,
         )
 
     @classmethod

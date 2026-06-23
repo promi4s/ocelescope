@@ -8,14 +8,14 @@ from ocelescope.visualization.default.graph.graph import (
     NodeStyle,
 )
 from ocelescope.visualization.default.graph.layouting import (
+    DIRECTED_ELK_GRAPH_LAYOUT,
+    DIRECTED_GRAPH_LAYOUT,
+    FORCE_GRAPH_LAYOUT,
+    ORDERED_TREE_LAYOUT,
+    RADIAL_GRAPH_LAYOUT,
     ElkLayoutConfig,
     GraphvizLayoutConfig,
     LayoutConfig,
-    directed_elk_graph_layout,
-    directed_graph_layout,
-    force_graph_layout,
-    ordered_tree_layout,
-    radial_graph_layout,
 )
 
 __all__ = [
@@ -29,9 +29,9 @@ __all__ = [
     "GraphvizLayoutConfig",
     "LayoutConfig",
     "NodeStyle",
-    "directed_elk_graph_layout",
-    "directed_graph_layout",
-    "force_graph_layout",
-    "ordered_tree_layout",
-    "radial_graph_layout",
+    "DIRECTED_ELK_GRAPH_LAYOUT",
+    "FORCE_GRAPH_LAYOUT",
+    "DIRECTED_GRAPH_LAYOUT",
+    "ORDERED_TREE_LAYOUT",
+    "RADIAL_GRAPH_LAYOUT",
 ]
