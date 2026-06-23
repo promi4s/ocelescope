@@ -9,6 +9,8 @@ const nextConfig: NextConfig = {
     proxyClientMaxBodySize: "1000gb",
   },
   transpilePackages: [
+    "@mantine/charts",
+    "recharts",
     "@ocelescope/core",
     "@ocelescope/resources",
     "@ocelescope/ocelot",
