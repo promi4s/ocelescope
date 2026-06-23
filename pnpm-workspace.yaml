@@ -60,7 +60,7 @@ catalog:
   jspdf: ^4.2.1
   lodash: ^4.17.23
   lucide-react: ^0.577.0
-  mantine-datatable: ^8.3.13
+  mantine-datatable: ^9.0.0
   next: ^16.1.6
   object-hash: ^3.0.0
   orval: ^8.5.2
