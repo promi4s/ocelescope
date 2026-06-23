@@ -444,20 +444,16 @@ const EdgeEndLabel = ({
   label,
   x,
   y,
-  offsetX,
-  offsetY,
 }: {
   label: string;
   x: number;
   y: number;
-  offsetX: number;
-  offsetY: number;
 }) => (
   <EdgeLabelRenderer>
     <div
       style={{
         position: "absolute",
-        transform: `translate(-50%, -50%) translate(${x + offsetX}px, ${y + offsetY}px)`,
+        transform: `translate(-50%, -50%) translate(${x}px, ${y}px)`,
         pointerEvents: "none",
         color: "#444",
         fontSize: 10,
@@ -471,6 +467,33 @@ const EdgeEndLabel = ({
     </div>
   </EdgeLabelRenderer>
 );
+
+const END_LABEL_INSET = 22;
+const END_LABEL_PERP = 9;
+
+const endLabelPositions = (
+  start: { x: number; y: number },
+  end: { x: number; y: number },
+) => {
+  const dx = end.x - start.x;
+  const dy = end.y - start.y;
+  const length = Math.hypot(dx, dy) || 1;
+  const ux = dx / length;
+  const uy = dy / length;
+  // Perpendicular unit vector (rotate the direction by 90°).
+  const px = -uy;
+  const py = ux;
+  return {
+    start: {
+      x: start.x + ux * END_LABEL_INSET + px * END_LABEL_PERP,
+      y: start.y + uy * END_LABEL_INSET + py * END_LABEL_PERP,
+    },
+    end: {
+      x: end.x - ux * END_LABEL_INSET + px * END_LABEL_PERP,
+      y: end.y - uy * END_LABEL_INSET + py * END_LABEL_PERP,
+    },
+  };
+};
 
 // ─── Edge ─────────────────────────────────────────────────────────────────────
 
@@ -536,24 +559,28 @@ const GraphFlowEdge = memo((props: EdgeProps<GraphFlowEdgeType>) => {
           y={edgePath.labelY}
         />
       )}
-      {data.start_label && (
-        <EdgeEndLabel
-          label={data.start_label}
-          x={startPos.x}
-          y={startPos.y}
-          offsetX={8}
-          offsetY={-10}
-        />
-      )}
-      {data.end_label && (
-        <EdgeEndLabel
-          label={data.end_label}
-          x={endPos.x}
-          y={endPos.y}
-          offsetX={8}
-          offsetY={-10}
-        />
-      )}
+      {(data.start_label || data.end_label) &&
+        (() => {
+          const positions = endLabelPositions(startPos, endPos);
+          return (
+            <>
+              {data.start_label && (
+                <EdgeEndLabel
+                  label={data.start_label}
+                  x={positions.start.x}
+                  y={positions.start.y}
+                />
+              )}
+              {data.end_label && (
+                <EdgeEndLabel
+                  label={data.end_label}
+                  x={positions.end.x}
+                  y={positions.end.y}
+                />
+              )}
+            </>
+          );
+        })()}
     </>
   );
 });

@@ -20,7 +20,7 @@ export const PluginCard: React.FC<{ plugin: PluginApi }> = ({ plugin }) => {
       menuItems={
         <Menu.Item
           leftSection={<Trash2Icon />}
-          color="red.6"
+          color="red"
           fw="bold"
           onClick={() => {
             deletePlugin({ pluginId: plugin.id });
