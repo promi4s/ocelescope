@@ -9,7 +9,7 @@ from ocelescope.ocel.filter.base import BaseFilter, FilterResult
 
 class FrequencyFilterConfig(BaseModel):
     mode: Literal["include", "exclude"] = "include"
-    threshold_percentage: int = Field(ge=0, le=100)
+    threshold_percentage: int = Field(default=3, ge=0, le=100)
 
 
 class EventTypeFrequencyFilter(BaseFilter, FrequencyFilterConfig):
