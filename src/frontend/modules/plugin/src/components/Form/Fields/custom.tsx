@@ -85,7 +85,7 @@ export const getComputedSelect = ({
           label={schema.title}
           description={schema.description}
           required={required}
-          value={formData}
+          value={formData ?? (schema.type === "array" ? [] : null)}
           onChange={(value) => onChange(value, path)}
           data={options}
         />

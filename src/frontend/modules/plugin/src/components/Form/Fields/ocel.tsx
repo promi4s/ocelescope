@@ -36,7 +36,7 @@ const AttributeSelector: (
 
     return (
       <SelectComponent
-        value={value}
+        value={value ?? (isMulti ? [] : null)}
         label={label}
         onChange={onChange}
         required={required}
@@ -58,7 +58,7 @@ const TypeSelector: (
 
     return (
       <SelectComponent
-        value={value}
+        value={value ?? (isMulti ? [] : null)}
         label={label}
         required={required}
         clearable
@@ -73,7 +73,7 @@ const IdSelect: (
   query: typeof useEventIds | typeof useObjectIds,
 ) => React.FC<OcelFieldProps> =
   (query) =>
-  ({ ocelId, isMulti, ...rest }) => {
+  ({ ocelId, isMulti, value, ...rest }) => {
     const [searchValue, setSearchValue] = useState<undefined | string>();
     const [debouncedSearch] = useDebouncedValue(searchValue, 300);
 
@@ -89,6 +89,7 @@ const IdSelect: (
         searchValue={searchValue}
         onSearchChange={(newSearchValue) => setSearchValue(newSearchValue)}
         data={ids?.response}
+        value={value ?? (isMulti ? [] : null)}
         {...rest}
       />
     );
