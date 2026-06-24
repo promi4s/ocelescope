@@ -3,7 +3,7 @@ from __future__ import annotations
 import warnings
 from os import PathLike
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any, Mapping, Sequence
 
 import pandas as pd
 import pm4py
@@ -11,7 +11,7 @@ import polars as pl
 import r4pm
 from pm4py.objects.ocel.obj import OCEL as PM4PYOCEL
 from pm4py.objects.ocel.obj import deepcopy
-from polars import DataFrame
+from polars import DataFrame, LazyFrame
 
 from ocelescope.ocel.constants.pm4py import O2O_SOURCE_ID, O2O_TARGET_ID
 from ocelescope.ocel.extensions.manager import ExtensionManager
@@ -68,10 +68,20 @@ class OCEL:
 
     def __init__(
         self,
-        ocel: dict[str, DataFrame],
+        ocel: Mapping[str, DataFrame | LazyFrame],
         meta: OCELMeta | None = None,
         quantityExtension: tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame] | None = None,
     ):
+        """
+        Args:
+            ocel: Mapping of table name ("events", "objects", "object_changes",
+                "relations", "o2o") to its table. Each value may be an eager
+                ``DataFrame`` (held in memory immediately) or a ``LazyFrame``
+                (e.g. from :meth:`scan`), in which case the table is only read
+                from disk the first time the corresponding manager is accessed.
+            meta: Metadata for this OCEL instance.
+            quantityExtension: Optional quantity extension tables.
+        """
         self.meta = meta or OCELMeta()
         self.extensions = ExtensionManager(self)
         self.objects = ObjectsManager(
@@ -97,21 +107,34 @@ class OCEL:
         ("ocel:oid", "ocel:oid_2"), the inverse of the rename `O2OManager`
         applies on construction.
 
+        The managers expose their tables lazily (``.pl`` returns a ``LazyFrame``);
+        r4pm and the export/copy paths need eager frames, so all five tables are
+        materialized together in a single optimized ``collect_all`` pass here.
+
         Returns:
             dict[str, pl.DataFrame]: Keys "events", "objects", "object_changes",
             "relations", and "o2o".
         """
+        events, objects, object_changes, relations, o2o = pl.collect_all(
+            [
+                self.events.pl,
+                self.objects.pl,
+                self.objects.changes_pl,
+                self.e2o.pl,
+                self.o2o.pl.rename(
+                    {
+                        O2O_SOURCE_ID: "ocel:oid",
+                        O2O_TARGET_ID: "ocel:oid_2",
+                    }
+                ),
+            ]
+        )
         return {
-            "events": self.events.pl,
-            "objects": self.objects.pl,
-            "object_changes": self.objects.changes_pl,
-            "relations": self.e2o.pl,
-            "o2o": self.o2o.pl.rename(
-                {
-                    O2O_SOURCE_ID: "ocel:oid",
-                    O2O_TARGET_ID: "ocel:oid_2",
-                }
-            ),
+            "events": events,
+            "objects": objects,
+            "object_changes": object_changes,
+            "relations": relations,
+            "o2o": o2o,
         }
 
     @property
@@ -165,6 +188,67 @@ class OCEL:
         return OCEL(
             ocel=ocel_dict, meta=OCELMeta(path=path, extra=meta), quantityExtension=quantity_table
         )
+
+    # Filenames used by `scan`/`dump_arrow`, keyed by r4pm table name.
+    _ARROW_FILES = {
+        "events": "events.arrow",
+        "objects": "objects.arrow",
+        "object_changes": "object_changes.arrow",
+        "relations": "relations.arrow",
+        "o2o": "o2o.arrow",
+    }
+
+    @staticmethod
+    def scan(directory: str | Path, meta: dict[str, Any] = {}) -> OCEL:
+        """
+        Lazily open an OCEL from a directory of Arrow IPC files.
+
+        Each core table is wrapped in a polars ``LazyFrame`` via ``scan_ipc``
+        and is only read from disk the first time the corresponding manager is
+        accessed (e.g. ``ocel.events.df``). Tables that are never touched are
+        never loaded. Use this for server / long-lived contexts where holding
+        every table in memory is wasteful.
+
+        Files are expected to follow the layout written by :meth:`dump_arrow`
+        (``events.arrow``, ``objects.arrow``, ``object_changes.arrow``,
+        ``relations.arrow``, ``o2o.arrow``). Missing files yield empty tables.
+        Quantity extensions are not handled by this lazy path.
+
+        Args:
+            directory: Directory containing the Arrow IPC files.
+            meta: Additional metadata to attach to the OCELMeta container.
+
+        Returns:
+            OCEL: A lazily-backed OCEL wrapper instance.
+        """
+        directory = Path(directory)
+        lazy: dict[str, DataFrame | LazyFrame] = {
+            key: pl.scan_ipc(directory / filename)
+            for key, filename in OCEL._ARROW_FILES.items()
+            if (directory / filename).exists()
+        }
+        return OCEL(ocel=lazy, meta=OCELMeta(path=directory, extra=meta))
+
+    def dump_arrow(self, directory: str | Path) -> None:
+        """
+        Write the OCEL's core tables to a directory as Arrow IPC files, in the
+        layout consumed by :meth:`scan`.
+
+        This materializes every core table once, so it is the counterpart to
+        the lazy :meth:`scan`: dump an OCEL to disk here, then ``scan`` it back
+        cheaply (per request) elsewhere. The O2O table is written with PM4PY's
+        raw column names (via :attr:`r4pm_dict`), so the round-trip through
+        ``scan`` reproduces the canonical names. Quantity extensions and other
+        extensions are not included.
+
+        Args:
+            directory: Destination directory (created if missing).
+        """
+        directory = Path(directory)
+        directory.mkdir(parents=True, exist_ok=True)
+        tables = self.r4pm_dict
+        for key, filename in OCEL._ARROW_FILES.items():
+            tables[key].write_ipc(directory / filename)
 
     def write(self, path: str | Path):
         """

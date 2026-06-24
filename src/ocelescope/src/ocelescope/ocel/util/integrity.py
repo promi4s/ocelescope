@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+from typing import Mapping
+
 import polars as pl
+from polars import DataFrame, LazyFrame
 
 from ocelescope.ocel.constants.pm4py import (
     E2O_EVENT_ID,
@@ -13,19 +16,29 @@ _O2O_SOURCE_COL = OID_COL
 _O2O_TARGET_COL = "ocel:oid_2"
 
 
-def clean_ocel(ocel_dfs: dict[str, pl.DataFrame]) -> dict[str, pl.DataFrame]:
+def _lazy(frame: DataFrame | LazyFrame) -> LazyFrame:
+    """Normalize an eager or lazy frame to a LazyFrame."""
+    return frame if isinstance(frame, LazyFrame) else frame.lazy()
+
+
+def clean_ocel(ocel_dfs: Mapping[str, DataFrame | LazyFrame]) -> dict[str, DataFrame]:
     """Drop dangling references and orphaned rows from an OCEL dataframe dict.
 
     Removes e2o relations pointing at a missing event or object, o2o
     relations pointing at a missing object, objects with no remaining e2o
     or o2o relation, events with no remaining e2o relation, and
     object_changes rows for objects that no longer exist.
+
+    Accepts eager ``DataFrame``s or lazy ``LazyFrame``s (the latter let any
+    upstream filters push into the scan). The integrity pruning runs lazily and
+    the five tables are materialized together in a single optimized
+    ``collect_all`` pass, so the returned dict always holds eager ``DataFrame``s.
     """
-    objects_df = ocel_dfs["objects"]
-    events_df = ocel_dfs["events"]
-    relations_df = ocel_dfs["relations"]
-    o2o_df = ocel_dfs["o2o"]
-    changes_df = ocel_dfs["object_changes"]
+    objects_df = _lazy(ocel_dfs["objects"])
+    events_df = _lazy(ocel_dfs["events"])
+    relations_df = _lazy(ocel_dfs["relations"])
+    o2o_df = _lazy(ocel_dfs["o2o"])
+    changes_df = _lazy(ocel_dfs["object_changes"])
 
     # Step 1: drop e2o relations whose event or object id isn't present in
     # the events/objects tables.
@@ -78,6 +91,10 @@ def clean_ocel(ocel_dfs: dict[str, pl.DataFrame]) -> dict[str, pl.DataFrame]:
         relations_df.select(pl.col(E2O_EVENT_ID).alias(EID_COL)).unique(),
         on=EID_COL,
         how="semi",
+    )
+
+    events_df, objects_df, relations_df, o2o_df, changes_df = pl.collect_all(
+        [events_df, objects_df, relations_df, o2o_df, changes_df]
     )
 
     return {

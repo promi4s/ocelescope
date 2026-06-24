@@ -45,14 +45,16 @@ def apply_filters(ocel: "OCEL", filters: Sequence[BaseFilter]) -> "OCEL":
     o2o_pl = ocel.o2o.pl if masks.o2o is None else ocel.o2o.pl.filter(masks.o2o)
 
     # o2o is stored under canonical column names (O2O_SOURCE_ID/O2O_TARGET_ID);
-    # r4pm_dict/clean_ocel expect PM4PY's raw names, same rename r4pm_dict applies.
+    # clean_ocel expects PM4PY's raw names, same rename r4pm_dict applies.
     o2o_pl = o2o_pl.rename({O2O_SOURCE_ID: "ocel:oid", O2O_TARGET_ID: "ocel:oid_2"})
 
+    # All tables stay lazy here; clean_ocel pushes the filters into the scans
+    # and materializes the cleaned result in one collect_all pass.
     ocel_dict = clean_ocel(
         {
-            **ocel.r4pm_dict,
             "events": events_pl,
             "objects": objects_pl,
+            "object_changes": ocel.objects.changes_pl,
             "relations": relations_pl,
             "o2o": o2o_pl,
         }

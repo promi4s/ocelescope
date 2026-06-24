@@ -4,7 +4,7 @@ from typing import cast
 
 import pandas as pd
 import polars as pl
-from polars import DataFrame
+from polars import DataFrame, LazyFrame
 
 from ocelescope.ocel.constants.pm4py import ACTIVITY_COL, EID_COL, TIMESTAMP_COL
 from ocelescope.ocel.managers.base import BaseManager
@@ -26,7 +26,7 @@ class EventsManager(BaseManager):
     pandas-compatible accessors as a facade.
     """
 
-    def __init__(self, ocel, events_df: DataFrame | None = None):
+    def __init__(self, ocel, events_df: DataFrame | LazyFrame | None = None):
         """
         Args:
             ocel: The owning OCEL instance.
@@ -51,7 +51,7 @@ class EventsManager(BaseManager):
         Returns:
             DataFrame: A pandas DataFrame containing all events and their attributes.
         """
-        return self._events_df.to_pandas()
+        return self.pl.collect().to_pandas()
 
     @df.setter
     def df(self, value: pd.DataFrame) -> None:
@@ -60,9 +60,20 @@ class EventsManager(BaseManager):
         self.cache.clear()
 
     @property
-    def pl(self) -> DataFrame:
-        """Return the events table as a polars DataFrame (the internal representation)."""
-        return self._events_df
+    def pl(self) -> LazyFrame:
+        """Return the events table as a polars LazyFrame.
+
+        Eagerly-provided tables are wrapped via ``DataFrame.lazy()``; tables
+        provided lazily (from :meth:`OCEL.scan`) are returned as-is, so any
+        downstream filter/projection stays deferred until the caller
+        ``.collect()``s and can be pushed into the scan.
+
+        Note: a scanned table is re-read from disk on each ``.collect()`` (there
+        is no materialization cache); collect once and reuse the result if you
+        need it repeatedly.
+        """
+        src = self._events_df
+        return src if isinstance(src, LazyFrame) else src.lazy()
 
     @property
     @instance_lru_cache()

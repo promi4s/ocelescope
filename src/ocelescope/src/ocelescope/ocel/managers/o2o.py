@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 import polars as pl
-from polars import DataFrame
+from polars import DataFrame, LazyFrame
 
 from ocelescope.ocel.constants.pm4py import (
     O2O_QUALIFIER,
@@ -35,7 +35,7 @@ class O2OManager(BaseManager):
     pandas-compatible facade.
     """
 
-    def __init__(self, ocel, o2o_df: DataFrame | None):
+    def __init__(self, ocel, o2o_df: DataFrame | LazyFrame | None):
         """
         Args:
             ocel: The owning OCEL instance.
@@ -77,7 +77,7 @@ class O2OManager(BaseManager):
         Returns:
             DataFrame: A normalized O2O relation table.
         """
-        return self._o2o_df.to_pandas()
+        return self.pl.collect().to_pandas()
 
     @df.setter
     def df(self, value: pd.DataFrame) -> None:
@@ -90,9 +90,20 @@ class O2OManager(BaseManager):
         self.cache.clear()
 
     @property
-    def pl(self) -> DataFrame:
-        """Return the O2O relation table as a polars DataFrame (the internal representation)."""
-        return self._o2o_df
+    def pl(self) -> LazyFrame:
+        """Return the O2O relation table as a polars LazyFrame.
+
+        Eagerly-provided tables are wrapped via ``DataFrame.lazy()``; tables
+        provided lazily (from :meth:`OCEL.scan`) are returned as-is, so any
+        downstream filter/projection stays deferred until the caller
+        ``.collect()``s and can be pushed into the scan.
+
+        Note: a scanned table is re-read from disk on each ``.collect()`` (there
+        is no materialization cache); collect once and reuse the result if you
+        need it repeatedly.
+        """
+        src = self._o2o_df
+        return src if isinstance(src, LazyFrame) else src.lazy()
 
     @property
     @instance_lru_cache()
