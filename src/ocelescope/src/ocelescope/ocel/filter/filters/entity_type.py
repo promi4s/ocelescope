@@ -8,9 +8,7 @@ from ocelescope.ocel.filter.base import BaseFilter, FilterResult
 
 
 class EventTypeFilter(BaseFilter):
-    event_types: Annotated[
-        list[str], Field(json_schema_extra={"fieldType": "event_type"})
-    ]
+    event_types: Annotated[list[str], Field(json_schema_extra={"fieldType": "event_type"})]
     mode: Literal["exclude", "include"] = "include"
 
     def filter(self, ocel):
@@ -21,9 +19,7 @@ class EventTypeFilter(BaseFilter):
 
 
 class ObjectTypeFilter(BaseFilter):
-    object_types: Annotated[
-        list[str], Field(json_schema_extra={"fieldType": "object_type"})
-    ]
+    object_types: Annotated[list[str], Field(json_schema_extra={"fieldType": "object_type"})]
     mode: Literal["exclude", "include"] = "include"
 
     def filter(self, ocel):
