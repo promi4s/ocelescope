@@ -3755,17 +3755,6 @@
             "type": "string",
             "title": "Name"
           },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description"
-          },
           "variants": {
             "items": {
               "$ref": "#/components/schemas/DiscoveryVariant"
@@ -3849,6 +3838,17 @@
             "additionalProperties": true,
             "type": "object",
             "title": "Inputschema"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
           }
         },
         "type": "object",
@@ -3912,6 +3912,46 @@
         "type": "object",
         "title": "EdgeStyle",
         "description": "Visual style options for a `GraphEdge`.\n\nAttributes:\n    dashed: Renders the edge as a dashed line.\n    bold: Renders the edge as a bold line."
+      },
+      "ElkLayoutConfig": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "elk",
+            "title": "Type",
+            "default": "elk"
+          },
+          "options": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    }
+                  ]
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Options"
+          }
+        },
+        "type": "object",
+        "title": "ElkLayoutConfig",
+        "description": "ELK-based layout configuration for a `Graph` visualization.\n\nAttributes:\n    options: Additional ELK layout options passed directly to the renderer.\n        Keys and values mirror the ELK option format (e.g. ``{\"elk.algorithm\": \"force\"}``).\n\n        For all available options see https://eclipse.dev/elk/reference/options.html."
       },
       "Entity_Time_Info": {
         "properties": {
@@ -4030,7 +4070,22 @@
             "title": "Edges"
           },
           "layout_config": {
-            "$ref": "#/components/schemas/LayoutConfig"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GraphvizLayoutConfig"
+              },
+              {
+                "$ref": "#/components/schemas/ElkLayoutConfig"
+              }
+            ],
+            "title": "Layout Config",
+            "discriminator": {
+              "propertyName": "type",
+              "mapping": {
+                "elk": "#/components/schemas/ElkLayoutConfig",
+                "graphviz": "#/components/schemas/GraphvizLayoutConfig"
+              }
+            }
           }
         },
         "type": "object",
@@ -4159,6 +4214,33 @@
               }
             ],
             "title": "End Label"
+          },
+          "layout_attrs": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    }
+                  ]
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Layout Attrs"
           }
         },
         "type": "object",
@@ -4306,31 +4388,8 @@
               }
             ],
             "title": "Rank"
-          }
-        },
-        "type": "object",
-        "required": [
-          "shape"
-        ],
-        "title": "GraphNode",
-        "description": "A node in a `Graph` visualization.\n\nA node defines its identity and visual appearance (shape, label, colors, size).\nLayout coordinates (`x`, `y`) are typically filled by the layouting step, not\nby the resource author.\n\nAttributes:\n    id: Unique node id. Defaults to a generated UUID string.\n    label: Optional label shown near the node.\n    shape: Node shape identifier.\n    width: Optional node width.\n    height: Optional node height.\n    color: Optional fill color (for example hex).\n    x: Optional x-coordinate after layouting.\n    y: Optional y-coordinate after layouting.\n    border_color: Optional border/stroke color.\n    style: Visual style options.\n    label_pos: Label position relative to the node.\n    rank: Optional layout constraint (source/sink or numeric rank).\n    annotation: Optional attached visualization."
-      },
-      "HTTPValidationError": {
-        "properties": {
-          "detail": {
-            "items": {
-              "$ref": "#/components/schemas/ValidationError"
-            },
-            "type": "array",
-            "title": "Detail"
-          }
-        },
-        "type": "object",
-        "title": "HTTPValidationError"
-      },
-      "LayoutConfig": {
-        "properties": {
-          "elk_options": {
+          },
+          "layout_attrs": {
             "anyOf": [
               {
                 "additionalProperties": {
@@ -4355,12 +4414,138 @@
                 "type": "null"
               }
             ],
-            "title": "Elk Options"
+            "title": "Layout Attrs"
           }
         },
         "type": "object",
-        "title": "LayoutConfig",
-        "description": "ELK-based layout configuration for a `Graph` visualization.\n\nAttributes:\n    elk_options: Additional ELK layout options passed directly to the renderer.\n        Keys and values mirror the ELK option format (e.g. ``{\"elk.algorithm\": \"force\"}``).\n\n        For all available options see https://eclipse.dev/elk/reference/options.html."
+        "required": [
+          "shape"
+        ],
+        "title": "GraphNode",
+        "description": "A node in a `Graph` visualization.\n\nA node defines its identity and visual appearance (shape, label, colors, size).\nLayout coordinates (`x`, `y`) are typically filled by the layouting step, not\nby the resource author.\n\nAttributes:\n    id: Unique node id. Defaults to a generated UUID string.\n    label: Optional label shown near the node.\n    shape: Node shape identifier.\n    width: Optional node width.\n    height: Optional node height.\n    color: Optional fill color (for example hex).\n    x: Optional x-coordinate after layouting.\n    y: Optional y-coordinate after layouting.\n    border_color: Optional border/stroke color.\n    style: Visual style options.\n    label_pos: Label position relative to the node.\n    rank: Optional layout constraint (source/sink or numeric rank).\n    annotation: Optional attached visualization."
+      },
+      "GraphvizLayoutConfig": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "graphviz",
+            "title": "Type",
+            "default": "graphviz"
+          },
+          "engine": {
+            "type": "string",
+            "enum": [
+              "circo",
+              "dot",
+              "fdp",
+              "sfdp",
+              "neato",
+              "osage",
+              "patchwork",
+              "twopi",
+              "nop",
+              "nop2"
+            ],
+            "title": "Engine",
+            "default": "dot"
+          },
+          "graphAttrs": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    }
+                  ]
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Graphattrs"
+          },
+          "nodeAttrs": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    }
+                  ]
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nodeattrs"
+          },
+          "edgeAttrs": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    }
+                  ]
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Edgeattrs"
+          }
+        },
+        "type": "object",
+        "title": "GraphvizLayoutConfig"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
       },
       "NodeStyle": {
         "properties": {

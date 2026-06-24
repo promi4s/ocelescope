@@ -5,11 +5,18 @@ from pydantic import Field
 # TODO: Rename this layouting engine a class
 from ocelescope.visualization.default.dot import DotVis
 from ocelescope.visualization.default.graph import (
+    DIRECTED_ELK_GRAPH_LAYOUT,
+    DIRECTED_GRAPH_LAYOUT,
+    FORCE_GRAPH_LAYOUT,
+    ORDERED_TREE_LAYOUT,
+    RADIAL_GRAPH_LAYOUT,
     EdgeArrow,
+    ElkLayoutConfig,
     Graph,
     GraphEdge,
     GraphNode,
     GraphShapes,
+    GraphvizLayoutConfig,
     LayoutConfig,
 )
 from ocelescope.visualization.default.plotly import Plotly
@@ -31,7 +38,14 @@ __all__ = [
     "GraphEdge",
     "EdgeArrow",
     "LayoutConfig",
+    "ElkLayoutConfig",
+    "GraphvizLayoutConfig",
     "GraphShapes",
+    "DIRECTED_ELK_GRAPH_LAYOUT",
+    "DIRECTED_GRAPH_LAYOUT",
+    "FORCE_GRAPH_LAYOUT",
+    "ORDERED_TREE_LAYOUT",
+    "RADIAL_GRAPH_LAYOUT",
     # Table
     "Table",
     "TableColumn",

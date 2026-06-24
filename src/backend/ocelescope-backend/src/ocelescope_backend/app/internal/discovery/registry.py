@@ -64,11 +64,9 @@ class DiscoveryMethodGroup:
     def __init__(
         self,
         name: str,
-        description: str | None,
         variants: list[DiscoveryMethodInfo],
     ) -> None:
         self.name = name
-        self.description = description
         self.variants = variants
 
 
@@ -117,7 +115,6 @@ class DiscoveryRegistry:
             if info.name not in groups:
                 groups[info.name] = DiscoveryMethodGroup(
                     name=info.name,
-                    description=info.description,
                     variants=[info],
                 )
             else:

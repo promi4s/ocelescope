@@ -14,7 +14,6 @@ import type { VisualizationsType } from "../../../../../types";
 import { Visualization } from "../../../index";
 import {
   DEFAULT_COLORS,
-  EXTERNAL_NODE_LABEL_HEIGHT,
   type GraphFlowNodeType,
   MARKING_DOT_SIZE,
 } from "../model/types";
@@ -112,19 +111,19 @@ const NodeAnnotation = ({ annotation }: { annotation: VisualizationsType }) => {
 
 const ExternalLabel = ({
   children,
-  top,
+  placement,
 }: {
   children: string;
-  top: number;
+  placement: "top" | "bottom";
 }) => (
   <Text
     size="xs"
     fw={600}
     style={{
       position: "absolute",
-      top,
+      [placement === "top" ? "bottom" : "top"]: "100%",
       left: "50%",
-      transform: "translateX(-50%)",
+      transform: `translate(-50%, ${placement === "top" ? "-4px" : "4px"})`,
       whiteSpace: "nowrap",
       color: DEFAULT_COLORS.text,
       pointerEvents: "none",
@@ -375,8 +374,6 @@ const GraphFlowNode = memo(({ data }: NodeProps<GraphFlowNodeType>) => {
   const isExternalLabel = Boolean(
     label && label_pos !== "center" && label_pos != null,
   );
-  const bottomLabelTop =
-    height != null ? EXTERNAL_NODE_LABEL_HEIGHT + height + 4 : null;
 
   // How many lines of text (size="sm" = 14px, lineHeight 1.2) fit inside the node.
   // Subtract 4px for the border simulation padding in BoxShape.
@@ -391,13 +388,11 @@ const GraphFlowNode = memo(({ data }: NodeProps<GraphFlowNodeType>) => {
       style={{
         position: "relative",
         width: shape === "circle" ? (width ?? undefined) : undefined,
-        paddingTop: isExternalLabel ? EXTERNAL_NODE_LABEL_HEIGHT : 0,
-        paddingBottom: isExternalLabel ? EXTERNAL_NODE_LABEL_HEIGHT : 0,
       }}
     >
       <HiddenHandles />
       {isExternalLabel && label_pos === "top" && (
-        <ExternalLabel top={0}>{label as string}</ExternalLabel>
+        <ExternalLabel placement="top">{label as string}</ExternalLabel>
       )}
       {shape === "circle" ? (
         <CircleShape
@@ -448,8 +443,8 @@ const GraphFlowNode = memo(({ data }: NodeProps<GraphFlowNodeType>) => {
           )}
         </BoxShape>
       )}
-      {isExternalLabel && label_pos === "bottom" && bottomLabelTop != null && (
-        <ExternalLabel top={bottomLabelTop}>{label as string}</ExternalLabel>
+      {isExternalLabel && label_pos === "bottom" && (
+        <ExternalLabel placement="bottom">{label as string}</ExternalLabel>
       )}
       {annotation && (
         <NodeAnnotation annotation={annotation as VisualizationsType} />

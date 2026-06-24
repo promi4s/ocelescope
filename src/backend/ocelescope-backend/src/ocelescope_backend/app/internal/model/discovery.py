@@ -30,9 +30,9 @@ class DiscoveryVariant(ApiBaseModel):
     method_id: str
     resource_type: str
     input_schema: dict[str, Any]
+    description: str | None = None
 
 
 class DiscoveryMethodMeta(ApiBaseModel):
     name: str
-    description: str | None = None
     variants: list[DiscoveryVariant]

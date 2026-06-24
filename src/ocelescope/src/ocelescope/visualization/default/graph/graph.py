@@ -3,6 +3,10 @@ from typing import Generic, Literal, TypeVar
 from pydantic import BaseModel, Field
 
 from ocelescope.util.pydantic import uuid_factory
+from ocelescope.visualization.default.graph.layouting import (
+    ElkLayoutConfig,
+    LayoutConfig,
+)
 from ocelescope.visualization.visualization import Visualization
 
 T = TypeVar("T", bound=Visualization)
@@ -97,6 +101,7 @@ class GraphNode(AnnotatedElement):
     label_pos: Literal["top", "center", "bottom"] = "center"
 
     rank: Literal["source", "sink"] | int | None = None
+    layout_attrs: dict[str, str | int | float | bool] | None = None
 
 
 class GraphEdge(AnnotatedElement):
@@ -129,18 +134,7 @@ class GraphEdge(AnnotatedElement):
     start_label: str | None = None
     end_label: str | None = None
 
-
-class LayoutConfig(BaseModel):
-    """ELK-based layout configuration for a `Graph` visualization.
-
-    Attributes:
-        elk_options: Additional ELK layout options passed directly to the renderer.
-            Keys and values mirror the ELK option format (e.g. ``{"elk.algorithm": "force"}``).
-
-            For all available options see https://eclipse.dev/elk/reference/options.html.
-    """
-
-    elk_options: dict[str, str | int | float | bool] | None = None
+    layout_attrs: dict[str, str | int | float | bool] | None = None
 
 
 class Graph(Visualization):
@@ -159,4 +153,4 @@ class Graph(Visualization):
     type: Literal["graph"] = "graph"
     nodes: list[GraphNode] = Field(default_factory=list)
     edges: list[GraphEdge] = Field(default_factory=list)
-    layout_config: LayoutConfig = Field(default_factory=LayoutConfig)
+    layout_config: LayoutConfig = Field(default_factory=ElkLayoutConfig)

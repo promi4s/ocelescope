@@ -10,11 +10,7 @@ import {
   useInternalNode,
 } from "@xyflow/react";
 import { memo } from "react";
-import {
-  EXTERNAL_NODE_LABEL_HEIGHT,
-  type GraphFlowEdgeType,
-  type GraphPoint,
-} from "../model/types";
+import type { GraphFlowEdgeType, GraphPoint } from "../model/types";
 
 type EdgeArrow = GraphEdge["end_arrow"];
 
@@ -24,20 +20,18 @@ const placeBounds = (node: InternalNode) => {
   const data = node.data as unknown as GraphNode;
   const width = data.width ?? 0;
   const height = data.height ?? 0;
-  const hasExternalTopLabel = Boolean(data.label) && data.label_pos === "top";
 
   return {
     x: node.internals.positionAbsolute.x,
-    y:
-      node.internals.positionAbsolute.y +
-      (hasExternalTopLabel ? EXTERNAL_NODE_LABEL_HEIGHT : 0),
+    y: node.internals.positionAbsolute.y,
     width,
     height,
   };
 };
 
 const visualBounds = (node: InternalNode) => {
-  if (node.type === "place") return placeBounds(node);
+  if ((node.data as unknown as GraphNode).shape === "circle")
+    return placeBounds(node);
   return {
     x: node.internals.positionAbsolute.x,
     y: node.internals.positionAbsolute.y,
@@ -86,7 +80,7 @@ const circleBorderPoint = (node: InternalNode, other: InternalNode) => {
 };
 
 const borderPoint = (node: InternalNode, other: InternalNode) =>
-  node.type === "place"
+  (node.data as unknown as GraphNode).shape === "circle"
     ? circleBorderPoint(node, other)
     : rectBorderPoint(node, other);
 

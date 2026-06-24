@@ -1,7 +1,6 @@
 import type { GraphEdge, GraphNode } from "@ocelescope/api-base";
 import type { Edge, Node } from "@xyflow/react";
 import {
-  DEFAULT_NODE_POSITION,
   type GraphEdgeRouting,
   type GraphFlowEdgeData,
   type GraphFlowEdgeType,
@@ -59,14 +58,10 @@ const normalizeElkOptions = (
   return { edgeRouting, elkOptions: normalizedOptions };
 };
 
-const hasFixedPosition = (node: GraphNode) => node.x != null && node.y != null;
-
 const mapNode = (node: GraphNode): GraphFlowNodeType => ({
   id: node.id as string,
   type: "node",
-  position: hasFixedPosition(node)
-    ? { x: node.x as number, y: node.y as number }
-    : DEFAULT_NODE_POSITION,
+  position: { x: node.x ?? 0, y: node.y ?? 0 },
   data: node as unknown as GraphFlowNodeData,
 });
 
@@ -81,19 +76,37 @@ const mapEdge = (edge: GraphEdge): GraphFlowEdgeType => ({
 const createLayoutPlan = (
   visualization: GraphVisualization,
 ): GraphLayoutPlan => {
-  const nodes = visualization.nodes ?? [];
-  if (nodes.length > 0 && nodes.every(hasFixedPosition)) {
-    return { type: "fixed-positions" };
+  const layoutConfig = visualization.layout_config;
+  switch (layoutConfig?.type) {
+    case "graphviz":
+      if (!layoutConfig.engine) {
+        throw new GraphVisualizationError("Invalid Graphviz layout config.", [
+          "Missing Graphviz layout engine.",
+        ]);
+      }
+
+      return {
+        type: "graphviz",
+        engine: layoutConfig.engine,
+        graphAttrs: layoutConfig.graphAttrs ?? {},
+        nodeAttrs: layoutConfig.nodeAttrs ?? {},
+        edgeAttrs: layoutConfig.edgeAttrs ?? {},
+      };
+
+    case "elk": {
+      const normalized = normalizeElkOptions(layoutConfig.options ?? {});
+      return {
+        type: "elk",
+        elkOptions: normalized.elkOptions,
+        edgeRouting: normalized.edgeRouting,
+      };
+    }
+
+    default:
+      throw new GraphVisualizationError("Invalid graph layout config.", [
+        "Expected an ELK or Graphviz layout config from the backend.",
+      ]);
   }
-
-  const elkOptions = visualization.layout_config?.elk_options ?? {};
-  const normalized = normalizeElkOptions(elkOptions);
-
-  return {
-    type: "elk",
-    elkOptions: normalized.elkOptions,
-    edgeRouting: normalized.edgeRouting,
-  };
 };
 
 export const buildGraphFlowModel = (
