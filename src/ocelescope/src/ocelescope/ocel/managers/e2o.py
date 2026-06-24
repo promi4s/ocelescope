@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 import polars as pl
+from polars import DataFrame
 
 from ocelescope.ocel.constants.pm4py import (
     E2O_ACTIVITY,
@@ -37,7 +38,7 @@ class E2OManager(BaseManager):
     pandas-compatible facade.
     """
 
-    def __init__(self, ocel, e2o_df: pl.DataFrame | None = None):
+    def __init__(self, ocel, e2o_df: DataFrame | None = None):
         """
         Args:
             ocel: The owning OCEL instance.
@@ -86,7 +87,7 @@ class E2OManager(BaseManager):
         self.cache.clear()
 
     @property
-    def pl(self) -> pl.DataFrame:
+    def pl(self) -> DataFrame:
         """Return the E2O relation table as a polars DataFrame (the internal representation)."""
         return self._e2o_df
 

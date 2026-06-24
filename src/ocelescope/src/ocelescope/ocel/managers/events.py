@@ -4,6 +4,7 @@ from typing import cast
 
 import pandas as pd
 import polars as pl
+from polars import DataFrame
 
 from ocelescope.ocel.constants.pm4py import ACTIVITY_COL, EID_COL, TIMESTAMP_COL
 from ocelescope.ocel.managers.base import BaseManager
@@ -25,7 +26,7 @@ class EventsManager(BaseManager):
     pandas-compatible accessors as a facade.
     """
 
-    def __init__(self, ocel, events_df: pl.DataFrame | None = None):
+    def __init__(self, ocel, events_df: DataFrame | None = None):
         """
         Args:
             ocel: The owning OCEL instance.
@@ -59,7 +60,7 @@ class EventsManager(BaseManager):
         self.cache.clear()
 
     @property
-    def pl(self) -> pl.DataFrame:
+    def pl(self) -> DataFrame:
         """Return the events table as a polars DataFrame (the internal representation)."""
         return self._events_df
 

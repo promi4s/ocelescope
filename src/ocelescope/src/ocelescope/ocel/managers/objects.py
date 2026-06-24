@@ -4,6 +4,7 @@ from typing import Any, Iterable, cast
 
 import pandas as pd
 import polars as pl
+from polars import DataFrame
 
 from ocelescope.ocel.constants.pm4py import OBJECT_CHANGED_FIELD, OID_COL, OTYPE_COL, TIMESTAMP_COL
 from ocelescope.ocel.managers.base import BaseManager
@@ -28,8 +29,8 @@ class ObjectsManager(BaseManager):
     def __init__(
         self,
         ocel,
-        objects_df: pl.DataFrame | None = None,
-        changes_df: pl.DataFrame | None = None,
+        objects_df: DataFrame | None = None,
+        changes_df: DataFrame | None = None,
     ):
         """
         Args:
@@ -76,7 +77,7 @@ class ObjectsManager(BaseManager):
         self.cache.clear()
 
     @property
-    def pl(self) -> pl.DataFrame:
+    def pl(self) -> DataFrame:
         """Return the objects table as a polars DataFrame (the internal representation)."""
         return self._objects_df
 
@@ -97,7 +98,7 @@ class ObjectsManager(BaseManager):
         self.cache.clear()
 
     @property
-    def changes_pl(self) -> pl.DataFrame:
+    def changes_pl(self) -> DataFrame:
         """Return the object_changes table as a polars DataFrame (the internal representation)."""
         return self._changes_df
 
