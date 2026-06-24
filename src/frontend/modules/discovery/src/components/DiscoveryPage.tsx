@@ -31,12 +31,12 @@ import { DiscoverySettingsContent } from "./DiscoverySettingsContent";
 const PANEL_OPEN_KEY = "ocelescope:discovery:panel-open";
 
 const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
-  const { selectedMethodId, formDataByMethod, filters } = useDiscoveryStore(
-    selectOcelFormState(ocelId),
-  );
+  const { selectedMethodId, formDataByMethod, filters, filtersInitialized } =
+    useDiscoveryStore(selectOcelFormState(ocelId));
   const setSelectedMethodId = useDiscoveryStore((s) => s.setSelectedMethodId);
   const setFormData = useDiscoveryStore((s) => s.setFormData);
   const setFiltersInStore = useDiscoveryStore((s) => s.setFilters);
+  const initializeFilters = useDiscoveryStore((s) => s.initializeFilters);
 
   const [taskId, setTaskId] = useState<string>();
   const [latestResourceId, setLatestResourceId] = useState<string>();
@@ -61,6 +61,18 @@ const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
   const { data: objectCounts = {} } = useObjectCounts(ocelId, undefined, {
     query: { enabled: true },
   });
+
+  // Initialize filter defaults on first visit for this OCEL
+  useEffect(() => {
+    if (filtersInitialized || availableFilters.length === 0) return;
+    initializeFilters(
+      ocelId,
+      availableFilters.map((f) => ({
+        name: f.name,
+        payload: getInitialFormData(f.json_schema as DiscoverySchema),
+      })),
+    );
+  }, [filtersInitialized, availableFilters, ocelId, initializeFilters]);
 
   // Auto-select first method only if nothing was restored
   useEffect(() => {
