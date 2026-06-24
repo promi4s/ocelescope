@@ -29,7 +29,7 @@ export const DiscoveryField = ({
 }: DiscoveryFieldProps) => {
   const label = property.title ?? name;
   const description = property.description;
-  const fieldType = property["x-ui-meta"]?.field_type;
+  const fieldType = property.fieldType;
 
   if (property.type === "array" && fieldType === "event_type") {
     return (

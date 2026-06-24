@@ -3,20 +3,6 @@ import type { DiscoveryFilterSchema } from "@ocelescope/api-base";
 import type { DiscoverySchema, FilterEntry } from "../types";
 import { DiscoveryField } from "./DiscoveryField";
 
-const initialPayload = (schema: DiscoverySchema): Record<string, unknown> => {
-  const payload: Record<string, unknown> = {};
-  for (const [name, property] of Object.entries(schema.properties ?? {})) {
-    if (property.default !== undefined) payload[name] = property.default;
-    else if (property.type === "array") payload[name] = [];
-    else if (
-      (property.type === "number" || property.type === "integer") &&
-      property.minimum !== undefined
-    )
-      payload[name] = property.minimum;
-  }
-  return payload;
-};
-
 type Props = {
   availableFilters: DiscoveryFilterSchema[];
   filters: FilterEntry[];
@@ -32,31 +18,14 @@ export const DiscoveryFiltersSection = ({
   eventTypeOptions,
   objectTypeOptions,
 }: Props) => {
-  const updateField = (
-    filterName: string,
-    schema: DiscoverySchema,
-    fieldName: string,
-    value: unknown,
-  ) => {
-    const exists = filters.some((f) => f.name === filterName);
-    if (exists) {
-      onFiltersChange(
-        filters.map((f) =>
-          f.name === filterName
-            ? { ...f, payload: { ...f.payload, [fieldName]: value } }
-            : f,
-        ),
-      );
-    } else {
-      onFiltersChange([
-        ...filters,
-        {
-          name: filterName,
-          payload: { ...initialPayload(schema), [fieldName]: value },
-        },
-      ]);
-    }
-  };
+  const updateField = (filterName: string, fieldName: string, value: unknown) =>
+    onFiltersChange(
+      filters.map((f) =>
+        f.name === filterName
+          ? { ...f, payload: { ...f.payload, [fieldName]: value } }
+          : f,
+      ),
+    );
 
   return (
     <Stack gap="xs">
@@ -64,7 +33,7 @@ export const DiscoveryFiltersSection = ({
       {availableFilters.map((filterSchema) => {
         const schema = filterSchema.json_schema as DiscoverySchema;
         const existing = filters.find((f) => f.name === filterSchema.name);
-        const payload = existing?.payload ?? initialPayload(schema);
+        const payload = existing?.payload ?? {};
 
         return (
           <Card key={filterSchema.name} withBorder padding="sm" radius="sm">
@@ -82,7 +51,7 @@ export const DiscoveryFiltersSection = ({
                     eventTypeOptions={eventTypeOptions}
                     objectTypeOptions={objectTypeOptions}
                     onChange={(value) =>
-                      updateField(filterSchema.name, schema, fieldName, value)
+                      updateField(filterSchema.name, fieldName, value)
                     }
                   />
                 ),

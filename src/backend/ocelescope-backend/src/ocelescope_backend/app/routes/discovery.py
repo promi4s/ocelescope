@@ -31,28 +31,6 @@ _DISCOVERY_FILTERS_BY_NAME: dict[str, type[BaseFilter]] = {
     cls.__name__: cls for cls in _DISCOVERY_FILTER_TYPES
 }
 
-# Maps (filter class name → property name → x-ui-meta.field_type) so the
-# RJSF-based form renderer can swap in the OCEL-aware custom fields.
-_DISCOVERY_FILTER_UI_HINTS: dict[str, dict[str, str]] = {
-    "EventTypeFilter": {"event_types": "event_type"},
-    "EventTypeFrequencyFilter": {"event_types": "event_type"},
-    "ObjectTypeFilter": {"object_types": "object_type"},
-    "ObjectTypeFrequencyFilter": {"object_types": "object_type"},
-}
-
-
-def _build_filter_schema(filter_cls: type[BaseFilter]) -> dict[str, Any]:
-    schema = filter_cls.model_json_schema()
-    hints = _DISCOVERY_FILTER_UI_HINTS.get(filter_cls.__name__, {})
-    properties = schema.get("properties", {})
-    for prop_name, field_type in hints.items():
-        prop = properties.get(prop_name)
-        if prop is None:
-            continue
-        existing = prop.get("x-ui-meta", {})
-        prop["x-ui-meta"] = {**existing, "field_type": field_type}
-    return schema
-
 
 class DiscoveryFilterSchema(BaseModel):
     name: str
@@ -119,7 +97,7 @@ def list_discovery_filters() -> list[DiscoveryFilterSchema]:
     return [
         DiscoveryFilterSchema(
             name=filter_cls.__name__,
-            json_schema=_build_filter_schema(filter_cls),
+            json_schema=filter_cls.model_json_schema(),
         )
         for filter_cls in _DISCOVERY_FILTER_TYPES
     ]
