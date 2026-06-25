@@ -47,7 +47,7 @@ class ResourceOutput(PluginOutputBase):
         return cls(
             type="resource",
             result_index=index,
-            resource_type=resource.get_type(),
+            resource_type=resource.label or resource.get_type(),
             visualization=cast(Visualization, resource.visualize()),
         )
 
