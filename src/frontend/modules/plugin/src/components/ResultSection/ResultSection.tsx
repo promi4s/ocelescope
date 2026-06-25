@@ -6,7 +6,7 @@ import {
   type ResourceOutput,
 } from "@ocelescope/api-base";
 import { Visualization, type VisualizationsType } from "@ocelescope/resources";
-import { BarsList } from "@mantine/charts";
+import { BarList } from "@ocelescope/core";
 import {
   ActionIcon,
   Badge,
@@ -23,6 +23,7 @@ import {
 } from "@mantine/core";
 import { generateColor } from "@marko19907/string-to-color";
 import {
+  CheckIcon,
   Columns2Icon,
   DatabaseIcon,
   DownloadIcon,
@@ -32,7 +33,7 @@ import { useMemo, useState } from "react";
 
 type PluginOutput = OCELOutput | ResourceOutput;
 
-const ResourceCard: React.FC<{
+const ResourceView: React.FC<{
   resource: ResourceOutput;
 }> = ({ resource }) => {
   return (
@@ -42,14 +43,12 @@ const ResourceCard: React.FC<{
   );
 };
 
-export const OCELCard: React.FC<{ ocel: OCELOutput }> = ({ ocel }) => {
+export const OCELView: React.FC<{ ocel: OCELOutput }> = ({ ocel }) => {
   return (
-    <BarsList
-      data={Object.entries(ocel.activity_count).map(([name, value]) => ({
-        name,
-        value,
-      }))}
-    />
+    <Stack gap="md">
+      <BarList data={ocel.activity_count} labelHeader="Activity" />
+      <BarList data={ocel.object_count} labelHeader="Object type" />
+    </Stack>
   );
 };
 
@@ -74,9 +73,9 @@ const ResultLabel: React.FC<{
 const ResultPane: React.FC<{ output: PluginOutput }> = ({ output }) => (
   <Box h="100%" p="xs" pos="relative">
     {output.type === "ocel" ? (
-      <OCELCard ocel={output} />
+      <OCELView ocel={output} />
     ) : (
-      <ResourceCard resource={output} />
+      <ResourceView resource={output} />
     )}
   </Box>
 );
@@ -107,7 +106,12 @@ const ResultSection: React.FC<{
     "vertical",
   );
 
-  const { mutate: saveResults, isPending: isSaving } = useSavePluginResults();
+  const {
+    mutate: saveResults,
+    isPending: isSaving,
+    isSuccess: isSaved,
+    reset: resetSave,
+  } = useSavePluginResults();
   const { mutate: downloadResults, isPending: isDownloading } =
     useDownloadPluginResults({
       request: { responseType: "blob" },
@@ -146,6 +150,13 @@ const ResultSection: React.FC<{
   }
 
   const selectedValues = selected ?? (options[0] ? [options[0].value] : []);
+  const selectionKey = selectedValues.join(",");
+
+  const handleSelectionChange = (value: string[]) => {
+    setSelected(value);
+    resetSave();
+  };
+
   const selectedOutputs = selectedValues
     .map((value) => Number(value))
     .map((index) => ({ index, output: pluginSummary[index] }))
@@ -197,7 +208,7 @@ const ResultSection: React.FC<{
             flex={1}
             data={options}
             value={selectedValues}
-            onChange={setSelected}
+            onChange={handleSelectionChange}
             placeholder="Select results to display"
             searchable
             clearable
@@ -258,12 +269,15 @@ const ResultSection: React.FC<{
           </Button>
           <Button
             variant="light"
-            leftSection={<DatabaseIcon size={16} />}
+            color={isSaved ? "green" : undefined}
+            leftSection={
+              isSaved ? <CheckIcon size={16} /> : <DatabaseIcon size={16} />
+            }
             onClick={handleSaveToSession}
             loading={isSaving}
             disabled={shownIndices.length === 0}
           >
-            Save to session
+            {isSaved ? "Saved" : "Save to session"}
           </Button>
         </Group>
       </Group>
@@ -274,7 +288,7 @@ const ResultSection: React.FC<{
         </Center>
       ) : (
         <Splitter
-          key={`${orientation}:${selectedValues.join(",")}`}
+          key={`${orientation}:${selectionKey}`}
           orientation={orientation}
           lineSize={4}
           handleColor="var(--mantine-color-default-border)"
