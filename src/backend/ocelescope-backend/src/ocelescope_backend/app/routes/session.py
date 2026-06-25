@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import io
 from datetime import datetime
 from pathlib import Path
 
@@ -17,6 +16,7 @@ from ocelescope_backend.app.internal.tasks.system_tasks import (
     import_resource,
     import_xes_task,
 )
+from ocelescope_backend.app.internal.util.spool_upload import spool_upload_to_tempfile
 
 session_router = APIRouter(prefix="/session", tags=["session"])
 
@@ -32,9 +32,6 @@ async def upload(session: ApiSession, files: list[UploadFile] = File(...)) -> li
 
         file_path = Path(file.filename)
 
-        file_bytes = await file.read()
-        file_stream = io.BytesIO(file_bytes)
-
         task_method = None
         match file_path.suffix:
             case ".zip":
@@ -46,17 +43,21 @@ async def upload(session: ApiSession, files: list[UploadFile] = File(...)) -> li
             case ".xes":
                 task_method = import_xes_task
 
-        if task_method is not None:
-            tasks.append(
-                task_method(
-                    session=session,
-                    file_stream=file_stream,
-                    metadata={
-                        "fileName": file_path.name,
-                        "uploaded_at": datetime.now().isoformat(),
-                    },
-                )
+        if task_method is None:
+            continue
+
+        tmp_path = await spool_upload_to_tempfile(file, suffix=file_path.suffix)
+
+        tasks.append(
+            task_method(
+                session=session,
+                file_path=tmp_path,
+                metadata={
+                    "fileName": file_path.name,
+                    "uploaded_at": datetime.now().isoformat(),
+                },
             )
+        )
 
     return tasks
 
