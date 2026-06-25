@@ -3,11 +3,18 @@ from typing import Any, Optional
 
 from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
+from pydantic_settings import SecretsSettingsSource
 
 from ocelescope import OCEL, PluginMethod, Resource
 from ocelescope_backend.app.dependencies import ApiSession
 from ocelescope_backend.app.internal.config import config
-from ocelescope_backend.app.internal.model.plugin import PluginApi
+from ocelescope_backend.app.internal.exceptions import NotFound
+from ocelescope_backend.app.internal.model.plugin import (
+    OCELOutput,
+    PluginApi,
+    PluginOutput,
+    ResourceOutput,
+)
 
 # TODO: Put this in own util function
 from ocelescope_backend.app.internal.registry import registry_manager
@@ -62,6 +69,33 @@ def run_plugin(
         method_name=method_name,
         input={"input": input, "ocels": input_ocels, "resources": input_resources},
     )
+
+
+@plugin_router.get(
+    "/{plugin_id}/{method_name}/result/{task_id}", operation_id="PluginResult"
+)
+def get_plugin_result(
+    session: ApiSession, plugin_id: str, method_name: str, task_id: str
+) -> list[PluginOutput] | None:
+    plugin_task = session.get_task(task_id)
+
+    if (
+        plugin_task is None
+        or not isinstance(plugin_task, PluginTask)
+        or plugin_task.plugin_id != plugin_id
+        or plugin_task.method_name != method_name
+    ):
+        raise NotFound("Task could not be found")
+
+    if plugin_task.result is None:
+        return None
+
+    return [
+        OCELOutput.from_ocel(index, result)
+        if isinstance(result, OCEL)
+        else ResourceOutput.from_resource(index, result)
+        for index, result in enumerate(plugin_task.result)
+    ]
 
 
 @plugin_router.post(
