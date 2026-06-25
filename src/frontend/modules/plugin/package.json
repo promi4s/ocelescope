@@ -34,8 +34,10 @@
   "peerDependencies": {
     "@apidevtools/json-schema-ref-parser": "catalog:",
     "@mantine/carousel": "catalog:",
+    "@mantine/charts": "catalog:",
     "@mantine/core": "catalog:",
     "@mantine/hooks": "catalog:",
+    "@marko19907/string-to-color": "catalog:",
     "@ocelescope/api-base": "workspace:*",
     "@ocelescope/core": "workspace:*",
     "@ocelescope/resources": "workspace:*",
@@ -52,11 +54,11 @@
     "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "react-hook-form": "catalog:",
-    "@marko19907/string-to-color": "catalog:"
+    "react-hook-form": "catalog:"
   },
   "devDependencies": {
     "@apidevtools/json-schema-ref-parser": "catalog:",
+    "@mantine/charts": "catalog:",
     "@rjsf/mantine": "catalog:",
     "@types/file-saver": "catalog:",
     "@types/node": "catalog:",

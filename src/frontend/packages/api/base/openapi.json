@@ -2591,85 +2591,6 @@
         }
       }
     },
-    "/tasks/plugin": {
-      "get": {
-        "tags": [
-          "tasks"
-        ],
-        "summary": "returns all tasks of a session",
-        "operationId": "getPluginTasks",
-        "parameters": [
-          {
-            "name": "plugin_id",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Plugin Id"
-            }
-          },
-          {
-            "name": "method_name",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Method Name"
-            }
-          },
-          {
-            "name": "only_running",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "boolean",
-              "default": true,
-              "title": "Only Running"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PluginTaskSummary"
-                  },
-                  "title": "Response Getplugintasks"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/tasks/plugin/{task_id}": {
       "get": {
         "tags": [
@@ -3048,6 +2969,91 @@
                 "schema": {
                   "type": "string",
                   "title": "Response Runplugin"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/plugins/{plugin_id}/{method_name}/result/{task_id}": {
+      "get": {
+        "tags": [
+          "plugins"
+        ],
+        "summary": "Get Plugin Result",
+        "operationId": "PluginResult",
+        "parameters": [
+          {
+            "name": "plugin_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Plugin Id"
+            }
+          },
+          {
+            "name": "method_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Method Name"
+            }
+          },
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "$ref": "#/components/schemas/OCELOutput"
+                          },
+                          {
+                            "$ref": "#/components/schemas/ResourceOutput"
+                          }
+                        ],
+                        "discriminator": {
+                          "propertyName": "type",
+                          "mapping": {
+                            "ocel": "#/components/schemas/OCELOutput",
+                            "resource": "#/components/schemas/ResourceOutput"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Pluginresult"
                 }
               }
             }
@@ -4655,6 +4661,41 @@
         ],
         "title": "OCELExtensionDescription"
       },
+      "OCELOutput": {
+        "properties": {
+          "result_index": {
+            "type": "integer",
+            "title": "Result Index"
+          },
+          "type": {
+            "type": "string",
+            "const": "ocel",
+            "title": "Type"
+          },
+          "activity_count": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Activity Count"
+          },
+          "object_count": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Object Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "result_index",
+          "type",
+          "activity_count",
+          "object_count"
+        ],
+        "title": "OCELOutput"
+      },
       "OCELResult": {
         "properties": {
           "type": {
@@ -5015,28 +5056,6 @@
         ],
         "title": "PluginMethod"
       },
-      "PluginOutput": {
-        "properties": {
-          "ocel_ids": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Ocel Ids",
-            "default": []
-          },
-          "resource_ids": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Resource Ids",
-            "default": []
-          }
-        },
-        "type": "object",
-        "title": "PluginOutput"
-      },
       "PluginSource": {
         "properties": {
           "task_id": {
@@ -5081,9 +5100,6 @@
           "method_name": {
             "type": "string",
             "title": "Method Name"
-          },
-          "output": {
-            "$ref": "#/components/schemas/PluginOutput"
           }
         },
         "type": "object",
@@ -5091,8 +5107,7 @@
           "id",
           "state",
           "plugin_id",
-          "method_name",
-          "output"
+          "method_name"
         ],
         "title": "PluginTaskSummary"
       },
@@ -5311,6 +5326,68 @@
           "description"
         ],
         "title": "ResourceInfo"
+      },
+      "ResourceOutput": {
+        "properties": {
+          "result_index": {
+            "type": "integer",
+            "title": "Result Index"
+          },
+          "type": {
+            "type": "string",
+            "const": "resource",
+            "title": "Type"
+          },
+          "resource_type": {
+            "type": "string",
+            "title": "Resource Type"
+          },
+          "visualization": {
+            "anyOf": [
+              {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/Graph"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Table"
+                  },
+                  {
+                    "$ref": "#/components/schemas/SVGVis"
+                  },
+                  {
+                    "$ref": "#/components/schemas/DotVis"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Plotly"
+                  }
+                ],
+                "discriminator": {
+                  "propertyName": "type",
+                  "mapping": {
+                    "dot": "#/components/schemas/DotVis",
+                    "graph": "#/components/schemas/Graph",
+                    "plotly": "#/components/schemas/Plotly",
+                    "svg": "#/components/schemas/SVGVis",
+                    "table": "#/components/schemas/Table"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Visualization"
+          }
+        },
+        "type": "object",
+        "required": [
+          "result_index",
+          "type",
+          "resource_type",
+          "visualization"
+        ],
+        "title": "ResourceOutput"
       },
       "ResourceResult": {
         "properties": {
