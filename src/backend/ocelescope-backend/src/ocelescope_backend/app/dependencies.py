@@ -7,6 +7,7 @@ from fastapi import Depends, HTTPException, Request
 from ocelescope import OCEL
 from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.session import Session
+from ocelescope_backend.app.internal.tasks.plugin import PluginTask
 
 
 def get_session(request: Request) -> Session:
@@ -36,3 +37,22 @@ def get_ocel(
 
 
 ApiOcel = Annotated[OCEL, Depends(get_ocel)]
+
+
+def get_plugin_task(
+    session: ApiSession, plugin_id: str, method_name: str, task_id: str
+) -> PluginTask:
+    plugin_task = session.get_task(task_id)
+
+    if (
+        plugin_task is None
+        or not isinstance(plugin_task, PluginTask)
+        or plugin_task.plugin_id != plugin_id
+        or plugin_task.method_name != method_name
+    ):
+        raise NotFound("Task could not be found")
+
+    return plugin_task
+
+
+ApiPluginTask = Annotated[PluginTask, Depends(get_plugin_task)]

@@ -1,11 +1,14 @@
 import {
+  useDownloadPluginResults,
   usePluginResult,
+  useSavePluginResults,
   type OCELOutput,
   type ResourceOutput,
 } from "@ocelescope/api-base";
 import { Visualization, type VisualizationsType } from "@ocelescope/resources";
 import { BarsList } from "@mantine/charts";
 import {
+  ActionIcon,
   Badge,
   Box,
   Button,
@@ -16,9 +19,15 @@ import {
   Splitter,
   Stack,
   Text,
+  Tooltip,
 } from "@mantine/core";
 import { generateColor } from "@marko19907/string-to-color";
-import { DatabaseIcon, DownloadIcon } from "lucide-react";
+import {
+  Columns2Icon,
+  DatabaseIcon,
+  DownloadIcon,
+  Rows2Icon,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 
 type PluginOutput = OCELOutput | ResourceOutput;
@@ -94,6 +103,15 @@ const ResultSection: React.FC<{
   );
 
   const [selected, setSelected] = useState<string[] | null>(null);
+  const [orientation, setOrientation] = useState<"vertical" | "horizontal">(
+    "vertical",
+  );
+
+  const { mutate: saveResults, isPending: isSaving } = useSavePluginResults();
+  const { mutate: downloadResults, isPending: isDownloading } =
+    useDownloadPluginResults({
+      request: { responseType: "blob" },
+    });
 
   const options = useMemo(
     () =>
@@ -127,7 +145,7 @@ const ResultSection: React.FC<{
     );
   }
 
-  const selectedValues = selected ?? options.map((option) => option.value);
+  const selectedValues = selected ?? (options[0] ? [options[0].value] : []);
   const selectedOutputs = selectedValues
     .map((value) => Number(value))
     .map((index) => ({ index, output: pluginSummary[index] }))
@@ -136,16 +154,33 @@ const ResultSection: React.FC<{
         entry.output != null,
     );
 
-  const handleDownload = (_outputs: PluginOutput[]) => {
-    // TODO: implement downloading the result resources.
-  };
-
-  const handleSaveToSession = (_outputs: PluginOutput[]) => {
-    // TODO: implement saving the result resources into the current session.
-  };
-
   const hasMultipleResults = options.length > 1;
-  const shownOutputs = selectedOutputs.map((entry) => entry.output);
+  const shownIndices = selectedOutputs.map((entry) => entry.index);
+
+  const handleDownload = () => {
+    downloadResults(
+      { pluginId, methodName, taskId, data: { indices: shownIndices } },
+      {
+        onSuccess: (data) => {
+          const url = URL.createObjectURL(data as Blob);
+          const anchor = document.createElement("a");
+          anchor.href = url;
+          anchor.download = `${methodName}_results.zip`;
+          anchor.click();
+          URL.revokeObjectURL(url);
+        },
+      },
+    );
+  };
+
+  const handleSaveToSession = () => {
+    saveResults({
+      pluginId,
+      methodName,
+      taskId,
+      data: { indices: shownIndices },
+    });
+  };
 
   return (
     <Stack gap={0} h="100%">
@@ -187,17 +222,46 @@ const ResultSection: React.FC<{
           )
         )}
         <Group gap="xs" ml="auto" wrap="nowrap">
+          {selectedOutputs.length > 1 && (
+            <Tooltip
+              label={
+                orientation === "vertical"
+                  ? "Show side by side"
+                  : "Stack vertically"
+              }
+            >
+              <ActionIcon
+                variant="default"
+                size="lg"
+                onClick={() =>
+                  setOrientation((prev) =>
+                    prev === "vertical" ? "horizontal" : "vertical",
+                  )
+                }
+              >
+                {orientation === "vertical" ? (
+                  <Columns2Icon size={16} />
+                ) : (
+                  <Rows2Icon size={16} />
+                )}
+              </ActionIcon>
+            </Tooltip>
+          )}
           <Button
             variant="default"
             leftSection={<DownloadIcon size={16} />}
-            onClick={() => handleDownload(shownOutputs)}
+            onClick={handleDownload}
+            loading={isDownloading}
+            disabled={shownIndices.length === 0}
           >
             Download
           </Button>
           <Button
             variant="light"
             leftSection={<DatabaseIcon size={16} />}
-            onClick={() => handleSaveToSession(shownOutputs)}
+            onClick={handleSaveToSession}
+            loading={isSaving}
+            disabled={shownIndices.length === 0}
           >
             Save to session
           </Button>
@@ -210,7 +274,8 @@ const ResultSection: React.FC<{
         </Center>
       ) : (
         <Splitter
-          key={selectedValues.join(",")}
+          key={`${orientation}:${selectedValues.join(",")}`}
+          orientation={orientation}
           lineSize={4}
           handleColor="var(--mantine-color-default-border)"
           style={{ flex: 1, minHeight: 0 }}
