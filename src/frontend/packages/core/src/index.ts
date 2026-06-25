@@ -1,4 +1,5 @@
 export { default as AttributesTable } from "./components/AttributeTable";
+export { BarList } from "./components/BarList/BarList";
 export { FileDropzone } from "./components/Dropzone/Dropzone";
 export { sseHandler } from "./components/EventHandler";
 export { createModulesPage } from "./components/ModulePage";
