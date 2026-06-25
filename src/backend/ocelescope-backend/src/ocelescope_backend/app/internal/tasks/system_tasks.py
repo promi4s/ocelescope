@@ -5,7 +5,6 @@ import traceback
 import zipfile
 from datetime import datetime
 from pathlib import Path
-from typing import IO
 from uuid import uuid4
 
 from fastapi import HTTPException
@@ -17,7 +16,6 @@ from ocelescope_backend.app.internal.model.resource import ResourceStore
 from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.session import Session
 from ocelescope_backend.app.internal.tasks.system import system_task
-from ocelescope_backend.app.internal.util.stream_to_tempfile import stream_to_tempfile
 from ocelescope_backend.app.sse_manager import (
     ErrorNotification,
     InvalidationRequest,
@@ -34,28 +32,36 @@ class ImportMetadata(TypedDict):
 @system_task(name="importOCEL")
 def import_ocel_task(
     session: Session,
-    file_stream: IO[bytes],
+    file_path: Path,
     metadata: ImportMetadata,
 ):
-    file_path = Path(metadata["fileName"])
+    original_name = Path(metadata["fileName"])
 
-    match file_path.suffix:
+    match original_name.suffix:
         case ".xml":
-            suffix = ".xmlocel"
+            desired_suffix = ".xmlocel"
         case ".json":
-            suffix = ".jsonocel"
+            desired_suffix = ".jsonocel"
         case _:
-            suffix = file_path.suffix
+            desired_suffix = original_name.suffix
 
-    with stream_to_tempfile(file_stream, prefix=file_path.stem, suffix=suffix) as path:
+    read_path = file_path
+    try:
+        if file_path.suffix != desired_suffix:
+            read_path = file_path.with_suffix(desired_suffix)
+            file_path.rename(read_path)
+
         ocel = OCEL.read(
-            path,
+            read_path,
             meta={
-                "name": file_path.stem,
+                "name": original_name.stem,
                 "upload_date": datetime.now().isoformat(),
             },
         )
         ocel.extensions.load(registry_manager.get_loaded_extensions())
+    finally:
+        read_path.unlink(missing_ok=True)
+        file_path.unlink(missing_ok=True)
 
     ocel_id = session.add_ocel(ocel)
 
@@ -73,18 +79,20 @@ def import_ocel_task(
 @system_task(name="importXES")
 def import_xes_task(
     session: Session,
-    file_stream: IO[bytes],
+    file_path: Path,
     metadata: ImportMetadata,
 ):
-    file_path = Path(metadata["fileName"])
+    original_name = Path(metadata["fileName"])
 
-    with stream_to_tempfile(file_stream, prefix=file_path.stem, suffix=".xes") as path:
+    try:
         ocel = OCEL.read_xes(
-            path,
+            file_path,
         )
+    finally:
+        file_path.unlink(missing_ok=True)
 
     ocel.meta.extra = {
-        "name": file_path.stem,
+        "name": original_name.stem,
         "upload_date": datetime.now().isoformat(),
     }
 
@@ -104,31 +112,34 @@ def import_xes_task(
 @system_task(name="importPlugin")
 def import_plugin(
     session: Session,
-    file_stream: IO[bytes],
+    file_path: Path,
     metadata: ImportMetadata,
 ):
     added_plugin_ids = []
 
-    if not config.PLUGIN_DIR:
-        return []
+    try:
+        if not config.PLUGIN_DIR:
+            return []
 
-    with tempfile.TemporaryDirectory() as temp_dir:
-        try:
-            with zipfile.ZipFile(file_stream, "r") as zip_ref:
-                zip_ref.extractall(temp_dir)
-        except zipfile.BadZipFile:
-            raise HTTPException(status_code=400, detail="Invalid zip file")
+        with tempfile.TemporaryDirectory() as temp_dir:
+            try:
+                with zipfile.ZipFile(file_path, "r") as zip_ref:
+                    zip_ref.extractall(temp_dir)
+            except zipfile.BadZipFile:
+                raise HTTPException(status_code=400, detail="Invalid zip file")
 
-        temp_path = Path(temp_dir)
+            temp_path = Path(temp_dir)
 
-        for plugin_candidate in temp_path.iterdir():
-            if (
-                plugin_candidate.is_dir()
-                and (plugin_candidate / "__init__.py").exists()
-            ):
-                plugin_id = f"plugin_{str(uuid4())}"
-                shutil.move(plugin_candidate, config.PLUGIN_DIR / plugin_id)
-                added_plugin_ids.append(plugin_id)
+            for plugin_candidate in temp_path.iterdir():
+                if (
+                    plugin_candidate.is_dir()
+                    and (plugin_candidate / "__init__.py").exists()
+                ):
+                    plugin_id = f"plugin_{str(uuid4())}"
+                    shutil.move(plugin_candidate, config.PLUGIN_DIR / plugin_id)
+                    added_plugin_ids.append(plugin_id)
+    finally:
+        file_path.unlink(missing_ok=True)
 
     try:
         registry_manager.load_plugins(added_plugin_ids, ignore_errors=False)
@@ -155,16 +166,17 @@ def import_plugin(
 @system_task(name="importResource")
 def import_resource(
     session: Session,
-    file_stream: IO[bytes],
+    file_path: Path,
     metadata: ImportMetadata,
 ):
     try:
-        contents = file_stream.read()
-        data = json.loads(contents)
+        data = json.loads(file_path.read_text())
         resource = ResourceStore(**data)
 
     except Exception:
         return []
+    finally:
+        file_path.unlink(missing_ok=True)
 
     session.add_resource(
         resource,

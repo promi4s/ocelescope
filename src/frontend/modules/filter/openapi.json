@@ -188,7 +188,8 @@
               "type": "string"
             },
             "type": "array",
-            "title": "Event Types"
+            "title": "Event Types",
+            "fieldType": "event_type"
           },
           "mode": {
             "type": "string",
@@ -647,7 +648,8 @@
               "type": "string"
             },
             "type": "array",
-            "title": "Object Types"
+            "title": "Object Types",
+            "fieldType": "object_type"
           },
           "mode": {
             "type": "string",
