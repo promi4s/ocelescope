@@ -211,40 +211,40 @@ const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
 
   return (
     <Box pos="relative" h="100%" style={{ overflow: "hidden" }}>
-      <LoadingOverlay visible={isMethodsLoading} />
+      {task?.state === "SUCCESS" ? (
+        <Box h="100%" p="sm">
+          <Visualization
+            visualization={task.visualization as VisualizationsType}
+          />
+        </Box>
+      ) : (
+        <Center h="100%">
+          <Text c="dimmed" ta="center">
+            {isDiscovering
+              ? "Discovering visualization..."
+              : "The discovery preview will appear here."}
+          </Text>
+        </Center>
+      )}
 
-      <Box pos="relative" h="100%">
-        <LoadingOverlay visible={isDiscovering} />
-        {task?.state === "SUCCESS" ? (
-          <Box h="100%" p="sm">
-            <Visualization
-              visualization={task.visualization as VisualizationsType}
-            />
-          </Box>
-        ) : (
-          <Center h="100%">
-            <Text c="dimmed" ta="center">
-              {isDiscovering
-                ? "Discovering visualization..."
-                : "The discovery preview will appear here."}
-            </Text>
-          </Center>
-        )}
+      {!panelOpen && (
+        <Tooltip label="Open settings" position="left" withArrow>
+          <ActionIcon
+            variant="default"
+            size="lg"
+            radius="md"
+            onClick={() => setPanelOpen(true)}
+            style={{ position: "absolute", top: 12, right: 12, zIndex: 5 }}
+          >
+            <SettingsIcon size={16} />
+          </ActionIcon>
+        </Tooltip>
+      )}
 
-        {!panelOpen && (
-          <Tooltip label="Open settings" position="left" withArrow>
-            <ActionIcon
-              variant="default"
-              size="lg"
-              radius="md"
-              onClick={() => setPanelOpen(true)}
-              style={{ position: "absolute", top: 12, right: 12, zIndex: 5 }}
-            >
-              <SettingsIcon size={16} />
-            </ActionIcon>
-          </Tooltip>
-        )}
-      </Box>
+      <LoadingOverlay
+        visible={isMethodsLoading || isDiscovering}
+        zIndex={100}
+      />
 
       <Drawer
         opened={panelOpen}
