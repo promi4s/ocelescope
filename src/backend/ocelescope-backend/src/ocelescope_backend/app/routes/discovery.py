@@ -12,13 +12,17 @@ from ocelescope import (
 )
 from ocelescope_backend.app.dependencies import ApiSession
 from ocelescope_backend.app.internal.discovery import discovery_registry
+from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.model.discovery import (
     CreateDiscoveryTaskBody,
     DiscoveryMethodMeta,
     DiscoveryRequest,
     DiscoveryVariant,
 )
-from ocelescope_backend.app.internal.tasks.discovery_task import DiscoveryTask
+from ocelescope_backend.app.internal.tasks.discovery_task import (
+    DiscoveryTask,
+    DiscoveryTaskSummary,
+)
 
 _DISCOVERY_FILTER_TYPES: list[type[BaseFilter]] = [
     EventTypeFilter,
@@ -86,6 +90,19 @@ def create_discovery_task(
             filters=filter_pipeline,
         ),
     )
+
+
+@discovery_router.get("/tasks/{task_id}", operation_id="DiscoveryTask")
+def get_discovery_task(
+    session: ApiSession,
+    task_id: str,
+) -> DiscoveryTaskSummary:
+    discovery_task = session.get_task(task_id)
+
+    if discovery_task is None or not isinstance(discovery_task, DiscoveryTask):
+        raise NotFound("Task could not be found")
+
+    return discovery_task.summarize()
 
 
 @discovery_router.get(

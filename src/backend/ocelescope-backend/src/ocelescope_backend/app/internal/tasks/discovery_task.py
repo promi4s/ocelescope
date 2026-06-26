@@ -1,6 +1,6 @@
 from typing import Any, Hashable, Sequence, cast
 
-from ocelescope import Resource
+from ocelescope import Resource, Visualization
 from ocelescope_backend.app.internal.discovery import discovery_registry
 from ocelescope_backend.app.internal.exceptions import BadRequest
 from ocelescope_backend.app.internal.model.discovery import DiscoveryRequest
@@ -14,10 +14,8 @@ from ocelescope_backend.app.sse_manager import (
 
 
 class DiscoveryTaskSummary(TaskSummary):
-    ocel_id: str
-    method_id: str
-    name: str
-    resource_type: str
+    state: TaskState
+    visualization: Visualization | None
 
 
 class DiscoveryTask(TaskBase):
@@ -110,10 +108,9 @@ class DiscoveryTask(TaskBase):
         return DiscoveryTaskSummary(
             id=self.id,
             state=self.state,
-            ocel_id=self.request.ocel_id,
-            method_id=self.request.method_id,
-            name=self.request.name,
-            resource_type=self._actual_resource_type,
+            visualization=cast(Visualization, self.result.visualize())
+            if self.result is not None
+            else None,
         )
 
     @staticmethod
