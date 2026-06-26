@@ -13,9 +13,16 @@ import PlotlyViewer from "./Viewers/Plotly";
 import SvgViewer from "./Viewers/SVG";
 import TableView from "./Viewers/Table";
 
+type ExtraMenuItem = {
+  icon: React.ReactNode;
+  label: string;
+  onClick: () => void;
+};
+
 export type VisualizationProps<T extends VisualizationsTypes> = {
   visualization: VisualizationByType<T>;
   isPreview?: boolean;
+  menuItems?: ExtraMenuItem[];
 };
 
 const visualizationMap: {

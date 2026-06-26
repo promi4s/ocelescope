@@ -17,8 +17,9 @@ import {
 } from "@mantine/core";
 import { DownloadIcon, Maximize2Icon } from "lucide-react";
 import { useCallback, useEffect, useRef } from "react";
+import type { VisualizationProps } from "../..";
 import { useLayout } from "./hooks/useLayout";
-import { FIT_VIEW_PADDING, type GraphVisualization } from "./model/types";
+import { FIT_VIEW_PADDING } from "./model/types";
 import GraphFlowEdge from "./render/Edge";
 import GraphFlowNode from "./render/Node";
 import { computeAutoFitBounds } from "./utils/bounds";
@@ -27,12 +28,11 @@ import { downloadPdf, downloadPng, downloadSvg } from "./utils/download";
 const nodeTypes = { node: GraphFlowNode };
 const edgeTypes = { graphflow: GraphFlowEdge };
 
-type GraphFlowProps = {
-  visualization: GraphVisualization;
-  isPreview?: boolean | undefined;
-};
-
-const GraphFlowCanvas = ({ visualization, isPreview }: GraphFlowProps) => {
+const GraphFlowCanvas = ({
+  visualization,
+  isPreview,
+  menuItems,
+}: VisualizationProps<"graph">) => {
   const { nodes, edges, layoutReady, error, onNodesChange } =
     useLayout(visualization);
 
@@ -130,6 +130,15 @@ const GraphFlowCanvas = ({ visualization, isPreview }: GraphFlowProps) => {
                     <Menu.Item onClick={handleDownloadPdf}>PDF</Menu.Item>
                   </Menu.Dropdown>
                 </Menu>
+                {menuItems &&
+                  menuItems.map((menuItem) => (
+                    <ControlButton
+                      onClick={menuItem.onClick}
+                      title={menuItem.label}
+                    >
+                      {menuItem.icon}
+                    </ControlButton>
+                  ))}
               </Controls>
             </>
           )}
@@ -139,7 +148,7 @@ const GraphFlowCanvas = ({ visualization, isPreview }: GraphFlowProps) => {
   );
 };
 
-const GraphFlow = (props: GraphFlowProps) => (
+const GraphFlow = (props: VisualizationProps<"graph">) => (
   <ReactFlowProvider>
     <GraphFlowCanvas {...props} />
   </ReactFlowProvider>
