@@ -7,7 +7,12 @@ export const BarList: React.FC<{
   labelHeader: string;
   valueHeader?: string;
   maxVisibleItems?: number;
-}> = ({ data, labelHeader, valueHeader = "Frequency", maxVisibleItems = 8 }) => {
+}> = ({
+  data,
+  labelHeader,
+  valueHeader = "Frequency",
+  maxVisibleItems = 8,
+}) => {
   const [expanded, setExpanded] = useState(false);
 
   const entries = useMemo(

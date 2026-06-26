@@ -1,5 +1,5 @@
-import { BarList } from "@ocelescope/core";
 import { useEventCounts, useObjectCounts } from "@ocelescope/api-base";
+import { BarList } from "@ocelescope/core";
 
 const countHook = {
   events: useEventCounts,
