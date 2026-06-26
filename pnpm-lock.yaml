@@ -9,18 +9,60 @@ catalogs:
     '@apidevtools/json-schema-ref-parser':
       specifier: ^15.3.1
       version: 15.3.1
+    '@dagrejs/dagre':
+      specifier: ^3.0.0
+      version: 3.0.0
     '@faker-js/faker':
       specifier: ^10.4.0
       version: 10.5.0
+    '@floating-ui/react':
+      specifier: ^0.27.18
+      version: 0.27.19
+    '@hpcc-js/wasm-graphviz':
+      specifier: ^1.21.0
+      version: 1.21.1
+    '@mantine/carousel':
+      specifier: ^9.4.0
+      version: 9.4.0
+    '@mantine/charts':
+      specifier: ^9.4.0
+      version: 9.4.0
+    '@mantine/core':
+      specifier: ^9.4.0
+      version: 9.4.0
+    '@mantine/dates':
+      specifier: ^9.4.0
+      version: 9.4.0
+    '@mantine/dropzone':
+      specifier: ^9.4.0
+      version: 9.4.0
+    '@mantine/hooks':
+      specifier: ^9.4.0
+      version: 9.4.0
     '@mantine/notifications':
       specifier: ^9.4.0
       version: 9.4.0
+    '@marko19907/string-to-color':
+      specifier: ^1.0.2
+      version: 1.0.2
+    '@rjsf/core':
+      specifier: ^6.3.1
+      version: 6.3.1
     '@rjsf/mantine':
+      specifier: ^6.3.1
+      version: 6.3.1
+    '@rjsf/utils':
+      specifier: ^6.3.1
+      version: 6.3.1
+    '@rjsf/validator-ajv8':
       specifier: ^6.3.1
       version: 6.3.1
     '@storybook/react-vite':
       specifier: ^10.3.5
       version: 10.4.6
+    '@tanstack/react-query':
+      specifier: ^5.90.21
+      version: 5.90.21
     '@tsconfig/strictest':
       specifier: ^2.0.8
       version: 2.0.8
@@ -54,15 +96,39 @@ catalogs:
     '@types/react-plotly.js':
       specifier: ^2.6.4
       version: 2.6.4
+    '@xyflow/react':
+      specifier: ^12.10.1
+      version: 12.10.1
     axios:
       specifier: ^1.18.0
       version: 1.18.0
     bumpp:
       specifier: ^11.0.0
       version: 11.1.0
+    clsx:
+      specifier: ^2.1.1
+      version: 2.1.1
+    content-disposition-attachment:
+      specifier: ^0.3.1
+      version: 0.3.1
     cspell:
       specifier: ^10.0.1
       version: 10.0.1
+    dayjs:
+      specifier: ^1.11.19
+      version: 1.11.19
+    elkjs:
+      specifier: ^0.11.0
+      version: 0.11.1
+    embla-carousel:
+      specifier: ^8.6.0
+      version: 8.6.0
+    embla-carousel-react:
+      specifier: ^8.6.0
+      version: 8.6.0
+    file-saver:
+      specifier: ^2.0.5
+      version: 2.0.5
     flat:
       specifier: ^6.0.1
       version: 6.0.1
@@ -75,9 +141,21 @@ catalogs:
     jspdf:
       specifier: ^4.2.1
       version: 4.2.1
+    lodash:
+      specifier: ^4.17.23
+      version: 4.17.23
+    lucide-react:
+      specifier: ^0.577.0
+      version: 0.577.0
+    mantine-datatable:
+      specifier: ^9.3.1
+      version: 9.3.1
     next:
       specifier: ^16.1.6
       version: 16.2.9
+    object-hash:
+      specifier: ^3.0.0
+      version: 3.0.0
     orval:
       specifier: ^8.5.2
       version: 8.5.2
@@ -90,6 +168,18 @@ catalogs:
     react-dom:
       specifier: ^19.2.0
       version: 19.2.7
+    react-hook-form:
+      specifier: ^7.71.2
+      version: 7.71.2
+    react-plotly.js:
+      specifier: ^2.6.0
+      version: 2.6.0
+    react-zoom-pan-pinch:
+      specifier: ^4.0.0
+      version: 4.0.3
+    recharts:
+      specifier: ^3.2.1
+      version: 3.8.1
     storybook:
       specifier: ^10.3.5
       version: 10.4.6
@@ -99,6 +189,15 @@ catalogs:
     typescript:
       specifier: ^5.9.3
       version: 5.9.3
+    uniqolor:
+      specifier: ^1.1.1
+      version: 1.1.1
+    zod:
+      specifier: ^4.3.6
+      version: 4.3.6
+    zustand:
+      specifier: ^5.0.11
+      version: 5.0.11
 
 importers:
 
@@ -249,7 +348,7 @@ importers:
         version: 1.0.0
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.3(@tsdown/css@0.22.3)(oxc-resolver@11.21.3)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1))
+        version: 0.22.3(@tsdown/css@0.22.3)(oxc-resolver@11.21.3)(typescript@5.9.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -597,6 +696,9 @@ importers:
       '@apidevtools/json-schema-ref-parser':
         specifier: 'catalog:'
         version: 15.3.1(@types/json-schema@7.0.15)
+      '@mantine/charts':
+        specifier: 'catalog:'
+        version: 9.4.0(@mantine/core@9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.0(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(recharts@3.8.1(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react-is@18.3.1)(react@19.2.7)(redux@5.0.1))
       '@rjsf/mantine':
         specifier: 'catalog:'
         version: 6.3.1(@mantine/core@9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/dates@9.4.0(@mantine/core@9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.0(react@19.2.7))(dayjs@1.11.19)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.0(react@19.2.7))(@rjsf/core@6.3.1(@rjsf/utils@6.3.1(react@19.2.7))(react@19.2.7))(@rjsf/utils@6.3.1(react@19.2.7))(react@19.2.7)
@@ -620,7 +722,7 @@ importers:
         version: 1.0.0
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.3(@tsdown/css@0.22.3)(oxc-resolver@11.21.3)(typescript@5.9.3)(unrun@0.2.32)
+        version: 0.22.3(@tsdown/css@0.22.3)(oxc-resolver@11.21.3)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1))
       typescript:
         specifier: 'catalog:'
         version: 5.9.3

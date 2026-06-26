@@ -54,28 +54,6 @@ def get_system_task(session: ApiSession, task_id: str) -> SystemTaskSummary:
 
 
 @tasks_router.get(
-    "/plugin", summary="returns all tasks of a session", operation_id="getPluginTasks"
-)
-def get_plugin_tasks(
-    session: ApiSession,
-    plugin_id: Optional[str],
-    method_name: Optional[str],
-    only_running: bool = True,
-) -> list[PluginTaskSummary]:
-    def filter_tasks(task: PluginTask):
-        return (
-            (plugin_id is None or task.plugin_id == plugin_id)
-            and (method_name is None or task.method_name == method_name)
-            and (not only_running or task.state == TaskState.STARTED)
-        )
-
-    return [
-        cast(PluginTaskSummary, task_summary)
-        for task_summary in session.list_tasks(PluginTask, filter_tasks)
-    ]
-
-
-@tasks_router.get(
     "/plugin/{task_id}",
     summary="returns the task of a given taskId",
     operation_id="getPluginTask",

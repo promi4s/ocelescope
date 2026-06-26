@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from typing import Optional
+from typing import Optional, cast
 
 from fastapi.datastructures import UploadFile
 from fastapi.exceptions import HTTPException
@@ -110,7 +110,7 @@ def get_resource(session: ApiSession, resource_id: str) -> GetResourceResponse:
             id=resource_id,
             **resource.model_dump(),
         ),
-        visualization=resource_instance.visualize()  # ty: ignore[invalid-argument-type]
+        visualization=cast(Visualization, resource_instance.visualize())
         if resource_instance is not None
         else None,
     )

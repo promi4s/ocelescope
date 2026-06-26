@@ -14,14 +14,10 @@ export const PluginUploadSection = ({
     },
   });
   return (
-    <>
-      <FileDropzone
-        onUpload={async (data: File[]) =>
-          await upload({ data: { files: data } })
-        }
-        content={{ description: "Drag'n'drop your Plugins to upload." }}
-        accept={["application/x-zip-compressed", "application/zip"]}
-      />
-    </>
+    <FileDropzone
+      onUpload={async (data: File[]) => await upload({ data: { files: data } })}
+      content={{ description: "Drag'n'drop your Plugins to upload." }}
+      accept={["application/x-zip-compressed", "application/zip"]}
+    />
   );
 };
