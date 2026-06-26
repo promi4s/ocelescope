@@ -10,14 +10,14 @@ import {
 import { useLocalStorage } from "@mantine/hooks";
 import {
   useCreateDiscoveryTask,
+  useDiscoveryTask,
   useEventCounts,
-  useGetDiscoveryTask,
   useListDiscoveryFilters,
   useListDiscoveryMethods,
   useObjectCounts,
 } from "@ocelescope/api-base";
 import { defineModuleRoute, useCurrentOcel } from "@ocelescope/core";
-import { ResourceViewer } from "@ocelescope/resources";
+import { Visualization, type VisualizationsType } from "@ocelescope/resources";
 import { SettingsIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -39,7 +39,6 @@ const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
   const initializeFilters = useDiscoveryStore((s) => s.initializeFilters);
 
   const [taskId, setTaskId] = useState<string>();
-  const [latestResourceId, setLatestResourceId] = useState<string>();
   const [submitError, setSubmitError] = useState<string>();
 
   const [panelOpen, setPanelOpen] = useLocalStorage<boolean>({
@@ -138,7 +137,7 @@ const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
       },
     });
 
-  const { data: task, error: taskError } = useGetDiscoveryTask(taskId ?? "", {
+  const { data: task, error: taskError } = useDiscoveryTask(taskId ?? "", {
     query: {
       enabled: !!taskId,
       refetchInterval: ({ state }) => {
@@ -148,12 +147,6 @@ const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
       },
     },
   });
-
-  useEffect(() => {
-    const resourceId = task?.output.resource_ids?.at(-1);
-    if (task?.state === "SUCCESS" && resourceId)
-      setLatestResourceId(resourceId);
-  }, [task]);
 
   const requestPayload = useMemo(
     () => normalizeFormData(activeFormData),
@@ -221,10 +214,12 @@ const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
       <LoadingOverlay visible={isMethodsLoading} />
 
       <Box pos="relative" h="100%">
-        <LoadingOverlay visible={Boolean(isDiscovering && latestResourceId)} />
-        {latestResourceId ? (
+        <LoadingOverlay visible={isDiscovering} />
+        {task?.state === "SUCCESS" ? (
           <Box h="100%" p="sm">
-            <ResourceViewer id={latestResourceId} />
+            <Visualization
+              visualization={task.visualization as VisualizationsType}
+            />
           </Box>
         ) : (
           <Center h="100%">
