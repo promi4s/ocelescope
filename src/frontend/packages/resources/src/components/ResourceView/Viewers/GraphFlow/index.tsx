@@ -130,15 +130,14 @@ const GraphFlowCanvas = ({
                     <Menu.Item onClick={handleDownloadPdf}>PDF</Menu.Item>
                   </Menu.Dropdown>
                 </Menu>
-                {menuItems &&
-                  menuItems.map((menuItem) => (
-                    <ControlButton
-                      onClick={menuItem.onClick}
-                      title={menuItem.label}
-                    >
-                      {menuItem.icon}
-                    </ControlButton>
-                  ))}
+                {menuItems?.map((menuItem) => (
+                  <ControlButton
+                    onClick={menuItem.onClick}
+                    title={menuItem.label}
+                  >
+                    {menuItem.icon}
+                  </ControlButton>
+                ))}
               </Controls>
             </>
           )}
