@@ -1,13 +1,4 @@
 import {
-  useDownloadPluginResults,
-  usePluginResult,
-  useSavePluginResults,
-  type OCELOutput,
-  type ResourceOutput,
-} from "@ocelescope/api-base";
-import { Visualization, type VisualizationsType } from "@ocelescope/resources";
-import { BarList } from "@ocelescope/core";
-import {
   ActionIcon,
   Badge,
   Box,
@@ -22,6 +13,15 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { generateColor } from "@marko19907/string-to-color";
+import {
+  type OCELOutput,
+  type ResourceOutput,
+  useDownloadPluginResults,
+  usePluginResult,
+  useSavePluginResults,
+} from "@ocelescope/api-base";
+import { BarList } from "@ocelescope/core";
+import { Visualization, type VisualizationsType } from "@ocelescope/resources";
 import {
   CheckIcon,
   Columns2Icon,
@@ -70,16 +70,6 @@ const ResultLabel: React.FC<{
   </Group>
 );
 
-const ResultPane: React.FC<{ output: PluginOutput }> = ({ output }) => (
-  <Box h="100%" p="xs" pos="relative">
-    {output.type === "ocel" ? (
-      <OCELView ocel={output} />
-    ) : (
-      <ResourceView resource={output} />
-    )}
-  </Box>
-);
-
 const ResultSection: React.FC<{
   pluginId: string;
   methodName: string;
@@ -101,7 +91,7 @@ const ResultSection: React.FC<{
     },
   );
 
-  const [selected, setSelected] = useState<string[] | null>(null);
+  const [selected, setSelected] = useState<number[]>([0]);
   const [orientation, setOrientation] = useState<"vertical" | "horizontal">(
     "vertical",
   );
@@ -119,12 +109,11 @@ const ResultSection: React.FC<{
 
   const options = useMemo(
     () =>
-      (pluginSummary ?? []).map((output, index) => {
-        const entityType = entityTypeOf(output);
+      (pluginSummary ?? []).map((output) => {
         return {
-          value: String(index),
-          label: `${entityType} ${index + 1}`,
-          entityType,
+          value: output.result_index,
+          label: entityTypeOf(output),
+          entityType: output.type,
         };
       }),
     [pluginSummary],
@@ -149,28 +138,14 @@ const ResultSection: React.FC<{
     );
   }
 
-  const selectedValues = selected ?? (options[0] ? [options[0].value] : []);
-  const selectionKey = selectedValues.join(",");
-
-  const handleSelectionChange = (value: string[]) => {
+  const handleSelectionChange = (value: number[]) => {
     setSelected(value);
     resetSave();
   };
 
-  const selectedOutputs = selectedValues
-    .map((value) => Number(value))
-    .map((index) => ({ index, output: pluginSummary[index] }))
-    .filter(
-      (entry): entry is { index: number; output: PluginOutput } =>
-        entry.output != null,
-    );
-
-  const hasMultipleResults = options.length > 1;
-  const shownIndices = selectedOutputs.map((entry) => entry.index);
-
   const handleDownload = () => {
     downloadResults(
-      { pluginId, methodName, taskId, data: { indices: shownIndices } },
+      { pluginId, methodName, taskId, data: { indices: selected } },
       {
         onSuccess: (data) => {
           const url = URL.createObjectURL(data as Blob);
@@ -189,7 +164,7 @@ const ResultSection: React.FC<{
       pluginId,
       methodName,
       taskId,
-      data: { indices: shownIndices },
+      data: { indices: selected },
     });
   };
 
@@ -203,12 +178,12 @@ const ResultSection: React.FC<{
           borderBottom: "1px solid var(--mantine-color-default-border)",
         }}
       >
-        {hasMultipleResults ? (
+        {options.length > 1 ? (
           <MultiSelect
             flex={1}
             data={options}
-            value={selectedValues}
             onChange={handleSelectionChange}
+            value={selected}
             placeholder="Select results to display"
             searchable
             clearable
@@ -233,7 +208,7 @@ const ResultSection: React.FC<{
           )
         )}
         <Group gap="xs" ml="auto" wrap="nowrap">
-          {selectedOutputs.length > 1 && (
+          {selected.length > 1 && (
             <Tooltip
               label={
                 orientation === "vertical"
@@ -263,7 +238,7 @@ const ResultSection: React.FC<{
             leftSection={<DownloadIcon size={16} />}
             onClick={handleDownload}
             loading={isDownloading}
-            disabled={shownIndices.length === 0}
+            disabled={selected.length === 0}
           >
             Download
           </Button>
@@ -275,34 +250,42 @@ const ResultSection: React.FC<{
             }
             onClick={handleSaveToSession}
             loading={isSaving}
-            disabled={shownIndices.length === 0}
+            disabled={selected.length === 0}
           >
             {isSaved ? "Saved" : "Save to session"}
           </Button>
         </Group>
       </Group>
 
-      {selectedOutputs.length === 0 ? (
+      {selected.length === 0 ? (
         <Center style={{ flex: 1 }}>
           <Text c="dimmed">Select one or more results to display.</Text>
         </Center>
       ) : (
         <Splitter
-          key={`${orientation}:${selectionKey}`}
+          key={`${orientation}:${selected.join(",")}`}
           orientation={orientation}
           lineSize={4}
           handleColor="var(--mantine-color-default-border)"
           style={{ flex: 1, minHeight: 0 }}
         >
-          {selectedOutputs.map(({ index, output }) => (
-            <Splitter.Pane
-              key={index}
-              defaultSize={100 / selectedOutputs.length}
-              min="15%"
-            >
-              <ResultPane output={output} />
-            </Splitter.Pane>
-          ))}
+          {pluginSummary
+            ?.filter(({ result_index }) => selected.includes(result_index))
+            .map((output, index) => (
+              <Splitter.Pane
+                key={index}
+                defaultSize={100 / selected.length}
+                min="15%"
+              >
+                <Box h="100%" p="xs" pos="relative">
+                  {output.type === "ocel" ? (
+                    <OCELView ocel={output} />
+                  ) : (
+                    <ResourceView resource={output} />
+                  )}
+                </Box>
+              </Splitter.Pane>
+            ))}
         </Splitter>
       )}
     </Stack>
