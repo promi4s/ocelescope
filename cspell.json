@@ -139,7 +139,8 @@
     "dorny",
     "nlevels",
     "gvid",
-    "bendpoints"
+    "bendpoints",
+    "arcname"
   ],
   "ignorePaths": [
     "pnpm-lock.yaml",
