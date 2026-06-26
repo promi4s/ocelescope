@@ -13,9 +13,16 @@ import PlotlyViewer from "./Viewers/Plotly";
 import SvgViewer from "./Viewers/SVG";
 import TableView from "./Viewers/Table";
 
+type ExtraMenuItem = {
+  icon: React.ReactNode;
+  label: string;
+  onClick: () => void;
+};
+
 export type VisualizationProps<T extends VisualizationsTypes> = {
   visualization: VisualizationByType<T>;
   isPreview?: boolean;
+  menuItems?: ExtraMenuItem[];
 };
 
 const visualizationMap: {
@@ -28,10 +35,11 @@ const visualizationMap: {
   plotly: PlotlyViewer,
 };
 
-export const Visualization: React.FC<{
-  visualization: VisualizationsType;
-  isPreview?: boolean;
-}> = ({ visualization, isPreview = false }) => {
+export const Visualization = ({
+  visualization,
+  isPreview = false,
+  menuItems,
+}: VisualizationProps<VisualizationsTypes>) => {
   //TODO: Fix this stroke of a typing hell
   const Component = visualizationMap[visualization.type] as ComponentType<
     VisualizationProps<typeof visualization.type>
@@ -43,6 +51,7 @@ export const Visualization: React.FC<{
         visualization as ComponentProps<typeof Component>["visualization"]
       }
       isPreview={isPreview}
+      {...(menuItems && { menuItems })}
     />
   );
 };

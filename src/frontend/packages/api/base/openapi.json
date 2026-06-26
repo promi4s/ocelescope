@@ -2414,6 +2414,86 @@
         }
       }
     },
+    "/discovery/tasks/{task_id}": {
+      "get": {
+        "tags": [
+          "discovery"
+        ],
+        "summary": "Get Discovery Task",
+        "operationId": "DiscoveryTask",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiscoveryTaskSummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "discovery"
+        ],
+        "summary": "Save Discovery",
+        "operationId": "saveDiscovery",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/discovery/filters": {
       "get": {
         "tags": [
@@ -2574,169 +2654,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SystemTaskSummary"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/tasks/plugin/{task_id}": {
-      "get": {
-        "tags": [
-          "tasks"
-        ],
-        "summary": "returns the task of a given taskId",
-        "operationId": "getPluginTask",
-        "parameters": [
-          {
-            "name": "task_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Task Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PluginTaskSummary"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/tasks/discovery": {
-      "get": {
-        "tags": [
-          "tasks"
-        ],
-        "summary": "returns all discovery tasks of a session",
-        "operationId": "getDiscoveryTasks",
-        "parameters": [
-          {
-            "name": "ocel_id",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Ocel Id"
-            }
-          },
-          {
-            "name": "resource_type",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Resource Type"
-            }
-          },
-          {
-            "name": "only_running",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "boolean",
-              "default": true,
-              "title": "Only Running"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/DiscoveryTaskSummary"
-                  },
-                  "title": "Response Getdiscoverytasks"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/tasks/discovery/{task_id}": {
-      "get": {
-        "tags": [
-          "tasks"
-        ],
-        "summary": "returns the discovery task of a given taskId",
-        "operationId": "getDiscoveryTask",
-        "parameters": [
-          {
-            "name": "task_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Task Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DiscoveryTaskSummary"
                 }
               }
             }
@@ -3948,19 +3865,6 @@
         ],
         "title": "DiscoveryMethodMeta"
       },
-      "DiscoveryOutput": {
-        "properties": {
-          "resource_ids": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Resource Ids"
-          }
-        },
-        "type": "object",
-        "title": "DiscoveryOutput"
-      },
       "DiscoveryTaskSummary": {
         "properties": {
           "id": {
@@ -3970,35 +3874,49 @@
           "state": {
             "$ref": "#/components/schemas/TaskState"
           },
-          "ocel_id": {
-            "type": "string",
-            "title": "Ocel Id"
-          },
-          "method_id": {
-            "type": "string",
-            "title": "Method Id"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "resource_type": {
-            "type": "string",
-            "title": "Resource Type"
-          },
-          "output": {
-            "$ref": "#/components/schemas/DiscoveryOutput"
+          "visualization": {
+            "anyOf": [
+              {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/Graph"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Table"
+                  },
+                  {
+                    "$ref": "#/components/schemas/SVGVis"
+                  },
+                  {
+                    "$ref": "#/components/schemas/DotVis"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Plotly"
+                  }
+                ],
+                "discriminator": {
+                  "propertyName": "type",
+                  "mapping": {
+                    "dot": "#/components/schemas/DotVis",
+                    "graph": "#/components/schemas/Graph",
+                    "plotly": "#/components/schemas/Plotly",
+                    "svg": "#/components/schemas/SVGVis",
+                    "table": "#/components/schemas/Table"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Visualization"
           }
         },
         "type": "object",
         "required": [
           "id",
           "state",
-          "ocel_id",
-          "method_id",
-          "name",
-          "resource_type",
-          "output"
+          "visualization"
         ],
         "title": "DiscoveryTaskSummary"
       },
@@ -5255,33 +5173,6 @@
           "version"
         ],
         "title": "PluginSource"
-      },
-      "PluginTaskSummary": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "title": "Id"
-          },
-          "state": {
-            "$ref": "#/components/schemas/TaskState"
-          },
-          "plugin_id": {
-            "type": "string",
-            "title": "Plugin Id"
-          },
-          "method_name": {
-            "type": "string",
-            "title": "Method Name"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "state",
-          "plugin_id",
-          "method_name"
-        ],
-        "title": "PluginTaskSummary"
       },
       "QuantityInfo": {
         "properties": {

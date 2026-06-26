@@ -10,15 +10,16 @@ import {
 import { useLocalStorage } from "@mantine/hooks";
 import {
   useCreateDiscoveryTask,
+  useDiscoveryTask,
   useEventCounts,
-  useGetDiscoveryTask,
   useListDiscoveryFilters,
   useListDiscoveryMethods,
   useObjectCounts,
+  useSaveDiscovery,
 } from "@ocelescope/api-base";
 import { defineModuleRoute, useCurrentOcel } from "@ocelescope/core";
-import { ResourceViewer } from "@ocelescope/resources";
-import { SettingsIcon } from "lucide-react";
+import { Visualization, type VisualizationsType } from "@ocelescope/resources";
+import { BookmarkIcon, SettingsIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import {
   selectOcelFormState,
@@ -39,7 +40,7 @@ const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
   const initializeFilters = useDiscoveryStore((s) => s.initializeFilters);
 
   const [taskId, setTaskId] = useState<string>();
-  const [latestResourceId, setLatestResourceId] = useState<string>();
+  const [savedTaskId, setSavedTaskId] = useState<string>();
   const [submitError, setSubmitError] = useState<string>();
 
   const [panelOpen, setPanelOpen] = useLocalStorage<boolean>({
@@ -138,7 +139,7 @@ const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
       },
     });
 
-  const { data: task, error: taskError } = useGetDiscoveryTask(taskId ?? "", {
+  const { data: task, error: taskError } = useDiscoveryTask(taskId ?? "", {
     query: {
       enabled: !!taskId,
       refetchInterval: ({ state }) => {
@@ -149,11 +150,13 @@ const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
     },
   });
 
-  useEffect(() => {
-    const resourceId = task?.output.resource_ids?.at(-1);
-    if (task?.state === "SUCCESS" && resourceId)
-      setLatestResourceId(resourceId);
-  }, [task]);
+  const { mutate: saveDiscovery, isPending: isSaving } = useSaveDiscovery({
+    mutation: {
+      onSuccess: (_data, { taskId: savedId }) => setSavedTaskId(savedId),
+    },
+  });
+
+  const isSaved = !!taskId && savedTaskId === taskId;
 
   const requestPayload = useMemo(
     () => normalizeFormData(activeFormData),
@@ -218,38 +221,63 @@ const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
 
   return (
     <Box pos="relative" h="100%" style={{ overflow: "hidden" }}>
-      <LoadingOverlay visible={isMethodsLoading} />
+      {task?.state === "SUCCESS" ? (
+        <Box h="100%" p="sm">
+          <Visualization
+            visualization={task.visualization as VisualizationsType}
+            menuItems={[
+              {
+                icon: (
+                  <BookmarkIcon
+                    style={{
+                      width: 16,
+                      height: 16,
+                      maxWidth: "none",
+                      maxHeight: "none",
+                      stroke: isSaved
+                        ? "var(--mantine-color-green-6)"
+                        : "currentColor",
+                      fill: isSaved ? "var(--mantine-color-green-6)" : "none",
+                    }}
+                  />
+                ),
+                label: isSaved ? "Saved" : "Save",
+                onClick: () => {
+                  if (taskId && !isSaving && taskId !== savedTaskId)
+                    saveDiscovery({ taskId });
+                },
+              },
+            ]}
+          />
+        </Box>
+      ) : (
+        <Center h="100%">
+          <Text c="dimmed" ta="center">
+            {isDiscovering
+              ? "Discovering visualization..."
+              : "The discovery preview will appear here."}
+          </Text>
+        </Center>
+      )}
 
-      <Box pos="relative" h="100%">
-        <LoadingOverlay visible={Boolean(isDiscovering && latestResourceId)} />
-        {latestResourceId ? (
-          <Box h="100%" p="sm">
-            <ResourceViewer id={latestResourceId} />
-          </Box>
-        ) : (
-          <Center h="100%">
-            <Text c="dimmed" ta="center">
-              {isDiscovering
-                ? "Discovering visualization..."
-                : "The discovery preview will appear here."}
-            </Text>
-          </Center>
-        )}
+      {!panelOpen && (
+        <Tooltip label="Open settings" position="left" withArrow>
+          <ActionIcon
+            variant="default"
+            size="lg"
+            radius="md"
+            onClick={() => setPanelOpen(true)}
+            style={{ position: "absolute", top: 12, right: 12, zIndex: 5 }}
+          >
+            <SettingsIcon size={16} />
+          </ActionIcon>
+        </Tooltip>
+      )}
 
-        {!panelOpen && (
-          <Tooltip label="Open settings" position="left" withArrow>
-            <ActionIcon
-              variant="default"
-              size="lg"
-              radius="md"
-              onClick={() => setPanelOpen(true)}
-              style={{ position: "absolute", top: 12, right: 12, zIndex: 5 }}
-            >
-              <SettingsIcon size={16} />
-            </ActionIcon>
-          </Tooltip>
-        )}
-      </Box>
+      <LoadingOverlay
+        visible={isMethodsLoading || isDiscovering}
+        zIndex={100}
+      />
 
       <Drawer
         opened={panelOpen}

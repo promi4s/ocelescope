@@ -1,8 +1,6 @@
 from typing import Any, Hashable, Sequence, cast
 
-from pydantic import BaseModel, Field
-
-from ocelescope import Resource
+from ocelescope import Resource, Visualization
 from ocelescope_backend.app.internal.discovery import discovery_registry
 from ocelescope_backend.app.internal.exceptions import BadRequest
 from ocelescope_backend.app.internal.model.discovery import DiscoveryRequest
@@ -11,22 +9,14 @@ from ocelescope_backend.app.internal.session import Session
 from ocelescope_backend.app.internal.tasks.base import TaskBase, TaskState, TaskSummary
 from ocelescope_backend.app.internal.util.hashing import generate_tuple_hash
 from ocelescope_backend.app.sse_manager import (
-    ResourceLink,
     SystemNotification,
     sse_manager,
 )
 
 
-class DiscoveryOutput(BaseModel):
-    resource_ids: list[str] = Field(default_factory=list)
-
-
 class DiscoveryTaskSummary(TaskSummary):
-    ocel_id: str
-    method_id: str
-    name: str
-    resource_type: str
-    output: DiscoveryOutput
+    state: TaskState
+    visualization: Visualization | None
 
 
 class DiscoveryTask(TaskBase):
@@ -39,7 +29,7 @@ class DiscoveryTask(TaskBase):
         super().__init__()
         self.session = session
         self.request = request
-        self.result = DiscoveryOutput()
+        self.result: Resource | None = None
         self.error: BaseException | None = None
         self._actual_resource_type = request.resource_type
 
@@ -61,16 +51,7 @@ class DiscoveryTask(TaskBase):
             except KeyError as exc:
                 raise BadRequest(str(exc)) from exc
 
-            self._actual_resource_type = resource.get_type()
-            resource_id = self.session.add_resource(
-                ResourceStore(
-                    name=self._build_resource_name(self._actual_resource_type),
-                    type=self._actual_resource_type,
-                    source=None,
-                    data=resource.model_dump(),
-                )
-            )
-            self.result.resource_ids.append(resource_id)
+            self.result = resource
 
             if self.state != TaskState.CANCELLED:
                 self.state = TaskState.SUCCESS
@@ -93,9 +74,6 @@ class DiscoveryTask(TaskBase):
     def _build_notification(self) -> SystemNotification:
         resource_type = self._actual_resource_type
         if self.state == TaskState.SUCCESS:
-            resource_id = (
-                self.result.resource_ids[0] if self.result.resource_ids else None
-            )
             return SystemNotification(
                 type="notification",
                 title="Discovery finished",
@@ -105,7 +83,6 @@ class DiscoveryTask(TaskBase):
                     f"for {self.request.ocel_id}"
                 ),
                 notification_type="info",
-                link=ResourceLink(resource_id=resource_id) if resource_id else None,
             )
 
         if self.state == TaskState.CANCELLED:
@@ -132,12 +109,21 @@ class DiscoveryTask(TaskBase):
         return DiscoveryTaskSummary(
             id=self.id,
             state=self.state,
-            ocel_id=self.request.ocel_id,
-            method_id=self.request.method_id,
-            name=self.request.name,
-            resource_type=self._actual_resource_type,
-            output=self.result,
+            visualization=cast(Visualization, self.result.visualize())
+            if self.result is not None
+            else None,
         )
+
+    def save_resource(self):
+        if self.result is not None:
+            return self.session.add_resource(
+                ResourceStore(
+                    type=self._actual_resource_type,
+                    name=self._build_resource_name(self._actual_resource_type),
+                    source=None,
+                    data=self.result.model_dump(),
+                )
+            )
 
     @staticmethod
     def _dedupe_key(
