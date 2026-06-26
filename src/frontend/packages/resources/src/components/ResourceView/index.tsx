@@ -35,10 +35,11 @@ const visualizationMap: {
   plotly: PlotlyViewer,
 };
 
-export const Visualization: React.FC<{
-  visualization: VisualizationsType;
-  isPreview?: boolean;
-}> = ({ visualization, isPreview = false }) => {
+export const Visualization = ({
+  visualization,
+  isPreview = false,
+  menuItems,
+}: VisualizationProps<VisualizationsTypes>) => {
   //TODO: Fix this stroke of a typing hell
   const Component = visualizationMap[visualization.type] as ComponentType<
     VisualizationProps<typeof visualization.type>
@@ -50,6 +51,7 @@ export const Visualization: React.FC<{
         visualization as ComponentProps<typeof Component>["visualization"]
       }
       isPreview={isPreview}
+      {...(menuItems && { menuItems })}
     />
   );
 };
