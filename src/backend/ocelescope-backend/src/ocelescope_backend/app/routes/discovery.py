@@ -105,6 +105,19 @@ def get_discovery_task(
     return discovery_task.summarize()
 
 
+@discovery_router.post("/tasks/{task_id}", operation_id="saveDiscovery")
+def save_discovery(
+    session: ApiSession,
+    task_id: str,
+):
+    discovery_task = session.get_task(task_id)
+
+    if discovery_task is None or not isinstance(discovery_task, DiscoveryTask):
+        raise NotFound("Task could not be found")
+
+    return discovery_task.save_resource()
+
+
 @discovery_router.get(
     "/filters",
     summary="List filters available to discovery tasks",

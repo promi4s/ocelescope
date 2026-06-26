@@ -4,6 +4,7 @@ from ocelescope import Resource, Visualization
 from ocelescope_backend.app.internal.discovery import discovery_registry
 from ocelescope_backend.app.internal.exceptions import BadRequest
 from ocelescope_backend.app.internal.model.discovery import DiscoveryRequest
+from ocelescope_backend.app.internal.model.resource import ResourceStore
 from ocelescope_backend.app.internal.session import Session
 from ocelescope_backend.app.internal.tasks.base import TaskBase, TaskState, TaskSummary
 from ocelescope_backend.app.internal.util.hashing import generate_tuple_hash
@@ -112,6 +113,17 @@ class DiscoveryTask(TaskBase):
             if self.result is not None
             else None,
         )
+
+    def save_resource(self):
+        if self.result is not None:
+            return self.session.add_resource(
+                ResourceStore(
+                    type=self._actual_resource_type,
+                    name=self._build_resource_name(self._actual_resource_type),
+                    source=None,
+                    data=self.result.model_dump(),
+                )
+            )
 
     @staticmethod
     def _dedupe_key(

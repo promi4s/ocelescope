@@ -15,10 +15,11 @@ import {
   useListDiscoveryFilters,
   useListDiscoveryMethods,
   useObjectCounts,
+  useSaveDiscovery,
 } from "@ocelescope/api-base";
 import { defineModuleRoute, useCurrentOcel } from "@ocelescope/core";
 import { Visualization, type VisualizationsType } from "@ocelescope/resources";
-import { SettingsIcon } from "lucide-react";
+import { BookmarkIcon, SettingsIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import {
   selectOcelFormState,
@@ -39,6 +40,7 @@ const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
   const initializeFilters = useDiscoveryStore((s) => s.initializeFilters);
 
   const [taskId, setTaskId] = useState<string>();
+  const [savedTaskId, setSavedTaskId] = useState<string>();
   const [submitError, setSubmitError] = useState<string>();
 
   const [panelOpen, setPanelOpen] = useLocalStorage<boolean>({
@@ -148,6 +150,14 @@ const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
     },
   });
 
+  const { mutate: saveDiscovery, isPending: isSaving } = useSaveDiscovery({
+    mutation: {
+      onSuccess: (_data, { taskId: savedId }) => setSavedTaskId(savedId),
+    },
+  });
+
+  const isSaved = !!taskId && savedTaskId === taskId;
+
   const requestPayload = useMemo(
     () => normalizeFormData(activeFormData),
     [activeFormData],
@@ -215,6 +225,29 @@ const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
         <Box h="100%" p="sm">
           <Visualization
             visualization={task.visualization as VisualizationsType}
+            menuItems={[
+              {
+                icon: (
+                  <BookmarkIcon
+                    style={{
+                      width: 16,
+                      height: 16,
+                      maxWidth: "none",
+                      maxHeight: "none",
+                      stroke: isSaved
+                        ? "var(--mantine-color-green-6)"
+                        : "currentColor",
+                      fill: isSaved ? "var(--mantine-color-green-6)" : "none",
+                    }}
+                  />
+                ),
+                label: isSaved ? "Saved" : "Save",
+                onClick: () => {
+                  if (taskId && !isSaving && taskId !== savedTaskId)
+                    saveDiscovery({ taskId });
+                },
+              },
+            ]}
           />
         </Box>
       ) : (
