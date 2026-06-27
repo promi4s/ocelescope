@@ -1,5 +1,4 @@
 import dynamic from "next/dynamic";
-import type { ComponentProps } from "react";
 import type { VisualizationProps } from "../../../types";
 
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
@@ -8,10 +7,10 @@ const PlotlyViewer: React.FC<VisualizationProps<"plotly">> = ({
   visualization,
   isPreview,
 }) => {
-  const { data, layout } = visualization.data as Pick<
-    ComponentProps<typeof Plot>,
-    "data" | "layout"
-  >;
+  const { data, layout } = visualization.data as {
+    data: unknown[];
+    layout: Record<string, unknown>;
+  };
 
   return (
     <Plot

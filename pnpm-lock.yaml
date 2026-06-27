@@ -6,21 +6,63 @@ settings:
 
 catalogs:
   default:
+    '@apidevtools/json-schema-ref-parser':
+      specifier: ^15.3.1
+      version: 15.4.0
+    '@dagrejs/dagre':
+      specifier: ^3.0.0
+      version: 3.0.0
     '@faker-js/faker':
       specifier: ^10.4.0
       version: 10.5.0
+    '@floating-ui/react':
+      specifier: ^0.27.18
+      version: 0.27.19
+    '@hpcc-js/wasm-graphviz':
+      specifier: ^1.21.0
+      version: 1.21.1
+    '@mantine/carousel':
+      specifier: ^9.4.0
+      version: 9.4.0
     '@mantine/charts':
+      specifier: ^9.4.0
+      version: 9.4.0
+    '@mantine/core':
+      specifier: ^9.4.0
+      version: 9.4.0
+    '@mantine/dates':
+      specifier: ^9.4.0
+      version: 9.4.0
+    '@mantine/dropzone':
+      specifier: ^9.4.0
+      version: 9.4.0
+    '@mantine/hooks':
       specifier: ^9.4.0
       version: 9.4.0
     '@mantine/notifications':
       specifier: ^9.4.0
       version: 9.4.0
+    '@marko19907/string-to-color':
+      specifier: ^1.0.2
+      version: 1.0.2
+    '@rjsf/core':
+      specifier: ^6.6.2
+      version: 6.6.2
     '@rjsf/mantine':
-      specifier: ^6.3.1
-      version: 6.3.1
+      specifier: ^6.6.2
+      version: 6.6.2
+    '@rjsf/utils':
+      specifier: ^6.6.2
+      version: 6.6.2
+    '@rjsf/validator-ajv8':
+      specifier: ^6.6.2
+      version: 6.6.2
     '@storybook/react-vite':
       specifier: ^10.3.5
       version: 10.4.6
+    '@tanstack/react-query':
+      specifier: ^5.90.21
+      version: 5.90.21
     '@tsconfig/strictest':
       specifier: ^2.0.8
       version: 2.0.8
@@ -54,15 +96,39 @@ catalogs:
     '@types/react-plotly.js':
       specifier: ^2.6.4
       version: 2.6.4
+    '@xyflow/react':
+      specifier: ^12.10.1
+      version: 12.10.1
     axios:
       specifier: ^1.18.0
       version: 1.18.0
     bumpp:
       specifier: ^11.0.0
       version: 11.1.0
+    clsx:
+      specifier: ^2.1.1
+      version: 2.1.1
+    content-disposition-attachment:
+      specifier: ^0.3.1
+      version: 0.3.1
     cspell:
       specifier: ^10.0.1
       version: 10.0.1
+    dayjs:
+      specifier: ^1.11.19
+      version: 1.11.19
+    elkjs:
+      specifier: ^0.11.0
+      version: 0.11.1
+    embla-carousel:
+      specifier: ^8.6.0
+      version: 8.6.0
+    embla-carousel-react:
+      specifier: ^8.6.0
+      version: 8.6.0
+    file-saver:
+      specifier: ^2.0.5
+      version: 2.0.5
     flat:
       specifier: ^6.0.1
       version: 6.0.1
@@ -75,9 +141,21 @@ catalogs:
     jspdf:
       specifier: ^4.2.1
       version: 4.2.1
+    lodash:
+      specifier: ^4.17.23
+      version: 4.17.23
+    lucide-react:
+      specifier: ^1.0.0
+      version: 1.21.0
+    mantine-datatable:
+      specifier: ^9.3.1
+      version: 9.3.1
     next:
       specifier: ^16.1.6
       version: 16.2.9
+    object-hash:
+      specifier: ^3.0.0
+      version: 3.0.0
     orval:
       specifier: ^8.5.2
       version: 8.5.2
@@ -90,6 +168,18 @@ catalogs:
     react-dom:
       specifier: ^19.2.0
       version: 19.2.7
+    react-hook-form:
+      specifier: ^7.71.2
+      version: 7.71.2
+    react-plotly.js:
+      specifier: ^4.0.0
+      version: 4.0.0
+    react-zoom-pan-pinch:
+      specifier: ^4.0.0
+      version: 4.0.3
+    recharts:
+      specifier: ^3.2.1
+      version: 3.8.1
     storybook:
       specifier: ^10.3.5
       version: 10.4.6
@@ -99,6 +189,15 @@ catalogs:
     typescript:
       specifier: ^5.9.3
       version: 5.9.3
+    uniqolor:
+      specifier: ^1.1.1
+      version: 1.1.1
+    zod:
+      specifier: ^4.3.6
+      version: 4.3.6
+    zustand:
+      specifier: ^5.0.11
+      version: 5.0.11
 
 importers:
 
@@ -185,13 +284,13 @@ importers:
         version: link:../../packages/resources
       '@rjsf/core':
         specifier: 'catalog:'
-        version: 6.3.1(@rjsf/utils@6.3.1(react@19.2.7))(react@19.2.7)
+        version: 6.6.2(@rjsf/utils@6.6.2(react@19.2.7))(react@19.2.7)
       '@rjsf/utils':
         specifier: 'catalog:'
-        version: 6.3.1(react@19.2.7)
+        version: 6.6.2(react@19.2.7)
       '@rjsf/validator-ajv8':
         specifier: 'catalog:'
-        version: 6.3.1(@rjsf/utils@6.3.1(react@19.2.7))
+        version: 6.6.2(@rjsf/utils@6.6.2(react@19.2.7))
       '@tanstack/react-query':
         specifier: 'catalog:'
         version: 5.90.21(react@19.2.7)
@@ -203,7 +302,7 @@ importers:
         version: 8.6.0(react@19.2.7)
       lucide-react:
         specifier: 'catalog:'
-        version: 0.577.0(react@19.2.7)
+        version: 1.21.0(react@19.2.7)
       next:
         specifier: 'catalog:'
         version: 16.2.9(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -228,7 +327,7 @@ importers:
         version: 15.4.0(@types/json-schema@7.0.15)
       '@rjsf/mantine':
         specifier: 'catalog:'
-        version: 6.3.1(@mantine/core@9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/dates@9.4.0(@mantine/core@9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.0(react@19.2.7))(dayjs@1.11.19)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.0(react@19.2.7))(@rjsf/core@6.3.1(@rjsf/utils@6.3.1(react@19.2.7))(react@19.2.7))(@rjsf/utils@6.3.1(react@19.2.7))(react@19.2.7)
+        version: 6.6.2(@mantine/core@9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/dates@9.4.0(@mantine/core@9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.0(react@19.2.7))(dayjs@1.11.19)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.0(react@19.2.7))(@rjsf/core@6.6.2(@rjsf/utils@6.6.2(react@19.2.7))(react@19.2.7))(@rjsf/utils@6.6.2(react@19.2.7))(react@19.2.7)
       '@types/file-saver':
         specifier: 'catalog:'
         version: 2.0.7
@@ -291,7 +390,7 @@ importers:
         version: 1.11.19
       lucide-react:
         specifier: 'catalog:'
-        version: 0.577.0(react@19.2.7)
+        version: 1.21.0(react@19.2.7)
       mantine-datatable:
         specifier: 'catalog:'
         version: 9.3.1(@mantine/core@9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.0(react@19.2.7))(clsx@2.1.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -364,7 +463,7 @@ importers:
         version: 1.11.19
       lucide-react:
         specifier: 'catalog:'
-        version: 0.577.0(react@19.2.7)
+        version: 1.21.0(react@19.2.7)
       mantine-datatable:
         specifier: 'catalog:'
         version: 9.3.1(@mantine/core@9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.0(react@19.2.7))(clsx@2.1.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -419,7 +518,7 @@ importers:
         version: 1.11.19
       lucide-react:
         specifier: 'catalog:'
-        version: 0.577.0(react@19.2.7)
+        version: 1.21.0(react@19.2.7)
       mantine-datatable:
         specifier: 'catalog:'
         version: 9.3.1(@mantine/core@9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.0(react@19.2.7))(clsx@2.1.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -495,7 +594,7 @@ importers:
         version: 1.11.13
       lucide-react:
         specifier: 'catalog:'
-        version: 0.577.0(react@19.2.7)
+        version: 1.21.0(react@19.2.7)
       mantine-datatable:
         specifier: 'catalog:'
         version: 9.3.1(@mantine/core@9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.0(react@19.2.7))(clsx@2.1.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -562,13 +661,13 @@ importers:
         version: link:../../packages/resources
       '@rjsf/core':
         specifier: 'catalog:'
-        version: 6.3.1(@rjsf/utils@6.3.1(react@19.2.7))(react@19.2.7)
+        version: 6.6.2(@rjsf/utils@6.6.2(react@19.2.7))(react@19.2.7)
       '@rjsf/utils':
         specifier: 'catalog:'
-        version: 6.3.1(react@19.2.7)
+        version: 6.6.2(react@19.2.7)
       '@rjsf/validator-ajv8':
         specifier: 'catalog:'
-        version: 6.3.1(@rjsf/utils@6.3.1(react@19.2.7))
+        version: 6.6.2(@rjsf/utils@6.6.2(react@19.2.7))
       '@tanstack/react-query':
         specifier: 'catalog:'
         version: 5.90.21(react@19.2.7)
@@ -580,7 +679,7 @@ importers:
         version: 8.6.0(react@19.2.7)
       lucide-react:
         specifier: 'catalog:'
-        version: 0.577.0(react@19.2.7)
+        version: 1.21.0(react@19.2.7)
       next:
         specifier: 'catalog:'
         version: 16.2.9(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -602,7 +701,7 @@ importers:
         version: 9.4.0(@mantine/core@9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.0(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(recharts@3.8.1(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react-is@18.3.1)(react@19.2.7)(redux@5.0.1))
       '@rjsf/mantine':
         specifier: 'catalog:'
-        version: 6.3.1(@mantine/core@9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/dates@9.4.0(@mantine/core@9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.0(react@19.2.7))(dayjs@1.11.19)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.0(react@19.2.7))(@rjsf/core@6.3.1(@rjsf/utils@6.3.1(react@19.2.7))(react@19.2.7))(@rjsf/utils@6.3.1(react@19.2.7))(react@19.2.7)
+        version: 6.6.2(@mantine/core@9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/dates@9.4.0(@mantine/core@9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.0(react@19.2.7))(dayjs@1.11.19)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.0(react@19.2.7))(@rjsf/core@6.6.2(@rjsf/utils@6.6.2(react@19.2.7))(react@19.2.7))(@rjsf/utils@6.6.2(react@19.2.7))(react@19.2.7)
       '@types/file-saver':
         specifier: 'catalog:'
         version: 2.0.7
@@ -779,7 +878,7 @@ importers:
         version: 2.0.5
       lucide-react:
         specifier: 'catalog:'
-        version: 0.577.0(react@19.2.7)
+        version: 1.21.0(react@19.2.7)
       mantine-datatable:
         specifier: 'catalog:'
         version: 9.3.1(@mantine/core@9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.0(react@19.2.7))(clsx@2.1.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -873,7 +972,7 @@ importers:
         version: 4.17.23
       lucide-react:
         specifier: 'catalog:'
-        version: 0.577.0(react@19.2.7)
+        version: 1.21.0(react@19.2.7)
       mantine-datatable:
         specifier: 'catalog:'
         version: 9.3.1(@mantine/core@9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.0(react@19.2.7))(clsx@2.1.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -888,7 +987,7 @@ importers:
         version: 19.2.7(react@19.2.7)
       react-plotly.js:
         specifier: 'catalog:'
-        version: 2.6.0(plotly.js@3.4.0(mapbox-gl@1.13.3))(react@19.2.7)
+        version: 4.0.0(plotly.js@3.4.0(mapbox-gl@1.13.3))(react@19.2.7)
       react-zoom-pan-pinch:
         specifier: 'catalog:'
         version: 4.0.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -2419,35 +2518,35 @@ packages:
       react-redux:
         optional: true
 
-  '@rjsf/core@6.3.1':
-    resolution: {integrity: sha512-LTjFz5Fk3FlbgFPJ+OJi1JdWJyiap9dSpx8W6u7JHNB7K5VbwzJe8gIU45XWLHzWFGDHKPm89VrUzjOs07TPtg==}
+  '@rjsf/core@6.6.2':
+    resolution: {integrity: sha512-rmckOHIc0N3Vu0egcjrm4aRnw4ETW1i4fGdm0m63qd/298zHfF7x2md2rDh8F5HLgoxW3X/LdvrCHcsD1lxbGw==}
     engines: {node: '>=20'}
     peerDependencies:
-      '@rjsf/utils': ^6.3.x
+      '@rjsf/utils': ^6.6.x
       react: '>=18'
 
-  '@rjsf/mantine@6.3.1':
-    resolution: {integrity: sha512-cuTh3XtmYrNfwq4EVfRrMYGvTdEq+vcQsJfDmznTaFk6iEq3AQApBn179wSuMX3mqNk/p5Xy31Uqj/SV8W+QsQ==}
+  '@rjsf/mantine@6.6.2':
+    resolution: {integrity: sha512-ETFbTzRXEm0bcswNPkcSlNBGa6ZWXI4ouheq47UJOZ4oQYnn74gTMY++C9OnYDLT6dYYIzRSQUp9IBDvfQ8y1g==}
     engines: {node: '>=20'}
     peerDependencies:
       '@mantine/core': '>=8'
       '@mantine/dates': '>=8'
       '@mantine/hooks': '>=8'
-      '@rjsf/core': ^6.3.x
-      '@rjsf/utils': ^6.3.x
+      '@rjsf/core': ^6.6.x
+      '@rjsf/utils': ^6.6.x
       react: '>=18'
 
-  '@rjsf/utils@6.3.1':
-    resolution: {integrity: sha512-ve2KHl1ITYG8QIonnuK83/T1k/5NuxP4D1egVqP9Hz2ub28kgl0rNMwmRSxXs3WIbCcMW9g3ox+daVrbSNc4Mw==}
+  '@rjsf/utils@6.6.2':
+    resolution: {integrity: sha512-npqdWuuFmCkiXETrDLRx8a4EwDJoUdTTnGhJA/774bwDgT99u4nAEyXbJd75VuobunewcLm2FOS2cErD3e28cg==}
     engines: {node: '>=20'}
     peerDependencies:
       react: '>=18'
 
-  '@rjsf/validator-ajv8@6.3.1':
-    resolution: {integrity: sha512-2RHDxBc0gBplPniau5UZj7aznpTelSBm1b3DNybok8L0NuIfmndbp9kNXgFuRvlyfsQSyYmZSBjbzeYqr0Hpcw==}
+  '@rjsf/validator-ajv8@6.6.2':
+    resolution: {integrity: sha512-pi+CBfkXxyR1JhEveuwi7qA9NcqYvFSvadY8LkQDC6wP89bZS8TYXzolirvXC7okDdI3WCtPjx/FYnxYpXbj7Q==}
     engines: {node: '>=20'}
     peerDependencies:
-      '@rjsf/utils': ^6.3.x
+      '@rjsf/utils': ^6.6.x
 
   '@rolldown/binding-android-arm64@1.0.0-rc.17':
     resolution: {integrity: sha512-s70pVGhw4zqGeFnXWvAzJDlvxhlRollagdCCKRgOsgUOH3N1l0LIxf83AtGzmb5SiVM4Hjl5HyarMRfdfj3DaQ==}
@@ -3206,8 +3305,8 @@ packages:
   '@webcontainer/env@1.1.1':
     resolution: {integrity: sha512-6aN99yL695Hi9SuIk1oC88l9o0gmxL1nGWWQ/kNy81HigJ0FoaoTXpytCj6ItzgyCEwA9kF1wixsTuv5cjsgng==}
 
-  '@x0k/json-schema-merge@1.0.2':
-    resolution: {integrity: sha512-1734qiJHNX3+cJGDMMw2yz7R+7kpbAtl5NdPs1c/0gO5kYT6s4dMbLXiIfpZNsOYhGZI3aH7FWrj4Zxz7epXNg==}
+  '@x0k/json-schema-merge@1.0.3':
+    resolution: {integrity: sha512-lerJC4sI9CNUQWdff3PnU1YJOqazD6TjMcvxZIPXUBjn4j1cUiXE0LvzhMnGYzKKr271TkvXJtH7gEwksrtn+w==}
 
   '@xyflow/react@12.10.1':
     resolution: {integrity: sha512-5eSWtIK/+rkldOuFbOOz44CRgQRjtS9v5nufk77DV+XBnfCGL9HAQ8PG00o2ZYKqkEU/Ak6wrKC95Tu+2zuK3Q==}
@@ -3261,6 +3360,9 @@ packages:
 
   ajv@8.18.0:
     resolution: {integrity: sha512-PlXPeEWMXMZ7sPYOHqmDyCJzcfNrUr3fGNKtezX14ykXOEIvyK81d+qydx89KY5O71FKMPaQ2vBfBFI5NHR63A==}
+
+  ajv@8.20.0:
+    resolution: {integrity: sha512-Thbli+OlOj+iMPYFBVBfJ3OmCAnaSyNn4M1vz9T6Gka5Jt9ba/HIR56joy65tY6kx/FCF5VXNB819Y7/GUrBGA==}
 
   ansi-colors@4.1.3:
     resolution: {integrity: sha512-/6w/C21Pm1A7aZitlI5Ni/2J6FFQN8i1Cvz3kHABAAbw93v/NlvKdVOqz7CCWz/3iv/JplRSEEZ83XION15ovw==}
@@ -3990,6 +4092,9 @@ packages:
   fast-uri@3.1.0:
     resolution: {integrity: sha512-iPeeDKJSWf4IEOasVVrknXpaBV0IApz/gp7S2bb7Z4Lljbl2MGJRqInZiUrQwV16cpzw/D3S5j5Julj/gT52AA==}
 
+  fast-uri@3.1.2:
+    resolution: {integrity: sha512-rVjf7ArG3LTk+FS6Yw81V1DLuZl1bRbNrev6Tmd/9RaroeeRRJhAt7jg/6YFxbvAQXUCavSoZhPPj6oOx+5KjQ==}
+
   fastq@1.20.1:
     resolution: {integrity: sha512-GGToxJ/w1x32s/D2EKND7kTil4n8OVk/9mycTc4VDza13lOvpUZTGX3mFSCtV9ksdGBVzvsyAVLM6mHFThxXxw==}
 
@@ -4525,14 +4630,17 @@ packages:
     resolution: {integrity: sha512-XT9ewWAC43tiAV7xDAPflMkG0qOPn2QjHqlgX8FOqmWa/rxnyYDulF9T0F7tRy1u+TVTmK/M//6VIOye+2zDXg==}
     engines: {node: '>=20'}
 
-  lodash-es@4.17.23:
-    resolution: {integrity: sha512-kVI48u3PZr38HdYz98UmfPnXl2DXrpdctLrFLCd3kOx1xUkOmpFPx7gCWWM5MPkL/fD8zb+Ph0QzjGFs4+hHWg==}
+  lodash-es@4.18.1:
+    resolution: {integrity: sha512-J8xewKD/Gk22OZbhpOVSwcs60zhd95ESDwezOFuA3/099925PdHJ7OFHNTGtajL3AlZkykD32HykiMo+BIBI8A==}
 
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
 
   lodash@4.17.23:
     resolution: {integrity: sha512-LgVTMpQtIopCi79SJeDiP0TfWi5CNEc/L/aRdTh3yIvmZXTnheWpKjSZhnvMl8iXbC1tFg9gdHHDMLoV7CnG+w==}
+
+  lodash@4.18.1:
+    resolution: {integrity: sha512-dMInicTPVE8d1e5otfwmmjlxkZoUpiVLwyeTdUsi/Caj/gfzzblBcCE5sRHV/AsjuCmxWrte2TNGSYuCeCq+0Q==}
 
   loose-envify@1.4.0:
     resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
@@ -4548,8 +4656,8 @@ packages:
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
 
-  lucide-react@0.577.0:
-    resolution: {integrity: sha512-4LjoFv2eEPwYDPg/CUdBJQSDfPyzXCRrVW1X7jrx/trgxnxkHFjnVZINbzvzxjN70dxychOfg+FTYwBiS3pQ5A==}
+  lucide-react@1.21.0:
+    resolution: {integrity: sha512-reEZMXq8Qdd5jg5XYkQ5TR1fB/GiQ7ih4vcrthYDtgjSDwh0i6/YLiGjsWsIwgN49gpAnd4J2elSNzncMEEUUQ==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
@@ -4587,13 +4695,22 @@ packages:
     resolution: {integrity: sha512-BuU2qnTti9YKgK5N+IeMubp14ZUKUUw7yeJbkjtosvHiP0AZ5c8IAgEMk79D0eC8F23r4Ac/q8cAIFdm2FtyoA==}
     hasBin: true
 
-  markdown-to-jsx@8.0.0:
-    resolution: {integrity: sha512-hWEaRxeCDjes1CVUQqU+Ov0mCqBqkGhLKjL98KdbwHSgEWZZSJQeGlJQatVfeZ3RaxrfTrZZ3eczl2dhp5c/pA==}
-    engines: {node: '>= 10'}
+  markdown-to-jsx@9.8.2:
+    resolution: {integrity: sha512-rWUuxKB5NsuJmSfUOuXkQ0O5qk0J/Lr3Lk6dzxKoKQI/jeHYlsVfz3zJdMLAhI46hHoXDYERWhtBOiqtWDZ4LA==}
+    engines: {node: '>= 18'}
     peerDependencies:
-      react: '>= 0.14.0'
+      react: '>= 16.0.0'
+      react-native: '*'
+      solid-js: '>=1.0.0'
+      vue: '>=3.0.0'
     peerDependenciesMeta:
       react:
+        optional: true
+      react-native:
+        optional: true
+      solid-js:
+        optional: true
+      vue:
         optional: true
 
   math-intrinsics@1.1.0:
@@ -4964,11 +5081,12 @@ packages:
       react: ^0.14 || ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
       react-dom: ^0.14 || ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
-  react-plotly.js@2.6.0:
-    resolution: {integrity: sha512-g93xcyhAVCSt9kV1svqG1clAEdL6k3U+jjuSzfTV7owaSU9Go6Ph8bl25J+jKfKvIGAEYpe4qj++WHJuc9IaeA==}
+  react-plotly.js@4.0.0:
+    resolution: {integrity: sha512-spKsIYganLXUOoeiUVzUHby1Ea4kK/UKdNRKlxFRfkcB6HlvO1zguqWIdQKwa2AkE+IuCc8lMSy1zmLA6hcgBg==}
+    engines: {node: '>=18'}
     peerDependencies:
-      plotly.js: '>1.34.0'
-      react: '>0.13.0'
+      plotly.js: '>=3.0.0'
+      react: ^18.0.0 || ^19.0.0
 
   react-redux@9.3.0:
     resolution: {integrity: sha512-KQopgqFo/p/fgmAs5qz6p5RWaNAzq40WAu7fJIXnQpYxFPbJYtsJPWvGeF2rOBaY/kEuV77AVsX8TsQzKm+A/g==}
@@ -7028,41 +7146,46 @@ snapshots:
       react: 19.2.7
       react-redux: 9.3.0(@types/react@19.2.17)(react@19.2.7)(redux@5.0.1)
 
-  '@rjsf/core@6.3.1(@rjsf/utils@6.3.1(react@19.2.7))(react@19.2.7)':
+  '@rjsf/core@6.6.2(@rjsf/utils@6.6.2(react@19.2.7))(react@19.2.7)':
     dependencies:
-      '@rjsf/utils': 6.3.1(react@19.2.7)
-      lodash: 4.17.23
-      lodash-es: 4.17.23
-      markdown-to-jsx: 8.0.0(react@19.2.7)
+      '@rjsf/utils': 6.6.2(react@19.2.7)
+      lodash: 4.18.1
+      lodash-es: 4.18.1
+      markdown-to-jsx: 9.8.2(react@19.2.7)
       prop-types: 15.8.1
       react: 19.2.7
+    transitivePeerDependencies:
+      - react-native
+      - solid-js
+      - vue
 
-  '@rjsf/mantine@6.3.1(@mantine/core@9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/dates@9.4.0(@mantine/core@9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.0(react@19.2.7))(dayjs@1.11.19)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.0(react@19.2.7))(@rjsf/core@6.3.1(@rjsf/utils@6.3.1(react@19.2.7))(react@19.2.7))(@rjsf/utils@6.3.1(react@19.2.7))(react@19.2.7)':
+  '@rjsf/mantine@6.6.2(@mantine/core@9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/dates@9.4.0(@mantine/core@9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.0(react@19.2.7))(dayjs@1.11.19)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.0(react@19.2.7))(@rjsf/core@6.6.2(@rjsf/utils@6.6.2(react@19.2.7))(react@19.2.7))(@rjsf/utils@6.6.2(react@19.2.7))(react@19.2.7)':
     dependencies:
       '@mantine/core': 9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@mantine/dates': 9.4.0(@mantine/core@9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.0(react@19.2.7))(dayjs@1.11.19)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@mantine/hooks': 9.4.0(react@19.2.7)
-      '@rjsf/core': 6.3.1(@rjsf/utils@6.3.1(react@19.2.7))(react@19.2.7)
-      '@rjsf/utils': 6.3.1(react@19.2.7)
+      '@rjsf/core': 6.6.2(@rjsf/utils@6.6.2(react@19.2.7))(react@19.2.7)
+      '@rjsf/utils': 6.6.2(react@19.2.7)
       react: 19.2.7
 
-  '@rjsf/utils@6.3.1(react@19.2.7)':
+  '@rjsf/utils@6.6.2(react@19.2.7)':
     dependencies:
-      '@x0k/json-schema-merge': 1.0.2
-      fast-uri: 3.1.0
+      '@x0k/json-schema-merge': 1.0.3
+      fast-equals: 6.0.0
+      fast-uri: 3.1.2
       jsonpointer: 5.0.1
-      lodash: 4.17.23
-      lodash-es: 4.17.23
+      lodash: 4.18.1
+      lodash-es: 4.18.1
       react: 19.2.7
       react-is: 18.3.1
 
-  '@rjsf/validator-ajv8@6.3.1(@rjsf/utils@6.3.1(react@19.2.7))':
+  '@rjsf/validator-ajv8@6.6.2(@rjsf/utils@6.6.2(react@19.2.7))':
     dependencies:
-      '@rjsf/utils': 6.3.1(react@19.2.7)
-      ajv: 8.18.0
-      ajv-formats: 2.1.1(ajv@8.18.0)
-      lodash: 4.17.23
-      lodash-es: 4.17.23
+      '@rjsf/utils': 6.6.2(react@19.2.7)
+      ajv: 8.20.0
+      ajv-formats: 2.1.1(ajv@8.20.0)
+      lodash: 4.18.1
+      lodash-es: 4.18.1
 
   '@rolldown/binding-android-arm64@1.0.0-rc.17':
     optional: true
@@ -7689,7 +7812,7 @@ snapshots:
 
   '@webcontainer/env@1.1.1': {}
 
-  '@x0k/json-schema-merge@1.0.2':
+  '@x0k/json-schema-merge@1.0.3':
     dependencies:
       '@types/json-schema': 7.0.15
 
@@ -7732,15 +7855,22 @@ snapshots:
     optionalDependencies:
       ajv: 8.18.0
 
-  ajv-formats@2.1.1(ajv@8.18.0):
+  ajv-formats@2.1.1(ajv@8.20.0):
     optionalDependencies:
-      ajv: 8.18.0
+      ajv: 8.20.0
 
   ajv-formats@3.0.1(ajv@8.18.0):
     optionalDependencies:
       ajv: 8.18.0
 
   ajv@8.18.0:
+    dependencies:
+      fast-deep-equal: 3.1.3
+      fast-uri: 3.1.0
+      json-schema-traverse: 1.0.0
+      require-from-string: 2.0.2
+
+  ajv@8.20.0:
     dependencies:
       fast-deep-equal: 3.1.3
       fast-uri: 3.1.0
@@ -8555,6 +8685,8 @@ snapshots:
 
   fast-uri@3.1.0: {}
 
+  fast-uri@3.1.2: {}
+
   fastq@1.20.1:
     dependencies:
       reusify: 1.1.0
@@ -9053,11 +9185,13 @@ snapshots:
     dependencies:
       p-locate: 6.0.0
 
-  lodash-es@4.17.23: {}
+  lodash-es@4.18.1: {}
 
   lodash.merge@4.6.2: {}
 
   lodash@4.17.23: {}
+
+  lodash@4.18.1: {}
 
   loose-envify@1.4.0:
     dependencies:
@@ -9071,7 +9205,7 @@ snapshots:
     dependencies:
       yallist: 3.1.1
 
-  lucide-react@0.577.0(react@19.2.7):
+  lucide-react@1.21.0(react@19.2.7):
     dependencies:
       react: 19.2.7
 
@@ -9158,7 +9292,7 @@ snapshots:
       punycode.js: 2.3.1
       uc.micro: 2.1.0
 
-  markdown-to-jsx@8.0.0(react@19.2.7):
+  markdown-to-jsx@9.8.2(react@19.2.7):
     optionalDependencies:
       react: 19.2.7
 
@@ -9608,10 +9742,9 @@ snapshots:
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
 
-  react-plotly.js@2.6.0(plotly.js@3.4.0(mapbox-gl@1.13.3))(react@19.2.7):
+  react-plotly.js@4.0.0(plotly.js@3.4.0(mapbox-gl@1.13.3))(react@19.2.7):
     dependencies:
       plotly.js: 3.4.0(mapbox-gl@1.13.3)
-      prop-types: 15.8.1
       react: 19.2.7
 
   react-redux@9.3.0(@types/react@19.2.17)(react@19.2.7)(redux@5.0.1):
