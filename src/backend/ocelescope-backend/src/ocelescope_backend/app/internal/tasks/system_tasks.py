@@ -46,29 +46,29 @@ def import_ocel_task(
             desired_suffix = original_name.suffix
 
     read_path = file_path
+    arrow_dir = Path(tempfile.mkdtemp(prefix="ocel-"))
     try:
         if file_path.suffix != desired_suffix:
             read_path = file_path.with_suffix(desired_suffix)
             file_path.rename(read_path)
 
-        ocel = OCEL.read(
-            read_path,
-            meta={
-                "name": original_name.stem,
-                "upload_date": datetime.now().isoformat(),
-            },
+        # Import straight to Arrow IPC files (no manager layer / no re-dump),
+        # then back the session OCEL with those files.
+        OCEL.import_to_arrow(read_path, arrow_dir)
+
+        ocel_id = session.add_arrow_ocel(arrow_dir, name=original_name.stem)
+
+        session.get_session_ocel(ocel_id).load_extensions(
+            read_path, registry_manager.get_loaded_extensions()
         )
-        ocel.extensions.load(registry_manager.get_loaded_extensions())
     finally:
         read_path.unlink(missing_ok=True)
         file_path.unlink(missing_ok=True)
 
-    ocel_id = session.add_ocel(ocel)
-
     return [
         SystemNotification(
             title="OCEL successfully uploaded",
-            message=f"{ocel.meta.extra.get('name', None) or 'OCEL '} was uploaded successfully",
+            message=f"{original_name.stem or 'OCEL '} was uploaded successfully",
             notification_type="info",
             link=OcelLink(ocel_id=ocel_id),
         ),

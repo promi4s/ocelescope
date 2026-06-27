@@ -70,7 +70,12 @@ class OCEL:
         self,
         ocel: Mapping[str, DataFrame | LazyFrame],
         meta: OCELMeta | None = None,
-        quantityExtension: tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame] | None = None,
+        quantityExtension: tuple[
+            DataFrame | LazyFrame | pd.DataFrame,
+            DataFrame | LazyFrame | pd.DataFrame,
+            DataFrame | LazyFrame | pd.DataFrame,
+        ]
+        | None = None,
     ):
         """
         Args:
@@ -198,6 +203,14 @@ class OCEL:
         "o2o": "o2o.arrow",
     }
 
+    # Filenames for the quantity-extension tables, keyed by `QuantityManager`
+    # constructor order (oqty, qop, properties). Written/read all-or-nothing.
+    _QUANTITY_ARROW_FILES = {
+        "oqty": "oqty.arrow",
+        "qop": "qop.arrow",
+        "properties": "item_properties.arrow",
+    }
+
     @staticmethod
     def scan(directory: str | Path, meta: dict[str, Any] = {}) -> OCEL:
         """
@@ -212,7 +225,8 @@ class OCEL:
         Files are expected to follow the layout written by :meth:`dump_arrow`
         (``events.arrow``, ``objects.arrow``, ``object_changes.arrow``,
         ``relations.arrow``, ``o2o.arrow``). Missing files yield empty tables.
-        Quantity extensions are not handled by this lazy path.
+        The quantity-extension tables (``oqty.arrow``, ``qop.arrow``,
+        ``item_properties.arrow``) are scanned the same lazy way when present.
 
         Args:
             directory: Directory containing the Arrow IPC files.
@@ -227,7 +241,23 @@ class OCEL:
             for key, filename in OCEL._ARROW_FILES.items()
             if (directory / filename).exists()
         }
-        return OCEL(ocel=lazy, meta=OCELMeta(path=directory, extra=meta))
+
+        quantity_lazy = {
+            key: pl.scan_ipc(directory / filename)
+            for key, filename in OCEL._QUANTITY_ARROW_FILES.items()
+            if (directory / filename).exists()
+        }
+        quantity_extension = (
+            (quantity_lazy["oqty"], quantity_lazy["qop"], quantity_lazy["properties"])
+            if len(quantity_lazy) == len(OCEL._QUANTITY_ARROW_FILES)
+            else None
+        )
+
+        return OCEL(
+            ocel=lazy,
+            meta=OCELMeta(path=directory, extra=meta),
+            quantityExtension=quantity_extension,
+        )
 
     def dump_arrow(self, directory: str | Path) -> None:
         """
@@ -238,8 +268,8 @@ class OCEL:
         the lazy :meth:`scan`: dump an OCEL to disk here, then ``scan`` it back
         cheaply (per request) elsewhere. The O2O table is written with PM4PY's
         raw column names (via :attr:`r4pm_dict`), so the round-trip through
-        ``scan`` reproduces the canonical names. Quantity extensions and other
-        extensions are not included.
+        ``scan`` reproduces the canonical names. The quantity extension is
+        written too (when populated); other extensions are not included.
 
         Args:
             directory: Destination directory (created if missing).
@@ -249,6 +279,65 @@ class OCEL:
         tables = self.r4pm_dict
         for key, filename in OCEL._ARROW_FILES.items():
             tables[key].write_ipc(directory / filename)
+
+        if self.quantities.is_populated():
+            quantity_tables = {
+                "oqty": self.quantities.oqty_pl,
+                "qop": self.quantities.qop_pl,
+                "properties": self.quantities.properties_pl,
+            }
+            for key, filename in OCEL._QUANTITY_ARROW_FILES.items():
+                quantity_tables[key].collect().write_ipc(directory / filename)
+
+    @staticmethod
+    def import_to_arrow(source_path: str | Path, directory: str | Path) -> None:
+        """Import an OCEL file straight to Arrow IPC files, without building managers.
+
+        This is the cheap counterpart to ``OCEL.read(...).dump_arrow(...)``: it
+        imports the source via r4pm, prunes dangling references with
+        :func:`clean_ocel`, and writes the core tables to ``directory`` in the
+        layout consumed by :meth:`scan` — never instantiating the manager layer
+        or round-tripping through :attr:`r4pm_dict`.
+
+        The quantity-extension tables are read and (when present) written
+        alongside the core tables, so a subsequent :meth:`scan` of ``directory``
+        recovers the full log lazily.
+
+        Args:
+            source_path: Path to the OCEL file (.jsonocel, .xmlocel, .sqlite).
+            directory: Destination directory for the Arrow IPC files (created if
+                missing).
+        """
+        from ocelescope.ocel.managers.quantities.quantity import (
+            _OQTY_SCHEMA,
+            _PROPERTIES_SCHEMA,
+            _QOP_SCHEMA,
+            _to_polars,
+        )
+
+        source_path = Path(source_path)
+        directory = Path(directory)
+        directory.mkdir(parents=True, exist_ok=True)
+
+        with warnings.catch_warnings(record=True):
+            tables = r4pm.df.import_ocel(str(source_path))
+            oqty, qop, properties = read_quantity_extension(source_path)
+
+        for key, filename in OCEL._ARROW_FILES.items():
+            tables[key].write_ipc(directory / filename)
+
+        # Normalize to typed polars frames (empty pandas would otherwise yield
+        # null-typed columns) and write all three together so `scan` picks them up.
+        if not (oqty.empty and qop.empty and properties.empty):
+            quantity_tables = {
+                "oqty": _to_polars(oqty, _OQTY_SCHEMA),
+                "qop": _to_polars(qop, _QOP_SCHEMA),
+                "properties": _to_polars(properties, _PROPERTIES_SCHEMA),
+            }
+            for key, filename in OCEL._QUANTITY_ARROW_FILES.items():
+                frame = quantity_tables[key]
+                eager = frame.collect() if isinstance(frame, LazyFrame) else frame
+                eager.write_ipc(directory / filename)
 
     def write(self, path: str | Path):
         """
@@ -309,9 +398,9 @@ class OCEL:
             ocel=ocel_dict,
             meta=OCELMeta(extra=deepcopy(self.meta.extra, memo)),
             quantityExtension=(
-                self.quantities.oqty.copy(),
-                self.quantities.qop.copy(),
-                self.quantities.properties.copy(),
+                self.quantities.oqty_pl.collect(),
+                self.quantities.qop_pl.collect(),
+                self.quantities.properties_pl.collect(),
             )
             if self.quantities.is_populated()
             else None,

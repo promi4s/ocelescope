@@ -2,21 +2,48 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Literal, cast
 
 import pandas as pd
+import polars as pl
+from polars import DataFrame, LazyFrame
 
 from ocelescope.ocel.constants.pm4py import ACTIVITY_COL, EID_COL, OID_COL, OTYPE_COL, TIMESTAMP_COL
 from ocelescope.ocel.constants.quantity import (
-    OQTY_COLUMNS,
     QEL_ITEM_TYPE,
     QEL_QUANTITY,
-    QOP_COLUMNS,
 )
 from ocelescope.ocel.managers.base import BaseManager
 from ocelescope.ocel.managers.quantities.util.io import (
     write_quantity_extension,
 )
+from ocelescope.util.cache import instance_lru_cache
 
 if TYPE_CHECKING:
     from ocelescope.ocel.core.ocel import OCEL
+
+QuantityTable = DataFrame | LazyFrame | pd.DataFrame
+
+_OQTY_SCHEMA = {OID_COL: pl.String, QEL_ITEM_TYPE: pl.String, QEL_QUANTITY: pl.Float64}
+_QOP_SCHEMA = {
+    OID_COL: pl.String,
+    EID_COL: pl.String,
+    QEL_ITEM_TYPE: pl.String,
+    QEL_QUANTITY: pl.Float64,
+}
+_PROPERTIES_SCHEMA = {QEL_ITEM_TYPE: pl.String}
+
+
+def _to_polars(frame: QuantityTable | None, schema: dict) -> DataFrame | LazyFrame:
+    """Normalize an input table to a polars frame.
+
+    LazyFrames (e.g. from :meth:`OCEL.scan`) are kept lazy so the rows are only
+    read from disk when a quantity accessor is actually used; eager polars
+    frames are kept as-is; pandas frames are converted (empty ones fall back to
+    the typed empty schema to avoid null-typed columns).
+    """
+    if isinstance(frame, (DataFrame, LazyFrame)):
+        return frame
+    if frame is None or frame.empty:
+        return pl.DataFrame(schema=schema)
+    return pl.from_pandas(frame)
 
 
 class QuantityManager(BaseManager):
@@ -28,31 +55,73 @@ class QuantityManager(BaseManager):
       - Helpers to query involved item types, objects, and events
       - Aggregations of quantity operations over time for a given object
 
+    The tables are stored internally as polars frames (eager or, when scanned
+    from Arrow, lazy) and exposed through pandas accessors (:attr:`oqty`,
+    :attr:`qop`, :attr:`properties`) as a facade, plus lazy :attr:`oqty_pl` /
+    :attr:`qop_pl` / :attr:`properties_pl` accessors. The initial-quantity and
+    quantity-operation tables have their zero-quantity rows dropped on access.
+
     Attributes:
         oqty: DataFrame containing *initial quantities* per object and item type.
         qop: DataFrame containing *quantity operations* per event, object, and item type.
     """
 
     def __init__(
-        self, ocel: "OCEL", tables: tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame] | None = None
+        self,
+        ocel: "OCEL",
+        tables: tuple[QuantityTable, QuantityTable, QuantityTable] | None = None,
     ):
         super().__init__(ocel)
 
-        self.oqty, self.qop, self.properties = (
-            tables
-            if tables is not None
-            else (
-                pd.DataFrame(columns=OQTY_COLUMNS),
-                pd.DataFrame(columns=QOP_COLUMNS),
-                pd.DataFrame(columns=[QEL_ITEM_TYPE]),
-            )
-        )
+        oqty, qop, properties = tables if tables is not None else (None, None, None)
 
-        self.qop = self.qop.loc[self._cleaned_qop_mask].reset_index(drop=True)
-        self.oqty = self.oqty.loc[self._cleaned_oqty_mask].reset_index(drop=True)
+        self._oqty = _to_polars(oqty, _OQTY_SCHEMA)
+        self._qop = _to_polars(qop, _QOP_SCHEMA)
+        self._properties = _to_polars(properties, _PROPERTIES_SCHEMA)
+
+    @property
+    def oqty_pl(self) -> LazyFrame:
+        """Initial quantities as a lazy frame, with zero-quantity rows dropped."""
+        src = self._oqty
+        lazy = src if isinstance(src, LazyFrame) else src.lazy()
+        return lazy.filter(pl.col(QEL_QUANTITY) != 0)
+
+    @property
+    def qop_pl(self) -> LazyFrame:
+        """Quantity operations as a lazy frame, with zero-quantity rows dropped."""
+        src = self._qop
+        lazy = src if isinstance(src, LazyFrame) else src.lazy()
+        return lazy.filter(pl.col(QEL_QUANTITY) != 0)
+
+    @property
+    def properties_pl(self) -> LazyFrame:
+        """Item properties as a lazy frame."""
+        src = self._properties
+        return src if isinstance(src, LazyFrame) else src.lazy()
+
+    @property
+    @instance_lru_cache()
+    def oqty(self) -> pd.DataFrame:
+        """Initial quantities as a pandas DataFrame (zero rows dropped)."""
+        return self.oqty_pl.collect().to_pandas()
+
+    @property
+    @instance_lru_cache()
+    def qop(self) -> pd.DataFrame:
+        """Quantity operations as a pandas DataFrame (zero rows dropped)."""
+        return self.qop_pl.collect().to_pandas()
+
+    @property
+    @instance_lru_cache()
+    def properties(self) -> pd.DataFrame:
+        """Item properties as a pandas DataFrame."""
+        return self.properties_pl.collect().to_pandas()
 
     def is_populated(self) -> bool:
-        return any(not df.empty for df in [self.oqty, self.qop, self.properties])
+        return any(
+            frame.limit(1).collect().height > 0
+            for frame in (self.oqty_pl, self.qop_pl, self.properties_pl)
+        )
 
     def write_quantities(self, path: Path):
         """Write quantity-extension tables to a OCEL file.

@@ -64,7 +64,11 @@ def apply_filters(ocel: "OCEL", filters: Sequence[BaseFilter]) -> "OCEL":
         ocel=ocel_dict,
         meta=ocel.meta,
         quantityExtension=(
-            (ocel.quantities.oqty, ocel.quantities.qop, ocel.quantities.properties)
+            (
+                ocel.quantities.oqty_pl,
+                ocel.quantities.qop_pl,
+                ocel.quantities.properties_pl,
+            )
             if ocel.quantities.is_populated()
             else None
         ),

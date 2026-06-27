@@ -1,10 +1,14 @@
 from __future__ import annotations
 
 import json
+import tempfile
 import uuid
+from datetime import datetime
+from pathlib import Path
 from typing import Any, Callable, Hashable, Sequence, Type, TypeVar, cast
 
 from ocelescope import OCEL
+from ocelescope.ocel.models.meta import OCELMeta
 from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.model.ocel import SessionOCEL
 from ocelescope_backend.app.internal.model.resource import ResourceApi, ResourceStore
@@ -91,11 +95,40 @@ class Session:
 
     # region OCEL management
     def add_ocel(self, ocel: OCEL) -> str:
-        self.ocels[ocel.meta.id] = SessionOCEL(ocel)
+        """Register an already-built OCEL by dumping its tables (core + quantity
+        extension) to a temp Arrow directory and keeping only the lazily-scanned
+        view in the session."""
+        directory = Path(tempfile.mkdtemp(prefix="ocel-"))
+        ocel.dump_arrow(directory)
+
+        self.ocels[ocel.meta.id] = SessionOCEL(
+            directory=directory,
+            meta=ocel.meta,
+            extensions=ocel.extensions.all(),
+        )
 
         sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
 
         return ocel.meta.id
+
+    def add_arrow_ocel(self, directory: str | Path, name: str) -> str:
+        """Register an OCEL that already lives on disk as Arrow IPC files.
+
+        The session takes ownership of ``directory`` (removed on
+        :meth:`delete_ocel`); no ``OCEL`` is materialized here.
+        """
+        meta = OCELMeta(extra={"name": name, "upload_date": datetime.now().isoformat()})
+
+        self.ocels[meta.id] = SessionOCEL(directory=directory, meta=meta)
+
+        sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
+
+        return meta.id
+
+    def get_session_ocel(self, ocel_id: str) -> SessionOCEL:
+        if ocel_id not in self.ocels:
+            raise NotFound(f"OCEL with id {ocel_id} not found")
+        return self.ocels[ocel_id]
 
     def get_ocel(self, ocel_id: str, use_original: bool = False) -> OCEL:
         if ocel_id not in self.ocels:
@@ -109,7 +142,9 @@ class Session:
         if ocel_id not in self.ocels:
             return
 
-        self.ocels.pop(ocel_id, None)
+        session_ocel = self.ocels.pop(ocel_id, None)
+        if session_ocel is not None:
+            session_ocel.cleanup()
         sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
 
     # endregion

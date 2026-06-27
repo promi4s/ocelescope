@@ -59,7 +59,7 @@ async def upload(session: ApiSession, files: list[UploadFile] = File(...)) -> li
             )
         )
 
-    return tasks
+    return []
 
 
 @session_router.post("/logout", summary="Deletes the Session", operation_id="logout")
