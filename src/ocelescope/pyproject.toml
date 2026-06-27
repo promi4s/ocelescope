@@ -13,7 +13,7 @@ dependencies = [
   "pandas>=2.3.1",
   "plotly>=6.3.1",
   "pm4py~=2.7.22",
-  "polars>=1.40.1",
+  "polars[pyarrow]>=1.40.1",
   "pydantic>=2.11.7",
   "r4pm[polars]>=0.5.3",
 ]
