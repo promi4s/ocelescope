@@ -41,7 +41,6 @@ catalog:
   "@types/react": ^19.2.7
   "@types/react-cytoscapejs": ^1.2.6
   "@types/react-dom": ^19.2.3
-  "@types/react-plotly.js": ^2.6.4
   "@xyflow/react": ^12.10.1
   axios: ^1.18.0
   bumpp: ^11.0.0
