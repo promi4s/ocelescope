@@ -4,6 +4,15 @@ version = "0.2.0"
 description = "General tools for working with Object-Centric Event Logs and building Ocelescope plugins"
 readme = "README.md"
 requires-python = ">=3.11"
+classifiers = [
+  "Typing :: Typed",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Scientific/Engineering :: Information Analysis",
+]
+
 dependencies = [
   "cachetools>=6.1.0",
   "graphviz>=0.21",
@@ -17,6 +26,12 @@ dependencies = [
   "pydantic>=2.11.7",
   "r4pm[polars]>=0.5.3",
 ]
+
+[project.urls]
+Homepage = "https://www.ocelescope.org"
+Documentation = "https://www.ocelescope.org"
+Repository = "https://github.com/promi4s/ocelescope"
+Issues = "https://github.com/promi4s/ocelescope/issues"
 
 [project.scripts]
 ocelescope = "ocelescope.tools.cli:main"
