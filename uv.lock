@@ -1689,7 +1689,7 @@ wheels = [
 
 [[package]]
 name = "ocelescope"
-version = "0.3.0"
+version = "0.3.1"
 source = { editable = "src/ocelescope" }
 dependencies = [
     { name = "cachetools" },
@@ -1733,7 +1733,7 @@ provides-extras = ["plugin"]
 
 [[package]]
 name = "ocelescope-backend"
-version = "0.1.0"
+version = "0.1.1"
 source = { editable = "src/backend/ocelescope-backend" }
 dependencies = [
     { name = "cachetools" },
@@ -1764,31 +1764,35 @@ requires-dist = [
 
 [[package]]
 name = "ocelescope-module-filter"
-version = "0.1.0"
+version = "0.1.1"
 source = { editable = "src/backend/modules/ocelescope-module-filter" }
 dependencies = [
     { name = "fastapi" },
+    { name = "ocelescope" },
     { name = "ocelescope-backend" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "fastapi" },
+    { name = "fastapi", specifier = ">=0.136.0" },
+    { name = "ocelescope", editable = "src/ocelescope" },
     { name = "ocelescope-backend", editable = "src/backend/ocelescope-backend" },
 ]
 
 [[package]]
 name = "ocelescope-module-ocelot"
-version = "0.1.0"
+version = "0.1.1"
 source = { editable = "src/backend/modules/ocelescope-module-ocelot" }
 dependencies = [
     { name = "fastapi" },
+    { name = "ocelescope" },
     { name = "ocelescope-backend" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "fastapi" },
+    { name = "fastapi", specifier = ">=0.136.0" },
+    { name = "ocelescope", editable = "src/ocelescope" },
     { name = "ocelescope-backend", editable = "src/backend/ocelescope-backend" },
 ]
 
