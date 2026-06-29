@@ -1,18 +1,10 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import type { NextConfig } from "next";
 
 const apiBase = process.env.EXTERNAL_API_BASE_URL ?? "http://localhost:8000";
-const { version: appVersion } = JSON.parse(
-  readFileSync(join(process.cwd(), "package.json"), "utf-8"),
-);
 
 const nextConfig: NextConfig = {
   output: "standalone",
   reactStrictMode: true,
-  env: {
-    NEXT_PUBLIC_APP_VERSION: appVersion,
-  },
   experimental: {
     proxyClientMaxBodySize: "1000gb",
   },
