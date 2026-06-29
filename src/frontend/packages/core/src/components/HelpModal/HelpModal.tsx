@@ -59,11 +59,7 @@ export const HelpModal: React.FC<{
           label="Known issues"
           href={env.troubleshootingUrl}
         />
-        <HelpLink
-          icon={BugIcon}
-          label="Report a bug"
-          href={env.reportBugUrl}
-        />
+        <HelpLink icon={BugIcon} label="Report a bug" href={env.reportBugUrl} />
         <HelpLink
           icon={LightbulbIcon}
           label="Request a feature"
