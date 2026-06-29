@@ -1,7 +1,7 @@
 {
   "name": "@ocelescope/log-overview",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A tool for inspecting OCELs",
   "author": "Görkem-Emre Öztürk <goerkem.oeztuerk@rwth-aachen.de>",
   "license": "MIT",
