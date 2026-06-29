@@ -9,8 +9,8 @@ body:
       label: Area
       description: What part of Ocelescope is affected?
       options:
-        - Python library
         - Ocelescope tool
+        - Python library
         - Plugins
     validations:
       required: true
