@@ -58,7 +58,6 @@
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "@types/react-plotly.js": "catalog:",
     "bumpp": "catalog:",
     "tsdown": "catalog:",
     "typescript": "catalog:"
