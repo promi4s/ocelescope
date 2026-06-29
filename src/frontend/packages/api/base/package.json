@@ -1,7 +1,7 @@
 {
   "name": "@ocelescope/api-base",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Generated, type-safe client + hooks for the Ocelescope Base backend.",
   "author": "Görkem-Emre Öztürk <goerkem.oeztuerk@rwth-aachen.de>",
   "license": "MIT",

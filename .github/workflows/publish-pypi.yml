@@ -1,10 +1,10 @@
-name: "Publish ocelescope to PyPI"
+name: "Publish Python packages to PyPI"
 
 on:
   workflow_dispatch:
 
 jobs:
-  run:
+  publish:
     runs-on: ubuntu-latest
     environment:
       name: pypi
@@ -18,7 +18,9 @@ jobs:
         uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
       - name: Install Python 3.13
         run: uv python install 3.13
-      - name: Build
-        run: uv build --package ocelescope
-      - name: Publish
-        run: uv publish 
+      - name: Build all packages
+        run: uv build --all-packages
+      - name: Exclude ocelot module (published from its own repo)
+        run: rm -f dist/ocelescope_module_ocelot-*
+      - name: Publish (skips versions already on PyPI)
+        run: uv publish --check-url https://pypi.org/simple/

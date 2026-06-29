@@ -1,29 +1,25 @@
-# react-components-starter
+# @ocelescope/api-client
 
-A starter for creating a React component library.
+The core client and session/hooks layer used by the Ocelescope API packages.
+It exposes the shared `customFetch` fetcher, environment configuration and the
+session store consumed by the generated API clients.
 
-## Development
-
-- Install dependencies:
-
-```bash
-npm install
-```
-
-- Run the playground:
+## Installation
 
 ```bash
-npm run play
+pnpm add @ocelescope/api-client
 ```
 
-- Run the unit tests:
+## Usage
 
-```bash
-npm run test
+```ts
+import { customFetch, env, useSessionStore } from "@ocelescope/api-client";
 ```
 
-- Build the library:
+## About
 
-```bash
-npm run build
-```
+Part of [Ocelescope](https://github.com/promi4s/ocelescope), a framework for
+working with Object-Centric Event Logs (OCEL) developed at the Chair of Process
+and Data Science (PADS), RWTH Aachen University.
+
+📖 Documentation: <https://www.ocelescope.org>

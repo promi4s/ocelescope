@@ -1,29 +1,37 @@
-# react-components-starter
+# @ocelescope/plugin
 
-A starter for creating a React component library.
+The **Plugins** module for [Ocelescope](https://github.com/promi4s/ocelescope).
 
-## Development
+Run process mining plugins inside Ocelescope.
 
-- Install dependencies:
+It is a frontend module that plugs into the Ocelescope app shell via
+`@ocelescope/core`'s `defineModule`.
 
-```bash
-npm install
-```
-
-- Run the playground:
+## Installation
 
 ```bash
-npm run play
+pnpm add @ocelescope/plugin
 ```
 
-- Run the unit tests:
+## Integration
 
-```bash
-npm run test
+Register the module in your `ocelescope.config.ts` by adding its default
+export to the `modules` array:
+
+```ts
+// ocelescope.config.ts
+import type { OcelescopeConfig } from "@ocelescope/core";
+import plugins from "@ocelescope/plugin";
+
+export default {
+  modules: [plugins],
+} satisfies OcelescopeConfig;
 ```
 
-- Build the library:
+## About
 
-```bash
-npm run build
-```
+Part of [Ocelescope](https://github.com/promi4s/ocelescope), a framework for
+working with Object-Centric Event Logs (OCEL) developed at the Chair of Process
+and Data Science (PADS), RWTH Aachen University.
+
+📖 Documentation: <https://www.ocelescope.org>

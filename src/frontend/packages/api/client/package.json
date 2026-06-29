@@ -1,7 +1,7 @@
 {
   "name": "@ocelescope/api-client",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Core client + session/hooks layer used by Ocelescope API packages.",
   "author": "Görkem-Emre Öztürk <goerkem.oeztuerk@rwth-aachen.de>",
   "license": "MIT",
