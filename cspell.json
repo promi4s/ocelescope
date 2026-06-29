@@ -140,7 +140,8 @@
     "nlevels",
     "gvid",
     "bendpoints",
-    "arcname"
+    "arcname",
+    "npmjs"
   ],
   "ignorePaths": [
     "pnpm-lock.yaml",
