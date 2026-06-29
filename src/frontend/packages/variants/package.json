@@ -1,5 +1,6 @@
 {
   "name": "@ocelescope/variants",
+  "private": "true",
   "type": "module",
   "version": "0.0.0",
   "description": "React components for rendering process mining variants.",
