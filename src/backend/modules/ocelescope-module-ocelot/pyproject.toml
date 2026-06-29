@@ -1,6 +1,8 @@
 [project]
 name = "ocelescope-module-ocelot"
 version = "0.1.0"
+description = "Ocelescope backend module for Ocelot: exploring events, objects and their relationships in OCELs"
+readme = "README.md"
 requires-python = ">=3.11"
 dependencies = ["fastapi", "ocelescope-backend"]
 
