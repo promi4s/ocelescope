@@ -53,7 +53,7 @@ export const AppShell: React.FC<{
               size="sm"
             />
             <Text size="xs" c="dimmed">
-              v{env.appVersion}
+              {env.appVersion}
             </Text>
           </Group>
 

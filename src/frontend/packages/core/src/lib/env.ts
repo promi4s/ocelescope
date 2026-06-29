@@ -2,7 +2,7 @@ import z from "zod";
 
 const schema = z
   .object({
-    NEXT_PUBLIC_APP_VERSION: z.string().default("0.0.0"),
+    NEXT_PUBLIC_APP_VERSION: z.string().default("v0.0.0"),
     NEXT_PUBLIC_PROJECT_PAGE: z.url().default("https://www.ocelescope.org/"),
     NEXT_PUBLIC_DOCS_URL: z
       .url()
