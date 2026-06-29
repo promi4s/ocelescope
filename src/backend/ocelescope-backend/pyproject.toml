@@ -1,6 +1,6 @@
 [project]
 name = "ocelescope-backend"
-version = "0.1.0"
+version = "0.1.1"
 description = "Ocelescope backend host application"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -13,7 +13,7 @@ dependencies = [
   "pydantic-settings>=2.2.1,<3",
   "fastapi[standard]>=0.136.0",
   "uvicorn>=0.49,<0.50",
-  "ocelescope[plugin]>=0.1.0,<0.2.0",
+  "ocelescope[plugin]>=0.3.0,<0.4.0",
   "orjson>=3.11.3",
 ]
 

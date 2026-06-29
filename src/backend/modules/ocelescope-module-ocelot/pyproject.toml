@@ -1,10 +1,14 @@
 [project]
 name = "ocelescope-module-ocelot"
-version = "0.1.0"
+version = "0.1.1"
 description = "Ocelescope backend module for Ocelot: exploring events, objects and their relationships in OCELs"
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = ["fastapi", "ocelescope-backend"]
+dependencies = [
+  "fastapi>=0.136.0",
+  "ocelescope>=0.3.0,<0.4.0",
+  "ocelescope-backend>=0.1.0,<0.2.0",
+]
 
 [project.entry-points."ocelescope_backend.modules"]
 ocelotV1 = "ocelescope_module_ocelot.module:Ocelot"
@@ -18,4 +22,5 @@ build-backend = "uv_build"
 package = true
 
 [tool.uv.sources]
+ocelescope = { workspace = true }
 ocelescope-backend = { workspace = true }
