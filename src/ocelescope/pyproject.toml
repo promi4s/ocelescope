@@ -1,6 +1,6 @@
 [project]
 name = "ocelescope"
-version = "0.2.0"
+version = "0.3.0"
 description = "General tools for working with Object-Centric Event Logs and building Ocelescope plugins"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -40,11 +40,7 @@ ocelescope = "ocelescope.tools.cli:main"
 package = true
 
 [project.optional-dependencies]
-plugin = [
-    "more-itertools>=11.1.0",
-    "networkx>=3.5",
-    "scikit-learn>=1.9.0",
-]
+plugin = ["more-itertools>=11.1.0", "networkx>=3.5", "scikit-learn>=1.9.0"]
 
 [build-system]
 requires = ["uv_build>=0.11.20,<0.12.0"]
