@@ -16,16 +16,31 @@ const PluginsOverview: React.FC = () => {
         <Title order={2}>Plugin Overview</Title>
         <Text c="dimmed" size="sm" mt={4}>
           Upload plugins to extend Ocelescope with custom process mining
-          functionality. Plugins are packaged as .zip files. Documentation for
-          writing your own plugins is available on the{" "}
+          functionality. Plugins are packaged as .zip files. Browse the{" "}
           <Anchor
-            href={env.projectPage}
+            href={env.pluginLibraryUrl}
             target="_blank"
             rel="noopener noreferrer"
           >
-            project page
+            plugin library
           </Anchor>
-          .
+          , read the{" "}
+          <Anchor
+            href={env.pluginDevGuideUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            plugin development guide
+          </Anchor>{" "}
+          to write your own, or{" "}
+          <Anchor
+            href={env.submitPluginUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            submit a plugin
+          </Anchor>{" "}
+          you've built.
         </Text>
       </div>
 
