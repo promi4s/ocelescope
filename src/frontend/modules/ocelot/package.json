@@ -1,7 +1,7 @@
 {
   "name": "@ocelescope/ocelot",
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "A module for inspections of OCELs",
   "author": "Görkem-Emre Öztürk <goerkem.oeztuerk@rwth-aachen.de>",
   "license": "MIT",
@@ -37,8 +37,8 @@
     "@dagrejs/dagre": "catalog:",
     "@mantine/core": "catalog:",
     "@mantine/hooks": "catalog:",
-    "@ocelescope/api-base": "workspace:*",
-    "@ocelescope/core": "workspace:*",
+    "@ocelescope/api-base": "workspace:^",
+    "@ocelescope/core": "workspace:^",
     "@tanstack/react-query": "catalog:",
     "@xyflow/react": "catalog:",
     "dayjs": "catalog:",
@@ -51,7 +51,7 @@
     "react-dom": "catalog:",
     "recharts": "catalog:",
     "axios": "catalog:",
-    "@ocelescope/api-client": "workspace:*"
+    "@ocelescope/api-client": "workspace:^"
   },
   "devDependencies": {
     "@tsdown/css": "catalog:",
@@ -60,7 +60,7 @@
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "@ocelescope/api-config": "workspace:*",
+    "@ocelescope/api-config": "workspace:^",
     "tsdown": "catalog:",
     "typescript": "catalog:"
   }

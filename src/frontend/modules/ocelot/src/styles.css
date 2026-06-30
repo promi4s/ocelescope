@@ -1,4 +1,7 @@
-@import "../node_modules/@xyflow/react/dist/style.css";
+/*
+ * @xyflow/react/dist/style.css is NOT bundled here — the consuming app imports
+ * it itself. See the README. Below are @ocelescope/ocelot's own styles.
+ */
 
 .floating-edges {
   width: 100%;

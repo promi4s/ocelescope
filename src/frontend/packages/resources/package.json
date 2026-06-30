@@ -1,7 +1,7 @@
 {
   "name": "@ocelescope/resources",
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Ocelescope resources: helpers and UI components for rendering and exporting data.",
   "author": "Görkem-Emre Öztürk <goerkem.oeztuerk@rwth-aachen.de>",
   "license": "MIT",
@@ -37,7 +37,7 @@
     "@floating-ui/react": "catalog:",
     "@hpcc-js/wasm-graphviz": "catalog:",
     "@mantine/core": "catalog:",
-    "@ocelescope/api-base": "workspace:*",
+    "@ocelescope/api-base": "workspace:^",
     "@xyflow/react": "catalog:",
     "dayjs": "catalog:",
     "elkjs": "catalog:",

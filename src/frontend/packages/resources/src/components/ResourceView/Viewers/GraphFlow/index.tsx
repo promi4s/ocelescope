@@ -1,13 +1,4 @@
 import {
-  Background,
-  ControlButton,
-  Controls,
-  ReactFlow,
-  ReactFlowProvider,
-  useReactFlow,
-} from "@xyflow/react";
-import "@xyflow/react/dist/style.css";
-import {
   ActionIcon,
   Alert,
   Code,
@@ -15,6 +6,14 @@ import {
   Menu,
   Stack,
 } from "@mantine/core";
+import {
+  Background,
+  ControlButton,
+  Controls,
+  ReactFlow,
+  ReactFlowProvider,
+  useReactFlow,
+} from "@xyflow/react";
 import { DownloadIcon, Maximize2Icon } from "lucide-react";
 import { useCallback, useEffect, useRef } from "react";
 import type { VisualizationProps } from "../..";
