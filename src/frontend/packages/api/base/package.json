@@ -35,14 +35,14 @@
     "generate:api": "uv run --package ocelescope-backend ocelescope-backend openapi && orval"
   },
   "peerDependencies": {
-    "@ocelescope/api-client": "workspace:*",
+    "@ocelescope/api-client": "workspace:^",
     "@tanstack/react-query": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "axios": "catalog:"
   },
   "devDependencies": {
-    "@ocelescope/api-config": "workspace:*",
+    "@ocelescope/api-config": "workspace:^",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",

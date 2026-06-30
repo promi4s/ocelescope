@@ -31,11 +31,14 @@ export default {
 } satisfies OcelescopeConfig;
 ```
 
-This module ships its own styles, so also import them once in your app
-entry point (`pages/_app.tsx`):
+This module's charts and date filters rely on two Mantine stylesheets. Add
+`@mantine/dates` and `@mantine/charts` to your app's `dependencies` and import
+their styles once in your app entry point (`pages/_app.tsx`), after
+`@mantine/core/styles.css`:
 
 ```tsx
-import "@ocelescope/filter/styles.css";
+import "@mantine/dates/styles.css";
+import "@mantine/charts/styles.css";
 ```
 
 ## About

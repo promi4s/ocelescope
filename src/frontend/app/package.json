@@ -18,6 +18,13 @@
     "@ocelescope/plugin": "workspace:*",
     "@ocelescope/management": "workspace:*",
     "@ocelescope/log-overview": "workspace:*",
+    "@mantine/core": "catalog:",
+    "@mantine/dates": "catalog:",
+    "@mantine/charts": "catalog:",
+    "@mantine/dropzone": "catalog:",
+    "@mantine/notifications": "catalog:",
+    "mantine-datatable": "catalog:",
+    "@xyflow/react": "catalog:",
     "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"

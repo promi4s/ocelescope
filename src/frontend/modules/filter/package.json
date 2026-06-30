@@ -1,7 +1,7 @@
 {
   "name": "@ocelescope/filter",
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "A module for basic filtering of OCELs",
   "author": "Görkem-Emre Öztürk <goerkem.oeztuerk@rwth-aachen.de>",
   "license": "MIT",
@@ -15,8 +15,7 @@
   },
   "exports": {
     ".": "./dist/index.js",
-    "./package.json": "./package.json",
-    "./styles.css": "./dist/style.css"
+    "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -40,9 +39,9 @@
     "@mantine/dates": "catalog:",
     "@mantine/hooks": "catalog:",
     "@mantine/notifications": "catalog:",
-    "@ocelescope/api-base": "workspace:*",
-    "@ocelescope/api-client": "workspace:*",
-    "@ocelescope/core": "workspace:*",
+    "@ocelescope/api-base": "workspace:^",
+    "@ocelescope/api-client": "workspace:^",
+    "@ocelescope/core": "workspace:^",
     "@tanstack/react-query": "catalog:",
     "axios": "catalog:",
     "dayjs": "catalog:",
@@ -57,7 +56,7 @@
   },
   "devDependencies": {
     "@mantine/notifications": "catalog:",
-    "@ocelescope/api-config": "workspace:*",
+    "@ocelescope/api-config": "workspace:^",
     "@types/node": "catalog:",
     "@types/object-hash": "catalog:",
     "@types/react": "catalog:",

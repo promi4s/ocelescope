@@ -28,6 +28,14 @@ export default {
 } satisfies OcelescopeConfig;
 ```
 
+This module's graph viewer uses [`@xyflow/react`](https://reactflow.dev). Add
+`@xyflow/react` to your app's `dependencies` and import its stylesheet once in
+your app entry point (`pages/_app.tsx`):
+
+```tsx
+import "@xyflow/react/dist/style.css";
+```
+
 ## About
 
 Part of [Ocelescope](https://github.com/promi4s/ocelescope), a framework for
