@@ -1,5 +1,8 @@
 import { Box, Button, ButtonGroup } from "@mantine/core";
-import { saveAs } from "file-saver";
+import FileSaver from "file-saver";
+
+const { saveAs } = FileSaver;
+
 import { DownloadIcon, MaximizeIcon, MinusIcon, PlusIcon } from "lucide-react";
 import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
 import type { VisualizationProps } from "../../../types";

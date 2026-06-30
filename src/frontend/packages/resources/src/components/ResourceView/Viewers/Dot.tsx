@@ -1,5 +1,8 @@
 import { Graphviz } from "@hpcc-js/wasm-graphviz";
-import { saveAs } from "file-saver";
+import FileSaver from "file-saver";
+
+const { saveAs } = FileSaver;
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { VisualizationProps } from "../../../types";
 import { SvgPanWrapper } from "./SVG";

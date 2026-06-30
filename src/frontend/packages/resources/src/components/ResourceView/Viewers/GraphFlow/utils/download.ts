@@ -1,5 +1,8 @@
 import type { Node } from "@xyflow/react";
-import { saveAs } from "file-saver";
+import FileSaver from "file-saver";
+
+const { saveAs } = FileSaver;
+
 import { toPng, toSvg } from "html-to-image";
 import { jsPDF } from "jspdf";
 import type { Rect } from "./bounds";
