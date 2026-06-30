@@ -6,7 +6,7 @@ import {
 } from "@ocelescope/api-base";
 import { env, useSessionStore } from "@ocelescope/api-client";
 import { parse } from "content-disposition-attachment";
-import { saveAs } from "file-saver";
+import FileSaver from "file-saver";
 import qs from "qs";
 
 export const useDownloadFile = () => {
@@ -33,7 +33,7 @@ export const useDownloadFile = () => {
         ? contentDisposition.filename
         : "fileName";
 
-      saveAs(blob, fileName);
+      FileSaver.saveAs(blob, fileName);
     } catch (err) {
       console.error("Download error:", err);
     }
