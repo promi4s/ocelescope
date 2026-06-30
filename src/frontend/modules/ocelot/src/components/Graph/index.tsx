@@ -10,7 +10,10 @@ import {
   ReactFlowProvider,
   useEdgesState,
 } from "@xyflow/react";
-import { saveAs } from "file-saver";
+import FileSaver from "file-saver";
+
+const { saveAs } = FileSaver;
+
 import { toPng } from "html-to-image";
 import { DownloadIcon } from "lucide-react";
 import type React from "react";
