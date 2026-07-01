@@ -22,6 +22,8 @@
     "@ocelescope/log-overview": "workspace:*",
     "@ocelescope/management": "workspace:*",
     "@ocelescope/ocelot": "catalog:",
+    "@ocelescope/api-client": "workspace:*",
+    "@ocelescope/api-base": "workspace:*",
     "@ocelescope/plugin": "workspace:*",
     "@xyflow/react": "catalog:",
     "mantine-datatable": "catalog:",
