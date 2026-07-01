@@ -16,6 +16,7 @@ import { HelpModal } from "../HelpModal/HelpModal";
 import { CurrentOcelSelect } from "../OcelSelect/OcelSelect";
 import { UploadModal } from "../UploadModal/UploadModal";
 import NavBar from "./components/NavBar";
+import { OcelescopeLogo } from "./components/OcelescopeLogo";
 
 export const AppShell: React.FC<{
   config: OcelescopeConfig;
@@ -52,6 +53,7 @@ export const AppShell: React.FC<{
               visibleFrom="sm"
               size="sm"
             />
+            <OcelescopeLogo size={32} />
             <Text size="xs" c="dimmed">
               {env.appVersion}
             </Text>
