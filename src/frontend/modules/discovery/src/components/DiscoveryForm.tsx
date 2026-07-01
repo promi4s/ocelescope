@@ -146,7 +146,7 @@ export const DiscoveryForm = ({
 
   return (
     <Form
-      schema={{ ...schema, title: "" }}
+      schema={{ ...schema, title: "" } as Record<string, any>}
       formData={formData}
       validator={validator}
       uiSchema={uiSchema}
