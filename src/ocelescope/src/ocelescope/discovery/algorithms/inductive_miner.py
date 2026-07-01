@@ -9,7 +9,7 @@ from ocelescope.resource.default.petri_net import PetriNet
 
 
 @discovery_method(
-    name="Inductive Miner",
+    name="Inductive Miner (flattening)",
     description="Discover an object-centric Petri net with the inductive miner.",
 )
 def inductive_miner(
