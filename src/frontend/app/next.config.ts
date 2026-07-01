@@ -13,7 +13,6 @@ const nextConfig: NextConfig = {
     "recharts",
     "@ocelescope/core",
     "@ocelescope/resources",
-    "@ocelescope/ocelot",
     "@ocelescope/plugin",
     "@ocelescope/api-base",
     "@ocelescope/api-client",
