@@ -23,6 +23,7 @@ catalog:
   "@mantine/hooks": ^9.4.0
   "@mantine/notifications": ^9.4.0
   "@marko19907/string-to-color": ^1.0.2
+  '@ocelescope/ocelot': ^0.1.2
   "@rjsf/core": ^6.6.2
   "@rjsf/mantine": ^6.6.2
   "@rjsf/utils": ^6.6.2
@@ -95,3 +96,4 @@ minimumReleaseAgeExclude:
   - '@mantine/hooks@9.4.0'
   - '@mantine/notifications@9.4.0'
   - '@mantine/store@9.4.0'
+  - '@ocelescope/ocelot@0.1.2'
