@@ -112,18 +112,22 @@ class DirectlyFollowsGraph(Resource):
         return [object_type.name for object_type in self.object_types]
 
     def filter_edges(self, threshold: float) -> "DirectlyFollowsGraph":
-        """Return a copy with edges whose count < threshold * total_count removed.
+        """Return a copy retaining only edges whose relative frequency >= threshold.
 
+        Relative frequency is edge.count / total_count_for_that_object_type,
+        so values are comparable across object types of different sizes.
         Activities and object types with no remaining edges are also pruned.
         At threshold=0 the original graph is returned unchanged.
         """
         if threshold == 0 or not self.edges:
             return self
-        max_count = max(e.count for e in self.edges)
-        if max_count == 0:
-            return self
-        min_count = threshold * max_count
-        kept_edges = [e for e in self.edges if e.count >= min_count]
+        totals: dict[str, int] = {}
+        for e in self.edges:
+            totals[e.object_type] = totals.get(e.object_type, 0) + e.count
+        kept_edges = [
+            e for e in self.edges
+            if totals[e.object_type] > 0 and e.count / totals[e.object_type] >= threshold
+        ]
         active_activities = {e.source for e in kept_edges if e.source} | {e.target for e in kept_edges if e.target}
         active_object_types = {e.object_type for e in kept_edges}
         return DirectlyFollowsGraph(

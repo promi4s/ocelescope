@@ -20,7 +20,7 @@ def ocdfg_miner(
             ge=0,
             le=1,
             title="Frequency Threshold",
-            description="Edges whose count is below this fraction of the most frequent edge are removed. 0 = show all edges.",
+            description="Edges whose count is below this fraction of their object type's total count are removed. 0 = show all edges.",
         ),
     ] = 0,
 ) -> DirectlyFollowsGraph:
