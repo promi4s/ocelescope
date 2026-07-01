@@ -1722,7 +1722,7 @@ requires-dist = [
     { name = "orjson", specifier = ">=3.11.7" },
     { name = "pandas", specifier = ">=2.3.1" },
     { name = "plotly", specifier = ">=6.3.1" },
-    { name = "pm4py", specifier = "~=2.7.22" },
+    { name = "pm4py", specifier = "~=2.7.23" },
     { name = "polars", specifier = ">=1.40.1" },
     { name = "pydantic", specifier = ">=2.11.7" },
     { name = "r4pm", extras = ["polars"], specifier = ">=0.5.3" },
@@ -2138,7 +2138,7 @@ wheels = [
 
 [[package]]
 name = "pm4py"
-version = "2.7.22.3"
+version = "2.7.23.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cvxopt", marker = "python_full_version < '3.15'" },
@@ -2154,9 +2154,9 @@ dependencies = [
     { name = "tqdm" },
     { name = "wheel" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/41/34/7d2f30b72342902908838de891401b32701b1eafbda45b31f5ed782f2ce1/pm4py-2.7.22.3.tar.gz", hash = "sha256:4580380850e6eeea2d3e510cd02c59f7bfc3bc1ce8600ef62f845fae470313b6", size = 1075702, upload-time = "2026-05-18T07:32:26.672Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/3d/71/c405a595d570d49525c6ff8b47daab8f07e4a082114739d5fc77d4e6f5c5/pm4py-2.7.23.1.tar.gz", hash = "sha256:2d24797beba9cb161272171b4bf333050a8de54ef42f0c4d8e3bf55c7e3e6eed", size = 1138239, upload-time = "2026-07-01T10:34:42.159Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/15/81/ad54644d8e4cdc4af92b746865f58a1792e2f3dcf02ac0c9f5a42b229e2b/pm4py-2.7.22.3-py3-none-any.whl", hash = "sha256:8a976279dc703b73ea81358b298cc095c5d9245c8c749693d4d2596d606ebbb0", size = 2484132, upload-time = "2026-05-18T07:32:22.191Z" },
+    { url = "https://files.pythonhosted.org/packages/d1/57/46f47efd8baa008ea5b9792b756ab8983dc9a1734c0ce857bc8fbcb6bbda/pm4py-2.7.23.1-py3-none-any.whl", hash = "sha256:43562631cec109faec1ab859f0c4e106ed64b5f4dd8004258939ef65db9c4f19", size = 2605259, upload-time = "2026-07-01T10:34:35.773Z" },
 ]
 
 [[package]]

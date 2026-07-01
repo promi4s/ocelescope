@@ -1,11 +1,11 @@
-import { Alert, Box, Divider, Select, Stack, Text } from "@mantine/core";
+import { Alert, Divider, Select, Stack, Text } from "@mantine/core";
 import type {
   DiscoveryFilterSchema,
   DiscoveryMethodMeta,
 } from "@ocelescope/api-base";
 import type { DiscoverySchema, FilterEntry } from "../types";
-import { DiscoveryField } from "./DiscoveryField";
 import { DiscoveryFiltersSection } from "./DiscoveryFiltersSection";
+import { DiscoveryForm } from "./DiscoveryForm";
 
 type DiscoverySettingsContentProps = {
   methods: DiscoveryMethodMeta[];
@@ -73,22 +73,13 @@ export const DiscoverySettingsContent = ({
             </Text>
           </>
         )}
-        {Object.entries(selectedSchema.properties ?? {}).map(
-          ([name, property]) => (
-            <Box key={name}>
-              <DiscoveryField
-                name={name}
-                property={property}
-                value={activeFormData[name]}
-                eventTypeOptions={Object.keys(eventCounts)}
-                objectTypeOptions={Object.keys(objectCounts)}
-                onChange={(value) =>
-                  setActiveFormData({ ...activeFormData, [name]: value })
-                }
-              />
-            </Box>
-          ),
-        )}
+        <DiscoveryForm
+          schema={selectedSchema}
+          formData={activeFormData}
+          onChange={setActiveFormData}
+          eventTypeOptions={Object.keys(eventCounts)}
+          objectTypeOptions={Object.keys(objectCounts)}
+        />
       </Stack>
 
       <Divider />
