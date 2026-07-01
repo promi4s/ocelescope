@@ -134,7 +134,7 @@ def save_plugin_results(
                         name=name,
                         type=entity.get_type(),
                         source=source,
-                        data=entity.model_dump(),
+                        data=entity.model_dump(mode="json"),
                     )
                 )
             )
@@ -188,11 +188,11 @@ def download_plugin_results(
                     name=name,
                     type=entity.get_type(),
                     source=source,
-                    data=entity.model_dump(),
+                    data=entity.model_dump(mode="json"),
                 )
                 archive.writestr(
                     _unique(name, ".ocelescope"),
-                    json.dumps(store.model_dump(), indent=2),
+                    json.dumps(store.model_dump(mode="json"), indent=2),
                 )
 
     return file_response
