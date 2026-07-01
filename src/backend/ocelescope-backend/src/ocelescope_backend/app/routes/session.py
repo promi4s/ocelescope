@@ -17,6 +17,7 @@ from ocelescope_backend.app.internal.tasks.system_tasks import (
     import_xes_task,
 )
 from ocelescope_backend.app.internal.util.spool_upload import spool_upload_to_tempfile
+from ocelescope_backend.app.sse_manager import SystemNotification, sse_manager
 
 session_router = APIRouter(prefix="/session", tags=["session"])
 
@@ -44,6 +45,15 @@ async def upload(session: ApiSession, files: list[UploadFile] = File(...)) -> li
                 task_method = import_xes_task
 
         if task_method is None:
+            await sse_manager.send(
+                session_id=session.id,
+                message=SystemNotification(
+                    title="Unsupported File format",
+                    notification_type="error",
+                    message=f"The file format {file_path.suffix} is currently not supported",
+                ),
+            )
+
             continue
 
         tmp_path = await spool_upload_to_tempfile(file, suffix=file_path.suffix)
