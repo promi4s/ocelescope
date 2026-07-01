@@ -11,11 +11,8 @@ const nextConfig: NextConfig = {
   transpilePackages: [
     "@mantine/charts",
     "recharts",
-    "@ocelescope/core",
     "@ocelescope/resources",
     "@ocelescope/plugin",
-    "@ocelescope/api-base",
-    "@ocelescope/api-client",
     "@ocelescope/filter",
     "@ocelescope/discovery",
     "@ocelescope/log-overview",
