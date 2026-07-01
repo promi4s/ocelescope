@@ -8,9 +8,31 @@ export const OcelescopeLogo: React.FC<{ size?: number }> = ({ size = 32 }) => (
   >
     <circle cx="8" cy="16" r="5.6" stroke="#17a3b8" strokeWidth="2.2" />
     <circle cx="8" cy="16" r="2.1" fill="#17a3b8" />
-    <line x1="13.6" y1="16" x2="16.6" y2="16" stroke="#17a3b8" strokeWidth="2.2" />
-    <rect x="16.9" y="9.5" width="5.4" height="13" rx="1.4" stroke="#17a3b8" strokeWidth="2.2" />
-    <line x1="22.7" y1="16" x2="26" y2="16" stroke="#17a3b8" strokeWidth="2.2" />
+    <line
+      x1="13.6"
+      y1="16"
+      x2="16.6"
+      y2="16"
+      stroke="#17a3b8"
+      strokeWidth="2.2"
+    />
+    <rect
+      x="16.9"
+      y="9.5"
+      width="5.4"
+      height="13"
+      rx="1.4"
+      stroke="#17a3b8"
+      strokeWidth="2.2"
+    />
+    <line
+      x1="22.7"
+      y1="16"
+      x2="26"
+      y2="16"
+      stroke="#17a3b8"
+      strokeWidth="2.2"
+    />
     <circle cx="31.6" cy="16" r="5.6" stroke="#17a3b8" strokeWidth="2.2" />
   </svg>
 );
