@@ -5,6 +5,12 @@ import { useEffect } from "react";
 import { useInvalidate } from "../hooks/useInvalidate";
 import { ServerEventMessage } from "../lib/sse";
 
+const NotificationColorMap: Record<"warning" | "info" | "error", string> = {
+  warning: "yellow",
+  info: "blue",
+  error: "red",
+};
+
 const SSEWrapper = () => {
   const { sessionId } = useSessionStore();
 
@@ -32,7 +38,7 @@ const SSEWrapper = () => {
           showNotification({
             title: message.title,
             message: message.message,
-            color: "green",
+            color: NotificationColorMap[message.notification_type],
           });
           break;
         case "error":
