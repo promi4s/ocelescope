@@ -141,7 +141,9 @@
     "gvid",
     "bendpoints",
     "arcname",
-    "npmjs"
+    "npmjs",
+    "fallthroughs",
+    "norender"
   ],
   "ignorePaths": [
     "pnpm-lock.yaml",
