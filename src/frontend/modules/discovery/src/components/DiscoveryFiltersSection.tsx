@@ -21,7 +21,11 @@ export const DiscoveryFiltersSection = ({
   const handleChange = (filterName: string, data: Record<string, unknown>) => {
     const exists = filters.some((f) => f.name === filterName);
     if (exists) {
-      onFiltersChange(filters.map((f) => (f.name === filterName ? { ...f, payload: data } : f)));
+      onFiltersChange(
+        filters.map((f) =>
+          f.name === filterName ? { ...f, payload: data } : f,
+        ),
+      );
     } else {
       onFiltersChange([...filters, { name: filterName, payload: data }]);
     }
@@ -32,7 +36,8 @@ export const DiscoveryFiltersSection = ({
       <Text fw={500}>Filters</Text>
       {availableFilters.map((filterSchema) => {
         const schema = filterSchema.json_schema as DiscoverySchema;
-        const payload = filters.find((f) => f.name === filterSchema.name)?.payload ?? {};
+        const payload =
+          filters.find((f) => f.name === filterSchema.name)?.payload ?? {};
 
         return (
           <Card key={filterSchema.name} withBorder padding="sm" radius="sm">

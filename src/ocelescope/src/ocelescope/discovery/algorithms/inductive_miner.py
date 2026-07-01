@@ -15,7 +15,13 @@ from ocelescope.resource.default.petri_net import PetriNet
 def inductive_miner(
     ocel: OCEL,
     noise_threshold: Annotated[
-        float, Field(ge=0, le=1, title="Noise Threshold", description="Fraction of infrequent behaviour to filter out (0 = no filtering, IMf variant).")
+        float,
+        Field(
+            ge=0,
+            le=1,
+            title="Noise Threshold",
+            description="Fraction of infrequent behaviour to filter out (0 = no filtering, IMf variant).",
+        ),
     ] = 0,
 ) -> PetriNet:
     ocpn = pm4py.discover_oc_petri_net(

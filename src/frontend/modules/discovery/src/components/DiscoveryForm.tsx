@@ -1,4 +1,11 @@
-import { MultiSelect, NumberInput, Select, Slider, Stack, Text } from "@mantine/core";
+import {
+  MultiSelect,
+  NumberInput,
+  Select,
+  Slider,
+  Stack,
+  Text,
+} from "@mantine/core";
 import type { FieldProps, WidgetProps } from "@rjsf/utils";
 import validator from "@rjsf/validator-ajv8";
 import dynamic from "next/dynamic";
@@ -36,7 +43,11 @@ const MantineSliderWidget = ({
         step={0.0001}
         decimalScale={4}
         hideControls
-        value={typeof value === "number" ? value : ((schema.default as number) ?? min)}
+        value={
+          typeof value === "number"
+            ? value
+            : ((schema.default as number) ?? min)
+        }
         onChange={(v) => typeof v === "number" && onChange(v)}
       />
       <Slider
@@ -44,7 +55,11 @@ const MantineSliderWidget = ({
         max={max}
         step={0.0001}
         label={(v) => v.toFixed(4)}
-        value={typeof value === "number" ? value : ((schema.default as number) ?? min)}
+        value={
+          typeof value === "number"
+            ? value
+            : ((schema.default as number) ?? min)
+        }
         onChange={onChange}
       />
     </Stack>
@@ -73,24 +88,34 @@ const buildUiSchema = (schema: DiscoverySchema) => {
   return uiSchema;
 };
 
-const makeOcelFields = (eventTypeOptions: string[], objectTypeOptions: string[]) => {
-  const OcelTypeField =
-    (options: string[]) =>
-    memo(({ schema, formData, onChange, required, fieldPathId: { path } }: FieldProps) => {
-      const Component = schema.type === "array" ? MultiSelect : Select;
-      return (
-        <Component
-          label={schema.title}
-          description={schema.description}
-          required={required}
-          value={formData ?? (schema.type === "array" ? [] : null)}
-          onChange={(v) => onChange(v, path)}
-          data={options}
-          clearable
-          searchable
-        />
-      );
-    });
+const makeOcelFields = (
+  eventTypeOptions: string[],
+  objectTypeOptions: string[],
+) => {
+  const OcelTypeField = (options: string[]) =>
+    memo(
+      ({
+        schema,
+        formData,
+        onChange,
+        required,
+        fieldPathId: { path },
+      }: FieldProps) => {
+        const Component = schema.type === "array" ? MultiSelect : Select;
+        return (
+          <Component
+            label={schema.title}
+            description={schema.description}
+            required={required}
+            value={formData ?? (schema.type === "array" ? [] : null)}
+            onChange={(v) => onChange(v, path)}
+            data={options}
+            clearable
+            searchable
+          />
+        );
+      },
+    );
 
   return {
     event_type: OcelTypeField(eventTypeOptions),
@@ -127,7 +152,9 @@ export const DiscoveryForm = ({
       uiSchema={uiSchema}
       fields={fields}
       widgets={WIDGETS}
-      onChange={(data) => onChange((data.formData as Record<string, unknown>) ?? {})}
+      onChange={(data) =>
+        onChange((data.formData as Record<string, unknown>) ?? {})
+      }
     />
   );
 };
