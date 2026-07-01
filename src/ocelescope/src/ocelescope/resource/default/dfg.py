@@ -111,6 +111,27 @@ class DirectlyFollowsGraph(Resource):
         """
         return [object_type.name for object_type in self.object_types]
 
+    def filter_edges(self, threshold: float) -> "DirectlyFollowsGraph":
+        """Return a copy with edges whose count < threshold * total_count removed.
+
+        Activities and object types with no remaining edges are also pruned.
+        At threshold=0 the original graph is returned unchanged.
+        """
+        if threshold == 0 or not self.edges:
+            return self
+        max_count = max(e.count for e in self.edges)
+        if max_count == 0:
+            return self
+        min_count = threshold * max_count
+        kept_edges = [e for e in self.edges if e.count >= min_count]
+        active_activities = {e.source for e in kept_edges if e.source} | {e.target for e in kept_edges if e.target}
+        active_object_types = {e.object_type for e in kept_edges}
+        return DirectlyFollowsGraph(
+            activities=[a for a in self.activities if a.name in active_activities],
+            object_types=[ot for ot in self.object_types if ot.name in active_object_types],
+            edges=kept_edges,
+        )
+
     @classmethod
     def from_pm4py(cls, ocdfg: Any) -> "DirectlyFollowsGraph":
         """Convert a pm4py OCDFG dict to a DirectlyFollowsGraph."""
@@ -119,6 +140,7 @@ class DirectlyFollowsGraph(Resource):
                 object_type=object_type,
                 source=source,
                 target=target,
+                count=len(events),
                 annotation=str(len(events)),
             )
             for object_type, raw_edges in ocdfg["edges"]["event_couples"].items()
@@ -126,13 +148,23 @@ class DirectlyFollowsGraph(Resource):
         ]
 
         start_edges = [
-            DFGEdge(object_type=object_type, target=activity, annotation=str(len(events)))
+            DFGEdge(
+                object_type=object_type,
+                target=activity,
+                count=len(events),
+                annotation=str(len(events)),
+            )
             for object_type, activities in ocdfg["start_activities"]["events"].items()
             for activity, events in activities.items()
         ]
 
         end_edges = [
-            DFGEdge(source=activity, object_type=object_type, annotation=str(len(events)))
+            DFGEdge(
+                source=activity,
+                object_type=object_type,
+                count=len(events),
+                annotation=str(len(events)),
+            )
             for object_type, activities in ocdfg["end_activities"]["events"].items()
             for activity, events in activities.items()
         ]

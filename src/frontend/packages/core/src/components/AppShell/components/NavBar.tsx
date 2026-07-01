@@ -62,7 +62,7 @@ const LogoutButton: React.FC = () => {
         onClick={() => setIsModalOpen(true)}
       >
         <Group justify={"space-between"} w={"100%"}>
-          <Text style={{ lineHeight: 1 }}>Logout</Text>
+          <Text style={{ lineHeight: 1 }}>Reset Session</Text>
           <LogOutIcon className={classes.buttonIcon} />
         </Group>
       </UnstyledButton>
