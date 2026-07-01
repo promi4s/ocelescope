@@ -142,7 +142,9 @@ def import_plugin(
         file_path.unlink(missing_ok=True)
 
     try:
-        registry_manager.load_plugins(added_plugin_ids, ignore_errors=False)
+        loaded_plugins = registry_manager.load_plugins(
+            added_plugin_ids, ignore_errors=False
+        )
     except Exception as e:
         return [
             ErrorNotification(
@@ -153,10 +155,26 @@ def import_plugin(
             )
         ]
 
+    loaded_plugins = [
+        plugin.label
+        for id in loaded_plugins
+        if (plugin := registry_manager.get_plugin(id)) is not None
+    ]
+
+    if len(loaded_plugins) == 0:
+        return [
+            SystemNotification(
+                type="notification",
+                title="Uploaded zip didn't contain any plugins",
+                notification_type="error",
+                message=f"The uploaded file {metadata['fileName']} did not contain any valid plugins",
+            )
+        ]
+
     return [
         SystemNotification(
             title="Plugin successfully uploaded",
-            message="",
+            message=f"Successfully uploaded {' '.join(loaded_plugins)}",
             notification_type="info",
         ),
         InvalidationRequest(routes=["plugins", "tasks"]),
