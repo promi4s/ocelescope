@@ -43,6 +43,8 @@ async def upload(session: ApiSession, files: list[UploadFile] = File(...)) -> li
                 task_method = import_ocel_task
             case ".xes":
                 task_method = import_xes_task
+            case ".gz" if file_path.suffixes[-2:] == [".xes", ".gz"]:
+                task_method = import_xes_task
 
         if task_method is None:
             await sse_manager.send(
