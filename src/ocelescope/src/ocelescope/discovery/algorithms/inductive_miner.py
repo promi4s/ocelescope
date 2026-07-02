@@ -22,7 +22,7 @@ def inductive_miner(
             title="Noise Threshold",
             description="Fraction of infrequent behaviour to filter out (0 = no filtering, IMf variant).",
         ),
-    ] = 0,
+    ] = 0.8,
 ) -> PetriNet:
     ocpn = pm4py.discover_oc_petri_net(
         ocel=ocel.ocel,
