@@ -11,7 +11,8 @@ export const FullScreenUpload: React.FC<{
   onSuccess?: () => void;
   accept?: ComponentProps<typeof Dropzone.FullScreen>["accept"];
   label?: React.ReactNode;
-}> = ({ onSuccess, accept, label = defaultLabel }) => {
+  active?: boolean;
+}> = ({ onSuccess, accept, label = defaultLabel, active = true }) => {
   const invalidate = useInvalidate();
 
   const { mutate: upload, isPending } = useUpload({
@@ -27,7 +28,7 @@ export const FullScreenUpload: React.FC<{
     <>
       <LoadingOverlay visible={isPending} overlayProps={{ blur: 2 }} />
       <Dropzone.FullScreen
-        active
+        active={active}
         accept={accept}
         withinPortal={false}
         styles={{

@@ -1,7 +1,7 @@
 import { Card, Menu, Modal, Stack, Text, ThemeIcon } from "@mantine/core";
 import type { PluginApi } from "@ocelescope/api-base";
 import { useDeletePlugin } from "@ocelescope/api-base";
-import { getModuleRoute } from "@ocelescope/core";
+import { FullScreenUpload, getModuleRoute } from "@ocelescope/core";
 import { Trash2Icon, UploadIcon } from "lucide-react";
 import { useState } from "react";
 import { PluginUploadSection } from "../PluginUploadSection/PluginUploadSection";
@@ -46,6 +46,11 @@ export const UploadPluginCard = () => {
 
   return (
     <>
+      <FullScreenUpload
+        active={!isModalOpen}
+        accept={["application/x-zip-compressed", "application/zip"]}
+        label="Drag'n'drop your Plugins to upload."
+      />
       <Modal
         title={<Text size={"h3"}>Upload</Text>}
         opened={isModalOpen}
