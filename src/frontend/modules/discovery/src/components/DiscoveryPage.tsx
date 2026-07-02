@@ -57,8 +57,8 @@ const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
   const methods = useMemo(
     () =>
       rawMethods
-        .map((m) => ({ ...m, variants: m.variants.filter((v) => v.enabled !== false) }))
-        .filter((m) => m.variants.length > 0),
+        .map((m) => ({ ...m, variants: m.variants.filter((v) => v.enabled) }))
+        .filter((m) => m.variants.length),
     [rawMethods],
   );
 
@@ -82,6 +82,23 @@ const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
       })),
     );
   }, [filtersInitialized, availableFilters, ocelId, initializeFilters]);
+
+  // Clear selection if the selected method was disabled/removed
+  useEffect(() => {
+    if (!selectedMethodId || isMethodsLoading) return;
+    const allVariantIds = methods.flatMap((m) =>
+      m.variants.map((v) => v.methodId),
+    );
+    if (!allVariantIds.includes(selectedMethodId)) {
+      setSelectedMethodId(ocelId, null);
+    }
+  }, [
+    methods,
+    selectedMethodId,
+    isMethodsLoading,
+    ocelId,
+    setSelectedMethodId,
+  ]);
 
   // Auto-select first method only if nothing was restored
   useEffect(() => {
