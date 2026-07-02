@@ -1,12 +1,5 @@
-import {
-  MultiSelect,
-  NumberInput,
-  Select,
-  Slider,
-  Stack,
-  Text,
-} from "@mantine/core";
-import type { FieldProps, WidgetProps } from "@rjsf/utils";
+import { Input, MultiSelect, NumberInput, Select, Slider } from "@mantine/core";
+import type { FieldProps, FieldTemplateProps, WidgetProps } from "@rjsf/utils";
 import validator from "@rjsf/validator-ajv8";
 import dynamic from "next/dynamic";
 import { memo, useMemo } from "react";
@@ -22,22 +15,16 @@ const MantineSliderWidget = ({
   schema,
   label,
   required,
-  description,
 }: WidgetProps) => {
   const min = schema.minimum as number;
   const max = schema.maximum as number;
+  const description = schema.description;
   return (
-    <Stack gap={6}>
-      <Text size="sm" fw={500}>
-        {label}
-        {required && " *"}
-      </Text>
-      {description && (
-        <Text size="xs" c="dimmed">
-          {description}
-        </Text>
-      )}
+    <>
+      <Input.Label required={required}>{label}</Input.Label>
+      {description && <Input.Description>{description}</Input.Description>}
       <NumberInput
+        mt={"5px"}
         min={min}
         max={max}
         step={0.0001}
@@ -62,11 +49,29 @@ const MantineSliderWidget = ({
         }
         onChange={onChange}
       />
-    </Stack>
+    </>
   );
 };
 
 const WIDGETS = { "mantine-slider": MantineSliderWidget };
+
+const FieldTemplate = ({
+  children,
+  errors,
+  help,
+  hidden,
+}: FieldTemplateProps) => {
+  if (hidden) return <div style={{ display: "none" }}>{children}</div>;
+  return (
+    <div>
+      {children}
+      {errors}
+      {help}
+    </div>
+  );
+};
+
+const TEMPLATES = { FieldTemplate };
 
 const UI_SCHEMA_BASE = {
   "ui:submitButtonOptions": { norender: true },
@@ -152,6 +157,7 @@ export const DiscoveryForm = ({
       uiSchema={uiSchema}
       fields={fields}
       widgets={WIDGETS}
+      templates={TEMPLATES}
       onChange={(data) =>
         onChange((data.formData as Record<string, unknown>) ?? {})
       }
