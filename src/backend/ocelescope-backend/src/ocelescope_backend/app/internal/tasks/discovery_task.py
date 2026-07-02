@@ -1,7 +1,7 @@
 from typing import Any, Hashable, Sequence, cast
 
 from ocelescope import Resource, Visualization
-from ocelescope_backend.app.internal.discovery import discovery_registry
+from ocelescope_backend.app.internal.registry.registry_manager import registry_manager
 from ocelescope_backend.app.internal.exceptions import BadRequest
 from ocelescope_backend.app.internal.model.discovery import DiscoveryRequest
 from ocelescope_backend.app.internal.model.resource import ResourceStore
@@ -37,7 +37,7 @@ class DiscoveryTask(TaskBase):
         self.state = TaskState.STARTED
         try:
             try:
-                info = discovery_registry.get(self.request.method_id)
+                info = registry_manager.discovery_registry.get(self.request.method_id)
                 parameters = info.parse_parameters(
                     cast(dict[str, Any], self.request.parameters)
                 )

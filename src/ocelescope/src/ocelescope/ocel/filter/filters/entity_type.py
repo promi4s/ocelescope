@@ -9,7 +9,7 @@ from ocelescope.ocel.filter.base import BaseFilter, FilterResult
 
 class EventTypeFilter(BaseFilter):
     event_types: Annotated[list[str], Field(json_schema_extra={"fieldType": "event_type"})]
-    mode: Literal["exclude", "include"] = "include"
+    mode: Literal["exclude", "include"] = "exclude"
 
     def filter(self, ocel):
         mask = cast(pd.Series, ocel.events.df[ACTIVITY_COL].isin(self.event_types))
@@ -20,7 +20,7 @@ class EventTypeFilter(BaseFilter):
 
 class ObjectTypeFilter(BaseFilter):
     object_types: Annotated[list[str], Field(json_schema_extra={"fieldType": "object_type"})]
-    mode: Literal["exclude", "include"] = "include"
+    mode: Literal["exclude", "include"] = "exclude"
 
     def filter(self, ocel):
         mask = cast(pd.Series, ocel.objects.df[OTYPE_COL].isin(self.object_types))

@@ -9,9 +9,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.sse import EventSourceResponse
 
 from ocelescope_backend.app.internal.config import config
-from ocelescope_backend.app.internal.discovery.bootstrap import (
-    register_builtin_discovery_methods,
-)
 from ocelescope_backend.app.internal.docs import init_custom_docs
 from ocelescope_backend.app.internal.ocel.default_ocel import load_default_ocels
 from ocelescope_backend.app.internal.registrar import (
@@ -55,7 +52,6 @@ def create_app() -> FastAPI:
     app.middleware("http")(session_access_middleware)
     app.exception_handler(Exception)(error_handler_server)
 
-    register_builtin_discovery_methods()
     register_initial_plugins()
     mount_modules(app)
 

@@ -49,10 +49,18 @@ const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
   });
 
   const {
-    data: methods = [],
+    data: rawMethods = [],
     isLoading: isMethodsLoading,
     error: methodsError,
   } = useListDiscoveryMethods();
+
+  const methods = useMemo(
+    () =>
+      rawMethods
+        .map((m) => ({ ...m, variants: m.variants.filter((v) => v.enabled !== false) }))
+        .filter((m) => m.variants.length > 0),
+    [rawMethods],
+  );
 
   const { data: availableFilters = [] } = useListDiscoveryFilters();
 
@@ -163,15 +171,7 @@ const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
     [activeFormData],
   );
 
-  const activeFilters = useMemo(
-    () =>
-      filters.filter((entry) =>
-        Object.values(entry.payload).every(
-          (v) => !Array.isArray(v) || v.length > 0,
-        ),
-      ),
-    [filters],
-  );
+  const activeFilters = useMemo(() => filters, [filters]);
 
   const requestSignature = useMemo(
     () =>

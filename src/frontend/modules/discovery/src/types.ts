@@ -13,6 +13,8 @@ export type DiscoverySchemaProperty = {
   default?: unknown;
   minimum?: number;
   maximum?: number;
+  exclusiveMinimum?: number;
+  exclusiveMaximum?: number;
   fieldType?: string;
 };
 
