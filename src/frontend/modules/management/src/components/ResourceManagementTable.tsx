@@ -21,6 +21,7 @@ import {
   useResources,
 } from "@ocelescope/api-base";
 import {
+  FullScreenUpload,
   UploadSection,
   useDownloadOCEL,
   useDownloadResource,
@@ -175,190 +176,196 @@ const ResourceManagementTable: React.FC = () => {
         onClose={() => setExportOcelId(undefined)}
       />
       {entities.length ? (
-        <DataTable<Entity>
-          withTableBorder
-          borderRadius={"md"}
-          idAccessor={"id"}
-          columns={[
-            {
-              accessor: "name",
-              render: ({ id, type, name, isFiltered }) => (
-                <>
-                  {renamedEntity?.id === id ? (
-                    <Group>
-                      <TextInput
-                        variant={"unstyled"}
-                        value={renamedEntity.value}
-                        style={{
-                          borderBottom: "1px solid #9ca3af",
-                        }}
-                        onChange={(e) => {
-                          setRenamedEntity({ id, value: e.target.value });
-                        }}
-                      />
-                      <Group gap={"xs"}>
-                        <ActionIcon
-                          color="green"
-                          m={0}
-                          onClick={() => {
-                            renameEntity(id, type, renamedEntity.value);
-                            setRenamedEntity(undefined);
+        <>
+          <FullScreenUpload />
+          <DataTable<Entity>
+            withTableBorder
+            borderRadius={"md"}
+            idAccessor={"id"}
+            columns={[
+              {
+                accessor: "name",
+                render: ({ id, type, name, isFiltered }) => (
+                  <>
+                    {renamedEntity?.id === id ? (
+                      <Group>
+                        <TextInput
+                          variant={"unstyled"}
+                          value={renamedEntity.value}
+                          style={{
+                            borderBottom: "1px solid #9ca3af",
                           }}
-                        >
-                          <CheckIcon size={16} />
-                        </ActionIcon>
-                        <ActionIcon
-                          color="red"
-                          m={0}
-                          onClick={() => {
-                            setRenamedEntity(undefined);
+                          onChange={(e) => {
+                            setRenamedEntity({ id, value: e.target.value });
                           }}
-                        >
-                          <XIcon size={16} />
-                        </ActionIcon>
+                        />
+                        <Group gap={"xs"}>
+                          <ActionIcon
+                            color="green"
+                            m={0}
+                            onClick={() => {
+                              renameEntity(id, type, renamedEntity.value);
+                              setRenamedEntity(undefined);
+                            }}
+                          >
+                            <CheckIcon size={16} />
+                          </ActionIcon>
+                          <ActionIcon
+                            color="red"
+                            m={0}
+                            onClick={() => {
+                              setRenamedEntity(undefined);
+                            }}
+                          >
+                            <XIcon size={16} />
+                          </ActionIcon>
+                        </Group>
                       </Group>
-                    </Group>
-                  ) : (
-                    <Group gap={6} wrap="nowrap">
-                      {name}
-                      {isFiltered && (
-                        <Tooltip label="This log has been filtered">
-                          <FilterIcon
-                            size={14}
-                            color="var(--mantine-color-blue-6)"
-                          />
-                        </Tooltip>
-                      )}
-                    </Group>
-                  )}
-                </>
-              ),
-            },
-            {
-              accessor: "createdAt",
-              render: ({ createdAt, isUploading }) =>
-                isUploading ? "uploading" : formatDateTime(createdAt),
-            },
-            {
-              accessor: "entityTypes",
-              title: "Type",
-              render: ({ type, entityTypes }) => (
-                <Group gap={"xs"}>
-                  {[...(type === "ocel" ? ["OCEL"] : []), ...entityTypes].map(
-                    (entityType) => (
-                      <Badge key={entityType} color={generateColor(entityType)}>
-                        {entityType}
-                      </Badge>
-                    ),
-                  )}
-                </Group>
-              ),
-            },
-            {
-              accessor: "",
-              textAlign: "right",
-              width: "0%",
-              //TODO: Maybe put this into its own component it is getting way to big
-              render: ({ type, resourceType, id, name, isUploading }) =>
-                isUploading ? (
-                  <Loader size={20} />
-                ) : (
-                  <Menu width={200} position="left-start">
-                    <Menu.Target>
-                      <ActionIcon
-                        variant="subtle"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <EllipsisVerticalIcon size={20} />
-                      </ActionIcon>
-                    </Menu.Target>
-                    <Menu.Dropdown onClick={(e) => e.stopPropagation()}>
-                      <Menu.Item
-                        leftSection={<PencilIcon size={16} />}
-                        onClick={() => setRenamedEntity({ id, value: name })}
-                      >
-                        Rename
-                      </Menu.Item>
-                      {type === "resource" && (
-                        <MenuItem
-                          leftSection={<EyeIcon size={16} />}
-                          onClick={() => setViewedResource(id)}
-                        >
-                          Inspect
-                        </MenuItem>
-                      )}
-                      {type === "ocel" ? (
-                        <Menu.Sub position="right-start">
-                          <Menu.Sub.Target>
-                            <Menu.Sub.Item
-                              leftSection={<DownloadIcon size={16} />}
-                            >
-                              Download
-                            </Menu.Sub.Item>
-                          </Menu.Sub.Target>
-                          <Menu.Sub.Dropdown>
-                            {ocelExtensions.map((extension) => (
-                              <Menu.Item
-                                key={extension}
-                                onClick={() =>
-                                  downloadOCEL(id, { ext: extension })
-                                }
-                              >
-                                {extension}
-                              </Menu.Item>
-                            ))}
-                            <Menu.Item
-                              key={".xes"}
-                              onClick={() => setExportOcelId(id)}
-                            >
-                              {".xes"}
-                            </Menu.Item>
-                          </Menu.Sub.Dropdown>
-                        </Menu.Sub>
-                      ) : resourceType === "PetriNet" ? (
-                        <Menu.Sub position="right-start">
-                          <Menu.Sub.Target>
-                            <Menu.Sub.Item
-                              leftSection={<DownloadIcon size={16} />}
-                            >
-                              Download
-                            </Menu.Sub.Item>
-                          </Menu.Sub.Target>
-                          <Menu.Sub.Dropdown>
-                            <Menu.Item onClick={() => downloadResource(id)}>
-                              .ocelescope
-                            </Menu.Item>
-                            <Menu.Item
-                              onClick={() => downloadResourceAsPnml(id)}
-                            >
-                              .pnml
-                            </Menu.Item>
-                          </Menu.Sub.Dropdown>
-                        </Menu.Sub>
-                      ) : (
-                        <Menu.Item
-                          onClick={() => downloadResource(id)}
-                          leftSection={<DownloadIcon size={16} />}
-                        >
-                          Download
-                        </Menu.Item>
-                      )}
-                      <Menu.Divider />
-                      <Menu.Item
-                        leftSection={<TrashIcon size={16} color={"red"} />}
-                        color="red"
-                        fw="bold"
-                        onClick={() => deleteEntity(id, type)}
-                      >
-                        Delete
-                      </Menu.Item>
-                    </Menu.Dropdown>
-                  </Menu>
+                    ) : (
+                      <Group gap={6} wrap="nowrap">
+                        {name}
+                        {isFiltered && (
+                          <Tooltip label="This log has been filtered">
+                            <FilterIcon
+                              size={14}
+                              color="var(--mantine-color-blue-6)"
+                            />
+                          </Tooltip>
+                        )}
+                      </Group>
+                    )}
+                  </>
                 ),
-            },
-          ]}
-          records={entities}
-        />
+              },
+              {
+                accessor: "createdAt",
+                render: ({ createdAt, isUploading }) =>
+                  isUploading ? "uploading" : formatDateTime(createdAt),
+              },
+              {
+                accessor: "entityTypes",
+                title: "Type",
+                render: ({ type, entityTypes }) => (
+                  <Group gap={"xs"}>
+                    {[...(type === "ocel" ? ["OCEL"] : []), ...entityTypes].map(
+                      (entityType) => (
+                        <Badge
+                          key={entityType}
+                          color={generateColor(entityType)}
+                        >
+                          {entityType}
+                        </Badge>
+                      ),
+                    )}
+                  </Group>
+                ),
+              },
+              {
+                accessor: "",
+                textAlign: "right",
+                width: "0%",
+                //TODO: Maybe put this into its own component it is getting way to big
+                render: ({ type, resourceType, id, name, isUploading }) =>
+                  isUploading ? (
+                    <Loader size={20} />
+                  ) : (
+                    <Menu width={200} position="left-start">
+                      <Menu.Target>
+                        <ActionIcon
+                          variant="subtle"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <EllipsisVerticalIcon size={20} />
+                        </ActionIcon>
+                      </Menu.Target>
+                      <Menu.Dropdown onClick={(e) => e.stopPropagation()}>
+                        <Menu.Item
+                          leftSection={<PencilIcon size={16} />}
+                          onClick={() => setRenamedEntity({ id, value: name })}
+                        >
+                          Rename
+                        </Menu.Item>
+                        {type === "resource" && (
+                          <MenuItem
+                            leftSection={<EyeIcon size={16} />}
+                            onClick={() => setViewedResource(id)}
+                          >
+                            Inspect
+                          </MenuItem>
+                        )}
+                        {type === "ocel" ? (
+                          <Menu.Sub position="right-start">
+                            <Menu.Sub.Target>
+                              <Menu.Sub.Item
+                                leftSection={<DownloadIcon size={16} />}
+                              >
+                                Download
+                              </Menu.Sub.Item>
+                            </Menu.Sub.Target>
+                            <Menu.Sub.Dropdown>
+                              {ocelExtensions.map((extension) => (
+                                <Menu.Item
+                                  key={extension}
+                                  onClick={() =>
+                                    downloadOCEL(id, { ext: extension })
+                                  }
+                                >
+                                  {extension}
+                                </Menu.Item>
+                              ))}
+                              <Menu.Item
+                                key={".xes"}
+                                onClick={() => setExportOcelId(id)}
+                              >
+                                {".xes"}
+                              </Menu.Item>
+                            </Menu.Sub.Dropdown>
+                          </Menu.Sub>
+                        ) : resourceType === "PetriNet" ? (
+                          <Menu.Sub position="right-start">
+                            <Menu.Sub.Target>
+                              <Menu.Sub.Item
+                                leftSection={<DownloadIcon size={16} />}
+                              >
+                                Download
+                              </Menu.Sub.Item>
+                            </Menu.Sub.Target>
+                            <Menu.Sub.Dropdown>
+                              <Menu.Item onClick={() => downloadResource(id)}>
+                                .ocelescope
+                              </Menu.Item>
+                              <Menu.Item
+                                onClick={() => downloadResourceAsPnml(id)}
+                              >
+                                .pnml
+                              </Menu.Item>
+                            </Menu.Sub.Dropdown>
+                          </Menu.Sub>
+                        ) : (
+                          <Menu.Item
+                            onClick={() => downloadResource(id)}
+                            leftSection={<DownloadIcon size={16} />}
+                          >
+                            Download
+                          </Menu.Item>
+                        )}
+                        <Menu.Divider />
+                        <Menu.Item
+                          leftSection={<TrashIcon size={16} color={"red"} />}
+                          color="red"
+                          fw="bold"
+                          onClick={() => deleteEntity(id, type)}
+                        >
+                          Delete
+                        </Menu.Item>
+                      </Menu.Dropdown>
+                    </Menu>
+                  ),
+              },
+            ]}
+            records={entities}
+          />
+        </>
       ) : (
         <>
           <Title size={"h3"}>Upload</Title>
