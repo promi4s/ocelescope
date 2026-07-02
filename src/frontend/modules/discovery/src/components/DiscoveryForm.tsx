@@ -93,42 +93,39 @@ const buildUiSchema = (schema: DiscoverySchema) => {
   return uiSchema;
 };
 
-type OcelFormContext = {
-  eventTypeOptions: string[];
-  objectTypeOptions: string[];
-};
+const makeOcelFields = (
+  eventTypeOptions: string[],
+  objectTypeOptions: string[],
+) => {
+  const OcelTypeField = (options: string[]) =>
+    memo(
+      ({
+        schema,
+        formData,
+        onChange,
+        required,
+        fieldPathId: { path },
+      }: FieldProps) => {
+        const Component = schema.type === "array" ? MultiSelect : Select;
+        return (
+          <Component
+            label={schema.title}
+            description={schema.description}
+            required={required}
+            value={formData ?? (schema.type === "array" ? [] : null)}
+            onChange={(v) => onChange(v, path)}
+            data={options}
+            clearable
+            searchable
+          />
+        );
+      },
+    );
 
-const makeOcelTypeField = (optionsKey: keyof OcelFormContext) =>
-  memo(
-    ({
-      schema,
-      formData,
-      onChange,
-      required,
-      registry,
-      fieldPathId: { path },
-    }: FieldProps) => {
-      const options: string[] =
-        (registry.formContext as OcelFormContext)?.[optionsKey] ?? [];
-      const Component = schema.type === "array" ? MultiSelect : Select;
-      return (
-        <Component
-          label={schema.title}
-          description={schema.description}
-          required={required}
-          value={formData ?? (schema.type === "array" ? [] : null)}
-          onChange={(v) => onChange(v, path)}
-          data={options}
-          clearable
-          searchable
-        />
-      );
-    },
-  );
-
-const OCEL_FIELDS = {
-  event_type: makeOcelTypeField("eventTypeOptions"),
-  object_type: makeOcelTypeField("objectTypeOptions"),
+  return {
+    event_type: OcelTypeField(eventTypeOptions),
+    object_type: OcelTypeField(objectTypeOptions),
+  };
 };
 
 type DiscoveryFormProps = {
@@ -147,8 +144,8 @@ export const DiscoveryForm = ({
   objectTypeOptions,
 }: DiscoveryFormProps) => {
   const uiSchema = useMemo(() => buildUiSchema(schema), [schema]);
-  const formContext = useMemo<OcelFormContext>(
-    () => ({ eventTypeOptions, objectTypeOptions }),
+  const fields = useMemo(
+    () => makeOcelFields(eventTypeOptions, objectTypeOptions),
     [eventTypeOptions, objectTypeOptions],
   );
 
@@ -158,10 +155,9 @@ export const DiscoveryForm = ({
       formData={formData}
       validator={validator}
       uiSchema={uiSchema}
-      fields={OCEL_FIELDS}
+      fields={fields}
       widgets={WIDGETS}
       templates={TEMPLATES}
-      formContext={formContext}
       onChange={(data) =>
         onChange((data.formData as Record<string, unknown>) ?? {})
       }
