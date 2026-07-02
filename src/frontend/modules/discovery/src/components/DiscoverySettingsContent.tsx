@@ -53,25 +53,26 @@ export const DiscoverySettingsContent = ({
           data={methods.map((m) => ({ value: m.name, label: m.name }))}
           allowDeselect={false}
         />
+        {selectedVariants.find((v) => v.methodId === selectedMethodId)
+          ?.description && (
+          <Text size="sm" c="dimmed">
+            {
+              selectedVariants.find((v) => v.methodId === selectedMethodId)
+                ?.description
+            }
+          </Text>
+        )}
         {selectedVariants.length > 1 && (
-          <>
-            <Select
-              label="Output Format"
-              value={selectedMethodId}
-              onChange={setSelectedMethodId}
-              data={selectedVariants.map((v) => ({
-                value: v.methodId,
-                label: v.resourceType,
-              }))}
-              allowDeselect={false}
-            />
-            <Text size="sm" c="dimmed">
-              {
-                selectedVariants.find((v) => v.methodId === selectedMethodId)
-                  ?.description
-              }
-            </Text>
-          </>
+          <Select
+            label="Output Format"
+            value={selectedMethodId}
+            onChange={setSelectedMethodId}
+            data={selectedVariants.map((v) => ({
+              value: v.methodId,
+              label: v.resourceType,
+            }))}
+            allowDeselect={false}
+          />
         )}
         <DiscoveryForm
           schema={selectedSchema}
