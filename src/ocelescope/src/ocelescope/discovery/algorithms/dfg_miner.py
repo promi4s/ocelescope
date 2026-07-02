@@ -20,7 +20,7 @@ def ocdfg_miner(
             ge=0,
             le=1,
             title="Frequency Threshold",
-            description="Precentage of edges too keep. Frquency Values of edges are determined with respect to the absolute count of their object types. 1 = Keep all",
+            description="Precentage of edges too keep (1 = keep all). Frquency Values of edges are determined with respect to the absolute count of their object types.",
         ),
     ] = 1,
 ) -> DirectlyFollowsGraph:
