@@ -20,9 +20,9 @@ def ocdfg_miner(
             ge=0,
             le=1,
             title="Frequency Threshold",
-            description="Edges whose count is below this fraction of their object type's total count are removed. 0 = show all edges.",
+            description="Precentage of edges too keep. Frquency Values of edges are determined with respect to the absolute count of their object types. 1 = Keep all",
         ),
-    ] = 0,
+    ] = 1,
 ) -> DirectlyFollowsGraph:
     dfg = DirectlyFollowsGraph.from_pm4py(pm4py.discover_ocdfg(ocel.ocel))
-    return dfg.filter_edges(frequency_threshold)
+    return dfg.filter_edges(1 - frequency_threshold)
