@@ -233,6 +233,12 @@ importers:
       '@mantine/notifications':
         specifier: 'catalog:'
         version: 9.4.0(@mantine/core@9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.0(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@ocelescope/api-base':
+        specifier: workspace:*
+        version: link:../packages/api/base
+      '@ocelescope/api-client':
+        specifier: workspace:*
+        version: link:../packages/api/client
       '@ocelescope/core':
         specifier: workspace:*
         version: link:../packages/core
@@ -250,7 +256,7 @@ importers:
         version: link:../modules/management
       '@ocelescope/ocelot':
         specifier: 'catalog:'
-        version: 0.1.2(2ac027e77dc4ca2794cc7f568647c987)
+        version: 0.1.2(f78a178af2e2085506d6c137ca5237b0)
       '@ocelescope/plugin':
         specifier: workspace:*
         version: link:../modules/plugin
@@ -2140,24 +2146,6 @@ packages:
   '@nodelib/fs.walk@1.2.8':
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
-
-  '@ocelescope/api-base@0.1.0':
-    resolution: {integrity: sha512-WEiDgbXxtmxuNYUSVeAEEBR3267CXpQ5XS6eO1sCxWBva/i5q0vMdBL9vVF//9Zc1Z3TGRjHS2cWlcWk+oowGg==}
-    peerDependencies:
-      '@ocelescope/api-client': 0.1.0
-      '@tanstack/react-query': ^5.90.21
-      axios: ^1.18.0
-      react: ^19.2.0
-      react-dom: ^19.2.0
-
-  '@ocelescope/api-client@0.1.0':
-    resolution: {integrity: sha512-gASvWqvkflP5JyEFB3CExJJG/4J7lYUSSNuV3l5tHHhVsvOZPiGXbEorI0K3+y8yb17W2M+obcHcLdu6g1tAmA==}
-    peerDependencies:
-      axios: ^1.18.0
-      react: ^19.2.0
-      react-dom: ^19.2.0
-      zod: ^4.3.6
-      zustand: ^5.0.11
 
   '@ocelescope/ocelot@0.1.2':
     resolution: {integrity: sha512-i9GupxbHiiIKPgcAPltCqosaHHQNotdAG9HVmu3U10agwDm/9TEXkel+Iz8BuHucpmaP+aM/qYDz4NSYmv9Zlg==}
@@ -6789,29 +6777,13 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.20.1
 
-  '@ocelescope/api-base@0.1.0(@ocelescope/api-client@0.1.0(axios@1.18.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(zod@4.3.6)(zustand@5.0.11(@types/react@19.2.17)(immer@11.1.8)(react@19.2.7)(use-sync-external-store@1.6.0(react@19.2.7))))(@tanstack/react-query@5.90.21(react@19.2.7))(axios@1.18.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
-    dependencies:
-      '@ocelescope/api-client': 0.1.0(axios@1.18.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(zod@4.3.6)(zustand@5.0.11(@types/react@19.2.17)(immer@11.1.8)(react@19.2.7)(use-sync-external-store@1.6.0(react@19.2.7)))
-      '@tanstack/react-query': 5.90.21(react@19.2.7)
-      axios: 1.18.0
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
-
-  '@ocelescope/api-client@0.1.0(axios@1.18.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(zod@4.3.6)(zustand@5.0.11(@types/react@19.2.17)(immer@11.1.8)(react@19.2.7)(use-sync-external-store@1.6.0(react@19.2.7)))':
-    dependencies:
-      axios: 1.18.0
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
-      zod: 4.3.6
-      zustand: 5.0.11(@types/react@19.2.17)(immer@11.1.8)(react@19.2.7)(use-sync-external-store@1.6.0(react@19.2.7))
-
-  '@ocelescope/ocelot@0.1.2(2ac027e77dc4ca2794cc7f568647c987)':
+  '@ocelescope/ocelot@0.1.2(f78a178af2e2085506d6c137ca5237b0)':
     dependencies:
       '@dagrejs/dagre': 3.0.0
       '@mantine/core': 9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@mantine/hooks': 9.4.0(react@19.2.7)
-      '@ocelescope/api-base': 0.1.0(@ocelescope/api-client@0.1.0(axios@1.18.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(zod@4.3.6)(zustand@5.0.11(@types/react@19.2.17)(immer@11.1.8)(react@19.2.7)(use-sync-external-store@1.6.0(react@19.2.7))))(@tanstack/react-query@5.90.21(react@19.2.7))(axios@1.18.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@ocelescope/api-client': 0.1.0(axios@1.18.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(zod@4.3.6)(zustand@5.0.11(@types/react@19.2.17)(immer@11.1.8)(react@19.2.7)(use-sync-external-store@1.6.0(react@19.2.7)))
+      '@ocelescope/api-base': link:src/frontend/packages/api/base
+      '@ocelescope/api-client': link:src/frontend/packages/api/client
       '@ocelescope/core': link:src/frontend/packages/core
       '@tanstack/react-query': 5.90.21(react@19.2.7)
       '@xyflow/react': 12.10.1(@types/react@19.2.17)(immer@11.1.8)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
