@@ -1,6 +1,7 @@
 export { default as AttributesTable } from "./components/AttributeTable";
 export { BarList } from "./components/BarList/BarList";
 export { FileDropzone } from "./components/Dropzone/Dropzone";
+export { FullScreenUpload } from "./components/Dropzone/FullScreenUpload";
 export { sseHandler } from "./components/EventHandler";
 export { HelpModal } from "./components/HelpModal/HelpModal";
 export { createModulesPage } from "./components/ModulePage";
