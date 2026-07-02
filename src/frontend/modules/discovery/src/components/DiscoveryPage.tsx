@@ -188,17 +188,15 @@ const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
     [activeFormData],
   );
 
-  const activeFilters = useMemo(() => filters, [filters]);
-
   const requestSignature = useMemo(
     () =>
       JSON.stringify({
         selectedMethodId,
         requestPayload,
         ocelId,
-        filters: activeFilters,
+        filters: filters,
       }),
-    [ocelId, requestPayload, selectedMethodId, activeFilters],
+    [ocelId, requestPayload, selectedMethodId, filters],
   );
 
   useEffect(() => {
@@ -209,7 +207,7 @@ const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
         data: {
           methodId: selectedMethodId,
           parameters: requestPayload,
-          filters: activeFilters,
+          filters: filters,
         },
       });
     }, 650);
@@ -220,7 +218,7 @@ const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
     requestSignature,
     requestPayload,
     selectedMethodId,
-    activeFilters,
+    filters,
   ]);
 
   const isDiscovering =
