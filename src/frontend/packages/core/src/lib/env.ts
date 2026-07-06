@@ -27,9 +27,7 @@ const schema = z
       .default("https://www.ocelescope.org/community/submit-plugin/"),
     NEXT_PUBLIC_REQUEST_ENVIRONMENT_URL: z
       .url()
-      .default(
-        "https://www.ocelescope.org/community/request-package/",
-      ),
+      .default("https://www.ocelescope.org/community/request-package/"),
     NEXT_PUBLIC_CONTACT_EMAIL: z
       .string()
       .default("ocelescope@pads.rwth-aachen.de"),
