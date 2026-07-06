@@ -28,7 +28,7 @@ const schema = z
     NEXT_PUBLIC_REQUEST_ENVIRONMENT_URL: z
       .url()
       .default(
-        "https://www.ocelescope.org/plugin-development/request-package/",
+        "https://www.ocelescope.org/community/request-package/",
       ),
     NEXT_PUBLIC_CONTACT_EMAIL: z
       .string()
