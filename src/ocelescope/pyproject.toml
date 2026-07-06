@@ -40,7 +40,12 @@ ocelescope = "ocelescope.tools.cli:main"
 package = true
 
 [project.optional-dependencies]
-plugin = ["more-itertools>=11.1.0", "networkx>=3.5", "scikit-learn>=1.9.0"]
+plugin = [
+    "more-itertools>=11.1.0",
+    "networkx>=3.5",
+    "pulp>=3.3.2",
+    "scikit-learn>=1.9.0",
+]
 
 [build-system]
 requires = ["uv_build>=0.11.20,<0.12.0"]
