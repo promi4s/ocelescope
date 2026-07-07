@@ -64,7 +64,6 @@ class ObjectTypeVariants(BaseModel):
             variants=object_variants,
             case_count=sum(variant.case_count for variant in object_variants),
             event_count=sum(
-                variant.event_count * variant.case_count
-                for variant in object_variants
+                variant.event_count * variant.case_count for variant in object_variants
             ),
         )

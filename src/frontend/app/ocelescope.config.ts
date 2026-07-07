@@ -7,15 +7,7 @@ import ocelot from "@ocelescope/ocelot";
 import plugin from "@ocelescope/plugin";
 import variants from "@ocelescope/variants";
 export default {
-  modules: [
-    management,
-    overview,
-    plugin,
-    discovery,
-    filter,
-    ocelot,
-    variants,
-  ],
+  modules: [management, overview, plugin, discovery, filter, ocelot, variants],
   navbarGroups: [
     {
       modulesNames: [
