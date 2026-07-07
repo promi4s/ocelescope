@@ -1,14 +1,14 @@
 import "@r4pm/components/styles.css";
 
 import { Box, Button, LoadingOverlay, Tabs } from "@mantine/core";
+import { useObjectTypes, useObjectVariants } from "@ocelescope/api-base";
 import {
   defineModuleRoute,
   useCurrentOcel,
   useDownloadVariantFlatLog,
 } from "@ocelescope/core";
-import { useObjectTypes, useObjectVariants } from "@ocelescope/api-base";
-import { LogVariants, Theme } from "@r4pm/components";
 import type { TraceVariants } from "@r4pm/components";
+import { LogVariants, Theme } from "@r4pm/components";
 import { DownloadIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 
