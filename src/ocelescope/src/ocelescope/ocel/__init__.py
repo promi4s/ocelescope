@@ -6,12 +6,14 @@ from ocelescope.ocel.filter import (
     EventAttributeFilter,
     EventTypeFrequencyFilter,
     EventTypeFilter,
+    ObjectIdFilter,
     FilterResult,
     O2OCountFilter,
     ObjectAttributeFilter,
     ObjectTypeFrequencyFilter,
     ObjectTypeFilter,
     TimeFrameFilter,
+    VariantFilter,
 )
 
 __all__ = [
@@ -21,11 +23,13 @@ __all__ = [
     "EventAttributeFilter",
     "EventTypeFrequencyFilter",
     "EventTypeFilter",
+    "ObjectIdFilter",
     "O2OCountFilter",
     "ObjectTypeFrequencyFilter",
     "ObjectTypeFilter",
     "ObjectAttributeFilter",
     "TimeFrameFilter",
+    "VariantFilter",
     "BaseFilter",
     "FilterResult",
 ]

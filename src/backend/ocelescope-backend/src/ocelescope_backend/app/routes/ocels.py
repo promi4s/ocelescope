@@ -6,13 +6,10 @@ import pandas as pd
 from fastapi import APIRouter, Query, Response
 from ocelescope.ocel.constants.misc import OCELFileExtensions
 
+from ocelescope import VariantFilter
 from ocelescope_backend.app.dependencies import ApiOcel, ApiSession
 from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.model.base import PaginatedResponse
-from ocelescope_backend.app.internal.model.relations import (
-    RelationCombination,
-    RelationCountSummary,
-)
 from ocelescope_backend.app.internal.model.events import (
     Date_Distribution_Item,
     Entity_Time_Info,
@@ -23,7 +20,12 @@ from ocelescope_backend.app.internal.model.ocel import (
     QuantityInfo,
     TypedAttribute,
 )
+from ocelescope_backend.app.internal.model.relations import (
+    RelationCombination,
+    RelationCountSummary,
+)
 from ocelescope_backend.app.internal.model.response import TempFileResponse
+from ocelescope_backend.app.internal.model.variants import ObjectTypeVariants
 from ocelescope_backend.app.internal.ocel.default_ocel import (
     DEFAULT_OCEL_KEYS,
     DefaultOCEL,
@@ -240,6 +242,25 @@ def get_object_attributes(
 )
 def get_object_types(ocel: ApiOcel) -> list[str]:
     return ocel.objects.types
+
+
+@ocels_router.get(
+    "/{ocel_id}/objects/variants",
+    summary="Get the variants of an object type",
+    description=(
+        "Returns the object variants for a single object type. Each variant is a "
+        "distinct activity sequence, together with the number of events it contains "
+        "and the number of cases (objects) that follow it."
+    ),
+    operation_id="objectVariants",
+)
+def get_object_variants(
+    ocel: ApiOcel,
+    object_type: str,
+) -> ObjectTypeVariants:
+    return ObjectTypeVariants.from_variants(
+        ocel.executions.get_object_variants(object_types=[object_type])
+    )
 
 
 @ocels_router.get(
@@ -526,6 +547,42 @@ def download_flat_log(ocel: ApiOcel, object_type_name: str) -> TempFileResponse:
     )
 
     ocel.write_xes(object_type_name, Path(file_response.tmp_path))
+
+    return file_response
+
+
+@ocels_router.get(
+    "/{ocel_id}/objects/variants/download/xes",
+    summary="Download selected object variants as a flat XES log",
+    description=(
+        "Filters the OCEL to the objects of `object_type` that follow any of the "
+        "given `variant_ids`, then flattens that sub-log by `object_type` into a "
+        "XES file (one trace per object)."
+    ),
+    operation_id="downloadVariantFlatLog",
+)
+def download_variant_flat_log(
+    ocel: ApiOcel,
+    object_type: str,
+    variant_ids: Annotated[list[str], Query(min_length=1)],
+) -> TempFileResponse:
+    variant_ocel = ocel.filter(
+        [VariantFilter(object_type=object_type, variant_ids=variant_ids)]
+    )
+
+    if len(variant_ocel.events.df) == 0:
+        raise NotFound("No objects were found for the given variants")
+
+    name = ocel.meta.extra["name"]
+    tmp_file_prefix = datetime.now().strftime("%Y%m%d-%H%M%S") + "-" + name
+
+    file_response = TempFileResponse(
+        prefix=tmp_file_prefix,
+        suffix=".xes",
+        filename=f"{name}_{object_type}.xes",
+    )
+
+    variant_ocel.write_xes(object_type, Path(file_response.tmp_path))
 
     return file_response
 

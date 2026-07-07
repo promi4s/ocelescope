@@ -11,12 +11,14 @@ const nextConfig: NextConfig = {
   transpilePackages: [
     "@mantine/charts",
     "recharts",
+    "@r4pm/components",
     "@ocelescope/resources",
     "@ocelescope/plugin",
     "@ocelescope/filter",
     "@ocelescope/discovery",
     "@ocelescope/log-overview",
     "@ocelescope/management",
+    "@ocelescope/variants",
   ],
   rewrites: async () => {
     return [

@@ -18,6 +18,7 @@ export {
   useDownloadOCEL,
   useDownloadResource,
   useDownloadResourceAsPnml,
+  useDownloadVariantFlatLog,
 } from "./hooks/useDownload";
 export { useInvalidate } from "./hooks/useInvalidate";
 export { formatAttributeValue } from "./lib/attributes";

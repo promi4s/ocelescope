@@ -52,6 +52,9 @@ def create_ocel_from_xml(path: str, fallback_object_name: str = "LogObject") -> 
         log = log.with_columns(pl.col(OTYPE_COL).fill_null(fallback_object_name))
 
     if EID_COL not in event_cols:
+        if EID_COL in log.columns:
+            log = log.drop(EID_COL)
+
         log = log.with_row_index(EID_COL).with_columns(
             (
                 pl.col(ACTIVITY_COL)
