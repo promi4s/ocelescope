@@ -7,6 +7,7 @@ strings and DuckDB casts them into the column type on insert.
 
 from __future__ import annotations
 
+import duckdb
 import pyarrow as pa
 
 from ocelescope.ocel.constants.pm4py import (
@@ -60,6 +61,43 @@ E2O_TABLE_SCHEMA: SchemaDefinition = [
     (E2O_QUALIFIER, pa.string()),
     (OID_COL, pa.string()),
 ]
+
+
+def ocel_table_schemas(
+    object_columns: SchemaDefinition, event_columns: SchemaDefinition
+) -> dict[str, pa.Schema]:
+    """The five flat OCEL tables as Arrow schemas.
+
+    ``object_columns`` / ``event_columns`` are the per-log attribute columns to
+    append to the fixed base columns of each table.
+    """
+    return {
+        "objects": pa.schema(OBJECT_TABLE_BASE_SCHEMA + object_columns),
+        "object_changes": pa.schema(OBJECT_CHANGES_TABLE_SCHEMA + object_columns),
+        "o2o": pa.schema(O2O_TABLE_SCHEMA),
+        "events": pa.schema(EVENT_TABLE_BASE_SCHEMA + event_columns),
+        "e2o": pa.schema(E2O_TABLE_SCHEMA),
+    }
+
+
+def create_ocel_tables(
+    con: duckdb.DuckDBPyConnection,
+    object_columns: SchemaDefinition,
+    event_columns: SchemaDefinition,
+) -> dict[str, pa.Schema]:
+    """(Re)create the five empty OCEL tables on ``con`` and return their schemas.
+
+    This is the single source of truth for the output layout, shared by every
+    importer: :class:`OCELWriter` (JSON/XML) creates the tables here and then
+    buffers rows into them, while the SQLite importer creates them here and fills
+    them with bulk ``INSERT ... SELECT`` statements. The returned schema dict lets
+    callers that buffer rows build one column buffer per table.
+    """
+    schemas = ocel_table_schemas(object_columns, event_columns)
+    for table, schema in schemas.items():
+        con.execute(f'DROP TABLE IF EXISTS "{table}"')
+        con.from_arrow(schema.empty_table()).create(table)
+    return schemas
 
 
 def merge_columns(columns: SchemaDefinition) -> SchemaDefinition:

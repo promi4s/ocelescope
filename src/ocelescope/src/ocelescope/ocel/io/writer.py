@@ -19,12 +19,8 @@ from ocelescope.ocel.constants.pm4py import (
     TIMESTAMP_COL,
 )
 from ocelescope.ocel.io.schema import (
-    E2O_TABLE_SCHEMA,
-    EVENT_TABLE_BASE_SCHEMA,
-    O2O_TABLE_SCHEMA,
-    OBJECT_CHANGES_TABLE_SCHEMA,
-    OBJECT_TABLE_BASE_SCHEMA,
     SchemaDefinition,
+    create_ocel_tables,
 )
 
 
@@ -68,22 +64,13 @@ class OCELWriter:
         self.con = duckdb.connect(str(db_path))
         self.batch_size = batch_size
 
-        self.schemas: dict[str, pa.Schema] = {
-            "objects": pa.schema(OBJECT_TABLE_BASE_SCHEMA + object_columns),
-            "object_changes": pa.schema(OBJECT_CHANGES_TABLE_SCHEMA + object_columns),
-            "o2o": pa.schema(O2O_TABLE_SCHEMA),
-            "events": pa.schema(EVENT_TABLE_BASE_SCHEMA + event_columns),
-            "e2o": pa.schema(E2O_TABLE_SCHEMA),
-        }
+        # Create the five (empty) OCEL tables and keep their schemas to size the
+        # per-table row buffers below.
+        self.schemas = create_ocel_tables(self.con, object_columns, event_columns)
         # One column buffer per table: {table: {column: [values...]}}.
         self.buffers: dict[str, dict[str, list]] = {
-            table: {field.name: [] for field in schema}
-            for table, schema in self.schemas.items()
+            table: {field.name: [] for field in schema} for table, schema in self.schemas.items()
         }
-
-        for table, schema in self.schemas.items():
-            self.con.execute(f'DROP TABLE IF EXISTS "{table}"')
-            self.con.from_arrow(schema.empty_table()).create(table)
 
     def add_object(self, obj: dict) -> None:
         """Add one OCEL object, filling the objects, object_changes and o2o tables."""
@@ -154,10 +141,7 @@ class OCELWriter:
             return
         # Insert every column as VARCHAR; DuckDB casts to the table's real
         # column types on insert (timestamps, numbers, booleans).
-        arrays = [
-            pa.array(_as_strings(values), type=pa.string())
-            for values in buffer.values()
-        ]
+        arrays = [pa.array(_as_strings(values), type=pa.string()) for values in buffer.values()]
         batch = pa.table(arrays, names=list(buffer))
         self.con.from_arrow(batch).insert_into(table)
         for values in buffer.values():
