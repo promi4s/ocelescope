@@ -1,8 +1,9 @@
-# @ocelescope/log-overview
+# @ocelescope/variants
 
-The **Log Overview** module for [Ocelescope](https://github.com/promi4s/ocelescope).
+The **Variants** module for [Ocelescope](https://github.com/promi4s/ocelescope).
 
-A tool for inspecting object-centric event logs at a glance.
+A tool for exploring object trace variants: the distinct activity sequences
+that objects of each type follow, with per-variant event and case counts.
 
 It is a frontend module that plugs into the Ocelescope app shell via
 `@ocelescope/core`'s `defineModule`.
@@ -10,7 +11,7 @@ It is a frontend module that plugs into the Ocelescope app shell via
 ## Installation
 
 ```bash
-pnpm add @ocelescope/log-overview
+pnpm add @ocelescope/variants
 ```
 
 ## Integration
@@ -21,10 +22,10 @@ export to the `modules` array:
 ```ts
 // ocelescope.config.ts
 import type { OcelescopeConfig } from "@ocelescope/core";
-import logOverview from "@ocelescope/log-overview";
+import variants from "@ocelescope/variants";
 
 export default {
-  modules: [logOverview],
+  modules: [variants],
 } satisfies OcelescopeConfig;
 ```
 
