@@ -4,6 +4,7 @@ from typing import Annotated, Literal, Optional
 
 import pandas as pd
 from fastapi import APIRouter, Query, Response
+from ocelescope import VariantFilter
 from ocelescope.ocel.constants.misc import OCELFileExtensions
 
 from ocelescope_backend.app.dependencies import ApiOcel, ApiSession
@@ -565,7 +566,9 @@ def download_variant_flat_log(
     object_type: str,
     variant_ids: Annotated[list[str], Query(min_length=1)],
 ) -> TempFileResponse:
-    variant_ocel = ocel.executions.filter_by_variants(object_type, variant_ids)
+    variant_ocel = ocel.filter(
+        [VariantFilter(object_type=object_type, variant_ids=variant_ids)]
+    )
 
     if len(variant_ocel.events.df) == 0:
         raise NotFound("No objects were found for the given variants")
