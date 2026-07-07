@@ -3,6 +3,7 @@ import {
   getDownloadOCELQueryKey,
   getDownloadResourceAsPnmlQueryKey,
   getDownloadResourceQueryKey,
+  getDownloadVariantFlatLogQueryKey,
 } from "@ocelescope/api-base";
 import { env, useSessionStore } from "@ocelescope/api-client";
 import { parse } from "content-disposition-attachment";
@@ -67,6 +68,10 @@ export const useDownloadOCEL = useDownloadFromServer(getDownloadOCELQueryKey);
 
 export const useDownloadFlatOCEL = useDownloadFromServer(
   getDownloadFlatLogQueryKey,
+);
+
+export const useDownloadVariantFlatLog = useDownloadFromServer(
+  getDownloadVariantFlatLogQueryKey,
 );
 
 export const useDownloadResource = useDownloadFromServer(

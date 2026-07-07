@@ -550,4 +550,38 @@ def download_flat_log(ocel: ApiOcel, object_type_name: str) -> TempFileResponse:
     return file_response
 
 
+@ocels_router.get(
+    "/{ocel_id}/objects/variants/download/xes",
+    summary="Download selected object variants as a flat XES log",
+    description=(
+        "Filters the OCEL to the objects of `object_type` that follow any of the "
+        "given `variant_ids`, then flattens that sub-log by `object_type` into a "
+        "XES file (one trace per object)."
+    ),
+    operation_id="downloadVariantFlatLog",
+)
+def download_variant_flat_log(
+    ocel: ApiOcel,
+    object_type: str,
+    variant_ids: Annotated[list[str], Query(min_length=1)],
+) -> TempFileResponse:
+    variant_ocel = ocel.executions.filter_by_variants(object_type, variant_ids)
+
+    if len(variant_ocel.events.df) == 0:
+        raise NotFound("No objects were found for the given variants")
+
+    name = ocel.meta.extra["name"]
+    tmp_file_prefix = datetime.now().strftime("%Y%m%d-%H%M%S") + "-" + name
+
+    file_response = TempFileResponse(
+        prefix=tmp_file_prefix,
+        suffix=".xes",
+        filename=f"{name}_{object_type}.xes",
+    )
+
+    variant_ocel.write_xes(object_type, Path(file_response.tmp_path))
+
+    return file_response
+
+
 # endregion

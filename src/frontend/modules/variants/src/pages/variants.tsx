@@ -1,11 +1,16 @@
 import "@r4pm/components/styles.css";
 
-import { Box, LoadingOverlay, Tabs } from "@mantine/core";
-import { defineModuleRoute, useCurrentOcel } from "@ocelescope/core";
+import { Box, Button, LoadingOverlay, Tabs } from "@mantine/core";
+import {
+  defineModuleRoute,
+  useCurrentOcel,
+  useDownloadVariantFlatLog,
+} from "@ocelescope/core";
 import { useObjectTypes, useObjectVariants } from "@ocelescope/api-base";
 import { LogVariants, Theme } from "@r4pm/components";
 import type { TraceVariants } from "@r4pm/components";
-import { useMemo } from "react";
+import { DownloadIcon } from "lucide-react";
+import { useMemo, useState } from "react";
 
 const ObjectTypeVariants = ({
   ocelId,
@@ -17,6 +22,8 @@ const ObjectTypeVariants = ({
   const { data, isPending } = useObjectVariants(ocelId, {
     object_type: objectType,
   });
+  const { download } = useDownloadVariantFlatLog();
+  const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
 
   const variants = useMemo<TraceVariants | null>(() => {
     if (!data) {
@@ -40,15 +47,52 @@ const ObjectTypeVariants = ({
     };
   }, [data]);
 
+  const exportSelected = () => {
+    if (!data) {
+      return;
+    }
+    const variantIds = selectedIndices
+      .map((index) => data.variants[index]?.variant_id)
+      .filter((id): id is string => id !== undefined);
+
+    if (variantIds.length === 0) {
+      return;
+    }
+
+    download(ocelId, { object_type: objectType, variant_ids: variantIds });
+  };
+
   return (
     <Box pos="relative" mih={200}>
       <LoadingOverlay visible={isPending || !data || !variants} />
       {data && variants && (
-        <LogVariants
-          variants={variants}
-          numEvents={data.event_count}
-          numTraces={data.case_count}
-        />
+        <>
+          <LogVariants
+            variants={variants}
+            numEvents={data.event_count}
+            numTraces={data.case_count}
+            onSelectionChange={(selection) =>
+              setSelectedIndices(selection.variantIndices)
+            }
+          />
+          {selectedIndices.length > 0 && (
+            <Button
+              onClick={exportSelected}
+              leftSection={<DownloadIcon size={18} />}
+              radius="xl"
+              size="md"
+              pos="fixed"
+              bottom={24}
+              right={24}
+              style={{
+                zIndex: 200,
+                boxShadow: "var(--mantine-shadow-lg)",
+              }}
+            >
+              Export {selectedIndices.length} as XES
+            </Button>
+          )}
+        </>
       )}
     </Box>
   );
