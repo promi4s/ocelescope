@@ -24,6 +24,7 @@ from ocelescope_backend.app.internal.model.ocel import (
     TypedAttribute,
 )
 from ocelescope_backend.app.internal.model.response import TempFileResponse
+from ocelescope_backend.app.internal.model.variants import ObjectTypeVariants
 from ocelescope_backend.app.internal.ocel.default_ocel import (
     DEFAULT_OCEL_KEYS,
     DefaultOCEL,
@@ -240,6 +241,25 @@ def get_object_attributes(
 )
 def get_object_types(ocel: ApiOcel) -> list[str]:
     return ocel.objects.types
+
+
+@ocels_router.get(
+    "/{ocel_id}/objects/variants",
+    summary="Get the variants of an object type",
+    description=(
+        "Returns the object variants for a single object type. Each variant is a "
+        "distinct activity sequence, together with the number of events it contains "
+        "and the number of cases (objects) that follow it."
+    ),
+    operation_id="objectVariants",
+)
+def get_object_variants(
+    ocel: ApiOcel,
+    object_type: str,
+) -> ObjectTypeVariants:
+    return ObjectTypeVariants.from_variants(
+        ocel.executions.get_object_variants(object_types=[object_type])
+    )
 
 
 @ocels_router.get(
