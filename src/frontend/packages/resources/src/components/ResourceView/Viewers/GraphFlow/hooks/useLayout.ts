@@ -1,31 +1,19 @@
-import {
-  applyNodeChanges,
-  type Edge,
-  type Node,
-  type NodeChange,
-} from "@xyflow/react";
+import { applyNodeChanges, type NodeChange } from "@xyflow/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { applyLayout, createLayout } from "../layout";
 import { buildGraphFlowModel } from "../model/buildModel";
-import { toGraphError } from "../model/runLayout";
-import type {
-  GraphFlowModel,
-  GraphVisualization,
-  GraphVisualizationError,
-} from "../model/types";
-import { type ElkGraphFlowModel, useElkLayout } from "./useElkLayout";
 import {
-  type GraphvizGraphFlowModel,
-  useGraphvizLayout,
-} from "./useGraphvizLayout";
+  type GraphFlowEdgeType,
+  type GraphFlowModel,
+  type GraphFlowNodeType,
+  type GraphVisualization,
+  type GraphVisualizationError,
+  toGraphError,
+} from "../model/types";
 
 type BuildResult =
   | { model: GraphFlowModel; buildError: null }
   | { model: null; buildError: GraphVisualizationError };
-
-type LayoutResult = {
-  nodes: Node[];
-  edges: Edge[];
-};
 
 const buildSafely = (visualization: GraphVisualization): BuildResult => {
   try {
@@ -35,65 +23,64 @@ const buildSafely = (visualization: GraphVisualization): BuildResult => {
   }
 };
 
-const isElkModel = (model: GraphFlowModel): model is ElkGraphFlowModel =>
-  model.layoutPlan.type === "elk";
-
-const isGraphvizModel = (
-  model: GraphFlowModel,
-): model is GraphvizGraphFlowModel => model.layoutPlan.type === "graphviz";
-
 export const useLayout = (visualization: GraphVisualization) => {
   const { model, buildError } = useMemo(
     () => buildSafely(visualization),
     [visualization],
   );
-  const runElkLayout = useElkLayout();
-  const runGraphvizLayout = useGraphvizLayout(visualization);
 
-  const [nodes, setNodes] = useState<Node[]>([]);
-  const [edges, setEdges] = useState<Edge[]>([]);
+  const [nodes, setNodes] = useState<GraphFlowNodeType[]>([]);
+  const [edges, setEdges] = useState<GraphFlowEdgeType[]>([]);
   const [layoutReady, setLayoutReady] = useState(false);
   const [layoutError, setLayoutError] =
     useState<GraphVisualizationError | null>(null);
 
   useEffect(() => {
     setLayoutError(null);
-    setNodes(model?.nodes ?? []);
-    setEdges(model?.edges ?? []);
-    setLayoutReady(!model || model.nodes.length === 0);
-  }, [model]);
 
-  useEffect(() => {
-    if (!model || buildError || layoutReady) return;
+    if (buildError || !model) {
+      setNodes([]);
+      setEdges([]);
+      setLayoutReady(true);
+      return;
+    }
+
+    // Mount the (still unpositioned) nodes so React Flow measures them while the
+    // engine runs; the canvas stays hidden until `layoutReady` flips. Empty
+    // graphs have nothing to lay out.
+    setNodes(model.nodes);
+    setEdges(model.edges);
+    if (model.nodes.length === 0) {
+      setLayoutReady(true);
+      return;
+    }
+    setLayoutReady(false);
 
     let cancelled = false;
-    const layoutPromise: Promise<LayoutResult | null> = isElkModel(model)
-      ? runElkLayout(model)
-      : isGraphvizModel(model)
-        ? runGraphvizLayout(model)
-        : Promise.resolve(null);
-
-    layoutPromise.then(
-      (result) => {
-        if (cancelled || !result) return;
-        setNodes(result.nodes);
-        setEdges(result.edges);
-        setLayoutReady(true);
-      },
-      (err) => {
-        if (cancelled) return;
-        setLayoutError(toGraphError(err));
-        setLayoutReady(true);
-      },
-    );
+    createLayout(model)
+      .run()
+      .then(
+        (result) => {
+          if (cancelled) return;
+          const laidOut = applyLayout(model, result);
+          setNodes(laidOut.nodes);
+          setEdges(laidOut.edges);
+          setLayoutReady(true);
+        },
+        (err) => {
+          if (cancelled) return;
+          setLayoutError(toGraphError(err));
+          setLayoutReady(true);
+        },
+      );
 
     return () => {
       cancelled = true;
     };
-  }, [model, buildError, layoutReady, runElkLayout, runGraphvizLayout]);
+  }, [model, buildError]);
 
   const onNodesChange = useCallback(
-    (changes: NodeChange[]) =>
+    (changes: NodeChange<GraphFlowNodeType>[]) =>
       setNodes((current) => applyNodeChanges(changes, current)),
     [],
   );

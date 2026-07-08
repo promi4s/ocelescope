@@ -22,8 +22,8 @@ export type GraphLayoutPlan =
     };
 
 export type GraphFlowModel = {
-  nodes: Node[];
-  edges: Edge[];
+  nodes: GraphFlowNodeType[];
+  edges: GraphFlowEdgeType[];
   layoutPlan: GraphLayoutPlan;
 };
 
@@ -49,6 +49,15 @@ export class GraphVisualizationError extends Error {
     this.details = details;
   }
 }
+
+// Normalizes anything thrown during build/layout into a GraphVisualizationError
+// so the viewer can render a consistent error state.
+export const toGraphError = (error: unknown): GraphVisualizationError => {
+  if (error instanceof GraphVisualizationError) return error;
+  return new GraphVisualizationError("Graph layout failed.", [
+    error instanceof Error ? error.message : String(error),
+  ]);
+};
 
 // React Flow's `Node`/`Edge` generics require `TData extends Record<string, unknown>`.
 // The generated backend interfaces don't carry an index signature, so we intersect.

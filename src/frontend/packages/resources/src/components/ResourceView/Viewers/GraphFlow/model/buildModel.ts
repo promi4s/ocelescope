@@ -1,5 +1,4 @@
 import type { GraphEdge, GraphNode } from "@ocelescope/api-base";
-import type { Edge, Node } from "@xyflow/react";
 import {
   type GraphEdgeRouting,
   type GraphFlowEdgeData,
@@ -112,7 +111,7 @@ const createLayoutPlan = (
 export const buildGraphFlowModel = (
   visualization: GraphVisualization,
 ): GraphFlowModel => ({
-  nodes: (visualization.nodes ?? []).map(mapNode) as Node[],
-  edges: (visualization.edges ?? []).map(mapEdge) as Edge[],
+  nodes: (visualization.nodes ?? []).map(mapNode),
+  edges: (visualization.edges ?? []).map(mapEdge),
   layoutPlan: createLayoutPlan(visualization),
 });
