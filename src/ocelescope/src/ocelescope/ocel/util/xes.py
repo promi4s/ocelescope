@@ -6,6 +6,7 @@ import pandas as pd
 import pm4py
 import polars as pl
 import r4pm
+from pm4py.objects.ocel.obj import OCEL as PM4PYOCEL
 
 from ocelescope.ocel.constants.pm4py import (
     ACTIVITY_COL,
@@ -94,16 +95,25 @@ def write_ocel_to_xes(ocel: "OCEL", object_type: str, path: str | Path):
         .set_index([OID_COL])
     )[ocel.objects.dynamic_attribute_names].dropna(axis=1, how="all")
 
-    objects = ocel.ocel.objects.set_index(OID_COL)
+    objects = ocel.objects.df.set_index(OID_COL)
 
     missing_col = [col for col in attr.columns if col not in objects.columns]
     objects[missing_col] = pd.NA
     objects.update(attr)
 
-    ocel.ocel.objects = objects.reset_index()
+    # Build a dedicated PM4PY OCEL with the enriched object table for flattening,
+    # so the OCEL's own DataFrames are left untouched.
+    base = ocel.ocel
+    flattening_ocel = PM4PYOCEL(
+        events=base.events,
+        objects=objects.reset_index(),
+        relations=base.relations,
+        o2o=base.o2o,
+        object_changes=base.object_changes,
+    )
 
     pm4py.write_xes(
-        pm4py.ocel_flattening(ocel.ocel, object_type),
+        pm4py.ocel_flattening(flattening_ocel, object_type),
         str(path),
         variant_str="r4pm/rustxes",
     )
