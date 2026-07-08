@@ -55,7 +55,7 @@ class E2OManager(BaseManager):
         Returns:
             DataFrame: Normalized E2O relation table.
         """
-        raw = self._ocel.ocel.relations
+        raw = self._ocel._relations
 
         return raw.rename(
             columns={
