@@ -3,7 +3,6 @@ import {
   Background,
   ReactFlow,
   ReactFlowProvider,
-  useNodesInitialized,
   useReactFlow,
 } from "@xyflow/react";
 import { useCallback, useEffect, useRef } from "react";
@@ -11,6 +10,7 @@ import type { VisualizationProps } from "../..";
 import GraphControls from "./GraphControls";
 import { useGraphExport } from "./hooks/useGraphExport";
 import { useLayout } from "./hooks/useLayout";
+import { useMeasuredEdges } from "./hooks/useMeasuredEdges";
 import { FIT_VIEW_PADDING } from "./model/types";
 import GraphFlowEdge from "./render/Edge";
 import GraphFlowNode from "./render/Node";
@@ -27,15 +27,7 @@ const GraphFlowCanvas = ({
   const { nodes, edges, layoutReady, error, onNodesChange } =
     useLayout(visualization);
 
-  // React Flow silently drops any edge whose source/target node has not been
-  // measured yet (no handle bounds in its internal store), and does not
-  // reliably re-create it once measurement lands — so edges added before the
-  // nodes settle stay "forgotten" until a remount/reload. This is most visible
-  // right after a layout swaps the node set (e.g. filtering an OCEL). Holding
-  // the edges back until every node is measured guarantees each edge is only
-  // handed to React Flow against ready endpoints.
-  const nodesInitialized = useNodesInitialized();
-  const renderedEdges = nodesInitialized ? edges : [];
+  const renderedEdges = useMeasuredEdges({ nodes, edges, layoutReady });
 
   const { fitBounds, getNodes, getEdges } = useReactFlow();
   const wrapperRef = useRef<HTMLDivElement>(null);

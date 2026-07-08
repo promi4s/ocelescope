@@ -49,7 +49,7 @@ export const useLayout = (visualization: GraphVisualization) => {
     // engine runs; the canvas stays hidden until `layoutReady` flips. Empty
     // graphs have nothing to lay out.
     setNodes(model.nodes);
-    setEdges(model.edges);
+    setEdges([]);
     if (model.nodes.length === 0) {
       setLayoutReady(true);
       return;

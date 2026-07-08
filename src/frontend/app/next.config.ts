@@ -1,6 +1,18 @@
 import type { NextConfig } from "next";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const apiBase = process.env.EXTERNAL_API_BASE_URL ?? "http://localhost:8000";
+const appDir = dirname(fileURLToPath(import.meta.url));
+
+const singletonPackages = [
+  "@mantine/core",
+  "@mantine/hooks",
+  "@mantine/notifications",
+  "@mantine/dates",
+  "@mantine/charts",
+  "@mantine/dropzone",
+] as const;
 
 const nextConfig: NextConfig = {
   output: "standalone",
@@ -20,6 +32,19 @@ const nextConfig: NextConfig = {
     "@ocelescope/management",
     "@ocelescope/variants",
   ],
+  webpack: (config) => {
+    config.resolve ??= {};
+    config.resolve.alias = {
+      ...(config.resolve.alias ?? {}),
+      ...Object.fromEntries(
+        singletonPackages.map((packageName) => [
+          packageName,
+          join(appDir, "node_modules", packageName),
+        ]),
+      ),
+    };
+    return config;
+  },
   rewrites: async () => {
     return [
       {
