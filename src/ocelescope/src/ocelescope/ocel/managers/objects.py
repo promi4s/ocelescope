@@ -29,7 +29,7 @@ class ObjectsManager(BaseManager):
         Returns:
             DataFrame: A pandas DataFrame containing all objects and their static attributes.
         """
-        return self._ocel.ocel.objects
+        return self._ocel._objects
 
     @property
     def changes(self) -> pd.DataFrame:
@@ -39,7 +39,7 @@ class ObjectsManager(BaseManager):
         Returns:
             DataFrame: A pandas DataFrame containing all dynamic updates to object attributes.
         """
-        return self._ocel.ocel.object_changes
+        return self._ocel._object_changes
 
     @property
     @instance_lru_cache()

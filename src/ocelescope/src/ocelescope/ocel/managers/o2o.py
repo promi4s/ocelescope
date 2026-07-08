@@ -45,7 +45,7 @@ class O2OManager(BaseManager):
         Returns:
             DataFrame: A normalized O2O relation table.
         """
-        raw = self._ocel.ocel.o2o
+        raw = self._ocel._o2o
 
         return raw.rename(
             columns={
