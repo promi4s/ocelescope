@@ -266,7 +266,10 @@ class OCEL:
         if path.suffix not in {".xmlocel", ".xml", ".jsonocel", ".json", ".sqlite"}:
             raise ValueError(f"Unsupported extension: {path.suffix}")
 
-        r4pm.df.export_ocel(self._as_polars_tables(), str(path))
+        if path.suffix == ".sqlite":
+            pm4py.write_ocel2_sqlite(self.ocel, str(path))
+        else:
+            r4pm.df.export_ocel(self._as_polars_tables(), str(path))
 
         self.quantities.write_quantities(path)
         self.extensions.export_all(path)
