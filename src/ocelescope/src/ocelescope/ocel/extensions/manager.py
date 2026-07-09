@@ -12,6 +12,25 @@ if TYPE_CHECKING:
 T = TypeVar("T", bound=OCELExtension)
 
 
+def import_extensions(path: Path, extensions: list[type[OCELExtension]]) -> list[OCELExtension]:
+    """Load every extension present in ``path`` from the given classes.
+
+    Extensions read their data straight from the file, so no OCEL is needed. Each
+    class is checked for format support and presence before it is imported;
+    failures are logged and skipped so one broken extension can't abort the rest.
+    """
+    loaded: list[OCELExtension] = []
+    for ext_cls in extensions:
+        try:
+            if path.suffix in getattr(ext_cls, "supported_extensions", []) and (
+                ext_cls.has_extension(path)
+            ):
+                loaded.append(ext_cls.import_extension(path))
+        except Exception as exc:
+            print(f"[ExtensionManager] Failed to load {ext_cls.__name__}: {exc}")
+    return loaded
+
+
 class ExtensionManager:
     """Manage loading, storing, and exporting OCEL file extensions.
 
@@ -46,16 +65,8 @@ class ExtensionManager:
         if not self.ocel.meta.path:
             return
 
-        path = Path(self.ocel.meta.path)
-
-        for ext_cls in extensions:
-            try:
-                if path.suffix in getattr(ext_cls, "supported_extensions", []):
-                    if ext_cls.has_extension(path):
-                        instance = ext_cls.import_extension(self.ocel, path)
-                        self._extensions[ext_cls] = instance
-            except Exception as exc:
-                print(f"[ExtensionManager] Failed to load {ext_cls.__name__}: {exc}")
+        for instance in import_extensions(Path(self.ocel.meta.path), extensions):
+            self._extensions[type(instance)] = instance
 
     def get(self, ext_type: type[T]) -> T | None:
         """Retrieve a loaded extension instance by its class.
@@ -75,6 +86,15 @@ class ExtensionManager:
             A list of all extension instances currently managed.
         """
         return list(self._extensions.values())
+
+    def set(self, extensions: list[OCELExtension]) -> None:
+        """Replace the managed extensions with the given instances.
+
+        Lets a caller re-attach previously loaded extension instances to a freshly
+        built OCEL (e.g. one materialized from a DuckDB store) without re-reading
+        them from a file.
+        """
+        self._extensions = {type(extension): extension for extension in extensions}
 
     def export_all(self, target_path: Path):
         """Export all loaded extensions to disk.

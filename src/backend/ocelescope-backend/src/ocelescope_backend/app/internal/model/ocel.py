@@ -3,6 +3,7 @@ from typing import Hashable, Self, Sequence, cast
 
 import pandas as pd
 from ocelescope.ocel.constants import ValueType
+from ocelescope.ocel.extensions.base_extension import OCELExtension
 from ocelescope.ocel.io import load_ocel_duckdb
 from ocelescope.ocel.models.meta import OCELMeta
 from pydantic.main import BaseModel
@@ -10,6 +11,7 @@ from pydantic.main import BaseModel
 from ocelescope import (
     OCEL,
 )
+from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.registry.extension import OCELExtensionDescription
 from ocelescope_backend.app.modules.base import ModuleFilter
 
@@ -23,11 +25,19 @@ class OcelMetadata(BaseModel):
 
     @classmethod
     def from_handle(cls, handle: "SessionOCEL", filter_applied: bool | None = None):
+        # Extensions live only as in-memory instances on the handle (they are not
+        # persisted with the DuckDB store); metadata is read off the handle
+        # without materializing the OCEL.
+        descriptions = registry_manager.get_extension_descriptions()
         return cls(
             id=handle.id,
             created_at=handle.created_at,
             name=handle.name,
-            extensions=[],
+            extensions=[
+                descriptions[extension.__class__.__name__]
+                for extension in handle.extensions
+                if extension.__class__.__name__ in descriptions
+            ],
             filter_applied=filter_applied,
         )
 
@@ -40,11 +50,21 @@ class SessionOCEL:
     lazily, so only the OCELs actively in use ever occupy RAM.
     """
 
-    def __init__(self, id: str, db_path: Path, name: str, created_at: str):
+    def __init__(
+        self,
+        id: str,
+        db_path: Path,
+        name: str,
+        created_at: str,
+        extensions: list[OCELExtension] | None = None,
+    ):
         self.id = id
         self.db_path = db_path
         self.name = name
         self.created_at = created_at
+        # Extension instances are kept in memory on the handle and re-attached to
+        # each materialized OCEL; they are not stored in the DuckDB file.
+        self.extensions: list[OCELExtension] = extensions or []
         self._applied_filter: list[ModuleFilter] = []
 
     def _meta(self) -> OCELMeta:
@@ -53,10 +73,12 @@ class SessionOCEL:
         )
 
     def ocel(self, use_original: bool = False) -> OCEL:
-        origin = load_ocel_duckdb(self.db_path, meta=self._meta())
-        if use_original or not self._applied_filter:
-            return origin
-        return origin.filter(self._applied_filter)
+        ocel = load_ocel_duckdb(self.db_path, meta=self._meta())
+        if not use_original and self._applied_filter:
+            ocel = ocel.filter(self._applied_filter)
+        if self.extensions:
+            ocel.extensions.set(self.extensions)
+        return ocel
 
     @property
     def is_filtered(self) -> bool:

@@ -8,6 +8,7 @@ from pathlib import Path
 from uuid import uuid4
 
 from fastapi import HTTPException
+from ocelescope.ocel.extensions.manager import import_extensions
 from typing_extensions import TypedDict
 
 from ocelescope import OCEL
@@ -57,6 +58,12 @@ def import_ocel_task(
             name=name,
             created_at=datetime.now().isoformat(),
         )
+
+        extensions = import_extensions(
+            read_path, registry_manager.get_loaded_extensions()
+        )
+        if extensions:
+            session.set_ocel_extensions(ocel_id, extensions)
     finally:
         read_path.unlink(missing_ok=True)
         file_path.unlink(missing_ok=True)

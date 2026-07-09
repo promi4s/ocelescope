@@ -57,12 +57,12 @@ ocels_router = APIRouter(prefix="/ocels", tags=["ocels"])
 def getOcels(
     session: ApiSession, extension_name: Optional[str] = None
 ) -> list[OcelMetadata]:
-    if extension_name is not None:
-        return []
-
     return [
         OcelMetadata.from_handle(handle, filter_applied=handle.is_filtered)
         for handle in session.ocels.values()
+        if extension_name is None
+        or extension_name
+        in [extension.__class__.__name__ for extension in handle.extensions]
     ]
 
 

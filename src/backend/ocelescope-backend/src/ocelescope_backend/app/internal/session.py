@@ -7,6 +7,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, Hashable, Sequence, Type, TypeVar, cast
 
+from ocelescope.ocel.extensions.base_extension import OCELExtension
 from ocelescope.ocel.io import convert_ocel_duckdb, dump_ocel_duckdb
 
 from ocelescope import OCEL
@@ -97,9 +98,20 @@ class Session:
         self.state = str(uuid.uuid4())
 
     # region OCEL management
-    def _register_ocel(self, id: str, db_path: Path, name: str, created_at: str) -> str:
+    def _register_ocel(
+        self,
+        id: str,
+        db_path: Path,
+        name: str,
+        created_at: str,
+        extensions: list[OCELExtension] | None = None,
+    ) -> str:
         self.ocels[id] = SessionOCEL(
-            id=id, db_path=db_path, name=name, created_at=created_at
+            id=id,
+            db_path=db_path,
+            name=name,
+            created_at=created_at,
+            extensions=extensions,
         )
         sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
         return id
@@ -115,6 +127,7 @@ class Session:
             db_path,
             name=ocel.meta.extra.get("name") or "OCEL",
             created_at=ocel.meta.extra.get("upload_date") or datetime.now().isoformat(),
+            extensions=ocel.extensions.all(),
         )
 
     def add_ocel_from_file(self, source_path: Path, name: str, created_at: str) -> str:
@@ -124,6 +137,14 @@ class Session:
         convert_ocel_duckdb(source_path, db_path)
 
         return self._register_ocel(ocel_id, db_path, name=name, created_at=created_at)
+
+    def set_ocel_extensions(self, ocel_id: str, extensions: list[OCELExtension]):
+        """Attach in-memory extension instances to an already registered OCEL."""
+        if ocel_id not in self.ocels:
+            raise NotFound(f"OCEL with id {ocel_id} not found")
+
+        self.ocels[ocel_id].extensions = extensions
+        sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
 
     def get_ocel(self, ocel_id: str, use_original: bool = False) -> OCEL:
         if ocel_id not in self.ocels:
