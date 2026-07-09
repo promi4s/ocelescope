@@ -57,14 +57,12 @@ ocels_router = APIRouter(prefix="/ocels", tags=["ocels"])
 def getOcels(
     session: ApiSession, extension_name: Optional[str] = None
 ) -> list[OcelMetadata]:
+    if extension_name is not None:
+        return []
+
     return [
-        OcelMetadata.from_ocel(
-            value.ocel, filter_applied=len(value._applied_filter) > 0
-        )
-        for value in session.ocels.values()
-        if extension_name is None
-        or extension_name
-        in [extension.__class__.__name__ for extension in value.ocel.extensions.all()]
+        OcelMetadata.from_handle(handle, filter_applied=handle.is_filtered)
+        for handle in session.ocels.values()
     ]
 
 
@@ -130,11 +128,12 @@ def get_extension_meta() -> dict[str, OCELExtensionDescription]:
 @ocels_router.get(
     "/{ocel_id}", summary="Get general information about a OCEL", operation_id="getOcel"
 )
-def get_ocel(ocel: ApiOcel, session: ApiSession) -> OcelMetadata:
+def get_ocel(session: ApiSession, ocel_id: str) -> OcelMetadata:
+    if ocel_id not in session.ocels:
+        raise NotFound("OCEL not found")
 
-    return OcelMetadata.from_ocel(
-        ocel,
-    )
+    handle = session.ocels[ocel_id]
+    return OcelMetadata.from_handle(handle, filter_applied=handle.is_filtered)
 
 
 @ocels_router.post(
@@ -159,8 +158,8 @@ def delete_ocel(session: ApiSession, ocel_id: str):
     ),
     operation_id="renameOcel",
 )
-def rename_ocel(ocel: ApiOcel, new_name: str):
-    ocel.meta.extra["name"] = new_name
+def rename_ocel(session: ApiSession, ocel_id: str, new_name: str):
+    session.rename_ocel(ocel_id, new_name)
 
 
 # endregion

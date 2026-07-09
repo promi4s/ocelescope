@@ -45,30 +45,26 @@ def import_ocel_task(
         case _:
             desired_suffix = original_name.suffix
 
+    name = original_name.stem
     read_path = file_path
     try:
         if file_path.suffix != desired_suffix:
             read_path = file_path.with_suffix(desired_suffix)
             file_path.rename(read_path)
 
-        ocel = OCEL.read(
+        ocel_id = session.add_ocel_from_file(
             read_path,
-            meta={
-                "name": original_name.stem,
-                "upload_date": datetime.now().isoformat(),
-            },
+            name=name,
+            created_at=datetime.now().isoformat(),
         )
-        ocel.extensions.load(registry_manager.get_loaded_extensions())
     finally:
         read_path.unlink(missing_ok=True)
         file_path.unlink(missing_ok=True)
 
-    ocel_id = session.add_ocel(ocel)
-
     return [
         SystemNotification(
             title="OCEL successfully uploaded",
-            message=f"{ocel.meta.extra.get('name', None) or 'OCEL '} was uploaded successfully",
+            message=f"{name} was uploaded successfully",
             notification_type="info",
             link=OcelLink(ocel_id=ocel_id),
         ),

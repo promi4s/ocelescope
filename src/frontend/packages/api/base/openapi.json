@@ -280,36 +280,8 @@
             "in": "path",
             "required": true,
             "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
+              "type": "string",
               "title": "Ocel Id"
-            }
-          },
-          {
-            "name": "ocel_version",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "enum": [
-                    "original",
-                    "filtered"
-                  ],
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "default": "filtered",
-              "title": "Ocel Version"
             }
           }
         ],
@@ -392,14 +364,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
+              "type": "string",
               "title": "Ocel Id"
             }
           },
@@ -410,27 +375,6 @@
             "schema": {
               "type": "string",
               "title": "New Name"
-            }
-          },
-          {
-            "name": "ocel_version",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "enum": [
-                    "original",
-                    "filtered"
-                  ],
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "default": "filtered",
-              "title": "Ocel Version"
             }
           }
         ],

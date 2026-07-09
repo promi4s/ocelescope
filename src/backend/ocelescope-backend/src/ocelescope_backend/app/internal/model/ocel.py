@@ -1,13 +1,15 @@
+from pathlib import Path
 from typing import Hashable, Self, Sequence, cast
 
 import pandas as pd
 from ocelescope.ocel.constants import ValueType
+from ocelescope.ocel.io import load_ocel_duckdb
+from ocelescope.ocel.models.meta import OCELMeta
 from pydantic.main import BaseModel
 
 from ocelescope import (
     OCEL,
 )
-from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.registry.extension import OCELExtensionDescription
 from ocelescope_backend.app.modules.base import ModuleFilter
 
@@ -20,31 +22,48 @@ class OcelMetadata(BaseModel):
     filter_applied: bool | None
 
     @classmethod
-    def from_ocel(cls, ocel: OCEL, filter_applied: bool | None = None):
-        extension_descriptions = registry_manager.get_extension_descriptions()
-
+    def from_handle(cls, handle: "SessionOCEL", filter_applied: bool | None = None):
         return cls(
-            id=ocel.meta.id,
-            created_at=ocel.meta.extra["upload_date"],
-            name=ocel.meta.extra["name"],
-            extensions=[
-                extension_descriptions[extension.__class__.__name__]
-                for extension in ocel.extensions.all()
-                if extension.__class__.__name__ in extension_descriptions
-            ],
+            id=handle.id,
+            created_at=handle.created_at,
+            name=handle.name,
+            extensions=[],
             filter_applied=filter_applied,
         )
 
 
 class SessionOCEL:
-    def __init__(self, ocel: OCEL):
-        self.origin: OCEL = ocel
+    """A handle to an OCEL persisted as a DuckDB file on disk.
+
+    The OCEL is not kept in memory; it is materialized on demand from ``db_path``
+    via :func:`load_ocel_duckdb` and the applied filter pipeline is re-applied
+    lazily, so only the OCELs actively in use ever occupy RAM.
+    """
+
+    def __init__(self, id: str, db_path: Path, name: str, created_at: str):
+        self.id = id
+        self.db_path = db_path
+        self.name = name
+        self.created_at = created_at
         self._applied_filter: list[ModuleFilter] = []
-        self._filtered_ocel: OCEL = ocel
+
+    def _meta(self) -> OCELMeta:
+        return OCELMeta(
+            id=self.id, extra={"name": self.name, "upload_date": self.created_at}
+        )
+
+    def ocel(self, use_original: bool = False) -> OCEL:
+        origin = load_ocel_duckdb(self.db_path, meta=self._meta())
+        if use_original or not self._applied_filter:
+            return origin
+        return origin.filter(self._applied_filter)
 
     @property
-    def ocel(self):
-        return self._filtered_ocel
+    def is_filtered(self) -> bool:
+        return len(self._applied_filter) > 0
+
+    def delete(self) -> None:
+        self.db_path.unlink(missing_ok=True)
 
     def get_filters(self, module_source: str | None) -> list[ModuleFilter]:
         return [
@@ -55,7 +74,7 @@ class SessionOCEL:
         ]
 
     def set_filters(self, module_source: str, pipeline: Sequence[ModuleFilter]):
-        new_pipeline = [
+        self._applied_filter = [
             filter
             for filter in self._applied_filter
             if filter.OcelescopeModuleSource != module_source
@@ -64,10 +83,6 @@ class SessionOCEL:
             for module_filter in pipeline
             if module_filter.OcelescopeModuleSource == module_source
         ]
-
-        self._filtered_ocel = self.origin.filter(pipeline)
-
-        self._applied_filter = new_pipeline
 
 
 class Attribute(BaseModel):

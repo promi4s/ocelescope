@@ -1,8 +1,13 @@
 from __future__ import annotations
 
 import json
+import tempfile
 import uuid
+from datetime import datetime
+from pathlib import Path
 from typing import Any, Callable, Hashable, Sequence, Type, TypeVar, cast
+
+from ocelescope.ocel.io import convert_ocel_duckdb, dump_ocel_duckdb
 
 from ocelescope import OCEL
 from ocelescope_backend.app.internal.exceptions import NotFound
@@ -36,8 +41,10 @@ class Session:
         # Resources
         self._resources: dict[str, ResourceStore] = {}
 
-        # OCELS
+        # OCELS -- persisted as DuckDB files under a per-session directory and
+        # materialized on demand, so they don't all sit in RAM at once.
         self.ocels: dict[str, SessionOCEL] = {}
+        self._ocel_dir = Path(tempfile.mkdtemp(prefix=f"ocelescope_{self.id}_"))
 
         self.response_cache: dict[str, Any] = {}
         # Set first state to UUID, to be updated on each response
@@ -90,26 +97,53 @@ class Session:
         self.state = str(uuid.uuid4())
 
     # region OCEL management
-    def add_ocel(self, ocel: OCEL) -> str:
-        self.ocels[ocel.meta.id] = SessionOCEL(ocel)
-
+    def _register_ocel(self, id: str, db_path: Path, name: str, created_at: str) -> str:
+        self.ocels[id] = SessionOCEL(
+            id=id, db_path=db_path, name=name, created_at=created_at
+        )
         sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
+        return id
 
-        return ocel.meta.id
+    def add_ocel(self, ocel: OCEL) -> str:
+        """Persist an in-memory OCEL to a DuckDB file and register a handle."""
+        ocel_id = ocel.meta.id
+        db_path = self._ocel_dir / f"{ocel_id}.duckdb"
+        dump_ocel_duckdb(ocel, db_path)
+
+        return self._register_ocel(
+            ocel_id,
+            db_path,
+            name=ocel.meta.extra.get("name") or "OCEL",
+            created_at=ocel.meta.extra.get("upload_date") or datetime.now().isoformat(),
+        )
+
+    def add_ocel_from_file(self, source_path: Path, name: str, created_at: str) -> str:
+        """Stream an OCEL file straight into a DuckDB file without materializing it."""
+        ocel_id = str(uuid.uuid4())
+        db_path = self._ocel_dir / f"{ocel_id}.duckdb"
+        convert_ocel_duckdb(source_path, db_path)
+
+        return self._register_ocel(ocel_id, db_path, name=name, created_at=created_at)
 
     def get_ocel(self, ocel_id: str, use_original: bool = False) -> OCEL:
         if ocel_id not in self.ocels:
             raise NotFound(f"OCEL with id {ocel_id} not found")
 
-        return (
-            self.ocels[ocel_id].ocel if not use_original else self.ocels[ocel_id].origin
-        )
+        return self.ocels[ocel_id].ocel(use_original=use_original)
+
+    def rename_ocel(self, ocel_id: str, new_name: str):
+        if ocel_id not in self.ocels:
+            raise NotFound(f"OCEL with id {ocel_id} not found")
+
+        self.ocels[ocel_id].name = new_name
+        sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
 
     def delete_ocel(self, ocel_id: str):
-        if ocel_id not in self.ocels:
+        handle = self.ocels.pop(ocel_id, None)
+        if handle is None:
             return
 
-        self.ocels.pop(ocel_id, None)
+        handle.delete()
         sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
 
     # endregion
