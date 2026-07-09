@@ -32,6 +32,7 @@ const nextConfig: NextConfig = {
     "@ocelescope/management",
     "@ocelescope/variants",
   ],
+  turbopack: {},
   webpack: (config) => {
     config.resolve ??= {};
     config.resolve.alias = {

@@ -1,4 +1,4 @@
-import { useNodesInitialized } from "@xyflow/react";
+import { useNodesInitialized, useUpdateNodeInternals } from "@xyflow/react";
 import { useEffect, useMemo, useState } from "react";
 import type { GraphFlowEdgeType, GraphFlowNodeType } from "../model/types";
 
@@ -27,6 +27,8 @@ export const useMeasuredEdges = ({
 }) => {
   const nodesInitialized = useNodesInitialized();
   const currentNodeLayoutKey = useMemo(() => nodeLayoutKey(nodes), [nodes]);
+  const nodeIds = useMemo(() => nodes.map((node) => node.id), [nodes]);
+  const updateNodeInternals = useUpdateNodeInternals();
   const [releasedNodeLayoutKey, setReleasedNodeLayoutKey] = useState<
     string | null
   >(null);
@@ -37,14 +39,28 @@ export const useMeasuredEdges = ({
       return;
     }
 
-    // React Flow can report the previous node set as initialized for one render
-    // after a layout swap. Delay edge release until the new nodes have committed.
-    const frame = requestAnimationFrame(() => {
-      setReleasedNodeLayoutKey(currentNodeLayoutKey);
+    // React Flow can keep stale handle bounds for one render after a fast
+    // layout swap. Force a node-internals refresh before edges enter the store.
+    let releaseFrame: number | null = null;
+    const updateFrame = requestAnimationFrame(() => {
+      updateNodeInternals(nodeIds);
+      releaseFrame = requestAnimationFrame(() => {
+        setReleasedNodeLayoutKey(currentNodeLayoutKey);
+      });
     });
 
-    return () => cancelAnimationFrame(frame);
-  }, [layoutReady, nodesInitialized, currentNodeLayoutKey, nodes.length]);
+    return () => {
+      cancelAnimationFrame(updateFrame);
+      if (releaseFrame != null) cancelAnimationFrame(releaseFrame);
+    };
+  }, [
+    layoutReady,
+    nodesInitialized,
+    currentNodeLayoutKey,
+    nodeIds,
+    nodes.length,
+    updateNodeInternals,
+  ]);
 
   if (
     !layoutReady ||
