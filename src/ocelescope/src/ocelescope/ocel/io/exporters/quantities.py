@@ -15,7 +15,7 @@ import duckdb
 
 from ocelescope.ocel.constants.pm4py import EID_COL, OID_COL
 from ocelescope.ocel.constants.quantity import QEL_ITEM_TYPE, QEL_QUANTITY
-from ocelescope.ocel.io.export_common import table_exists
+from ocelescope.ocel.io.exporters.common import table_exists
 from ocelescope.ocel.managers.quantities.util.constants import (
     JSON_KEYMAP,
     JSON_OPERATIONS,

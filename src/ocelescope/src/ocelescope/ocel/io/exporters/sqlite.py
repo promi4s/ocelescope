@@ -34,13 +34,13 @@ from ocelescope.ocel.constants.pm4py import (
     OTYPE_COL,
     TIMESTAMP_COL,
 )
-from ocelescope.ocel.io.export_common import (
+from ocelescope.ocel.io.exporters.common import (
     INITIAL_ATTR_TIME,
     attribute_columns,
     event_attribute_presence,
     object_attribute_presence,
 )
-from ocelescope.ocel.io.export_quantities import export_quantities_sqlite
+from ocelescope.ocel.io.exporters.quantities import export_quantities_sqlite
 
 _OBJECT_META = (OID_COL, OTYPE_COL)
 _EVENT_META = (EID_COL, ACTIVITY_COL, TIMESTAMP_COL)

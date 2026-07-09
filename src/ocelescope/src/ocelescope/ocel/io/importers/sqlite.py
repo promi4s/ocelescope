@@ -49,7 +49,7 @@ from ocelescope.ocel.constants.pm4py import (
     OTYPE_COL,
     TIMESTAMP_COL,
 )
-from ocelescope.ocel.io.quantities import import_quantities_sqlite
+from ocelescope.ocel.io.importers.quantities import import_quantities_sqlite
 from ocelescope.ocel.io.schema import (
     SchemaDefinition,
     create_ocel_tables,

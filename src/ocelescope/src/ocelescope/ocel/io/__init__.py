@@ -16,14 +16,18 @@ entry points -- pick the reader/writer from the file extension.
 
 from pathlib import Path
 
-from ocelescope.ocel.io.export_json import export_ocel_json
-from ocelescope.ocel.io.export_sqlite import export_ocel_sqlite
-from ocelescope.ocel.io.export_xml import export_ocel_xml
-from ocelescope.ocel.io.json import import_ocel_json
-from ocelescope.ocel.io.read_duckdb import dump_ocel_duckdb, load_ocel_duckdb
-from ocelescope.ocel.io.sqlite import import_ocel_sqlite
-from ocelescope.ocel.io.writer import OCELWriter
-from ocelescope.ocel.io.xml import import_ocel_xml
+from ocelescope.ocel.io.exporters import (
+    export_ocel_json,
+    export_ocel_sqlite,
+    export_ocel_xml,
+)
+from ocelescope.ocel.io.importers import (
+    OCELWriter,
+    import_ocel_json,
+    import_ocel_sqlite,
+    import_ocel_xml,
+)
+from ocelescope.ocel.io.materialize import dump_ocel_duckdb, load_ocel_duckdb
 
 
 def convert_ocel_duckdb(source: str | Path, db_path: str | Path) -> None:

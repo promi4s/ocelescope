@@ -11,13 +11,13 @@ from pathlib import Path
 
 from lxml import etree
 
-from ocelescope.ocel.io.quantities import import_quantities_xml
+from ocelescope.ocel.io.importers.quantities import import_quantities_xml
 from ocelescope.ocel.io.schema import (
     ATTRIBUTE_TYPE_TO_ARROW,
     SchemaDefinition,
     merge_columns,
 )
-from ocelescope.ocel.io.writer import OCELWriter
+from ocelescope.ocel.io.importers.writer import OCELWriter
 
 
 def _local(tag: object) -> str:

@@ -6,13 +6,13 @@ from pathlib import Path
 
 import ijson
 
-from ocelescope.ocel.io.quantities import import_quantities_json
+from ocelescope.ocel.io.importers.quantities import import_quantities_json
 from ocelescope.ocel.io.schema import (
     ATTRIBUTE_TYPE_TO_ARROW,
     SchemaDefinition,
     merge_columns,
 )
-from ocelescope.ocel.io.writer import OCELWriter
+from ocelescope.ocel.io.importers.writer import OCELWriter
 
 
 def _attribute_schemas(source: str | Path) -> tuple[SchemaDefinition, SchemaDefinition]:

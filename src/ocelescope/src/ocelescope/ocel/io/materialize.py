@@ -28,14 +28,11 @@ import duckdb
 import pandas as pd
 
 from ocelescope.ocel.constants.pm4py import (
-    ACTIVITY_COL,
     E2O_QUALIFIER,
     EID_COL,
     O2O_QUALIFIER,
     O2O_SOURCE_ID,
     O2O_TARGET_ID,
-    OBJECT_CHANGE_CUMCOUNT,
-    OBJECT_CHANGED_FIELD,
     OID_COL,
     OTYPE_COL,
     TIMESTAMP_COL,
@@ -47,8 +44,15 @@ from ocelescope.ocel.constants.quantity import (
     QOP_COLUMNS,
 )
 from ocelescope.ocel.core.ocel import OCEL
-from ocelescope.ocel.io.export_common import table_exists
-from ocelescope.ocel.io.export_quantities import (
+from ocelescope.ocel.io.reshape import (
+    events_sql,
+    o2o_sql,
+    object_changes_sql,
+    objects_sql,
+    relations_sql,
+)
+from ocelescope.ocel.io.exporters.common import table_exists
+from ocelescope.ocel.io.exporters.quantities import (
     QUANTITIES_TABLE,
     QUANTITY_ITEM_PROPERTIES_TABLE,
     QUANTITY_OPERATIONS_TABLE,
@@ -66,47 +70,11 @@ def _attribute_columns(
     return [name for name in names if name not in meta]
 
 
-def _relations(con: duckdb.DuckDBPyConnection) -> pd.DataFrame:
-    """The E2O relations frame: e2o joined to its event and object metadata.
-
-    Ordered by timestamp to match the invariant the file readers guarantee.
-    """
-    return con.execute(
-        f'SELECT r."{EID_COL}", r."{OID_COL}", r."{E2O_QUALIFIER}" AS "{O2O_QUALIFIER}", '
-        f'e."{ACTIVITY_COL}", e."{TIMESTAMP_COL}", o."{OTYPE_COL}" '
-        f"FROM e2o r "
-        f'JOIN events e ON r."{EID_COL}" = e."{EID_COL}" '
-        f'JOIN objects o ON r."{OID_COL}" = o."{OID_COL}" '
-        f'ORDER BY e."{TIMESTAMP_COL}"'
-    ).df()
-
-
-def _o2o(con: duckdb.DuckDBPyConnection) -> pd.DataFrame | None:
-    """The pm4py O2O frame (source renamed to ``ocel:oid``), or ``None`` if empty."""
-    o2o = con.execute(
-        f'SELECT "{O2O_SOURCE_ID}" AS "{OID_COL}", "{O2O_TARGET_ID}", "{O2O_QUALIFIER}" FROM o2o'
-    ).df()
-    return o2o if len(o2o) else None
-
-
-def _object_changes(con: duckdb.DuckDBPyConnection, objects: pd.DataFrame) -> pd.DataFrame | None:
-    """The pm4py object-changes frame, or ``None`` when there are no changes.
-
-    The flat ``object_changes`` table is wide (one non-null attribute value per
-    row); the frame additionally carries the object type, the name of the changed
-    field, and a per-object change counter, which we recover here.
-    """
+def _object_changes(con: duckdb.DuckDBPyConnection) -> pd.DataFrame | None:
+    """The pm4py object-changes frame, or ``None`` when there are no changes."""
     attr_cols = _attribute_columns(con, "object_changes", (OID_COL, TIMESTAMP_COL))
-    changes = con.execute('SELECT * FROM object_changes ORDER BY "' + TIMESTAMP_COL + '"').df()
-    if not len(changes):
-        return None
-
-    changes = changes.merge(objects[[OID_COL, OTYPE_COL]], on=OID_COL, how="left")
-    changes[OBJECT_CHANGED_FIELD] = cast(pd.DataFrame, changes[attr_cols]).apply(
-        lambda row: next((name for name in attr_cols if pd.notna(row[name])), None), axis=1
-    )
-    changes[OBJECT_CHANGE_CUMCOUNT] = changes.groupby(OID_COL).cumcount() + 1
-    return changes
+    changes = con.execute(object_changes_sql(attr_cols)).df()
+    return changes if len(changes) else None
 
 
 def _quantity_extension(
@@ -159,11 +127,12 @@ def load_ocel_duckdb(db_path: str | Path, meta: OCELMeta | None = None) -> OCEL:
         # UTC so the materialized frames match a normal file read.
         con.execute("SET TimeZone='UTC'")
 
-        events = con.execute(f'SELECT * FROM events ORDER BY "{TIMESTAMP_COL}"').df()
-        objects = con.execute("SELECT * FROM objects").df()
-        relations = _relations(con)
-        o2o = _o2o(con)
-        object_changes = _object_changes(con, objects)
+        events = con.execute(events_sql()).df()
+        objects = con.execute(objects_sql()).df()
+        relations = con.execute(relations_sql()).df()
+        o2o = con.execute(o2o_sql()).df()
+        o2o = o2o if len(o2o) else None
+        object_changes = _object_changes(con)
         quantity_extension = _quantity_extension(con)
     finally:
         con.close()

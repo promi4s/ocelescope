@@ -9,13 +9,13 @@ from typing import IO, Iterable
 import duckdb
 import orjson
 
-from ocelescope.ocel.io.export_common import (
+from ocelescope.ocel.io.exporters.common import (
     event_types,
     iter_events,
     iter_objects,
     object_types,
 )
-from ocelescope.ocel.io.export_quantities import json_quantity_extension
+from ocelescope.ocel.io.exporters.quantities import json_quantity_extension
 from ocelescope.ocel.managers.quantities.util.constants import JSON_QUANTITY_EXTENSION
 
 
