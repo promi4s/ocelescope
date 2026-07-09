@@ -7,6 +7,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, Hashable, Sequence, Type, TypeVar, cast
 
+from ocelescope_backend.app.internal.ocel.lazy_ocel import LazyOCEL
 from ocelescope.ocel.extensions.base_extension import OCELExtension
 from ocelescope.ocel.io import convert_ocel_duckdb, dump_ocel_duckdb
 
@@ -151,6 +152,12 @@ class Session:
             raise NotFound(f"OCEL with id {ocel_id} not found")
 
         return self.ocels[ocel_id].ocel(use_original=use_original)
+
+    def get_lazy_ocel(self, ocel_id: str) -> LazyOCEL:
+        if ocel_id not in self.ocels:
+            raise NotFound(f"OCEL with id {ocel_id} not found")
+
+        return self.ocels[ocel_id].lazy()
 
     def rename_ocel(self, ocel_id: str, new_name: str):
         if ocel_id not in self.ocels:

@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from typing import Annotated, Literal
+from typing import Annotated, Iterator, Literal
 
 from fastapi import Depends, HTTPException, Request
 
 from ocelescope import OCEL
+from ocelescope_backend.app.internal.ocel.lazy_ocel import LazyOCEL
 from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.session import Session
 from ocelescope_backend.app.internal.tasks.plugin import PluginTask
@@ -37,6 +38,26 @@ def get_ocel(
 
 
 ApiOcel = Annotated[OCEL, Depends(get_ocel)]
+
+
+def get_lazy_ocel(
+    session: ApiSession,
+    ocel_id: str | None = None,
+) -> Iterator[LazyOCEL]:
+    # DuckDB-backed lazy view; the connection is closed when the request ends.
+    if not ocel_id:
+        raise HTTPException(status_code=500, detail="Ocel id is required")
+    try:
+        lazy = session.get_lazy_ocel(ocel_id)
+    except NotFound:
+        raise HTTPException(status_code=404, detail="OCEL not found")
+    try:
+        yield lazy
+    finally:
+        lazy.close()
+
+
+ApiLazyOcel = Annotated[LazyOCEL, Depends(get_lazy_ocel)]
 
 
 def get_plugin_task(

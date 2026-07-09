@@ -3,6 +3,7 @@ from typing import Hashable, Self, Sequence, cast
 
 import pandas as pd
 from ocelescope.ocel.constants import ValueType
+from ocelescope_backend.app.internal.ocel.lazy_ocel import LazyOCEL
 from ocelescope.ocel.extensions.base_extension import OCELExtension
 from ocelescope.ocel.io import load_ocel_duckdb
 from ocelescope.ocel.models.meta import OCELMeta
@@ -79,6 +80,14 @@ class SessionOCEL:
         if self.extensions:
             ocel.extensions.set(self.extensions)
         return ocel
+
+    def lazy(self) -> LazyOCEL:
+        """A DuckDB-backed lazy view of this OCEL.
+
+        Note: filters are not applied on the lazy path yet (that lands with the
+        SQL filter layer); this exposes the origin tables.
+        """
+        return LazyOCEL(self.db_path, meta=self._meta())
 
     @property
     def is_filtered(self) -> bool:
