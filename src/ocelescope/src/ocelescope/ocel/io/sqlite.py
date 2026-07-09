@@ -49,6 +49,7 @@ from ocelescope.ocel.constants.pm4py import (
     OTYPE_COL,
     TIMESTAMP_COL,
 )
+from ocelescope.ocel.io.quantities import import_quantities_sqlite
 from ocelescope.ocel.io.schema import (
     SchemaDefinition,
     create_ocel_tables,
@@ -96,6 +97,7 @@ _SQLITE_TYPE_TO_ARROW: dict[str, pa.DataType] = {
     "BOOL": pa.bool_(),
     "TIMESTAMP": pa.timestamp("us", tz="UTC"),
     "DATETIME": pa.timestamp("us", tz="UTC"),
+    "DATE": pa.date64(),
 }
 
 #: Arrow attribute type -> DuckDB type to ``TRY_CAST`` the (VARCHAR) source into.
@@ -409,3 +411,7 @@ def import_ocel_sqlite(source: str | Path, db_path: str | Path) -> None:
                 ['"ocel_event_id"', '"ocel_qualifier"', '"ocel_object_id"'],
                 "event_object",
             )
+
+        # --- Step 7: quantity extension (optional) ----------------------------
+        # Copy the extension tables across the still-attached source, if present.
+        import_quantities_sqlite(con, present)

@@ -11,6 +11,7 @@ from pathlib import Path
 
 from lxml import etree
 
+from ocelescope.ocel.io.quantities import import_quantities_xml
 from ocelescope.ocel.io.schema import (
     ATTRIBUTE_TYPE_TO_ARROW,
     SchemaDefinition,
@@ -128,3 +129,5 @@ def import_ocel_xml(source: str | Path, db_path: str | Path) -> None:
             elif elem.get("id") is not None:
                 writer.add_object(_build_object(elem))
                 _clear(elem)
+
+    import_quantities_xml(source, db_path)

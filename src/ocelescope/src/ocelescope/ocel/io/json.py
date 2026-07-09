@@ -6,6 +6,7 @@ from pathlib import Path
 
 import ijson
 
+from ocelescope.ocel.io.quantities import import_quantities_json
 from ocelescope.ocel.io.schema import (
     ATTRIBUTE_TYPE_TO_ARROW,
     SchemaDefinition,
@@ -56,3 +57,5 @@ def import_ocel_json(source: str | Path, db_path: str | Path) -> None:
         with open(source, "rb") as f:
             for event in ijson.items(f, "events.item", use_float=True):
                 writer.add_event(event)
+
+    import_quantities_json(source, db_path)
