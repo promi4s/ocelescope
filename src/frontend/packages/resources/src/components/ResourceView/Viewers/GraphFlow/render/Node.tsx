@@ -2,7 +2,7 @@ import { Text } from "@mantine/core";
 import { Handle, type NodeProps, Position } from "@xyflow/react";
 import { type CSSProperties, memo } from "react";
 import type { VisualizationsType } from "../../../../../types";
-import { DEFAULT_COLORS, type GraphFlowNodeType } from "../model/types";
+import { DEFAULT_COLORS, type RenderNode } from "../model/types";
 import { NodeAnnotation } from "./annotation";
 import { BoxShape, CircleShape } from "./nodeShapes";
 
@@ -48,7 +48,7 @@ const ExternalLabel = ({
   </Text>
 );
 
-const GraphFlowNode = memo(({ data }: NodeProps<GraphFlowNodeType>) => {
+const GraphFlowNode = memo(({ data }: NodeProps<RenderNode>) => {
   const {
     shape,
     label,
@@ -59,7 +59,7 @@ const GraphFlowNode = memo(({ data }: NodeProps<GraphFlowNodeType>) => {
     width,
     height,
     style,
-  } = data;
+  } = data.model;
   const doubleBorder = style?.double_border ?? null;
   const innerSymbol = style?.inner_symbol ?? null;
   const initialTokens = style?.initial_tokens ?? null;

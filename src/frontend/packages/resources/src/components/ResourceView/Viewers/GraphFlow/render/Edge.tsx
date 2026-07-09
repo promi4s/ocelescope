@@ -7,26 +7,27 @@ import {
   useInternalNode,
 } from "@xyflow/react";
 import { memo } from "react";
-import type { GraphFlowEdgeType, GraphPoint } from "../model/types";
+import type { EdgeLayout, Point, RenderEdge } from "../model/types";
 import { ArrowMarker, getMarkerIds } from "./edgeArrows";
 import { EdgeEndLabel, EdgeLabel, endLabelPositions } from "./edgeLabels";
 
-type EdgePathResult = { path: string; labelX: number; labelY: number };
+type ResolvedPath = { path: string; labelX: number; labelY: number };
 
-const fallbackLabelPosition = ({
+const centerOf = ({
   sourceX,
   sourceY,
   targetX,
   targetY,
 }: Pick<
-  EdgeProps<GraphFlowEdgeType>,
+  EdgeProps<RenderEdge>,
   "sourceX" | "sourceY" | "targetX" | "targetY"
->): GraphPoint => ({
+>): Point => ({
   x: (sourceX + targetX) / 2,
   y: (sourceY + targetY) / 2,
 });
 
-const getSelfLoopPath = (sourceNode: InternalNode): EdgePathResult => {
+// Self-loop: a rounded route out of and back into the source node's right side.
+const selfLoopPath = (sourceNode: InternalNode): ResolvedPath => {
   const width = sourceNode.measured.width ?? 60;
   const height = sourceNode.measured.height ?? 34;
   const position = sourceNode.internals.positionAbsolute;
@@ -43,67 +44,52 @@ const getSelfLoopPath = (sourceNode: InternalNode): EdgePathResult => {
   return { path, labelX, labelY };
 };
 
-const getFallbackPath = ({
-  sourceX,
-  sourceY,
-  sourcePosition,
-  targetX,
-  targetY,
-  targetPosition,
-}: EdgeProps<GraphFlowEdgeType>): EdgePathResult => {
-  const [path, labelX, labelY] = getBezierPath({
-    sourceX,
-    sourceY,
-    sourcePosition,
-    targetX,
-    targetY,
-    targetPosition,
-  });
+const bezierFallback = (edge: EdgeProps<RenderEdge>): ResolvedPath => {
+  const [path, labelX, labelY] = getBezierPath(edge);
   return { path, labelX, labelY };
 };
 
-const resolveEdgePath = ({
-  edge,
-  sourceNode,
-}: {
-  edge: EdgeProps<GraphFlowEdgeType>;
-  sourceNode: InternalNode | undefined;
-}): EdgePathResult => {
-  const { data, source, target } = edge;
-  const customLabelPosition = fallbackLabelPosition(edge);
-
-  if (data?.path) {
+// Prefer the absolute path computed by layout. Only when there is none do we
+// fall back to a live-node self-loop or a straight bezier between handles.
+const resolvePath = (
+  edge: EdgeProps<RenderEdge>,
+  layout: EdgeLayout | null,
+  sourceNode: InternalNode | undefined,
+): ResolvedPath => {
+  if (layout?.path) {
+    const center = centerOf(edge);
     return {
-      path: data.path,
-      labelX: data.labelPosition?.x ?? customLabelPosition.x,
-      labelY: data.labelPosition?.y ?? customLabelPosition.y,
+      path: layout.path,
+      labelX: layout.labelPosition?.x ?? center.x,
+      labelY: layout.labelPosition?.y ?? center.y,
     };
   }
-
-  if (source === target && sourceNode) return getSelfLoopPath(sourceNode);
-
-  return getFallbackPath(edge);
+  if (edge.source === edge.target && sourceNode)
+    return selfLoopPath(sourceNode);
+  return bezierFallback(edge);
 };
 
-const GraphFlowEdge = memo((props: EdgeProps<GraphFlowEdgeType>) => {
+const GraphFlowEdge = memo((props: EdgeProps<RenderEdge>) => {
   const { id, source, data, sourceX, sourceY, targetX, targetY } = props;
   const sourceNode = useInternalNode(source);
 
   if (!data) return null;
+  const { model, layout } = data;
 
-  const color = data.color ?? "#555";
-  const dashed = data.style?.dashed ?? false;
-  const bold = data.style?.bold ?? false;
-  const startArrow = data.start_arrow ?? null;
-  const endArrow = data.end_arrow ?? null;
+  const color = model.color ?? "#555";
+  const dashed = model.style?.dashed ?? false;
+  const bold = model.style?.bold ?? false;
+  const startArrow = model.start_arrow ?? null;
+  const endArrow = model.end_arrow ?? null;
   const { startMarkerId, endMarkerId } = getMarkerIds({
     color,
     startArrow,
     endArrow,
   });
-  const edgePath = resolveEdgePath({ edge: props, sourceNode });
-  const startPos = data.startPoint ?? { x: sourceX, y: sourceY };
-  const endPos = data.endPoint ?? { x: targetX, y: targetY };
+
+  const resolved = resolvePath(props, layout, sourceNode);
+  const startPos = layout?.startPoint ?? { x: sourceX, y: sourceY };
+  const endPos = layout?.endPoint ?? { x: targetX, y: targetY };
 
   return (
     <>
@@ -127,7 +113,7 @@ const GraphFlowEdge = memo((props: EdgeProps<GraphFlowEdgeType>) => {
       </defs>
       <BaseEdge
         id={id}
-        path={edgePath.path}
+        path={resolved.path}
         {...(endMarkerId ? { markerEnd: `url(#${endMarkerId})` } : {})}
         {...(startMarkerId ? { markerStart: `url(#${startMarkerId})` } : {})}
         style={{
@@ -136,30 +122,30 @@ const GraphFlowEdge = memo((props: EdgeProps<GraphFlowEdgeType>) => {
           strokeDasharray: dashed ? "6 3" : undefined,
         }}
       />
-      {(data.label || data.annotation) && (
+      {(model.label || model.annotation) && (
         <EdgeLabel
           color={color}
-          label={data.label}
-          hasAnnotation={Boolean(data.annotation)}
-          x={edgePath.labelX}
-          y={edgePath.labelY}
+          label={model.label}
+          hasAnnotation={Boolean(model.annotation)}
+          x={resolved.labelX}
+          y={resolved.labelY}
         />
       )}
-      {(data.start_label || data.end_label) &&
+      {(model.start_label || model.end_label) &&
         (() => {
           const positions = endLabelPositions(startPos, endPos);
           return (
             <>
-              {data.start_label && (
+              {model.start_label && (
                 <EdgeEndLabel
-                  label={data.start_label}
+                  label={model.start_label}
                   x={positions.start.x}
                   y={positions.start.y}
                 />
               )}
-              {data.end_label && (
+              {model.end_label && (
                 <EdgeEndLabel
-                  label={data.end_label}
+                  label={model.end_label}
                   x={positions.end.x}
                   y={positions.end.y}
                 />

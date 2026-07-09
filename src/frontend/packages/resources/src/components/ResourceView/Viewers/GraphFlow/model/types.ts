@@ -2,102 +2,104 @@ import type { GraphEdge, GraphNode } from "@ocelescope/api-base";
 import type { Edge, Node } from "@xyflow/react";
 import type { VisualizationByType } from "../../../../../types";
 
+// The raw backend visualization (nodes + edges + layout_config). This is the
+// only place the outside world is referenced; everything below is our own
+// domain model, deliberately decoupled from the generated API shape.
 export type GraphVisualization = VisualizationByType<"graph">;
-export type GraphEdgeRouting = "SPLINES" | "ORTHOGONAL" | "POLYLINE";
 
-export type GraphPoint = { x: number; y: number };
+export type Point = { x: number; y: number };
 
-export type GraphLayoutPlan =
-  | {
-      type: "graphviz";
-      engine: string;
-      graphAttrs: Record<string, string | number | boolean>;
-      nodeAttrs: Record<string, string | number | boolean>;
-      edgeAttrs: Record<string, string | number | boolean>;
-    }
-  | {
-      type: "elk";
-      elkOptions: Record<string, string | number | boolean>;
-      edgeRouting: GraphEdgeRouting;
-    };
+// ── Domain model ────────────────────────────────────────────────────────────
+// Backend nodes/edges with a guaranteed id. This is the ONLY graph shape the
+// layout engines and the renderer consume — neither of them ever sees the raw
+// visualization or its `layout_config`.
 
-export type GraphFlowModel = {
-  nodes: GraphFlowNodeType[];
-  edges: GraphFlowEdgeType[];
-  layoutPlan: GraphLayoutPlan;
+export type ModelNode = GraphNode & { id: string };
+export type ModelEdge = GraphEdge & { id: string };
+
+export type GraphModel = {
+  nodes: ModelNode[];
+  edges: ModelEdge[];
 };
 
-export type GraphLayoutResult = {
-  positions: Record<string, GraphPoint>;
-  edgeLayouts: Record<
-    string,
-    {
-      path: string;
-      labelPosition?: GraphPoint | null;
-      startPoint?: GraphPoint | null;
-      endPoint?: GraphPoint | null;
-    }
-  >;
+// ── Layout contract (the black box) ─────────────────────────────────────────
+// A layout engine turns a `GraphModel` into pure geometry: where each node sits
+// and how each edge is routed. It returns NO SVG and knows NOTHING about React
+// Flow. Swapping or adding an engine only means implementing this contract.
+
+// How a routed edge's `points` are interpreted when drawn:
+//   "polyline" — straight segments through every point, in order
+//   "spline"   — cubic Bézier control points: [P0, c1, c2, P1, c3, c4, P2, …]
+export type EdgeRouteKind = "polyline" | "spline";
+
+export type EdgeRoute = {
+  kind: EdgeRouteKind;
+  // The body of the route (polyline vertices or spline control points).
+  points: Point[];
+  // Optional straight segments stitched onto either end of the body. Used for
+  // arrow anchors that live outside the spline control points (e.g. Graphviz's
+  // `s,`/`e,` points). `null` for engines that don't need them (e.g. ELK).
+  startAnchor: Point | null;
+  endAnchor: Point | null;
+  labelPosition: Point | null;
 };
 
-export class GraphVisualizationError extends Error {
+export type LayoutResult = {
+  // Top-left node positions in React Flow coordinate space, keyed by node id.
+  positions: Record<string, Point>;
+  // Best-effort edge routes keyed by edge id. A missing entry means the engine
+  // did not route that edge; the renderer supplies a fallback.
+  routes: Record<string, EdgeRoute>;
+};
+
+// ── Render model (React Flow) ───────────────────────────────────────────────
+// React Flow requires node/edge `data` to be an index-signature object, so each
+// data type is intersected with `Record<string, unknown>`. Computed layout is
+// kept strictly separate from the backend element so the renderer never blurs
+// "what the backend said" with "what layout produced".
+
+export type NodeData = { model: ModelNode } & Record<string, unknown>;
+export type RenderNode = Node<NodeData, "node">;
+
+// Render-ready geometry for a single edge: an absolute SVG path plus the anchors
+// the renderer needs (arrow endpoints and the label position).
+export type EdgeLayout = {
+  path: string;
+  startPoint: Point | null;
+  endPoint: Point | null;
+  labelPosition: Point | null;
+};
+
+export type EdgeData = {
+  model: ModelEdge;
+  // `null` when neither the engine nor the projection fallback could produce a
+  // path; the edge renderer then draws its own last-resort route (self-loop /
+  // bezier between the live node handles).
+  layout: EdgeLayout | null;
+} & Record<string, unknown>;
+export type RenderEdge = Edge<EdgeData, "graphflow">;
+
+// ── Errors ──────────────────────────────────────────────────────────────────
+// Anything thrown while building the model or running layout is normalized into
+// this so the viewer can render one consistent error state.
+export class GraphError extends Error {
   details: string[] | undefined;
 
   constructor(message: string, details?: string[]) {
     super(message);
-    this.name = "GraphVisualizationError";
+    this.name = "GraphError";
     this.details = details;
   }
 }
 
-// Normalizes anything thrown during build/layout into a GraphVisualizationError
-// so the viewer can render a consistent error state.
-export const toGraphError = (error: unknown): GraphVisualizationError => {
-  if (error instanceof GraphVisualizationError) return error;
-  return new GraphVisualizationError("Graph layout failed.", [
-    error instanceof Error ? error.message : String(error),
-  ]);
-};
+export const toGraphError = (error: unknown): GraphError =>
+  error instanceof GraphError
+    ? error
+    : new GraphError("Graph rendering failed.", [
+        error instanceof Error ? error.message : String(error),
+      ]);
 
-// React Flow's `Node`/`Edge` generics require `TData extends Record<string, unknown>`.
-// The generated backend interfaces don't carry an index signature, so we intersect.
-export type GraphFlowNodeData = GraphNode & Record<string, unknown>;
-export type GraphFlowNodeType = Node<GraphFlowNodeData, "node">;
-
-// Layout extras attached at runtime by `runLayout` on top of the backend edge.
-export type EdgeLayoutExtras = {
-  path?: string | null;
-  labelPosition?: GraphPoint | null;
-  startPoint?: GraphPoint | null;
-  endPoint?: GraphPoint | null;
-};
-export type GraphFlowEdgeData = GraphEdge &
-  EdgeLayoutExtras &
-  Record<string, unknown>;
-export type GraphFlowEdgeType = Edge<GraphFlowEdgeData, "graphflow">;
-
-export type ElkPoint = { x: number; y: number };
-
-export type ElkEdgeSection = {
-  startPoint?: ElkPoint;
-  bendPoints?: ElkPoint[];
-  endPoint?: ElkPoint;
-};
-
-export type ElkEdgeLabel = {
-  x?: number;
-  y?: number;
-  width?: number;
-  height?: number;
-};
-
-export type ElkEdgeResult = {
-  id?: string;
-  sections?: ElkEdgeSection[];
-  labels?: ElkEdgeLabel[];
-  layoutOptions?: Record<string, unknown>;
-};
-
+// ── Constants ───────────────────────────────────────────────────────────────
 export const DEFAULT_COLORS = {
   edge: "#555555",
   place: "#aec6e8",
@@ -107,3 +109,8 @@ export const DEFAULT_COLORS = {
 } as const;
 export const MARKING_DOT_SIZE = 12;
 export const FIT_VIEW_PADDING = 0.15;
+
+// Fallback node dimensions for plugin nodes that leave a size unset. Built-in
+// backend nodes always carry width/height.
+export const DEFAULT_NODE_WIDTH = 120;
+export const DEFAULT_NODE_HEIGHT = 40;

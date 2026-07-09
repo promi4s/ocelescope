@@ -9,8 +9,7 @@ import { useCallback, useEffect, useRef } from "react";
 import type { VisualizationProps } from "../..";
 import GraphControls from "./GraphControls";
 import { useGraphExport } from "./hooks/useGraphExport";
-import { useLayout } from "./hooks/useLayout";
-import { useMeasuredEdges } from "./hooks/useMeasuredEdges";
+import { useGraphLayout } from "./hooks/useGraphLayout";
 import { FIT_VIEW_PADDING } from "./model/types";
 import GraphFlowEdge from "./render/Edge";
 import GraphFlowNode from "./render/Node";
@@ -24,10 +23,8 @@ const GraphFlowCanvas = ({
   isPreview,
   menuItems,
 }: VisualizationProps<"graph">) => {
-  const { nodes, edges, layoutReady, error, onNodesChange } =
-    useLayout(visualization);
-
-  const renderedEdges = useMeasuredEdges({ nodes, edges, layoutReady });
+  const { nodes, edges, ready, error, onNodesChange } =
+    useGraphLayout(visualization);
 
   const { fitBounds, getNodes, getEdges } = useReactFlow();
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -39,17 +36,17 @@ const GraphFlowCanvas = ({
     });
   }, [fitBounds, getNodes, getEdges]);
 
+  // Fit the view once, the first time a layout becomes ready.
   const wasReadyRef = useRef(false);
   useEffect(() => {
-    if (!layoutReady) {
+    if (!ready) {
       wasReadyRef.current = false;
       return;
     }
     if (wasReadyRef.current) return;
     wasReadyRef.current = true;
-
     fitViewWithEdges();
-  }, [layoutReady, fitViewWithEdges]);
+  }, [ready, fitViewWithEdges]);
 
   if (error) {
     return (
@@ -67,14 +64,14 @@ const GraphFlowCanvas = ({
 
   return (
     <>
-      <LoadingOverlay visible={!layoutReady} zIndex={10} />
+      <LoadingOverlay visible={!ready} zIndex={10} />
       <div
         ref={wrapperRef}
-        style={{ width: "100%", height: "100%", opacity: layoutReady ? 1 : 0 }}
+        style={{ width: "100%", height: "100%", opacity: ready ? 1 : 0 }}
       >
         <ReactFlow
           nodes={nodes}
-          edges={renderedEdges}
+          edges={edges}
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
           onNodesChange={onNodesChange}
