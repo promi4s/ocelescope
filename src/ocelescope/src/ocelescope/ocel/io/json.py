@@ -35,11 +35,7 @@ def _attribute_schemas(source: str | Path) -> tuple[SchemaDefinition, SchemaDefi
             elif prefix.endswith("attributes.item.type"):
                 arrow_type = ATTRIBUTE_TYPE_TO_ARROW.get(value)
                 if arrow_type is not None:
-                    target = (
-                        object_attrs
-                        if prefix.startswith("objectTypes")
-                        else event_attrs
-                    )
+                    target = object_attrs if prefix.startswith("objectTypes") else event_attrs
                     target.append((current_name, arrow_type))
 
     return merge_columns(object_attrs), merge_columns(event_attrs)

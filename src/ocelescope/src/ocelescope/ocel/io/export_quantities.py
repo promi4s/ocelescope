@@ -68,9 +68,12 @@ def _fetch_dicts(con: duckdb.DuckDBPyConnection, sql: str) -> list[dict]:
 
 
 def _property_columns(con: duckdb.DuckDBPyConnection) -> list[str]:
-    return [description[0] for description in con.execute(
-        f'SELECT * FROM "{QUANTITY_ITEM_PROPERTIES_TABLE}" LIMIT 0'
-    ).description]
+    return [
+        description[0]
+        for description in con.execute(
+            f'SELECT * FROM "{QUANTITY_ITEM_PROPERTIES_TABLE}" LIMIT 0'
+        ).description
+    ]
 
 
 # ---------------------------------------------------------------------------
@@ -144,13 +147,16 @@ def xml_quantity_extension(con: duckdb.DuckDBPyConnection) -> etree.Element | No
                 XML_OPERATION,
                 {XML_EVENT_ID: _xml_text(row[EID_COL]), XML_OBJECT_ID: _xml_text(row[OID_COL])},
             )
-            item = etree.SubElement(operation, XML_ITEM, {XML_ITEM_TYPE: _xml_text(row[QEL_ITEM_TYPE])})
+            item = etree.SubElement(
+                operation, XML_ITEM, {XML_ITEM_TYPE: _xml_text(row[QEL_ITEM_TYPE])}
+            )
             item.text = _xml_text(row[QEL_QUANTITY])
 
     quantities = etree.SubElement(root, XML_QUANTITIES)
     if table_exists(con, QUANTITIES_TABLE):
         for row in _fetch_dicts(
-            con, f'SELECT "{OID_COL}", "{QEL_ITEM_TYPE}", "{QEL_QUANTITY}" FROM "{QUANTITIES_TABLE}"'
+            con,
+            f'SELECT "{OID_COL}", "{QEL_ITEM_TYPE}", "{QEL_QUANTITY}" FROM "{QUANTITIES_TABLE}"',
         ):
             quantity = etree.SubElement(
                 quantities,

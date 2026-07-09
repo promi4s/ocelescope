@@ -88,9 +88,7 @@ def _build_event(elem) -> dict:
     for child in elem:
         tag = _local(child.tag)
         if tag == "attributes":
-            attributes = [
-                {"name": attr.get("name"), "value": attr.text} for attr in child
-            ]
+            attributes = [{"name": attr.get("name"), "value": attr.text} for attr in child]
         elif tag == "objects":  # event-to-object relationships
             relationships = [
                 {"objectId": ref.get("object-id"), "qualifier": ref.get("qualifier")}
@@ -120,9 +118,7 @@ def import_ocel_xml(source: str | Path, db_path: str | Path) -> None:
         # Objects precede events in the document, so a single streamed pass fills
         # every table. Relationship refs are also `<object>` elements, but only
         # real objects carry an ``id``.
-        for _, elem in etree.iterparse(
-            str(source), events=("end",), tag=("{*}object", "{*}event")
-        ):
+        for _, elem in etree.iterparse(str(source), events=("end",), tag=("{*}object", "{*}event")):
             if _local(elem.tag) == "event":
                 writer.add_event(_build_event(elem))
                 _clear(elem)

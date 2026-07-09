@@ -188,7 +188,7 @@ def _objects_query(attr_cols: list[str]) -> str:
         f'FROM o2o GROUP BY 1) rel ON rel.oid = o."{OID_COL}"'
     )
 
-    return f'SELECT o.*, {changes_select} AS __changes, rel.rels AS __rels FROM objects o{joins}'
+    return f"SELECT o.*, {changes_select} AS __changes, rel.rels AS __rels FROM objects o{joins}"
 
 
 def iter_objects(con: duckdb.DuckDBPyConnection) -> Iterator[dict]:
@@ -225,7 +225,7 @@ def iter_objects(con: duckdb.DuckDBPyConnection) -> Iterator[dict]:
 def _events_query() -> str:
     """SQL yielding one row per event with its object relationships nested."""
     return (
-        f'SELECT e.*, rel.rels AS __rels FROM events e '
+        f"SELECT e.*, rel.rels AS __rels FROM events e "
         f'LEFT JOIN (SELECT "{EID_COL}" AS eid, '
         f'list(struct_pack("objectId" := "{OID_COL}", qualifier := "{E2O_QUALIFIER}")) AS rels '
         f'FROM e2o GROUP BY 1) rel ON rel.eid = e."{EID_COL}"'

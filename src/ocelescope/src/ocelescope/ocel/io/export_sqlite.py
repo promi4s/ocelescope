@@ -64,14 +64,10 @@ def _suffix_map(types: list[str]) -> dict[str, str]:
 def _create_map_table(con: duckdb.DuckDBPyConnection, table: str, mapping: dict[str, str]) -> None:
     con.execute(f'CREATE TABLE out."{table}" (ocel_type VARCHAR, ocel_type_map VARCHAR)')
     if mapping:
-        con.executemany(
-            f'INSERT INTO out."{table}" VALUES (?, ?)', list(mapping.items())
-        )
+        con.executemany(f'INSERT INTO out."{table}" VALUES (?, ?)', list(mapping.items()))
 
 
-def _ordered_present(
-    ordered_attributes: list[tuple[str, str]], present: set[str]
-) -> list[str]:
+def _ordered_present(ordered_attributes: list[tuple[str, str]], present: set[str]) -> list[str]:
     """The attribute names present for a type, in the flat table's column order."""
     return [name for name, _ in ordered_attributes if name in present]
 
@@ -174,7 +170,7 @@ def _create_object_type_table(
             *values,
         ]
         selects.append(
-            f'SELECT {", ".join(change)} FROM object_changes c '
+            f"SELECT {', '.join(change)} FROM object_changes c "
             f'JOIN objects o ON c."{OID_COL}" = o."{OID_COL}" '
             f'WHERE o."{OTYPE_COL}" = ? AND c."{changed}" IS NOT NULL'
         )
@@ -197,11 +193,11 @@ def export_ocel_sqlite(db_path: str | Path, target: str | Path) -> None:
         try:
             # id -> type index tables
             con.execute(
-                f'CREATE TABLE out.object AS '
+                f"CREATE TABLE out.object AS "
                 f'SELECT "{OID_COL}" AS ocel_id, "{OTYPE_COL}" AS ocel_type FROM objects'
             )
             con.execute(
-                f'CREATE TABLE out.event AS '
+                f"CREATE TABLE out.event AS "
                 f'SELECT "{EID_COL}" AS ocel_id, "{ACTIVITY_COL}" AS ocel_type FROM events'
             )
 
@@ -227,12 +223,12 @@ def export_ocel_sqlite(db_path: str | Path, target: str | Path) -> None:
 
             # Relationship tables
             con.execute(
-                f'CREATE TABLE out.object_object AS SELECT '
+                f"CREATE TABLE out.object_object AS SELECT "
                 f'"{O2O_SOURCE_ID}" AS ocel_source_id, "{O2O_TARGET_ID}" AS ocel_target_id, '
                 f'"{O2O_QUALIFIER}" AS ocel_qualifier FROM o2o'
             )
             con.execute(
-                f'CREATE TABLE out.event_object AS SELECT '
+                f"CREATE TABLE out.event_object AS SELECT "
                 f'"{EID_COL}" AS ocel_event_id, "{OID_COL}" AS ocel_object_id, '
                 f'"{E2O_QUALIFIER}" AS ocel_qualifier FROM e2o'
             )

@@ -20,6 +20,7 @@ from ocelescope.ocel.io.export_json import export_ocel_json
 from ocelescope.ocel.io.export_sqlite import export_ocel_sqlite
 from ocelescope.ocel.io.export_xml import export_ocel_xml
 from ocelescope.ocel.io.json import import_ocel_json
+from ocelescope.ocel.io.read_duckdb import dump_ocel_duckdb, load_ocel_duckdb
 from ocelescope.ocel.io.sqlite import import_ocel_sqlite
 from ocelescope.ocel.io.writer import OCELWriter
 from ocelescope.ocel.io.xml import import_ocel_xml
@@ -64,6 +65,7 @@ def export_duckdb_ocel(db_path: str | Path, target: str | Path) -> None:
 __all__ = [
     "OCELWriter",
     "convert_ocel_duckdb",
+    "dump_ocel_duckdb",
     "export_duckdb_ocel",
     "export_ocel_json",
     "export_ocel_sqlite",
@@ -71,4 +73,5 @@ __all__ = [
     "import_ocel_json",
     "import_ocel_sqlite",
     "import_ocel_xml",
+    "load_ocel_duckdb",
 ]
