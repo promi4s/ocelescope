@@ -13,10 +13,10 @@ _O2O_TARGET_COL = "ocel:oid_2"
 def clean_ocel(ocel_dfs: Mapping[str, pd.DataFrame]) -> dict[str, pd.DataFrame]:
     """Drop dangling references and orphaned rows from an OCEL dataframe dict.
 
-    Removes e2o relations pointing at a missing event or object, o2o
-    relations pointing at a missing object, objects with no remaining e2o
-    or o2o relation, events with no remaining e2o relation, and
-    object_changes rows for objects that no longer exist.
+    Removes e2o relations pointing at a missing event or object, objects
+    with no remaining e2o relation, o2o relations pointing at a removed
+    object, events with no remaining e2o relation, and object_changes rows
+    for objects that no longer exist.
 
     Boolean-mask indexing already yields fresh copies, so the returned dict
     holds tables independent of the inputs.
@@ -32,15 +32,11 @@ def clean_ocel(ocel_dfs: Mapping[str, pd.DataFrame]) -> dict[str, pd.DataFrame]:
         & relations_df[OID_COL].isin(objects_df[OID_COL])
     ]
 
+    objects_df = objects_df.loc[objects_df[OID_COL].isin(relations_df[OID_COL])]
+
     o2o_df = o2o_df.loc[
         o2o_df[_O2O_SOURCE_COL].isin(objects_df[OID_COL])
         & o2o_df[_O2O_TARGET_COL].isin(objects_df[OID_COL])
-    ]
-
-    objects_df = objects_df.loc[
-        objects_df[OID_COL].isin(relations_df[OID_COL])
-        | objects_df[OID_COL].isin(o2o_df[_O2O_SOURCE_COL])
-        | objects_df[OID_COL].isin(o2o_df[_O2O_TARGET_COL])
     ]
 
     changes_df = changes_df.loc[changes_df[OID_COL].isin(objects_df[OID_COL])]

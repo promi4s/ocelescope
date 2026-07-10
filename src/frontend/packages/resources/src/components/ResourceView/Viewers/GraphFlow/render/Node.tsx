@@ -1,24 +1,10 @@
-import {
-  ActionIcon,
-  Badge,
-  Group,
-  Popover,
-  ScrollArea,
-  Text,
-} from "@mantine/core";
-import type { GraphNode } from "@ocelescope/api-base";
+import { Text } from "@mantine/core";
 import { Handle, type NodeProps, Position } from "@xyflow/react";
-import { XIcon } from "lucide-react";
-import { memo, useCallback, useState } from "react";
+import { type CSSProperties, memo } from "react";
 import type { VisualizationsType } from "../../../../../types";
-import { Visualization } from "../../../index";
-import {
-  DEFAULT_COLORS,
-  type GraphFlowNodeType,
-  MARKING_DOT_SIZE,
-} from "../model/types";
-
-// ─── Hidden handles ───────────────────────────────────────────────────────────
+import { DEFAULT_COLORS, type RenderNode } from "../model/types";
+import { NodeAnnotation } from "./annotation";
+import { BoxShape, CircleShape } from "./nodeShapes";
 
 const HIDDEN_HANDLE_STYLE = { opacity: 0, pointerEvents: "none" } as const;
 
@@ -36,78 +22,6 @@ const HiddenHandles = () => (
     />
   </>
 );
-
-// ─── Annotation badge ─────────────────────────────────────────────────────────
-
-const AnnotationBadge = () => (
-  <Badge
-    size="xs"
-    variant="filled"
-    color="gray"
-    title="This graph element has an annotation visualization."
-  >
-    i
-  </Badge>
-);
-
-const NodeAnnotation = ({ annotation }: { annotation: VisualizationsType }) => {
-  const [opened, setOpened] = useState(false);
-
-  const toggle = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    setOpened((o) => !o);
-  }, []);
-
-  return (
-    <Popover
-      opened={opened}
-      onClose={() => setOpened(false)}
-      position="right"
-      withArrow
-      withinPortal
-      shadow="md"
-    >
-      <Popover.Target>
-        <button
-          type="button"
-          className="nodrag nopan"
-          style={{
-            position: "absolute",
-            right: -8,
-            top: -8,
-            cursor: "pointer",
-            pointerEvents: "all",
-            zIndex: 10,
-            background: "none",
-            border: "none",
-            padding: 0,
-          }}
-          onClick={toggle}
-          onMouseDown={(e) => e.stopPropagation()}
-        >
-          <AnnotationBadge />
-        </button>
-      </Popover.Target>
-      <Popover.Dropdown style={{ minWidth: 200, maxWidth: 400 }}>
-        <Group justify="flex-end" mb={4}>
-          <ActionIcon
-            size="xs"
-            variant="subtle"
-            color="gray"
-            onClick={() => setOpened(false)}
-          >
-            <XIcon size={12} />
-          </ActionIcon>
-        </Group>
-        <ScrollArea.Autosize mah={300}>
-          <Visualization visualization={annotation} />
-        </ScrollArea.Autosize>
-      </Popover.Dropdown>
-    </Popover>
-  );
-};
-
-// ─── External label (top / bottom) ────────────────────────────────────────────
 
 const ExternalLabel = ({
   children,
@@ -134,227 +48,7 @@ const ExternalLabel = ({
   </Text>
 );
 
-// ─── Inner symbol ─────────────────────────────────────────────────────────────
-
-const InnerSymbol = ({
-  symbol,
-  color,
-}: {
-  symbol: "triangle" | "square";
-  color: string;
-}) => {
-  if (symbol === "triangle") {
-    return (
-      <div
-        style={{
-          width: 0,
-          height: 0,
-          borderTop: `${MARKING_DOT_SIZE * 0.6}px solid transparent`,
-          borderBottom: `${MARKING_DOT_SIZE * 0.6}px solid transparent`,
-          borderLeft: `${MARKING_DOT_SIZE}px solid ${color}`,
-          marginLeft: 2,
-        }}
-      />
-    );
-  }
-  return (
-    <div
-      style={{
-        width: MARKING_DOT_SIZE,
-        height: MARKING_DOT_SIZE,
-        backgroundColor: color,
-      }}
-    />
-  );
-};
-
-const CLIP_PATH: Partial<Record<GraphNode["shape"], string>> = {
-  triangle: "polygon(50% 0, 100% 100%, 0 100%)",
-  diamond: "polygon(50% 0, 100% 50%, 50% 100%, 0 50%)",
-  hexagon: "polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%)",
-};
-
-const CircleShape = ({
-  width,
-  height,
-  color,
-  borderColor,
-  doubleBorder,
-  innerSymbol,
-  initialTokens,
-  finalTokens,
-  centerLabel,
-}: {
-  width: number;
-  height: number;
-  color: string;
-  borderColor: string | null;
-  doubleBorder: boolean | null;
-  innerSymbol: "triangle" | "square" | null;
-  initialTokens: number | null;
-  finalTokens: number | null;
-  centerLabel: string | null;
-}) => (
-  <div
-    style={{
-      position: "relative",
-      boxSizing: "border-box",
-      width,
-      height,
-      borderRadius: "50%",
-      backgroundColor: color,
-      border: borderColor ? `2px solid ${borderColor}` : "none",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: 2,
-    }}
-  >
-    {doubleBorder && (
-      <div
-        style={{
-          position: "absolute",
-          inset: 5,
-          borderRadius: "50%",
-          border: borderColor ? `2px solid ${borderColor}` : "none",
-          pointerEvents: "none",
-        }}
-      />
-    )}
-    {initialTokens &&
-      !innerSymbol &&
-      (initialTokens === 1 ? (
-        <div
-          style={{
-            width: MARKING_DOT_SIZE,
-            height: MARKING_DOT_SIZE,
-            borderRadius: "50%",
-            backgroundColor: "rgba(0,0,0,0.65)",
-          }}
-        />
-      ) : (
-        <span
-          style={{
-            color: "#111",
-            fontSize: 11,
-            fontWeight: 700,
-            lineHeight: 1,
-          }}
-        >
-          {initialTokens}
-        </span>
-      ))}
-    {finalTokens && finalTokens > 1 && (
-      <span
-        style={{
-          position: "absolute",
-          right: 4,
-          bottom: 3,
-          color: "#111",
-          fontSize: 9,
-          fontWeight: 700,
-          lineHeight: 1,
-        }}
-      >
-        {finalTokens}
-      </span>
-    )}
-    {innerSymbol && (
-      <InnerSymbol symbol={innerSymbol} color={borderColor ?? "#111"} />
-    )}
-    {centerLabel && (
-      <span
-        style={{
-          maxWidth: width - 6,
-          color: "#111",
-          fontSize: 10,
-          fontWeight: 600,
-          lineHeight: 1,
-          overflow: "hidden",
-          textAlign: "center",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {centerLabel}
-      </span>
-    )}
-  </div>
-);
-
-const BoxShape = ({
-  shape,
-  color,
-  borderColor,
-  doubleBorder,
-  innerSymbol,
-  width,
-  height,
-  children,
-}: {
-  shape: Exclude<GraphNode["shape"], "circle">;
-  color: string;
-  borderColor: string | null;
-  doubleBorder: boolean | null;
-  innerSymbol: "triangle" | "square" | null;
-  width: number | null;
-  height: number | null;
-  children?: React.ReactNode;
-}) => {
-  const clipPath = CLIP_PATH[shape];
-  const hasBorder = borderColor != null;
-
-  return (
-    <div
-      style={{
-        position: "relative",
-        boxSizing: "border-box",
-        width: width ?? undefined,
-        height: height ?? undefined,
-        padding: hasBorder ? 2 : 0,
-        backgroundColor: borderColor ?? "transparent",
-        borderRadius: shape === "rectangle" ? 5 : 0,
-        clipPath,
-      }}
-    >
-      <div
-        style={{
-          boxSizing: "border-box",
-          width: "100%",
-          height: "100%",
-          backgroundColor: color,
-          borderRadius: shape === "rectangle" ? 3 : 0,
-          clipPath,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          overflow: "hidden",
-        }}
-      >
-        {innerSymbol && !children ? (
-          <InnerSymbol symbol={innerSymbol} color="#111" />
-        ) : (
-          children
-        )}
-      </div>
-      {doubleBorder && (
-        <div
-          style={{
-            position: "absolute",
-            inset: 6,
-            border: borderColor ? `1.5px solid ${borderColor}` : "none",
-            borderRadius: shape === "rectangle" ? 3 : 0,
-            clipPath,
-            pointerEvents: "none",
-          }}
-        />
-      )}
-    </div>
-  );
-};
-
-const GraphFlowNode = memo(({ data }: NodeProps<GraphFlowNodeType>) => {
+const GraphFlowNode = memo(({ data }: NodeProps<RenderNode>) => {
   const {
     shape,
     label,
@@ -365,7 +59,7 @@ const GraphFlowNode = memo(({ data }: NodeProps<GraphFlowNodeType>) => {
     width,
     height,
     style,
-  } = data;
+  } = data.model;
   const doubleBorder = style?.double_border ?? null;
   const innerSymbol = style?.inner_symbol ?? null;
   const initialTokens = style?.initial_tokens ?? null;
@@ -375,9 +69,6 @@ const GraphFlowNode = memo(({ data }: NodeProps<GraphFlowNodeType>) => {
     label && label_pos !== "center" && label_pos != null,
   );
 
-  // How many lines of text (size="sm" = 14px, lineHeight 1.2) fit inside the node.
-  // Subtract 4px for the border simulation padding in BoxShape.
-  // When height is null the node auto-sizes, so no clamping needed.
   const maxLabelLines =
     height != null
       ? Math.max(1, Math.floor((height - 4) / (14 * 1.2)))
@@ -434,7 +125,7 @@ const GraphFlowNode = memo(({ data }: NodeProps<GraphFlowNodeType>) => {
                       display: "-webkit-box",
                       WebkitBoxOrient: "vertical",
                       WebkitLineClamp: maxLabelLines,
-                    } as React.CSSProperties)
+                    } as CSSProperties)
                   : { whiteSpace: "normal" }),
               }}
             >
@@ -456,4 +147,3 @@ const GraphFlowNode = memo(({ data }: NodeProps<GraphFlowNodeType>) => {
 GraphFlowNode.displayName = "GraphFlowNode";
 
 export default GraphFlowNode;
-export { AnnotationBadge };

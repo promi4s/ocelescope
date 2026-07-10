@@ -51,7 +51,8 @@ function svgPathBounds(d: string): Rect | null {
 export function computeAutoFitBounds(nodes: Node[], edges: Edge[]): Rect {
   let combined = nodeBoundsFromData(nodes);
   for (const edge of edges) {
-    const path = (edge.data as { path?: string } | undefined)?.path;
+    const path = (edge.data as { layout?: { path?: string } } | undefined)
+      ?.layout?.path;
     if (!path) continue;
     const eb = svgPathBounds(path);
     if (eb) combined = unionRects(combined, eb);
