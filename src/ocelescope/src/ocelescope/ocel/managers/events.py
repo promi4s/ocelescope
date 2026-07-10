@@ -29,7 +29,7 @@ class EventsManager(BaseManager):
         Returns:
             DataFrame: A pandas DataFrame containing all events and their attributes.
         """
-        return self._ocel.ocel.events
+        return self._ocel._events
 
     @property
     @instance_lru_cache()

@@ -873,6 +873,86 @@
         }
       }
     },
+    "/ocels/{ocel_id}/objects/variants": {
+      "get": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Get the variants of an object type",
+        "description": "Returns the object variants for a single object type. Each variant is a distinct activity sequence, together with the number of events it contains and the number of cases (objects) that follow it.",
+        "operationId": "objectVariants",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "object_type",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Object Type"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectTypeVariants"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/ocels/{ocel_id}/events/attributes": {
       "get": {
         "tags": [
@@ -2315,6 +2395,97 @@
             "schema": {
               "type": "string",
               "title": "Object Type Name"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ocels/{ocel_id}/objects/variants/download/xes": {
+      "get": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Download selected object variants as a flat XES log",
+        "description": "Filters the OCEL to the objects of `object_type` that follow any of the given `variant_ids`, then flattens that sub-log by `object_type` into a XES file (one trace per object).",
+        "operationId": "downloadVariantFlatLog",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "object_type",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Object Type"
+            }
+          },
+          {
+            "name": "variant_ids",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Variant Ids"
             }
           },
           {
@@ -4911,6 +5082,65 @@
           "annotation"
         ],
         "title": "OCELResult"
+      },
+      "ObjectTypeVariants": {
+        "properties": {
+          "variants": {
+            "items": {
+              "$ref": "#/components/schemas/ObjectVariant"
+            },
+            "type": "array",
+            "title": "Variants"
+          },
+          "case_count": {
+            "type": "integer",
+            "title": "Case Count"
+          },
+          "event_count": {
+            "type": "integer",
+            "title": "Event Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "variants",
+          "case_count",
+          "event_count"
+        ],
+        "title": "ObjectTypeVariants",
+        "description": "All variants of a single object type together with the totals across them.\n\nAttributes:\n    variants: The distinct variants, sorted by frequency (descending).\n    case_count: Total number of cases (objects) of the object type.\n    event_count: Total number of events across all cases of the object type."
+      },
+      "ObjectVariant": {
+        "properties": {
+          "variant_id": {
+            "type": "string",
+            "title": "Variant Id"
+          },
+          "activities": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Activities"
+          },
+          "event_count": {
+            "type": "integer",
+            "title": "Event Count"
+          },
+          "case_count": {
+            "type": "integer",
+            "title": "Case Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "variant_id",
+          "activities",
+          "event_count",
+          "case_count"
+        ],
+        "title": "ObjectVariant",
+        "description": "A single object variant: a distinct sequence of activities that objects of a\ngiven object type go through.\n\nAttributes:\n    variant_id: Identifier of the variant (``<object_type>_<hash>``).\n    activities: The ordered activity sequence that defines the variant.\n    event_count: Number of events in the variant (length of ``activities``).\n    case_count: Number of objects (cases) that follow this variant."
       },
       "OcelMetadata": {
         "properties": {

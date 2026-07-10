@@ -1,3 +1,5 @@
+from typing import cast
+
 import pandas as pd
 import pm4py
 from pm4py.objects.ocel.obj import OCEL
@@ -27,16 +29,18 @@ def get_objects_with_object_changes(ocel: OCEL):
 
 
 def summarize_attribute_values(attr_name: str, attr_table: pd.DataFrame):
-    attr_col = attr_table[attr_name].dropna()
+    raw_col = attr_table[attr_name]
+    present_mask = raw_col.notna() & (raw_col != "")
+    attr_col = cast(pd.Series, raw_col[present_mask])
 
     activities = (
-        list(attr_table.loc[attr_table[attr_name].notna(), ACTIVITY_COL].dropna().unique())
+        list(attr_table.loc[present_mask, ACTIVITY_COL].dropna().unique())
         if ACTIVITY_COL in attr_table
         else []
     )
 
     object_types = (
-        list(attr_table.loc[attr_table[attr_name].notna(), OTYPE_COL].dropna().unique())
+        list(attr_table.loc[present_mask, OTYPE_COL].dropna().unique())
         if OTYPE_COL in attr_table
         else []
     )
@@ -47,7 +51,7 @@ def summarize_attribute_values(attr_name: str, attr_table: pd.DataFrame):
         case ValueType.STRING:
             attr_col = attr_col.astype("str")
         case ValueType.INT | ValueType.FLOAT:
-            attr_col = pd.to_numeric(attr_col, errors="coerce")
+            attr_col = cast(pd.Series, pd.to_numeric(attr_col, errors="coerce"))
 
     return [
         attr_name,
