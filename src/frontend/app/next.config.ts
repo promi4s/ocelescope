@@ -1,6 +1,6 @@
-import type { NextConfig } from "next";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import type { NextConfig } from "next";
 
 const apiBase = process.env.EXTERNAL_API_BASE_URL ?? "http://localhost:8000";
 const appDir = dirname(fileURLToPath(import.meta.url));
