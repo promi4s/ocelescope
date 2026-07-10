@@ -14,9 +14,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { LogOutIcon, PackageIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import useModulePath from "../../../hooks/useModulePath";
-import type { OcelescopeConfig } from "../../../lib/config";
+import type { ModuleDefinition, OcelescopeConfig } from "../../../lib/config";
 import { getModuleRoute } from "../../../lib/getModuleRoute";
 import classes from "../AppShell.module.css";
 
@@ -62,7 +62,7 @@ const LogoutButton: React.FC = () => {
         onClick={() => setIsModalOpen(true)}
       >
         <Group justify={"space-between"} w={"100%"}>
-          <Text style={{ lineHeight: 1 }}>Logout</Text>
+          <Text style={{ lineHeight: 1 }}>Reset Session</Text>
           <LogOutIcon className={classes.buttonIcon} />
         </Group>
       </UnstyledButton>
@@ -70,63 +70,118 @@ const LogoutButton: React.FC = () => {
   );
 };
 
+const NavbarGroup = ({
+  modules,
+  modulePath,
+  isOcelAvailable,
+}: {
+  modules: ModuleDefinition[];
+  isOcelAvailable: boolean;
+  modulePath?: {
+    moduleName?: string;
+    routeName?: string;
+  };
+}) => {
+  return modules.map(({ label, name, icon: Icon = PackageIcon, routes }) => {
+    const isModuleDisabled =
+      !Object.values(routes).some(({ requiresOcel }) => !requiresOcel) &&
+      !isOcelAvailable;
+
+    return (
+      <NavLink
+        key={name}
+        leftSection={<Icon width={18} height={18} size={18} />}
+        label={label}
+        defaultOpened={name === modulePath?.moduleName}
+        component={Link}
+        href={getModuleRoute({
+          moduleName: name,
+        })}
+        disabled={isModuleDisabled}
+        {...(isModuleDisabled ? { opened: false } : {})}
+        active={
+          Object.keys(routes).length === 1 && name === modulePath?.moduleName
+        }
+      >
+        {Object.keys(routes).length > 1 &&
+          Object.values(routes).map(
+            ({ label: routeLabel, name: routeName, requiresOcel }) => (
+              <NavLink
+                key={routeName}
+                label={routeLabel}
+                href={getModuleRoute({
+                  moduleName: name,
+                  routeName: routeName,
+                })}
+                disabled={!!requiresOcel && !isOcelAvailable}
+                component={Link}
+                active={
+                  name === modulePath?.moduleName &&
+                  routeName === modulePath.routeName
+                }
+              />
+            ),
+          )}
+      </NavLink>
+    );
+  });
+};
+
 const NavBar: React.FC<{ config: OcelescopeConfig }> = ({ config }) => {
-  const { modules = [] } = config;
+  const { modules = [], navbarGroups } = config;
 
   const modulePath = useModulePath(config);
   const { data: ocels } = useGetOcels();
 
   const isOcelAvailable = ocels?.length !== 0;
 
+  const moduleGroups = useMemo(() => {
+    if (!navbarGroups) {
+      return [{ title: undefined, modules: modules as ModuleDefinition[] }];
+    }
+
+    const groupedModuleNames = navbarGroups.flatMap(
+      ({ modulesNames }) => modulesNames,
+    );
+
+    const ungroupedModules = modules.filter(
+      ({ name }) => !groupedModuleNames.includes(name),
+    );
+
+    return [
+      ...navbarGroups.map(({ modulesNames, title }) => ({
+        title,
+        modules: modulesNames
+          .map((moduleName) => modules.find(({ name }) => name === moduleName))
+          .filter((module) => !!module),
+      })),
+      ...(ungroupedModules.length > 0
+        ? [
+            {
+              title: undefined,
+              modules: ungroupedModules,
+            },
+          ]
+        : []),
+    ];
+  }, [modules, navbarGroups]);
+
   return (
     <AppShell.Navbar className={classes.navbar ?? ""}>
       <Stack justify="space-between" h={"100%"} gap={0}>
         <Stack gap={0} flex={1}>
-          {modules.map(({ label, name, icon: Icon = PackageIcon, routes }) => {
-            const isModuleDisabled =
-              !Object.values(routes).some(
-                ({ requiresOcel }) => !requiresOcel,
-              ) && !isOcelAvailable;
-
-            return (
-              <NavLink
-                key={name}
-                leftSection={<Icon width={18} height={18} size={18} />}
-                label={label}
-                defaultOpened={name === modulePath?.moduleName}
-                component={Link}
-                href={getModuleRoute({
-                  moduleName: name,
-                })}
-                disabled={isModuleDisabled}
-                {...(isModuleDisabled ? { opened: false } : {})}
-                active={
-                  Object.keys(routes).length === 1 &&
-                  name === modulePath?.moduleName
-                }
-              >
-                {Object.keys(routes).length > 1 &&
-                  Object.values(routes).map(
-                    ({ label: routeLabel, name: routeName, requiresOcel }) => (
-                      <NavLink
-                        key={routeName}
-                        label={routeLabel}
-                        href={getModuleRoute({
-                          moduleName: name,
-                          routeName: routeName,
-                        })}
-                        disabled={!!requiresOcel && !isOcelAvailable}
-                        component={Link}
-                        active={
-                          name === modulePath?.moduleName &&
-                          routeName === modulePath.routeName
-                        }
-                      />
-                    ),
-                  )}
-              </NavLink>
-            );
-          })}
+          {moduleGroups.map(({ modules, title }, index) => (
+            <Fragment key={index}>
+              {index > 0 && (
+                <Divider label={title} my={!title ? 9 : undefined} />
+              )}
+              <NavbarGroup
+                modules={modules}
+                isOcelAvailable={isOcelAvailable}
+                modulePath={modulePath}
+              />
+            </Fragment>
+          ))}
         </Stack>
         <Divider />
         <LogoutButton />

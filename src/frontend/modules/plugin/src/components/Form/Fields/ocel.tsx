@@ -21,14 +21,14 @@ type OcelFieldProps = {
   ocelId: string;
   label?: string;
   description?: string;
-  requiered?: boolean;
+  required?: boolean;
 };
 
 const AttributeSelector: (
   query: typeof useObjectAttributes | typeof useEventAttributes,
 ) => React.FC<OcelFieldProps> =
   (query) =>
-  ({ isMulti, ocelId, onChange, value, label, requiered, description }) => {
+  ({ isMulti, ocelId, onChange, value, label, required, description }) => {
     const { data: attributes = [] } = query(ocelId);
     const attributeNames = new Set(attributes.map(({ name }) => name));
 
@@ -36,10 +36,10 @@ const AttributeSelector: (
 
     return (
       <SelectComponent
-        value={value}
+        value={value ?? (isMulti ? [] : null)}
         label={label}
         onChange={onChange}
-        required={requiered}
+        required={required}
         description={description}
         clearable
         data={[...attributeNames]}
@@ -51,16 +51,16 @@ const TypeSelector: (
   query: typeof useEventCounts | typeof useObjectCounts,
 ) => React.FC<OcelFieldProps> =
   (query) =>
-  ({ ocelId, onChange, requiered, value, isMulti, label, description }) => {
+  ({ ocelId, onChange, required, value, isMulti, label, description }) => {
     const { data = {} } = query(ocelId);
 
     const SelectComponent = isMulti ? MultiSelect : Select;
 
     return (
       <SelectComponent
-        value={value}
+        value={value ?? (isMulti ? [] : null)}
         label={label}
-        required={requiered}
+        required={required}
         clearable
         description={description}
         onChange={onChange}
@@ -73,7 +73,7 @@ const IdSelect: (
   query: typeof useEventIds | typeof useObjectIds,
 ) => React.FC<OcelFieldProps> =
   (query) =>
-  ({ ocelId, isMulti, ...rest }) => {
+  ({ ocelId, isMulti, value, ...rest }) => {
     const [searchValue, setSearchValue] = useState<undefined | string>();
     const [debouncedSearch] = useDebouncedValue(searchValue, 300);
 
@@ -89,6 +89,7 @@ const IdSelect: (
         searchValue={searchValue}
         onSearchChange={(newSearchValue) => setSearchValue(newSearchValue)}
         data={ids?.response}
+        value={value ?? (isMulti ? [] : null)}
         {...rest}
       />
     );
@@ -121,7 +122,7 @@ export const wrapFieldsWithContext = (control: Control<PluginInputType>) => {
       return (
         <Field
           label={schema?.title}
-          requiered={required}
+          required={required}
           description={schema?.description}
           isMulti={isMulti}
           onChange={(data) => onChange(data, path)}

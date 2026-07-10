@@ -1,29 +1,25 @@
-# react-components-starter
+# @ocelescope/api-base
 
-A starter for creating a React component library.
+Generated, type-safe client and React Query hooks for the Ocelescope **base**
+backend API.
+[Orval](https://orval.dev/).
 
-## Development
-
-- Install dependencies:
-
-```bash
-npm install
-```
-
-- Run the playground:
+## Installation
 
 ```bash
-npm run play
+pnpm add @ocelescope/api-base
 ```
 
-- Run the unit tests:
+## Usage
 
-```bash
-npm run test
+```ts
+import { /* hooks and client */ } from "@ocelescope/api-base";
 ```
 
-- Build the library:
+## About
 
-```bash
-npm run build
-```
+Part of [Ocelescope](https://github.com/promi4s/ocelescope), a framework for
+working with Object-Centric Event Logs (OCEL) developed at the Chair of Process
+and Data Science (PADS), RWTH Aachen University.
+
+📖 Documentation: <https://www.ocelescope.org>

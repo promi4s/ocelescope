@@ -1,3 +1,4 @@
+import mmap
 import os
 import sqlite3
 import xml.etree.ElementTree as etree
@@ -235,7 +236,7 @@ def write_extension_to_json(
         JSON_QUANTITIES: renamed_oqty.to_dict(orient="records"),
         JSON_OPERATIONS: renamed_qop.to_dict(orient="records"),
         JSON_PROPERTIES: orjson.loads(
-            renamed_properties.to_json(orient="records", date_format="iso")
+            renamed_properties.to_json(orient="records", date_format="iso")  # ty: ignore[invalid-argument-type]
         ),
     }
 
@@ -279,7 +280,51 @@ def read_extension_from_sqlite(path: Path) -> tuple[pd.DataFrame, pd.DataFrame, 
     return oqty, qop, item_properties
 
 
+def has_quantity_extension(path: Path) -> bool:
+    """Cheaply check whether a file carries a quantity extension.
+
+    Avoids fully parsing the file (DOM/dict) when there is nothing to read,
+    which is the common case. For XML/JSON this scans the raw bytes for the
+    marker tag/key; a false positive only costs a parse, never correctness.
+    """
+    match path.suffix:
+        case ".xmlocel" | ".xml":
+            marker = f"<{XML_QUANTITY_EXTENSION}".encode()
+        case ".jsonocel" | ".json":
+            marker = f'"{JSON_QUANTITY_EXTENSION}"'.encode()
+        case ".sqlite":
+            with sqlite3.connect(path) as conn:
+                tables = {
+                    name
+                    for (name,) in conn.execute(
+                        "SELECT name FROM sqlite_master WHERE type = 'table'"
+                    )
+                }
+            return bool(tables & {SQL_QUANTITIES, SQL_OPERATIONS, SQL_ITEM_PROPERTIES})
+        case _:
+            raise ValueError(f"Unsupported extension: {path.suffix}")
+
+    if path.stat().st_size == 0:
+        return False
+
+    # mmap lets the OS page the file in on demand; the marker is found without
+    # loading the whole file into RAM.
+    with open(path, "rb") as f, mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as mm:
+        return mm.find(marker) != -1
+
+
+def empty_quantity_extension() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    return (
+        pd.DataFrame(columns=OQTY_COLUMNS),
+        pd.DataFrame(columns=QOP_COLUMNS),
+        pd.DataFrame(columns=[QEL_ITEM_TYPE]),
+    )
+
+
 def read_quantity_extension(path: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+
+    if not has_quantity_extension(path):
+        return empty_quantity_extension()
 
     match path.suffix:
         case ".xmlocel" | ".xml":

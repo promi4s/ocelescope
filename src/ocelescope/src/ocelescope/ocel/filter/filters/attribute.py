@@ -12,7 +12,7 @@ from ..base import BaseFilter, FilterResult
 
 
 class AttributeFilterConfig(BaseModel):
-    target_type: str
+    target_type: Optional[str] = None
     attribute: str
 
     # Range filters
@@ -29,12 +29,12 @@ def filter_by_attribute(attribute_df: DataFrame, type_column: str, config: Attri
     col = config.attribute
 
     if col not in df.columns:
-        raise ValueError(f"Attribute '{col}' not found in {config.target_type} data")
+        scope = config.target_type if config.target_type is not None else "any"
+        raise ValueError(f"Attribute '{col}' not found in {scope} data")
 
     series = cast(Series, df[col])
     mask = pd.Series(True, index=series.index)
 
-    # Handle numeric filtering
     if config.number_range is not None:
         if is_numeric_dtype(series):
             numeric_series = series
@@ -46,7 +46,6 @@ def filter_by_attribute(attribute_df: DataFrame, type_column: str, config: Attri
         if config.number_range[1] is not None:
             mask &= numeric_series <= float(config.number_range[1])  # type:ignore
 
-    # Handle date filtering
     elif config.time_range is not None:
         if is_datetime64_any_dtype(series):
             date_series = series
@@ -58,16 +57,19 @@ def filter_by_attribute(attribute_df: DataFrame, type_column: str, config: Attri
         if config.time_range[1] is not None:
             mask &= date_series <= pd.to_datetime(config.time_range[1])
 
-    # Handle nominal filtering
     if config.values is not None:
         mask &= series.isin(config.values)
 
     if config.regex is not None:
         mask &= series.astype(str).str.contains(config.regex, regex=True, na=False)
 
-    is_not_target_type = attribute_df[type_column] != config.target_type
+    if config.target_type is not None:
+        is_unaffected = attribute_df[type_column] != config.target_type
+    else:
+        types_with_attribute = attribute_df.loc[series.notna(), type_column].unique()
+        is_unaffected = ~attribute_df[type_column].isin(types_with_attribute)
 
-    final_mask = cast(Series, is_not_target_type | mask)
+    final_mask = cast(Series, is_unaffected | mask)
     return final_mask
 
 

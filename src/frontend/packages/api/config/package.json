@@ -1,7 +1,7 @@
 {
   "name": "@ocelescope/api-config",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Shared Orval config utilities for consistent Ocelescope API client generation.",
   "author": "Görkem-Emre Öztürk <goerkem.oeztuerk@rwth-aachen.de>",
   "license": "MIT",

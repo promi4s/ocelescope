@@ -1,9 +1,10 @@
-import { Card, Menu, Stack, Text, ThemeIcon } from "@mantine/core";
+import { Card, Menu, Modal, Stack, Text, ThemeIcon } from "@mantine/core";
 import type { PluginApi } from "@ocelescope/api-base";
 import { useDeletePlugin } from "@ocelescope/api-base";
-import { getModuleRoute, UploadModal } from "@ocelescope/core";
+import { FullScreenUpload, getModuleRoute } from "@ocelescope/core";
 import { Trash2Icon, UploadIcon } from "lucide-react";
 import { useState } from "react";
+import { PluginUploadSection } from "../PluginUploadSection/PluginUploadSection";
 import { GenericCard } from "./GenericCard";
 
 export const PluginCard: React.FC<{ plugin: PluginApi }> = ({ plugin }) => {
@@ -19,7 +20,7 @@ export const PluginCard: React.FC<{ plugin: PluginApi }> = ({ plugin }) => {
       menuItems={
         <Menu.Item
           leftSection={<Trash2Icon />}
-          color="red.6"
+          color="red"
           fw="bold"
           onClick={() => {
             deletePlugin({ pluginId: plugin.id });
@@ -40,15 +41,24 @@ export const PluginCard: React.FC<{ plugin: PluginApi }> = ({ plugin }) => {
   );
 };
 
-export const UploadPluginCard: React.FC = () => {
+export const UploadPluginCard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <>
-      <UploadModal
-        visible={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+      <FullScreenUpload
+        active={!isModalOpen}
+        accept={["application/x-zip-compressed", "application/zip"]}
+        label="Drag'n'drop your Plugins to upload."
       />
+      <Modal
+        title={<Text size={"h3"}>Upload</Text>}
+        opened={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        size={"xl"}
+      >
+        <PluginUploadSection onSuccess={() => setIsModalOpen(false)} />
+      </Modal>
       <Card
         shadow="sm"
         padding="lg"

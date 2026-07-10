@@ -12,7 +12,7 @@ import { formatTime } from "../util/dayjs";
 const OCELInfo: React.FC<{ ocelId: string }> = ({ ocelId }) => {
   const { data: ocel } = useGetOcel(ocelId);
   const { data: eventCounts } = useEventCounts(ocelId);
-  const { data: objectCount } = useObjectCounts(ocelId);
+  const { data: objectCounts } = useObjectCounts(ocelId);
   const { data: timeInfo } = useTimeInfo(ocelId);
   const { data: quantityInfo } = useQuantityInfo(ocelId);
 
@@ -22,8 +22,9 @@ const OCELInfo: React.FC<{ ocelId: string }> = ({ ocelId }) => {
   );
 
   const totalObjectCount = useMemo(
-    () => Object.values(objectCount ?? {}).reduce((acc, curr) => acc + curr, 0),
-    [eventCounts],
+    () =>
+      Object.values(objectCounts ?? {}).reduce((acc, curr) => acc + curr, 0),
+    [objectCounts],
   );
 
   if (!ocel) {
@@ -43,7 +44,7 @@ const OCELInfo: React.FC<{ ocelId: string }> = ({ ocelId }) => {
         </Table.Tr>
         <Table.Tr>
           <Table.Th>Objects:</Table.Th>
-          <Table.Td>{`${totalObjectCount.toLocaleString("en-US")} of ${Object.keys(objectCount ?? {}).length} object types`}</Table.Td>
+          <Table.Td>{`${totalObjectCount.toLocaleString("en-US")} of ${Object.keys(objectCounts ?? {}).length} object types`}</Table.Td>
         </Table.Tr>
         <Table.Tr>
           <Table.Th>Timeframe:</Table.Th>

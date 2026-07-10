@@ -1,7 +1,7 @@
 {
   "name": "@ocelescope/log-overview",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.1.2",
   "description": "A tool for inspecting OCELs",
   "author": "Görkem-Emre Öztürk <goerkem.oeztuerk@rwth-aachen.de>",
   "license": "MIT",
@@ -15,8 +15,7 @@
   },
   "exports": {
     ".": "./dist/index.js",
-    "./package.json": "./package.json",
-    "./styles.css": "./dist/style.css"
+    "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -37,18 +36,15 @@
     "@mantine/core": "catalog:",
     "@mantine/hooks": "catalog:",
     "mantine-datatable": "catalog:",
-    "@ocelescope/api-base": "workspace:*",
-    "@ocelescope/api-client": "workspace:*",
-    "@ocelescope/charts": "workspace:*",
-    "@ocelescope/core": "workspace:*",
-    "@tanstack/react-query": "catalog:",
+    "@ocelescope/api-base": "workspace:^",
+    "@ocelescope/core": "workspace:^",
     "@marko19907/string-to-color": "*",
-    "@ocelescope/resources": "workspace:*",
-    "axios": "catalog:",
+    "@ocelescope/resources": "workspace:^",
     "dayjs": "catalog:",
     "lucide-react": "catalog:",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "@tanstack/react-query": "catalog:"
   },
   "devDependencies": {
     "@ocelescope/api-config": "workspace:*",

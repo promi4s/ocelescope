@@ -1,3 +1,4 @@
+import traceback
 from copy import deepcopy
 from typing import (
     TYPE_CHECKING,
@@ -7,12 +8,9 @@ from typing import (
     ParamSpec,
 )
 
-from pydantic.fields import Field
-from pydantic.main import BaseModel
 from typing_extensions import TypedDict
 
-from ocelescope import OCEL, BaseFilter, Resource
-from ocelescope_backend.app.internal.model.resource import ResourceStore
+from ocelescope import OCEL, Resource
 from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.tasks.base import (
     TaskBase,
@@ -21,7 +19,9 @@ from ocelescope_backend.app.internal.tasks.base import (
     _call_with_known_params,
 )
 from ocelescope_backend.app.internal.util.hashing import generate_tuple_hash
+from ocelescope_backend.app.modules.base import ModuleFilter
 from ocelescope_backend.app.sse_manager import (
+    ErrorNotification,
     PluginLink,
     SystemNotification,
     sse_manager,
@@ -39,15 +39,9 @@ class PluginInput(TypedDict):
     input: dict[str, Any]
 
 
-class PluginOutput(BaseModel):
-    ocel_ids: list[str] = Field(default=[])
-    resource_ids: list[str] = Field(default=[])
-
-
 class PluginTaskSummary(TaskSummary):
     plugin_id: str
     method_name: str
-    output: PluginOutput
 
 
 class PluginTask(TaskBase, Generic[P]):
@@ -58,14 +52,12 @@ class PluginTask(TaskBase, Generic[P]):
         self.plugin_id = plugin_id
         self.method_name = method_name
         self.input = input
-        self.result: PluginOutput = PluginOutput()
-
+        self.result: list[OCEL | Resource] | None = None
         self.session = session
 
     def run(self):
         self.state = TaskState.STARTED
         try:
-            plugin = registry_manager.get_plugin(plugin_id=self.plugin_id)
             method = registry_manager.get_plugin_method(
                 self.plugin_id, self.method_name
             )
@@ -96,61 +88,51 @@ class PluginTask(TaskBase, Generic[P]):
 
             result = _call_with_known_params(method._method, **kwargs)
 
+            self.result = []
+
             if not isinstance(result, tuple):
                 result = (result,)
 
-            for item_index, item in enumerate(result):
+            for item in result:
                 if not isinstance(item, list):
                     item = [item]
 
-                for entitiy_index, entitiy in enumerate(item):
-                    if isinstance(entitiy, OCEL):
-                        entitiy.meta.extra["name"] = (
-                            f"{plugin.meta().name if plugin else self.plugin_id}_{self.method_name}_{item_index}_{entitiy_index}"
-                        )
-                        self.result.ocel_ids.append(self.session.add_ocel(entitiy))
-                    if isinstance(entitiy, Resource):
-                        self.result.resource_ids.append(
-                            self.session.add_resource(
-                                ResourceStore(
-                                    name=f"{plugin.meta().name if plugin else self.plugin_id}_{self.method_name}_{item_index}_{entitiy_index}",
-                                    type=entitiy.get_type(),
-                                    source={
-                                        "task_id": self.id,
-                                        "method_name": self.method_name,
-                                        "plugin_name": plugin.meta().name,
-                                        "version": "",
-                                    }
-                                    if plugin
-                                    else None,
-                                    data=entitiy.model_dump(),
-                                ),
-                            )
-                        )
+                for entity in item:
+                    self.result.append(entity)
 
             if self.state != TaskState.CANCELLED:
                 self.state = TaskState.SUCCESS
-        except Exception as exc:
-            self.error = exc
+
+                sse_manager.send_safe(
+                    session_id=self.session.id,
+                    message=SystemNotification(
+                        type="notification",
+                        title="Plugin successfully run",
+                        message=f"Successfully run plugin {self.plugin_id} {self.method_name}",
+                        notification_type="info",
+                        link=PluginLink(
+                            type="plugin",
+                            method=self.method_name,
+                            id=self.plugin_id,
+                            task_id=self.id,
+                        ),
+                    ),
+                )
+
+        except Exception as e:
+            self.error = e
             self.state = TaskState.FAILURE
-            raise
-        finally:
-            self.session.running_tasks.pop(self.id, None)
             sse_manager.send_safe(
                 session_id=self.session.id,
-                message=SystemNotification(
-                    type="notification",
-                    title="Plugin successfully run",
-                    message=f"Successfully run plugin {self.plugin_id} {self.method_name}",
-                    notification_type="info",
-                    link=PluginLink(
-                        type="plugin",
-                        method=self.method_name,
-                        id=self.plugin_id,
-                        task_id=self.id,
-                    ),
+                message=ErrorNotification(
+                    type="error",
+                    title=f"Error while running plugin {self.plugin_id} {self.method_name}",
+                    message=str(e),
+                    trace=traceback.format_exc(),
                 ),
             )
+        finally:
+            self.session.running_tasks.pop(self.id, None)
 
     def summarize(self) -> PluginTaskSummary:
         return PluginTaskSummary(
@@ -158,7 +140,6 @@ class PluginTask(TaskBase, Generic[P]):
             plugin_id=self.plugin_id,
             method_name=self.method_name,
             state=self.state,
-            output=self.result,
         )
 
     @staticmethod
@@ -166,7 +147,7 @@ class PluginTask(TaskBase, Generic[P]):
         plugin_name: str,
         method_name: str,
         input: PluginInput,
-        filter: dict[str, list[BaseFilter]],
+        filter: dict[str, list[ModuleFilter]],
     ) -> Hashable:
         return generate_tuple_hash("plugin", plugin_name, method_name, input, filter)
 
@@ -179,8 +160,7 @@ class PluginTask(TaskBase, Generic[P]):
         input: PluginInput,
     ) -> str:
         filters = {
-            ocel_id: session.get_ocel_filters(ocel_id)
-            for ocel_id in input["ocels"].values()
+            ocel_id: session.get_filter(ocel_id) for ocel_id in input["ocels"].values()
         }
 
         key = cls._dedupe_key(plugin_id, method_name, input, filters)

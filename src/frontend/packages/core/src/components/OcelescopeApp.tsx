@@ -1,4 +1,4 @@
-import { MantineProvider } from "@mantine/core";
+import { createTheme, MantineProvider } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
 import {
   HydrationBoundary,
@@ -11,6 +11,11 @@ import type { OcelescopeConfig } from "../lib/config";
 import { AppShell } from "./AppShell/AppShell";
 import SSEWrapper from "./SSEWrapper";
 
+// Restore the pre-v9 medium font weight (Mantine v9 changed it from 500 to 600).
+const theme = createTheme({
+  fontWeights: { medium: "500" },
+});
+
 export const OcelescopeApp: (config: OcelescopeConfig) => React.FC<any> =
   (config) =>
   ({ Component, pageProps }) => {
@@ -19,7 +24,7 @@ export const OcelescopeApp: (config: OcelescopeConfig) => React.FC<any> =
     return (
       <QueryClientProvider client={client}>
         <HydrationBoundary state={pageProps.dehydratedState}>
-          <MantineProvider>
+          <MantineProvider theme={theme}>
             <SSEWrapper />
             <Notifications />
             <AppShell config={config}>

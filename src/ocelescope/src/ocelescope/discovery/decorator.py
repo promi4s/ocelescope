@@ -26,9 +26,9 @@ def discovery_method(
 
     def decorator(func: Callable[..., Resource]) -> Callable[..., Resource]:
         hints = get_type_hints(func, include_extras=True)
-        resource_type = _extract_resource_type(func.__name__, hints.get("return"))
+        resource_type = _extract_resource_type(func.__name__, hints.get("return"))  # ty: ignore[unresolved-attribute]
 
-        func.__discovery_meta__ = DiscoveryMethodMeta(  # type: ignore[attr-defined]
+        func.__discovery_meta__ = DiscoveryMethodMeta(  # type: ignore[attr-defined]  # ty: ignore[unresolved-attribute]
             name=name,
             description=description,
             func=func,

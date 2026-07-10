@@ -5,6 +5,8 @@ from typing import ClassVar
 from fastapi import FastAPI
 from packaging.version import Version
 
+from ocelescope import BaseFilter
+
 
 @dataclass(frozen=True)
 class ModuleMeta:
@@ -19,3 +21,7 @@ class Module(ABC):
     @abstractmethod
     def create_app(cls) -> FastAPI:
         raise NotImplementedError
+
+
+class ModuleFilter(BaseFilter):
+    OcelescopeModuleSource: ClassVar[str]

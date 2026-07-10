@@ -1,11 +1,11 @@
-import { Alert, Box, Divider, Select, Stack, Text } from "@mantine/core";
+import { Alert, Divider, Select, Stack, Text } from "@mantine/core";
 import type {
   DiscoveryFilterSchema,
   DiscoveryMethodMeta,
 } from "@ocelescope/api-base";
 import type { DiscoverySchema, FilterEntry } from "../types";
-import { DiscoveryField } from "./DiscoveryField";
 import { DiscoveryFiltersSection } from "./DiscoveryFiltersSection";
+import { DiscoveryForm } from "./DiscoveryForm";
 
 type DiscoverySettingsContentProps = {
   methods: DiscoveryMethodMeta[];
@@ -41,50 +41,48 @@ export const DiscoverySettingsContent = ({
   const selectedVariants = selectedMethod?.variants ?? [];
 
   return (
-    <Stack gap="md">
-      <Select
-        label="Discovery Method"
-        value={selectedMethod?.name ?? null}
-        onChange={(name) => {
-          const group = methods.find((m) => m.name === name);
-          setSelectedMethodId(group?.variants[0]?.methodId ?? null);
-        }}
-        data={methods.map((m) => ({ value: m.name, label: m.name }))}
-        allowDeselect={false}
-      />
-      {selectedVariants.length > 1 && (
+    <Stack gap="xl">
+      <Stack gap="xs">
         <Select
-          label="Output Format"
-          value={selectedMethodId}
-          onChange={setSelectedMethodId}
-          data={selectedVariants.map((v) => ({
-            value: v.methodId,
-            label: v.resourceType,
-          }))}
+          label="Discovery Method"
+          value={selectedMethod?.name ?? null}
+          onChange={(name) => {
+            const group = methods.find((m) => m.name === name);
+            setSelectedMethodId(group?.variants[0]?.methodId ?? null);
+          }}
+          data={methods.map((m) => ({ value: m.name, label: m.name }))}
           allowDeselect={false}
         />
-      )}
-      {selectedMethod?.description && (
-        <Text size="sm" c="dimmed">
-          {selectedMethod.description}
-        </Text>
-      )}
-      {Object.entries(selectedSchema.properties ?? {}).map(
-        ([name, property]) => (
-          <Box key={name}>
-            <DiscoveryField
-              name={name}
-              property={property}
-              value={activeFormData[name]}
-              eventTypeOptions={Object.keys(eventCounts)}
-              objectTypeOptions={Object.keys(objectCounts)}
-              onChange={(value) =>
-                setActiveFormData({ ...activeFormData, [name]: value })
-              }
-            />
-          </Box>
-        ),
-      )}
+        {selectedVariants.find((v) => v.methodId === selectedMethodId)
+          ?.description && (
+          <Text size="sm" c="dimmed">
+            {
+              selectedVariants.find((v) => v.methodId === selectedMethodId)
+                ?.description
+            }
+          </Text>
+        )}
+        {selectedVariants.length > 1 && (
+          <Select
+            label="Output Format"
+            value={selectedMethodId}
+            onChange={setSelectedMethodId}
+            data={selectedVariants.map((v) => ({
+              value: v.methodId,
+              label: v.resourceType,
+            }))}
+            allowDeselect={false}
+          />
+        )}
+        <DiscoveryForm
+          schema={selectedSchema}
+          formData={activeFormData}
+          onChange={setActiveFormData}
+          eventTypeOptions={Object.keys(eventCounts)}
+          objectTypeOptions={Object.keys(objectCounts)}
+        />
+      </Stack>
+
       <Divider />
 
       <DiscoveryFiltersSection

@@ -6,7 +6,7 @@ export default defineModule({
   name: "discovery",
   description:
     "A tool for discovering object-centric event logs, allowing you create various plots like OC-DFGs or OC-Petri-Nets.",
-  label: "Discovery",
+  label: "Model Discovery",
   authors: [{ name: "Menne, Sebastian" }],
   routes: [DiscoveryRoute],
   icon: ChartNetwork,

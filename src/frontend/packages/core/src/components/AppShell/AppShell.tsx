@@ -1,17 +1,22 @@
 import {
+  ActionIcon,
   Box,
   Burger,
   Button,
   Group,
   AppShell as MantineAppShell,
+  Text,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { UploadIcon } from "lucide-react";
+import { HelpCircleIcon, UploadIcon } from "lucide-react";
 import { useState } from "react";
 import type { OcelescopeConfig } from "../../lib/config";
+import { env } from "../../lib/env";
+import { HelpModal } from "../HelpModal/HelpModal";
 import { CurrentOcelSelect } from "../OcelSelect/OcelSelect";
 import { UploadModal } from "../UploadModal/UploadModal";
 import NavBar from "./components/NavBar";
+import { OcelescopeLogo } from "./components/OcelescopeLogo";
 
 export const AppShell: React.FC<{
   config: OcelescopeConfig;
@@ -21,6 +26,7 @@ export const AppShell: React.FC<{
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
 
   const [isUploadModalVisible, setIsUploadModalVisible] = useState(false);
+  const [isHelpModalVisible, setIsHelpModalVisible] = useState(false);
 
   return (
     <MantineAppShell
@@ -47,6 +53,10 @@ export const AppShell: React.FC<{
               visibleFrom="sm"
               size="sm"
             />
+            <OcelescopeLogo size={32} />
+            <Text size="xs" c="dimmed">
+              {env.appVersion}
+            </Text>
           </Group>
 
           <Group>
@@ -61,6 +71,17 @@ export const AppShell: React.FC<{
               visible={isUploadModalVisible}
               onClose={() => setIsUploadModalVisible(false)}
             />
+            <ActionIcon
+              variant="subtle"
+              aria-label="Help"
+              onClick={() => setIsHelpModalVisible(true)}
+            >
+              <HelpCircleIcon size={20} />
+            </ActionIcon>
+            <HelpModal
+              visible={isHelpModalVisible}
+              onClose={() => setIsHelpModalVisible(false)}
+            />
           </Group>
         </Group>
       </MantineAppShell.Header>
@@ -69,7 +90,7 @@ export const AppShell: React.FC<{
         style={{ overflow: "hidden" }}
         h="calc(100dvh - var(--app-shell-header-offset, 0rem) - var(--app-shell-footer-height, 0px) + var(--app-shell-padding, 0))"
       >
-        <Box h={"100%"} style={{ overflow: "scroll", position: "relative" }}>
+        <Box h={"100%"} style={{ overflow: "auto", position: "relative" }}>
           {children}
         </Box>
       </MantineAppShell.Main>

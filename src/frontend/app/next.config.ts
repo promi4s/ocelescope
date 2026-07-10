@@ -9,14 +9,16 @@ const nextConfig: NextConfig = {
     proxyClientMaxBodySize: "1000gb",
   },
   transpilePackages: [
-    "@ocelescope/core",
+    "@mantine/charts",
+    "recharts",
+    "@r4pm/components",
     "@ocelescope/resources",
-    "@ocelsecope/charts",
-    "@ocelescope/ocelot",
-    "@ocelescope/api-base",
-    "@ocelescope/api-client",
+    "@ocelescope/plugin",
     "@ocelescope/filter",
     "@ocelescope/discovery",
+    "@ocelescope/log-overview",
+    "@ocelescope/management",
+    "@ocelescope/variants",
   ],
   rewrites: async () => {
     return [

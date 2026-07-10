@@ -1,6 +1,9 @@
 import { Graphviz } from "@hpcc-js/wasm-graphviz";
-import { saveAs } from "file-saver";
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import FileSaver from "file-saver";
+
+const { saveAs } = FileSaver;
+
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { VisualizationProps } from "../../../types";
 import { SvgPanWrapper } from "./SVG";
 
@@ -61,48 +64,48 @@ const DotToSvgViewer: React.FC<VisualizationProps<"dot">> = ({
     saveAs(blob, "resource.svg");
   };
 
-  const Wrapper = isPreview ? Fragment : SvgPanWrapper;
-
-  return (
-    <Wrapper onDownload={handleDownload}>
-      <div style={{ width: "100%", height: "100%", position: "relative" }}>
-        {error && (
+  const content = (
+    <div style={{ width: "100%", height: "100%", position: "relative" }}>
+      {error && (
+        <div
+          style={{
+            position: "absolute",
+            top: 8,
+            left: 8,
+            color: "red",
+            zIndex: 10,
+          }}
+        >
+          Graphviz error: {error}
+        </div>
+      )}
+      {cleanedSvg ? (
+        <div
+          style={{ width: "100%", height: "100%" }}
+          dangerouslySetInnerHTML={{ __html: cleanedSvg }}
+        />
+      ) : (
+        !error && (
           <div
             style={{
-              position: "absolute",
-              top: 8,
-              left: 8,
-              color: "red",
-              zIndex: 10,
+              width: "100%",
+              height: "100%",
+              display: "grid",
+              placeItems: "center",
+              opacity: 0.6,
+              fontSize: 14,
             }}
           >
-            Graphviz error: {error}
+            Rendering…
           </div>
-        )}
-        {cleanedSvg ? (
-          <div
-            style={{ width: "100%", height: "100%" }}
-            dangerouslySetInnerHTML={{ __html: cleanedSvg }}
-          />
-        ) : (
-          !error && (
-            <div
-              style={{
-                width: "100%",
-                height: "100%",
-                display: "grid",
-                placeItems: "center",
-                opacity: 0.6,
-                fontSize: 14,
-              }}
-            >
-              Rendering…
-            </div>
-          )
-        )}
-      </div>
-    </Wrapper>
+        )
+      )}
+    </div>
   );
+
+  if (isPreview) return content;
+
+  return <SvgPanWrapper onDownload={handleDownload}>{content}</SvgPanWrapper>;
 };
 
 export default DotToSvgViewer;

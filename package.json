@@ -1,20 +1,23 @@
 {
   "name": "ocelescope-workspace",
   "private": "true",
-  "packageManager": "pnpm@10.34.1",
+  "packageManager": "pnpm@11.10.0+sha512.0b7f8b98060031904c017e3a41eb187a16d40eeb829b95c4f8cb03681761fc4ab53dd219115b9b447f4dce1a05a214764461e7d3703392a9f32f9511ce8c86c8",
   "scripts": {
     "init:backend": "uv sync --all-packages",
-    "init:frontend": "pnpm i && pnpm run build:frontend",
+    "init:frontend": "pnpm i && pnpm run api:sync && pnpm run build:frontend",
     "init": "pnpm run init:backend && pnpm run init:frontend",
     "build:frontend": "pnpm -r --filter \"!@ocelescope/app\" run build",
     "lint:frontend": "biome check .",
     "lint:backend": "uv run ruff check ./src/",
     "lint": "pnpm run lint:backend && pnpm run lint:frontend",
+    "typecheck:frontend": "pnpm -r --if-present run typecheck",
+    "typecheck:backend": "uv run ty check ./src/",
+    "typecheck": "pnpm run typecheck:backend && pnpm run typecheck:frontend",
     "format:frontend": "biome format --write ./src/frontend",
     "format:backend": "uv run ruff format ./src/backend & uv run ruff format ./src/ocelescope",
     "format": "pnpm run format:frontend && pnpm run format:backend",
     "api:generate": "pnpm -r --if-present --parallel run generate:api",
-    "api:sync": "pnpm run api:generate && pnpm run build:frontend",
+    "api:sync": "pnpm --filter @ocelescope/api-config run build && pnpm run api:generate && pnpm run build:frontend",
     "docs:dev": "uv sync --group docs && uv run mkdocs serve --livereload",
     "docs:update": "uv run scripts/update_plugins.py && uv run --package ocelescope pip freeze >> docs/data/pluginEnviroment.txt",
     "dev:deps": "pnpm -r --parallel --filter \"!@ocelescope/app\" run dev",
@@ -23,10 +26,11 @@
     "dev:app": "pnpm run dev:backend & pnpm run dev:frontend",
     "docker:up": "docker compose -f docker-compose.yml up --build",
     "docker:down": "docker compose down",
+    "spellcheck": "cspell \"README.md\" \"CONTRIBUTING.md\" \"docs/**/*.md\" \".github/**/*.yml\" \"src/**/*.py\" \"src/**/*.ts\" \"src/**/*.tsx\" --no-progress --no-must-find-files",
     "notebook": "uv run --with jupyterlab --with jupyter-ruff jupyter lab notebooks/"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.16",
+    "@biomejs/biome": "2.5.1",
     "@tsconfig/strictest": "catalog:",
     "orval": "catalog:"
   },
@@ -34,4 +38,8 @@
     "echarts": "catalog:",
     "echarts-for-react": "catalog:"
   }
+    "orval": "catalog:",
+    "cspell": "catalog:"
+  },
+  "dependencies": {}
 }

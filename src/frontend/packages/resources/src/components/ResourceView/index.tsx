@@ -4,8 +4,8 @@ import { EyeOffIcon } from "lucide-react";
 import type { ComponentProps, ComponentType } from "react";
 import type {
   VisualizationByType,
-  VisulizationsType,
-  VisulizationsTypes,
+  VisualizationsType,
+  VisualizationsTypes,
 } from "../../types";
 import DotToSvgViewer from "./Viewers/Dot";
 import GraphViewer from "./Viewers/Graph";
@@ -13,13 +13,20 @@ import PlotlyViewer from "./Viewers/Plotly";
 import SvgViewer from "./Viewers/SVG";
 import TableView from "./Viewers/Table";
 
-export type VisualizationProps<T extends VisulizationsTypes> = {
-  visualization: VisualizationByType<T>;
-  isPreview?: boolean;
+type ExtraMenuItem = {
+  icon: React.ReactNode;
+  label: string;
+  onClick: () => void;
 };
 
-const visulizationMap: {
-  [T in VisulizationsTypes]: ComponentType<VisualizationProps<T>>;
+export type VisualizationProps<T extends VisualizationsTypes> = {
+  visualization: VisualizationByType<T>;
+  isPreview?: boolean;
+  menuItems?: ExtraMenuItem[];
+};
+
+const visualizationMap: {
+  [T in VisualizationsTypes]: ComponentType<VisualizationProps<T>>;
 } = {
   table: TableView,
   svg: SvgViewer,
@@ -28,12 +35,13 @@ const visulizationMap: {
   plotly: PlotlyViewer,
 };
 
-export const Visualization: React.FC<{
-  visualization: VisulizationsType;
-  isPreview?: boolean;
-}> = ({ visualization, isPreview = false }) => {
+export const Visualization = ({
+  visualization,
+  isPreview = false,
+  menuItems,
+}: VisualizationProps<VisualizationsTypes>) => {
   //TODO: Fix this stroke of a typing hell
-  const Component = visulizationMap[visualization.type] as ComponentType<
+  const Component = visualizationMap[visualization.type] as ComponentType<
     VisualizationProps<typeof visualization.type>
   >;
 
@@ -43,6 +51,7 @@ export const Visualization: React.FC<{
         visualization as ComponentProps<typeof Component>["visualization"]
       }
       isPreview={isPreview}
+      {...(menuItems && { menuItems })}
     />
   );
 };
@@ -69,7 +78,7 @@ export const ResourceViewer: React.FC<{ id: string; isPreview?: boolean }> = ({
 
   return (
     <Visualization
-      visualization={data.visualization as VisulizationsType}
+      visualization={data.visualization as VisualizationsType}
       isPreview={isPreview}
     />
   );

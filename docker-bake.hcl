@@ -25,6 +25,10 @@ target "backend" {
 target "frontend" {
   dockerfile = "./src/frontend/Dockerfile"
 
+  args = {
+    NEXT_PUBLIC_APP_VERSION = "${VERSION}"
+  }
+
   tags = [
     "${REPO}-frontend:${VERSION}",
     "${REPO}-frontend:latest",

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from typing import Optional
+from typing import Optional, cast
 
 from fastapi.datastructures import UploadFile
 from fastapi.exceptions import HTTPException
@@ -63,7 +63,7 @@ def download_resource(session: ApiSession, resource_id: str) -> TempFileResponse
     )
 
     with open(file_response.tmp_path, "w", encoding="utf-8") as output_file:
-        json.dump(resource.model_dump(), output_file, indent=2)
+        json.dump(resource.model_dump(mode="json"), output_file, indent=2)
 
     return file_response
 
@@ -110,7 +110,7 @@ def get_resource(session: ApiSession, resource_id: str) -> GetResourceResponse:
             id=resource_id,
             **resource.model_dump(),
         ),
-        visualization=resource_instance.visualize()
+        visualization=cast(Visualization, resource_instance.visualize())
         if resource_instance is not None
         else None,
     )

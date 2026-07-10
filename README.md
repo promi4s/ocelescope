@@ -2,6 +2,8 @@
 
 🔗 **Documentation:** <https://www.ocelescope.org>
 
+Ocelescope is part of a project by the Chair of Process and Data Science ([PADS](https://www.pads.rwth-aachen.de/go/id/pnbx/)) at RWTH Aachen University. 
+
 > ⚠️ **Project Status: Under Construction**
 >
 > This repository is under active development and is **not production-ready** yet.
@@ -76,3 +78,7 @@ pnpm run
 
 - If `pnpm` complains about your Node version, use the version specified in `.nvmrc`.
 - If you change backend routes/schemas, run `pnpm run api:sync` to refresh the generated client.
+
+## Acknowledgement
+The project on which this work is based upon was funded by the German Federal Ministry of
+Research, Technology and Space under grant number 16IS26019.

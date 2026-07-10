@@ -1,6 +1,7 @@
 from typing import Any
 
 from fastapi import APIRouter, HTTPException
+from ocelescope.ocel.filter.base import BaseFilter
 from pydantic import BaseModel, ValidationError
 
 from ocelescope import (
@@ -9,17 +10,19 @@ from ocelescope import (
     ObjectTypeFilter,
     ObjectTypeFrequencyFilter,
 )
-from ocelescope.ocel.filter.base import BaseFilter
 from ocelescope_backend.app.dependencies import ApiSession
 from ocelescope_backend.app.internal.discovery import discovery_registry
+from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.model.discovery import (
     CreateDiscoveryTaskBody,
     DiscoveryMethodMeta,
     DiscoveryRequest,
     DiscoveryVariant,
 )
-from ocelescope_backend.app.internal.tasks.discovery_task import DiscoveryTask
-
+from ocelescope_backend.app.internal.tasks.discovery_task import (
+    DiscoveryTask,
+    DiscoveryTaskSummary,
+)
 
 _DISCOVERY_FILTER_TYPES: list[type[BaseFilter]] = [
     EventTypeFilter,
@@ -31,28 +34,6 @@ _DISCOVERY_FILTER_TYPES: list[type[BaseFilter]] = [
 _DISCOVERY_FILTERS_BY_NAME: dict[str, type[BaseFilter]] = {
     cls.__name__: cls for cls in _DISCOVERY_FILTER_TYPES
 }
-
-# Maps (filter class name → property name → x-ui-meta.field_type) so the
-# RJSF-based form renderer can swap in the OCEL-aware custom fields.
-_DISCOVERY_FILTER_UI_HINTS: dict[str, dict[str, str]] = {
-    "EventTypeFilter": {"event_types": "event_type"},
-    "EventTypeFrequencyFilter": {"event_types": "event_type"},
-    "ObjectTypeFilter": {"object_types": "object_type"},
-    "ObjectTypeFrequencyFilter": {"object_types": "object_type"},
-}
-
-
-def _build_filter_schema(filter_cls: type[BaseFilter]) -> dict[str, Any]:
-    schema = filter_cls.model_json_schema()
-    hints = _DISCOVERY_FILTER_UI_HINTS.get(filter_cls.__name__, {})
-    properties = schema.get("properties", {})
-    for prop_name, field_type in hints.items():
-        prop = properties.get(prop_name)
-        if prop is None:
-            continue
-        existing = prop.get("x-ui-meta", {})
-        prop["x-ui-meta"] = {**existing, "field_type": field_type}
-    return schema
 
 
 class DiscoveryFilterSchema(BaseModel):
@@ -111,6 +92,32 @@ def create_discovery_task(
     )
 
 
+@discovery_router.get("/tasks/{task_id}", operation_id="DiscoveryTask")
+def get_discovery_task(
+    session: ApiSession,
+    task_id: str,
+) -> DiscoveryTaskSummary:
+    discovery_task = session.get_task(task_id)
+
+    if discovery_task is None or not isinstance(discovery_task, DiscoveryTask):
+        raise NotFound("Task could not be found")
+
+    return discovery_task.summarize()
+
+
+@discovery_router.post("/tasks/{task_id}", operation_id="saveDiscovery")
+def save_discovery(
+    session: ApiSession,
+    task_id: str,
+):
+    discovery_task = session.get_task(task_id)
+
+    if discovery_task is None or not isinstance(discovery_task, DiscoveryTask):
+        raise NotFound("Task could not be found")
+
+    return discovery_task.save_resource()
+
+
 @discovery_router.get(
     "/filters",
     summary="List filters available to discovery tasks",
@@ -120,7 +127,7 @@ def list_discovery_filters() -> list[DiscoveryFilterSchema]:
     return [
         DiscoveryFilterSchema(
             name=filter_cls.__name__,
-            json_schema=_build_filter_schema(filter_cls),
+            json_schema=filter_cls.model_json_schema(),
         )
         for filter_cls in _DISCOVERY_FILTER_TYPES
     ]
@@ -135,11 +142,13 @@ def list_discovery_methods() -> list[DiscoveryMethodMeta]:
     return [
         DiscoveryMethodMeta(
             name=group.name,
-            description=group.description,
             variants=[
                 DiscoveryVariant(
                     method_id=v.method_id,
-                    resource_type=v.resource_type.get_type(),
+                    resource_type=v.resource_type.label
+                    if v.resource_type.label is not None
+                    else v.resource_type.get_type(),
+                    description=v.description,
                     input_schema=v.parameters_schema(),
                 )
                 for v in group.variants

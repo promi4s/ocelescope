@@ -1,10 +1,7 @@
 import { DataTable, type DataTableColumn } from "mantine-datatable";
-import type React from "react";
 import { useEffect, useMemo, useState } from "react";
-import type { VisualizationByType } from "../../../types";
 import dayjs, { formatDate, formatDateTime } from "../../../util/dayjs";
-
-type Table = VisualizationByType<"table">;
+import type { VisualizationProps } from "..";
 
 const formatCell = (
   value: any,
@@ -28,12 +25,10 @@ const formatCell = (
 };
 const PAGE_SIZES = [20, 50, 75] as const;
 
-const TableView: React.FC<{ visualization: Table; isPreview?: boolean }> = ({
-  visualization,
-}) => {
+const TableView = ({ visualization }: VisualizationProps<"table">) => {
   const [pageSize, setPageSize] = useState<number>(PAGE_SIZES[0]);
 
-  //TODO: Make everthing sortable and searchable
+  //TODO: Make everything sortable and searchable
   const columns: DataTableColumn[] = useMemo(
     () =>
       visualization.columns.map((col) => ({

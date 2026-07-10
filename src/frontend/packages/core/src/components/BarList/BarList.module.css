@@ -1,0 +1,86 @@
+.head th {
+  background-color: var(--mantine-color-default-hover);
+  border-bottom: 2px solid
+    var(--mantine-color-default-border);
+}
+
+.headLabel {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mantine-color-dimmed);
+}
+
+.headCount {
+  color: var(--mantine-color-blue-4);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.container {
+  border: 1px solid var(--mantine-color-default-border);
+  border-radius: var(--mantine-radius-default);
+  overflow: hidden;
+}
+
+.scrollArea {
+  overflow-y: auto;
+}
+
+.toggleRow {
+  display: block;
+  width: 100%;
+  padding: 0.55em var(--mantine-spacing-sm);
+  text-align: center;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--mantine-color-blue-6);
+  border-top: 1px solid var(--mantine-color-default-border);
+  transition: background-color 100ms ease;
+}
+
+.toggleRow:hover {
+  background-color: var(--mantine-color-blue-light);
+}
+
+.barCell {
+  display: flex;
+  align-items: center;
+}
+
+.bar {
+  background: var(--mantine-color-blue-6);
+  height: 1.2em;
+  border-radius: 4px;
+
+  display: flex;
+  justify-content: center;
+
+  overflow: hidden;
+
+  white-space: nowrap;
+  line-height: 1.2em;
+
+  padding-right: 0.5em;
+  box-sizing: border-box;
+
+  position: relative;
+}
+
+.labelInside {
+  display: inline-block;
+  padding: 0 0.4em;
+  color: white;
+  font-weight: 600;
+  font-size: 0.9em;
+}
+
+.labelOutside {
+  display: inline-block;
+  margin-left: 0.5em;
+  color: #111;
+  font-weight: 600;
+  font-size: 0.9em;
+}

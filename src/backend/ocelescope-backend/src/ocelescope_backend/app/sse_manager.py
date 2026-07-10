@@ -34,13 +34,20 @@ class SystemNotification(BaseModel):
     link: Optional[SystemLink] = None
 
 
+class ErrorNotification(BaseModel):
+    type: Literal["error"]
+    title: str
+    message: str
+    trace: str
+
+
 class InvalidationRequest(BaseModel):
     type: Literal["invalidation"] = "invalidation"
     routes: list[Literal["resources", "ocels", "tasks", "plugins"]]
 
 
 SSEMessage = Annotated[
-    Union[SystemNotification, InvalidationRequest],
+    Union[SystemNotification, InvalidationRequest, ErrorNotification],
     Field(discriminator="type"),
 ]
 

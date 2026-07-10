@@ -4,9 +4,9 @@ from typing import Annotated, Literal, Optional
 
 import pandas as pd
 from fastapi import APIRouter, Query, Response
-from ocelescope import RelationCountSummary
 from ocelescope.ocel.constants.misc import OCELFileExtensions
 
+from ocelescope import VariantFilter
 from ocelescope_backend.app.dependencies import ApiOcel, ApiSession
 from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.model.base import PaginatedResponse
@@ -16,12 +16,16 @@ from ocelescope_backend.app.internal.model.events import (
 )
 from ocelescope_backend.app.internal.model.ocel import (
     AggregatedAttribute,
-    OCELFilter,
     OcelMetadata,
     QuantityInfo,
     TypedAttribute,
 )
+from ocelescope_backend.app.internal.model.relations import (
+    RelationCombination,
+    RelationCountSummary,
+)
 from ocelescope_backend.app.internal.model.response import TempFileResponse
+from ocelescope_backend.app.internal.model.variants import ObjectTypeVariants
 from ocelescope_backend.app.internal.ocel.default_ocel import (
     DEFAULT_OCEL_KEYS,
     DefaultOCEL,
@@ -30,8 +34,11 @@ from ocelescope_backend.app.internal.ocel.default_ocel import (
 )
 from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.registry.extension import OCELExtensionDescription
-from ocelescope_backend.app.internal.util.filters import merge_filters, unmerge_filter
 from ocelescope_backend.app.internal.util.pandas import search_paginated_dataframe
+from ocelescope_backend.app.internal.util.relations import (
+    RelationSortField,
+    relation_summary,
+)
 
 ocels_router = APIRouter(prefix="/ocels", tags=["ocels"])
 
@@ -50,9 +57,10 @@ ocels_router = APIRouter(prefix="/ocels", tags=["ocels"])
 def getOcels(
     session: ApiSession, extension_name: Optional[str] = None
 ) -> list[OcelMetadata]:
-
     return [
-        OcelMetadata.from_ocel(value.ocel)
+        OcelMetadata.from_ocel(
+            value.ocel, filter_applied=len(value._applied_filter) > 0
+        )
         for value in session.ocels.values()
         if extension_name is None
         or extension_name
@@ -122,8 +130,11 @@ def get_extension_meta() -> dict[str, OCELExtensionDescription]:
 @ocels_router.get(
     "/{ocel_id}", summary="Get general information about a OCEL", operation_id="getOcel"
 )
-def get_ocel(ocel: ApiOcel) -> OcelMetadata:
-    return OcelMetadata.from_ocel(ocel)
+def get_ocel(ocel: ApiOcel, session: ApiSession) -> OcelMetadata:
+
+    return OcelMetadata.from_ocel(
+        ocel,
+    )
 
 
 @ocels_router.post(
@@ -156,11 +167,55 @@ def rename_ocel(ocel: ApiOcel, new_name: str):
 # region Info
 @ocels_router.get(
     "/{ocel_id}/attributes",
-    response_model=list[AggregatedAttribute],
     operation_id="AggregatedAttributes",
 )
-def get_aggr_attributes(ocel: ApiOcel):
-    return AggregatedAttribute.from_df(ocel.attributes.get_aggr_summary())
+def get_aggr_object_attributes(
+    ocel: ApiOcel,
+    page: Annotated[int, Query(ge=1)] = 1,
+    page_size: Annotated[int, Query()] = 10,
+    entity_type: Annotated[Literal["events", "objects"], Query()] = "events",
+    attribute_names: Annotated[list[str] | None, Query()] = None,
+    entity_names: Annotated[list[str] | None, Query()] = None,
+) -> PaginatedResponse[list[AggregatedAttribute]]:
+    attribute_names = (
+        (
+            ocel.events.attribute_names
+            if entity_type == "events"
+            else ocel.objects.attribute_names
+        )
+        if attribute_names is None
+        else sorted(attribute_names)
+    )
+
+    attribute_summary = ocel.attributes.get_aggr_summary(
+        activities=[] if entity_type == "objects" else entity_names,
+        object_types=[] if entity_type == "events" else entity_names,
+        attributes=attribute_names[(page - 1) * page_size : page * page_size],
+    )
+
+    return PaginatedResponse(
+        page=page,
+        total_items=len(attribute_names),
+        response=AggregatedAttribute.from_df(attribute_summary),
+        page_size=page_size,
+    )
+
+
+@ocels_router.get("/{ocel_id}/attribute/names", operation_id="AttributeNames")
+def get_attribute_names(
+    ocel: ApiOcel,
+    entity_type: Annotated[Literal["events", "objects"] | None, Query()] = None,
+) -> list[str]:
+
+    attribute_names = []
+
+    if entity_type != "events":
+        attribute_names += ocel.objects.attribute_names
+
+    if entity_type != "objects":
+        attribute_names += ocel.events.attribute_names
+
+    return attribute_names
 
 
 @ocels_router.get(
@@ -169,12 +224,42 @@ def get_aggr_attributes(ocel: ApiOcel):
     operation_id="objectAttributes",
 )
 def get_object_attributes(
-    ocel: ApiOcel, attribute_names: Annotated[list[str], Query()] = []
+    ocel: ApiOcel,
+    attribute_names: Annotated[list[str], Query()] = [],
+    names: Annotated[list[str] | None, Query()] = None,
 ):
     return TypedAttribute.from_df(
         ocel.attributes.get_object_summary(
-            attributes=None if len(attribute_names) == 0 else attribute_names
+            attributes=None if len(attribute_names) == 0 else attribute_names,
+            object_types=names,
         )
+    )
+
+
+@ocels_router.get(
+    "/{ocel_id}/objects/types",
+    operation_id="objectTypes",
+)
+def get_object_types(ocel: ApiOcel) -> list[str]:
+    return ocel.objects.types
+
+
+@ocels_router.get(
+    "/{ocel_id}/objects/variants",
+    summary="Get the variants of an object type",
+    description=(
+        "Returns the object variants for a single object type. Each variant is a "
+        "distinct activity sequence, together with the number of events it contains "
+        "and the number of cases (objects) that follow it."
+    ),
+    operation_id="objectVariants",
+)
+def get_object_variants(
+    ocel: ApiOcel,
+    object_type: str,
+) -> ObjectTypeVariants:
+    return ObjectTypeVariants.from_variants(
+        ocel.executions.get_object_variants(object_types=[object_type])
     )
 
 
@@ -184,11 +269,14 @@ def get_object_attributes(
     operation_id="eventAttributes",
 )
 def get_event_attributes(
-    ocel: ApiOcel, attribute_names: Annotated[list[str], Query()] = []
+    ocel: ApiOcel,
+    attribute_names: Annotated[list[str], Query()] = [],
+    names: Annotated[list[str] | None, Query()] = None,
 ):
     return TypedAttribute.from_df(
         ocel.attributes.get_activity_summary(
-            attributes=None if len(attribute_names) == 0 else attribute_names
+            attributes=None if len(attribute_names) == 0 else attribute_names,
+            activities=names,
         )
     )
 
@@ -202,6 +290,16 @@ def get_event_counts(
     ocel: ApiOcel,
 ) -> dict[str, int]:
     return ocel.events.activity_counts.to_dict()
+
+
+@ocels_router.get(
+    "/{ocel_id}/events/activityNames",
+    operation_id="Activities",
+)
+def get_activities(
+    ocel: ApiOcel,
+) -> list[str]:
+    return ocel.events.activities
 
 
 @ocels_router.get(
@@ -271,24 +369,88 @@ def get_object_counts(
 
 @ocels_router.get(
     "/{ocel_id}/relations/e2o",
-    response_model=list[RelationCountSummary],
     operation_id="e2o",
 )
 def get_e2o(
-    ocel: ApiOcel, direction: Literal["source", "target"] = "source"
-) -> list[RelationCountSummary]:
-    return ocel.e2o.summary(direction=direction)
+    ocel: ApiOcel,
+    direction: Literal["source", "target"] = "source",
+    source_types: Annotated[list[str] | None, Query()] = None,
+    target_types: Annotated[list[str] | None, Query()] = None,
+    qualifiers: Annotated[list[str] | None, Query()] = None,
+    sort_by: Annotated[RelationSortField | None, Query()] = None,
+    order: Annotated[Literal["asc", "desc"], Query()] = "asc",
+    page: Annotated[int | None, Query(ge=1)] = None,
+    page_size: Annotated[int | None, Query(ge=1)] = None,
+    with_qualifier: Annotated[bool, Query()] = True,
+) -> PaginatedResponse[list[RelationCountSummary]]:
+    return relation_summary(
+        ocel.e2o,
+        direction,
+        source_types,
+        target_types,
+        qualifiers,
+        sort_by,
+        order,
+        page,
+        page_size,
+        with_qualifier=with_qualifier,
+    )
 
 
 @ocels_router.get(
     "/{ocel_id}/relations/o2o",
-    response_model=list[RelationCountSummary],
     operation_id="o2o",
 )
 def get_object_relations(
-    ocel: ApiOcel, direction: Literal["source", "target"] = "source"
-) -> list[RelationCountSummary]:
-    return ocel.o2o.summary(direction=direction)
+    ocel: ApiOcel,
+    direction: Literal["source", "target"] = "source",
+    source_types: Annotated[list[str] | None, Query()] = None,
+    target_types: Annotated[list[str] | None, Query()] = None,
+    qualifiers: Annotated[list[str] | None, Query()] = None,
+    sort_by: Annotated[RelationSortField | None, Query()] = None,
+    order: Annotated[Literal["asc", "desc"], Query()] = "asc",
+    page: Annotated[int | None, Query(ge=1)] = None,
+    page_size: Annotated[int | None, Query(ge=1)] = None,
+    with_qualifier: Annotated[bool, Query()] = True,
+) -> PaginatedResponse[list[RelationCountSummary]]:
+    return relation_summary(
+        ocel.o2o,
+        direction,
+        source_types,
+        target_types,
+        qualifiers,
+        sort_by,
+        order,
+        page,
+        page_size,
+        with_qualifier=with_qualifier,
+    )
+
+
+@ocels_router.get(
+    "/{ocel_id}/relations/e2o/combinations",
+    operation_id="e2oCombinations",
+)
+def get_e2o_combinations(
+    ocel: ApiOcel,
+    direction: Literal["source", "target"] = "source",
+) -> list[RelationCombination]:
+    return RelationCombination.from_combinations(
+        ocel.e2o.combinations(direction, with_qualifier=True)
+    )
+
+
+@ocels_router.get(
+    "/{ocel_id}/relations/o2o/combinations",
+    operation_id="o2oCombinations",
+)
+def get_o2o_combinations(
+    ocel: ApiOcel,
+    direction: Literal["source", "target"] = "source",
+) -> list[RelationCombination]:
+    return RelationCombination.from_combinations(
+        ocel.o2o.combinations(direction, with_qualifier=True)
+    )
 
 
 @ocels_router.get("/{ocel_id}/events/ids", operation_id="eventIds")
@@ -333,28 +495,6 @@ def get_object_ids(
     return PaginatedResponse(
         response=object_ids, page=page, page_size=size, total_items=len(ocel.objects.df)
     )
-
-
-# endregion
-# region Filters
-@ocels_router.get(
-    "/{ocel_id}/filter",
-    operation_id="getFilters",
-)
-def get_filter(ocel: ApiOcel, session: ApiSession) -> Optional[OCELFilter]:
-    return merge_filters(session.get_ocel_filters(ocel.meta.id))
-
-
-@ocels_router.post(
-    "/{ocel_id}/filter",
-    operation_id="setFilters",
-)
-def set_filter(
-    ocel: ApiOcel, session: ApiSession, filter: Optional[OCELFilter]
-) -> Optional[OCELFilter]:
-    session.filter_ocel(ocel.meta.id, unmerge_filter(filter or {}))
-
-    return merge_filters(session.get_ocel_filters(ocel.meta.id))
 
 
 # endregion
@@ -407,6 +547,42 @@ def download_flat_log(ocel: ApiOcel, object_type_name: str) -> TempFileResponse:
     )
 
     ocel.write_xes(object_type_name, Path(file_response.tmp_path))
+
+    return file_response
+
+
+@ocels_router.get(
+    "/{ocel_id}/objects/variants/download/xes",
+    summary="Download selected object variants as a flat XES log",
+    description=(
+        "Filters the OCEL to the objects of `object_type` that follow any of the "
+        "given `variant_ids`, then flattens that sub-log by `object_type` into a "
+        "XES file (one trace per object)."
+    ),
+    operation_id="downloadVariantFlatLog",
+)
+def download_variant_flat_log(
+    ocel: ApiOcel,
+    object_type: str,
+    variant_ids: Annotated[list[str], Query(min_length=1)],
+) -> TempFileResponse:
+    variant_ocel = ocel.filter(
+        [VariantFilter(object_type=object_type, variant_ids=variant_ids)]
+    )
+
+    if len(variant_ocel.events.df) == 0:
+        raise NotFound("No objects were found for the given variants")
+
+    name = ocel.meta.extra["name"]
+    tmp_file_prefix = datetime.now().strftime("%Y%m%d-%H%M%S") + "-" + name
+
+    file_response = TempFileResponse(
+        prefix=tmp_file_prefix,
+        suffix=".xes",
+        filename=f"{name}_{object_type}.xes",
+    )
+
+    variant_ocel.write_xes(object_type, Path(file_response.tmp_path))
 
     return file_response
 

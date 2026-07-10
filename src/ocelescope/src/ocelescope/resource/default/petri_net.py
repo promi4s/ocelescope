@@ -12,11 +12,11 @@ if TYPE_CHECKING:
 
 from ocelescope.resource.resource import Annotated, Resource
 from ocelescope.visualization.default.graph import (
+    DIRECTED_ELK_GRAPH_LAYOUT,
     EdgeStyle,
     Graph,
     GraphEdge,
     GraphNode,
-    LayoutConfig,
     NodeStyle,
 )
 from ocelescope.visualization.util.color import generate_color_map
@@ -288,29 +288,7 @@ class PetriNet(Resource):
         return Graph(
             nodes=nodes,
             edges=edges,
-            layout_config=LayoutConfig(
-                elk_options={
-                    "elk.algorithm": "layered",
-                    "elk.direction": "RIGHT",
-                    "elk.edgeRouting": "SPLINES",
-                    "elk.layered.layering.strategy": "NETWORK_SIMPLEX",
-                    "elk.layered.nodePlacement.strategy": "BRANDES_KOEPF",
-                    "elk.layered.nodePlacement.bk.edgeStraightening": "IMPROVE_STRAIGHTNESS",
-                    "elk.layered.nodePlacement.bk.fixedAlignment": "BALANCED",
-                    "elk.layered.crossingMinimization.strategy": "LAYER_SWEEP",
-                    "elk.layered.cycleBreaking.strategy": "DEPTH_FIRST",
-                    "elk.spacing.nodeNode": 22,
-                    "elk.layered.spacing.nodeNodeBetweenLayers": 34,
-                    "elk.spacing.edgeNode": 12,
-                    "elk.layered.spacing.edgeNodeBetweenLayers": 15,
-                    "elk.spacing.edgeEdge": 15,
-                    "elk.spacing.labelNode": 6,
-                    "elk.spacing.edgeLabel": 6,
-                    "elk.spacing.labelLabel": 4,
-                    "elk.edgeLabels.placement": "CENTER",
-                    "elk.edgeLabels.inline": "false",
-                }
-            ),
+            layout_config=DIRECTED_ELK_GRAPH_LAYOUT,
         )
 
     @classmethod
@@ -371,13 +349,13 @@ class PetriNet(Resource):
         place_map: dict[str, Pm4pyPetriNet.Place] = {}
         for place in self.places:
             p = Pm4pyPetriNet.Place(place.name)
-            net.places.add(p)
+            net.places.add(p)  # ty: ignore[unresolved-attribute]
             place_map[place.name] = p
 
         transition_map: dict[str, Pm4pyPetriNet.Transition] = {}
         for transition in self.transitions:
             t = Pm4pyPetriNet.Transition(transition.name, transition.label)
-            net.transitions.add(t)
+            net.transitions.add(t)  # ty: ignore[unresolved-attribute]
             transition_map[transition.name] = t
 
         node_map: dict[str, Any] = {**place_map, **transition_map}

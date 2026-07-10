@@ -46,9 +46,9 @@ def key_decorator_make_hashable(make_hashable: bool, func: Callable, ignore_firs
                     if any(isinstance(arg, (set, list, dict)) for arg in args) or any(
                         isinstance(v, (set, list, dict)) for v in kwargs.values()
                     ):
-                        msg = f"{func.__name__}: Encountered non-hashable collection argument(s) of type(s) {', '.join(unhashable_types)}. You probably want to set make_hashable=True on the cache decorator."
+                        msg = f"{func.__name__}: Encountered non-hashable collection argument(s) of type(s) {', '.join(unhashable_types)}. You probably want to set make_hashable=True on the cache decorator."  # ty: ignore[unresolved-attribute]
                     else:
-                        msg = f"{func.__name__}: Encountered non-hashable argument(s) of type(s) {', '.join(unhashable_types)}. Omitting for cache key computation."
+                        msg = f"{func.__name__}: Encountered non-hashable argument(s) of type(s) {', '.join(unhashable_types)}. Omitting for cache key computation."  # ty: ignore[unresolved-attribute]
                     if EXCEPTION_ON_NON_HASHABLE:
                         raise CacheError(msg)
                     else:
@@ -88,7 +88,7 @@ def key_decorator_add_func_name(func: Callable):
     def decorator(key):
         @functools.wraps(key)
         def key_wrapper(self, *args, **kwargs):
-            return key(self, func.__name__, *args, **kwargs)
+            return key(self, func.__name__, *args, **kwargs)  # ty: ignore[unresolved-attribute]
 
         return key_wrapper
 
@@ -169,9 +169,9 @@ def instance_lru_cache(
         )(func)
         # Assign method cache helpers
         # (func_cached.cache and existing convenience methods refer to the whole object cache)
-        func_cached.cache_has = cache_has
-        func_cached.cache_forget = cache_forget
-        func_cached.cache_clear = (
+        func_cached.cache_has = cache_has  # ty: ignore[unresolved-attribute]
+        func_cached.cache_forget = cache_forget  # ty: ignore[unresolved-attribute]
+        func_cached.cache_clear = (  # ty: ignore[invalid-assignment]
             cache_clear  # Overriding the original method, only clearing cache for this method
         )
         return func_cached

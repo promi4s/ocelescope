@@ -11,6 +11,15 @@ body:
     validations:
       required: true
 
+  - type: input
+    id: submitter_name
+    attributes:
+      label: Your name
+      description: Name of the person submitting the plugin
+      placeholder: e.g. Jane Doe
+    validations:
+      required: true
+
   - type: textarea
     id: description
     attributes:
@@ -26,6 +35,15 @@ body:
       label: Repository URL
       description: Link to the plugin source repository
       placeholder: https://github.com/your-name/your-plugin
+    validations:
+      required: false
+
+  - type: input
+    id: doi
+    attributes:
+      label: Method publication DOI
+      description: DOI of the publication describing the method, if there is one
+      placeholder: e.g. 10.1007/978-3-031-70418-5_7
     validations:
       required: false
 

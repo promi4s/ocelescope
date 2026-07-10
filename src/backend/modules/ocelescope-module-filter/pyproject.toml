@@ -1,0 +1,26 @@
+[project]
+name = "ocelescope-module-filter"
+version = "0.1.1"
+description = "Ocelescope backend module providing basic filtering of OCELs"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.136.0",
+  "ocelescope>=0.3.0,<0.4.0",
+  "ocelescope-backend>=0.1.0,<0.2.0",
+]
+
+[project.entry-points."ocelescope_backend.modules"]
+filterV1 = "ocelescope_module_filter.module:Filter"
+
+
+[build-system]
+requires = ["uv_build>=0.11.20,<0.12.0"]
+build-backend = "uv_build"
+
+[tool.uv]
+package = true
+
+[tool.uv.sources]
+ocelescope = { workspace = true }
+ocelescope-backend = { workspace = true }

@@ -6,14 +6,15 @@ from ocelescope.ocel.filter import (
     EventAttributeFilter,
     EventTypeFrequencyFilter,
     EventTypeFilter,
+    ObjectIdFilter,
     FilterResult,
     O2OCountFilter,
     ObjectAttributeFilter,
     ObjectTypeFrequencyFilter,
     ObjectTypeFilter,
     TimeFrameFilter,
+    VariantFilter,
 )
-from ocelescope.ocel.models import RelationCountSummary
 
 __all__ = [
     "OCEL",
@@ -22,12 +23,13 @@ __all__ = [
     "EventAttributeFilter",
     "EventTypeFrequencyFilter",
     "EventTypeFilter",
+    "ObjectIdFilter",
     "O2OCountFilter",
     "ObjectTypeFrequencyFilter",
     "ObjectTypeFilter",
     "ObjectAttributeFilter",
     "TimeFrameFilter",
+    "VariantFilter",
     "BaseFilter",
     "FilterResult",
-    "RelationCountSummary",
 ]

@@ -1,43 +1,34 @@
+import { Alert, Code, LoadingOverlay, Stack } from "@mantine/core";
 import {
   Background,
-  ControlButton,
-  Controls,
   ReactFlow,
   ReactFlowProvider,
   useReactFlow,
 } from "@xyflow/react";
-import "@xyflow/react/dist/style.css";
-import {
-  ActionIcon,
-  Alert,
-  Code,
-  LoadingOverlay,
-  Menu,
-  Stack,
-} from "@mantine/core";
-import { DownloadIcon, Maximize2Icon } from "lucide-react";
 import { useCallback, useEffect, useRef } from "react";
-import { useLayout } from "./hooks/useLayout";
-import { FIT_VIEW_PADDING, type GraphVisualization } from "./model/types";
+import type { VisualizationProps } from "../..";
+import GraphControls from "./GraphControls";
+import { useGraphExport } from "./hooks/useGraphExport";
+import { useGraphLayout } from "./hooks/useGraphLayout";
+import { FIT_VIEW_PADDING } from "./model/types";
 import GraphFlowEdge from "./render/Edge";
 import GraphFlowNode from "./render/Node";
 import { computeAutoFitBounds } from "./utils/bounds";
-import { downloadPdf, downloadPng, downloadSvg } from "./utils/download";
 
 const nodeTypes = { node: GraphFlowNode };
 const edgeTypes = { graphflow: GraphFlowEdge };
 
-type GraphFlowProps = {
-  visualization: GraphVisualization;
-  isPreview?: boolean | undefined;
-};
+const GraphFlowCanvas = ({
+  visualization,
+  isPreview,
+  menuItems,
+}: VisualizationProps<"graph">) => {
+  const { nodes, edges, ready, error, onNodesChange } =
+    useGraphLayout(visualization);
 
-const GraphFlowCanvas = ({ visualization, isPreview }: GraphFlowProps) => {
-  const { nodes, edges, layoutReady, error, onNodesChange } =
-    useLayout(visualization);
-
-  const { fitBounds, getNodes, getEdges, getNodesBounds } = useReactFlow();
+  const { fitBounds, getNodes, getEdges } = useReactFlow();
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const { downloadPng, downloadSvg, downloadPdf } = useGraphExport(wrapperRef);
 
   const fitViewWithEdges = useCallback(() => {
     fitBounds(computeAutoFitBounds(getNodes(), getEdges()), {
@@ -45,36 +36,17 @@ const GraphFlowCanvas = ({ visualization, isPreview }: GraphFlowProps) => {
     });
   }, [fitBounds, getNodes, getEdges]);
 
-  const handleDownloadPng = useCallback(
-    () =>
-      wrapperRef.current &&
-      downloadPng(wrapperRef.current, getNodes(), getNodesBounds),
-    [getNodes, getNodesBounds],
-  );
-  const handleDownloadSvg = useCallback(
-    () =>
-      wrapperRef.current &&
-      downloadSvg(wrapperRef.current, getNodes(), getNodesBounds),
-    [getNodes, getNodesBounds],
-  );
-  const handleDownloadPdf = useCallback(
-    () =>
-      wrapperRef.current &&
-      downloadPdf(wrapperRef.current, getNodes(), getNodesBounds),
-    [getNodes, getNodesBounds],
-  );
-
+  // Fit the view once, the first time a layout becomes ready.
   const wasReadyRef = useRef(false);
   useEffect(() => {
-    if (!layoutReady) {
+    if (!ready) {
       wasReadyRef.current = false;
       return;
     }
     if (wasReadyRef.current) return;
     wasReadyRef.current = true;
-
     fitViewWithEdges();
-  }, [layoutReady, fitViewWithEdges]);
+  }, [ready, fitViewWithEdges]);
 
   if (error) {
     return (
@@ -92,10 +64,10 @@ const GraphFlowCanvas = ({ visualization, isPreview }: GraphFlowProps) => {
 
   return (
     <>
-      <LoadingOverlay visible={!layoutReady} zIndex={10} />
+      <LoadingOverlay visible={!ready} zIndex={10} />
       <div
         ref={wrapperRef}
-        style={{ width: "100%", height: "100%", opacity: layoutReady ? 1 : 0 }}
+        style={{ width: "100%", height: "100%", opacity: ready ? 1 : 0 }}
       >
         <ReactFlow
           nodes={nodes}
@@ -111,35 +83,22 @@ const GraphFlowCanvas = ({ visualization, isPreview }: GraphFlowProps) => {
           minZoom={0.05}
           maxZoom={3}
         >
-          {!isPreview && (
-            <>
-              <Background color="#e5e7eb" gap={20} size={1} />
-              <Controls showInteractive={false} showFitView={false}>
-                <ControlButton onClick={fitViewWithEdges} title="fit view">
-                  <Maximize2Icon size={11} />
-                </ControlButton>
-                <Menu position="right" withinPortal={false}>
-                  <Menu.Target>
-                    <ActionIcon variant="transparent">
-                      <DownloadIcon color="black" size={18} />
-                    </ActionIcon>
-                  </Menu.Target>
-                  <Menu.Dropdown>
-                    <Menu.Item onClick={handleDownloadPng}>PNG</Menu.Item>
-                    <Menu.Item onClick={handleDownloadSvg}>SVG</Menu.Item>
-                    <Menu.Item onClick={handleDownloadPdf}>PDF</Menu.Item>
-                  </Menu.Dropdown>
-                </Menu>
-              </Controls>
-            </>
-          )}
+          {!isPreview && <Background color="#e5e7eb" gap={20} size={1} />}
+          <GraphControls
+            isPreview={isPreview}
+            onFitView={fitViewWithEdges}
+            onDownloadPng={downloadPng}
+            onDownloadSvg={downloadSvg}
+            onDownloadPdf={downloadPdf}
+            menuItems={menuItems}
+          />
         </ReactFlow>
       </div>
     </>
   );
 };
 
-const GraphFlow = (props: GraphFlowProps) => (
+const GraphFlow = (props: VisualizationProps<"graph">) => (
   <ReactFlowProvider>
     <GraphFlowCanvas {...props} />
   </ReactFlowProvider>

@@ -43,7 +43,7 @@ def generate_color_map(strings: list[str], scale: str | Literal["custom"] = "Pas
             "#f5ff0099",  # neon-yellow
         ]
     else:
-        cmap = plt.cm.get_cmap(scale, len(unique_strings))
+        cmap = plt.get_cmap(scale, len(unique_strings))
         palette = [mcolors.to_hex(cmap(i)) for i in range(len(unique_strings))]
 
     return {s: c for s, c in zip(unique_strings, palette)}

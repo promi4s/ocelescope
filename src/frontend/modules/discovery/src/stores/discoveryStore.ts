@@ -6,12 +6,14 @@ type OcelFormState = {
   selectedMethodId: string | null;
   formDataByMethod: Partial<Record<string, Record<string, unknown>>>;
   filters: FilterEntry[];
+  filtersInitialized: boolean;
 };
 
 const EMPTY: OcelFormState = {
   selectedMethodId: null,
   formDataByMethod: {},
   filters: [],
+  filtersInitialized: false,
 };
 
 type DiscoveryState = {
@@ -23,6 +25,7 @@ type DiscoveryState = {
     data: Record<string, unknown>,
   ) => void;
   setFilters: (ocelId: string, filters: FilterEntry[]) => void;
+  initializeFilters: (ocelId: string, filters: FilterEntry[]) => void;
 };
 
 const updateOcel = (
@@ -51,6 +54,11 @@ export const useDiscoveryStore = create<DiscoveryState>()(
         }),
       setFilters: (ocelId, filters) =>
         set((s) => updateOcel(s, ocelId, { filters })),
+      initializeFilters: (ocelId, filters) =>
+        set((s) => {
+          if (s.byOcel[ocelId]?.filtersInitialized) return s;
+          return updateOcel(s, ocelId, { filters, filtersInitialized: true });
+        }),
     }),
     { name: "ocelescope:discovery" },
   ),

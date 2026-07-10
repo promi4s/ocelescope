@@ -3,10 +3,11 @@ import {
   getDownloadOCELQueryKey,
   getDownloadResourceAsPnmlQueryKey,
   getDownloadResourceQueryKey,
+  getDownloadVariantFlatLogQueryKey,
 } from "@ocelescope/api-base";
 import { env, useSessionStore } from "@ocelescope/api-client";
 import { parse } from "content-disposition-attachment";
-import { saveAs } from "file-saver";
+import FileSaver from "file-saver";
 import qs from "qs";
 
 export const useDownloadFile = () => {
@@ -33,7 +34,7 @@ export const useDownloadFile = () => {
         ? contentDisposition.filename
         : "fileName";
 
-      saveAs(blob, fileName);
+      FileSaver.saveAs(blob, fileName);
     } catch (err) {
       console.error("Download error:", err);
     }
@@ -67,6 +68,10 @@ export const useDownloadOCEL = useDownloadFromServer(getDownloadOCELQueryKey);
 
 export const useDownloadFlatOCEL = useDownloadFromServer(
   getDownloadFlatLogQueryKey,
+);
+
+export const useDownloadVariantFlatLog = useDownloadFromServer(
+  getDownloadVariantFlatLogQueryKey,
 );
 
 export const useDownloadResource = useDownloadFromServer(

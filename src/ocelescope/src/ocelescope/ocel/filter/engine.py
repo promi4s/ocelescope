@@ -1,16 +1,15 @@
-from typing import TYPE_CHECKING, Optional, cast
+from typing import TYPE_CHECKING, Sequence
 
 import pandas as pd
-import pm4py
 
-from ocelescope.ocel.constants.pm4py import OID_COL
 from ocelescope.ocel.filter.base import BaseFilter, FilterResult
+from ocelescope.ocel.util.cleanup import clean_ocel
 
 if TYPE_CHECKING:
     from ocelescope.ocel.core.ocel import OCEL
 
 
-def compute_combined_masks(ocel: "OCEL", filters: list[BaseFilter]) -> FilterResult:
+def compute_combined_masks(ocel: "OCEL", filters: Sequence[BaseFilter]) -> FilterResult:
     combined = FilterResult(
         events=pd.Series(True, index=ocel.events.df.index),
         objects=pd.Series(True, index=ocel.objects.df.index),
@@ -22,40 +21,41 @@ def compute_combined_masks(ocel: "OCEL", filters: list[BaseFilter]) -> FilterRes
     return combined
 
 
-def apply_filters(ocel: "OCEL", filters: list[BaseFilter]) -> "OCEL":
+def apply_filters(ocel: "OCEL", filters: Sequence[BaseFilter]) -> "OCEL":
     from ocelescope.ocel.core.ocel import OCEL
 
     masks = compute_combined_masks(ocel, filters)
 
-    filtered_event_ids: Optional[pd.Series] = (
-        cast(pd.Series, ocel.events.df[ocel.ocel.event_id_column][masks.events])
-        if masks.events is not None
-        else None
+    events_df = ocel.events.df
+    if masks.events is not None:
+        events_df = events_df.loc[masks.events]
+
+    objects_df = ocel.objects.df
+    if masks.objects is not None:
+        objects_df = objects_df.loc[masks.objects]
+
+    cleaned = clean_ocel(
+        {
+            "events": events_df,
+            "objects": objects_df,
+            "relations": ocel._relations,
+            "o2o": ocel._o2o,
+            "object_changes": ocel._object_changes,
+        }
     )
 
-    filtered_object_ids: Optional[pd.Series] = (
-        cast(pd.Series, ocel.objects.df[OID_COL][masks.objects])
-        if masks.objects is not None
-        else None
-    )
-
-    filtered_ocel = ocel.ocel
-
-    if filtered_event_ids is not None:
-        filtered_ocel = pm4py.filter_ocel_events(filtered_ocel, filtered_event_ids, positive=True)
-
-    if filtered_object_ids is not None:
-        filtered_ocel = pm4py.filter_ocel_objects(filtered_ocel, filtered_object_ids, positive=True)
-
-    # TODO: Don't do this step
-    filtered_ocel = OCEL(
-        filtered_ocel,
-        ocel.meta,
-        # TODO: Clean up quantities
-        quantityExtension=(ocel.quantities.oqty, ocel.quantities.qop, ocel.quantities.properties)
-        if ocel.quantities.is_populated
+    return OCEL(
+        events=cleaned["events"],
+        objects=cleaned["objects"],
+        relations=cleaned["relations"],
+        o2o=cleaned["o2o"],
+        object_changes=cleaned["object_changes"],
+        meta=ocel.meta,
+        quantityExtension=(
+            ocel.quantities.oqty,
+            ocel.quantities.qop,
+            ocel.quantities.properties,
+        )
+        if ocel.quantities.is_populated()
         else None,
     )
-    filtered_ocel.meta = ocel.meta
-
-    return filtered_ocel

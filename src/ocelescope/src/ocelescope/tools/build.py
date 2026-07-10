@@ -113,6 +113,8 @@ def zip_package(pkg_dir: Path, name: str | None) -> Path:
     base_for_archive = pkg_dir.parent  # include folder name inside zip
     with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
         for path in pkg_dir.rglob("*"):
+            if "__pycache__" in path.parts or path.suffix in {".pyc", ".pyo"}:
+                continue
             if path.is_file():
                 zf.write(path, path.relative_to(base_for_archive))
     print(f"📦 Wrote {zip_path}")

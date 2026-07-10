@@ -1,4 +1,4 @@
-name: Plugin environment package request
+name: Plugin environment extension
 description: Request a Python package to be added to the Ocelescope plugin environment
 labels:
   - package-request

@@ -17,7 +17,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const generateVariant = (length: number) => {
+const generateVariant = (_length: number) => {
   const activityArrays = Array.from({ length: 5 }).map(() =>
     faker.lorem.word(),
   );

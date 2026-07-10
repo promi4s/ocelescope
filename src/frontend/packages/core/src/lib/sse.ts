@@ -28,7 +28,7 @@ const SystemNotification = z.object({
   title: z.string(),
   message: z.string(),
   notification_type: z.enum(["warning", "info", "error"]),
-  link: z.optional(SystemLink),
+  link: SystemLink.nullish(),
 });
 
 const InvalidationRequest = z.object({
@@ -36,7 +36,15 @@ const InvalidationRequest = z.object({
   routes: z.array(z.enum(["ocels", "resources", "tasks", "plugins"])),
 });
 
+const ErrorNotification = z.object({
+  type: z.literal("error"),
+  title: z.string(),
+  message: z.string(),
+  trace: z.string(),
+});
+
 export const ServerEventMessage = z.discriminatedUnion("type", [
   SystemNotification,
   InvalidationRequest,
+  ErrorNotification,
 ]);

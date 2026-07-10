@@ -1,7 +1,9 @@
 import { Box, Button, ButtonGroup } from "@mantine/core";
-import { saveAs } from "file-saver";
+import FileSaver from "file-saver";
+
+const { saveAs } = FileSaver;
+
 import { DownloadIcon, MaximizeIcon, MinusIcon, PlusIcon } from "lucide-react";
-import { Fragment } from "react";
 import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
 import type { VisualizationProps } from "../../../types";
 
@@ -36,14 +38,14 @@ export const SvgPanWrapper: React.FC<{
               {children}
             </TransformComponent>
             <ButtonGroup orientation="vertical" pos={"absolute"} bottom={0}>
-              <Button px="xs">
-                <MaximizeIcon width={18} onClick={() => resetTransform(0)} />
+              <Button px="xs" onClick={() => resetTransform(0)}>
+                <MaximizeIcon width={18} />
               </Button>
-              <Button px="xs">
-                <PlusIcon width={18} onClick={() => zoomIn()} />
+              <Button px="xs" onClick={() => zoomIn()}>
+                <PlusIcon width={18} />
               </Button>
-              <Button px="xs">
-                <MinusIcon width={18} onClick={() => zoomOut()} />
+              <Button px="xs" onClick={() => zoomOut()}>
+                <MinusIcon width={18} />
               </Button>
               <Button px="xs" onClick={onDownload}>
                 <DownloadIcon width={18} />
@@ -66,8 +68,6 @@ const SvgViewer: React.FC<VisualizationProps<"svg">> = ({
     .replace(/height="[^"]+"/, 'height="100%"')
     .replace(/<svg(?![^>]*xmlns=)/, '<svg xmlns="http://www.w3.org/2000/svg"');
 
-  const Wrapper = isPreview ? Fragment : SvgPanWrapper;
-
   const handleDownload = () => {
     if (!cleanedSvg) return;
     const blob = new Blob([cleanedSvg], {
@@ -76,14 +76,16 @@ const SvgViewer: React.FC<VisualizationProps<"svg">> = ({
     saveAs(blob, "resource.svg");
   };
 
-  return (
-    <Wrapper onDownload={handleDownload}>
-      <div
-        style={{ width: "100%", height: "100%" }}
-        dangerouslySetInnerHTML={{ __html: cleanedSvg }}
-      />
-    </Wrapper>
+  const content = (
+    <div
+      style={{ width: "100%", height: "100%" }}
+      dangerouslySetInnerHTML={{ __html: cleanedSvg }}
+    />
   );
+
+  if (isPreview) return content;
+
+  return <SvgPanWrapper onDownload={handleDownload}>{content}</SvgPanWrapper>;
 };
 
 export default SvgViewer;

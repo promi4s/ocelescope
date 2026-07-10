@@ -461,7 +461,7 @@
         "tags": [
           "ocels"
         ],
-        "summary": "Get Aggr Attributes",
+        "summary": "Get Aggr Object Attributes",
         "operationId": "AggregatedAttributes",
         "parameters": [
           {
@@ -478,6 +478,169 @@
                 }
               ],
               "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "title": "Page Size"
+            }
+          },
+          {
+            "name": "entity_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "events",
+                "objects"
+              ],
+              "type": "string",
+              "default": "events",
+              "title": "Entity Type"
+            }
+          },
+          {
+            "name": "attribute_names",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Attribute Names"
+            }
+          },
+          {
+            "name": "entity_names",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Entity Names"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResponse_list_AggregatedAttribute__"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ocels/{ocel_id}/attribute/names": {
+      "get": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Get Attribute Names",
+        "operationId": "AttributeNames",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "entity_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "events",
+                    "objects"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Entity Type"
             }
           },
           {
@@ -510,9 +673,9 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/AggregatedAttribute"
+                    "type": "string"
                   },
-                  "title": "Response Aggregatedattributes"
+                  "title": "Response Attributenames"
                 }
               }
             }
@@ -568,6 +731,25 @@
             }
           },
           {
+            "name": "names",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Names"
+            }
+          },
+          {
             "name": "ocel_version",
             "in": "query",
             "required": false,
@@ -600,6 +782,160 @@
                     "$ref": "#/components/schemas/TypedAttribute"
                   },
                   "title": "Response Objectattributes"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ocels/{ocel_id}/objects/types": {
+      "get": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Get Object Types",
+        "operationId": "objectTypes",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "title": "Response Objecttypes"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ocels/{ocel_id}/objects/variants": {
+      "get": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Get the variants of an object type",
+        "description": "Returns the object variants for a single object type. Each variant is a distinct activity sequence, together with the number of events it contains and the number of cases (objects) that follow it.",
+        "operationId": "objectVariants",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "object_type",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Object Type"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectTypeVariants"
                 }
               }
             }
@@ -652,6 +988,25 @@
               },
               "default": [],
               "title": "Attribute Names"
+            }
+          },
+          {
+            "name": "names",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Names"
             }
           },
           {
@@ -761,6 +1116,80 @@
                     "type": "integer"
                   },
                   "title": "Response Eventcounts"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ocels/{ocel_id}/events/activityNames": {
+      "get": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Get Activities",
+        "operationId": "Activities",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "title": "Response Activities"
                 }
               }
             }
@@ -993,6 +1422,142 @@
             }
           },
           {
+            "name": "source_types",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Source Types"
+            }
+          },
+          {
+            "name": "target_types",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Target Types"
+            }
+          },
+          {
+            "name": "qualifiers",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Qualifiers"
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "source",
+                    "target",
+                    "qualifier"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sort By"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "type": "string",
+              "default": "asc",
+              "title": "Order"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Page"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Page Size"
+            }
+          },
+          {
+            "name": "with_qualifier",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true,
+              "title": "With Qualifier"
+            }
+          },
+          {
             "name": "ocel_version",
             "in": "query",
             "required": false,
@@ -1020,11 +1585,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/RelationCountSummary"
-                  },
-                  "title": "Response E2O"
+                  "$ref": "#/components/schemas/PaginatedResponse_list_RelationCountSummary__"
                 }
               }
             }
@@ -1049,6 +1610,226 @@
         ],
         "summary": "Get Object Relations",
         "operationId": "o2o",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "source",
+                "target"
+              ],
+              "type": "string",
+              "default": "source",
+              "title": "Direction"
+            }
+          },
+          {
+            "name": "source_types",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Source Types"
+            }
+          },
+          {
+            "name": "target_types",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Target Types"
+            }
+          },
+          {
+            "name": "qualifiers",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Qualifiers"
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "source",
+                    "target",
+                    "qualifier"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sort By"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "type": "string",
+              "default": "asc",
+              "title": "Order"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Page"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Page Size"
+            }
+          },
+          {
+            "name": "with_qualifier",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true,
+              "title": "With Qualifier"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResponse_list_RelationCountSummary__"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ocels/{ocel_id}/relations/e2o/combinations": {
+      "get": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Get E2O Combinations",
+        "operationId": "e2oCombinations",
         "parameters": [
           {
             "name": "ocel_id",
@@ -1110,9 +1891,97 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/RelationCountSummary"
+                    "$ref": "#/components/schemas/RelationCombination"
                   },
-                  "title": "Response O2O"
+                  "title": "Response E2Ocombinations"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ocels/{ocel_id}/relations/o2o/combinations": {
+      "get": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Get O2O Combinations",
+        "operationId": "o2oCombinations",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "source",
+                "target"
+              ],
+              "type": "string",
+              "default": "source",
+              "title": "Direction"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelationCombination"
+                  },
+                  "title": "Response O2Ocombinations"
                 }
               }
             }
@@ -1325,178 +2194,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PaginatedResponse_list_str__"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/ocels/{ocel_id}/filter": {
-      "get": {
-        "tags": [
-          "ocels"
-        ],
-        "summary": "Get Filter",
-        "operationId": "getFilters",
-        "parameters": [
-          {
-            "name": "ocel_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Ocel Id"
-            }
-          },
-          {
-            "name": "ocel_version",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "enum": [
-                    "original",
-                    "filtered"
-                  ],
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "default": "filtered",
-              "title": "Ocel Version"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/OCELFilter"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "title": "Response Getfilters"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "ocels"
-        ],
-        "summary": "Set Filter",
-        "operationId": "setFilters",
-        "parameters": [
-          {
-            "name": "ocel_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Ocel Id"
-            }
-          },
-          {
-            "name": "ocel_version",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "enum": [
-                    "original",
-                    "filtered"
-                  ],
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "default": "filtered",
-              "title": "Ocel Version"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "anyOf": [
-                  {
-                    "$ref": "#/components/schemas/OCELFilter"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "title": "Filter"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/OCELFilter"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "title": "Response Setfilters"
                 }
               }
             }
@@ -1744,6 +2441,97 @@
         }
       }
     },
+    "/ocels/{ocel_id}/objects/variants/download/xes": {
+      "get": {
+        "tags": [
+          "ocels"
+        ],
+        "summary": "Download selected object variants as a flat XES log",
+        "description": "Filters the OCEL to the objects of `object_type` that follow any of the given `variant_ids`, then flattens that sub-log by `object_type` into a XES file (one trace per object).",
+        "operationId": "downloadVariantFlatLog",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "object_type",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Object Type"
+            }
+          },
+          {
+            "name": "variant_ids",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Variant Ids"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/discovery/ocels/{ocel_id}/tasks": {
       "post": {
         "tags": [
@@ -1781,6 +2569,86 @@
                   "type": "string",
                   "title": "Response Creatediscoverytask"
                 }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/discovery/tasks/{task_id}": {
+      "get": {
+        "tags": [
+          "discovery"
+        ],
+        "summary": "Get Discovery Task",
+        "operationId": "DiscoveryTask",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiscoveryTaskSummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "discovery"
+        ],
+        "summary": "Save Discovery",
+        "operationId": "saveDiscovery",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
               }
             }
           },
@@ -1974,248 +2842,6 @@
         }
       }
     },
-    "/tasks/plugin": {
-      "get": {
-        "tags": [
-          "tasks"
-        ],
-        "summary": "returns all tasks of a session",
-        "operationId": "getPluginTasks",
-        "parameters": [
-          {
-            "name": "plugin_id",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Plugin Id"
-            }
-          },
-          {
-            "name": "method_name",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Method Name"
-            }
-          },
-          {
-            "name": "only_running",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "boolean",
-              "default": true,
-              "title": "Only Running"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PluginTaskSummary"
-                  },
-                  "title": "Response Getplugintasks"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/tasks/plugin/{task_id}": {
-      "get": {
-        "tags": [
-          "tasks"
-        ],
-        "summary": "returns the task of a given taskId",
-        "operationId": "getPluginTask",
-        "parameters": [
-          {
-            "name": "task_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Task Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PluginTaskSummary"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/tasks/discovery": {
-      "get": {
-        "tags": [
-          "tasks"
-        ],
-        "summary": "returns all discovery tasks of a session",
-        "operationId": "getDiscoveryTasks",
-        "parameters": [
-          {
-            "name": "ocel_id",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Ocel Id"
-            }
-          },
-          {
-            "name": "resource_type",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Resource Type"
-            }
-          },
-          {
-            "name": "only_running",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "boolean",
-              "default": true,
-              "title": "Only Running"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/DiscoveryTaskSummary"
-                  },
-                  "title": "Response Getdiscoverytasks"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/tasks/discovery/{task_id}": {
-      "get": {
-        "tags": [
-          "tasks"
-        ],
-        "summary": "returns the discovery task of a given taskId",
-        "operationId": "getDiscoveryTask",
-        "parameters": [
-          {
-            "name": "task_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Task Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DiscoveryTaskSummary"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/plugins": {
       "get": {
         "tags": [
@@ -2234,43 +2860,6 @@
                   },
                   "type": "array",
                   "title": "Response Plugins"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "plugins"
-        ],
-        "summary": "Upload Plugin",
-        "operationId": "uploadPlugin",
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "$ref": "#/components/schemas/Body_uploadPlugin"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -2469,6 +3058,231 @@
                   "type": "string",
                   "title": "Response Runplugin"
                 }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/plugins/{plugin_id}/{method_name}/result/{task_id}": {
+      "get": {
+        "tags": [
+          "plugins"
+        ],
+        "summary": "Get Plugin Result",
+        "operationId": "PluginResult",
+        "parameters": [
+          {
+            "name": "plugin_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Plugin Id"
+            }
+          },
+          {
+            "name": "method_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Method Name"
+            }
+          },
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "$ref": "#/components/schemas/OCELOutput"
+                          },
+                          {
+                            "$ref": "#/components/schemas/ResourceOutput"
+                          }
+                        ],
+                        "discriminator": {
+                          "propertyName": "type",
+                          "mapping": {
+                            "ocel": "#/components/schemas/OCELOutput",
+                            "resource": "#/components/schemas/ResourceOutput"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Pluginresult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/plugins/{plugin_id}/{method_name}/result/{task_id}/save": {
+      "post": {
+        "tags": [
+          "plugins"
+        ],
+        "summary": "Save Plugin Results",
+        "description": "Save the selected results into the session as OCELs / resources.",
+        "operationId": "savePluginResults",
+        "parameters": [
+          {
+            "name": "plugin_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Plugin Id"
+            }
+          },
+          {
+            "name": "method_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Method Name"
+            }
+          },
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_savePluginResults"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedResults"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/plugins/{plugin_id}/{method_name}/result/{task_id}/download": {
+      "post": {
+        "tags": [
+          "plugins"
+        ],
+        "summary": "Download Plugin Results",
+        "description": "Bundle the selected results into a zip for download.",
+        "operationId": "downloadPluginResults",
+        "parameters": [
+          {
+            "name": "plugin_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Plugin Id"
+            }
+          },
+          {
+            "name": "method_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Method Name"
+            }
+          },
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_downloadPluginResults"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
               }
             }
           },
@@ -2925,19 +3739,12 @@
           "type": {
             "$ref": "#/components/schemas/ValueType"
           },
-          "object_types": {
+          "entity_type_names": {
             "items": {
               "type": "string"
             },
             "type": "array",
-            "title": "Object Types"
-          },
-          "actitvities": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Actitvities"
+            "title": "Entity Type Names"
           }
         },
         "type": "object",
@@ -2947,10 +3754,25 @@
           "max",
           "distinct_values",
           "type",
-          "object_types",
-          "actitvities"
+          "entity_type_names"
         ],
         "title": "AggregatedAttribute"
+      },
+      "Body_downloadPluginResults": {
+        "properties": {
+          "indices": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Indices"
+          }
+        },
+        "type": "object",
+        "required": [
+          "indices"
+        ],
+        "title": "Body_downloadPluginResults"
       },
       "Body_getComputedValues": {
         "properties": {
@@ -3026,6 +3848,22 @@
         ],
         "title": "Body_runPlugin"
       },
+      "Body_savePluginResults": {
+        "properties": {
+          "indices": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Indices"
+          }
+        },
+        "type": "object",
+        "required": [
+          "indices"
+        ],
+        "title": "Body_savePluginResults"
+      },
       "Body_upload": {
         "properties": {
           "files": {
@@ -3042,20 +3880,6 @@
           "files"
         ],
         "title": "Body_upload"
-      },
-      "Body_uploadPlugin": {
-        "properties": {
-          "file": {
-            "type": "string",
-            "contentMediaType": "application/octet-stream",
-            "title": "File"
-          }
-        },
-        "type": "object",
-        "required": [
-          "file"
-        ],
-        "title": "Body_uploadPlugin"
       },
       "Body_uploadResource": {
         "properties": {
@@ -3197,17 +4021,6 @@
             "type": "string",
             "title": "Name"
           },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description"
-          },
           "variants": {
             "items": {
               "$ref": "#/components/schemas/DiscoveryVariant"
@@ -3223,19 +4036,6 @@
         ],
         "title": "DiscoveryMethodMeta"
       },
-      "DiscoveryOutput": {
-        "properties": {
-          "resource_ids": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Resource Ids"
-          }
-        },
-        "type": "object",
-        "title": "DiscoveryOutput"
-      },
       "DiscoveryTaskSummary": {
         "properties": {
           "id": {
@@ -3245,35 +4045,49 @@
           "state": {
             "$ref": "#/components/schemas/TaskState"
           },
-          "ocel_id": {
-            "type": "string",
-            "title": "Ocel Id"
-          },
-          "method_id": {
-            "type": "string",
-            "title": "Method Id"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "resource_type": {
-            "type": "string",
-            "title": "Resource Type"
-          },
-          "output": {
-            "$ref": "#/components/schemas/DiscoveryOutput"
+          "visualization": {
+            "anyOf": [
+              {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/Graph"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Table"
+                  },
+                  {
+                    "$ref": "#/components/schemas/SVGVis"
+                  },
+                  {
+                    "$ref": "#/components/schemas/DotVis"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Plotly"
+                  }
+                ],
+                "discriminator": {
+                  "propertyName": "type",
+                  "mapping": {
+                    "dot": "#/components/schemas/DotVis",
+                    "graph": "#/components/schemas/Graph",
+                    "plotly": "#/components/schemas/Plotly",
+                    "svg": "#/components/schemas/SVGVis",
+                    "table": "#/components/schemas/Table"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Visualization"
           }
         },
         "type": "object",
         "required": [
           "id",
           "state",
-          "ocel_id",
-          "method_id",
-          "name",
-          "resource_type",
-          "output"
+          "visualization"
         ],
         "title": "DiscoveryTaskSummary"
       },
@@ -3291,6 +4105,17 @@
             "additionalProperties": true,
             "type": "object",
             "title": "Inputschema"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
           }
         },
         "type": "object",
@@ -3338,89 +4163,6 @@
         "title": "DotVis",
         "description": "Graphviz DOT visualization.\n\nThis visualization stores a raw DOT source string plus the selected layout engine.\nIt is useful when you already have DOT output (for example from `graphviz.Digraph`)\nand want to render it directly.\n\nAttributes:\n    type: Fixed discriminator `\"dot\"`.\n    dot_str: The DOT source string.\n    layout_engine: Graphviz layout engine used for layouting."
       },
-      "E2OCountFilter": {
-        "properties": {
-          "source": {
-            "type": "string",
-            "title": "Source"
-          },
-          "target": {
-            "type": "string",
-            "title": "Target"
-          },
-          "mode": {
-            "anyOf": [
-              {
-                "type": "string",
-                "enum": [
-                  "include",
-                  "exclude"
-                ]
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Mode",
-            "default": "include"
-          },
-          "range": {
-            "prefixItems": [
-              {
-                "anyOf": [
-                  {
-                    "type": "integer"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
-              },
-              {
-                "anyOf": [
-                  {
-                    "type": "integer"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
-              }
-            ],
-            "type": "array",
-            "maxItems": 2,
-            "minItems": 2,
-            "title": "Range"
-          },
-          "qualifier": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Qualifier"
-          },
-          "direction": {
-            "type": "string",
-            "enum": [
-              "source",
-              "target"
-            ],
-            "title": "Direction",
-            "default": "source"
-          }
-        },
-        "type": "object",
-        "required": [
-          "source",
-          "target",
-          "range"
-        ],
-        "title": "E2OCountFilter"
-      },
       "EdgeStyle": {
         "properties": {
           "dashed": {
@@ -3437,6 +4179,46 @@
         "type": "object",
         "title": "EdgeStyle",
         "description": "Visual style options for a `GraphEdge`.\n\nAttributes:\n    dashed: Renders the edge as a dashed line.\n    bold: Renders the edge as a bold line."
+      },
+      "ElkLayoutConfig": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "elk",
+            "title": "Type",
+            "default": "elk"
+          },
+          "options": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    }
+                  ]
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Options"
+          }
+        },
+        "type": "object",
+        "title": "ElkLayoutConfig",
+        "description": "ELK-based layout configuration for a `Graph` visualization.\n\nAttributes:\n    options: Additional ELK layout options passed directly to the renderer.\n        Keys and values mirror the ELK option format (e.g. ``{\"elk.algorithm\": \"force\"}``).\n\n        For all available options see https://eclipse.dev/elk/reference/options.html."
       },
       "Entity_Time_Info": {
         "properties": {
@@ -3463,160 +4245,6 @@
           "date_distribution"
         ],
         "title": "Entity_Time_Info"
-      },
-      "EventAttributeFilter": {
-        "properties": {
-          "target_type": {
-            "type": "string",
-            "title": "Target Type"
-          },
-          "attribute": {
-            "type": "string",
-            "title": "Attribute"
-          },
-          "time_range": {
-            "anyOf": [
-              {
-                "prefixItems": [
-                  {
-                    "anyOf": [
-                      {
-                        "type": "string"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  },
-                  {
-                    "anyOf": [
-                      {
-                        "type": "string"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  }
-                ],
-                "type": "array",
-                "maxItems": 2,
-                "minItems": 2
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Time Range"
-          },
-          "number_range": {
-            "anyOf": [
-              {
-                "prefixItems": [
-                  {
-                    "anyOf": [
-                      {
-                        "type": "integer"
-                      },
-                      {
-                        "type": "number"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  },
-                  {
-                    "anyOf": [
-                      {
-                        "type": "integer"
-                      },
-                      {
-                        "type": "number"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  }
-                ],
-                "type": "array",
-                "maxItems": 2,
-                "minItems": 2
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Number Range"
-          },
-          "values": {
-            "anyOf": [
-              {
-                "items": {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "integer"
-                    },
-                    {
-                      "type": "number"
-                    }
-                  ]
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Values"
-          },
-          "regex": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Regex"
-          }
-        },
-        "type": "object",
-        "required": [
-          "target_type",
-          "attribute"
-        ],
-        "title": "EventAttributeFilter"
-      },
-      "EventTypeFilter": {
-        "properties": {
-          "event_types": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Event Types"
-          },
-          "mode": {
-            "type": "string",
-            "enum": [
-              "exclude",
-              "include"
-            ],
-            "title": "Mode",
-            "default": "include"
-          }
-        },
-        "type": "object",
-        "required": [
-          "event_types"
-        ],
-        "title": "EventTypeFilter"
       },
       "FilterEnvelope": {
         "properties": {
@@ -3709,7 +4337,22 @@
             "title": "Edges"
           },
           "layout_config": {
-            "$ref": "#/components/schemas/LayoutConfig"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GraphvizLayoutConfig"
+              },
+              {
+                "$ref": "#/components/schemas/ElkLayoutConfig"
+              }
+            ],
+            "title": "Layout Config",
+            "discriminator": {
+              "propertyName": "type",
+              "mapping": {
+                "elk": "#/components/schemas/ElkLayoutConfig",
+                "graphviz": "#/components/schemas/GraphvizLayoutConfig"
+              }
+            }
           }
         },
         "type": "object",
@@ -3838,6 +4481,33 @@
               }
             ],
             "title": "End Label"
+          },
+          "layout_attrs": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    }
+                  ]
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Layout Attrs"
           }
         },
         "type": "object",
@@ -3985,31 +4655,8 @@
               }
             ],
             "title": "Rank"
-          }
-        },
-        "type": "object",
-        "required": [
-          "shape"
-        ],
-        "title": "GraphNode",
-        "description": "A node in a `Graph` visualization.\n\nA node defines its identity and visual appearance (shape, label, colors, size).\nLayout coordinates (`x`, `y`) are typically filled by the layouting step, not\nby the resource author.\n\nAttributes:\n    id: Unique node id. Defaults to a generated UUID string.\n    label: Optional label shown near the node.\n    shape: Node shape identifier.\n    width: Optional node width.\n    height: Optional node height.\n    color: Optional fill color (for example hex).\n    x: Optional x-coordinate after layouting.\n    y: Optional y-coordinate after layouting.\n    border_color: Optional border/stroke color.\n    style: Visual style options.\n    label_pos: Label position relative to the node.\n    rank: Optional layout constraint (source/sink or numeric rank).\n    annotation: Optional attached visualization."
-      },
-      "HTTPValidationError": {
-        "properties": {
-          "detail": {
-            "items": {
-              "$ref": "#/components/schemas/ValidationError"
-            },
-            "type": "array",
-            "title": "Detail"
-          }
-        },
-        "type": "object",
-        "title": "HTTPValidationError"
-      },
-      "LayoutConfig": {
-        "properties": {
-          "elk_options": {
+          },
+          "layout_attrs": {
             "anyOf": [
               {
                 "additionalProperties": {
@@ -4034,12 +4681,138 @@
                 "type": "null"
               }
             ],
-            "title": "Elk Options"
+            "title": "Layout Attrs"
           }
         },
         "type": "object",
-        "title": "LayoutConfig",
-        "description": "ELK-based layout configuration for a `Graph` visualization.\n\nAttributes:\n    elk_options: Additional ELK layout options passed directly to the renderer.\n        Keys and values mirror the ELK option format (e.g. ``{\"elk.algorithm\": \"force\"}``).\n\n        For all available options see https://eclipse.dev/elk/reference/options.html."
+        "required": [
+          "shape"
+        ],
+        "title": "GraphNode",
+        "description": "A node in a `Graph` visualization.\n\nA node defines its identity and visual appearance (shape, label, colors, size).\nLayout coordinates (`x`, `y`) are typically filled by the layouting step, not\nby the resource author.\n\nAttributes:\n    id: Unique node id. Defaults to a generated UUID string.\n    label: Optional label shown near the node.\n    shape: Node shape identifier.\n    width: Optional node width.\n    height: Optional node height.\n    color: Optional fill color (for example hex).\n    x: Optional x-coordinate after layouting.\n    y: Optional y-coordinate after layouting.\n    border_color: Optional border/stroke color.\n    style: Visual style options.\n    label_pos: Label position relative to the node.\n    rank: Optional layout constraint (source/sink or numeric rank).\n    annotation: Optional attached visualization."
+      },
+      "GraphvizLayoutConfig": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "graphviz",
+            "title": "Type",
+            "default": "graphviz"
+          },
+          "engine": {
+            "type": "string",
+            "enum": [
+              "circo",
+              "dot",
+              "fdp",
+              "sfdp",
+              "neato",
+              "osage",
+              "patchwork",
+              "twopi",
+              "nop",
+              "nop2"
+            ],
+            "title": "Engine",
+            "default": "dot"
+          },
+          "graphAttrs": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    }
+                  ]
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Graphattrs"
+          },
+          "nodeAttrs": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    }
+                  ]
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nodeattrs"
+          },
+          "edgeAttrs": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    }
+                  ]
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Edgeattrs"
+          }
+        },
+        "type": "object",
+        "title": "GraphvizLayoutConfig"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
       },
       "NodeStyle": {
         "properties": {
@@ -4089,89 +4862,6 @@
         "type": "object",
         "title": "NodeStyle",
         "description": "Visual style options for a `GraphNode`.\n\nAttributes:\n    double_border: Renders a second border inside the node (e.g. final-marking places).\n    inner_symbol: Optional symbol rendered inside the node shape.\n    initial_tokens: Optional initial token count rendered inside a place node.\n    final_tokens: Optional final token count rendered inside a place node."
-      },
-      "O2OCountFilter": {
-        "properties": {
-          "source": {
-            "type": "string",
-            "title": "Source"
-          },
-          "target": {
-            "type": "string",
-            "title": "Target"
-          },
-          "mode": {
-            "anyOf": [
-              {
-                "type": "string",
-                "enum": [
-                  "include",
-                  "exclude"
-                ]
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Mode",
-            "default": "include"
-          },
-          "range": {
-            "prefixItems": [
-              {
-                "anyOf": [
-                  {
-                    "type": "integer"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
-              },
-              {
-                "anyOf": [
-                  {
-                    "type": "integer"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
-              }
-            ],
-            "type": "array",
-            "maxItems": 2,
-            "minItems": 2,
-            "title": "Range"
-          },
-          "qualifier": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Qualifier"
-          },
-          "direction": {
-            "type": "string",
-            "enum": [
-              "source",
-              "target"
-            ],
-            "title": "Direction",
-            "default": "source"
-          }
-        },
-        "type": "object",
-        "required": [
-          "source",
-          "target",
-          "range"
-        ],
-        "title": "O2OCountFilter"
       },
       "OCELAnnotation": {
         "properties": {
@@ -4232,48 +4922,40 @@
         ],
         "title": "OCELExtensionDescription"
       },
-      "OCELFilter": {
+      "OCELOutput": {
         "properties": {
-          "object_types": {
-            "$ref": "#/components/schemas/ObjectTypeFilter"
+          "result_index": {
+            "type": "integer",
+            "title": "Result Index"
           },
-          "event_type": {
-            "$ref": "#/components/schemas/EventTypeFilter"
+          "type": {
+            "type": "string",
+            "const": "ocel",
+            "title": "Type"
           },
-          "time_range": {
-            "$ref": "#/components/schemas/TimeFrameFilter"
-          },
-          "o2o_count": {
-            "items": {
-              "$ref": "#/components/schemas/O2OCountFilter"
+          "activity_count": {
+            "additionalProperties": {
+              "type": "integer"
             },
-            "type": "array",
-            "title": "O2O Count"
+            "type": "object",
+            "title": "Activity Count"
           },
-          "e2o_count": {
-            "items": {
-              "$ref": "#/components/schemas/E2OCountFilter"
+          "object_count": {
+            "additionalProperties": {
+              "type": "integer"
             },
-            "type": "array",
-            "title": "E2O Count"
-          },
-          "event_attributes": {
-            "items": {
-              "$ref": "#/components/schemas/EventAttributeFilter"
-            },
-            "type": "array",
-            "title": "Event Attributes"
-          },
-          "object_attributes": {
-            "items": {
-              "$ref": "#/components/schemas/ObjectAttributeFilter"
-            },
-            "type": "array",
-            "title": "Object Attributes"
+            "type": "object",
+            "title": "Object Count"
           }
         },
         "type": "object",
-        "title": "OCELFilter"
+        "required": [
+          "result_index",
+          "type",
+          "activity_count",
+          "object_count"
+        ],
+        "title": "OCELOutput"
       },
       "OCELResult": {
         "properties": {
@@ -4305,159 +4987,64 @@
         ],
         "title": "OCELResult"
       },
-      "ObjectAttributeFilter": {
+      "ObjectTypeVariants": {
         "properties": {
-          "target_type": {
-            "type": "string",
-            "title": "Target Type"
+          "variants": {
+            "items": {
+              "$ref": "#/components/schemas/ObjectVariant"
+            },
+            "type": "array",
+            "title": "Variants"
           },
-          "attribute": {
-            "type": "string",
-            "title": "Attribute"
+          "case_count": {
+            "type": "integer",
+            "title": "Case Count"
           },
-          "time_range": {
-            "anyOf": [
-              {
-                "prefixItems": [
-                  {
-                    "anyOf": [
-                      {
-                        "type": "string"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  },
-                  {
-                    "anyOf": [
-                      {
-                        "type": "string"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  }
-                ],
-                "type": "array",
-                "maxItems": 2,
-                "minItems": 2
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Time Range"
-          },
-          "number_range": {
-            "anyOf": [
-              {
-                "prefixItems": [
-                  {
-                    "anyOf": [
-                      {
-                        "type": "integer"
-                      },
-                      {
-                        "type": "number"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  },
-                  {
-                    "anyOf": [
-                      {
-                        "type": "integer"
-                      },
-                      {
-                        "type": "number"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  }
-                ],
-                "type": "array",
-                "maxItems": 2,
-                "minItems": 2
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Number Range"
-          },
-          "values": {
-            "anyOf": [
-              {
-                "items": {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "integer"
-                    },
-                    {
-                      "type": "number"
-                    }
-                  ]
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Values"
-          },
-          "regex": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Regex"
+          "event_count": {
+            "type": "integer",
+            "title": "Event Count"
           }
         },
         "type": "object",
         "required": [
-          "target_type",
-          "attribute"
+          "variants",
+          "case_count",
+          "event_count"
         ],
-        "title": "ObjectAttributeFilter"
+        "title": "ObjectTypeVariants",
+        "description": "All variants of a single object type together with the totals across them.\n\nAttributes:\n    variants: The distinct variants, sorted by frequency (descending).\n    case_count: Total number of cases (objects) of the object type.\n    event_count: Total number of events across all cases of the object type."
       },
-      "ObjectTypeFilter": {
+      "ObjectVariant": {
         "properties": {
-          "object_types": {
+          "variant_id": {
+            "type": "string",
+            "title": "Variant Id"
+          },
+          "activities": {
             "items": {
               "type": "string"
             },
             "type": "array",
-            "title": "Object Types"
+            "title": "Activities"
           },
-          "mode": {
-            "type": "string",
-            "enum": [
-              "exclude",
-              "include"
-            ],
-            "title": "Mode",
-            "default": "include"
+          "event_count": {
+            "type": "integer",
+            "title": "Event Count"
+          },
+          "case_count": {
+            "type": "integer",
+            "title": "Case Count"
           }
         },
         "type": "object",
         "required": [
-          "object_types"
+          "variant_id",
+          "activities",
+          "event_count",
+          "case_count"
         ],
-        "title": "ObjectTypeFilter"
+        "title": "ObjectVariant",
+        "description": "A single object variant: a distinct sequence of activities that objects of a\ngiven object type go through.\n\nAttributes:\n    variant_id: Identifier of the variant (``<object_type>_<hash>``).\n    activities: The ordered activity sequence that defines the variant.\n    event_count: Number of events in the variant (length of ``activities``).\n    case_count: Number of objects (cases) that follow this variant."
       },
       "OcelMetadata": {
         "properties": {
@@ -4479,6 +5066,17 @@
             },
             "type": "array",
             "title": "Extensions"
+          },
+          "filter_applied": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filter Applied"
           }
         },
         "type": "object",
@@ -4486,9 +5084,84 @@
           "id",
           "name",
           "created_at",
-          "extensions"
+          "extensions",
+          "filter_applied"
         ],
         "title": "OcelMetadata"
+      },
+      "PaginatedResponse_list_AggregatedAttribute__": {
+        "properties": {
+          "response": {
+            "items": {
+              "$ref": "#/components/schemas/AggregatedAttribute"
+            },
+            "type": "array",
+            "title": "Response"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "page_size": {
+            "type": "integer",
+            "title": "Page Size"
+          },
+          "total_items": {
+            "type": "integer",
+            "title": "Total Items"
+          },
+          "total_pages": {
+            "type": "integer",
+            "title": "Total Pages",
+            "readOnly": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "response",
+          "page",
+          "page_size",
+          "total_items",
+          "total_pages"
+        ],
+        "title": "PaginatedResponse[list[AggregatedAttribute]]"
+      },
+      "PaginatedResponse_list_RelationCountSummary__": {
+        "properties": {
+          "response": {
+            "items": {
+              "$ref": "#/components/schemas/RelationCountSummary"
+            },
+            "type": "array",
+            "title": "Response"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "page_size": {
+            "type": "integer",
+            "title": "Page Size"
+          },
+          "total_items": {
+            "type": "integer",
+            "title": "Total Items"
+          },
+          "total_pages": {
+            "type": "integer",
+            "title": "Total Pages",
+            "readOnly": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "response",
+          "page",
+          "page_size",
+          "total_items",
+          "total_pages"
+        ],
+        "title": "PaginatedResponse[list[RelationCountSummary]]"
       },
       "PaginatedResponse_list_str__": {
         "properties": {
@@ -4703,28 +5376,6 @@
         ],
         "title": "PluginMethod"
       },
-      "PluginOutput": {
-        "properties": {
-          "ocel_ids": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Ocel Ids",
-            "default": []
-          },
-          "resource_ids": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Resource Ids",
-            "default": []
-          }
-        },
-        "type": "object",
-        "title": "PluginOutput"
-      },
       "PluginSource": {
         "properties": {
           "task_id": {
@@ -4752,37 +5403,6 @@
           "version"
         ],
         "title": "PluginSource"
-      },
-      "PluginTaskSummary": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "title": "Id"
-          },
-          "state": {
-            "$ref": "#/components/schemas/TaskState"
-          },
-          "plugin_id": {
-            "type": "string",
-            "title": "Plugin Id"
-          },
-          "method_name": {
-            "type": "string",
-            "title": "Method Name"
-          },
-          "output": {
-            "$ref": "#/components/schemas/PluginOutput"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "state",
-          "plugin_id",
-          "method_name",
-          "output"
-        ],
-        "title": "PluginTaskSummary"
       },
       "QuantityInfo": {
         "properties": {
@@ -4826,11 +5446,43 @@
         ],
         "title": "QuantityInfo"
       },
+      "RelationCombination": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "target": {
+            "type": "string",
+            "title": "Target"
+          },
+          "qualifier": {
+            "type": "string",
+            "title": "Qualifier"
+          }
+        },
+        "type": "object",
+        "required": [
+          "source",
+          "target",
+          "qualifier"
+        ],
+        "title": "RelationCombination",
+        "description": "A distinct (source, target, qualifier) combination of a relation.\n\nAttributes:\n    source: The source object or event type.\n    target: The target object or event type.\n    qualifier: The relation qualifier (empty string when none applies)."
+      },
       "RelationCountSummary": {
         "properties": {
           "qualifier": {
             "type": "string",
             "title": "Qualifier"
+          },
+          "qualifiers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Qualifiers",
+            "default": []
           },
           "source": {
             "type": "string",
@@ -4863,7 +5515,7 @@
           "sum"
         ],
         "title": "RelationCountSummary",
-        "description": "Summary statistics for relationship multiplicities in O2O or E2O relations.\n\nThis structure captures how many related objects (or events) occur for each\ncombination of source type, target type, and qualifier. It is typically used\nin relation summaries such as those produced by O2OManager.summary or\nE2OManager.summary.\n\nAttributes:\n    qualifier (str):\n        The relation qualifier (e.g., role, relationship type) used in the\n        OCEL relation. For O2O this is often empty; for E2O this may describe\n        the nature of the event–object link.\n    source (str):\n        The source object or event type associated with the relation.\n    target (str):\n        The target object or event type associated with the relation.\n    min_count (int):\n        The minimum number of related items observed for any source instance.\n    max_count (int):\n        The maximum number of related items observed for any source instance.\n    sum (int):\n        The total number of relation occurrences across all instances."
+        "description": "Summary statistics for relationship multiplicities in O2O or E2O relations.\n\nCaptures, for each combination of source type, target type and qualifier,\nhow many related items occur per source instance.\n\nAttributes:\n    qualifier: The relation qualifier (empty string when none applies).\n    qualifiers: The qualifiers aggregated under a (source, target) pair. For\n        aggregated rows (``with_qualifier=False``) this lists every qualifier;\n        for per-qualifier rows it is the single-element list ``[qualifier]``.\n    source: The source object or event type.\n    target: The target object or event type.\n    min_count: The minimum number of related items for any source instance.\n    max_count: The maximum number of related items for any source instance.\n    sum: The total number of relation occurrences across all instances."
       },
       "Resource": {
         "properties": {
@@ -4968,6 +5620,68 @@
         ],
         "title": "ResourceInfo"
       },
+      "ResourceOutput": {
+        "properties": {
+          "result_index": {
+            "type": "integer",
+            "title": "Result Index"
+          },
+          "type": {
+            "type": "string",
+            "const": "resource",
+            "title": "Type"
+          },
+          "resource_type": {
+            "type": "string",
+            "title": "Resource Type"
+          },
+          "visualization": {
+            "anyOf": [
+              {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/Graph"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Table"
+                  },
+                  {
+                    "$ref": "#/components/schemas/SVGVis"
+                  },
+                  {
+                    "$ref": "#/components/schemas/DotVis"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Plotly"
+                  }
+                ],
+                "discriminator": {
+                  "propertyName": "type",
+                  "mapping": {
+                    "dot": "#/components/schemas/DotVis",
+                    "graph": "#/components/schemas/Graph",
+                    "plotly": "#/components/schemas/Plotly",
+                    "svg": "#/components/schemas/SVGVis",
+                    "table": "#/components/schemas/Table"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Visualization"
+          }
+        },
+        "type": "object",
+        "required": [
+          "result_index",
+          "type",
+          "resource_type",
+          "visualization"
+        ],
+        "title": "ResourceOutput"
+      },
       "ResourceResult": {
         "properties": {
           "type": {
@@ -5022,6 +5736,30 @@
         ],
         "title": "SVGVis",
         "description": "SVG visualization.\n\nUse this visualization when you want full control over the rendered output\nby providing raw SVG markup.\n\nAttributes:\n    type: Fixed discriminator `\"svg\"`.\n    svg: SVG markup as a string."
+      },
+      "SavedResults": {
+        "properties": {
+          "ocel_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Ocel Ids"
+          },
+          "resource_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Resource Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ocel_ids",
+          "resource_ids"
+        ],
+        "title": "SavedResults"
       },
       "SystemTaskSummary": {
         "properties": {
@@ -5141,52 +5879,6 @@
           "CANCELLED"
         ],
         "title": "TaskState"
-      },
-      "TimeFrameFilter": {
-        "properties": {
-          "time_range": {
-            "prefixItems": [
-              {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
-              },
-              {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
-              }
-            ],
-            "type": "array",
-            "maxItems": 2,
-            "minItems": 2,
-            "title": "Time Range"
-          },
-          "mode": {
-            "type": "string",
-            "enum": [
-              "exclude",
-              "include"
-            ],
-            "title": "Mode",
-            "default": "include"
-          }
-        },
-        "type": "object",
-        "required": [
-          "time_range"
-        ],
-        "title": "TimeFrameFilter"
       },
       "TypedAttribute": {
         "properties": {

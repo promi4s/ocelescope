@@ -1,24 +1,39 @@
+import json
 import shutil
-import tempfile
 import zipfile
+from datetime import datetime
 from pathlib import Path
+from tempfile import NamedTemporaryFile
 from typing import Any, Optional
-from uuid import uuid4
 
-from fastapi.datastructures import UploadFile
+from fastapi import Body
 from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
+from pydantic import BaseModel
+
 from ocelescope import OCEL, PluginMethod, Resource
-
-from ocelescope_backend.app.dependencies import ApiSession
+from ocelescope_backend.app.dependencies import ApiPluginTask, ApiSession
 from ocelescope_backend.app.internal.config import config
-from ocelescope_backend.app.internal.model.plugin import PluginApi
-
-# TODO: Put this in own util function
+from ocelescope_backend.app.internal.model.plugin import (
+    OCELOutput,
+    PluginApi,
+    PluginOutput,
+    ResourceOutput,
+)
+from ocelescope_backend.app.internal.model.resource import ResourceStore
+from ocelescope_backend.app.internal.model.response import TempFileResponse
 from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.tasks.base import _call_with_known_params
 from ocelescope_backend.app.internal.tasks.plugin import PluginTask
-from ocelescope_backend.app.sse_manager import InvalidationRequest, sse_manager
+from ocelescope_backend.app.internal.util.plugin_result import (
+    default_result_name,
+    plugin_source,
+    select_results,
+)
+from ocelescope_backend.app.sse_manager import (
+    InvalidationRequest,
+    sse_manager,
+)
 
 plugin_router = APIRouter(prefix="/plugins", tags=["plugins"])
 
@@ -66,6 +81,123 @@ def run_plugin(
     )
 
 
+@plugin_router.get(
+    "/{plugin_id}/{method_name}/result/{task_id}", operation_id="PluginResult"
+)
+def get_plugin_result(
+    plugin_task: ApiPluginTask,
+) -> list[PluginOutput] | None:
+    if plugin_task.result is None:
+        return None
+
+    return [
+        OCELOutput.from_ocel(index, result)
+        if isinstance(result, OCEL)
+        else ResourceOutput.from_resource(index, result)
+        for index, result in enumerate(plugin_task.result)
+    ]
+
+
+class SavedResults(BaseModel):
+    ocel_ids: list[str]
+    resource_ids: list[str]
+
+
+@plugin_router.post(
+    "/{plugin_id}/{method_name}/result/{task_id}/save",
+    operation_id="savePluginResults",
+)
+def save_plugin_results(
+    session: ApiSession,
+    plugin_task: ApiPluginTask,
+    plugin_id: str,
+    method_name: str,
+    task_id: str,
+    indices: list[int] = Body(embed=True),
+) -> SavedResults:
+    """Save the selected results into the session as OCELs / resources."""
+    selected = select_results(plugin_task, indices)
+    source = plugin_source(plugin_id, method_name, task_id)
+
+    saved = SavedResults(ocel_ids=[], resource_ids=[])
+
+    for index, entity in selected:
+        name = default_result_name(plugin_id, method_name, index)
+
+        if isinstance(entity, OCEL):
+            entity.meta.extra["name"] = name
+            saved.ocel_ids.append(session.add_ocel(entity))
+        else:
+            saved.resource_ids.append(
+                session.add_resource(
+                    ResourceStore(
+                        name=name,
+                        type=entity.get_type(),
+                        source=source,
+                        data=entity.model_dump(mode="json"),
+                    )
+                )
+            )
+
+    return saved
+
+
+@plugin_router.post(
+    "/{plugin_id}/{method_name}/result/{task_id}/download",
+    operation_id="downloadPluginResults",
+)
+def download_plugin_results(
+    plugin_task: ApiPluginTask,
+    plugin_id: str,
+    method_name: str,
+    task_id: str,
+    indices: list[int] = Body(embed=True),
+) -> TempFileResponse:
+    """Bundle the selected results into a zip for download."""
+    selected = select_results(plugin_task, indices)
+    source = plugin_source(plugin_id, method_name, task_id)
+
+    archive_name = f"{plugin_id}_{method_name}_results"
+    file_response = TempFileResponse(
+        prefix=datetime.now().strftime("%Y%m%d-%H%M%S") + "-",
+        suffix=".zip",
+        filename=f"{archive_name}.zip",
+    )
+
+    used_names: set[str] = set()
+
+    def _unique(name: str, extension: str) -> str:
+        filename = f"{name}{extension}"
+        suffix = 1
+        while filename in used_names:
+            filename = f"{name}_{suffix}{extension}"
+            suffix += 1
+        used_names.add(filename)
+        return filename
+
+    with zipfile.ZipFile(file_response.tmp_path, "w", zipfile.ZIP_DEFLATED) as archive:
+        for index, entity in selected:
+            name = default_result_name(plugin_id, method_name, index)
+
+            if isinstance(entity, OCEL):
+                with NamedTemporaryFile(suffix=".json") as ocel_file:
+                    entity.write(Path(ocel_file.name))
+                    archive.write(ocel_file.name, arcname=_unique(name, ".json"))
+            else:
+                store = ResourceStore(
+                    name=name,
+                    type=entity.get_type(),
+                    source=source,
+                    data=entity.model_dump(mode="json"),
+                )
+                archive.writestr(
+                    _unique(name, ".ocelescope"),
+                    json.dumps(store.model_dump(mode="json"), indent=2),
+                )
+
+    return file_response
+
+
 @plugin_router.post(
     "/{plugin_id}/{method_name}/computed/{provider}", operation_id="getComputedValues"
 )
@@ -111,37 +243,11 @@ def get_computed(
         return []
 
 
-@plugin_router.post("", operation_id="uploadPlugin")
-def upload_plugin(file: UploadFile, session: ApiSession):
-    file_name = file.filename
-    if not file_name or not file_name.endswith(".zip"):
-        raise HTTPException(status_code=400, detail="Only zip files are supported")
-
-    added_plugin_ids = []
-
-    with tempfile.TemporaryDirectory() as temp_dir:
-        try:
-            with zipfile.ZipFile(file.file, "r") as zip_ref:
-                zip_ref.extractall(temp_dir)
-        except zipfile.BadZipFile:
-            raise HTTPException(status_code=400, detail="Invalid zip file")
-
-        temp_path = Path(temp_dir)
-
-        for plugin_candidate in temp_path.iterdir():
-            if (
-                plugin_candidate.is_dir()
-                and (plugin_candidate / "__init__.py").exists()
-            ):
-                plugin_id = f"plugin_{str(uuid4())}"
-                shutil.move(plugin_candidate, config.PLUGIN_DIR / plugin_id)
-                added_plugin_ids.append(plugin_id)
-
-    registry_manager.load_plugins(added_plugin_ids)
-
-
 @plugin_router.delete("/{plugin_id}", operation_id="deletePlugin")
 def delete_plugin(plugin_id: str, session: ApiSession):
+    if not config.PLUGIN_DIR:
+        raise HTTPException(status_code=404, detail="Plugin files not found")
+
     plugin_path = config.PLUGIN_DIR / plugin_id
 
     if not plugin_path.exists():

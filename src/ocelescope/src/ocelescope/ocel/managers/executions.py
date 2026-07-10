@@ -85,3 +85,9 @@ class ExecutionsManager(BaseManager):
         )
 
         return variants
+
+    def get_variant_object_ids(self, object_type: str, variant_ids: list[str]) -> list[str]:
+        """Return the ids of the objects of ``object_type`` that follow any of ``variant_ids``."""
+        executions = self.get_object_executions([object_type])
+
+        return executions.index[executions[EXECUTION_VARIANT_ID_COL].isin(variant_ids)].tolist()
