@@ -260,7 +260,7 @@ def delete_plugin(plugin_id: str, session: ApiSession):
     sse_manager.send_safe(
         session.id,
         InvalidationRequest(
-            routes=["plugins"],
+            routes=["plugins", "discoveryMethods"],
         ),
     )
 

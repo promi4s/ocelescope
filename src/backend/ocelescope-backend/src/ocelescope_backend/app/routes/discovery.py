@@ -11,8 +11,9 @@ from ocelescope import (
     ObjectTypeFrequencyFilter,
 )
 from ocelescope_backend.app.dependencies import ApiSession
-from ocelescope_backend.app.internal.discovery import discovery_registry
 from ocelescope_backend.app.internal.exceptions import NotFound
+from ocelescope_backend.app.internal.registry.registry_manager import registry_manager
+from ocelescope_backend.app.sse_manager import InvalidationRequest, sse_manager
 from ocelescope_backend.app.internal.model.discovery import (
     CreateDiscoveryTaskBody,
     DiscoveryMethodMeta,
@@ -55,7 +56,7 @@ def create_discovery_task(
     body: CreateDiscoveryTaskBody,
 ) -> str:
     try:
-        info = discovery_registry.get(body.method_id)
+        info = registry_manager.discovery_registry.get(body.method_id)
         parsed_parameters = info.parse_parameters(body.parameters)
         parameters = info.dump_parameters(parsed_parameters)
     except KeyError:
@@ -150,9 +151,44 @@ def list_discovery_methods() -> list[DiscoveryMethodMeta]:
                     else v.resource_type.get_type(),
                     description=v.description,
                     input_schema=v.parameters_schema(),
+                    plugin_id=v.plugin_id,
+                    enabled=v.enabled,
                 )
                 for v in group.variants
             ],
         )
-        for group in discovery_registry.list_groups()
+        for group in registry_manager.discovery_registry.list_groups()
     ]
+
+
+def _get_any_method(method_id: str):
+    info = registry_manager.discovery_registry._methods.get(method_id)
+    if info is None:
+        raise HTTPException(
+            status_code=404, detail=f"Discovery method '{method_id}' not found"
+        )
+    return info
+
+
+@discovery_router.post(
+    "/methods/{method_id}/disable",
+    summary="Disable a discovery method",
+    operation_id="disableDiscoveryMethod",
+)
+def disable_discovery_method(method_id: str, session: ApiSession):
+    _get_any_method(method_id)
+    registry_manager.discovery_registry.disable(method_id)
+    sse_manager.send_safe(session.id, InvalidationRequest(routes=["discoveryMethods"]))
+    return {"status": "disabled", "method_id": method_id}
+
+
+@discovery_router.post(
+    "/methods/{method_id}/enable",
+    summary="Enable a discovery method",
+    operation_id="enableDiscoveryMethod",
+)
+def enable_discovery_method(method_id: str, session: ApiSession):
+    _get_any_method(method_id)
+    registry_manager.discovery_registry.enable(method_id)
+    sse_manager.send_safe(session.id, InvalidationRequest(routes=["discoveryMethods"]))
+    return {"status": "enabled", "method_id": method_id}

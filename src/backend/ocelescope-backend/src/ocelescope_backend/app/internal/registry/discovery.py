@@ -46,6 +46,8 @@ class DiscoveryMethodInfo:
     func: Callable[..., Resource]
     parameter_type: type[BaseModel]
     resource_type: type[Resource]
+    plugin_id: str
+    enabled: bool = True
 
     def parameters_schema(self) -> dict[str, Any]:
         return self.parameter_type.model_json_schema(by_alias=True)
@@ -74,7 +76,17 @@ class DiscoveryRegistry:
     def __init__(self) -> None:
         self._methods: dict[str, DiscoveryMethodInfo] = {}
 
-    def register(self, meta: DiscoveryMethodMeta) -> DiscoveryMethodInfo:
+    def register(self, module: ModuleType) -> list[DiscoveryMethodInfo]:
+        registered: list[DiscoveryMethodInfo] = []
+        for value in vars(module).values():
+            meta = getattr(value, "__discovery_meta__", None)
+            if isinstance(meta, DiscoveryMethodMeta):
+                registered.append(self._register_meta(meta, plugin_id=module.__name__))
+        return registered
+
+    def _register_meta(
+        self, meta: DiscoveryMethodMeta, plugin_id: str
+    ) -> DiscoveryMethodInfo:
         parameter_type = _build_parameter_model(meta.func)
 
         for existing in self._methods.values():
@@ -94,19 +106,32 @@ class DiscoveryRegistry:
             func=meta.func,
             parameter_type=parameter_type,
             resource_type=meta.resource_type,
+            plugin_id=plugin_id,
         )
         self._methods[info.method_id] = info
         return info
 
-    def unregister_by_func(self, func: Callable[..., Resource]) -> None:
+    def disable(self, method_id: str) -> None:
+        info = self._methods.get(method_id)
+        if info is not None:
+            info.enabled = False
+
+    def enable(self, method_id: str) -> None:
+        info = self._methods.get(method_id)
+        if info is not None:
+            info.enabled = True
+
+    def unload_module(self, plugin_id: str) -> None:
         for method_id, info in list(self._methods.items()):
-            if info.func is func:
+            if info.plugin_id == plugin_id:
                 del self._methods[method_id]
 
     def get(self, method_id: str) -> DiscoveryMethodInfo:
         info = self._methods.get(method_id)
-        if info is None:
-            raise KeyError(f"Discovery method '{method_id}' is not registered")
+        if info is None or not info.enabled:
+            raise KeyError(
+                f"Discovery method '{method_id}' is not registered or is disabled"
+            )
         return info
 
     def list_groups(self) -> list[DiscoveryMethodGroup]:
@@ -120,18 +145,3 @@ class DiscoveryRegistry:
             else:
                 groups[info.name].variants.append(info)
         return list(groups.values())
-
-
-discovery_registry = DiscoveryRegistry()
-
-
-def register_discovery_methods_from_module(
-    module: ModuleType,
-) -> list[DiscoveryMethodInfo]:
-    """Scan a module for functions tagged with `__discovery_meta__` and register them."""
-    registered: list[DiscoveryMethodInfo] = []
-    for value in vars(module).values():
-        meta = getattr(value, "__discovery_meta__", None)
-        if isinstance(meta, DiscoveryMethodMeta):
-            registered.append(discovery_registry.register(meta))
-    return registered

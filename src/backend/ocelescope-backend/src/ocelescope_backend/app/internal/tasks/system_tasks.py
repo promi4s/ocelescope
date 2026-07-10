@@ -177,7 +177,7 @@ def import_plugin(
             message=f"Successfully uploaded {' '.join(loaded_plugins)}",
             notification_type="info",
         ),
-        InvalidationRequest(routes=["plugins", "tasks"]),
+        InvalidationRequest(routes=["plugins", "tasks", "discoveryMethods"]),
     ]
 
 
