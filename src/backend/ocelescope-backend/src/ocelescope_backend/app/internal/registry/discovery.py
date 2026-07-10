@@ -129,7 +129,9 @@ class DiscoveryRegistry:
     def get(self, method_id: str) -> DiscoveryMethodInfo:
         info = self._methods.get(method_id)
         if info is None or not info.enabled:
-            raise KeyError(f"Discovery method '{method_id}' is not registered or is disabled")
+            raise KeyError(
+                f"Discovery method '{method_id}' is not registered or is disabled"
+            )
         return info
 
     def list_groups(self) -> list[DiscoveryMethodGroup]:

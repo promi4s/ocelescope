@@ -164,7 +164,9 @@ def list_discovery_methods() -> list[DiscoveryMethodMeta]:
 def _get_any_method(method_id: str):
     info = registry_manager.discovery_registry._methods.get(method_id)
     if info is None:
-        raise HTTPException(status_code=404, detail=f"Discovery method '{method_id}' not found")
+        raise HTTPException(
+            status_code=404, detail=f"Discovery method '{method_id}' not found"
+        )
     return info
 
 

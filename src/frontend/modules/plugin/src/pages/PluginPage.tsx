@@ -76,8 +76,12 @@ const PluginPage: React.FC<{ pluginId: string }> = ({ pluginId }) => {
   const { data: allMethods = [] } = useListDiscoveryMethods();
   const invalidate = useInvalidate();
   const onSuccess = () => invalidate(["discoveryMethods"]);
-  const { mutate: disableMethod } = useDisableDiscoveryMethod({ mutation: { onSuccess } });
-  const { mutate: enableMethod } = useEnableDiscoveryMethod({ mutation: { onSuccess } });
+  const { mutate: disableMethod } = useDisableDiscoveryMethod({
+    mutation: { onSuccess },
+  });
+  const { mutate: enableMethod } = useEnableDiscoveryMethod({
+    mutation: { onSuccess },
+  });
 
   const discoveryMethods = useMemo(
     () =>
