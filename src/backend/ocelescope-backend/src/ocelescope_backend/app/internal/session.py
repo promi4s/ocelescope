@@ -158,6 +158,15 @@ class Session:
 
         return self.ocels[ocel_id].lazy(use_original=use_original)
 
+    def export_ocel(
+        self, ocel_id: str, target_path: Path, use_original: bool = False
+    ) -> None:
+        """Stream an OCEL to a file straight from its DuckDB store (no full load)."""
+        if ocel_id not in self.ocels:
+            raise NotFound(f"OCEL with id {ocel_id} not found")
+
+        self.ocels[ocel_id].export(target_path, use_original=use_original)
+
     def rename_ocel(self, ocel_id: str, new_name: str):
         if ocel_id not in self.ocels:
             raise NotFound(f"OCEL with id {ocel_id} not found")

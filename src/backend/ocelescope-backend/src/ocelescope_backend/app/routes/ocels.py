@@ -515,17 +515,26 @@ def get_quantity_info(
     operation_id="downloadOCEL",
 )
 def download_ocel(
-    ocel: ApiOcel,
+    session: ApiSession,
+    ocel_id: str,
     ext: OCELFileExtensions = ".json",
+    ocel_version: Literal["original", "filtered"] | None = "filtered",
 ) -> TempFileResponse:
-    name = ocel.meta.extra["name"]
+    if ocel_id not in session.ocels:
+        raise NotFound("OCEL not found")
+
+    name = session.ocels[ocel_id].name
     tmp_file_prefix = datetime.now().strftime("%Y%m%d-%H%M%S") + "-" + name
 
     file_response = TempFileResponse(
         prefix=tmp_file_prefix, suffix=ext, filename=name + ext
     )
 
-    ocel.write(Path(file_response.tmp_path))
+    session.export_ocel(
+        ocel_id,
+        Path(file_response.tmp_path),
+        use_original=ocel_version == "original",
+    )
 
     return file_response
 

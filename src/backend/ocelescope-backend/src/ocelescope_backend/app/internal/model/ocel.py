@@ -4,7 +4,7 @@ from typing import Hashable, Self, Sequence, cast
 import pandas as pd
 from ocelescope.ocel.constants import ValueType
 from ocelescope.ocel.extensions.base_extension import OCELExtension
-from ocelescope.ocel.io import load_ocel_duckdb
+from ocelescope.ocel.io import export_duckdb_ocel, load_ocel_duckdb
 from ocelescope.ocel.models.meta import OCELMeta
 from pydantic.main import BaseModel
 
@@ -96,6 +96,20 @@ class SessionOCEL:
     def lazy(self, use_original: bool = False) -> LazyOCEL:
         """A RAM-friendly DuckDB reader (filtered unless ``use_original``)."""
         return LazyOCEL(self._active_path(use_original), meta=self._meta())
+
+    def export(self, target_path: Path, use_original: bool = False) -> None:
+        """Write the OCEL to ``target_path`` straight from the DuckDB store.
+
+        Streams the log (and quantities) from the active DuckDB file entity-by-entity
+        rather than materializing the whole OCEL into pandas, then re-exports the
+        in-memory session extensions (which aren't persisted to DuckDB) so the output
+        matches :meth:`ocel` + :meth:`OCEL.write`. The target format is chosen from the
+        file extension (``.json`` / ``.xml`` / ``.sqlite``).
+        """
+        export_duckdb_ocel(self._active_path(use_original), target_path)
+        for extension in self.extensions:
+            if target_path.suffix in getattr(extension, "supported_extensions", []):
+                extension.export_extension(target_path)
 
     def _drop_filtered(self) -> None:
         if self._filtered_db_path is not None:
