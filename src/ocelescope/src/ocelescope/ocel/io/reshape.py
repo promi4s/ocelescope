@@ -18,7 +18,6 @@ from ocelescope.ocel.constants.pm4py import (
     O2O_QUALIFIER,
     O2O_SOURCE_ID,
     O2O_TARGET_ID,
-    OBJECT_CHANGE_CUMCOUNT,
     OBJECT_CHANGED_FIELD,
     OID_COL,
     OTYPE_COL,
@@ -57,11 +56,12 @@ def o2o_sql(source: str = "") -> str:
 
 
 def object_changes_sql(attribute_columns: list[str], source: str = "") -> str:
-    """Object changes with the recovered ``ocel:type`` / ``ocel:field`` / ``@@cumcount``.
+    """Object changes with the recovered ``ocel:type`` / ``ocel:field``.
 
     The flat table is wide with exactly one non-null attribute value per row, so
-    ``ocel:field`` is the name of that column and ``@@cumcount`` is the per-object
-    change index in timestamp order.
+    ``ocel:field`` is the name of that column. Rows are ordered by timestamp.
+    (PM4PY's internal ``@@cumcount`` is a transient split-helper in its own sqlite
+    importer and is read nowhere else, so it is not reconstructed here.)
     """
     if attribute_columns:
         field = (
@@ -76,9 +76,7 @@ def object_changes_sql(attribute_columns: list[str], source: str = "") -> str:
         field = "NULL"
 
     return (
-        f'SELECT c.*, o."{OTYPE_COL}", {field} AS "{OBJECT_CHANGED_FIELD}", '
-        f'row_number() OVER (PARTITION BY c."{OID_COL}" ORDER BY c."{TIMESTAMP_COL}") '
-        f'AS "{OBJECT_CHANGE_CUMCOUNT}" '
+        f'SELECT c.*, o."{OTYPE_COL}", {field} AS "{OBJECT_CHANGED_FIELD}" '
         f"FROM {source}object_changes c "
         f'JOIN {source}objects o ON c."{OID_COL}" = o."{OID_COL}" '
         f'ORDER BY c."{TIMESTAMP_COL}"'

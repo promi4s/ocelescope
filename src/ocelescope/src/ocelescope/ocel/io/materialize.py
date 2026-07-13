@@ -7,8 +7,8 @@ tables. This module is the in-memory bridge:
 * :func:`load_ocel_duckdb` reads those tables and reshapes them into the frames an
   :class:`OCEL` is built from -- the same reshaping pm4py's own SQLite importer
   performs (join activity/timestamp/type into the E2O relations, rename the O2O
-  columns, and recover ``ocel:field`` / ``ocel:type`` / ``@@cumcount`` for the
-  object changes). Events and relations are read in timestamp order to match the
+  columns, and recover ``ocel:field`` / ``ocel:type`` for the object changes).
+  Events and relations are read in timestamp order to match the
   invariant the file readers guarantee, so the result is equivalent to a normal
   :meth:`OCEL.read`.
 * :func:`dump_ocel_duckdb` is the inverse: it writes an already in-memory
