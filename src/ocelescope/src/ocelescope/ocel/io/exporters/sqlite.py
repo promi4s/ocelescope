@@ -211,14 +211,25 @@ def export_ocel_sqlite(db_path: str | Path, target: str | Path) -> None:
             _create_map_table(con, "object_map_type", object_suffix)
             _create_map_table(con, "event_map_type", event_suffix)
 
+            event_attr_type = dict(event_attrs)
+            object_attr_type = dict(object_attrs)
+
             for activity, suffix in event_suffix.items():
                 _create_event_type_table(
-                    con, suffix, activity, _ordered_present(event_attrs, event_presence[activity])
+                    con,
+                    suffix,
+                    activity,
+                    _ordered_present(event_attrs, event_presence[activity]),
+                    event_attr_type,
                 )
 
             for otype, suffix in object_suffix.items():
                 _create_object_type_table(
-                    con, suffix, otype, _ordered_present(object_attrs, object_presence[otype])
+                    con,
+                    suffix,
+                    otype,
+                    _ordered_present(object_attrs, object_presence[otype]),
+                    object_attr_type,
                 )
 
             # Relationship tables
