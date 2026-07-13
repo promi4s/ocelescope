@@ -12,12 +12,12 @@ from pathlib import Path
 from lxml import etree
 
 from ocelescope.ocel.io.importers.quantities import import_quantities_xml
+from ocelescope.ocel.io.importers.writer import OCELWriter
 from ocelescope.ocel.io.schema import (
     ATTRIBUTE_TYPE_TO_ARROW,
     SchemaDefinition,
     merge_columns,
 )
-from ocelescope.ocel.io.importers.writer import OCELWriter
 
 
 def _local(tag: object) -> str:
@@ -40,7 +40,7 @@ def _attribute_schemas(source: str | Path) -> tuple[SchemaDefinition, SchemaDefi
         tag = _local(elem.tag)
         if event == "start":
             if tag in ("objects", "events"):
-                break  # reached the data section
+                break
             if tag == "object-types":
                 target = object_attrs
             elif tag == "event-types":
@@ -115,14 +115,11 @@ def import_ocel_xml(source: str | Path, db_path: str | Path) -> None:
     object_columns, event_columns = _attribute_schemas(source)
 
     with OCELWriter(db_path, object_columns, event_columns) as writer:
-        # Objects precede events in the document, so a single streamed pass fills
-        # every table. Relationship refs are also `<object>` elements, but only
-        # real objects carry an ``id``.
         for _, elem in etree.iterparse(str(source), events=("end",), tag=("{*}object", "{*}event")):
             if _local(elem.tag) == "event":
                 writer.add_event(_build_event(elem))
                 _clear(elem)
-            elif elem.get("id") is not None:
+            elif _local(elem.tag) == "object":
                 writer.add_object(_build_object(elem))
                 _clear(elem)
 

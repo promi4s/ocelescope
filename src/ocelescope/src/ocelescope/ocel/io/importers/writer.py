@@ -64,10 +64,7 @@ class OCELWriter:
         self.con = duckdb.connect(str(db_path))
         self.batch_size = batch_size
 
-        # Create the five (empty) OCEL tables and keep their schemas to size the
-        # per-table row buffers below.
         self.schemas = create_ocel_tables(self.con, object_columns, event_columns)
-        # One column buffer per table: {table: {column: [values...]}}.
         self.buffers: dict[str, dict[str, list]] = {
             table: {field.name: [] for field in schema} for table, schema in self.schemas.items()
         }
@@ -77,8 +74,6 @@ class OCELWriter:
         object_row = {OID_COL: obj["id"], OTYPE_COL: obj["type"]}
 
         for attribute in sorted(obj.get("attributes", []), key=lambda a: a["time"]):
-            # The first value per attribute is the object's value; later
-            # (timestamped) values are recorded as attribute changes.
             if attribute["name"] not in object_row:
                 object_row[attribute["name"]] = attribute["value"]
             else:
@@ -139,8 +134,7 @@ class OCELWriter:
         buffer = self.buffers[table]
         if not next(iter(buffer.values())):
             return
-        # Insert every column as VARCHAR; DuckDB casts to the table's real
-        # column types on insert (timestamps, numbers, booleans).
+
         arrays = [pa.array(_as_strings(values), type=pa.string()) for values in buffer.values()]
         batch = pa.table(arrays, names=list(buffer))
         self.con.from_arrow(batch).insert_into(table)
