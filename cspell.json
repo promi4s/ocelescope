@@ -143,7 +143,19 @@
     "arcname",
     "npmjs",
     "fallthroughs",
-    "norender"
+    "norender",
+    "TINYINT",
+    "HUGEINT",
+    "UINTEGER",
+    "TIMESTAMPTZ",
+    "UNPIVOT",
+    "unpivoted",
+    "rels",
+    "executemany",
+    "attribs",
+    "kvitems",
+    "getprevious",
+    "unparseable"
   ],
   "ignorePaths": [
     "pnpm-lock.yaml",
