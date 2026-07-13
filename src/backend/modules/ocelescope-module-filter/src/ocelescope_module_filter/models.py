@@ -1,58 +1,35 @@
-from typing import Annotated, Literal
+"""The filter payload this module pushes into the session.
 
-from ocelescope_backend.app.modules import ModuleFilter
+The concrete filters live in :mod:`ocelescope_module_filter.filters` (built on the
+backend's ``ModuleFilter`` contract). This assembles them into the discriminated
+union the routes accept/return.
+"""
+
+from typing import Annotated, TypeAlias, Union
+
 from pydantic import Field
 
-from ocelescope import (
+from ocelescope_module_filter.filters import (
+    ActivityFilter,
     E2OCountFilter,
     EventAttributeFilter,
-    EventTypeFilter,
     O2OCountFilter,
     ObjectAttributeFilter,
     ObjectTypeFilter,
     TimeFrameFilter,
 )
 
+FILTER_SOURCE = "FilterV1"
 
-class NativeFilterBase(ModuleFilter):
-    OcelescopeModuleSource = "FilterV1"
-
-
-class NativeE2OCountFilter(NativeFilterBase, E2OCountFilter):
-    type: Literal["e2o_count"]
-
-
-class NativeO2OCountFilter(NativeFilterBase, O2OCountFilter):
-    type: Literal["o2o_count"]
-
-
-class NativeActivityFilter(NativeFilterBase, EventTypeFilter):
-    type: Literal["activity"]
-
-
-class NativeObjectTypeFilter(NativeFilterBase, ObjectTypeFilter):
-    type: Literal["object_type"]
-
-
-class NativeEventAttributeFilter(NativeFilterBase, EventAttributeFilter):
-    type: Literal["event_attribute"]
-
-
-class NativeObjectAttributeFilter(NativeFilterBase, ObjectAttributeFilter):
-    type: Literal["object_attribute"]
-
-
-class NativeTimeFrameFilter(NativeFilterBase, TimeFrameFilter):
-    type: Literal["time_frame"]
-
-
-NativeFilter = Annotated[
-    NativeActivityFilter
-    | NativeObjectTypeFilter
-    | NativeTimeFrameFilter
-    | NativeEventAttributeFilter
-    | NativeObjectAttributeFilter
-    | NativeE2OCountFilter
-    | NativeO2OCountFilter,
+NativeFilter: TypeAlias = Annotated[
+    Union[
+        TimeFrameFilter,
+        ActivityFilter,
+        ObjectTypeFilter,
+        EventAttributeFilter,
+        ObjectAttributeFilter,
+        E2OCountFilter,
+        O2OCountFilter,
+    ],
     Field(discriminator="type"),
 ]

@@ -3,7 +3,6 @@ from typing import Hashable, Self, Sequence, cast
 
 import pandas as pd
 from ocelescope.ocel.constants import ValueType
-from ocelescope_backend.app.internal.ocel.lazy_ocel import LazyOCEL
 from ocelescope.ocel.extensions.base_extension import OCELExtension
 from ocelescope.ocel.io import load_ocel_duckdb
 from ocelescope.ocel.models.meta import OCELMeta
@@ -12,9 +11,10 @@ from pydantic.main import BaseModel
 from ocelescope import (
     OCEL,
 )
+from ocelescope_backend.app.internal.ocel.filters import ModuleFilter, apply_filters
+from ocelescope_backend.app.internal.ocel.lazy_ocel import LazyOCEL
 from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.registry.extension import OCELExtensionDescription
-from ocelescope_backend.app.modules.base import ModuleFilter
 
 
 class OcelMetadata(BaseModel):
@@ -26,9 +26,7 @@ class OcelMetadata(BaseModel):
 
     @classmethod
     def from_handle(cls, handle: "SessionOCEL", filter_applied: bool | None = None):
-        # Extensions live only as in-memory instances on the handle (they are not
-        # persisted with the DuckDB store); metadata is read off the handle
-        # without materializing the OCEL.
+
         descriptions = registry_manager.get_extension_descriptions()
         return cls(
             id=handle.id,
@@ -46,9 +44,12 @@ class OcelMetadata(BaseModel):
 class SessionOCEL:
     """A handle to an OCEL persisted as a DuckDB file on disk.
 
-    The OCEL is not kept in memory; it is materialized on demand from ``db_path``
-    via :func:`load_ocel_duckdb` and the applied filter pipeline is re-applied
-    lazily, so only the OCELs actively in use ever occupy RAM.
+    The OCEL is never kept in memory. A global filter pipeline (:class:`ModuleFilter`
+    s, grouped by the module that set them) defines a *view*; it is applied **once**
+    -- when the pipeline changes -- into a pre-computed filtered DuckDB file. Both
+    views then read that file: :meth:`ocel` materializes the pm4py :class:`OCEL`,
+    :meth:`lazy` opens a RAM-friendly :class:`LazyOCEL`. So a per-request access
+    never re-runs the filter. Passing ``use_original`` reads the origin instead.
     """
 
     def __init__(
@@ -63,57 +64,63 @@ class SessionOCEL:
         self.db_path = db_path
         self.name = name
         self.created_at = created_at
-        # Extension instances are kept in memory on the handle and re-attached to
-        # each materialized OCEL; they are not stored in the DuckDB file.
         self.extensions: list[OCELExtension] = extensions or []
-        self._applied_filter: list[ModuleFilter] = []
+        self._filters_by_source: dict[str, list[ModuleFilter]] = {}
+        self._filtered_db_path: Path | None = None
 
     def _meta(self) -> OCELMeta:
         return OCELMeta(
             id=self.id, extra={"name": self.name, "upload_date": self.created_at}
         )
 
+    def _all_filters(self) -> list[ModuleFilter]:
+        return [f for pipeline in self._filters_by_source.values() for f in pipeline]
+
+    def _active_path(self, use_original: bool) -> Path:
+        """The DuckDB file to read: the origin, or the (once-computed) filtered one."""
+        filters = self._all_filters()
+        if use_original or not filters:
+            return self.db_path
+        if self._filtered_db_path is None:
+            filtered = self.db_path.with_suffix(".filtered.duckdb")
+            apply_filters(self.db_path, filtered, filters)
+            self._filtered_db_path = filtered
+        return self._filtered_db_path
+
     def ocel(self, use_original: bool = False) -> OCEL:
-        ocel = load_ocel_duckdb(self.db_path, meta=self._meta())
-        if not use_original and self._applied_filter:
-            ocel = ocel.filter(self._applied_filter)
+        """The materialized pm4py OCEL (filtered unless ``use_original``)."""
+        ocel = load_ocel_duckdb(self._active_path(use_original), meta=self._meta())
         if self.extensions:
             ocel.extensions.set(self.extensions)
         return ocel
 
-    def lazy(self) -> LazyOCEL:
-        """A DuckDB-backed lazy view of this OCEL.
+    def lazy(self, use_original: bool = False) -> LazyOCEL:
+        """A RAM-friendly DuckDB reader (filtered unless ``use_original``)."""
+        return LazyOCEL(self._active_path(use_original), meta=self._meta())
 
-        Note: filters are not applied on the lazy path yet (that lands with the
-        SQL filter layer); this exposes the origin tables.
-        """
-        return LazyOCEL(self.db_path, meta=self._meta())
+    def _drop_filtered(self) -> None:
+        if self._filtered_db_path is not None:
+            self._filtered_db_path.unlink(missing_ok=True)
+            self._filtered_db_path = None
 
     @property
     def is_filtered(self) -> bool:
-        return len(self._applied_filter) > 0
+        return len(self._all_filters()) > 0
 
     def delete(self) -> None:
+        self._drop_filtered()
         self.db_path.unlink(missing_ok=True)
 
-    def get_filters(self, module_source: str | None) -> list[ModuleFilter]:
-        return [
-            filterItem
-            for filterItem in self._applied_filter
-            if module_source is None
-            or filterItem.OcelescopeModuleSource == module_source
-        ]
+    def get_filters(self, module_source: str | None = None) -> list[ModuleFilter]:
+        if module_source is None:
+            return self._all_filters()
+        return list(self._filters_by_source.get(module_source, []))
 
     def set_filters(self, module_source: str, pipeline: Sequence[ModuleFilter]):
-        self._applied_filter = [
-            filter
-            for filter in self._applied_filter
-            if filter.OcelescopeModuleSource != module_source
-        ] + [
-            module_filter
-            for module_filter in pipeline
-            if module_filter.OcelescopeModuleSource == module_source
-        ]
+        self._filters_by_source[module_source] = list(pipeline)
+        self._drop_filtered()
+        if self._all_filters():
+            self._active_path(use_original=False)
 
 
 class Attribute(BaseModel):

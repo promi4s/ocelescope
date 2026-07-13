@@ -19,7 +19,7 @@ from ocelescope_backend.app.internal.tasks.base import (
     _call_with_known_params,
 )
 from ocelescope_backend.app.internal.util.hashing import generate_tuple_hash
-from ocelescope_backend.app.modules.base import ModuleFilter
+from ocelescope_backend.app.internal.ocel.filters import ModuleFilter
 from ocelescope_backend.app.sse_manager import (
     ErrorNotification,
     PluginLink,

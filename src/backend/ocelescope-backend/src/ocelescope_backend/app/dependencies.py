@@ -43,12 +43,14 @@ ApiOcel = Annotated[OCEL, Depends(get_ocel)]
 def get_lazy_ocel(
     session: ApiSession,
     ocel_id: str | None = None,
+    ocel_version: Literal["original", "filtered"] | None = "filtered",
 ) -> Iterator[LazyOCEL]:
-    # DuckDB-backed lazy view; the connection is closed when the request ends.
+    # DuckDB-backed lazy view (filtered by default); the connection is closed
+    # when the request ends.
     if not ocel_id:
         raise HTTPException(status_code=500, detail="Ocel id is required")
     try:
-        lazy = session.get_lazy_ocel(ocel_id)
+        lazy = session.get_lazy_ocel(ocel_id, use_original=ocel_version == "original")
     except NotFound:
         raise HTTPException(status_code=404, detail="OCEL not found")
     try:

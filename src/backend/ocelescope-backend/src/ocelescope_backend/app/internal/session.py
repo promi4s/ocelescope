@@ -7,7 +7,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, Hashable, Sequence, Type, TypeVar, cast
 
-from ocelescope_backend.app.internal.ocel.lazy_ocel import LazyOCEL
 from ocelescope.ocel.extensions.base_extension import OCELExtension
 from ocelescope.ocel.io import convert_ocel_duckdb, dump_ocel_duckdb
 
@@ -15,8 +14,9 @@ from ocelescope import OCEL
 from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.model.ocel import SessionOCEL
 from ocelescope_backend.app.internal.model.resource import ResourceApi, ResourceStore
+from ocelescope_backend.app.internal.ocel.filters import ModuleFilter
+from ocelescope_backend.app.internal.ocel.lazy_ocel import LazyOCEL
 from ocelescope_backend.app.internal.tasks.base import TaskBase
-from ocelescope_backend.app.modules.base import ModuleFilter
 from ocelescope_backend.app.sse_manager import InvalidationRequest, sse_manager
 
 S = TypeVar("S", bound=TaskBase)
@@ -43,8 +43,7 @@ class Session:
         # Resources
         self._resources: dict[str, ResourceStore] = {}
 
-        # OCELS -- persisted as DuckDB files under a per-session directory and
-        # materialized on demand, so they don't all sit in RAM at once.
+        # OCELS
         self.ocels: dict[str, SessionOCEL] = {}
         self._ocel_dir = Path(tempfile.mkdtemp(prefix=f"ocelescope_{self.id}_"))
 
@@ -153,11 +152,11 @@ class Session:
 
         return self.ocels[ocel_id].ocel(use_original=use_original)
 
-    def get_lazy_ocel(self, ocel_id: str) -> LazyOCEL:
+    def get_lazy_ocel(self, ocel_id: str, use_original: bool = False) -> LazyOCEL:
         if ocel_id not in self.ocels:
             raise NotFound(f"OCEL with id {ocel_id} not found")
 
-        return self.ocels[ocel_id].lazy()
+        return self.ocels[ocel_id].lazy(use_original=use_original)
 
     def rename_ocel(self, ocel_id: str, new_name: str):
         if ocel_id not in self.ocels:

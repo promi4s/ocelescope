@@ -1,21 +1,13 @@
-"""A memory-efficient, DuckDB-backed OCEL used for dependency injection.
+"""A memory-efficient, DuckDB-backed reader for an OCEL.
 
-Where :class:`ocelescope.OCEL` holds every table in memory as pandas frames,
-:class:`LazyOCEL` keeps the log on disk as a DuckDB database and only reads what a
-caller asks for. It connects to the database read-only through **ibis** and exposes
-each table as a lazy ibis expression, so a request can compose a query
-(``lz.events.filter(...).group_by(...)``) and only pull the result it needs -- as
-pandas (``.to_pandas()``) or polars (``.to_polars()``) -- or, when it truly needs
-the full in-memory object, :meth:`materialize` it into an :class:`ocelescope.OCEL`.
+``LazyOCEL`` is simply *another way to read an OCEL without loading the whole thing
+into memory*: it opens a DuckDB file read-only and hands back each table as a lazy
+DuckDB relation (``.df()`` for pandas, ``.pl()`` for polars, ``.fetchall()`` ...),
+or the full pm4py :class:`ocelescope.OCEL` via :meth:`materialize` when needed.
 
-Unlike the materialized OCEL, this view is *not* pm4py-shaped: ``events``,
-``objects``, ``o2o`` and ``object_changes`` are the flat stored tables as-is, and
-only ``relations`` is enriched -- the ``e2o`` table with the object ``ocel:type``
-joined on. Nothing is reshaped or materialized until a query is executed.
-
-This is a backend-only construct (it is what the ``ApiLazyOcel`` dependency
-yields); the reshaping/loader primitives it builds on live in
-:mod:`ocelescope.ocel.io`.
+It has no notion of filtering -- filtering is a *view* applied once when it is set
+(see :mod:`.views`), which produces a filtered DuckDB file that this reader is then
+pointed at. So a filtered ``LazyOCEL`` is just a reader over the pre-filtered file.
 """
 
 from __future__ import annotations
@@ -23,63 +15,59 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import ibis
+import duckdb
 from ocelescope.ocel.constants.pm4py import OID_COL, OTYPE_COL
 from ocelescope.ocel.io import load_ocel_duckdb
 from ocelescope.ocel.models.meta import OCELMeta
 
 if TYPE_CHECKING:
-    from ibis.expr.types import Table
-
     from ocelescope import OCEL
 
 
 class LazyOCEL:
-    """DuckDB-backed OCEL whose tables are lazy ibis expressions.
+    """Read an OCEL DuckDB file table-by-table without materializing the whole log.
+
+    ``events``, ``objects``, ``o2o`` and ``object_changes`` are the flat stored
+    tables; ``relations`` is ``e2o`` with the object ``ocel:type`` joined on. Each
+    returns a lazy :class:`duckdb.DuckDBPyRelation`.
 
     Args:
-        db_path: Path to a DuckDB database produced by ``convert_ocel_duckdb`` /
-            ``dump_ocel_duckdb``.
+        db_path: Path to an OCEL DuckDB database (origin or a pre-filtered one).
         meta: Optional metadata, forwarded to :meth:`materialize`.
     """
 
     def __init__(self, db_path: str | Path, meta: OCELMeta | None = None):
         self.meta = meta or OCELMeta()
         self._db_path = Path(db_path)
-        self._con = ibis.duckdb.connect(str(self._db_path), read_only=True)
-        # DuckDB returns TIMESTAMPTZ in the session zone; pin it to UTC.
-        self._con.raw_sql("SET TimeZone='UTC'")
+        self._con = duckdb.connect(str(self._db_path), read_only=True)
+        self._con.execute("SET TimeZone='UTC'")
 
-    # ------------------------------------------------------------------
-    # Tables (lazy ibis expressions)
-    # ------------------------------------------------------------------
     @property
-    def events(self) -> "Table":
+    def events(self) -> duckdb.DuckDBPyRelation:
         return self._con.table("events")
 
     @property
-    def objects(self) -> "Table":
+    def objects(self) -> duckdb.DuckDBPyRelation:
         return self._con.table("objects")
 
     @property
-    def o2o(self) -> "Table":
+    def o2o(self) -> duckdb.DuckDBPyRelation:
         return self._con.table("o2o")
 
     @property
-    def object_changes(self) -> "Table":
+    def object_changes(self) -> duckdb.DuckDBPyRelation:
         return self._con.table("object_changes")
 
     @property
-    def relations(self) -> "Table":
+    def relations(self) -> duckdb.DuckDBPyRelation:
         """The ``e2o`` table with the object ``ocel:type`` joined on."""
-        object_types = self._con.table("objects").select(OID_COL, OTYPE_COL)
-        return self._con.table("e2o").join(object_types, OID_COL)
+        return self._con.sql(
+            f'SELECT r.*, o."{OTYPE_COL}" FROM e2o r '
+            f'JOIN objects o ON r."{OID_COL}" = o."{OID_COL}"'
+        )
 
-    # ------------------------------------------------------------------
-    # Escape hatches
-    # ------------------------------------------------------------------
-    def sql(self, query: str) -> "Table":
-        """Run arbitrary SQL against the stored tables, returning an ibis expression."""
+    def sql(self, query: str) -> duckdb.DuckDBPyRelation:
+        """Run arbitrary SQL against the stored tables."""
         return self._con.sql(query)
 
     def materialize(self) -> "OCEL":
@@ -87,7 +75,7 @@ class LazyOCEL:
         return load_ocel_duckdb(self._db_path, meta=self.meta)
 
     def close(self) -> None:
-        self._con.disconnect()
+        self._con.close()
 
     def __enter__(self) -> "LazyOCEL":
         return self

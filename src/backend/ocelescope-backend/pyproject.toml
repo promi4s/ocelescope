@@ -15,7 +15,7 @@ dependencies = [
   "uvicorn>=0.49,<0.50",
   "ocelescope[plugin]>=0.3.0,<0.4.0",
   "orjson>=3.11.3",
-  "ibis-framework[duckdb]>=12.0.0",
+  "polars>=1.40",
 ]
 
 [project.scripts]
