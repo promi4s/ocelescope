@@ -26,7 +26,6 @@ class OcelMetadata(BaseModel):
 
     @classmethod
     def from_handle(cls, handle: "SessionOCEL", filter_applied: bool | None = None):
-
         descriptions = registry_manager.get_extension_descriptions()
         return cls(
             id=handle.id,

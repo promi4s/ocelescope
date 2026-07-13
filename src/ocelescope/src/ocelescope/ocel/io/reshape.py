@@ -64,10 +64,14 @@ def object_changes_sql(attribute_columns: list[str], source: str = "") -> str:
     change index in timestamp order.
     """
     if attribute_columns:
-        field = "CASE " + " ".join(
-            f"WHEN c.\"{name}\" IS NOT NULL THEN '{name.replace(chr(39), chr(39) * 2)}'"
-            for name in attribute_columns
-        ) + " END"
+        field = (
+            "CASE "
+            + " ".join(
+                f"WHEN c.\"{name}\" IS NOT NULL THEN '{name.replace(chr(39), chr(39) * 2)}'"
+                for name in attribute_columns
+            )
+            + " END"
+        )
     else:
         field = "NULL"
 
@@ -75,7 +79,7 @@ def object_changes_sql(attribute_columns: list[str], source: str = "") -> str:
         f'SELECT c.*, o."{OTYPE_COL}", {field} AS "{OBJECT_CHANGED_FIELD}", '
         f'row_number() OVER (PARTITION BY c."{OID_COL}" ORDER BY c."{TIMESTAMP_COL}") '
         f'AS "{OBJECT_CHANGE_CUMCOUNT}" '
-        f'FROM {source}object_changes c '
+        f"FROM {source}object_changes c "
         f'JOIN {source}objects o ON c."{OID_COL}" = o."{OID_COL}" '
         f'ORDER BY c."{TIMESTAMP_COL}"'
     )
