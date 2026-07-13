@@ -37,6 +37,11 @@ class OCELDb:
     ``ocel:type`` onto the relation tables. Each returns a lazy
     :class:`duckdb.DuckDBPyRelation`.
 
+    Every access returns a relation on its *own* DuckDB cursor -- a single DuckDB
+    connection can't be scanned twice in one query (e.g. when polars joins two of
+    these frames), so **access ``ocel.events`` (etc.) freshly at each use rather
+    than storing it in a variable and reusing it**.
+
     Args:
         db_path: Path to an OCEL DuckDB database (origin or a pre-filtered one).
         meta: Optional metadata, forwarded to :meth:`materialize`.
@@ -50,28 +55,28 @@ class OCELDb:
 
     @property
     def events(self) -> duckdb.DuckDBPyRelation:
-        return self._con.table("events")
+        return self._con.cursor().table("events")
 
     @property
     def objects(self) -> duckdb.DuckDBPyRelation:
-        return self._con.table("objects")
+        return self._con.cursor().table("objects")
 
     @property
     def o2o(self) -> duckdb.DuckDBPyRelation:
-        return self._con.table("o2o")
+        return self._con.cursor().table("o2o")
 
     @property
     def e2o(self) -> duckdb.DuckDBPyRelation:
-        return self._con.table("e2o")
+        return self._con.cursor().table("e2o")
 
     @property
     def object_changes(self) -> duckdb.DuckDBPyRelation:
-        return self._con.table("object_changes")
+        return self._con.cursor().table("object_changes")
 
     @property
     def typed_e2o(self) -> duckdb.DuckDBPyRelation:
         """The ``e2o`` table with the object ``ocel:type`` joined on."""
-        return self._con.sql(
+        return self._con.cursor().sql(
             f'SELECT r.*, o."{OTYPE_COL}" FROM e2o r '
             f'JOIN objects o ON r."{OID_COL}" = o."{OID_COL}"'
         )
@@ -83,7 +88,7 @@ class OCELDb:
         The source object's type is exposed as ``ocel:type_1`` and the target's as
         ``ocel:type_2``, mirroring the ``ocel:oid_1`` / ``ocel:oid_2`` id columns.
         """
-        return self._con.sql(
+        return self._con.cursor().sql(
             f'SELECT r.*, s."{OTYPE_COL}" AS "{OTYPE_COL}_1", '
             f't."{OTYPE_COL}" AS "{OTYPE_COL}_2" FROM o2o r '
             f'JOIN objects s ON r."{O2O_SOURCE_ID}" = s."{OID_COL}" '

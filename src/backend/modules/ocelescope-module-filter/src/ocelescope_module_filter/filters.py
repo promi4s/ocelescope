@@ -1,7 +1,7 @@
 """Concrete module filters, written in pure lazy polars (no SQL).
 
-The concrete ``FilterV1`` filters, owned by this module. Each filter
-returns a lazy frame of the event/object ids it keeps; the applier combines them.
+The concrete ``FilterV1`` filters, owned by this module. Each filter's ``keep``
+returns a :class:`Keep` of the event/object ids it keeps; the applier combines them.
 """
 
 from __future__ import annotations
@@ -21,7 +21,8 @@ from ocelescope.ocel.constants.pm4py import (
     OTYPE_COL,
     TIMESTAMP_COL,
 )
-from ocelescope_backend.app.internal.ocel.filters import ModuleFilter, Tables
+from ocelescope_backend.app.internal.ocel.filters import Keep, ModuleFilter
+from ocelescope_backend.app.internal.ocel.ocel_db import OCELDb
 
 Mode = Literal["include", "exclude"]
 
@@ -47,7 +48,7 @@ class TimeFrameFilter(ModuleFilter):
     time_range: tuple[Optional[str], Optional[str]]
     mode: Mode = "include"
 
-    def keep_events(self, tables: Tables) -> pl.LazyFrame | None:
+    def keep(self, ocel: OCELDb) -> Keep:
         start, end = self.time_range
         predicate = None
         if start is not None:
@@ -56,10 +57,10 @@ class TimeFrameFilter(ModuleFilter):
             upper = pl.col(TIMESTAMP_COL) <= datetime.fromisoformat(end)
             predicate = upper if predicate is None else predicate & upper
         if predicate is None:
-            return None
+            return Keep()
         if self.mode == "exclude":
             predicate = ~predicate
-        return tables.events.filter(predicate).select(EID_COL)
+        return Keep(events=ocel.events.pl(lazy=True).filter(predicate).select(EID_COL))
 
 
 class ActivityFilter(ModuleFilter):
@@ -69,11 +70,11 @@ class ActivityFilter(ModuleFilter):
     event_types: list[str]
     mode: Mode = "include"
 
-    def keep_events(self, tables: Tables) -> pl.LazyFrame | None:
+    def keep(self, ocel: OCELDb) -> Keep:
         predicate = pl.col(ACTIVITY_COL).is_in(self.event_types)
         if self.mode == "exclude":
             predicate = ~predicate
-        return tables.events.filter(predicate).select(EID_COL)
+        return Keep(events=ocel.events.pl(lazy=True).filter(predicate).select(EID_COL))
 
 
 class ObjectTypeFilter(ModuleFilter):
@@ -83,11 +84,11 @@ class ObjectTypeFilter(ModuleFilter):
     object_types: list[str]
     mode: Mode = "include"
 
-    def keep_objects(self, tables: Tables) -> pl.LazyFrame | None:
+    def keep(self, ocel: OCELDb) -> Keep:
         predicate = pl.col(OTYPE_COL).is_in(self.object_types)
         if self.mode == "exclude":
             predicate = ~predicate
-        return tables.objects.filter(predicate).select(OID_COL)
+        return Keep(objects=ocel.objects.pl(lazy=True).filter(predicate).select(OID_COL))
 
 
 # ---------------------------------------------------------------------------
@@ -134,7 +135,7 @@ class _AttributeFilter(ModuleFilter):
     def _keep(
         self, get: "Callable[[], pl.LazyFrame]", type_col: str, id_col: str
     ) -> pl.LazyFrame:
-        # ``get()`` returns a fresh table scan each call (see Tables docstring).
+        # ``get()`` returns a fresh table scan each call (see OCELDb docstring).
         if self.target_type is not None:
             unaffected = pl.col(type_col) != self.target_type
         else:
@@ -156,8 +157,10 @@ class EventAttributeFilter(_AttributeFilter):
 
     type: Literal["event_attribute"]
 
-    def keep_events(self, tables: Tables) -> pl.LazyFrame | None:
-        return self._keep(lambda: tables.events, ACTIVITY_COL, EID_COL)
+    def keep(self, ocel: OCELDb) -> Keep:
+        return Keep(
+            events=self._keep(lambda: ocel.events.pl(lazy=True), ACTIVITY_COL, EID_COL)
+        )
 
 
 class ObjectAttributeFilter(_AttributeFilter):
@@ -168,8 +171,10 @@ class ObjectAttributeFilter(_AttributeFilter):
 
     type: Literal["object_attribute"]
 
-    def keep_objects(self, tables: Tables) -> pl.LazyFrame | None:
-        return self._keep(lambda: tables.objects, OTYPE_COL, OID_COL)
+    def keep(self, ocel: OCELDb) -> Keep:
+        return Keep(
+            objects=self._keep(lambda: ocel.objects.pl(lazy=True), OTYPE_COL, OID_COL)
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -203,9 +208,9 @@ class E2OCountFilter(ModuleFilter):
     qualifier: Optional[str] = None
     direction: Literal["source", "target"] = "source"
 
-    def _matched(self, tables: Tables) -> pl.LazyFrame:
-        matched = tables.relations.join(
-            tables.events.select(EID_COL, ACTIVITY_COL), on=EID_COL
+    def _matched(self, ocel: OCELDb) -> pl.LazyFrame:
+        matched = ocel.typed_e2o.pl(lazy=True).join(
+            ocel.events.pl(lazy=True).select(EID_COL, ACTIVITY_COL), on=EID_COL
         ).filter(
             (pl.col(ACTIVITY_COL) == self.source) & (pl.col(OTYPE_COL) == self.target)
         )
@@ -213,31 +218,35 @@ class E2OCountFilter(ModuleFilter):
             matched = matched.filter(pl.col(E2O_QUALIFIER) == self.qualifier)
         return matched
 
-    def keep_events(self, tables: Tables) -> pl.LazyFrame | None:
-        if self.direction != "source":
-            return None
-        counts = self._matched(tables).group_by(EID_COL).agg(pl.len().alias(_COUNT))
-        counted = tables.events.filter(pl.col(ACTIVITY_COL) == self.source).select(
-            EID_COL
-        )
-        survivors = _counted_survivors(counted, counts, EID_COL, self.range)
-        unaffected = tables.events.filter(pl.col(ACTIVITY_COL) != self.source).select(
-            EID_COL
-        )
-        return pl.concat([unaffected, survivors]).unique()
+    def keep(self, ocel: OCELDb) -> Keep:
+        if self.direction == "source":
+            counts = self._matched(ocel).group_by(EID_COL).agg(pl.len().alias(_COUNT))
+            counted = (
+                ocel.events.pl(lazy=True)
+                .filter(pl.col(ACTIVITY_COL) == self.source)
+                .select(EID_COL)
+            )
+            survivors = _counted_survivors(counted, counts, EID_COL, self.range)
+            unaffected = (
+                ocel.events.pl(lazy=True)
+                .filter(pl.col(ACTIVITY_COL) != self.source)
+                .select(EID_COL)
+            )
+            return Keep(events=pl.concat([unaffected, survivors]).unique())
 
-    def keep_objects(self, tables: Tables) -> pl.LazyFrame | None:
-        if self.direction != "target":
-            return None
-        counts = self._matched(tables).group_by(OID_COL).agg(pl.len().alias(_COUNT))
-        counted = tables.objects.filter(pl.col(OTYPE_COL) == self.target).select(
-            OID_COL
+        counts = self._matched(ocel).group_by(OID_COL).agg(pl.len().alias(_COUNT))
+        counted = (
+            ocel.objects.pl(lazy=True)
+            .filter(pl.col(OTYPE_COL) == self.target)
+            .select(OID_COL)
         )
         survivors = _counted_survivors(counted, counts, OID_COL, self.range)
-        unaffected = tables.objects.filter(pl.col(OTYPE_COL) != self.target).select(
-            OID_COL
+        unaffected = (
+            ocel.objects.pl(lazy=True)
+            .filter(pl.col(OTYPE_COL) != self.target)
+            .select(OID_COL)
         )
-        return pl.concat([unaffected, survivors]).unique()
+        return Keep(objects=pl.concat([unaffected, survivors]).unique())
 
 
 class O2OCountFilter(ModuleFilter):
@@ -254,15 +263,20 @@ class O2OCountFilter(ModuleFilter):
     qualifier: Optional[str] = None
     direction: Literal["source", "target"] = "source"
 
-    def keep_objects(self, tables: Tables) -> pl.LazyFrame | None:
-        source_types = tables.objects.select(OID_COL, OTYPE_COL).rename(
-            {OID_COL: O2O_SOURCE_ID, OTYPE_COL: "__src_type"}
+    def keep(self, ocel: OCELDb) -> Keep:
+        source_types = (
+            ocel.objects.pl(lazy=True)
+            .select(OID_COL, OTYPE_COL)
+            .rename({OID_COL: O2O_SOURCE_ID, OTYPE_COL: "__src_type"})
         )
-        target_types = tables.objects.select(OID_COL, OTYPE_COL).rename(
-            {OID_COL: O2O_TARGET_ID, OTYPE_COL: "__tgt_type"}
+        target_types = (
+            ocel.objects.pl(lazy=True)
+            .select(OID_COL, OTYPE_COL)
+            .rename({OID_COL: O2O_TARGET_ID, OTYPE_COL: "__tgt_type"})
         )
         matched = (
-            tables.o2o.join(source_types, on=O2O_SOURCE_ID)
+            ocel.o2o.pl(lazy=True)
+            .join(source_types, on=O2O_SOURCE_ID)
             .join(target_types, on=O2O_TARGET_ID)
             .filter(
                 (pl.col("__src_type") == self.source)
@@ -280,11 +294,15 @@ class O2OCountFilter(ModuleFilter):
             .agg(pl.len().alias(_COUNT))
             .rename({key_col: OID_COL})
         )
-        counted = tables.objects.filter(pl.col(OTYPE_COL) == counted_type).select(
-            OID_COL
+        counted = (
+            ocel.objects.pl(lazy=True)
+            .filter(pl.col(OTYPE_COL) == counted_type)
+            .select(OID_COL)
         )
         survivors = _counted_survivors(counted, counts, OID_COL, self.range)
-        unaffected = tables.objects.filter(pl.col(OTYPE_COL) != counted_type).select(
-            OID_COL
+        unaffected = (
+            ocel.objects.pl(lazy=True)
+            .filter(pl.col(OTYPE_COL) != counted_type)
+            .select(OID_COL)
         )
-        return pl.concat([unaffected, survivors]).unique()
+        return Keep(objects=pl.concat([unaffected, survivors]).unique())

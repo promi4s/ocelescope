@@ -23,7 +23,8 @@ from ocelescope.ocel.constants.pm4py import (
     OID_COL,
 )
 
-from ocelescope_backend.app.internal.ocel.filters.base import ModuleFilter, Tables
+from ocelescope_backend.app.internal.ocel.filters.base import ModuleFilter
+from ocelescope_backend.app.internal.ocel.ocel_db import OCELDb
 
 SRC = "src"
 _QUANTITY_TABLES = ("quantities", "quantity_operations", "quantity_item_properties")
@@ -57,20 +58,21 @@ def apply_filters(
     target_db = Path(target_db)
     target_db.unlink(missing_ok=True)
 
-    con = duckdb.connect(str(origin_db), read_only=True)
-    try:
-        con.execute("SET TimeZone='UTC'")
-        tables = Tables(con)
-        event_keeps = [k for f in filters if (k := f.keep_events(tables)) is not None]
-        object_keeps = [k for f in filters if (k := f.keep_objects(tables)) is not None]
-        kept_events = _intersect(
-            event_keeps, tables.events.select(EID_COL), EID_COL
-        ).collect()
-        kept_objects = _intersect(
-            object_keeps, tables.objects.select(OID_COL), OID_COL
-        ).collect()
-    finally:
-        con.close()
+    with OCELDb(origin_db) as ocel:
+        keeps = [f.keep(ocel) for f in filters]
+        event_keeps = [k.events for k in keeps if k.events is not None]
+        object_keeps = [k.objects for k in keeps if k.objects is not None]
+
+        kept_events, kept_objects = pl.collect_all(
+            [
+                _intersect(
+                    event_keeps, ocel.events.pl(lazy=True).select(EID_COL), EID_COL
+                ),
+                _intersect(
+                    object_keeps, ocel.objects.pl(lazy=True).select(OID_COL), OID_COL
+                ),
+            ]
+        )
 
     _write(origin_db, target_db, kept_events, kept_objects)
 
@@ -97,7 +99,7 @@ def _write(
             f'WHERE "{OID_COL}" IN (SELECT "{OID_COL}" FROM kept_objects)'
         )
 
-        # Cascade (== clean_ocel): drop dangling relations, then orphaned entities.
+        # Clean the OCEL
         out.execute(
             f"CREATE TABLE e2o AS SELECT * FROM {SRC}.e2o "
             f'WHERE "{EID_COL}" IN (SELECT "{EID_COL}" FROM events) '
