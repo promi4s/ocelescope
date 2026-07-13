@@ -15,7 +15,7 @@ from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.model.ocel import SessionOCEL
 from ocelescope_backend.app.internal.model.resource import ResourceApi, ResourceStore
 from ocelescope_backend.app.internal.ocel.filters import ModuleFilter
-from ocelescope_backend.app.internal.ocel.lazy_ocel import LazyOCEL
+from ocelescope_backend.app.internal.ocel.ocel_db import OCELDb
 from ocelescope_backend.app.internal.tasks.base import TaskBase
 from ocelescope_backend.app.sse_manager import InvalidationRequest, sse_manager
 
@@ -152,11 +152,11 @@ class Session:
 
         return self.ocels[ocel_id].ocel(use_original=use_original)
 
-    def get_lazy_ocel(self, ocel_id: str, use_original: bool = False) -> LazyOCEL:
+    def get_ocel_db(self, ocel_id: str, use_original: bool = False) -> OCELDb:
         if ocel_id not in self.ocels:
             raise NotFound(f"OCEL with id {ocel_id} not found")
 
-        return self.ocels[ocel_id].lazy(use_original=use_original)
+        return self.ocels[ocel_id].ocel_db(use_original=use_original)
 
     def export_ocel(
         self, ocel_id: str, target_path: Path, use_original: bool = False

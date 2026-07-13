@@ -12,7 +12,7 @@ from ocelescope import (
     OCEL,
 )
 from ocelescope_backend.app.internal.ocel.filters import ModuleFilter, apply_filters
-from ocelescope_backend.app.internal.ocel.lazy_ocel import LazyOCEL
+from ocelescope_backend.app.internal.ocel.ocel_db import OCELDb
 from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.registry.extension import OCELExtensionDescription
 
@@ -47,7 +47,7 @@ class SessionOCEL:
     s, grouped by the module that set them) defines a *view*; it is applied **once**
     -- when the pipeline changes -- into a pre-computed filtered DuckDB file. Both
     views then read that file: :meth:`ocel` materializes the pm4py :class:`OCEL`,
-    :meth:`lazy` opens a RAM-friendly :class:`LazyOCEL`. So a per-request access
+    :meth:`ocel_db` opens a RAM-friendly :class:`OCELDb`. So a per-request access
     never re-runs the filter. Passing ``use_original`` reads the origin instead.
     """
 
@@ -93,9 +93,9 @@ class SessionOCEL:
             ocel.extensions.set(self.extensions)
         return ocel
 
-    def lazy(self, use_original: bool = False) -> LazyOCEL:
+    def ocel_db(self, use_original: bool = False) -> OCELDb:
         """A RAM-friendly DuckDB reader (filtered unless ``use_original``)."""
-        return LazyOCEL(self._active_path(use_original), meta=self._meta())
+        return OCELDb(self._active_path(use_original), meta=self._meta())
 
     def export(self, target_path: Path, use_original: bool = False) -> None:
         """Write the OCEL to ``target_path`` straight from the DuckDB store.
