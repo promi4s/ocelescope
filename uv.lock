@@ -1319,6 +1319,15 @@ wheels = [
 ]
 
 [[package]]
+name = "lxml-stubs"
+version = "0.5.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/99/da/1a3a3e5d159b249fc2970d73437496b908de8e4716a089c69591b4ffa6fd/lxml-stubs-0.5.1.tar.gz", hash = "sha256:e0ec2aa1ce92d91278b719091ce4515c12adc1d564359dfaf81efa7d4feab79d", size = 14778, upload-time = "2024-01-10T09:37:46.521Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1f/c9/e0f8e4e6e8a69e5959b06499582dca6349db6769cc7fdfb8a02a7c75a9ae/lxml_stubs-0.5.1-py3-none-any.whl", hash = "sha256:1f689e5dbc4b9247cb09ae820c7d34daeb1fdbd1db06123814b856dae7787272", size = 13584, upload-time = "2024-01-10T09:37:44.931Z" },
+]
+
+[[package]]
 name = "markdown"
 version = "3.10.2"
 source = { registry = "https://pypi.org/simple" }
@@ -1936,6 +1945,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "lxml-stubs" },
     { name = "ruff" },
     { name = "ty" },
 ]
@@ -1958,6 +1968,7 @@ repl = [
     { name = "ipython-autotime" },
 ]
 typecheck = [
+    { name = "lxml-stubs" },
     { name = "ty" },
 ]
 
@@ -1966,6 +1977,7 @@ requires-dist = [{ name = "ocelescope-module-ocelot", specifier = ">=0.1.0" }]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "lxml-stubs", specifier = ">=0.5.1" },
     { name = "ruff", specifier = ">=0.15.7" },
     { name = "ty", specifier = ">=0.0.51" },
 ]
@@ -1985,7 +1997,10 @@ repl = [
     { name = "ipython", specifier = ">=9.11.0" },
     { name = "ipython-autotime", specifier = ">=0.3.2" },
 ]
-typecheck = [{ name = "ty", specifier = ">=0.0.51" }]
+typecheck = [
+    { name = "lxml-stubs", specifier = ">=0.5.1" },
+    { name = "ty", specifier = ">=0.0.51" },
+]
 
 [[package]]
 name = "orjson"
