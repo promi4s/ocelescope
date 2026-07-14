@@ -54,6 +54,11 @@ class OCELDb:
         self._con.execute("SET TimeZone='UTC'")
 
     @property
+    def db_path(self) -> Path:
+        """Path to the underlying DuckDB file (e.g. to feed :func:`apply_filters`)."""
+        return self._db_path
+
+    @property
     def events(self) -> duckdb.DuckDBPyRelation:
         return self._con.cursor().table("events")
 
