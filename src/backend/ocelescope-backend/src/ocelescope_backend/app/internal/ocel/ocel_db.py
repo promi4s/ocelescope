@@ -95,6 +95,55 @@ class OCELDb:
             f'JOIN objects t ON r."{O2O_TARGET_ID}" = t."{OID_COL}"'
         )
 
+    def sql(
+        self, query: str, params: list[object] | None = None
+    ) -> duckdb.DuckDBPyRelation:
+        """Run a read-only SQL query over the OCEL tables, returning a lazy relation.
+
+        An escape hatch for reads the table properties + relational API can't express
+        cleanly -- multi-table joins, list aggregation, window functions, and the like.
+        Reference the stored tables by name (``events``, ``objects``, ``e2o``, ``o2o``,
+        ``object_changes``, and the quantity tables when present). The query runs on its
+        own cursor, so its result can still be combined with the other ``OCELDb``
+        relations in a single follow-up query.
+
+        Always bind caller-supplied values through ``params`` (``?`` placeholders) rather
+        than formatting them into the query string, so they stay injection-safe.
+        """
+        cursor = self._con.cursor()
+        return cursor.sql(query, params=params) if params else cursor.sql(query)
+
+    def _has_table(self, name: str) -> bool:
+        return (
+            self._con.execute(
+                "SELECT 1 FROM information_schema.tables WHERE table_name = ?", [name]
+            ).fetchone()
+            is not None
+        )
+
+    @property
+    def has_quantities(self) -> bool:
+        """Whether the OCEL carries a quantity extension (its tables are present)."""
+        return self._has_table("quantities") or self._has_table("quantity_operations")
+
+    @property
+    def quantities(self) -> duckdb.DuckDBPyRelation | None:
+        """Initial per-object quantities, or ``None`` without a quantity extension."""
+        return (
+            self._con.cursor().table("quantities")
+            if self._has_table("quantities")
+            else None
+        )
+
+    @property
+    def quantity_operations(self) -> duckdb.DuckDBPyRelation | None:
+        """Per-event quantity operations, or ``None`` without a quantity extension."""
+        return (
+            self._con.cursor().table("quantity_operations")
+            if self._has_table("quantity_operations")
+            else None
+        )
+
     def materialize(self) -> "OCEL":
         """Load the full in-memory :class:`ocelescope.OCEL` (all tables into pandas)."""
         return load_ocel_duckdb(self._db_path, meta=self.meta)

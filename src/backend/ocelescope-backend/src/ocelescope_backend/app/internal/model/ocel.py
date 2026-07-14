@@ -1,43 +1,15 @@
 from pathlib import Path
-from typing import Hashable, Self, Sequence, cast
+from typing import Sequence
 
-import pandas as pd
-from ocelescope.ocel.constants import ValueType
 from ocelescope.ocel.extensions.base_extension import OCELExtension
 from ocelescope.ocel.io import export_duckdb_ocel, load_ocel_duckdb
 from ocelescope.ocel.models.meta import OCELMeta
-from pydantic.main import BaseModel
 
 from ocelescope import (
     OCEL,
 )
 from ocelescope_backend.app.internal.ocel.filters import ModuleFilter, apply_filters
 from ocelescope_backend.app.internal.ocel.ocel_db import OCELDb
-from ocelescope_backend.app.internal.registry import registry_manager
-from ocelescope_backend.app.internal.registry.extension import OCELExtensionDescription
-
-
-class OcelMetadata(BaseModel):
-    id: str
-    name: str
-    created_at: str
-    extensions: list[OCELExtensionDescription]
-    filter_applied: bool | None
-
-    @classmethod
-    def from_handle(cls, handle: "SessionOCEL", filter_applied: bool | None = None):
-        descriptions = registry_manager.get_extension_descriptions()
-        return cls(
-            id=handle.id,
-            created_at=handle.created_at,
-            name=handle.name,
-            extensions=[
-                descriptions[extension.__class__.__name__]
-                for extension in handle.extensions
-                if extension.__class__.__name__ in descriptions
-            ],
-            filter_applied=filter_applied,
-        )
 
 
 class SessionOCEL:
@@ -134,74 +106,3 @@ class SessionOCEL:
         self._drop_filtered()
         if self._all_filters():
             self._active_path(use_original=False)
-
-
-class Attribute(BaseModel):
-    name: str
-    min: str | int | float
-    max: str | int | float
-    distinct_values: int
-    type: ValueType
-
-    @classmethod
-    def from_df_row(cls, row: tuple[Hashable, pd.Series]) -> Self:
-        attribute_name = cast(str, row[0])
-        series = row[1]
-
-        return cls(
-            name=attribute_name,
-            min=series["min"],
-            max=series["max"],
-            distinct_values=series["distinct_values"],
-            type=series["type"],
-        )
-
-    @classmethod
-    def from_df(cls, df: pd.DataFrame) -> list[Self]:
-        return [cls.from_df_row(row) for row in df.iterrows()]
-
-
-class AggregatedAttribute(Attribute):
-    entity_type_names: list[str]
-
-    @classmethod
-    def from_df_row(cls, row: tuple[Hashable, pd.Series]) -> Self:
-        base = Attribute.from_df_row(row)
-
-        return cls(
-            entity_type_names=row[1]["object_types"] + row[1]["activities"],
-            **base.model_dump(),
-        )
-
-
-class TypedAttribute(Attribute):
-    entity_type: str
-
-    @classmethod
-    def from_df_row(cls, row: tuple[Hashable, pd.Series]) -> "TypedAttribute":
-        index = cast(tuple[str, str], row[0])
-        entity_type = index[0]
-        base = Attribute.from_df_row((index[1], row[1]))
-
-        return cls(
-            entity_type=entity_type,
-            **base.model_dump(),
-        )
-
-
-class QuantityInfo(BaseModel):
-    item_types: list[str]
-    total_object_count: int
-    total_event_count: int
-    object_types: list[str]
-    activities: list[str]
-
-    @classmethod
-    def from_ocel(cls, ocel: OCEL) -> Self:
-        return cls(
-            item_types=ocel.quantities.item_types,
-            total_object_count=len(ocel.quantities.objects),
-            total_event_count=len(ocel.quantities.events),
-            object_types=ocel.quantities.object_types,
-            activities=ocel.quantities.activities,
-        )
