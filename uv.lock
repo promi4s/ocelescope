@@ -18,6 +18,7 @@ members = [
     "ocelescope",
     "ocelescope-backend",
     "ocelescope-module-filter",
+    "ocelescope-module-ocel",
     "ocelescope-workspace",
 ]
 
@@ -1924,6 +1925,25 @@ requires-dist = [
 ]
 
 [[package]]
+name = "ocelescope-module-ocel"
+version = "0.1.0"
+source = { editable = "src/backend/modules/ocelescope-module-ocel" }
+dependencies = [
+    { name = "fastapi" },
+    { name = "ocelescope" },
+    { name = "ocelescope-backend" },
+    { name = "polars" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "fastapi", specifier = ">=0.136.0" },
+    { name = "ocelescope", editable = "src/ocelescope" },
+    { name = "ocelescope-backend", editable = "src/backend/ocelescope-backend" },
+    { name = "polars", specifier = ">=1.40" },
+]
+
+[[package]]
 name = "ocelescope-module-ocelot"
 version = "0.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1940,6 +1960,7 @@ name = "ocelescope-workspace"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "ocelescope-module-ocel" },
     { name = "ocelescope-module-ocelot" },
 ]
 
@@ -1973,7 +1994,10 @@ typecheck = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "ocelescope-module-ocelot", specifier = ">=0.1.0" }]
+requires-dist = [
+    { name = "ocelescope-module-ocel", editable = "src/backend/modules/ocelescope-module-ocel" },
+    { name = "ocelescope-module-ocelot", specifier = ">=0.1.0" },
+]
 
 [package.metadata.requires-dev]
 dev = [
