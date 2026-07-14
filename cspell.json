@@ -155,7 +155,9 @@
     "attribs",
     "kvitems",
     "getprevious",
-    "unparseable"
+    "unparseable",
+    "otypes",
+    "quals"
   ],
   "ignorePaths": [
     "pnpm-lock.yaml",
