@@ -362,6 +362,10 @@
             "in": "query",
             "required": false,
             "schema": {
+              "enum": [
+                "events",
+                "objects"
+              ],
               "type": "string",
               "default": "events",
               "title": "Entity Type"
@@ -403,6 +407,16 @@
                 }
               ],
               "title": "Entity Names"
+            }
+          },
+          {
+            "name": "drop_constant",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Drop Constant"
             }
           },
           {
@@ -685,6 +699,10 @@
             "schema": {
               "anyOf": [
                 {
+                  "enum": [
+                    "events",
+                    "objects"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1503,41 +1521,6 @@
             }
           },
           {
-            "name": "sort_by",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "enum": [
-                    "source",
-                    "target",
-                    "qualifier"
-                  ],
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Sort By"
-            }
-          },
-          {
-            "name": "order",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "enum": [
-                "asc",
-                "desc"
-              ],
-              "type": "string",
-              "default": "asc",
-              "title": "Order"
-            }
-          },
-          {
             "name": "page",
             "in": "query",
             "required": false,
@@ -1579,6 +1562,16 @@
               "type": "boolean",
               "default": true,
               "title": "With Qualifier"
+            }
+          },
+          {
+            "name": "drop_constant",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Drop Constant"
             }
           },
           {
@@ -1720,41 +1713,6 @@
             }
           },
           {
-            "name": "sort_by",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "enum": [
-                    "source",
-                    "target",
-                    "qualifier"
-                  ],
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Sort By"
-            }
-          },
-          {
-            "name": "order",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "enum": [
-                "asc",
-                "desc"
-              ],
-              "type": "string",
-              "default": "asc",
-              "title": "Order"
-            }
-          },
-          {
             "name": "page",
             "in": "query",
             "required": false,
@@ -1796,6 +1754,16 @@
               "type": "boolean",
               "default": true,
               "title": "With Qualifier"
+            }
+          },
+          {
+            "name": "drop_constant",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Drop Constant"
             }
           },
           {
