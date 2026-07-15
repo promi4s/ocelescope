@@ -1,30 +1,30 @@
+from datetime import datetime
 from typing import Literal, Optional
 
-import pandas as pd
+import polars as pl
 
-from ocelescope.ocel.filter.base import BaseFilter, FilterResult
+from ocelescope.ocel.constants.pm4py import EID_COL, TIMESTAMP_COL
+from ocelescope.ocel.filter.base import BaseFilter, Keep
 
 
 class TimeFrameFilter(BaseFilter):
+    """Keep the events within a time range. Either end may be left open."""
+
     time_range: tuple[Optional[str], Optional[str]]
     mode: Literal["exclude", "include"] = "include"
 
-    def filter(self, ocel):
-        start_time, end_time = self.time_range
+    def keep(self, ocel) -> Keep:
+        start, end = (
+            datetime.fromisoformat(bound) if bound is not None else None
+            for bound in self.time_range
+        )
 
-        if start_time is not None:
-            start_time = pd.Timestamp(start_time, tz="UTC")
-        if end_time is not None:
-            end_time = pd.Timestamp(end_time, tz="UTC")
-
-        events_df = ocel.events.df
-
-        mask = pd.Series([True] * len(events_df), index=events_df.index)
-        if start_time is not None:
-            mask &= events_df["ocel:timestamp"] >= start_time
-        if end_time is not None:
-            mask &= events_df["ocel:timestamp"] <= end_time
+        within = pl.lit(True)
+        if start is not None:
+            within = within & (pl.col(TIMESTAMP_COL) >= pl.lit(start).dt.replace_time_zone("UTC"))
+        if end is not None:
+            within = within & (pl.col(TIMESTAMP_COL) <= pl.lit(end).dt.replace_time_zone("UTC"))
         if self.mode == "exclude":
-            mask = ~mask
+            within = ~within
 
-        return FilterResult(events=mask)
+        return Keep(events=ocel.events.pl.filter(within).select(EID_COL))

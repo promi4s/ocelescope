@@ -1,64 +1,78 @@
+"""Apply a stack of :class:`BaseFilter` s to an OCEL, producing a new one.
+
+Runs *once* per pipeline: asks each filter for the event/object ids it keeps
+(read as lazy polars, so predicates push down into DuckDB), intersects them, then
+hands the surviving ids back to DuckDB. Only the small id-sets cross between
+polars and DuckDB, so nothing but them is materialised in Python.
+
+The filtered log is a copy of the original with the unkept events and objects
+deleted, then :meth:`OCEL.clean` run over it -- which is what makes the result a
+valid OCEL rather than merely a smaller one.
+"""
+
+from __future__ import annotations
+
+from functools import reduce
 from typing import TYPE_CHECKING, Sequence
 
-import pandas as pd
+import polars as pl
 
-from ocelescope.ocel.constants.pm4py import O2O_SOURCE_ID, OID_COL
-from ocelescope.ocel.filter.base import BaseFilter, FilterResult
-from ocelescope.ocel.util.cleanup import clean_ocel
+from ocelescope.ocel.constants.pm4py import EID_COL, OID_COL
+from ocelescope.ocel.filter.base import BaseFilter, Keep
 
 if TYPE_CHECKING:
     from ocelescope.ocel.core.ocel import OCEL
 
 
-def compute_combined_masks(ocel: "OCEL", filters: Sequence[BaseFilter]) -> FilterResult:
-    combined = FilterResult(
-        events=pd.Series(True, index=ocel.events.df.index),
-        objects=pd.Series(True, index=ocel.objects.df.index),
-    )
-
-    for filter in filters:
-        combined = combined.and_merge(filter.filter(ocel))
-
-    return combined
+def _intersect(frames: list[pl.LazyFrame], all_ids: pl.LazyFrame, id_col: str) -> pl.LazyFrame:
+    """Ids kept by *every* frame (inner joins); ``all_ids`` when no frame constrains."""
+    if not frames:
+        return all_ids
+    unique = [frame.select(id_col).unique() for frame in frames]
+    return reduce(lambda left, right: left.join(right, on=id_col, how="inner"), unique)
 
 
 def apply_filters(ocel: "OCEL", filters: Sequence[BaseFilter]) -> "OCEL":
+    """Return a new :class:`OCEL` holding the subset ``filters`` agree on.
+
+    Each filter names the ids it keeps and the sets are intersected, so a pipeline
+    keeps what *all* of its filters keep. A filter that leaves a side ``None``
+    constrains only the other one.
+    """
     from ocelescope.ocel.core.ocel import OCEL
 
-    masks = compute_combined_masks(ocel, filters)
+    keeps: list[Keep] = [f.keep(ocel) for f in filters]
 
-    events_df = ocel.events.df
-    if masks.events is not None:
-        events_df = events_df.loc[masks.events]
-
-    objects_df = ocel.objects.df
-    if masks.objects is not None:
-        objects_df = objects_df.loc[masks.objects]
-
-    # clean_ocel still expects PM4PY's name for the O2O source column, so it is
-    # renamed on the way in and back on the way out.
-    cleaned = clean_ocel(
-        {
-            "events": events_df,
-            "objects": objects_df,
-            "relations": ocel.e2o.df,
-            "o2o": ocel.o2o.df.rename(columns={O2O_SOURCE_ID: OID_COL}),
-            "object_changes": ocel.objects.changes,
-        }
+    # Collected together: a filter that derives both id-sets from one intermediate
+    # then evaluates that shared work once.
+    kept_events, kept_objects = pl.collect_all(
+        [
+            _intersect([k.events for k in keeps if k.events is not None], ocel.events.pl, EID_COL),
+            _intersect(
+                [k.objects for k in keeps if k.objects is not None], ocel.objects.pl, OID_COL
+            ),
+        ]
     )
 
-    return OCEL.from_frames(
-        events=cleaned["events"],
-        objects=cleaned["objects"],
-        relations=cleaned["relations"],
-        o2o=cleaned["o2o"].rename(columns={OID_COL: O2O_SOURCE_ID}),
-        object_changes=cleaned["object_changes"],
-        meta=ocel.meta,
-        quantityExtension=(
-            ocel.quantities.oqty,
-            ocel.quantities.qop,
-            ocel.quantities.properties,
-        )
-        if ocel.quantities.is_populated()
-        else None,
-    )
+    clone = ocel._copy_database()
+    try:
+        clone.register("kept_events", kept_events)
+        clone.register("kept_objects", kept_objects)
+        try:
+            clone.execute(
+                f'DELETE FROM events WHERE "{EID_COL}" NOT IN (SELECT "{EID_COL}" FROM kept_events)'
+            )
+            clone.execute(
+                f'DELETE FROM objects WHERE "{OID_COL}" '
+                f'NOT IN (SELECT "{OID_COL}" FROM kept_objects)'
+            )
+        finally:
+            clone.unregister("kept_events")
+            clone.unregister("kept_objects")
+    except Exception:
+        clone.close()
+        raise
+
+    filtered = OCEL(clone, meta=ocel.meta)
+    filtered.clean()
+    return filtered

@@ -1,37 +1,52 @@
-from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from typing import TYPE_CHECKING, Optional
+"""Contract for filters.
 
-from pandas import Series
+A :class:`BaseFilter` defines a *view* -- a valid subset of an OCEL -- by
+returning, from a single :meth:`BaseFilter.keep`, the **ids to keep** as a
+:class:`Keep` (event ids and/or object ids). Filters are plain pydantic classes
+(so they serialize) and contain no SQL: each gets an :class:`ocelescope.OCEL` and
+reads its tables as polars ``LazyFrame`` s (:attr:`EventsManager.pl` and friends --
+predicates and projections push down into DuckDB, so nothing is read whole).
+
+Both id-sets come from one method so a filter that constrains events *and* objects
+can build a shared intermediate once and derive both from it -- the engine collects
+the two together, so that shared work is evaluated a single time.
+
+The engine (:mod:`.engine`) intersects those id-frames, collects them, and lets
+DuckDB build the filtered OCEL: id membership plus a fixed relational cascade, run
+once for the whole pipeline. There is no per-access filtering.
+"""
+
+from __future__ import annotations
+
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING, NamedTuple
+
+import polars as pl
 from pydantic import BaseModel
 
 if TYPE_CHECKING:
     from ocelescope.ocel.core.ocel import OCEL
 
 
-@dataclass()
-class FilterResult:
-    events: Optional[Series] = None
-    objects: Optional[Series] = None
+class Keep(NamedTuple):
+    """The ids a filter keeps.
 
-    def and_merge(self, other: "FilterResult") -> "FilterResult":
-        def _and(a, b):
-            if a is not None and b is not None:
-                return a & b
-            elif a is not None:
-                return a
-            elif b is not None:
-                return b
-            else:
-                return None
+    ``events`` / ``objects`` are single-column lazy frames of the surviving event /
+    object ids. ``None`` on a side means "keep all" of that entity, which is not
+    the same as an empty frame -- that keeps none.
 
-        return FilterResult(
-            events=_and(self.events, other.events),
-            objects=_and(self.objects, other.objects),
-        )
+    A filter only names what it constrains: one that selects objects returns just
+    ``objects``, and the engine works out what that implies for the events.
+    """
+
+    events: pl.LazyFrame | None = None
+    objects: pl.LazyFrame | None = None
 
 
-class BaseFilter(ABC, BaseModel):
+class BaseFilter(BaseModel, ABC):
+    """A valid subset of an OCEL, expressed as the event/object ids to keep."""
+
     @abstractmethod
-    def filter(self, ocel: "OCEL") -> FilterResult:
-        pass
+    def keep(self, ocel: "OCEL") -> Keep:
+        """Return the event/object ids to keep as a :class:`Keep`."""
+        ...

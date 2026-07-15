@@ -69,6 +69,10 @@ class EventsManager(BaseManager):
         Nothing is read until it is collected, so further filtering or projection
         can be pushed down rather than paid for here.
 
+        Each access is its own scan, bound to its own cursor -- so read it freshly
+        at each use rather than storing it in a variable and reusing it. One
+        LazyFrame cannot be read twice within a single query.
+
         Returns:
             polars.LazyFrame: All events and their attributes.
         """

@@ -12,6 +12,8 @@ from ocelescope.ocel.constants.pm4py import (
     O2O_SOURCE_TYPE,
     O2O_TARGET_ID,
     O2O_TARGET_TYPE,
+    OID_COL,
+    OTYPE_COL,
 )
 from ocelescope.ocel.managers.base import BaseManager
 from ocelescope.ocel.util.relations import (
@@ -22,6 +24,7 @@ from ocelescope.ocel.util.relations import (
 from ocelescope.util.cache import instance_lru_cache
 
 TABLE = "o2o"
+_OBJECTS_TABLE = "objects"
 
 
 class O2OManager(BaseManager):
@@ -85,6 +88,10 @@ class O2OManager(BaseManager):
 
         Nothing is read until it is collected.
 
+        Each access is its own scan, bound to its own cursor -- so read it freshly
+        at each use rather than storing it in a variable and reusing it. One
+        LazyFrame cannot be read twice within a single query.
+
         Returns:
             polars.LazyFrame: A normalized O2O relation table.
         """
@@ -95,30 +102,50 @@ class O2OManager(BaseManager):
         self._replace(TABLE, contents)
 
     @property
+    def typed_table(self) -> duckdb.DuckDBPyRelation:
+        """
+        Return the O2O relations with each end's object type joined on, lazily.
+
+        Adds two columns to the normalized O2O table:
+
+            - O2O_SOURCE_TYPE
+            - O2O_TARGET_TYPE
+
+        The joins are outer, so a relation naming an object the log does not have
+        keeps its row and gets a null type rather than disappearing.
+
+        Returns:
+            DuckDBPyRelation: A lazy relation over the type-enriched O2O table.
+        """
+        return self._relation(
+            f'SELECT r.*, s."{OTYPE_COL}" AS "{O2O_SOURCE_TYPE}", '
+            f't."{OTYPE_COL}" AS "{O2O_TARGET_TYPE}" '
+            f'FROM (SELECT "{O2O_SOURCE_ID}", "{O2O_TARGET_ID}", "{O2O_QUALIFIER}" '
+            f"FROM {TABLE}) r "
+            f'LEFT JOIN {_OBJECTS_TABLE} s ON r."{O2O_SOURCE_ID}" = s."{OID_COL}" '
+            f'LEFT JOIN {_OBJECTS_TABLE} t ON r."{O2O_TARGET_ID}" = t."{OID_COL}"'
+        )
+
+    @property
+    def typed_pl(self) -> pl.LazyFrame:
+        """
+        Return the type-enriched O2O relation table as a polars LazyFrame.
+
+        Returns:
+            polars.LazyFrame: A type-enriched O2O relation table.
+        """
+        return self.typed_table.pl(lazy=True)
+
+    @property
     @instance_lru_cache()
     def typed_df(self) -> pd.DataFrame:
         """
         Return the O2O relation table enriched with object types.
 
-        Adds two additional columns to the normalized O2O table:
-
-            - O2O_SOURCE_TYPE
-            - O2O_TARGET_TYPE
-
-        These are obtained by joining against the object manager’s
-        `type_by_id` Series.
-
         Returns:
             DataFrame: A type-enriched O2O relation table.
         """
-        type_by_id: pd.Series = self._ocel.objects.type_by_id
-
-        df = self.df.copy()
-
-        df = df.join(type_by_id.rename(O2O_SOURCE_TYPE), on=O2O_SOURCE_ID)
-        df = df.join(type_by_id.rename(O2O_TARGET_TYPE), on=O2O_TARGET_ID)
-
-        return df
+        return self.typed_table.df()
 
     def summary(
         self,

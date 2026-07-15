@@ -85,6 +85,10 @@ class ObjectsManager(BaseManager):
 
         Nothing is read until it is collected.
 
+        Each access is its own scan, bound to its own cursor -- so read it freshly
+        at each use rather than storing it in a variable and reusing it. One
+        LazyFrame cannot be read twice within a single query.
+
         Returns:
             polars.LazyFrame: All objects and their static attributes.
         """

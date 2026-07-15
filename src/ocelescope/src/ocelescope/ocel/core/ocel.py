@@ -11,6 +11,7 @@ import r4pm
 from pm4py.objects.ocel.obj import OCEL as PM4PYOCEL
 
 from ocelescope.ocel.constants.pm4py import (
+    EID_COL,
     O2O_QUALIFIER,
     O2O_SOURCE_ID,
     O2O_TARGET_ID,
@@ -122,6 +123,44 @@ class OCEL:
     def con(self) -> duckdb.DuckDBPyConnection:
         """The DuckDB connection backing this OCEL."""
         return self._con
+
+    def clean(self) -> None:
+        """Drop everything the log no longer supports, in place.
+
+        An OCEL stops being a valid log as soon as something is removed from it: a
+        relation can be left pointing at an event or object that is gone, and an
+        entity can be left in no relation at all. This puts that right --
+
+        * a relation whose event or object is missing is dropped,
+        * an object in no relation, E2O or O2O, is dropped,
+        * an event with no E2O relation is dropped,
+        * object changes follow their object.
+
+        Order matters: relations are pruned first, so the orphan checks that follow
+        read a relation table that is already true. Quantities are left alone.
+
+        Removing rows yourself (``ocel.events.df = ...``) leaves the log in exactly
+        that state, so this is what makes it whole again -- :meth:`filter` runs it
+        for you.
+        """
+        con = self._con
+        con.execute(
+            f'DELETE FROM e2o WHERE "{EID_COL}" NOT IN (SELECT "{EID_COL}" FROM events) '
+            f'OR "{OID_COL}" NOT IN (SELECT "{OID_COL}" FROM objects)'
+        )
+        con.execute(
+            f'DELETE FROM o2o WHERE "{O2O_SOURCE_ID}" NOT IN (SELECT "{OID_COL}" FROM objects) '
+            f'OR "{O2O_TARGET_ID}" NOT IN (SELECT "{OID_COL}" FROM objects)'
+        )
+        con.execute(
+            f'DELETE FROM objects WHERE "{OID_COL}" NOT IN (SELECT "{OID_COL}" FROM e2o) '
+            f'AND "{OID_COL}" NOT IN (SELECT "{O2O_SOURCE_ID}" FROM o2o) '
+            f'AND "{OID_COL}" NOT IN (SELECT "{O2O_TARGET_ID}" FROM o2o)'
+        )
+        con.execute(f'DELETE FROM events WHERE "{EID_COL}" NOT IN (SELECT "{EID_COL}" FROM e2o)')
+        con.execute(
+            f'DELETE FROM object_changes WHERE "{OID_COL}" NOT IN (SELECT "{OID_COL}" FROM objects)'
+        )
 
     def close(self) -> None:
         """Close the underlying connection, dropping an in-memory database."""
@@ -386,17 +425,18 @@ class OCEL:
         """
         Apply a sequence of filters to this OCEL instance.
 
-        Filters are executed in sequence, and their boolean masks are merged
-        to produce a refined subset of events and objects. A new OCEL instance
-        is returned containing only the items that satisfy all filters.
+        Each filter names the event/object ids it keeps; the pipeline keeps what
+        all of them keep. The result is a new OCEL over its own database, cleaned
+        so it is a valid log in its own right: relations whose event or object is
+        gone go too, and an entity left in no relation goes with them. This OCEL is
+        untouched.
 
         Args:
             pipeline (list[BaseFilter]):
-                A list of filter objects, each implementing a ``filter()`` method
-                that returns a ``FilterResult`` mask.
+                A list of filter objects, each implementing ``keep()``.
 
         Returns:
-            OCEL: A new OCEL instance representing the filtered view of the log.
+            OCEL: A new OCEL instance holding the filtered log.
         """
         from ocelescope.ocel.filter.engine import apply_filters
 

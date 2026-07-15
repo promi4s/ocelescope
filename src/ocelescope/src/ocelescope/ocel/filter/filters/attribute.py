@@ -1,102 +1,86 @@
-from typing import Optional, Tuple, Union, cast
+"""Keep the entities whose attribute matches a condition."""
 
-import pandas as pd
-from pandas.api.types import is_datetime64_any_dtype, is_numeric_dtype
-from pandas.core.frame import DataFrame
-from pandas.core.series import Series
-from pydantic.main import BaseModel
+from __future__ import annotations
 
-from ocelescope.ocel.util.attributes import get_objects_with_object_changes
+from datetime import datetime
+from typing import Callable, Optional, Union
 
-from ..base import BaseFilter, FilterResult
+import polars as pl
+
+from ocelescope.ocel.constants.pm4py import ACTIVITY_COL, EID_COL, OID_COL, OTYPE_COL
+from ocelescope.ocel.filter.base import BaseFilter, Keep
 
 
-class AttributeFilterConfig(BaseModel):
+class _AttributeFilter(BaseFilter):
+    """Shared config/predicate for the event and object attribute filters.
+
+    An entity matches when its ``attribute`` satisfies the range / value / regex
+    condition. Entities whose type does not carry the attribute at all are left
+    untouched rather than dropped -- a filter on ``price`` has no opinion about
+    employees. ``target_type`` names the affected type; without it, any type that
+    ever has the attribute non-null is affected.
+    """
+
     target_type: Optional[str] = None
     attribute: str
-
-    # Range filters
-    time_range: Optional[Tuple[Optional[str], Optional[str]]] = None
-    number_range: Optional[Tuple[Optional[Union[int, float]], Optional[Union[int, float]]]] = None
-
-    # Nominal filters
+    time_range: Optional[tuple[Optional[str], Optional[str]]] = None
+    number_range: Optional[tuple[Optional[float], Optional[float]]] = None
     values: Optional[list[Union[str, int, float]]] = None
     regex: Optional[str] = None
 
+    def _match(self) -> pl.Expr:
+        column = pl.col(self.attribute)
+        predicate = pl.lit(True)
+        if self.number_range is not None:
+            low, high = self.number_range
+            numeric = column.cast(pl.Float64, strict=False)
+            if low is not None:
+                predicate = predicate & (numeric >= float(low))
+            if high is not None:
+                predicate = predicate & (numeric <= float(high))
+        if self.time_range is not None:
+            low, high = self.time_range
+            if low is not None:
+                predicate = predicate & (column >= datetime.fromisoformat(low))
+            if high is not None:
+                predicate = predicate & (column <= datetime.fromisoformat(high))
+        if self.values is not None:
+            predicate = predicate & column.is_in(self.values)
+        if self.regex is not None:
+            predicate = predicate & column.cast(pl.Utf8).str.contains(self.regex)
+        return predicate
 
-def filter_by_attribute(attribute_df: DataFrame, type_column: str, config: AttributeFilterConfig):
-    df = attribute_df
-    col = config.attribute
-
-    if col not in df.columns:
-        scope = config.target_type if config.target_type is not None else "any"
-        raise ValueError(f"Attribute '{col}' not found in {scope} data")
-
-    series = cast(Series, df[col])
-    mask = pd.Series(True, index=series.index)
-
-    if config.number_range is not None:
-        if is_numeric_dtype(series):
-            numeric_series = series
+    def _keep(self, table: Callable[[], pl.LazyFrame], type_col: str, id_col: str) -> pl.LazyFrame:
+        # `table()` is called afresh each time: every access is its own scan.
+        if self.target_type is not None:
+            unaffected = pl.col(type_col) != self.target_type
         else:
-            numeric_series = pd.to_numeric(series, errors="coerce")
-
-        if config.number_range[0] is not None:
-            mask &= numeric_series >= float(config.number_range[0])  # type:ignore
-        if config.number_range[1] is not None:
-            mask &= numeric_series <= float(config.number_range[1])  # type:ignore
-
-    elif config.time_range is not None:
-        if is_datetime64_any_dtype(series):
-            date_series = series
-        else:
-            date_series = pd.to_datetime(series, errors="coerce")
-
-        if config.time_range[0] is not None:
-            mask &= date_series >= pd.to_datetime(config.time_range[0])
-        if config.time_range[1] is not None:
-            mask &= date_series <= pd.to_datetime(config.time_range[1])
-
-    if config.values is not None:
-        mask &= series.isin(config.values)
-
-    if config.regex is not None:
-        mask &= series.astype(str).str.contains(config.regex, regex=True, na=False)
-
-    if config.target_type is not None:
-        is_unaffected = attribute_df[type_column] != config.target_type
-    else:
-        types_with_attribute = attribute_df.loc[series.notna(), type_column].unique()
-        is_unaffected = ~attribute_df[type_column].isin(types_with_attribute)
-
-    final_mask = cast(Series, is_unaffected | mask)
-    return final_mask
-
-
-class EventAttributeFilter(BaseFilter, AttributeFilterConfig):
-    def filter(self, ocel):
-        return FilterResult(
-            events=filter_by_attribute(
-                ocel.events.df,
-                ocel.ocel.event_activity,
-                config=AttributeFilterConfig(**self.model_dump()),
+            affected_types = (
+                table()
+                .filter(pl.col(self.attribute).is_not_null())
+                .select(type_col)
+                .unique()
+                .collect()
+                .to_series()
+                .to_list()
             )
-        )
+            unaffected = ~pl.col(type_col).is_in(affected_types)
+        return table().filter(unaffected | self._match()).select(id_col)
 
 
-class ObjectAttributeFilter(BaseFilter, AttributeFilterConfig):
-    def filter(self, ocel):
-        enriched_objects = get_objects_with_object_changes(ocel.ocel)
+class EventAttributeFilter(_AttributeFilter):
+    """Keep the events whose attribute matches; activities without it are untouched."""
 
-        filtered_rows = enriched_objects[
-            filter_by_attribute(
-                enriched_objects,
-                ocel.ocel.object_type_column,
-                config=AttributeFilterConfig(**self.model_dump()),
-            )
-        ]
-        valid_ids = filtered_rows[ocel.ocel.object_id_column].unique()  # type:ignore
+    def keep(self, ocel) -> Keep:
+        return Keep(events=self._keep(lambda: ocel.events.pl, ACTIVITY_COL, EID_COL))
 
-        return FilterResult(
-            objects=ocel.ocel.objects[ocel.ocel.object_id_column].isin(valid_ids)  # type:ignore
-        )
+
+class ObjectAttributeFilter(_AttributeFilter):
+    """Keep the objects whose attribute matches; types without it are untouched.
+
+    Matches on an object's *static* value only -- the dynamic values in
+    ``object_changes`` are not folded in.
+    """
+
+    def keep(self, ocel) -> Keep:
+        return Keep(objects=self._keep(lambda: ocel.objects.pl, OTYPE_COL, OID_COL))
