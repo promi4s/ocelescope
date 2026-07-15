@@ -37,9 +37,11 @@ from ocelescope.ocel.constants.pm4py import (
 from ocelescope.ocel.io.exporters.common import (
     INITIAL_ATTR_TIME,
     attribute_columns,
+    changing_attributes,
     event_attribute_presence,
     object_attribute_presence,
 )
+from ocelescope.ocel.io.connection import DuckDBTarget, connect_target
 from ocelescope.ocel.io.exporters.quantities import export_quantities_sqlite
 
 _OBJECT_META = (OID_COL, OTYPE_COL)
@@ -139,12 +141,17 @@ def _create_object_type_table(
     otype: str,
     attrs: list[str],
     attr_type: dict[str, str],
+    changing: list[str],
 ) -> None:
     """Rebuild one ``object_<suffix>`` table: the initial snapshot plus change rows.
 
     The snapshot row (``ocel_changed_field`` NULL) carries the initial values; each
     later value becomes its own row naming the changed field, matching the format
     and re-importing to the same ``objects`` / ``object_changes`` split.
+
+    ``attrs`` are the type's attributes, which the snapshot reads off ``objects``;
+    ``changing`` is the subset ``object_changes`` actually holds, since an
+    attribute that never changes has no column there to read.
     """
     ddl = [("ocel_id", "TEXT"), ("ocel_time", "TIMESTAMP"), ("ocel_changed_field", "TEXT")]
     ddl += [(name, _sqlite_decl(attr_type[name])) for name in attrs]
@@ -158,7 +165,7 @@ def _create_object_type_table(
     selects = [f'SELECT {", ".join(initial)} FROM objects WHERE "{OTYPE_COL}" = ?']
     params: list = [INITIAL_ATTR_TIME, otype]
 
-    for changed in attrs:
+    for changed in changing:
         values = [
             f'CAST(c."{name}" AS VARCHAR)' if name == changed else "CAST(NULL AS VARCHAR)"
             for name in attrs
@@ -179,14 +186,21 @@ def _create_object_type_table(
     _create_and_fill(con, f"object_{suffix}", ddl, " UNION ALL ".join(selects), params)
 
 
-def export_ocel_sqlite(db_path: str | Path, target: str | Path) -> None:
-    """Write the OCEL in the DuckDB at ``db_path`` to an OCEL 2.0 SQLite log at ``target``."""
+def export_ocel_sqlite(source: DuckDBTarget, target: str | Path) -> None:
+    """Write the OCEL in the DuckDB at ``source`` to an OCEL 2.0 SQLite log at ``target``.
+
+    Args:
+        source: Path to a DuckDB database holding the flat OCEL tables, or an
+            open connection to one (e.g. an :class:`ocelescope.OCEL`'s own). It
+            must be writable -- see below.
+        target: Output path for the SQLite log.
+    """
     target = Path(target)
     if target.exists():
         target.unlink()
 
     # Not read-only: attaching a writable SQLite output needs a writable connection.
-    with duckdb.connect(str(db_path)) as con:
+    with connect_target(source) as con:
         con.execute("SET TimeZone='UTC'")
         con.execute("INSTALL sqlite; LOAD sqlite;")
         con.execute(f"ATTACH '{target}' AS out (TYPE sqlite)")
@@ -223,13 +237,16 @@ def export_ocel_sqlite(db_path: str | Path, target: str | Path) -> None:
                     event_attr_type,
                 )
 
+            changing = set(changing_attributes(con))
             for otype, suffix in object_suffix.items():
+                present = _ordered_present(object_attrs, object_presence[otype])
                 _create_object_type_table(
                     con,
                     suffix,
                     otype,
-                    _ordered_present(object_attrs, object_presence[otype]),
+                    present,
                     object_attr_type,
+                    [name for name in present if name in changing],
                 )
 
             # Relationship tables

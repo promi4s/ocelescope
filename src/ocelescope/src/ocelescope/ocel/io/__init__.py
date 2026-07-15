@@ -12,6 +12,10 @@ are the inverse: they stream those DuckDB tables back out into an OCEL 2.0 log.
 Both directions keep peak memory bounded by a single entity rather than the whole
 log. ``convert_ocel_duckdb`` and ``export_duckdb_ocel`` are the format-dispatching
 entry points -- pick the reader/writer from the file extension.
+
+This package only deals with OCEL *files*. Reading and writing the DuckDB database
+itself is the OCEL's own business, since a database is what an OCEL already is --
+see :meth:`ocelescope.OCEL.read_duckdb` and :meth:`ocelescope.OCEL.to_duckdb`.
 """
 
 from pathlib import Path
@@ -21,55 +25,59 @@ from ocelescope.ocel.io.exporters import (
     export_ocel_sqlite,
     export_ocel_xml,
 )
+from ocelescope.ocel.io.connection import DuckDBTarget, connect_target
 from ocelescope.ocel.io.importers import (
     OCELWriter,
     import_ocel_json,
     import_ocel_sqlite,
     import_ocel_xml,
 )
-from ocelescope.ocel.io.materialize import dump_ocel_duckdb, load_ocel_duckdb
 
 
-def convert_ocel_duckdb(source: str | Path, db_path: str | Path) -> None:
+def convert_ocel_duckdb(source: str | Path, target: DuckDBTarget) -> None:
     """Read an OCEL file into a DuckDB database, dispatching on the file extension.
 
     Args:
         source: Path to an ``.jsonocel`` / ``.xmlocel`` / ``.sqlite`` OCEL 2.0 log.
-        db_path: Path of the DuckDB database to (re)create.
+        target: Path of the DuckDB database to (re)create, or an open connection
+            to write into (which the caller keeps owning).
     """
     match Path(source).suffix:
         case ".xmlocel" | ".xml":
-            import_ocel_xml(source, db_path)
+            import_ocel_xml(source, target)
         case ".jsonocel" | ".json":
-            import_ocel_json(source, db_path)
+            import_ocel_json(source, target)
         case ".sqlite":
-            import_ocel_sqlite(source, db_path)
+            import_ocel_sqlite(source, target)
         case suffix:
             raise ValueError(f"Unsupported extension: {suffix}")
 
 
-def export_duckdb_ocel(db_path: str | Path, target: str | Path) -> None:
+def export_duckdb_ocel(source: DuckDBTarget, target: str | Path) -> None:
     """Write a DuckDB OCEL database to a file, dispatching on the target extension.
 
     Args:
-        db_path: Path to a DuckDB database produced by :func:`convert_ocel_duckdb`.
+        source: Path to a DuckDB database produced by :func:`convert_ocel_duckdb`,
+            or an open connection to one (e.g. an :class:`ocelescope.OCEL`'s own,
+            which is what :meth:`ocelescope.OCEL.write` passes).
         target: Output path with a ``.jsonocel`` / ``.xmlocel`` / ``.sqlite`` extension.
     """
     match Path(target).suffix:
         case ".xmlocel" | ".xml":
-            export_ocel_xml(db_path, target)
+            export_ocel_xml(source, target)
         case ".jsonocel" | ".json":
-            export_ocel_json(db_path, target)
+            export_ocel_json(source, target)
         case ".sqlite":
-            export_ocel_sqlite(db_path, target)
+            export_ocel_sqlite(source, target)
         case suffix:
             raise ValueError(f"Unsupported extension: {suffix}")
 
 
 __all__ = [
+    "DuckDBTarget",
     "OCELWriter",
+    "connect_target",
     "convert_ocel_duckdb",
-    "dump_ocel_duckdb",
     "export_duckdb_ocel",
     "export_ocel_json",
     "export_ocel_sqlite",
@@ -77,5 +85,4 @@ __all__ = [
     "import_ocel_json",
     "import_ocel_sqlite",
     "import_ocel_xml",
-    "load_ocel_duckdb",
 ]

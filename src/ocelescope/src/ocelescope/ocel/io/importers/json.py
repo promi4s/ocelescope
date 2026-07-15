@@ -6,6 +6,7 @@ from pathlib import Path
 
 import ijson
 
+from ocelescope.ocel.io.connection import DuckDBTarget
 from ocelescope.ocel.io.importers.quantities import import_quantities_json
 from ocelescope.ocel.io.schema import (
     ATTRIBUTE_TYPE_TO_ARROW,
@@ -41,11 +42,11 @@ def _attribute_schemas(source: str | Path) -> tuple[SchemaDefinition, SchemaDefi
     return merge_columns(object_attrs), merge_columns(event_attrs)
 
 
-def import_ocel_json(source: str | Path, db_path: str | Path) -> None:
-    """Stream an OCEL 2.0 JSON log into a DuckDB database at ``db_path``."""
+def import_ocel_json(source: str | Path, target: DuckDBTarget) -> None:
+    """Stream an OCEL 2.0 JSON log into the DuckDB database at ``target``."""
     object_columns, event_columns = _attribute_schemas(source)
 
-    with OCELWriter(db_path, object_columns, event_columns) as writer:
+    with OCELWriter(target, object_columns, event_columns) as writer:
         with open(source, "rb") as f:
             for obj in ijson.items(f, "objects.item", use_float=True):
                 writer.add_object(obj)
@@ -54,4 +55,4 @@ def import_ocel_json(source: str | Path, db_path: str | Path) -> None:
             for event in ijson.items(f, "events.item", use_float=True):
                 writer.add_event(event)
 
-    import_quantities_json(source, db_path)
+    import_quantities_json(source, target)

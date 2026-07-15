@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING, Sequence
 
 import pandas as pd
 
+from ocelescope.ocel.constants.pm4py import O2O_SOURCE_ID, OID_COL
 from ocelescope.ocel.filter.base import BaseFilter, FilterResult
 from ocelescope.ocel.util.cleanup import clean_ocel
 
@@ -34,21 +35,23 @@ def apply_filters(ocel: "OCEL", filters: Sequence[BaseFilter]) -> "OCEL":
     if masks.objects is not None:
         objects_df = objects_df.loc[masks.objects]
 
+    # clean_ocel still expects PM4PY's name for the O2O source column, so it is
+    # renamed on the way in and back on the way out.
     cleaned = clean_ocel(
         {
             "events": events_df,
             "objects": objects_df,
-            "relations": ocel._relations,
-            "o2o": ocel._o2o,
-            "object_changes": ocel._object_changes,
+            "relations": ocel.e2o.df,
+            "o2o": ocel.o2o.df.rename(columns={O2O_SOURCE_ID: OID_COL}),
+            "object_changes": ocel.objects.changes,
         }
     )
 
-    return OCEL(
+    return OCEL.from_frames(
         events=cleaned["events"],
         objects=cleaned["objects"],
         relations=cleaned["relations"],
-        o2o=cleaned["o2o"],
+        o2o=cleaned["o2o"].rename(columns={OID_COL: O2O_SOURCE_ID}),
         object_changes=cleaned["object_changes"],
         meta=ocel.meta,
         quantityExtension=(

@@ -1,4 +1,10 @@
+from __future__ import annotations
+
+from typing import Any
+
+import duckdb
 import pandas as pd
+import polars as pl
 
 from ocelescope.ocel.constants.pm4py import (
     O2O_QUALIFIER,
@@ -14,6 +20,8 @@ from ocelescope.ocel.util.relations import (
     summarize_relation,
 )
 from ocelescope.util.cache import instance_lru_cache
+
+TABLE = "o2o"
 
 
 class O2OManager(BaseManager):
@@ -31,13 +39,32 @@ class O2OManager(BaseManager):
     """
 
     @property
+    def table(self) -> duckdb.DuckDBPyRelation:
+        """
+        Return the O2O relation table as a lazy DuckDB relation.
+
+        Columns follow the canonical constants (O2O_SOURCE_ID, O2O_TARGET_ID,
+        O2O_QUALIFIER), which is how the table is stored -- so nothing is derived
+        here and assigning it back is a straight replace.
+
+        Returns:
+            DuckDBPyRelation: A lazy relation over all O2O relations.
+        """
+        return self._relation(
+            f'SELECT "{O2O_SOURCE_ID}", "{O2O_TARGET_ID}", "{O2O_QUALIFIER}" FROM {TABLE}'
+        )
+
+    @table.setter
+    def table(self, contents: Any) -> None:
+        self._replace(TABLE, contents)
+
+    @property
     def df(self) -> pd.DataFrame:
         """
         Return the O2O relation table with normalized column names.
 
-        PM4PY uses mixed naming conventions for O2O relations
-        (e.g., "ocel:oid" and "ocel:oid_2").
-        This property maps these raw names to canonical constants:
+        Read from the OCEL's DuckDB database on every access. The source and
+        target objects are named by the canonical constants:
 
             - O2O_SOURCE_ID
             - O2O_TARGET_ID
@@ -45,14 +72,27 @@ class O2OManager(BaseManager):
         Returns:
             DataFrame: A normalized O2O relation table.
         """
-        raw = self._ocel._o2o
+        return self.table.df()
 
-        return raw.rename(
-            columns={
-                "ocel:oid": O2O_SOURCE_ID,
-                "ocel:oid_2": O2O_TARGET_ID,
-            }
-        )
+    @df.setter
+    def df(self, contents: pd.DataFrame) -> None:
+        self._replace(TABLE, contents)
+
+    @property
+    def pl(self) -> pl.LazyFrame:
+        """
+        Return the O2O relation table as a polars LazyFrame.
+
+        Nothing is read until it is collected.
+
+        Returns:
+            polars.LazyFrame: A normalized O2O relation table.
+        """
+        return self.table.pl(lazy=True)
+
+    @pl.setter
+    def pl(self, contents: pl.LazyFrame | pl.DataFrame) -> None:
+        self._replace(TABLE, contents)
 
     @property
     @instance_lru_cache()

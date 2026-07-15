@@ -1,10 +1,22 @@
+from __future__ import annotations
+
 from typing import Any, Iterable, cast
 
+import duckdb
 import pandas as pd
+import polars as pl
 
-from ocelescope.ocel.constants.pm4py import OID_COL, OTYPE_COL, TIMESTAMP_COL
+from ocelescope.ocel.constants.pm4py import (
+    OBJECT_CHANGED_FIELD,
+    OID_COL,
+    OTYPE_COL,
+    TIMESTAMP_COL,
+)
 from ocelescope.ocel.managers.base import BaseManager
 from ocelescope.util.cache import instance_lru_cache
+
+TABLE = "objects"
+CHANGES_TABLE = "object_changes"
 
 
 class ObjectsManager(BaseManager):
@@ -21,25 +33,154 @@ class ObjectsManager(BaseManager):
     Acts as a facade over the underlying PM4PY OCEL object.
     """
 
+    def _attributes(self, table: str) -> list[str]:
+        """The attribute columns of a stored table: its columns minus the OCEL ones.
+
+        A table's columns *are* the answer -- ``objects`` has one per attribute and
+        ``object_changes`` only keeps the ones that change -- so this reads no rows.
+        """
+        return sorted(
+            name
+            for name, *_ in self._ocel.con.execute(f'DESCRIBE "{table}"').fetchall()
+            if not name.startswith("ocel:")
+        )
+
+    @property
+    def table(self) -> duckdb.DuckDBPyRelation:
+        """
+        Return the object table as a lazy DuckDB relation.
+
+        Nothing is read until the relation is consumed (``.df()``, ``.pl()``,
+        ``.fetchall()`` ...).
+
+        Returns:
+            DuckDBPyRelation: A lazy relation over all objects.
+        """
+        return self._relation(f"SELECT * FROM {TABLE}")
+
+    @table.setter
+    def table(self, contents: Any) -> None:
+        self._replace(TABLE, contents)
+
     @property
     def df(self) -> pd.DataFrame:
         """
         Return the object table from the underlying OCEL.
 
+        Read from the OCEL's DuckDB database on every access.
+
         Returns:
             DataFrame: A pandas DataFrame containing all objects and their static attributes.
         """
-        return self._ocel._objects
+        return self.table.df()
+
+    @df.setter
+    def df(self, contents: pd.DataFrame) -> None:
+        self._replace(TABLE, contents)
+
+    @property
+    def pl(self) -> pl.LazyFrame:
+        """
+        Return the object table as a polars LazyFrame.
+
+        Nothing is read until it is collected.
+
+        Returns:
+            polars.LazyFrame: All objects and their static attributes.
+        """
+        return self.table.pl(lazy=True)
+
+    @pl.setter
+    def pl(self, contents: pl.LazyFrame | pl.DataFrame) -> None:
+        self._replace(TABLE, contents)
+
+    @property
+    def changes_table(self) -> duckdb.DuckDBPyRelation:
+        """
+        Return the dynamic object attribute change table as a lazy relation.
+
+        ``ocel:type`` and ``ocel:field`` are derived here (joined on / recovered
+        from the changed column) rather than stored, so assigning this table back
+        drops them again.
+
+        Returns:
+            DuckDBPyRelation: A lazy relation over all dynamic attribute updates.
+        """
+        names = self.dynamic_attribute_names
+        # The stored table is wide with exactly one non-null attribute value per
+        # row, so `ocel:field` is the name of whichever column that is.
+        if names:
+            field = (
+                "CASE "
+                + " ".join(
+                    f"WHEN c.\"{name}\" IS NOT NULL THEN '{name.replace(chr(39), chr(39) * 2)}'"
+                    for name in names
+                )
+                + " END"
+            )
+        else:
+            field = "NULL"
+
+        return self._relation(
+            f'SELECT c.*, o."{OTYPE_COL}", {field} AS "{OBJECT_CHANGED_FIELD}" '
+            f"FROM {CHANGES_TABLE} c "
+            f'JOIN {TABLE} o ON c."{OID_COL}" = o."{OID_COL}" '
+            f'ORDER BY c."{TIMESTAMP_COL}"'
+        )
+
+    @changes_table.setter
+    def changes_table(self, contents: Any) -> None:
+        self._store_changes(contents)
 
     @property
     def changes(self) -> pd.DataFrame:
         """
         Return the dynamic object attribute change table.
 
+        Read from the OCEL's DuckDB database on every access.
+
         Returns:
             DataFrame: A pandas DataFrame containing all dynamic updates to object attributes.
         """
-        return self._ocel._object_changes
+        return self.changes_table.df()
+
+    @changes.setter
+    def changes(self, contents: pd.DataFrame) -> None:
+        self._store_changes(contents)
+
+    @property
+    def changes_pl(self) -> pl.LazyFrame:
+        """
+        Return the dynamic object attribute change table as a polars LazyFrame.
+
+        Nothing is read until it is collected.
+
+        Returns:
+            polars.LazyFrame: All dynamic updates to object attributes.
+        """
+        return self.changes_table.pl(lazy=True)
+
+    @changes_pl.setter
+    def changes_pl(self, contents: pl.LazyFrame | pl.DataFrame) -> None:
+        self._store_changes(contents)
+
+    def _store_changes(self, contents: Any) -> None:
+        """Store ``contents`` as the object changes, verbatim but for the derived columns.
+
+        Whatever columns the caller brings are the columns the table gets -- add an
+        attribute and it is simply there. The two exceptions are ``ocel:type`` and
+        ``ocel:field``, which :attr:`changes_table` computes on the way out; storing
+        them back would have the next read derive them a second time, leaving an
+        ``ocel:type_1`` behind on every round trip.
+
+        ``COLUMNS(...)`` drops them in SQL rather than here, which also means a
+        caller who never had them is not asked to have them.
+        """
+        self._replace(
+            CHANGES_TABLE,
+            contents,
+            f"COLUMNS(c -> c NOT IN ('{OTYPE_COL}', '{OBJECT_CHANGED_FIELD}'))",
+        )
 
     @property
     @instance_lru_cache()
@@ -87,50 +228,44 @@ class ObjectsManager(BaseManager):
         return all(ot in self.types for ot in types)
 
     @property
-    def static_attribute_names(self) -> list[str]:
+    def attribute_names(self) -> list[str]:
         """
-        Return the names of all static object attributes.
+        Return all object attribute names.
 
-        Static attributes are non-OCEL-prefixed columns in the objects
-        table that contain at least one non-null value.
+        Every object attribute has a column in the objects table, whether or not
+        it ever changes.
 
         Returns:
-            list[str]: Sorted list of static object attribute names.
+            list[str]: Sorted list of all object attribute names.
         """
-        return sorted(
-            [col for col in self.df.columns[self.df.count() > 0] if not col.startswith("ocel:")]
-        )
+        return self._attributes(TABLE)
 
     @property
     def dynamic_attribute_names(self) -> list[str]:
         """
         Return the names of all dynamic object attributes.
 
-        Dynamic attributes are derived from the object_changes table,
-        excluding OCEL system columns and internal counters.
+        Dynamic attributes are the ones that change, which is exactly what the
+        object_changes table stores.
 
         Returns:
             list[str]: Sorted list of dynamic object attribute names.
         """
-        return sorted(
-            [
-                col
-                for col in self.changes.columns[self.changes.count() > 0]
-                if not col.startswith("ocel:") and col != "@@cumcount"
-            ]
-        )
+        return self._attributes(CHANGES_TABLE)
 
     @property
-    def attribute_names(self) -> list[str]:
+    def static_attribute_names(self) -> list[str]:
         """
-        Return all object attribute names.
+        Return the names of all static object attributes.
 
-        Combines both static and dynamic attributes into a unified list.
+        Static attributes are the ones that never change: every attribute the
+        object_changes table does not carry.
 
         Returns:
-            list[str]: Sorted list of all object attribute names.
+            list[str]: Sorted list of static object attribute names.
         """
-        return sorted(set(self.static_attribute_names + self.dynamic_attribute_names))
+        dynamic = set(self.dynamic_attribute_names)
+        return [name for name in self.attribute_names if name not in dynamic]
 
     @property
     @instance_lru_cache()

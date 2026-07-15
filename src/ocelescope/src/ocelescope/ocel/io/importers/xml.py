@@ -11,6 +11,7 @@ from pathlib import Path
 
 from lxml import etree
 
+from ocelescope.ocel.io.connection import DuckDBTarget
 from ocelescope.ocel.io.importers.quantities import import_quantities_xml
 from ocelescope.ocel.io.importers.writer import OCELWriter
 from ocelescope.ocel.io.schema import (
@@ -64,7 +65,9 @@ def _build_object(elem) -> dict:
                 {
                     "name": attr.get("name"),
                     "value": attr.text,
-                    "time": attr.get("time") or "",
+                    # An attribute with no time has no recoverable one; keep it
+                    # null rather than inventing a timestamp for it.
+                    "time": attr.get("time") or None,
                 }
                 for attr in child
             ]
@@ -110,11 +113,11 @@ def _clear(elem) -> None:
         del elem.getparent()[0]
 
 
-def import_ocel_xml(source: str | Path, db_path: str | Path) -> None:
-    """Stream an OCEL 2.0 XML log into a DuckDB database at ``db_path``."""
+def import_ocel_xml(source: str | Path, target: DuckDBTarget) -> None:
+    """Stream an OCEL 2.0 XML log into the DuckDB database at ``target``."""
     object_columns, event_columns = _attribute_schemas(source)
 
-    with OCELWriter(db_path, object_columns, event_columns) as writer:
+    with OCELWriter(target, object_columns, event_columns) as writer:
         for _, elem in etree.iterparse(str(source), events=("end",), tag=("{*}object", "{*}event")):
             if _local(elem.tag) == "event":
                 writer.add_event(_build_event(elem))
@@ -123,4 +126,4 @@ def import_ocel_xml(source: str | Path, db_path: str | Path) -> None:
                 writer.add_object(_build_object(elem))
                 _clear(elem)
 
-    import_quantities_xml(source, db_path)
+    import_quantities_xml(source, target)

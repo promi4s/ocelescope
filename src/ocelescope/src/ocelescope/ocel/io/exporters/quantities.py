@@ -14,13 +14,16 @@ import xml.etree.ElementTree as etree
 import duckdb
 
 from ocelescope.ocel.constants.pm4py import EID_COL, OID_COL
-from ocelescope.ocel.constants.quantity import QEL_ITEM_TYPE, QEL_QUANTITY
-from ocelescope.ocel.io.exporters.common import table_exists
-from ocelescope.ocel.managers.quantities.util.constants import (
+from ocelescope.ocel.constants.quantity import (
     JSON_KEYMAP,
     JSON_OPERATIONS,
     JSON_PROPERTIES,
     JSON_QUANTITIES,
+    QEL_ITEM_TYPE,
+    QEL_QUANTITY,
+    QUANTITIES_TABLE,
+    QUANTITY_ITEM_PROPERTIES_TABLE,
+    QUANTITY_OPERATIONS_TABLE,
     SQL_ITEM_PROPERTIES,
     SQL_KEYMAP,
     SQL_OPERATIONS,
@@ -42,10 +45,7 @@ from ocelescope.ocel.managers.quantities.util.constants import (
     XML_QUANTITY_EXTENSION,
     XML_QUANTITY_TYPE,
 )
-
-QUANTITIES_TABLE = "quantities"
-QUANTITY_OPERATIONS_TABLE = "quantity_operations"
-QUANTITY_ITEM_PROPERTIES_TABLE = "quantity_item_properties"
+from ocelescope.ocel.io.exporters.common import table_exists
 
 
 def has_quantities(con: duckdb.DuckDBPyConnection) -> bool:

@@ -1,5 +1,4 @@
-from pathlib import Path
-from typing import TYPE_CHECKING, Literal, cast
+from typing import Any, Literal, cast
 
 import pandas as pd
 
@@ -9,14 +8,20 @@ from ocelescope.ocel.constants.quantity import (
     QEL_ITEM_TYPE,
     QEL_QUANTITY,
     QOP_COLUMNS,
+    QUANTITIES_TABLE,
+    QUANTITY_ITEM_PROPERTIES_TABLE,
+    QUANTITY_OPERATIONS_TABLE,
 )
 from ocelescope.ocel.managers.base import BaseManager
-from ocelescope.ocel.managers.quantities.util.io import (
-    write_quantity_extension,
-)
 
-if TYPE_CHECKING:
-    from ocelescope.ocel.core.ocel import OCEL
+_QUANTITY_AS_NUMBER = f'TRY_CAST("{QEL_QUANTITY}" AS DOUBLE) AS "{QEL_QUANTITY}"'
+
+
+def _quantity_projection(columns: list[str]) -> str:
+    """The stored columns, with the quantity forced to a number."""
+    return ", ".join(
+        _QUANTITY_AS_NUMBER if column == QEL_QUANTITY else f'"{column}"' for column in columns
+    )
 
 
 class QuantityManager(BaseManager):
@@ -33,44 +38,56 @@ class QuantityManager(BaseManager):
         qop: DataFrame containing *quantity operations* per event, object, and item type.
     """
 
-    def __init__(
-        self, ocel: "OCEL", tables: tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame] | None = None
-    ):
-        super().__init__(ocel)
+    def _read(self, table: str, columns: list[str]) -> pd.DataFrame:
+        """Read a quantity table, or an empty frame when the OCEL carries no extension.
 
-        self.oqty, self.qop, self.properties = (
-            tables
-            if tables is not None
-            else (
-                pd.DataFrame(columns=OQTY_COLUMNS),
-                pd.DataFrame(columns=QOP_COLUMNS),
-                pd.DataFrame(columns=[QEL_ITEM_TYPE]),
-            )
-        )
+        The quantity tables are the one part of an OCEL that is optional, so every
+        read has to cope with them not being there at all.
+        """
+        if not self._has_table(table):
+            return pd.DataFrame(columns=columns)
+        projection = ", ".join(f'"{c}"' for c in columns)
+        return self._relation(f'SELECT {projection} FROM "{table}"').df()
 
-        self.qop = self.qop.loc[self._cleaned_qop_mask].reset_index(drop=True)
-        self.oqty = self.oqty.loc[self._cleaned_oqty_mask].reset_index(drop=True)
+    def _cleaned(self, frame: pd.DataFrame) -> pd.DataFrame:
+        """Drop zero-quantity rows, so every read sees a cleaned table."""
+        return frame.loc[frame[QEL_QUANTITY].ne(0)].reset_index(drop=True)
+
+    @property
+    def oqty(self) -> pd.DataFrame:
+        """Initial quantities per object and item type."""
+        return self._cleaned(self._read(QUANTITIES_TABLE, OQTY_COLUMNS))
+
+    @oqty.setter
+    def oqty(self, contents: Any) -> None:
+        self._replace(QUANTITIES_TABLE, contents, _quantity_projection(OQTY_COLUMNS))
+
+    @property
+    def qop(self) -> pd.DataFrame:
+        """Quantity operations per event, object and item type."""
+        return self._cleaned(self._read(QUANTITY_OPERATIONS_TABLE, QOP_COLUMNS))
+
+    @qop.setter
+    def qop(self, contents: Any) -> None:
+        self._replace(QUANTITY_OPERATIONS_TABLE, contents, _quantity_projection(QOP_COLUMNS))
+
+    @property
+    def properties(self) -> pd.DataFrame:
+        """One row of properties per item type.
+
+        Its columns are user-defined, so unlike the other two this table is read
+        and stored as-is.
+        """
+        if not self._has_table(QUANTITY_ITEM_PROPERTIES_TABLE):
+            return pd.DataFrame(columns=[QEL_ITEM_TYPE])
+        return self._relation(f'SELECT * FROM "{QUANTITY_ITEM_PROPERTIES_TABLE}"').df()
+
+    @properties.setter
+    def properties(self, contents: Any) -> None:
+        self._replace(QUANTITY_ITEM_PROPERTIES_TABLE, contents)
 
     def is_populated(self) -> bool:
         return any(not df.empty for df in [self.oqty, self.qop, self.properties])
-
-    def write_quantities(self, path: Path):
-        """Write quantity-extension tables to a OCEL file.
-
-        Writes the initial quantities (`oqty`) and quantity operations (`qop`) to
-        the given directory path if at least one of them is non-empty.
-
-        Args:
-            path: Target directory where the quantity extension should be stored.
-        """
-
-        if not self.oqty.empty or not self.qop.empty:
-            write_quantity_extension(
-                path,
-                self.oqty.loc[self._cleaned_oqty_mask],
-                self.qop.loc[self._cleaned_qop_mask],
-                self.properties,
-            )
 
     @property
     def _cleaned_oqty_mask(self):

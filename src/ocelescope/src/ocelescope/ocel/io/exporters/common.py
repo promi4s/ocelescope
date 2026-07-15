@@ -46,6 +46,18 @@ _BATCH = 10_000
 
 _OBJECT_META = (OID_COL, OTYPE_COL)
 _EVENT_META = (EID_COL, ACTIVITY_COL, TIMESTAMP_COL)
+_CHANGES_META = (OID_COL, TIMESTAMP_COL)
+
+
+def changing_attributes(con: duckdb.DuckDBPyConnection) -> list[str]:
+    """The attributes ``object_changes`` carries -- only those ever change.
+
+    An object attribute that never changes has no column there, so the change
+    table has to be asked what it holds rather than told by the objects table.
+    """
+    if not table_exists(con, "object_changes"):
+        return []
+    return [name for name, _ in attribute_columns(con, "object_changes", _CHANGES_META)]
 
 
 def table_exists(con: duckdb.DuckDBPyConnection, name: str) -> bool:
@@ -109,15 +121,16 @@ def object_attribute_presence(con: duckdb.DuckDBPyConnection) -> dict[str, set[s
     presence = _presence(con, f'SELECT "{OTYPE_COL}"{projection} FROM objects GROUP BY 1', names)
 
     # Attributes that only ever appear as a *change* still belong to the type.
-    if names and table_exists(con, "object_changes"):
+    changing = changing_attributes(con)
+    if changing:
         change_projection = "".join(
-            f', bool_or(c."{name}" IS NOT NULL) AS "{name}"' for name in names
+            f', bool_or(c."{name}" IS NOT NULL) AS "{name}"' for name in changing
         )
         change_presence = _presence(
             con,
             f'SELECT o."{OTYPE_COL}"{change_projection} FROM object_changes c '
             f'JOIN objects o ON c."{OID_COL}" = o."{OID_COL}" GROUP BY 1',
-            names,
+            changing,
         )
         for type_name, present in change_presence.items():
             presence.setdefault(type_name, set()).update(present)
@@ -161,19 +174,21 @@ def event_types(con: duckdb.DuckDBPyConnection) -> list[dict]:
     return _type_declarations(attributes, event_attribute_presence(con))
 
 
-def _objects_query(attr_cols: list[str]) -> str:
+def _objects_query(change_cols: list[str]) -> str:
     """SQL yielding one row per object with its changes and relationships nested.
 
-    Each attribute column is cast to text before being unpivoted into
-    ``(name, time, value)`` change structs (``UNPIVOT`` needs one common type and
-    drops NULLs), and object-to-object relationships are aggregated per source.
-    DuckDB performs the grouping/joins; the caller streams the result.
+    ``change_cols`` are the attributes ``object_changes`` holds, which is only the
+    ones that ever change -- the initial values come from ``objects`` via ``o.*``.
+    Each is cast to text before being unpivoted into ``(name, time, value)`` change
+    structs (``UNPIVOT`` needs one common type and drops NULLs), and
+    object-to-object relationships are aggregated per source. DuckDB performs the
+    grouping/joins; the caller streams the result.
     """
     joins = ""
     changes_select = "NULL"
-    if attr_cols:
-        casts = ", ".join(f'CAST("{name}" AS VARCHAR) AS "{name}"' for name in attr_cols)
-        in_list = ", ".join(f'"{name}"' for name in attr_cols)
+    if change_cols:
+        casts = ", ".join(f'CAST("{name}" AS VARCHAR) AS "{name}"' for name in change_cols)
+        in_list = ", ".join(f'"{name}"' for name in change_cols)
         joins += (
             f' LEFT JOIN (SELECT "{OID_COL}" AS oid, '
             f'list(struct_pack(name := field, "time" := ts, value := val) ORDER BY ts) AS changes '
@@ -195,7 +210,7 @@ def iter_objects(con: duckdb.DuckDBPyConnection) -> Iterator[dict]:
     """Stream objects shaped like the importer input (id/type/attributes/relationships)."""
     attr_cols = [name for name, _ in attribute_columns(con, "objects", _OBJECT_META)]
     cursor = con.cursor()
-    cursor.execute(_objects_query(attr_cols))
+    cursor.execute(_objects_query(changing_attributes(con)))
     names = [description[0] for description in cursor.description]
 
     while batch := cursor.fetchmany(_BATCH):

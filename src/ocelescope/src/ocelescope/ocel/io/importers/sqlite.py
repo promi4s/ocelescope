@@ -21,7 +21,9 @@ Real-world files vary, so the importer is deliberately defensive:
   marker.** An attribute's earliest value is its initial value (-> ``objects``)
   and every later value is a change (-> ``object_changes``). This matches
   OCELWriter and works whether a file stores an explicit initial row (pm4py) or
-  only per-field change rows.
+  only per-field change rows. A row with *no* time is an initial snapshot and so
+  counts as earliest of all -- which SQL does not believe by default, hence
+  :func:`_order_expr`.
 * **Objects without attributes** have an empty/absent type table, so the
   ``objects`` rows are sourced from the core ``object`` table.
 * **Dirty data.** SQLite is dynamically typed, so a numeric column may hold stray
@@ -49,10 +51,12 @@ from ocelescope.ocel.constants.pm4py import (
     OTYPE_COL,
     TIMESTAMP_COL,
 )
+from ocelescope.ocel.io.connection import DuckDBTarget, connect_target
 from ocelescope.ocel.io.importers.quantities import import_quantities_sqlite
 from ocelescope.ocel.io.schema import (
     SchemaDefinition,
     create_ocel_tables,
+    drop_unchanged_columns,
     merge_columns,
 )
 
@@ -109,16 +113,23 @@ _ARROW_TO_DUCKDB_CAST: dict[pa.DataType, str] = {
     pa.timestamp("us", tz="UTC"): "TIMESTAMPTZ",
 }
 
+#: Stands in for the time of a row that has none; see :func:`_order_expr`.
+_EARLIEST = "'-infinity'::TIMESTAMPTZ"
+
 #: Column names that carry the row timestamp (standard first, then pm4py).
 _TIME_COLUMNS = ("ocel_time", "ocel:timestamp", "ocel:time")
 #: Column names flagging which attribute a change row updates.
 _CHANGED_FIELD_COLUMNS = ("ocel_changed_field", "ocel:field")
 #: Non-attribute columns of a type table (everything else is an attribute).
+#: ``@@cumcount`` is pm4py's internal split-helper, which its own SQLite exporter
+#: writes into the type tables. It is read nowhere else, so it is dropped here
+#: rather than leaking into the flat tables as a user attribute.
 _META_COLUMNS = {
     "ocel_id",
     "ocel_type",
     "ocel:type",
     "ocel:activity",
+    "@@cumcount",
     *_TIME_COLUMNS,
     *_CHANGED_FIELD_COLUMNS,
 }
@@ -172,6 +183,26 @@ def _timestamp_expr(column: str) -> str:
     UTC instant. ``TRY_CAST`` guards against malformed timestamps.
     """
     return f"TRY_CAST({_quote(column)} AS TIMESTAMPTZ)"
+
+
+def _order_expr(time_column: str | None) -> str:
+    """Ordering key for "earliest value wins", with an untimed row counting first.
+
+    A row with no time is an object's initial snapshot -- the format leaves
+    ``ocel_time`` empty on it, since initial values happen before anything. But
+    NULL expresses the opposite of that to both of the things we rank with:
+    DuckDB's ``ORDER BY`` sorts NULLs *last*, and ``arg_min`` skips a row whose
+    key is NULL rather than treating it as the minimum. Either way the snapshot
+    loses to the first real change, which is exactly backwards.
+
+    ``-infinity`` says "earliest" in a way both respect. When the type table has
+    no time column at all there are no changes to order against, so every row is
+    equally earliest and any value wins -- as opposed to ``NULL``, which would
+    make ``arg_min`` discard every row and null the whole type's attributes.
+    """
+    if time_column is None:
+        return _EARLIEST
+    return f"COALESCE({_timestamp_expr(time_column)}, {_EARLIEST})"
 
 
 class _TypeTable:
@@ -290,10 +321,11 @@ def _insert_objects(con: duckdb.DuckDBPyConnection, table: _TypeTable) -> None:
         )
         return
 
-    # Aggregate each attribute to its earliest value; arg_min skips NULLs, so a
-    # dirty leading value (e.g. the text 'null') is ignored in favour of the
-    # first real one. Without a timestamp there are no changes, so any value wins.
-    order_key = _timestamp_expr(table.time_column) if table.time_column else "NULL"
+    # Aggregate each attribute to its earliest value; arg_min skips rows where the
+    # value is NULL, so a change row that leaves an attribute alone doesn't claim
+    # it, and a dirty leading value (e.g. the text 'null') is ignored in favour of
+    # the first real one.
+    order_key = _order_expr(table.time_column)
     initial = ", ".join(
         f"arg_min({_cast_expr(name, dtype)}, {order_key}) AS {_quote(name)}"
         for name, dtype in table.attributes
@@ -316,23 +348,29 @@ def _insert_object_changes(con: duckdb.DuckDBPyConnection, table: _TypeTable) ->
     earliest (rank 1, the initial value already stored in ``objects``) is
     dropped, leaving only genuine changes. Each change becomes a row carrying
     that single attribute, matching the shape OCELWriter produces.
+
+    The rank is taken over :func:`_order_expr` so that an untimed snapshot row
+    ranks first and drops out, while the stored timestamp stays the row's real
+    one -- otherwise the snapshot would rank last, survive as a bogus change with
+    no timestamp, and push the first real change into ``objects`` in its place.
     """
     if not table.time_column:  # no timestamps -> no notion of a change
         return
-    order_key = _timestamp_expr(table.time_column)
+    stored_time = _timestamp_expr(table.time_column)
+    order_key = _order_expr(table.time_column)
     for name, dtype in table.attributes:
         cast = _cast_expr(name, dtype)
         con.execute(
             f'INSERT INTO "object_changes" '
             f"({_quote(OID_COL)}, {_quote(TIMESTAMP_COL)}, {_quote(name)}) "
-            f'SELECT "ocel_id", {order_key}, {cast} FROM src.{_quote(table.name)} '
+            f'SELECT "ocel_id", {stored_time}, {cast} FROM src.{_quote(table.name)} '
             f"WHERE {cast} IS NOT NULL "
             f'QUALIFY row_number() OVER (PARTITION BY "ocel_id" ORDER BY {order_key}) > 1'
         )
 
 
-def import_ocel_sqlite(source: str | Path, db_path: str | Path) -> None:
-    """Stream an OCEL 2.0 SQLite log into a DuckDB database at ``db_path``."""
+def import_ocel_sqlite(source: str | Path, target: DuckDBTarget) -> None:
+    """Stream an OCEL 2.0 SQLite log into the DuckDB database at ``target``."""
     # --- Step 1: inspect the source schema (metadata only, no row data) --------
     # Open the SQLite file read-only just to learn which type tables exist and
     # what columns they have. We use Python's sqlite3 here because PRAGMA
@@ -350,10 +388,9 @@ def import_ocel_sqlite(source: str | Path, db_path: str | Path) -> None:
     event_columns = merge_columns([attr for table in event_tables for attr in table.attributes])
     object_columns = merge_columns([attr for table in object_tables for attr in table.attributes])
 
-    with duckdb.connect(str(db_path)) as con:
+    with connect_target(target) as con:
         # Create the five empty output tables (the shared layout every importer
-        # writes), then fill them below with bulk INSERTs. The `with` block closes
-        # the connection on exit.
+        # writes), then fill them below with bulk INSERTs.
         create_ocel_tables(con, object_columns, event_columns)
 
         # --- Step 3: attach the SQLite file so DuckDB can read it directly -----
@@ -367,51 +404,58 @@ def import_ocel_sqlite(source: str | Path, db_path: str | Path) -> None:
         con.execute("SET GLOBAL sqlite_all_varchar=true")
         con.execute(f"ATTACH '{Path(source)}' AS src (TYPE sqlite, READ_ONLY)")
 
-        # --- Step 4: events -> `events` table ---------------------------------
-        # One INSERT per event type. The activity is a constant (the real type
-        # name from the map table), the timestamp is cast to UTC, and each
-        # type's attributes flow into their matching shared columns.
-        for table in event_tables:
-            time = _timestamp_expr(table.time_column) if table.time_column else "NULL"
-            attr_names = [name for name, _ in table.attributes]
-            attr_select = [_cast_expr(name, dtype) for name, dtype in table.attributes]
-            _insert(
-                con,
-                "events",
-                [EID_COL, ACTIVITY_COL, TIMESTAMP_COL, *attr_names],
-                ['"ocel_id"', _literal(table.ocel_type), time, *attr_select],
-                table.name,
-            )
+        try:
+            # --- Step 4: events -> `events` table -----------------------------
+            # One INSERT per event type. The activity is a constant (the real
+            # type name from the map table), the timestamp is cast to UTC, and
+            # each type's attributes flow into their matching shared columns.
+            for table in event_tables:
+                time = _timestamp_expr(table.time_column) if table.time_column else "NULL"
+                attr_names = [name for name, _ in table.attributes]
+                attr_select = [_cast_expr(name, dtype) for name, dtype in table.attributes]
+                _insert(
+                    con,
+                    "events",
+                    [EID_COL, ACTIVITY_COL, TIMESTAMP_COL, *attr_names],
+                    ['"ocel_id"', _literal(table.ocel_type), time, *attr_select],
+                    table.name,
+                )
 
-        # --- Step 5: objects -> `objects` (initial) + `object_changes` --------
-        # An object's initial attribute values become one `objects` row; every
-        # later value of an attribute becomes an `object_changes` row. Both are
-        # derived by "earliest value wins" rather than trusting an explicit
-        # snapshot marker, so all format dialects behave the same (see helpers).
-        for table in object_tables:
-            _insert_objects(con, table)
-            _insert_object_changes(con, table)
+            # --- Step 5: objects -> `objects` (initial) + `object_changes` ----
+            # An object's initial attribute values become one `objects` row; every
+            # later value of an attribute becomes an `object_changes` row. Both are
+            # derived by "earliest value wins" rather than trusting an explicit
+            # snapshot marker, so all format dialects behave the same (see helpers).
+            for table in object_tables:
+                _insert_objects(con, table)
+                _insert_object_changes(con, table)
+            # Which attributes actually changed is only known now they are all in.
+            drop_unchanged_columns(con)
 
-        # --- Step 6: relationship tables (straight column renames) ------------
-        # These live in single source tables, so one INSERT each. Guarded by an
-        # existence check since a log may have no o2o (or no e2o) relations.
-        if "object_object" in present:
-            _insert(
-                con,
-                "o2o",
-                [O2O_SOURCE_ID, O2O_QUALIFIER, O2O_TARGET_ID],
-                ['"ocel_source_id"', '"ocel_qualifier"', '"ocel_target_id"'],
-                "object_object",
-            )
-        if "event_object" in present:
-            _insert(
-                con,
-                "e2o",
-                [EID_COL, E2O_QUALIFIER, OID_COL],
-                ['"ocel_event_id"', '"ocel_qualifier"', '"ocel_object_id"'],
-                "event_object",
-            )
+            # --- Step 6: relationship tables (straight column renames) --------
+            # These live in single source tables, so one INSERT each. Guarded by an
+            # existence check since a log may have no o2o (or no e2o) relations.
+            if "object_object" in present:
+                _insert(
+                    con,
+                    "o2o",
+                    [O2O_SOURCE_ID, O2O_QUALIFIER, O2O_TARGET_ID],
+                    ['"ocel_source_id"', '"ocel_qualifier"', '"ocel_target_id"'],
+                    "object_object",
+                )
+            if "event_object" in present:
+                _insert(
+                    con,
+                    "e2o",
+                    [EID_COL, E2O_QUALIFIER, OID_COL],
+                    ['"ocel_event_id"', '"ocel_qualifier"', '"ocel_object_id"'],
+                    "event_object",
+                )
 
-        # --- Step 7: quantity extension (optional) ----------------------------
-        # Copy the extension tables across the still-attached source, if present.
-        import_quantities_sqlite(con, present)
+            # --- Step 7: quantity extension (optional) ------------------------
+            # Copy the extension tables across the still-attached source, if present.
+            import_quantities_sqlite(con, present)
+        finally:
+            # The connection may be the caller's and outlive this import, so leave
+            # no `src` behind -- a later ATTACH on it would clash with the name.
+            con.execute("DETACH src")

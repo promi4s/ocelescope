@@ -88,7 +88,9 @@ class ObjectTypeFilter(ModuleFilter):
         predicate = pl.col(OTYPE_COL).is_in(self.object_types)
         if self.mode == "exclude":
             predicate = ~predicate
-        return Keep(objects=ocel.objects.pl(lazy=True).filter(predicate).select(OID_COL))
+        return Keep(
+            objects=ocel.objects.pl(lazy=True).filter(predicate).select(OID_COL)
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -209,10 +211,13 @@ class E2OCountFilter(ModuleFilter):
     direction: Literal["source", "target"] = "source"
 
     def _matched(self, ocel: OCELDb) -> pl.LazyFrame:
-        matched = ocel.typed_e2o.pl(lazy=True).join(
-            ocel.events.pl(lazy=True).select(EID_COL, ACTIVITY_COL), on=EID_COL
-        ).filter(
-            (pl.col(ACTIVITY_COL) == self.source) & (pl.col(OTYPE_COL) == self.target)
+        matched = (
+            ocel.typed_e2o.pl(lazy=True)
+            .join(ocel.events.pl(lazy=True).select(EID_COL, ACTIVITY_COL), on=EID_COL)
+            .filter(
+                (pl.col(ACTIVITY_COL) == self.source)
+                & (pl.col(OTYPE_COL) == self.target)
+            )
         )
         if self.qualifier is not None:
             matched = matched.filter(pl.col(E2O_QUALIFIER) == self.qualifier)

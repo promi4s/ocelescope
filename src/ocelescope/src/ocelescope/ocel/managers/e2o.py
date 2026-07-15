@@ -1,4 +1,10 @@
+from __future__ import annotations
+
+from typing import Any
+
+import duckdb
 import pandas as pd
+import polars as pl
 
 from ocelescope.ocel.constants.pm4py import (
     E2O_ACTIVITY,
@@ -17,6 +23,10 @@ from ocelescope.ocel.util.relations import (
     summarize_relation,
 )
 from ocelescope.util.cache import instance_lru_cache
+
+TABLE = "e2o"
+_EVENTS_TABLE = "events"
+_OBJECTS_TABLE = "objects"
 
 
 class E2OManager(BaseManager):
@@ -37,34 +47,71 @@ class E2OManager(BaseManager):
     # Raw → Normalized E2O DataFrame
     # ---------------------------------------------------------
     @property
-    def df(self) -> pd.DataFrame:
+    def table(self) -> duckdb.DuckDBPyRelation:
         """
-        Return the E2O relation table with normalized column names.
+        Return the E2O relation table as a lazy DuckDB relation.
 
-        PM4PY uses the following columns:
-            - "ocel:eid"
-            - "ocel:oid"
-            - "ocel:type"
-            - "ocel:qualifier"
+        The stored relations are joined to their event (activity, timestamp) and
+        to their object's type. Those three columns are derived here rather than
+        stored, so assigning this table back drops them again.
 
-        This property renames them to canonical constants:
-            - E2O_EVENT_ID
-            - E2O_OBJECT_ID
-            - E2O_OBJECT_TYPE
+        The canonical E2O column names (``E2O_EVENT_ID`` and friends) are the
+        same strings PM4PY uses, so this shape serves both.
 
         Returns:
-            DataFrame: Normalized E2O relation table.
+            DuckDBPyRelation: A lazy relation over all E2O relations.
         """
-        raw = self._ocel._relations
-
-        return raw.rename(
-            columns={
-                "ocel:eid": E2O_EVENT_ID,
-                "ocel:oid": E2O_OBJECT_ID,
-                "ocel:type": E2O_OBJECT_TYPE,
-                "ocel:activity": E2O_ACTIVITY,
-            }
+        return self._relation(
+            f'SELECT r."{E2O_EVENT_ID}", r."{E2O_OBJECT_ID}", r."{E2O_QUALIFIER}", '
+            f'e."{E2O_ACTIVITY}", e."{TIMESTAMP_COL}", o."{E2O_OBJECT_TYPE}" '
+            f"FROM {TABLE} r "
+            f'JOIN {_EVENTS_TABLE} e ON r."{EID_COL}" = e."{EID_COL}" '
+            f'JOIN {_OBJECTS_TABLE} o ON r."{OID_COL}" = o."{OID_COL}" '
+            f'ORDER BY e."{TIMESTAMP_COL}"'
         )
+
+    @table.setter
+    def table(self, contents: Any) -> None:
+        self._store(contents)
+
+    @property
+    def df(self) -> pd.DataFrame:
+        """
+        Return the E2O relation table.
+
+        Read from the OCEL's DuckDB database on every access. Columns follow the
+        canonical constants (E2O_EVENT_ID, E2O_OBJECT_ID, E2O_OBJECT_TYPE,
+        E2O_ACTIVITY, E2O_QUALIFIER), which PM4PY happens to share.
+
+        Returns:
+            DataFrame: E2O relation table.
+        """
+        return self.table.df()
+
+    @df.setter
+    def df(self, contents: pd.DataFrame) -> None:
+        self._store(contents)
+
+    @property
+    def pl(self) -> pl.LazyFrame:
+        """
+        Return the E2O relation table as a polars LazyFrame.
+
+        Nothing is read until it is collected.
+
+        Returns:
+            polars.LazyFrame: E2O relation table.
+        """
+        return self.table.pl(lazy=True)
+
+    @pl.setter
+    def pl(self, contents: pl.LazyFrame | pl.DataFrame) -> None:
+        self._store(contents)
+
+    def _store(self, contents: Any) -> None:
+        """Store ``contents`` as the E2O relations, dropping the derived columns."""
+        projection = ", ".join(f'"{c}"' for c in (E2O_EVENT_ID, E2O_QUALIFIER, E2O_OBJECT_ID))
+        self._replace(TABLE, contents, projection)
 
     # ---------------------------------------------------------
     # Summary

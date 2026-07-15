@@ -1,10 +1,16 @@
-from typing import cast
+from __future__ import annotations
 
+from typing import Any, cast
+
+import duckdb
 import pandas as pd
+import polars as pl
 
 from ocelescope.ocel.constants.pm4py import ACTIVITY_COL, EID_COL, TIMESTAMP_COL
 from ocelescope.ocel.managers.base import BaseManager
 from ocelescope.util.cache import instance_lru_cache
+
+TABLE = "events"
 
 
 class EventsManager(BaseManager):
@@ -18,18 +24,59 @@ class EventsManager(BaseManager):
     - event attribute names
     - structured summaries of event attributes
 
-    Acts as a facade over the underlying PM4PY OCEL object.
+    The events are stored in exactly the shape they are read in, so reading only
+    pins their order and assigning one back is a straight replace.
     """
+
+    @property
+    def table(self) -> duckdb.DuckDBPyRelation:
+        """
+        Return the event table as a lazy DuckDB relation, in timestamp order.
+
+        Nothing is read until the relation is consumed (``.df()``, ``.pl()``,
+        ``.fetchall()`` ...), so this is the cheapest way to reach the events.
+
+        Returns:
+            DuckDBPyRelation: A lazy relation over all events.
+        """
+        return self._relation(f'SELECT * FROM {TABLE} ORDER BY "{TIMESTAMP_COL}"')
+
+    @table.setter
+    def table(self, contents: Any) -> None:
+        self._replace(TABLE, contents)
 
     @property
     def df(self) -> pd.DataFrame:
         """
         Return the event table from the underlying OCEL.
 
+        Read from the OCEL's DuckDB database on every access.
+
         Returns:
             DataFrame: A pandas DataFrame containing all events and their attributes.
         """
-        return self._ocel._events
+        return self.table.df()
+
+    @df.setter
+    def df(self, contents: pd.DataFrame) -> None:
+        self._replace(TABLE, contents)
+
+    @property
+    def pl(self) -> pl.LazyFrame:
+        """
+        Return the event table as a polars LazyFrame.
+
+        Nothing is read until it is collected, so further filtering or projection
+        can be pushed down rather than paid for here.
+
+        Returns:
+            polars.LazyFrame: All events and their attributes.
+        """
+        return self.table.pl(lazy=True)
+
+    @pl.setter
+    def pl(self, contents: pl.LazyFrame | pl.DataFrame) -> None:
+        self._replace(TABLE, contents)
 
     @property
     @instance_lru_cache()

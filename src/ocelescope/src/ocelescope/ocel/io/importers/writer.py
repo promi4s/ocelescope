@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import duckdb
 import pyarrow as pa
 
@@ -18,9 +16,11 @@ from ocelescope.ocel.constants.pm4py import (
     OTYPE_COL,
     TIMESTAMP_COL,
 )
+from ocelescope.ocel.io.connection import DuckDBTarget
 from ocelescope.ocel.io.schema import (
     SchemaDefinition,
     create_ocel_tables,
+    drop_unchanged_columns,
 )
 
 
@@ -37,7 +37,7 @@ def _as_strings(values: list) -> list:
 class OCELWriter:
     """Streams an OCEL 2.0 log into a DuckDB database batch by batch.
 
-    On init it opens ``db_path`` and creates the five (empty) OCEL tables.
+    On init it opens ``target`` and creates the five (empty) OCEL tables.
     Records added via :meth:`add_object` / :meth:`add_event` are buffered per
     table and flushed to DuckDB once a buffer reaches ``batch_size``, so peak
     memory stays bounded regardless of log size.
@@ -47,21 +47,28 @@ class OCELWriter:
 
     Usage::
 
-        with OCELWriter(db_path, object_columns, event_columns) as writer:
+        with OCELWriter(target, object_columns, event_columns) as writer:
             for obj in objects:
                 writer.add_object(obj)
             for event in events:
                 writer.add_event(event)
+
+    Args:
+        target: A database path to open, or a connection to borrow. A borrowed
+            connection stays open on :meth:`close` -- it belongs to the caller.
     """
 
     def __init__(
         self,
-        db_path: str | Path,
+        target: DuckDBTarget,
         object_columns: SchemaDefinition,
         event_columns: SchemaDefinition,
         batch_size: int = 100_000,
     ):
-        self.con = duckdb.connect(str(db_path))
+        if isinstance(target, duckdb.DuckDBPyConnection):
+            self.con, self._owns_connection = target, False
+        else:
+            self.con, self._owns_connection = duckdb.connect(str(target)), True
         self.batch_size = batch_size
 
         self.schemas = create_ocel_tables(self.con, object_columns, event_columns)
@@ -70,10 +77,18 @@ class OCELWriter:
         }
 
     def add_object(self, obj: dict) -> None:
-        """Add one OCEL object, filling the objects, object_changes and o2o tables."""
+        """Add one OCEL object, filling the objects, object_changes and o2o tables.
+
+        An attribute's earliest value is its initial one and every later value is a
+        change, so the attributes are read in time order. A value whose time is
+        missing sorts last -- it stays a change rather than displacing a known
+        initial value, and it cannot be ordered against one anyway.
+        """
         object_row = {OID_COL: obj["id"], OTYPE_COL: obj["type"]}
 
-        for attribute in sorted(obj.get("attributes", []), key=lambda a: a["time"]):
+        for attribute in sorted(
+            obj.get("attributes", []), key=lambda a: (a["time"] is None, a["time"])
+        ):
             if attribute["name"] not in object_row:
                 object_row[attribute["name"]] = attribute["value"]
             else:
@@ -142,10 +157,16 @@ class OCELWriter:
             values.clear()
 
     def close(self) -> None:
-        """Flush any remaining buffered rows and close the database."""
+        """Flush any remaining buffered rows, closing a connection we opened.
+
+        Once everything is in, the object-attribute columns nothing ever changed
+        are dropped -- which attributes those are is only known now.
+        """
         for table in self.schemas:
             self._flush(table)
-        self.con.close()
+        drop_unchanged_columns(self.con)
+        if self._owns_connection:
+            self.con.close()
 
     def __enter__(self) -> "OCELWriter":
         return self

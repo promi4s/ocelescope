@@ -20,19 +20,24 @@ from __future__ import annotations
 import mmap
 import xml.etree.ElementTree as etree
 from pathlib import Path
+from typing import Any, cast
 
 import duckdb
 import ijson
 import pandas as pd
 
 from ocelescope.ocel.constants.pm4py import EID_COL, OID_COL
-from ocelescope.ocel.constants.quantity import QEL_ITEM_TYPE, QEL_QUANTITY
-from ocelescope.ocel.managers.quantities.util.constants import (
+from ocelescope.ocel.constants.quantity import (
     JSON_KEYMAP,
     JSON_OPERATIONS,
     JSON_PROPERTIES,
     JSON_QUANTITIES,
     JSON_QUANTITY_EXTENSION,
+    QEL_ITEM_TYPE,
+    QEL_QUANTITY,
+    QUANTITIES_TABLE,
+    QUANTITY_ITEM_PROPERTIES_TABLE,
+    QUANTITY_OPERATIONS_TABLE,
     SQL_ITEM_PROPERTIES,
     SQL_KEYMAP,
     SQL_OPERATIONS,
@@ -54,11 +59,29 @@ from ocelescope.ocel.managers.quantities.util.constants import (
     XML_QUANTITY_TYPE,
     inverse_keymap,
 )
+from ocelescope.ocel.io.connection import DuckDBTarget, connect_target
 
-#: DuckDB table names for the three quantity-extension tables.
-QUANTITIES_TABLE = "quantities"
-QUANTITY_OPERATIONS_TABLE = "quantity_operations"
-QUANTITY_ITEM_PROPERTIES_TABLE = "quantity_item_properties"
+
+def import_quantities(source: str | Path, target: DuckDBTarget) -> None:
+    """Add a log's quantity-extension tables to ``target``, dispatching on extension.
+
+    For a reader that only brings in the log body -- r4pm's, say -- this is how the
+    extension is added alongside it. SQLite is absent on purpose: its extension
+    tables are copied by :func:`import_quantities_sqlite` from within the SQLite
+    importer, which already has the source attached to read them through.
+    """
+    match Path(source).suffix:
+        case ".xmlocel" | ".xml":
+            import_quantities_xml(source, target)
+        case ".jsonocel" | ".json":
+            import_quantities_json(source, target)
+        case suffix:
+            raise ValueError(f"Unsupported extension: {suffix}")
+
+
+def _as_float(values: Any) -> pd.Series:
+    """A quantity column as floats, with anything non-numeric turned into NaN."""
+    return cast(pd.Series, pd.to_numeric(values, errors="coerce")).astype("float64")
 
 
 def _write_table(con: duckdb.DuckDBPyConnection, name: str, df: pd.DataFrame) -> None:
@@ -85,11 +108,15 @@ def _write_quantity_frames(
     """Persist the three extension frames as DuckDB tables.
 
     ``quantity`` columns are coerced to floats so numeric text (or ``Decimal``
-    from a JSON parse) lands in a numeric column; item-property values keep the
-    types the parser produced.
+    from a JSON parse) lands in a numeric column -- a log that writes quantities
+    as text would otherwise poison every later comparison and sum. ``float`` (not
+    whatever ``to_numeric`` infers) so that a log with whole-number quantities
+    still gets the same column type as one with fractional ones, matching the
+    ``DOUBLE`` the SQLite importer and the quantity setters store. Item-property
+    values keep the types the parser produced.
     """
-    oqty[QEL_QUANTITY] = pd.to_numeric(oqty[QEL_QUANTITY], errors="coerce")
-    qop[QEL_QUANTITY] = pd.to_numeric(qop[QEL_QUANTITY], errors="coerce")
+    oqty[QEL_QUANTITY] = _as_float(oqty[QEL_QUANTITY])
+    qop[QEL_QUANTITY] = _as_float(qop[QEL_QUANTITY])
 
     _write_table(con, QUANTITIES_TABLE, oqty)
     _write_table(con, QUANTITY_OPERATIONS_TABLE, qop)
@@ -99,8 +126,8 @@ def _write_quantity_frames(
 # ---------------------------------------------------------------------------
 # JSON
 # ---------------------------------------------------------------------------
-def import_quantities_json(source: str | Path, db_path: str | Path) -> None:
-    """Add the quantity-extension tables from a JSON log to the DuckDB at ``db_path``.
+def import_quantities_json(source: str | Path, target: DuckDBTarget) -> None:
+    """Add the quantity-extension tables from a JSON log to the DuckDB at ``target``.
 
     ``ijson.kvitems`` streams the top-level ``quantityExtension`` object, so the
     (potentially multi-GB) log body is never held in memory -- only the small
@@ -142,7 +169,7 @@ def import_quantities_json(source: str | Path, db_path: str | Path) -> None:
         else pd.DataFrame(columns=[QEL_ITEM_TYPE])
     )
 
-    with duckdb.connect(str(db_path)) as con:
+    with connect_target(target) as con:
         _write_quantity_frames(con, oqty, qop, item_properties)
 
 
@@ -171,8 +198,8 @@ def _xml_extension_fragment(source: Path) -> bytes | None:
         return mm[start : end + len(close_marker)]
 
 
-def import_quantities_xml(source: str | Path, db_path: str | Path) -> None:
-    """Add the quantity-extension tables from an XML log to the DuckDB at ``db_path``.
+def import_quantities_xml(source: str | Path, target: DuckDBTarget) -> None:
+    """Add the quantity-extension tables from an XML log to the DuckDB at ``target``.
 
     Only the ``<quantity-extension>`` subtree is sliced out and parsed, so the
     log body never has to be materialised. Nothing happens when it is absent.
@@ -236,7 +263,7 @@ def import_quantities_xml(source: str | Path, db_path: str | Path) -> None:
         else pd.DataFrame(columns=[QEL_ITEM_TYPE])
     )
 
-    with duckdb.connect(str(db_path)) as con:
+    with connect_target(target) as con:
         _write_quantity_frames(con, oqty, qop, item_properties)
 
 

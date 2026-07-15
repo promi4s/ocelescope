@@ -1,18 +1,18 @@
 from __future__ import annotations
 
-import warnings
 from os import PathLike
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any, Literal, Sequence
 
+import duckdb
 import pandas as pd
-import pm4py
 import polars as pl
 import r4pm
 from pm4py.objects.ocel.obj import OCEL as PM4PYOCEL
 
 from ocelescope.ocel.constants.pm4py import (
     O2O_QUALIFIER,
+    O2O_SOURCE_ID,
     O2O_TARGET_ID,
     OBJECT_CHANGES_DF_COLS,
     OID_COL,
@@ -28,20 +28,41 @@ from ocelescope.ocel.managers import (
 )
 from ocelescope.ocel.managers.attributes import AttributeManager
 from ocelescope.ocel.managers.executions import ExecutionsManager
-from ocelescope.ocel.managers.quantities.util.io import read_quantity_extension
 from ocelescope.ocel.models.meta import OCELMeta
 from ocelescope.ocel.util.xes import create_ocel_from_xml, write_ocel_to_xes
+
+#: Name the destination database is attached under while :meth:`OCEL.to_duckdb` copies.
+_COPY_TARGET = "_copy_target"
+
+#: A table :meth:`OCEL.from_frames` accepts. DuckDB scans each of them directly.
+Frame = pd.DataFrame | pl.DataFrame | pl.LazyFrame
+
+#: PM4PY calls an O2O relation's source object ``ocel:oid`` and its target
+#: ``ocel:oid_2``; we call them ``ocel:oid_1`` / ``ocel:oid_2``. That one column is
+#: the only place the two namings disagree, so it is the only thing to translate --
+#: and it is translated here, at the PM4PY boundary, rather than by the O2O manager.
+_O2O_TO_PM4PY = {O2O_SOURCE_ID: OID_COL}
+_O2O_FROM_PM4PY = {OID_COL: O2O_SOURCE_ID}
+
+#: Extensions r4pm can read. It has no usable SQLite reader (see :meth:`OCEL.read`).
+_R4PM_SUFFIXES = {".jsonocel", ".json", ".xmlocel", ".xml"}
 
 
 class OCEL:
     """
     High-level wrapper for an OCEL 2.0 event log.
 
-    The source of truth for this class is a small set of pandas DataFrames
-    (events, objects, E2O relations, O2O relations and object changes). A PM4PY
-    OCEL is not stored; it is built lazily from those DataFrames on demand via
-    the :attr:`ocel` property, so callers that only read tables never pay for
-    constructing a PM4PY object.
+    An OCEL is a **DuckDB connection** holding the flat OCEL tables (``events``,
+    ``objects``, ``e2o``, ``o2o``, ``object_changes``, plus the optional quantity
+    tables). That database is the single source of truth, and each manager reaches
+    its own table on it: ``.table`` is a lazy DuckDB relation, ``.pl`` a polars
+    LazyFrame and ``.df`` a pandas frame -- the first two lazy, the last read on
+    access -- and each is assignable to write the table back. Reading only the
+    events therefore never materializes the rest of the log.
+
+    Construct one with :meth:`read` (from an OCEL file), :meth:`from_duckdb` (from
+    an existing database) or :meth:`from_frames` / :meth:`from_pm4py` (from tables
+    already in memory, which are written into a fresh in-memory database).
 
     It exposes convenient managers for objects, events, E2O relations, O2O
     relations, and extensions. It also supports reading, writing, and
@@ -70,48 +91,276 @@ class OCEL:
 
     def __init__(
         self,
-        events: pd.DataFrame,
-        objects: pd.DataFrame,
-        relations: pd.DataFrame,
-        o2o: pd.DataFrame | None = None,
-        object_changes: pd.DataFrame | None = None,
+        connection: duckdb.DuckDBPyConnection,
         meta: OCELMeta | None = None,
-        quantityExtension: tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame] | None = None,
     ):
         """
         Args:
-            events: Event table (source of truth), PM4PY column naming.
-            objects: Object table (source of truth), PM4PY column naming.
-            relations: E2O relation table (source of truth), PM4PY column naming.
-            o2o: Optional O2O relation table. Defaults to an empty table.
-            object_changes: Optional dynamic object-attribute change table.
-                Defaults to an empty table.
+            connection: An open DuckDB connection holding the flat OCEL tables,
+                with its ``TimeZone`` set to UTC. The OCEL takes ownership of it:
+                for an in-memory database, which DuckDB drops once its last
+                connection closes, that means the log lives exactly as long as
+                this instance.
             meta: Metadata for this OCEL instance.
-            quantityExtension: Optional quantity-extension tables.
         """
-        self._events = events
-        self._objects = objects
-        self._relations = relations
-        self._o2o = (
-            o2o
-            if o2o is not None
-            else pd.DataFrame(columns=[OID_COL, O2O_TARGET_ID, O2O_QUALIFIER])
-        )
-        self._object_changes = (
-            object_changes
-            if object_changes is not None
-            else pd.DataFrame(columns=OBJECT_CHANGES_DF_COLS)
-        )
+        self._con = connection
 
         self.meta = meta or OCELMeta()
         self.extensions = ExtensionManager(self)
         self.objects = ObjectsManager(self)
         self.events = EventsManager(self)
-        self.quantities = QuantityManager(self, quantityExtension)
+        self.quantities = QuantityManager(self)
         self.e2o = E2OManager(self)
         self.o2o = O2OManager(self)
         self.attributes = AttributeManager(self)
         self.executions = ExecutionsManager(self)
+
+    # ------------------------------------------------------------------
+    # Database access
+    # ------------------------------------------------------------------
+    @property
+    def con(self) -> duckdb.DuckDBPyConnection:
+        """The DuckDB connection backing this OCEL."""
+        return self._con
+
+    def close(self) -> None:
+        """Close the underlying connection, dropping an in-memory database."""
+        self._con.close()
+
+    def __enter__(self) -> OCEL:
+        return self
+
+    def __exit__(self, *_exc) -> None:
+        self.close()
+
+    # ------------------------------------------------------------------
+    # Construction
+    # ------------------------------------------------------------------
+    @classmethod
+    def from_duckdb(
+        cls, connection: duckdb.DuckDBPyConnection, meta: OCELMeta | None = None
+    ) -> OCEL:
+        """Build an :class:`OCEL` on an existing DuckDB connection.
+
+        An alias of the constructor that names what it does at the call site.
+        """
+        return cls(connection, meta=meta)
+
+    @classmethod
+    def from_frames(
+        cls,
+        events: Frame,
+        objects: Frame,
+        relations: Frame,
+        o2o: Frame | None = None,
+        object_changes: Frame | None = None,
+        meta: OCELMeta | None = None,
+        quantityExtension: tuple[Frame, Frame, Frame] | None = None,
+    ) -> OCEL:
+        """
+        Build an :class:`OCEL` from tables already held in memory.
+
+        The frames are written into a fresh in-memory DuckDB database, which then
+        backs the returned OCEL like any other. This is the way in for callers
+        that produced their tables themselves rather than reading a file.
+
+        Every table may be a pandas frame, a polars frame or a LazyFrame -- DuckDB
+        reads them all directly, so none is converted on the way in.
+
+        Tables are in the same shape the managers hand them out, so a table taken
+        off one OCEL can be given to another. That is PM4PY's naming too, save for
+        the O2O source column: see :meth:`from_pm4py`, which translates it.
+
+        Args:
+            events: Event table, as :attr:`EventsManager.df`.
+            objects: Object table, as :attr:`ObjectsManager.df`.
+            relations: E2O relation table, as :attr:`E2OManager.df`.
+            o2o: Optional O2O relation table, as :attr:`O2OManager.df` -- the source
+                object named ``ocel:oid_1``. Defaults to an empty table.
+            object_changes: Optional dynamic object-attribute change table, as
+                :attr:`ObjectsManager.changes`. Defaults to an empty table.
+            meta: Metadata for this OCEL instance.
+            quantityExtension: Optional quantity-extension tables.
+        """
+        connection = duckdb.connect(":memory:")
+        try:
+            connection.execute("SET TimeZone='UTC'")
+            ocel = cls(connection, meta=meta)
+            # Each table goes in through its manager, which projects it back onto
+            # the stored layout. Objects first: the object changes are stored with
+            # one column per object attribute, so that table has to exist already.
+            ocel.objects.table = objects
+            ocel.events.table = events
+            ocel.e2o.table = relations
+            ocel.o2o.table = (
+                o2o
+                if o2o is not None
+                else pd.DataFrame(columns=[O2O_SOURCE_ID, O2O_TARGET_ID, O2O_QUALIFIER])
+            )
+            ocel.objects.changes_table = (
+                object_changes
+                if object_changes is not None
+                else pd.DataFrame(columns=OBJECT_CHANGES_DF_COLS)
+            )
+            if quantityExtension is not None:
+                oqty, qop, properties = quantityExtension
+                ocel.quantities.oqty = oqty
+                ocel.quantities.qop = qop
+                ocel.quantities.properties = properties
+        except Exception:
+            connection.close()
+            raise
+
+        return ocel
+
+    @classmethod
+    def from_pm4py(
+        cls,
+        ocel: PM4PYOCEL,
+        meta: OCELMeta | None = None,
+    ) -> OCEL:
+        """
+        Build an :class:`OCEL` from an existing PM4PY OCEL by writing its
+        DataFrames into a fresh in-memory database.
+
+        PM4PY's naming is ours but for the O2O source column, and this is the
+        boundary it arrives at, so that is renamed here.
+        """
+        return cls.from_frames(
+            events=ocel.events,
+            objects=ocel.objects,
+            relations=ocel.relations,
+            o2o=ocel.o2o.rename(columns=_O2O_FROM_PM4PY),
+            object_changes=ocel.object_changes,
+            meta=meta,
+        )
+
+    @staticmethod
+    def read(
+        path: str | Path,
+        meta: dict[str, Any] = {},
+        variant: Literal["r4pm", "streamed"] = "r4pm",
+    ) -> OCEL:
+        """
+        Read an OCEL file (.jsonocel, .xmlocel, or .sqlite) from disk.
+
+        Either way the log ends up in an in-memory DuckDB database, which becomes
+        the returned OCEL's source of truth; the pandas tables are reshaped out of
+        it only as they are asked for. The format is detected from the extension.
+
+        Args:
+            path (str | Path):
+                Path to the OCEL file on disk.
+            meta (dict[str, Any], optional):
+                Additional metadata to attach to the OCELMeta container.
+            variant:
+                Which reader to use.
+
+                ``"r4pm"`` parses the whole log with r4pm's Rust reader and hands
+                the finished tables over, which is fast but holds the log in
+                memory while it does so.
+
+                ``"streamed"`` reads the file entity by entity into the database,
+                so peak memory stays bounded by the log's widest single entity
+                rather than the whole log -- use it for logs too big to hold.
+
+                **``.sqlite`` logs are always streamed.** r4pm has no SQLite
+                reader worth the name: it assumes every object-type table carries
+                an ``ocel_changed_field`` column and errors out on the many real
+                logs that don't.
+
+        Returns:
+            OCEL: A fully constructed OCEL wrapper instance.
+        """
+        from ocelescope.ocel.io import convert_ocel_duckdb
+        from ocelescope.ocel.io.importers.quantities import import_quantities
+
+        path = Path(path)
+        ocel_meta = OCELMeta(path=path, extra=meta)
+
+        if variant == "r4pm" and path.suffix in _R4PM_SUFFIXES:
+            tables = r4pm.df.import_ocel(str(path))
+            # r4pm hands back PM4PY-named tables, so the O2O source column is
+            # renamed on the way in -- exactly as in :meth:`from_pm4py`.
+            o2o = tables.get("o2o")
+            ocel = OCEL.from_frames(
+                events=tables["events"],
+                objects=tables["objects"],
+                relations=tables["relations"],
+                o2o=o2o.rename(_O2O_FROM_PM4PY) if o2o is not None else None,
+                object_changes=tables.get("object_changes"),
+                meta=ocel_meta,
+            )
+            try:
+                import_quantities(path, ocel.con)
+            except Exception:
+                ocel.close()
+                raise
+            return ocel
+
+        connection = duckdb.connect(":memory:")
+        try:
+            convert_ocel_duckdb(path, connection)
+            connection.execute("SET TimeZone='UTC'")
+        except Exception:
+            connection.close()
+            raise
+
+        return OCEL(connection, meta=ocel_meta)
+
+    @staticmethod
+    def read_duckdb(db_path: str | Path, meta: OCELMeta | None = None) -> OCEL:
+        """
+        Open a flat DuckDB database (as written by :meth:`to_duckdb` or
+        ``convert_ocel_duckdb``) as an :class:`OCEL`.
+
+        The database is opened read-only and no log data is read here -- the
+        tables are reshaped out of the file only as they are asked for. The OCEL
+        reads through to ``db_path`` for as long as it lives, so the file must
+        outlive it, and its tables cannot be assigned to.
+
+        Args:
+            db_path: Path to a DuckDB database holding the flat OCEL tables.
+            meta: Metadata for this OCEL instance.
+        """
+        connection = duckdb.connect(str(db_path), read_only=True)
+        try:
+            # DuckDB hands back TIMESTAMPTZ values in the session's zone; pin it to
+            # UTC so the reshaped tables match a normal file read.
+            connection.execute("SET TimeZone='UTC'")
+        except Exception:
+            connection.close()
+            raise
+
+        return OCEL(connection, meta=meta)
+
+    def to_duckdb(self, db_path: str | Path) -> None:
+        """
+        Write this OCEL's database out to a DuckDB file at ``db_path``.
+
+        DuckDB copies the database wholesale -- every table, quantity tables
+        included -- so nothing is reshaped through pandas on the way.
+
+        Args:
+            db_path: Destination path. An existing file is replaced.
+        """
+        db_path = Path(db_path)
+        db_path.unlink(missing_ok=True)
+
+        # An in-memory database is called "memory", a file-backed one after its
+        # file, so ask rather than assume. (fetchall, because fetchone is typed
+        # optional -- a scalar SELECT always has its row.)
+        source = self._con.execute("SELECT current_database()").fetchall()[0][0]
+
+        self._con.execute(f"ATTACH '{db_path}' AS {_COPY_TARGET}")
+        try:
+            self._con.execute(f'COPY FROM DATABASE "{source}" TO {_COPY_TARGET}')
+        finally:
+            self._con.execute(f"DETACH {_COPY_TARGET}")
+
+    @staticmethod
+    def read_xes(path: str | PathLike, fallback_object_name: str = "LogObject") -> OCEL:
+        return OCEL.from_pm4py(create_ocel_from_xml(str(path), fallback_object_name))
 
     # ------------------------------------------------------------------
     # PM4PY interop
@@ -126,51 +375,11 @@ class OCEL:
         table reads via the managers never build one.
         """
         return PM4PYOCEL(
-            events=self._events,
-            objects=self._objects,
-            relations=self._relations,
-            o2o=self._o2o,
-            object_changes=self._object_changes,
-        )
-
-    def _as_polars_tables(self) -> dict[str, pl.DataFrame]:
-        """Return the underlying tables as polars DataFrames for r4pm export.
-
-        Internal ``@@``-prefixed columns (e.g. PM4PY's ``@@cumcount``) are
-        dropped so they don't leak into the exported file as attributes.
-        """
-
-        def to_polars(df: pd.DataFrame) -> pl.DataFrame:
-            internal = [col for col in df.columns if col.startswith("@@")]
-            return pl.from_pandas(df.drop(columns=internal) if internal else df)
-
-        return {
-            "events": to_polars(self._events),
-            "objects": to_polars(self._objects),
-            "relations": to_polars(self._relations),
-            "o2o": to_polars(self._o2o),
-            "object_changes": to_polars(self._object_changes),
-        }
-
-    @classmethod
-    def from_pm4py(
-        cls,
-        ocel: PM4PYOCEL,
-        meta: OCELMeta | None = None,
-        quantityExtension: tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame] | None = None,
-    ) -> OCEL:
-        """
-        Build an :class:`OCEL` from an existing PM4PY OCEL by extracting its
-        DataFrames as the source of truth.
-        """
-        return cls(
-            events=ocel.events,
-            objects=ocel.objects,
-            relations=ocel.relations,
-            o2o=ocel.o2o,
-            object_changes=ocel.object_changes,
-            meta=meta,
-            quantityExtension=quantityExtension,
+            events=self.events.df,
+            objects=self.objects.df,
+            relations=self.e2o.df,
+            o2o=self.o2o.df.rename(columns=_O2O_TO_PM4PY),
+            object_changes=self.objects.changes,
         )
 
     def filter(self, pipeline: Sequence[BaseFilter]) -> OCEL:
@@ -193,60 +402,13 @@ class OCEL:
 
         return apply_filters(ocel=self, filters=pipeline)
 
-    @staticmethod
-    def read(path: str | Path, meta: dict[str, Any] = {}) -> OCEL:
-        """
-        Read an OCEL file (.jsonocel, .xmlocel, or .sqlite) from disk.
-
-        Automatically detects the file format based on extension and loads the
-        OCEL into a structured wrapper.
-
-        Args:
-            path (str | Path):
-                Path to the OCEL file on disk.
-            meta (dict[str, Any], optional):
-                Additional metadata to attach to the OCELMeta container.
-
-        Returns:
-            OCEL: A fully constructed OCEL wrapper instance.
-        """
-
-        path = Path(path)
-
-        quantity_table = read_quantity_extension(path)
-        ocel_meta = OCELMeta(path=path, extra=meta)
-
-        with warnings.catch_warnings(record=True):
-            match path.suffix:
-                case ".sqlite":
-                    # r4pm's sqlite reader is unreliable, so use pm4py here.
-                    return OCEL.from_pm4py(
-                        pm4py.read.read_ocel2_sqlite(str(path)),
-                        meta=ocel_meta,
-                        quantityExtension=quantity_table,
-                    )
-                case ".xmlocel" | ".xml":
-                    tables = r4pm.df.import_ocel_xml(str(path))
-                case ".jsonocel" | ".json":
-                    tables = r4pm.df.import_ocel_json(str(path))
-                case _:
-                    raise ValueError(f"Unsupported extension: {path.suffix}")
-
-        return OCEL(
-            events=tables["events"].to_pandas(),
-            objects=tables["objects"].to_pandas(),
-            relations=tables["relations"].to_pandas(),
-            o2o=tables["o2o"].to_pandas() if "o2o" in tables else None,
-            object_changes=(
-                tables["object_changes"].to_pandas() if "object_changes" in tables else None
-            ),
-            meta=ocel_meta,
-            quantityExtension=quantity_table,
-        )
-
     def write(self, path: str | Path):
         """
         Write the OCEL log and all registered extensions to disk.
+
+        The log is streamed straight out of this OCEL's database by the exporters
+        one entity at a time, so writing never materializes the whole log -- and
+        the quantity extension, being tables like any other, goes with it.
 
         The output format is inferred from the file extension. Supported file
         types are:
@@ -261,17 +423,14 @@ class OCEL:
         Raises:
             ValueError: If the file extension is not supported.
         """
+        from ocelescope.ocel.io import export_duckdb_ocel
+
         path = Path(path)
 
         if path.suffix not in {".xmlocel", ".xml", ".jsonocel", ".json", ".sqlite"}:
             raise ValueError(f"Unsupported extension: {path.suffix}")
 
-        if path.suffix == ".sqlite":
-            pm4py.write_ocel2_sqlite(self.ocel, str(path))
-        else:
-            r4pm.df.export_ocel(self._as_polars_tables(), str(path))
-
-        self.quantities.write_quantities(path)
+        export_duckdb_ocel(self._con, path)
         self.extensions.export_all(path)
 
     def write_xes(self, object_type: str, path: str | Path):
@@ -288,28 +447,43 @@ class OCEL:
 
         write_ocel_to_xes(ocel=self, object_type=object_type, path=path)
 
-    @staticmethod
-    def read_xes(path: str | PathLike, fallback_object_name: str = "LogObject") -> OCEL:
-        return OCEL.from_pm4py(create_ocel_from_xml(str(path), fallback_object_name))
-
     def __deepcopy__(self, memo: dict[int, Any]):
         from copy import deepcopy
 
         return OCEL(
-            events=self._events.copy(deep=True),
-            objects=self._objects.copy(deep=True),
-            relations=self._relations.copy(deep=True),
-            o2o=self._o2o.copy(deep=True),
-            object_changes=self._object_changes.copy(deep=True),
+            self._copy_database(),
             meta=OCELMeta(extra=deepcopy(self.meta.extra, memo)),
-            quantityExtension=(
-                self.quantities.oqty.copy(),
-                self.quantities.qop.copy(),
-                self.quantities.properties.copy(),
-            )
-            if self.quantities.is_populated()
-            else None,
         )
+
+    def _copy_database(self) -> duckdb.DuckDBPyConnection:
+        """Copy every stored table into a new in-memory database.
+
+        The tables are moved across as Arrow, which keeps their stored schema
+        exactly -- including the quantity tables, and without reshaping anything
+        into pandas on the way.
+
+        This is table-by-table rather than the single ``COPY FROM DATABASE`` that
+        :meth:`to_duckdb` gets to use, because that statement needs both databases
+        attached to one instance. ``to_duckdb`` can arrange that -- its target is a
+        file, and a file can be attached. A clone cannot: ``ATTACH ':memory:'``
+        would put it inside *this* instance, where it dies with this connection
+        (and holding it open through a cursor doesn't help -- a cursor closes with
+        its parent), while a second ``duckdb.connect(':memory:')`` is a separate
+        instance that this one has no way to reach.
+        """
+        clone = duckdb.connect(":memory:")
+        try:
+            clone.execute("SET TimeZone='UTC'")
+            tables = self._con.execute(
+                "SELECT table_name FROM information_schema.tables "
+                "WHERE table_schema = 'main' AND table_type = 'BASE TABLE'"
+            ).fetchall()
+            for (name,) in tables:
+                clone.from_arrow(self._con.table(name).to_arrow_table()).create(name)
+        except Exception:
+            clone.close()
+            raise
+        return clone
 
     def __str__(self):
         return f"OCEL [{len(self.events.df)} events, {len(self.objects.df)} objects]"

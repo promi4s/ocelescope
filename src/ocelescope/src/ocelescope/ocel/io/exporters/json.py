@@ -6,7 +6,6 @@ import os
 from pathlib import Path
 from typing import IO, Iterable
 
-import duckdb
 import orjson
 
 from ocelescope.ocel.io.exporters.common import (
@@ -15,8 +14,9 @@ from ocelescope.ocel.io.exporters.common import (
     iter_objects,
     object_types,
 )
+from ocelescope.ocel.io.connection import DuckDBTarget, connect_target
 from ocelescope.ocel.io.exporters.quantities import json_quantity_extension
-from ocelescope.ocel.managers.quantities.util.constants import JSON_QUANTITY_EXTENSION
+from ocelescope.ocel.constants.quantity import JSON_QUANTITY_EXTENSION
 
 
 def _stream_array(stream: IO[bytes], items: Iterable[dict]) -> None:
@@ -29,18 +29,23 @@ def _stream_array(stream: IO[bytes], items: Iterable[dict]) -> None:
         first = False
 
 
-def export_ocel_json(db_path: str | Path, target: str | Path) -> None:
-    """Write the OCEL in the DuckDB at ``db_path`` to a JSON log at ``target``.
+def export_ocel_json(source: DuckDBTarget, target: str | Path) -> None:
+    """Write the OCEL in the DuckDB at ``source`` to a JSON log at ``target``.
 
     The type declarations (small) are materialised, then the objects and events
     arrays are streamed straight from DuckDB record by record, so peak memory
     stays bounded by a single entity rather than the whole log. Written to a
     temp file and atomically renamed so a failure never leaves a partial log.
+
+    Args:
+        source: Path to a DuckDB database holding the flat OCEL tables, or an
+            open connection to one (e.g. an :class:`ocelescope.OCEL`'s own).
+        target: Output path for the JSON log.
     """
     target = Path(target)
     tmp = target.with_suffix(target.suffix + ".tmp")
 
-    with duckdb.connect(str(db_path), read_only=True) as con:
+    with connect_target(source, read_only=True) as con:
         con.execute("SET TimeZone='UTC'")
 
         object_type_decls = object_types(con)

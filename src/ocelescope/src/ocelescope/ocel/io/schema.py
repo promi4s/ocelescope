@@ -100,6 +100,32 @@ def create_ocel_tables(
     return schemas
 
 
+def drop_unchanged_columns(con: duckdb.DuckDBPyConnection) -> None:
+    """Drop the ``object_changes`` columns that turned out to hold nothing.
+
+    The tables are created from the log's type declarations, before a single row
+    has been read, so ``object_changes`` starts with a column per *declared*
+    object attribute. Only the attributes that actually change ever get a value;
+    the rest are all-NULL padding, which no reader wants and every exporter has to
+    step around. Which is which is only knowable once the table is filled, so the
+    importers call this at the end rather than guessing up front.
+
+    One aggregate decides them all -- the table is never materialised to find out.
+    """
+    meta = (OID_COL, TIMESTAMP_COL)
+    names = [
+        name for name, *_ in con.execute('DESCRIBE "object_changes"').fetchall() if name not in meta
+    ]
+    if not names:
+        return
+
+    projection = ", ".join(f'bool_or("{name}" IS NOT NULL) AS "{name}"' for name in names)
+    row = con.execute(f'SELECT {projection} FROM "object_changes"').fetchall()[0]
+    for name, has_values in zip(names, row):
+        if not has_values:
+            con.execute(f'ALTER TABLE "object_changes" DROP COLUMN "{name}"')
+
+
 def merge_columns(columns: SchemaDefinition) -> SchemaDefinition:
     """Collapse duplicate attribute names into one column each.
 
