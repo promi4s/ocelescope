@@ -189,8 +189,7 @@ class QuantityManager(BaseManager):
         if not union:
             return []
         return self._column(
-            f'SELECT DISTINCT "{column}" FROM ({union}) '
-            f'WHERE "{column}" IS NOT NULL ORDER BY 1'
+            f'SELECT DISTINCT "{column}" FROM ({union}) WHERE "{column}" IS NOT NULL ORDER BY 1'
         )
 
     def _types_of(self, table: str, id_column: str, type_column: str, union: str) -> list[str]:
@@ -234,9 +233,7 @@ class QuantityManager(BaseManager):
         Returns:
             A list of object types
         """
-        return self._types_of(
-            _OBJECTS_TABLE, OID_COL, OTYPE_COL, self._cleaned_union(OID_COL)
-        )
+        return self._types_of(_OBJECTS_TABLE, OID_COL, OTYPE_COL, self._cleaned_union(OID_COL))
 
     def get_it_objects(self, item_type: str):
         """Return object ids involved for a given item type.
