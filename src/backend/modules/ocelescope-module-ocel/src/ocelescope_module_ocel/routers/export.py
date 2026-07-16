@@ -93,7 +93,9 @@ def download_variant_flat_log(
     variant_ids: Annotated[list[str], Query(min_length=1)],
 ) -> TempFileResponse:
     name = session.ocels[ocel_id].name
-    object_ids = variant_util.object_ids_for_variants(ocel, object_type, variant_ids)
+
+    object_ids = ocel.executions.get_variant_object_ids(object_type, variant_ids)
+
     if not object_ids:
         raise NotFound("No objects were found for the given variants")
 

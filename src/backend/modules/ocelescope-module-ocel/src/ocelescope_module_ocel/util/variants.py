@@ -19,7 +19,6 @@ from ocelescope.ocel.constants.executions import (
 )
 
 from ocelescope import OCEL
-
 from ocelescope_module_ocel.models import ObjectTypeVariants, ObjectVariant
 
 
@@ -47,10 +46,3 @@ def object_type_variants(ocel: OCEL, object_type: str) -> ObjectTypeVariants:
             variant.event_count * variant.case_count for variant in variants
         ),
     )
-
-
-def object_ids_for_variants(
-    ocel: OCEL, object_type: str, variant_ids: list[str]
-) -> list[str]:
-    """The ids of the objects belonging to any of the given variant ids."""
-    return ocel.executions.get_variant_object_ids(object_type, variant_ids)
