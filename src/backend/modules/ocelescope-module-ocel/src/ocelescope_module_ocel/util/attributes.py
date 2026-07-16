@@ -17,7 +17,6 @@ from __future__ import annotations
 from typing import Any, Literal
 
 import duckdb
-from ocelescope.ocel.constants import ValueType
 from ocelescope.ocel.constants.pm4py import (
     ACTIVITY_COL,
     EID_COL,
@@ -27,18 +26,14 @@ from ocelescope.ocel.constants.pm4py import (
 )
 
 from ocelescope import OCEL
-
 from ocelescope_module_ocel.models import AggregatedAttribute, TypedAttribute
+from ocelescope_module_ocel.models.attributes import ValueType
 
 EntityType = Literal["events", "objects"]
 
-#: Structural output columns. ``ocel:``-prefixed so they never collide with a data
-#: attribute (which can legitimately be named e.g. "entity_type").
 ENTITY_ID = "ocel:entity_id"
 ENTITY_TYPE = "ocel:entity_type"
 
-#: The importer only gives attribute columns one of these DuckDB types (every integer ->
-#: BIGINT, every float -> DOUBLE, time -> DATE, or TIMESTAMP from the sqlite path).
 _DUCKDB_TO_VALUE_TYPE = {
     "BIGINT": ValueType.INT,
     "DOUBLE": ValueType.FLOAT,

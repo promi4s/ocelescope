@@ -1,5 +1,15 @@
-from ocelescope.ocel.constants import ValueType
+from enum import StrEnum
+
 from pydantic import BaseModel
+
+
+class ValueType(StrEnum):
+    EMPTY = "empty"
+    STRING = "string"
+    BOOL = "bool"
+    INT = "int"
+    FLOAT = "float"
+    DATE = "date"
 
 
 class Attribute(BaseModel):
