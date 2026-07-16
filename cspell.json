@@ -157,7 +157,10 @@
     "getprevious",
     "unparseable",
     "otypes",
-    "quals"
+    "quals",
+    "ctes",
+    "pydatetime",
+    "RJEM"
   ],
   "ignorePaths": [
     "pnpm-lock.yaml",
