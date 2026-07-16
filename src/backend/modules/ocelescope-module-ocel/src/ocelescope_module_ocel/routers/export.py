@@ -13,20 +13,20 @@ from typing import Annotated, Literal
 
 import polars as pl
 from fastapi import APIRouter, Query
+from ocelescope.ocel import Keep
 from ocelescope.ocel.constants.misc import OCELFileExtensions
 from ocelescope.ocel.constants.pm4py import OID_COL
 from ocelescope_backend.app.dependencies import ApiOcel, ApiSession
 from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.model.response import TempFileResponse
-from ocelescope import OCEL
-from ocelescope_backend.app.internal.ocel.filters import Keep, ModuleFilter
 
+from ocelescope import OCEL, BaseFilter
 from ocelescope_module_ocel.util import variants as variant_util
 
 router = APIRouter()
 
 
-class _ObjectIdKeep(ModuleFilter):
+class _ObjectIdKeep(BaseFilter):
     """A ModuleFilter that keeps only the given object ids (for a variant sub-log)."""
 
     object_ids: list[str]

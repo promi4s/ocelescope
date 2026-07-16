@@ -10,7 +10,7 @@ from typing import (
 
 from typing_extensions import TypedDict
 
-from ocelescope import OCEL, Resource
+from ocelescope import OCEL, BaseFilter, Resource
 from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.tasks.base import (
     TaskBase,
@@ -19,7 +19,6 @@ from ocelescope_backend.app.internal.tasks.base import (
     _call_with_known_params,
 )
 from ocelescope_backend.app.internal.util.hashing import generate_tuple_hash
-from ocelescope_backend.app.internal.ocel.filters import ModuleFilter
 from ocelescope_backend.app.sse_manager import (
     ErrorNotification,
     PluginLink,
@@ -147,7 +146,7 @@ class PluginTask(TaskBase, Generic[P]):
         plugin_name: str,
         method_name: str,
         input: PluginInput,
-        filter: dict[str, list[ModuleFilter]],
+        filter: dict[str, list[BaseFilter]],
     ) -> Hashable:
         return generate_tuple_hash("plugin", plugin_name, method_name, input, filter)
 

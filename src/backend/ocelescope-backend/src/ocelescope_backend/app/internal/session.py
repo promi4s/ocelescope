@@ -10,11 +10,10 @@ from typing import Any, Callable, Hashable, Sequence, Type, TypeVar, cast
 from ocelescope.ocel.extensions.base_extension import OCELExtension
 from ocelescope.ocel.io import convert_ocel_duckdb
 
-from ocelescope import OCEL
+from ocelescope import OCEL, BaseFilter
 from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.model.ocel import SessionOCEL
 from ocelescope_backend.app.internal.model.resource import ResourceApi, ResourceStore
-from ocelescope_backend.app.internal.ocel.filters import ModuleFilter
 from ocelescope_backend.app.internal.tasks.base import TaskBase
 from ocelescope_backend.app.sse_manager import InvalidationRequest, sse_manager
 
@@ -179,14 +178,14 @@ class Session:
     # region Resource management
     def get_filter(
         self, ocel_id: str, module_source: str | None = None
-    ) -> list[ModuleFilter]:
+    ) -> list[BaseFilter]:
         if ocel_id not in self.ocels:
             raise NotFound(f"OCEL with id {ocel_id} not found")
 
         return self.ocels[ocel_id].get_filters(module_source)
 
     def set_filter(
-        self, ocel_id: str, module_source: str, pipeline: Sequence[ModuleFilter]
+        self, ocel_id: str, module_source: str, pipeline: Sequence[BaseFilter]
     ):
         if ocel_id not in self.ocels:
             raise NotFound(f"OCEL with id {ocel_id} not found")

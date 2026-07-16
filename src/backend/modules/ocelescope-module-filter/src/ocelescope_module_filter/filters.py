@@ -34,50 +34,49 @@ from ocelescope.ocel.filter import (
 from ocelescope.ocel.filter import (
     TimeFrameFilter as _TimeFrameFilter,
 )
-from ocelescope_backend.app.internal.ocel.filters import ModuleFilter
 
 Mode = Literal["include", "exclude"]
 
 
-class TimeFrameFilter(_TimeFrameFilter, ModuleFilter):
+class TimeFrameFilter(_TimeFrameFilter):
     """Keep (or exclude) events whose timestamp falls in ``[start, end]``."""
 
     type: Literal["time_frame"]
 
 
-class ActivityFilter(_EventTypeFilter, ModuleFilter):
+class ActivityFilter(_EventTypeFilter):
     """Keep (or exclude) events of the given activities."""
 
     type: Literal["activity"]
     mode: Mode = "include"
 
 
-class ObjectTypeFilter(_ObjectTypeFilter, ModuleFilter):
+class ObjectTypeFilter(_ObjectTypeFilter):
     """Keep (or exclude) objects of the given object types."""
 
     type: Literal["object_type"]
     mode: Mode = "include"
 
 
-class EventAttributeFilter(_EventAttributeFilter, ModuleFilter):
+class EventAttributeFilter(_EventAttributeFilter):
     """Keep events whose attribute matches; activities without it are untouched."""
 
     type: Literal["event_attribute"]
 
 
-class ObjectAttributeFilter(_ObjectAttributeFilter, ModuleFilter):
+class ObjectAttributeFilter(_ObjectAttributeFilter):
     """Keep objects whose (static) attribute matches; types without it are untouched."""
 
     type: Literal["object_attribute"]
 
 
-class E2OCountFilter(_E2OCountFilter, ModuleFilter):
+class E2OCountFilter(_E2OCountFilter):
     """Keep events/objects by how many E2O relations of a given kind they have."""
 
     type: Literal["e2o_count"]
 
 
-class O2OCountFilter(_O2OCountFilter, ModuleFilter):
+class O2OCountFilter(_O2OCountFilter):
     """Keep objects by how many O2O relations of a given kind they have."""
 
     type: Literal["o2o_count"]

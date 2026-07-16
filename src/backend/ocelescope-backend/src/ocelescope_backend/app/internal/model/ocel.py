@@ -5,8 +5,7 @@ from ocelescope.ocel.extensions.base_extension import OCELExtension
 from ocelescope.ocel.io import export_duckdb_ocel
 from ocelescope.ocel.models.meta import OCELMeta
 
-from ocelescope import OCEL
-from ocelescope_backend.app.internal.ocel.filters import ModuleFilter
+from ocelescope import OCEL, BaseFilter
 
 
 class SessionOCEL:
@@ -32,13 +31,15 @@ class SessionOCEL:
         self.name = name
         self.created_at = created_at
         self.extensions: list[OCELExtension] = extensions or []
-        self._filters_by_source: dict[str, list[ModuleFilter]] = {}
+        self._filters_by_source: dict[str, list[BaseFilter]] = {}
         self._filtered_db_path: Path | None = None
 
     def _meta(self) -> OCELMeta:
-        return OCELMeta(id=self.id, extra={"name": self.name, "upload_date": self.created_at})
+        return OCELMeta(
+            id=self.id, extra={"name": self.name, "upload_date": self.created_at}
+        )
 
-    def _all_filters(self) -> list[ModuleFilter]:
+    def _all_filters(self) -> list[BaseFilter]:
         return [f for pipeline in self._filters_by_source.values() for f in pipeline]
 
     def _active_path(self, use_original: bool) -> Path:
@@ -98,12 +99,12 @@ class SessionOCEL:
         self._drop_filtered()
         self.db_path.unlink(missing_ok=True)
 
-    def get_filters(self, module_source: str | None = None) -> list[ModuleFilter]:
+    def get_filters(self, module_source: str | None = None) -> list[BaseFilter]:
         if module_source is None:
             return self._all_filters()
         return list(self._filters_by_source.get(module_source, []))
 
-    def set_filters(self, module_source: str, pipeline: Sequence[ModuleFilter]):
+    def set_filters(self, module_source: str, pipeline: Sequence[BaseFilter]):
         self._filters_by_source[module_source] = list(pipeline)
         self._drop_filtered()
         if self._all_filters():
