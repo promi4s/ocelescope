@@ -59,6 +59,7 @@ from ocelescope.ocel.io.schema import (
     drop_unchanged_columns,
     merge_columns,
 )
+from ocelescope.util.sql import ident, literal
 
 # ---------------------------------------------------------------------------
 # What the source SQLite file looks like (OCEL 2.0 SQLite format)
@@ -142,25 +143,6 @@ def _arrow_type(sqlite_type: str | None) -> pa.DataType:
     return _SQLITE_TYPE_TO_ARROW.get(base, pa.string())
 
 
-def _quote(identifier: str) -> str:
-    """Quote a SQL identifier so table/column names with odd characters are safe.
-
-    Attribute and type names come from the file, so they may contain spaces,
-    colons (``ocel:activity``) or quotes. Wrapping them in double quotes and
-    doubling any embedded quote is the SQL-standard way to escape an identifier.
-    """
-    return '"' + identifier.replace('"', '""') + '"'
-
-
-def _literal(value: str) -> str:
-    """Render a string as a SQL literal, escaping embedded single quotes.
-
-    Used to inject the real type name (e.g. ``'place order'``) as a constant
-    column in the SELECT, since it lives in the map table, not the type table.
-    """
-    return "'" + value.replace("'", "''") + "'"
-
-
 def _cast_expr(name: str, arrow_type: pa.DataType) -> str:
     """SQL expression reading attribute ``name`` as its target type.
 
@@ -170,7 +152,7 @@ def _cast_expr(name: str, arrow_type: pa.DataType) -> str:
     files in the wild store things like the literal text ``'null'`` in a REAL
     column. String attributes are already text and pass through unchanged.
     """
-    quoted = _quote(name)
+    quoted = ident(name)
     duckdb_type = _ARROW_TO_DUCKDB_CAST.get(arrow_type)
     return quoted if duckdb_type is None else f"TRY_CAST({quoted} AS {duckdb_type})"
 
@@ -182,7 +164,7 @@ def _timestamp_expr(column: str) -> str:
     (carrying its ``Z``/``+00:00`` offset), so a direct cast lands on the correct
     UTC instant. ``TRY_CAST`` guards against malformed timestamps.
     """
-    return f"TRY_CAST({_quote(column)} AS TIMESTAMPTZ)"
+    return f"TRY_CAST({ident(column)} AS TIMESTAMPTZ)"
 
 
 def _order_expr(time_column: str | None) -> str:
@@ -249,7 +231,7 @@ def _type_map(cur: sqlite3.Cursor, map_table: str, present: set[str]) -> dict[st
         return {}
     return {
         row[0]: row[1]
-        for row in cur.execute(f"SELECT ocel_type, ocel_type_map FROM {_quote(map_table)}")
+        for row in cur.execute(f"SELECT ocel_type, ocel_type_map FROM {ident(map_table)}")
     }
 
 
@@ -269,7 +251,7 @@ def _discover(
             continue  # map references a table that isn't actually present
         # PRAGMA table_info rows are (cid, name, type, notnull, default, pk);
         # we keep column name (row[1]) and declared type (row[2]).
-        columns = [(row[1], row[2]) for row in cur.execute(f"PRAGMA table_info({_quote(name)})")]
+        columns = [(row[1], row[2]) for row in cur.execute(f"PRAGMA table_info({ident(name)})")]
         tables.append(_TypeTable(name, ocel_type, columns))
     return tables
 
@@ -291,11 +273,11 @@ def _insert(
     type table, which only knows its own attributes, fills the shared wide
     ``events``/``objects`` tables. DuckDB streams the rows, so this stays cheap.
     """
-    column_sql = ", ".join(_quote(column) for column in columns)
+    column_sql = ", ".join(ident(column) for column in columns)
     filter_sql = f" WHERE {where}" if where else ""
     con.execute(
-        f"INSERT INTO {_quote(target)} ({column_sql}) "
-        f"SELECT {', '.join(select)} FROM src.{_quote(source)}{filter_sql}"
+        f"INSERT INTO {ident(target)} ({column_sql}) "
+        f"SELECT {', '.join(select)} FROM src.{ident(source)}{filter_sql}"
     )
 
 
@@ -311,8 +293,8 @@ def _insert_objects(con: duckdb.DuckDBPyConnection, table: _TypeTable) -> None:
     explicit initial-snapshot row, so files that store one (pm4py) and files that
     store only per-field change rows both come out the same.
     """
-    otype = _literal(table.ocel_type)
-    columns = ", ".join(_quote(c) for c in [OID_COL, OTYPE_COL, *(n for n, _ in table.attributes)])
+    otype = literal(table.ocel_type)
+    columns = ", ".join(ident(c) for c in [OID_COL, OTYPE_COL, *(n for n, _ in table.attributes)])
 
     if not table.attributes:
         con.execute(
@@ -327,15 +309,15 @@ def _insert_objects(con: duckdb.DuckDBPyConnection, table: _TypeTable) -> None:
     # the first real one.
     order_key = _order_expr(table.time_column)
     initial = ", ".join(
-        f"arg_min({_cast_expr(name, dtype)}, {order_key}) AS {_quote(name)}"
+        f"arg_min({_cast_expr(name, dtype)}, {order_key}) AS {ident(name)}"
         for name, dtype in table.attributes
     )
-    projected = ", ".join(f"snapshot.{_quote(name)}" for name, _ in table.attributes)
+    projected = ", ".join(f"snapshot.{ident(name)}" for name, _ in table.attributes)
     con.execute(
         f'INSERT INTO "objects" ({columns}) '
         f'SELECT core."ocel_id", {otype}, {projected} '
         f'FROM src."object" core LEFT JOIN ('
-        f'SELECT "ocel_id", {initial} FROM src.{_quote(table.name)} GROUP BY "ocel_id"'
+        f'SELECT "ocel_id", {initial} FROM src.{ident(table.name)} GROUP BY "ocel_id"'
         f') snapshot ON core."ocel_id" = snapshot."ocel_id" '
         f'WHERE core."ocel_type" = {otype}'
     )
@@ -362,8 +344,8 @@ def _insert_object_changes(con: duckdb.DuckDBPyConnection, table: _TypeTable) ->
         cast = _cast_expr(name, dtype)
         con.execute(
             f'INSERT INTO "object_changes" '
-            f"({_quote(OID_COL)}, {_quote(TIMESTAMP_COL)}, {_quote(name)}) "
-            f'SELECT "ocel_id", {stored_time}, {cast} FROM src.{_quote(table.name)} '
+            f"({ident(OID_COL)}, {ident(TIMESTAMP_COL)}, {ident(name)}) "
+            f'SELECT "ocel_id", {stored_time}, {cast} FROM src.{ident(table.name)} '
             f"WHERE {cast} IS NOT NULL "
             f'QUALIFY row_number() OVER (PARTITION BY "ocel_id" ORDER BY {order_key}) > 1'
         )
@@ -417,7 +399,7 @@ def import_ocel_sqlite(source: str | Path, target: DuckDBTarget) -> None:
                     con,
                     "events",
                     [EID_COL, ACTIVITY_COL, TIMESTAMP_COL, *attr_names],
-                    ['"ocel_id"', _literal(table.ocel_type), time, *attr_select],
+                    ['"ocel_id"', literal(table.ocel_type), time, *attr_select],
                     table.name,
                 )
 

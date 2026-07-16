@@ -119,28 +119,55 @@ class E2OManager(BaseManager):
         Returns:
             list[str]: Sorted list of unique qualifier names.
         """
-        return sorted(self.df[E2O_QUALIFIER].dropna().unique().tolist())
+        return self._column(
+            f'SELECT DISTINCT "{E2O_QUALIFIER}" FROM {TABLE} '
+            f'WHERE "{E2O_QUALIFIER}" IS NOT NULL ORDER BY 1'
+        )
 
     def get_events_of_object(self, object_id: str):
-        return self.df.loc[self.df[OID_COL].eq(object_id), EID_COL].dropna().unique()
+        """
+        Return the ids of the events the given object takes part in, in time order.
 
-    def __get_event_timestamps_of_object(self, object_id: str):
-        events = self._ocel.events.df
+        Only the object's own relations are read, not the whole E2O table. Events
+        sharing a timestamp are ordered by id, so the order is fully determined.
 
-        return events.loc[
-            events[EID_COL].isin(self.get_events_of_object(object_id)), [EID_COL, TIMESTAMP_COL]
-        ].set_index(EID_COL)[TIMESTAMP_COL]
+        Returns:
+            numpy.ndarray: The event ids, ordered by event timestamp then by id.
+        """
+        return (
+            self._relation(
+                f'SELECT r."{EID_COL}" FROM {TABLE} r '
+                f'JOIN {_EVENTS_TABLE} e ON r."{EID_COL}" = e."{EID_COL}" '
+                f'WHERE r."{OID_COL}" = ? AND r."{EID_COL}" IS NOT NULL '
+                f'GROUP BY r."{EID_COL}" '
+                f'ORDER BY min(e."{TIMESTAMP_COL}"), r."{EID_COL}"',
+                [object_id],
+            )
+            .df()[EID_COL]
+            .unique()
+        )
+
+    def _boundary_event_of_object(self, object_id: str, which: str) -> str | None:
+        """The id of the object's earliest (``min``) or latest (``max``) event.
+
+        ``arg_min``/``arg_max`` pick the id belonging to the extreme timestamp in a
+        single pass, so no per-event rows are read. An object with no events yields
+        one null row rather than nothing, which is why the value -- not the row --
+        is what gets checked.
+        """
+        rows = self._relation(
+            f'SELECT arg_{which}(r."{EID_COL}", e."{TIMESTAMP_COL}") FROM {TABLE} r '
+            f'JOIN {_EVENTS_TABLE} e ON r."{EID_COL}" = e."{EID_COL}" '
+            f'WHERE r."{OID_COL}" = ?',
+            [object_id],
+        ).fetchall()
+        event_id = rows[0][0] if rows else None
+        return str(event_id) if event_id is not None else None
 
     def get_first_event_of_object(self, object_id: str) -> str | None:
-        return str(
-            self.__get_event_timestamps_of_object(
-                object_id,
-            ).idxmin()
-        )
+        """The id of the object's earliest event, or None if it has none."""
+        return self._boundary_event_of_object(object_id, "min")
 
     def get_last_event_of_object(self, object_id: str) -> str | None:
-        return str(
-            self.__get_event_timestamps_of_object(
-                object_id,
-            ).idxmax()
-        )
+        """The id of the object's latest event, or None if it has none."""
+        return self._boundary_event_of_object(object_id, "max")

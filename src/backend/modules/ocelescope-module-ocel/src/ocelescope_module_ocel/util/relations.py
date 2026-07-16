@@ -19,6 +19,7 @@ from ocelescope.ocel.constants.pm4py import (
     OID_COL,
     OTYPE_COL,
 )
+from ocelescope.util.sql import ident
 from ocelescope_backend.app.internal.model.base import PaginatedResponse
 
 from ocelescope import OCEL
@@ -29,11 +30,6 @@ QUALIFIER = "ocel:qualifier"
 
 RelationKind = Literal["e2o", "o2o"]
 Direction = Literal["source", "target"]
-
-
-def _ident(name: str) -> str:
-    """Safely double-quote a SQL identifier (column names contain ':' and spaces)."""
-    return '"' + name.replace('"', '""') + '"'
 
 
 def _normalized_relation(kind: RelationKind, direction: Direction) -> str:
@@ -47,26 +43,26 @@ def _normalized_relation(kind: RelationKind, direction: Direction) -> str:
     if kind == "e2o":
         base = (
             f"e2o r "
-            f"JOIN events e ON r.{_ident(EID_COL)} = e.{_ident(EID_COL)} "
-            f"JOIN objects o ON r.{_ident(OID_COL)} = o.{_ident(OID_COL)}"
+            f"JOIN events e ON r.{ident(EID_COL)} = e.{ident(EID_COL)} "
+            f"JOIN objects o ON r.{ident(OID_COL)} = o.{ident(OID_COL)}"
         )
-        event = (f"e.{_ident(EID_COL)}", f"e.{_ident(ACTIVITY_COL)}")
-        obj = (f"o.{_ident(OID_COL)}", f"o.{_ident(OTYPE_COL)}")
+        event = (f"e.{ident(EID_COL)}", f"e.{ident(ACTIVITY_COL)}")
+        obj = (f"o.{ident(OID_COL)}", f"o.{ident(OTYPE_COL)}")
         src, tgt = (event, obj) if direction == "source" else (obj, event)
     else:
         base = (
             f"o2o r "
-            f"JOIN objects s ON r.{_ident(O2O_SOURCE_ID)} = s.{_ident(OID_COL)} "
-            f"JOIN objects t ON r.{_ident(O2O_TARGET_ID)} = t.{_ident(OID_COL)}"
+            f"JOIN objects s ON r.{ident(O2O_SOURCE_ID)} = s.{ident(OID_COL)} "
+            f"JOIN objects t ON r.{ident(O2O_TARGET_ID)} = t.{ident(OID_COL)}"
         )
-        first = (f"s.{_ident(OID_COL)}", f"s.{_ident(OTYPE_COL)}")
-        second = (f"t.{_ident(OID_COL)}", f"t.{_ident(OTYPE_COL)}")
+        first = (f"s.{ident(OID_COL)}", f"s.{ident(OTYPE_COL)}")
+        second = (f"t.{ident(OID_COL)}", f"t.{ident(OTYPE_COL)}")
         src, tgt = (first, second) if direction == "source" else (second, first)
 
     return (
         f"SELECT {src[0]} AS src_id, {src[1]} AS src_type, "
         f"{tgt[0]} AS tgt_id, {tgt[1]} AS tgt_type, "
-        f"r.{_ident(QUALIFIER)} AS qualifier FROM {base}"
+        f"r.{ident(QUALIFIER)} AS qualifier FROM {base}"
     )
 
 
@@ -118,9 +114,9 @@ def relation_summary(
 
     # All instances of the source type -- so min can drop to 0 when some don't relate.
     if kind == "e2o" and direction == "source":
-        instances = f"SELECT {_ident(ACTIVITY_COL)} AS src_type FROM events"
+        instances = f"SELECT {ident(ACTIVITY_COL)} AS src_type FROM events"
     else:
-        instances = f"SELECT {_ident(OTYPE_COL)} AS src_type FROM objects"
+        instances = f"SELECT {ident(OTYPE_COL)} AS src_type FROM objects"
 
     ctes = [
         f"rel AS ({_normalized_relation(kind, direction)})",

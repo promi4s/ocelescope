@@ -5,7 +5,9 @@ class ObjectVariant(BaseModel):
     """A single object variant: a distinct activity sequence objects of a type follow.
 
     Attributes:
-        variant_id: Identifier of the variant (``<object_type>_<index>``).
+        variant_id: Identifier of the variant
+            (``<object_type>_<hash of the activity sequence>``). It depends only
+            on the sequence, so it stays the same across filtered views of a log.
         activities: The ordered activity sequence that defines the variant.
         event_count: Number of events in the variant (length of ``activities``).
         case_count: Number of objects (cases) that follow this variant.

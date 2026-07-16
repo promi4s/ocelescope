@@ -148,4 +148,7 @@ class O2OManager(BaseManager):
         Returns:
             list[str]: Sorted list of unique qualifier names.
         """
-        return sorted(self.df[O2O_QUALIFIER].dropna().unique().tolist())
+        return self._column(
+            f'SELECT DISTINCT "{O2O_QUALIFIER}" FROM {TABLE} '
+            f'WHERE "{O2O_QUALIFIER}" IS NOT NULL ORDER BY 1'
+        )

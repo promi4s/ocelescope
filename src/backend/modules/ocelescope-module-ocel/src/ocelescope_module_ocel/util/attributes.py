@@ -22,8 +22,8 @@ from ocelescope.ocel.constants.pm4py import (
     EID_COL,
     OID_COL,
     OTYPE_COL,
-    TIMESTAMP_COL,
 )
+from ocelescope.util.sql import ident
 
 from ocelescope import OCEL
 from ocelescope_module_ocel.models import AggregatedAttribute, TypedAttribute
@@ -40,11 +40,6 @@ _DUCKDB_TO_VALUE_TYPE = {
     "BOOLEAN": ValueType.BOOL,
     "DATE": ValueType.DATE,
 }
-
-
-def _ident(name: str) -> str:
-    """Safely double-quote a SQL identifier (column names contain ':' and spaces)."""
-    return '"' + name.replace('"', '""') + '"'
 
 
 def _type_filter(
@@ -80,9 +75,9 @@ def _marshal(value: Any, value_type: ValueType) -> Any:
 
 def _present(name: str, duckdb_type: str) -> str:
     """The ``WHERE`` condition for an attribute having a value (non-null, non-empty)."""
-    condition = f"{_ident(name)} IS NOT NULL"
+    condition = f"{ident(name)} IS NOT NULL"
     if duckdb_type.upper() == "VARCHAR":
-        condition += f" AND {_ident(name)} <> ''"
+        condition += f" AND {ident(name)} <> ''"
     return condition
 
 
@@ -98,18 +93,17 @@ def merged_event_table(
     all; empty list = nothing).
     """
     if attribute_names is None:
-        meta = {EID_COL, ACTIVITY_COL, TIMESTAMP_COL}
-        attribute_names = [c for c in ocel.events.table.columns if c not in meta]
+        attribute_names = ocel.events.attribute_names
 
     params: list[object] = []
     columns = ", ".join(
         [
-            f"{_ident(EID_COL)} AS {_ident(ENTITY_ID)}",
-            f"{_ident(ACTIVITY_COL)} AS {_ident(ENTITY_TYPE)}",
-            *(_ident(name) for name in attribute_names),
+            f"{ident(EID_COL)} AS {ident(ENTITY_ID)}",
+            f"{ident(ACTIVITY_COL)} AS {ident(ENTITY_TYPE)}",
+            *(ident(name) for name in attribute_names),
         ]
     )
-    where = _type_filter(_ident(ACTIVITY_COL), entity_names, params)
+    where = _type_filter(ident(ACTIVITY_COL), entity_names, params)
     return ocel.sql(f"SELECT {columns} FROM events {where}", params)
 
 
@@ -129,38 +123,34 @@ def merged_object_table(
     all; empty list = nothing).
     """
     if attribute_names is None:
-        meta = {OID_COL, OTYPE_COL}
-        attribute_names = [c for c in ocel.objects.table.columns if c not in meta]
+        attribute_names = ocel.objects.attribute_names
 
     # objects and object_changes share the attribute schema; UNION ALL BY NAME aligns
     # them and fills any attribute missing from one side with NULL there.
     change_cols = set(ocel.objects.dynamic_attribute_names)
+    object_cols = set(ocel.objects.attribute_names)
     object_columns = ", ".join(
         [
-            f"{_ident(OID_COL)} AS {_ident(ENTITY_ID)}",
-            f"{_ident(OTYPE_COL)} AS {_ident(ENTITY_TYPE)}",
-            *(
-                _ident(name)
-                for name in attribute_names
-                if name in ocel.objects.table.columns
-            ),
+            f"{ident(OID_COL)} AS {ident(ENTITY_ID)}",
+            f"{ident(OTYPE_COL)} AS {ident(ENTITY_TYPE)}",
+            *(ident(name) for name in attribute_names if name in object_cols),
         ]
     )
     change_columns = ", ".join(
         [
-            f"c.{_ident(OID_COL)} AS {_ident(ENTITY_ID)}",
-            f"o.{_ident(OTYPE_COL)} AS {_ident(ENTITY_TYPE)}",
-            *(f"c.{_ident(name)}" for name in attribute_names if name in change_cols),
+            f"c.{ident(OID_COL)} AS {ident(ENTITY_ID)}",
+            f"o.{ident(OTYPE_COL)} AS {ident(ENTITY_TYPE)}",
+            *(f"c.{ident(name)}" for name in attribute_names if name in change_cols),
         ]
     )
     params: list[object] = []
-    objects_where = _type_filter(_ident(OTYPE_COL), entity_names, params)
-    changes_where = _type_filter(f"o.{_ident(OTYPE_COL)}", entity_names, params)
+    objects_where = _type_filter(ident(OTYPE_COL), entity_names, params)
+    changes_where = _type_filter(f"o.{ident(OTYPE_COL)}", entity_names, params)
     return ocel.sql(
         f"SELECT {object_columns} FROM objects {objects_where} "
         f"UNION ALL BY NAME "
         f"SELECT {change_columns} FROM object_changes c "
-        f"JOIN objects o ON c.{_ident(OID_COL)} = o.{_ident(OID_COL)} {changes_where}",
+        f"JOIN objects o ON c.{ident(OID_COL)} = o.{ident(OID_COL)} {changes_where}",
         params,
     )
 
@@ -201,7 +191,7 @@ def attribute_names(
         present = _present(name, types[name])
         exprs.append(f"count(*) FILTER (WHERE {present})")
         if drop_constant:
-            exprs.append(f"count(DISTINCT {_ident(name)}) FILTER (WHERE {present})")
+            exprs.append(f"count(DISTINCT {ident(name)}) FILTER (WHERE {present})")
     row = table.aggregate(", ".join(exprs)).fetchone() or ()
 
     stride = 2 if drop_constant else 1
@@ -231,10 +221,10 @@ def aggregate_attributes(
     for name in names:
         present = _present(name, types[name])
         exprs += [
-            f"min({_ident(name)}) FILTER (WHERE {present})",
-            f"max({_ident(name)}) FILTER (WHERE {present})",
-            f"count(DISTINCT {_ident(name)}) FILTER (WHERE {present})",
-            f"array_agg(DISTINCT {_ident(ENTITY_TYPE)}) FILTER (WHERE {present})",
+            f"min({ident(name)}) FILTER (WHERE {present})",
+            f"max({ident(name)}) FILTER (WHERE {present})",
+            f"count(DISTINCT {ident(name)}) FILTER (WHERE {present})",
+            f"array_agg(DISTINCT {ident(ENTITY_TYPE)}) FILTER (WHERE {present})",
         ]
     row = table.aggregate(", ".join(exprs)).fetchone()
     assert row is not None  # an aggregate without GROUP BY always yields one row
@@ -277,12 +267,12 @@ def typed_attributes(table: duckdb.DuckDBPyRelation) -> list[TypedAttribute]:
     for name in names:
         present = _present(name, types[name])
         exprs += [
-            f"min({_ident(name)}) FILTER (WHERE {present})",
-            f"max({_ident(name)}) FILTER (WHERE {present})",
-            f"count(DISTINCT {_ident(name)}) FILTER (WHERE {present})",
+            f"min({ident(name)}) FILTER (WHERE {present})",
+            f"max({ident(name)}) FILTER (WHERE {present})",
+            f"count(DISTINCT {ident(name)}) FILTER (WHERE {present})",
         ]
     rows = table.aggregate(
-        f"{_ident(ENTITY_TYPE)}, {', '.join(exprs)}", group_expr=_ident(ENTITY_TYPE)
+        f"{ident(ENTITY_TYPE)}, {', '.join(exprs)}", group_expr=ident(ENTITY_TYPE)
     ).fetchall()
 
     attributes: list[TypedAttribute] = []

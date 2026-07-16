@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
-from threading import Lock
 from typing import TYPE_CHECKING, Any, Iterator
 
 import duckdb
-from cachetools import LRUCache
+
+from ocelescope.util.sql import ident
 
 if TYPE_CHECKING:
     from ocelescope.ocel.core.ocel import OCEL
@@ -15,12 +15,10 @@ _INCOMING = "_incoming_table"
 
 
 class BaseManager:
-    """Base class for all manager classes providing per-instance caching."""
+    """Base class for all managers, holding their shared access to the database."""
 
     def __init__(self, ocel: "OCEL"):
         self._ocel = ocel
-        self.cache = LRUCache(maxsize=128)
-        self.cache_lock = Lock()
 
     def _has_table(self, name: str) -> bool:
         """Whether a table called ``name`` exists in the OCEL's database."""
@@ -31,7 +29,7 @@ class BaseManager:
             is not None
         )
 
-    def _relation(self, sql: str) -> duckdb.DuckDBPyRelation:
+    def _relation(self, sql: str, params: list[object] | None = None) -> duckdb.DuckDBPyRelation:
         """A lazy relation for ``sql``, on its own DuckDB cursor.
 
         A cursor is a second connection to the same database. Each relation gets
@@ -50,10 +48,34 @@ class BaseManager:
         connection's ``TimeZone`` but starts on the machine's own. Left alone it
         would render every ``TIMESTAMPTZ`` in local time, making the tables' dtype
         depend on where the code runs, so the zone is pinned back to UTC here.
+
+        Bind caller-supplied values through ``params`` (``?`` placeholders) rather
+        than formatting them into ``sql``, so they stay injection-safe.
         """
         cursor = self._ocel.con.cursor()
         cursor.execute("SET TimeZone='UTC'")
-        return cursor.sql(sql)
+        return cursor.sql(sql, params=params) if params else cursor.sql(sql)
+
+    def _column(self, sql: str, params: list[object] | None = None) -> list[Any]:
+        """The first column of ``sql``'s result, as a list.
+
+        For the many summaries that are one column of a handful of rows -- type
+        names, qualifiers -- where a frame would be a detour.
+        """
+        return [row[0] for row in self._relation(sql, params).fetchall()]
+
+    def _attribute_names(self, table: str) -> list[str]:
+        """The attribute columns of a stored table: its columns minus the OCEL ones.
+
+        A table's columns *are* the answer -- ``events`` has one per attribute, as
+        does ``objects``, and ``object_changes`` keeps only the ones that change --
+        so this reads no rows.
+        """
+        return sorted(
+            name
+            for name, *_ in self._ocel.con.execute(f"DESCRIBE {ident(table)}").fetchall()
+            if not name.startswith("ocel:")
+        )
 
     @contextmanager
     def _bound(self, contents: Any) -> Iterator[str]:

@@ -18,8 +18,7 @@ router = APIRouter()
 
 @router.get("/{ocel_id}/events/activityNames", operation_id="Activities")
 def get_activities(ocel: ApiOcel) -> list[str]:
-    activities = ocel.events.table.project(f'"{ACTIVITY_COL}"').distinct().fetchall()
-    return sorted(row[0] for row in activities)
+    return ocel.events.activities
 
 
 @router.get(
@@ -28,15 +27,8 @@ def get_activities(ocel: ApiOcel) -> list[str]:
     operation_id="eventCounts",
 )
 def get_event_counts(ocel: ApiOcel) -> dict[str, int]:
-    counts = (
-        ocel.events.table.aggregate(
-            f'"{ACTIVITY_COL}" AS activity, count(*) AS count',
-            group_expr=f'"{ACTIVITY_COL}"',
-        )
-        .order("count DESC")
-        .fetchall()
-    )
-    return {activity: int(count) for activity, count in counts}
+    # Ordered most frequent first, which the response preserves.
+    return {str(activity): int(count) for activity, count in ocel.events.activity_counts.items()}
 
 
 @router.get("/{ocel_id}/events/ids", operation_id="eventIds")

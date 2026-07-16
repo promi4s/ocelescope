@@ -170,17 +170,13 @@
     "schemas": {
       "ActivityFilter": {
         "properties": {
-          "type": {
-            "type": "string",
-            "const": "activity",
-            "title": "Type"
-          },
           "event_types": {
             "items": {
               "type": "string"
             },
             "type": "array",
-            "title": "Event Types"
+            "title": "Event Types",
+            "fieldType": "event_type"
           },
           "mode": {
             "type": "string",
@@ -190,23 +186,23 @@
             ],
             "title": "Mode",
             "default": "include"
+          },
+          "type": {
+            "type": "string",
+            "const": "activity",
+            "title": "Type"
           }
         },
         "type": "object",
         "required": [
-          "type",
-          "event_types"
+          "event_types",
+          "type"
         ],
         "title": "ActivityFilter",
         "description": "Keep (or exclude) events of the given activities."
       },
       "E2OCountFilter": {
         "properties": {
-          "type": {
-            "type": "string",
-            "const": "e2o_count",
-            "title": "Type"
-          },
           "source": {
             "type": "string",
             "title": "Source"
@@ -262,17 +258,22 @@
             ],
             "title": "Direction",
             "default": "source"
+          },
+          "type": {
+            "type": "string",
+            "const": "e2o_count",
+            "title": "Type"
           }
         },
         "type": "object",
         "required": [
-          "type",
           "source",
           "target",
-          "range"
+          "range",
+          "type"
         ],
         "title": "E2OCountFilter",
-        "description": "Keep events/objects by how many e2o relations of a given kind they have.\n\nCounts relations between activity ``source`` and object type ``target``\n(optionally a ``qualifier``); ``direction`` picks whether events (source) or\nobjects (target) are counted. Entities not of the counted type are untouched."
+        "description": "Keep events/objects by how many E2O relations of a given kind they have."
       },
       "EventAttributeFilter": {
         "properties": {
@@ -408,7 +409,7 @@
           "type"
         ],
         "title": "EventAttributeFilter",
-        "description": "Keep events whose attribute matches (activities without it untouched)."
+        "description": "Keep events whose attribute matches; activities without it are untouched."
       },
       "HTTPValidationError": {
         "properties": {
@@ -425,11 +426,6 @@
       },
       "O2OCountFilter": {
         "properties": {
-          "type": {
-            "type": "string",
-            "const": "o2o_count",
-            "title": "Type"
-          },
           "source": {
             "type": "string",
             "title": "Source"
@@ -485,17 +481,22 @@
             ],
             "title": "Direction",
             "default": "source"
+          },
+          "type": {
+            "type": "string",
+            "const": "o2o_count",
+            "title": "Type"
           }
         },
         "type": "object",
         "required": [
-          "type",
           "source",
           "target",
-          "range"
+          "range",
+          "type"
         ],
         "title": "O2OCountFilter",
-        "description": "Keep objects by how many o2o relations of a given kind they have.\n\nCounts relations between object types ``source`` and ``target`` (optionally a\n``qualifier``); ``direction`` picks whether the source or target object is counted."
+        "description": "Keep objects by how many O2O relations of a given kind they have."
       },
       "ObjectAttributeFilter": {
         "properties": {
@@ -631,21 +632,17 @@
           "type"
         ],
         "title": "ObjectAttributeFilter",
-        "description": "Keep objects whose (static) attribute matches (types without it untouched).\n\nNote: dynamic values from ``object_changes`` are not folded in."
+        "description": "Keep objects whose (static) attribute matches; types without it are untouched."
       },
       "ObjectTypeFilter": {
         "properties": {
-          "type": {
-            "type": "string",
-            "const": "object_type",
-            "title": "Type"
-          },
           "object_types": {
             "items": {
               "type": "string"
             },
             "type": "array",
-            "title": "Object Types"
+            "title": "Object Types",
+            "fieldType": "object_type"
           },
           "mode": {
             "type": "string",
@@ -655,23 +652,23 @@
             ],
             "title": "Mode",
             "default": "include"
+          },
+          "type": {
+            "type": "string",
+            "const": "object_type",
+            "title": "Type"
           }
         },
         "type": "object",
         "required": [
-          "type",
-          "object_types"
+          "object_types",
+          "type"
         ],
         "title": "ObjectTypeFilter",
         "description": "Keep (or exclude) objects of the given object types."
       },
       "TimeFrameFilter": {
         "properties": {
-          "type": {
-            "type": "string",
-            "const": "time_frame",
-            "title": "Type"
-          },
           "time_range": {
             "prefixItems": [
               {
@@ -703,17 +700,22 @@
           "mode": {
             "type": "string",
             "enum": [
-              "include",
-              "exclude"
+              "exclude",
+              "include"
             ],
             "title": "Mode",
             "default": "include"
+          },
+          "type": {
+            "type": "string",
+            "const": "time_frame",
+            "title": "Type"
           }
         },
         "type": "object",
         "required": [
-          "type",
-          "time_range"
+          "time_range",
+          "type"
         ],
         "title": "TimeFrameFilter",
         "description": "Keep (or exclude) events whose timestamp falls in ``[start, end]``."

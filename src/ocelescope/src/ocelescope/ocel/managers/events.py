@@ -89,17 +89,25 @@ class EventsManager(BaseManager):
         Returns:
             list[str]: A sorted list of unique activity names.
         """
-        return list(sorted(self.df[ACTIVITY_COL].unique().tolist()))
+        return self._column(f'SELECT DISTINCT "{ACTIVITY_COL}" FROM {TABLE} ORDER BY 1')
 
     @property
     def activity_counts(self) -> pd.Series:
         """
         Return the frequency of each activity in the log.
 
+        Counted by DuckDB, so only one row per activity is read rather than the
+        whole event table. Ordered like ``value_counts``: most frequent first,
+        ties broken by name.
+
         Returns:
             Series: A pandas Series indexed by activity name with occurrence counts.
         """
-        return self.df[ACTIVITY_COL].value_counts()
+        counts = self._relation(
+            f'SELECT "{ACTIVITY_COL}", count(*) AS "count" FROM {TABLE} '
+            f'GROUP BY 1 ORDER BY "count" DESC, 1'
+        ).df()
+        return cast(pd.Series, counts.set_index(ACTIVITY_COL)["count"])
 
     @property
     def activity_by_id(self) -> pd.Series:
@@ -109,7 +117,10 @@ class EventsManager(BaseManager):
         Returns:
             Series: A pandas Series indexed by event ID, containing activity names as values.
         """
-        return cast(pd.Series, self.df[[EID_COL, ACTIVITY_COL]].set_index(EID_COL)[ACTIVITY_COL])
+        mapping = self._relation(
+            f'SELECT "{EID_COL}", "{ACTIVITY_COL}" FROM {TABLE} ORDER BY "{TIMESTAMP_COL}"'
+        ).df()
+        return cast(pd.Series, mapping.set_index(EID_COL)[ACTIVITY_COL])
 
     @property
     def attribute_names(self) -> list[str]:
@@ -119,10 +130,14 @@ class EventsManager(BaseManager):
         Returns:
             list[str]: A sorted list of event attribute names.
         """
-        return sorted([col for col in self.df.columns if not col.startswith("ocel:")])
+        return self._attribute_names(TABLE)
 
     def get_event_timestamp(self, event_id: str):
         """
         Returns the timestamp of the passed event.
         """
-        return str(self.df.loc[self.df[EID_COL].eq(event_id), TIMESTAMP_COL].iloc[0])
+        return str(
+            self._relation(
+                f'SELECT "{TIMESTAMP_COL}" FROM {TABLE} WHERE "{EID_COL}" = ?', [event_id]
+            ).df()[TIMESTAMP_COL].iloc[0]
+        )

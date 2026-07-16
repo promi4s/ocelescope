@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter
-from ocelescope.ocel.constants.pm4py import OID_COL, OTYPE_COL
+from ocelescope.ocel.constants.pm4py import OID_COL
 from ocelescope_backend.app.dependencies import ApiOcel
 from ocelescope_backend.app.internal.model.base import PaginatedResponse
 
@@ -16,8 +16,7 @@ router = APIRouter()
 
 @router.get("/{ocel_id}/objects/types", operation_id="objectTypes")
 def get_object_types(ocel: ApiOcel) -> list[str]:
-    types = ocel.objects.table.project(f'"{OTYPE_COL}"').distinct().fetchall()
-    return sorted(row[0] for row in types)
+    return ocel.objects.types
 
 
 @router.get(
@@ -26,15 +25,8 @@ def get_object_types(ocel: ApiOcel) -> list[str]:
     operation_id="objectCounts",
 )
 def get_object_counts(ocel: ApiOcel) -> dict[str, int]:
-    counts = (
-        ocel.objects.table.aggregate(
-            f'"{OTYPE_COL}" AS type, count(*) AS count',
-            group_expr=f'"{OTYPE_COL}"',
-        )
-        .order("count DESC")
-        .fetchall()
-    )
-    return {type: int(count) for type, count in counts}
+    # Ordered most frequent first, which the response preserves.
+    return {str(object_type): int(count) for object_type, count in ocel.objects.counts.items()}
 
 
 @router.get("/{ocel_id}/objects/ids", operation_id="objectIds")

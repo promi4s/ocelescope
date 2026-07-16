@@ -13,6 +13,7 @@ from ocelescope.ocel.constants.pm4py import (
     TIMESTAMP_COL,
 )
 from ocelescope.ocel.managers.base import BaseManager
+from ocelescope.util.sql import ident, literal
 
 TABLE = "objects"
 CHANGES_TABLE = "object_changes"
@@ -31,18 +32,6 @@ class ObjectsManager(BaseManager):
 
     Acts as a facade over the underlying PM4PY OCEL object.
     """
-
-    def _attributes(self, table: str) -> list[str]:
-        """The attribute columns of a stored table: its columns minus the OCEL ones.
-
-        A table's columns *are* the answer -- ``objects`` has one per attribute and
-        ``object_changes`` only keeps the ones that change -- so this reads no rows.
-        """
-        return sorted(
-            name
-            for name, *_ in self._ocel.con.execute(f'DESCRIBE "{table}"').fetchall()
-            if not name.startswith("ocel:")
-        )
 
     @property
     def table(self) -> duckdb.DuckDBPyRelation:
@@ -116,7 +105,7 @@ class ObjectsManager(BaseManager):
             field = (
                 "CASE "
                 + " ".join(
-                    f"WHEN c.\"{name}\" IS NOT NULL THEN '{name.replace(chr(39), chr(39) * 2)}'"
+                    f"WHEN c.{ident(name)} IS NOT NULL THEN {literal(name)}"
                     for name in names
                 )
                 + " END"
@@ -175,17 +164,25 @@ class ObjectsManager(BaseManager):
         Returns:
             list[str]: Sorted list of unique object type names.
         """
-        return list(sorted(self.df[OTYPE_COL].unique().tolist()))
+        return self._column(f'SELECT DISTINCT "{OTYPE_COL}" FROM {TABLE} ORDER BY 1')
 
     @property
     def counts(self) -> pd.Series:
         """
         Count how many objects exist for each object type.
 
+        Counted by DuckDB, so only one row per object type is read rather than the
+        whole objects table. Ordered like ``value_counts``: most frequent first,
+        ties broken by name.
+
         Returns:
             Series: A pandas Series indexed by object type with occurrence counts.
         """
-        return self.df[OTYPE_COL].value_counts()
+        counts = self._relation(
+            f'SELECT "{OTYPE_COL}", count(*) AS "count" FROM {TABLE} '
+            f'GROUP BY 1 ORDER BY "count" DESC, 1'
+        ).df()
+        return cast(pd.Series, counts.set_index(OTYPE_COL)["count"])
 
     @property
     def type_by_id(self) -> pd.Series:
@@ -195,11 +192,15 @@ class ObjectsManager(BaseManager):
         Returns:
             Series: A pandas Series indexed by object ID, containing object types as values.
         """
-        return cast(pd.Series, self.df[[OID_COL, OTYPE_COL]].set_index(OID_COL)[OTYPE_COL])
+        mapping = self._relation(f'SELECT "{OID_COL}", "{OTYPE_COL}" FROM {TABLE}').df()
+        return cast(pd.Series, mapping.set_index(OID_COL)[OTYPE_COL])
 
     def has_types(self, types: Iterable[str]) -> bool:
         """
         Check whether all provided object types exist in the OCEL.
+
+        Asked of DuckDB as one count, so this stops at the types named rather than
+        collecting every type the log has.
 
         Args:
             types: Iterable of object type names to verify.
@@ -207,7 +208,16 @@ class ObjectsManager(BaseManager):
         Returns:
             bool: True if all types exist, False otherwise.
         """
-        return all(ot in self.types for ot in types)
+        wanted = set(types)
+        if not wanted:
+            return True
+        placeholders = ", ".join(["?"] * len(wanted))
+        found = self._relation(
+            f'SELECT count(DISTINCT "{OTYPE_COL}") FROM {TABLE} '
+            f'WHERE "{OTYPE_COL}" IN ({placeholders})',
+            list(wanted),
+        ).fetchall()[0][0]
+        return found == len(wanted)
 
     @property
     def attribute_names(self) -> list[str]:
@@ -220,7 +230,7 @@ class ObjectsManager(BaseManager):
         Returns:
             list[str]: Sorted list of all object attribute names.
         """
-        return self._attributes(TABLE)
+        return self._attribute_names(TABLE)
 
     @property
     def dynamic_attribute_names(self) -> list[str]:
@@ -233,7 +243,7 @@ class ObjectsManager(BaseManager):
         Returns:
             list[str]: Sorted list of dynamic object attribute names.
         """
-        return self._attributes(CHANGES_TABLE)
+        return self._attribute_names(CHANGES_TABLE)
 
     @property
     def static_attribute_names(self) -> list[str]:
@@ -254,12 +264,21 @@ class ObjectsManager(BaseManager):
         object_types: Iterable[Any] | None = None,
         objects: Iterable[Any] | None = None,
         attributes: Iterable[Any] | None = None,
-    ):
+    ) -> pd.DataFrame:
         """
         Return dynamic object attributes over time.
 
         Filters `object_changes` by object type and/or object id, forward-fills
         attribute values per object, and returns one row per `(object_id, timestamp)`.
+
+        Filtering, forward-filling and de-duplication all happen in DuckDB, so only
+        the resulting rows are read. A change row holds a single attribute's new
+        value, so forward-filling is what turns the log's one-attribute-at-a-time
+        rows into the object's full state at each point in time.
+
+        Where several attributes change at the same timestamp the log has one row
+        each, and only the last is kept -- forward-filling makes that the one row
+        carrying all of them.
 
         Args:
             object_types: Optional object types to include.
@@ -272,38 +291,58 @@ class ObjectsManager(BaseManager):
             the selected dynamic attribute columns and the object type column
             (`ocel:type`).
         """
-
         attr_cols = [
             attr_name
             for attr_name in self.dynamic_attribute_names
             if attributes is None or attr_name in attributes
         ]
 
-        changes = self.changes
+        params: list[object] = []
+        conditions: list[str] = []
 
-        mask = pd.Series(True, index=changes.index)
+        def add_filter(column: str, values: Iterable[Any] | None) -> None:
+            """Restrict ``column`` to ``values``; None = no filter, empty = nothing."""
+            if values is None:
+                return
+            wanted = list(values)
+            if not wanted:
+                conditions.append("false")
+                return
+            params.extend(wanted)
+            conditions.append(f"{column} IN ({', '.join(['?'] * len(wanted))})")
 
-        if object_types is not None:
-            mask &= changes[OTYPE_COL].isin(object_types)
+        add_filter(f'o."{OTYPE_COL}"', object_types)
+        add_filter(f'c."{OID_COL}"', objects)
+        where = ("WHERE " + " AND ".join(conditions)) if conditions else ""
 
-        if objects is not None:
-            mask &= changes[OID_COL].isin(objects)
+        # _rn pins the stored order, to break ties between changes to the same
+        # object at the same timestamp -- for the fill order and the row kept.
+        selected = "".join(f", c.{ident(name)}" for name in attr_cols)
+        source = (
+            f'SELECT c."{OID_COL}", c."{TIMESTAMP_COL}", o."{OTYPE_COL}"{selected}, '
+            f"row_number() OVER () AS _rn "
+            f"FROM {CHANGES_TABLE} c "
+            f'JOIN {TABLE} o ON c."{OID_COL}" = o."{OID_COL}" {where}'
+        )
 
-        changes = cast(pd.DataFrame, changes.loc[mask])
+        filled = "".join(
+            f", last_value({ident(name)} IGNORE NULLS) OVER w AS {ident(name)}"
+            for name in attr_cols
+        )
+        query = (
+            f"WITH source AS ({source}), "
+            f'filled AS (SELECT "{OID_COL}", "{TIMESTAMP_COL}", "{OTYPE_COL}", _rn{filled} '
+            f"FROM source "
+            f'WINDOW w AS (PARTITION BY "{OID_COL}" ORDER BY "{TIMESTAMP_COL}", _rn '
+            f"ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)) "
+            f"SELECT * EXCLUDE (_rn) FROM filled "
+            f'QUALIFY row_number() OVER (PARTITION BY "{OID_COL}", "{TIMESTAMP_COL}" '
+            f"ORDER BY _rn DESC) = 1 "
+            f'ORDER BY "{TIMESTAMP_COL}", "{OID_COL}"'
+        )
 
-        changes.sort_values([OID_COL, TIMESTAMP_COL])
-
-        changes[attr_cols] = changes.groupby(OID_COL)[attr_cols].ffill()
-
-        return (
-            changes.assign(_nn=changes.notna().sum(axis=1))
-            .reset_index()
-            .sort_values([TIMESTAMP_COL, OID_COL] + ["_nn"])
-            .drop_duplicates(subset=[TIMESTAMP_COL, OID_COL], keep="last")
-            .set_index([OID_COL, TIMESTAMP_COL], drop=True)[
-                attr_cols
-                + [
-                    OTYPE_COL,
-                ]
-            ]
+        frame = self._relation(query, params).df()
+        return cast(
+            pd.DataFrame,
+            frame.set_index([OID_COL, TIMESTAMP_COL], drop=True)[attr_cols + [OTYPE_COL]],
         )
