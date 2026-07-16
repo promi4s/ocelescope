@@ -16,6 +16,15 @@ from ocelescope.ocel.managers.base import BaseManager
 
 _QUANTITY_AS_NUMBER = f'TRY_CAST("{QEL_QUANTITY}" AS DOUBLE) AS "{QEL_QUANTITY}"'
 
+#: Keeps the rows a quantity table is read through: a zero quantity is no
+#: quantity at all. Null is kept, since SQL's ``NULL != 0`` is null rather than
+#: true -- which is what makes this the same rule as the pandas ``.ne(0)`` the
+#: frame-returning reads apply.
+_CLEAN = f'("{QEL_QUANTITY}" != 0 OR "{QEL_QUANTITY}" IS NULL)'
+
+_OBJECTS_TABLE = "objects"
+_EVENTS_TABLE = "events"
+
 
 def _quantity_projection(columns: list[str]) -> str:
     """The stored columns, with the quantity forced to a number."""
@@ -154,6 +163,47 @@ class QuantityManager(BaseManager):
             fill_value=0,
         )
 
+    def _cleaned_union(self, column: str, *, operations_only: bool = False) -> str:
+        """SQL reading ``column`` from the quantity tables, zero quantities dropped.
+
+        The tables are optional, so the ones that are actually there are what gets
+        read -- and when neither is, the empty string says so, since a query over
+        no tables cannot be written.
+        """
+        tables = []
+        if self.has_quantities and not operations_only:
+            tables.append(QUANTITIES_TABLE)
+        if self.has_operations:
+            tables.append(QUANTITY_OPERATIONS_TABLE)
+        return " UNION ALL ".join(
+            f'SELECT "{column}" FROM "{table}" WHERE {_CLEAN}' for table in tables
+        )
+
+    def _distinct(self, column: str, *, operations_only: bool = False) -> list[str]:
+        """The distinct non-null values of ``column`` across the quantity tables.
+
+        Sorted: DuckDB computes a ``DISTINCT`` in parallel, so without an order
+        the same query hands its rows back in a different order each time it runs.
+        """
+        union = self._cleaned_union(column, operations_only=operations_only)
+        if not union:
+            return []
+        return self._column(
+            f'SELECT DISTINCT "{column}" FROM ({union}) '
+            f'WHERE "{column}" IS NOT NULL ORDER BY 1'
+        )
+
+    def _types_of(self, table: str, id_column: str, type_column: str, union: str) -> list[str]:
+        """The distinct ``type_column`` of the entities ``union`` names, sorted."""
+        if not union:
+            return []
+        return self._column(
+            f'SELECT DISTINCT "{type_column}" FROM "{table}" '
+            f'WHERE "{id_column}" IN '
+            f'(SELECT "{id_column}" FROM ({union}) WHERE "{id_column}" IS NOT NULL) '
+            f"ORDER BY 1"
+        )
+
     @property
     def item_types(self) -> list[str]:
         """Return all item types present in initial quantities or quantity operations.
@@ -161,22 +211,10 @@ class QuantityManager(BaseManager):
         Returns:
             A list of unique item type identifiers (strings).
         """
-
-        return (
-            pd.concat(
-                [
-                    self.oqty.loc[self._cleaned_oqty_mask, QEL_ITEM_TYPE],
-                    self.qop.loc[self._cleaned_qop_mask, QEL_ITEM_TYPE],
-                ],
-                ignore_index=True,
-            )
-            .dropna()
-            .unique()
-            .tolist()
-        )
+        return self._distinct(QEL_ITEM_TYPE)
 
     @property
-    def objects(self):
+    def objects(self) -> list[str]:
         """Return all object ids involved in quantities.
 
         Includes:
@@ -184,19 +222,9 @@ class QuantityManager(BaseManager):
           - objects with any initial quantity row.
 
         Returns:
-            An array-like of unique object ids.
+            A list of unique object ids.
         """
-        return (
-            pd.concat(
-                [
-                    self.oqty.loc[self._cleaned_oqty_mask, OID_COL],
-                    self.qop.loc[self._cleaned_qop_mask, OID_COL],
-                ],
-                ignore_index=True,
-            )
-            .dropna()
-            .unique()
-        )
+        return self._distinct(OID_COL)
 
     @property
     def object_types(self) -> list[str]:
@@ -206,9 +234,9 @@ class QuantityManager(BaseManager):
         Returns:
             A list of object types
         """
-        oid_type_map = self._ocel.objects.type_by_id
-
-        return oid_type_map.loc[oid_type_map.index.isin(self.objects)].drop_duplicates().to_list()
+        return self._types_of(
+            _OBJECTS_TABLE, OID_COL, OTYPE_COL, self._cleaned_union(OID_COL)
+        )
 
     def get_it_objects(self, item_type: str):
         """Return object ids involved for a given item type.
@@ -254,13 +282,15 @@ class QuantityManager(BaseManager):
         ).tolist()
 
     @property
-    def events(self):
+    def events(self) -> list[str]:
         """Return all event ids involved in quantity operations.
 
+        Only operations carry an event, so the initial quantities have no say here.
+
         Returns:
-            An array-like of unique event ids.
+            A list of unique event ids.
         """
-        return self.qop[EID_COL].dropna().unique()
+        return self._distinct(EID_COL, operations_only=True)
 
     @property
     def activities(self) -> list[str]:
@@ -270,10 +300,11 @@ class QuantityManager(BaseManager):
         Returns:
             A list of activities
         """
-        activity_id_map = self._ocel.events.activity_by_id
-
-        return (
-            activity_id_map.loc[activity_id_map.index.isin(self.events)].drop_duplicates().tolist()
+        return self._types_of(
+            _EVENTS_TABLE,
+            EID_COL,
+            ACTIVITY_COL,
+            self._cleaned_union(EID_COL, operations_only=True),
         )
 
     def get_it_events(self, item_type: str):
