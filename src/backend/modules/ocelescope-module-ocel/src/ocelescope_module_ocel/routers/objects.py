@@ -26,7 +26,10 @@ def get_object_types(ocel: ApiOcel) -> list[str]:
 )
 def get_object_counts(ocel: ApiOcel) -> dict[str, int]:
     # Ordered most frequent first, which the response preserves.
-    return {str(object_type): int(count) for object_type, count in ocel.objects.counts.items()}
+    return {
+        str(object_type): int(count)
+        for object_type, count in ocel.objects.counts.items()
+    }
 
 
 @router.get("/{ocel_id}/objects/ids", operation_id="objectIds")

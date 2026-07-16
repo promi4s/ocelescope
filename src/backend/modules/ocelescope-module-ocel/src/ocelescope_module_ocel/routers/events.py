@@ -28,7 +28,10 @@ def get_activities(ocel: ApiOcel) -> list[str]:
 )
 def get_event_counts(ocel: ApiOcel) -> dict[str, int]:
     # Ordered most frequent first, which the response preserves.
-    return {str(activity): int(count) for activity, count in ocel.events.activity_counts.items()}
+    return {
+        str(activity): int(count)
+        for activity, count in ocel.events.activity_counts.items()
+    }
 
 
 @router.get("/{ocel_id}/events/ids", operation_id="eventIds")

@@ -105,8 +105,7 @@ class ObjectsManager(BaseManager):
             field = (
                 "CASE "
                 + " ".join(
-                    f"WHEN c.{ident(name)} IS NOT NULL THEN {literal(name)}"
-                    for name in names
+                    f"WHEN c.{ident(name)} IS NOT NULL THEN {literal(name)}" for name in names
                 )
                 + " END"
             )

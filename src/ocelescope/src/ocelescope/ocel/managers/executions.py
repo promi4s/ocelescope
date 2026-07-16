@@ -99,7 +99,9 @@ class ExecutionsManager(BaseManager):
         params: list[object] = []
         where = self._type_filter(object_types, params)
 
-        sequences = [f'list(e."{ACTIVITY_COL}" ORDER BY {_EVENT_ORDER}) AS "{EXECUTION_ACT_LIST_COL}"']
+        sequences = [
+            f'list(e."{ACTIVITY_COL}" ORDER BY {_EVENT_ORDER}) AS "{EXECUTION_ACT_LIST_COL}"'
+        ]
         if include_timestamps:
             sequences.append(
                 f'list(e."{TIMESTAMP_COL}" ORDER BY {_EVENT_ORDER}) AS "{EXECUTION_TSTAMP_LIST_COL}"'

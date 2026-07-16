@@ -139,5 +139,7 @@ class EventsManager(BaseManager):
         return str(
             self._relation(
                 f'SELECT "{TIMESTAMP_COL}" FROM {TABLE} WHERE "{EID_COL}" = ?', [event_id]
-            ).df()[TIMESTAMP_COL].iloc[0]
+            )
+            .df()[TIMESTAMP_COL]
+            .iloc[0]
         )
