@@ -41,9 +41,7 @@ def get_event_ids(
     size: int = 10,
     page: int = 1,
 ) -> PaginatedResponse[list[str]]:
-    return paginate_ids(
-        ocel.events.table, EID_COL, search, page, size, order_by=[TIMESTAMP_COL]
-    )
+    return paginate_ids(ocel.events.table, EID_COL, search, page, size)
 
 
 @router.get(
