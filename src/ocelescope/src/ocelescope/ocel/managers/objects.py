@@ -4,7 +4,7 @@ from typing import Any, Iterable, cast
 
 import duckdb
 import pandas as pd
-import polars as pl
+import polars
 
 from ocelescope.ocel.constants.pm4py import (
     OBJECT_CHANGED_FIELD,
@@ -78,7 +78,7 @@ class ObjectsManager(BaseManager):
         self._replace(TABLE, contents)
 
     @property
-    def pl(self) -> pl.LazyFrame:
+    def pl(self) -> polars.LazyFrame:
         """
         Return the object table as a polars LazyFrame.
 
@@ -94,7 +94,7 @@ class ObjectsManager(BaseManager):
         return self.table.pl(lazy=True)
 
     @pl.setter
-    def pl(self, contents: pl.LazyFrame | pl.DataFrame) -> None:
+    def pl(self, contents: polars.LazyFrame | polars.DataFrame) -> None:
         self._replace(TABLE, contents)
 
     @property
@@ -152,7 +152,7 @@ class ObjectsManager(BaseManager):
         self._replace(CHANGES_TABLE, contents)
 
     @property
-    def changes_pl(self) -> pl.LazyFrame:
+    def changes_pl(self) -> polars.LazyFrame:
         """
         Return the dynamic object attribute change table as a polars LazyFrame.
 
@@ -164,7 +164,7 @@ class ObjectsManager(BaseManager):
         return self.changes_table.pl(lazy=True)
 
     @changes_pl.setter
-    def changes_pl(self, contents: pl.LazyFrame | pl.DataFrame) -> None:
+    def changes_pl(self, contents: polars.LazyFrame | polars.DataFrame) -> None:
         self._replace(CHANGES_TABLE, contents)
 
     @property

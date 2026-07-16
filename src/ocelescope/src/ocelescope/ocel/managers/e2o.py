@@ -4,7 +4,7 @@ from typing import Any
 
 import duckdb
 import pandas as pd
-import polars as pl
+import polars
 
 from ocelescope.ocel.constants.pm4py import (
     E2O_ACTIVITY,
@@ -87,7 +87,7 @@ class E2OManager(BaseManager):
         self._store(contents)
 
     @property
-    def pl(self) -> pl.LazyFrame:
+    def pl(self) -> polars.LazyFrame:
         """
         Return the E2O relation table as a polars LazyFrame.
 
@@ -103,7 +103,7 @@ class E2OManager(BaseManager):
         return self.table.pl(lazy=True)
 
     @pl.setter
-    def pl(self, contents: pl.LazyFrame | pl.DataFrame) -> None:
+    def pl(self, contents: polars.LazyFrame | polars.DataFrame) -> None:
         self._store(contents)
 
     def _store(self, contents: Any) -> None:

@@ -4,7 +4,7 @@ from typing import Any, cast
 
 import duckdb
 import pandas as pd
-import polars as pl
+import polars
 
 from ocelescope.ocel.constants.pm4py import ACTIVITY_COL, EID_COL, TIMESTAMP_COL
 from ocelescope.ocel.managers.base import BaseManager
@@ -61,7 +61,7 @@ class EventsManager(BaseManager):
         self._replace(TABLE, contents)
 
     @property
-    def pl(self) -> pl.LazyFrame:
+    def pl(self) -> polars.LazyFrame:
         """
         Return the event table as a polars LazyFrame.
 
@@ -78,7 +78,7 @@ class EventsManager(BaseManager):
         return self.table.pl(lazy=True)
 
     @pl.setter
-    def pl(self, contents: pl.LazyFrame | pl.DataFrame) -> None:
+    def pl(self, contents: polars.LazyFrame | polars.DataFrame) -> None:
         self._replace(TABLE, contents)
 
     @property

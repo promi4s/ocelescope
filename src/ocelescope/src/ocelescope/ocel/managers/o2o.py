@@ -4,7 +4,7 @@ from typing import Any
 
 import duckdb
 import pandas as pd
-import polars as pl
+import polars
 
 from ocelescope.ocel.constants.pm4py import (
     O2O_QUALIFIER,
@@ -76,7 +76,7 @@ class O2OManager(BaseManager):
         self._replace(TABLE, contents)
 
     @property
-    def pl(self) -> pl.LazyFrame:
+    def pl(self) -> polars.LazyFrame:
         """
         Return the O2O relation table as a polars LazyFrame.
 
@@ -92,7 +92,7 @@ class O2OManager(BaseManager):
         return self.table.pl(lazy=True)
 
     @pl.setter
-    def pl(self, contents: pl.LazyFrame | pl.DataFrame) -> None:
+    def pl(self, contents: polars.LazyFrame | polars.DataFrame) -> None:
         self._replace(TABLE, contents)
 
     @property
@@ -121,7 +121,7 @@ class O2OManager(BaseManager):
         )
 
     @property
-    def typed_pl(self) -> pl.LazyFrame:
+    def typed_pl(self) -> polars.LazyFrame:
         """
         Return the type-enriched O2O relation table as a polars LazyFrame.
 
