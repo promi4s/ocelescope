@@ -67,8 +67,7 @@ class DiscoveryTask(TaskBase):
             )
 
     def _build_resource_name(self, resource_type: str) -> str:
-        ocel = self.session.ocels[self.request.ocel_id]
-        ocel_name = ocel.name
+        ocel_name = self.session.ocels[self.request.ocel_id].name
         return f"{ocel_name}_{resource_type}"
 
     def _build_notification(self) -> SystemNotification:
