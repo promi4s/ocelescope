@@ -1,17 +1,6 @@
-"""The concrete ``FilterV1`` filters this module pushes.
-
-Each is one of ocelescope's filters plus the ``type`` discriminator the API needs
-to serialize a pipeline and read it back. The filtering itself -- what each keeps,
-and how -- belongs to the library, so there is nothing to restate here: these
-classes exist to name the library's filters over the wire.
-
-The module's own default is to *include* what a filter names, where the library
-leaves that open, so the two entity-type filters say so.
-"""
-
 from __future__ import annotations
 
-from typing import Literal
+from typing import Annotated, Literal, TypeAlias, Union
 
 from ocelescope.ocel.filter import (
     E2OCountFilter as _E2OCountFilter,
@@ -34,6 +23,10 @@ from ocelescope.ocel.filter import (
 from ocelescope.ocel.filter import (
     TimeFrameFilter as _TimeFrameFilter,
 )
+from pydantic import Field
+
+FILTER_SOURCE = "FilterV1"
+
 
 Mode = Literal["include", "exclude"]
 
@@ -80,3 +73,17 @@ class O2OCountFilter(_O2OCountFilter):
     """Keep objects by how many O2O relations of a given kind they have."""
 
     type: Literal["o2o_count"]
+
+
+NativeFilter: TypeAlias = Annotated[
+    Union[
+        TimeFrameFilter,
+        ActivityFilter,
+        ObjectTypeFilter,
+        EventAttributeFilter,
+        ObjectAttributeFilter,
+        E2OCountFilter,
+        O2OCountFilter,
+    ],
+    Field(discriminator="type"),
+]

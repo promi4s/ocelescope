@@ -3,7 +3,7 @@ from typing import cast
 from fastapi import APIRouter
 from ocelescope_backend.app.dependencies import ApiSession
 
-from ocelescope_module_filter.models import FILTER_SOURCE, NativeFilter
+from ocelescope_module_filter.filters import FILTER_SOURCE, NativeFilter
 
 router = APIRouter()
 
