@@ -43,8 +43,6 @@ def apply_filters(ocel: "OCEL", filters: Sequence[BaseFilter]) -> "OCEL":
 
     keeps: list[Keep] = [f.keep(ocel) for f in filters]
 
-    # Collected together: a filter that derives both id-sets from one intermediate
-    # then evaluates that shared work once.
     kept_events, kept_objects = pl.collect_all(
         [
             _intersect([k.events for k in keeps if k.events is not None], ocel.events.pl, EID_COL),
