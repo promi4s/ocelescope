@@ -73,6 +73,8 @@ def apply_filters(ocel: "OCEL", filters: Sequence[BaseFilter]) -> "OCEL":
         clone.close()
         raise
 
-    filtered = OCEL(clone, meta=ocel.meta)
+    filtered = OCEL(
+        clone,
+    )
     filtered.clean()
     return filtered

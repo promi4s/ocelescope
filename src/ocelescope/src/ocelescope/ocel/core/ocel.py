@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from os import PathLike
 from pathlib import Path
-from typing import Any, Literal, Sequence
+from typing import Literal, Sequence
 
 import duckdb
 import pandas as pd
@@ -27,9 +27,7 @@ from ocelescope.ocel.managers import (
     ObjectsManager,
     QuantityManager,
 )
-from ocelescope.ocel.managers.attributes import AttributeManager
 from ocelescope.ocel.managers.executions import ExecutionsManager
-from ocelescope.ocel.models.meta import OCELMeta
 from ocelescope.ocel.util.xes import create_ocel_from_xml, write_ocel_to_xes
 
 #: Name the destination database is attached under while :meth:`OCEL.to_duckdb` copies.
@@ -93,7 +91,6 @@ class OCEL:
     def __init__(
         self,
         connection: duckdb.DuckDBPyConnection,
-        meta: OCELMeta | None = None,
     ):
         """
         Args:
@@ -106,7 +103,6 @@ class OCEL:
         """
         self._con = connection
 
-        self.meta = meta or OCELMeta()
         self.extensions = ExtensionManager(self)
         self.objects = ObjectsManager(self)
         self.events = EventsManager(self)
@@ -194,14 +190,12 @@ class OCEL:
     # Construction
     # ------------------------------------------------------------------
     @classmethod
-    def from_duckdb(
-        cls, connection: duckdb.DuckDBPyConnection, meta: OCELMeta | None = None
-    ) -> OCEL:
+    def from_duckdb(cls, connection: duckdb.DuckDBPyConnection) -> OCEL:
         """Build an :class:`OCEL` on an existing DuckDB connection.
 
         An alias of the constructor that names what it does at the call site.
         """
-        return cls(connection, meta=meta)
+        return cls(connection)
 
     @classmethod
     def from_frames(
@@ -211,7 +205,6 @@ class OCEL:
         relations: Frame,
         o2o: Frame | None = None,
         object_changes: Frame | None = None,
-        meta: OCELMeta | None = None,
         quantityExtension: tuple[Frame, Frame, Frame] | None = None,
     ) -> OCEL:
         """
@@ -242,7 +235,7 @@ class OCEL:
         connection = duckdb.connect(":memory:")
         try:
             connection.execute("SET TimeZone='UTC'")
-            ocel = cls(connection, meta=meta)
+            ocel = cls(connection)
             # Each table goes in through its manager, which projects it back onto
             # the stored layout. Objects first: the object changes are stored with
             # one column per object attribute, so that table has to exist already.
@@ -274,7 +267,6 @@ class OCEL:
     def from_pm4py(
         cls,
         ocel: PM4PYOCEL,
-        meta: OCELMeta | None = None,
     ) -> OCEL:
         """
         Build an :class:`OCEL` from an existing PM4PY OCEL by writing its
@@ -289,13 +281,11 @@ class OCEL:
             relations=ocel.relations,
             o2o=ocel.o2o.rename(columns=_O2O_FROM_PM4PY),
             object_changes=ocel.object_changes,
-            meta=meta,
         )
 
     @staticmethod
     def read(
         path: str | Path,
-        meta: dict[str, Any] = {},
         variant: Literal["r4pm", "streamed"] = "r4pm",
     ) -> OCEL:
         """
@@ -333,7 +323,6 @@ class OCEL:
         from ocelescope.ocel.io.importers.quantities import import_quantities
 
         path = Path(path)
-        ocel_meta = OCELMeta(path=path, extra=meta)
 
         if variant == "r4pm" and path.suffix in _R4PM_SUFFIXES:
             tables = r4pm.df.import_ocel(str(path))
@@ -346,7 +335,6 @@ class OCEL:
                 relations=tables["relations"],
                 o2o=o2o.rename(_O2O_FROM_PM4PY) if o2o is not None else None,
                 object_changes=tables.get("object_changes"),
-                meta=ocel_meta,
             )
             try:
                 import_quantities(path, ocel.con)
@@ -363,10 +351,14 @@ class OCEL:
             connection.close()
             raise
 
-        return OCEL(connection, meta=ocel_meta)
+        return OCEL(
+            connection,
+        )
 
     @staticmethod
-    def read_duckdb(db_path: str | Path, meta: OCELMeta | None = None) -> OCEL:
+    def read_duckdb(
+        db_path: str | Path,
+    ) -> OCEL:
         """
         Open a flat DuckDB database (as written by :meth:`to_duckdb` or
         ``convert_ocel_duckdb``) as an :class:`OCEL`.
@@ -389,7 +381,7 @@ class OCEL:
             connection.close()
             raise
 
-        return OCEL(connection, meta=meta)
+        return OCEL(connection)
 
     def to_duckdb(self, db_path: str | Path) -> None:
         """
@@ -505,12 +497,12 @@ class OCEL:
 
         write_ocel_to_xes(ocel=self, object_type=object_type, path=path)
 
-    def __deepcopy__(self, memo: dict[int, Any]):
-        from copy import deepcopy
+    def __deepcopy__(
+        self,
+    ):
 
         return OCEL(
             self._copy_database(),
-            meta=OCELMeta(extra=deepcopy(self.meta.extra, memo)),
         )
 
     def _copy_database(self) -> duckdb.DuckDBPyConnection:

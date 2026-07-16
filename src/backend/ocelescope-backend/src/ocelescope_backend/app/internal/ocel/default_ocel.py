@@ -4,14 +4,14 @@ from copy import deepcopy
 from functools import cached_property
 from typing import Any
 
-from pydantic import Field, FilePath
-
 import ocelescope_backend.app.internal.util.misc as util
-from ocelescope import OCEL
 from ocelescope_backend.app.internal.config import config
 from ocelescope_backend.app.internal.logger import logger
 from ocelescope_backend.app.internal.model.base import ApiBaseModel
 from ocelescope_backend.app.internal.session import Session
+from pydantic import Field, FilePath
+
+from ocelescope import OCEL
 
 OCEL_BASE_PATH = None
 DEFAULT_OCELS: list["DefaultOCEL"] = []
@@ -174,7 +174,7 @@ def load_default_ocels() -> list[Session]:
         # Init dummy session with consistent key (for API playground)
         ocel = getattr(ocel_data, "__ocel")
         session = Session(id=key)
-        session.add_ocel(ocel)
+        session.add_ocel(ocel, ocel_data.name)
         sessions.append(session)
 
     return sessions

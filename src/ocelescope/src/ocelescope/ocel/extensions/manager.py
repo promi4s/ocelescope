@@ -49,7 +49,7 @@ class ExtensionManager:
         self.ocel = ocel
         self._extensions: Dict[type[OCELExtension], OCELExtension] = {}
 
-    def load(self, extensions: list[type[OCELExtension]]):
+    def load(self, path: str | Path, extensions: list[type[OCELExtension]]):
         """Attempt to load the given extension classes from the OCEL file.
 
         For each extension class, this method:
@@ -62,10 +62,7 @@ class ExtensionManager:
             extensions: A list of OCELExtension subclasses to check for and load.
         """
 
-        if not self.ocel.meta.path:
-            return
-
-        for instance in import_extensions(Path(self.ocel.meta.path), extensions):
+        for instance in import_extensions(Path(path), extensions):
             self._extensions[type(instance)] = instance
 
     def get(self, ext_type: type[T]) -> T | None:

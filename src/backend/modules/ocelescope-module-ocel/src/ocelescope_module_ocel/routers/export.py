@@ -62,9 +62,11 @@ def download_ocel(
     summary="Download OCEL as a xes",
     operation_id="downloadFlatLog",
 )
-def download_flat_log(ocel: ApiOcel, object_type_name: str) -> TempFileResponse:
-    name = ocel.meta.extra["name"]
-    tmp_file_prefix = datetime.now().strftime("%Y%m%d-%H%M%S") + "-" + name
+def download_flat_log(
+    ocel: ApiOcel, ocel_id: str, session: ApiSession, object_type_name: str
+) -> TempFileResponse:
+    name = session.ocels[ocel_id].name
+    tmp_file_prefix = f"{datetime.now().strftime('%Y%m%d-%H%M%S')}-{name}"
     file_response = TempFileResponse(
         prefix=tmp_file_prefix, suffix=".xes", filename=f"{name}_{object_type_name}.xes"
     )
@@ -85,14 +87,16 @@ def download_flat_log(ocel: ApiOcel, object_type_name: str) -> TempFileResponse:
 )
 def download_variant_flat_log(
     ocel: ApiOcel,
+    session: ApiSession,
+    ocel_id: str,
     object_type: str,
     variant_ids: Annotated[list[str], Query(min_length=1)],
 ) -> TempFileResponse:
+    name = session.ocels[ocel_id].name
     object_ids = variant_util.object_ids_for_variants(ocel, object_type, variant_ids)
     if not object_ids:
         raise NotFound("No objects were found for the given variants")
 
-    name = ocel.meta.extra["name"]
     tmp_file_prefix = datetime.now().strftime("%Y%m%d-%H%M%S") + "-" + name
     file_response = TempFileResponse(
         prefix=tmp_file_prefix, suffix=".xes", filename=f"{name}_{object_type}.xes"

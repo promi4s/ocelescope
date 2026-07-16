@@ -3,7 +3,6 @@ from typing import Sequence
 
 from ocelescope.ocel.extensions.base_extension import OCELExtension
 from ocelescope.ocel.io import export_duckdb_ocel
-from ocelescope.ocel.models.meta import OCELMeta
 
 from ocelescope import OCEL, BaseFilter
 
@@ -34,11 +33,6 @@ class SessionOCEL:
         self._filters_by_source: dict[str, list[BaseFilter]] = {}
         self._filtered_db_path: Path | None = None
 
-    def _meta(self) -> OCELMeta:
-        return OCELMeta(
-            id=self.id, extra={"name": self.name, "upload_date": self.created_at}
-        )
-
     def _all_filters(self) -> list[BaseFilter]:
         return [f for pipeline in self._filters_by_source.values() for f in pipeline]
 
@@ -67,7 +61,7 @@ class SessionOCEL:
         writing to it. Its tables are read out of the file only as they are asked
         for, so this call itself loads nothing.
         """
-        ocel = OCEL.read_duckdb(self._active_path(use_original), meta=self._meta())
+        ocel = OCEL.read_duckdb(self._active_path(use_original))
         if self.extensions:
             ocel.extensions.set(self.extensions)
         return ocel

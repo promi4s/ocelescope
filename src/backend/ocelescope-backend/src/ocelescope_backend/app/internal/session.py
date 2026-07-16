@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import json
 import tempfile
-import uuid
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, Hashable, Sequence, Type, TypeVar, cast
+from uuid import uuid4
 
 from ocelescope.ocel.extensions.base_extension import OCELExtension
 from ocelescope.ocel.io import convert_ocel_duckdb
@@ -28,7 +28,7 @@ class Session:
         self,
         id: str | None = None,
     ):
-        self.id = id or str(uuid.uuid4())
+        self.id = id or str(uuid4())
 
         # Tasks
         self._tasks: dict[str, TaskBase] = {}
@@ -93,7 +93,7 @@ class Session:
         )
 
     def update_state(self):
-        self.state = str(uuid.uuid4())
+        self.state = str(uuid4())
 
     # region OCEL management
     def _register_ocel(
@@ -114,23 +114,24 @@ class Session:
         sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
         return id
 
-    def add_ocel(self, ocel: OCEL) -> str:
+    def add_ocel(self, ocel: OCEL, name: str) -> str:
         """Persist an in-memory OCEL to a DuckDB file and register a handle."""
-        ocel_id = ocel.meta.id
+        ocel_id = str(uuid4())
+
         db_path = self._ocel_dir / f"{ocel_id}.duckdb"
         ocel.to_duckdb(db_path)
 
         return self._register_ocel(
             ocel_id,
             db_path,
-            name=ocel.meta.extra.get("name") or "OCEL",
-            created_at=ocel.meta.extra.get("upload_date") or datetime.now().isoformat(),
+            name,
+            created_at=datetime.now().isoformat(),
             extensions=ocel.extensions.all(),
         )
 
     def add_ocel_from_file(self, source_path: Path, name: str, created_at: str) -> str:
         """Stream an OCEL file straight into a DuckDB file without materializing it."""
-        ocel_id = str(uuid.uuid4())
+        ocel_id = str(uuid4())
         db_path = self._ocel_dir / f"{ocel_id}.duckdb"
         convert_ocel_duckdb(source_path, db_path)
 
@@ -195,7 +196,7 @@ class Session:
     # endregion
     # region Resource management
     def add_resource(self, resource: ResourceStore) -> str:
-        id = str(uuid.uuid4())
+        id = str(uuid4())
 
         self._resources[id] = resource
 

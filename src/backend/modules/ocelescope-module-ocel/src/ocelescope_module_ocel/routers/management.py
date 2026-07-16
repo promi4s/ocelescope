@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from datetime import datetime
 from typing import Optional
 
 from fastapi import APIRouter, Query, Response
@@ -74,9 +73,8 @@ def import_default_ocel(
         raise NotFound("The given default OCEL was not found")
 
     ocel = default_ocel.get_ocel_copy(use_abbreviations=False)
-    ocel.meta.extra = {"name": default_ocel.name, "upload_date": str(datetime.now())}
 
-    session.add_ocel(ocel)
+    session.add_ocel(ocel, name=default_ocel.name)
     response.status_code = 200
     return response
 

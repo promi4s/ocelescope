@@ -94,17 +94,12 @@ def import_xes_task(
     finally:
         file_path.unlink(missing_ok=True)
 
-    ocel.meta.extra = {
-        "name": original_name.stem,
-        "upload_date": datetime.now().isoformat(),
-    }
-
-    ocel_id = session.add_ocel(ocel)
+    ocel_id = session.add_ocel(ocel, name=original_name.stem)
 
     return [
         SystemNotification(
             title="XES was uploaded successfully",
-            message=f"{ocel.meta.extra.get('name', None) or 'OCEL '} was uploaded successfully",
+            message=f"{original_name.stem} was uploaded successfully",
             notification_type="info",
             link=OcelLink(ocel_id=ocel_id),
         ),
