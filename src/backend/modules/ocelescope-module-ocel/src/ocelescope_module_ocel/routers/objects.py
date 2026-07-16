@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter
 from ocelescope.ocel.constants.pm4py import OID_COL, OTYPE_COL
-from ocelescope_backend.app.dependencies import ApiOCELDb
+from ocelescope_backend.app.dependencies import ApiOcel
 from ocelescope_backend.app.internal.model.base import PaginatedResponse
 
 from ocelescope_module_ocel.models import ObjectTypeVariants
@@ -15,8 +15,8 @@ router = APIRouter()
 
 
 @router.get("/{ocel_id}/objects/types", operation_id="objectTypes")
-def get_object_types(ocel_db: ApiOCELDb) -> list[str]:
-    types = ocel_db.objects.project(f'"{OTYPE_COL}"').distinct().fetchall()
+def get_object_types(ocel: ApiOcel) -> list[str]:
+    types = ocel.objects.table.project(f'"{OTYPE_COL}"').distinct().fetchall()
     return sorted(row[0] for row in types)
 
 
@@ -25,9 +25,9 @@ def get_object_types(ocel_db: ApiOCELDb) -> list[str]:
     response_model=dict[str, int],
     operation_id="objectCounts",
 )
-def get_object_counts(ocel_db: ApiOCELDb) -> dict[str, int]:
+def get_object_counts(ocel: ApiOcel) -> dict[str, int]:
     counts = (
-        ocel_db.objects.aggregate(
+        ocel.objects.table.aggregate(
             f'"{OTYPE_COL}" AS type, count(*) AS count',
             group_expr=f'"{OTYPE_COL}"',
         )
@@ -39,12 +39,12 @@ def get_object_counts(ocel_db: ApiOCELDb) -> dict[str, int]:
 
 @router.get("/{ocel_id}/objects/ids", operation_id="objectIds")
 def get_object_ids(
-    ocel_db: ApiOCELDb,
+    ocel: ApiOcel,
     search: str | None = None,
     size: int = 10,
     page: int = 1,
 ) -> PaginatedResponse[list[str]]:
-    return paginate_ids(ocel_db.objects, OID_COL, search, page, size)
+    return paginate_ids(ocel.objects.table, OID_COL, search, page, size)
 
 
 @router.get(
@@ -57,5 +57,5 @@ def get_object_ids(
     ),
     operation_id="objectVariants",
 )
-def get_object_variants(ocel_db: ApiOCELDb, object_type: str) -> ObjectTypeVariants:
-    return variant_util.object_type_variants(ocel_db, object_type)
+def get_object_variants(ocel: ApiOcel, object_type: str) -> ObjectTypeVariants:
+    return variant_util.object_type_variants(ocel, object_type)

@@ -1,11 +1,11 @@
-"""E2O / O2O relation-count summaries and combinations (DuckDB over OCELDb)."""
+"""E2O / O2O relation-count summaries and combinations, computed in DuckDB."""
 
 from __future__ import annotations
 
 from typing import Annotated
 
 from fastapi import APIRouter, Query
-from ocelescope_backend.app.dependencies import ApiOCELDb
+from ocelescope_backend.app.dependencies import ApiOcel
 from ocelescope_backend.app.internal.model.base import PaginatedResponse
 
 from ocelescope_module_ocel.models import RelationCombination, RelationCountSummary
@@ -17,7 +17,7 @@ router = APIRouter()
 
 @router.get("/{ocel_id}/relations/e2o", operation_id="e2o")
 def get_e2o(
-    ocel_db: ApiOCELDb,
+    ocel: ApiOcel,
     direction: Direction = "source",
     source_types: Annotated[list[str] | None, Query()] = None,
     target_types: Annotated[list[str] | None, Query()] = None,
@@ -28,7 +28,7 @@ def get_e2o(
     drop_constant: Annotated[bool, Query()] = False,
 ) -> PaginatedResponse[list[RelationCountSummary]]:
     return relation_util.relation_summary(
-        ocel_db,
+        ocel,
         "e2o",
         direction,
         source_types,
@@ -43,7 +43,7 @@ def get_e2o(
 
 @router.get("/{ocel_id}/relations/o2o", operation_id="o2o")
 def get_o2o(
-    ocel_db: ApiOCELDb,
+    ocel: ApiOcel,
     direction: Direction = "source",
     source_types: Annotated[list[str] | None, Query()] = None,
     target_types: Annotated[list[str] | None, Query()] = None,
@@ -54,7 +54,7 @@ def get_o2o(
     drop_constant: Annotated[bool, Query()] = False,
 ) -> PaginatedResponse[list[RelationCountSummary]]:
     return relation_util.relation_summary(
-        ocel_db,
+        ocel,
         "o2o",
         direction,
         source_types,
@@ -69,15 +69,15 @@ def get_o2o(
 
 @router.get("/{ocel_id}/relations/e2o/combinations", operation_id="e2oCombinations")
 def get_e2o_combinations(
-    ocel_db: ApiOCELDb,
+    ocel: ApiOcel,
     direction: Direction = "source",
 ) -> list[RelationCombination]:
-    return relation_util.combinations(ocel_db, "e2o", direction)
+    return relation_util.combinations(ocel, "e2o", direction)
 
 
 @router.get("/{ocel_id}/relations/o2o/combinations", operation_id="o2oCombinations")
 def get_o2o_combinations(
-    ocel_db: ApiOCELDb,
+    ocel: ApiOcel,
     direction: Direction = "source",
 ) -> list[RelationCombination]:
-    return relation_util.combinations(ocel_db, "o2o", direction)
+    return relation_util.combinations(ocel, "o2o", direction)

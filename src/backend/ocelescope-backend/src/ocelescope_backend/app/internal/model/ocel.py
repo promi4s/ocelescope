@@ -2,25 +2,21 @@ from pathlib import Path
 from typing import Sequence
 
 from ocelescope.ocel.extensions.base_extension import OCELExtension
-from ocelescope.ocel.io import export_duckdb_ocel, load_ocel_duckdb
+from ocelescope.ocel.io import export_duckdb_ocel
 from ocelescope.ocel.models.meta import OCELMeta
 
-from ocelescope import (
-    OCEL,
-)
-from ocelescope_backend.app.internal.ocel.filters import ModuleFilter, apply_filters
-from ocelescope_backend.app.internal.ocel.ocel_db import OCELDb
+from ocelescope import OCEL
+from ocelescope_backend.app.internal.ocel.filters import ModuleFilter
 
 
 class SessionOCEL:
     """A handle to an OCEL persisted as a DuckDB file on disk.
 
-    The OCEL is never kept in memory. A global filter pipeline (:class:`ModuleFilter`
-    s, grouped by the module that set them) defines a *view*; it is applied **once**
-    -- when the pipeline changes -- into a pre-computed filtered DuckDB file. Both
-    views then read that file: :meth:`ocel` materializes the pm4py :class:`OCEL`,
-    :meth:`ocel_db` opens a RAM-friendly :class:`OCELDb`. So a per-request access
-    never re-runs the filter. Passing ``use_original`` reads the origin instead.
+    The log is never held in the session. A global filter pipeline
+    (:class:`ModuleFilter` s, grouped by the module that set them) defines a *view*,
+    applied **once** -- when the pipeline changes -- into a filtered DuckDB file
+    beside the origin. Reads then open that file, so a per-request access never
+    re-runs the filter; ``use_original`` reads the origin instead.
     """
 
     def __init__(
@@ -40,43 +36,49 @@ class SessionOCEL:
         self._filtered_db_path: Path | None = None
 
     def _meta(self) -> OCELMeta:
-        return OCELMeta(
-            id=self.id, extra={"name": self.name, "upload_date": self.created_at}
-        )
+        return OCELMeta(id=self.id, extra={"name": self.name, "upload_date": self.created_at})
 
     def _all_filters(self) -> list[ModuleFilter]:
         return [f for pipeline in self._filters_by_source.values() for f in pipeline]
 
     def _active_path(self, use_original: bool) -> Path:
-        """The DuckDB file to read: the origin, or the (once-computed) filtered one."""
+        """The DuckDB file to read: the origin, or the (once-computed) filtered one.
+
+        The filtered file is built by reading the origin, applying the pipeline and
+        writing the result back out -- so the cost is paid here, when the pipeline
+        changes, rather than on every read.
+        """
         filters = self._all_filters()
         if use_original or not filters:
             return self.db_path
         if self._filtered_db_path is None:
             filtered = self.db_path.with_suffix(".filtered.duckdb")
-            apply_filters(self.db_path, filtered, filters)
+            with OCEL.read_duckdb(self.db_path) as origin:
+                with origin.filter(filters) as subset:
+                    subset.to_duckdb(filtered)
             self._filtered_db_path = filtered
         return self._filtered_db_path
 
     def ocel(self, use_original: bool = False) -> OCEL:
-        """The materialized pm4py OCEL (filtered unless ``use_original``)."""
-        ocel = load_ocel_duckdb(self._active_path(use_original), meta=self._meta())
+        """The OCEL over the active DuckDB file (filtered unless ``use_original``).
+
+        Opened read-only: the file is the session's, and a request has no business
+        writing to it. Its tables are read out of the file only as they are asked
+        for, so this call itself loads nothing.
+        """
+        ocel = OCEL.read_duckdb(self._active_path(use_original), meta=self._meta())
         if self.extensions:
             ocel.extensions.set(self.extensions)
         return ocel
-
-    def ocel_db(self, use_original: bool = False) -> OCELDb:
-        """A RAM-friendly DuckDB reader (filtered unless ``use_original``)."""
-        return OCELDb(self._active_path(use_original), meta=self._meta())
 
     def export(self, target_path: Path, use_original: bool = False) -> None:
         """Write the OCEL to ``target_path`` straight from the DuckDB store.
 
         Streams the log (and quantities) from the active DuckDB file entity-by-entity
-        rather than materializing the whole OCEL into pandas, then re-exports the
-        in-memory session extensions (which aren't persisted to DuckDB) so the output
-        matches :meth:`ocel` + :meth:`OCEL.write`. The target format is chosen from the
-        file extension (``.json`` / ``.xml`` / ``.sqlite``).
+        rather than materializing the whole OCEL, then re-exports the in-memory
+        session extensions (which aren't persisted to DuckDB) so the output matches
+        :meth:`ocel` + :meth:`OCEL.write`. The target format is chosen from the file
+        extension (``.json`` / ``.xml`` / ``.sqlite``).
         """
         export_duckdb_ocel(self._active_path(use_original), target_path)
         for extension in self.extensions:

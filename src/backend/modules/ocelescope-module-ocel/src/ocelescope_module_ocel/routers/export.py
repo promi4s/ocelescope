@@ -2,12 +2,11 @@
 
 ``downloadOCEL`` streams the log straight from the DuckDB store (no materialization).
 The two XES routes flatten a chosen object type into a per-object trace log, which
-is pm4py-only, so they materialize the OCEL through the handle.
+is pm4py-only, so those do pull the tables they need into memory.
 """
 
 from __future__ import annotations
 
-import tempfile
 from datetime import datetime
 from pathlib import Path
 from typing import Annotated, Literal
@@ -16,12 +15,11 @@ import polars as pl
 from fastapi import APIRouter, Query
 from ocelescope.ocel.constants.misc import OCELFileExtensions
 from ocelescope.ocel.constants.pm4py import OID_COL
-from ocelescope_backend.app.dependencies import ApiOCELDb, ApiSession
+from ocelescope_backend.app.dependencies import ApiOcel, ApiSession
 from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.model.response import TempFileResponse
-from ocelescope_backend.app.internal.ocel.filters import apply_filters
-from ocelescope_backend.app.internal.ocel.filters.base import Keep, ModuleFilter
-from ocelescope_backend.app.internal.ocel.ocel_db import OCELDb
+from ocelescope import OCEL
+from ocelescope_backend.app.internal.ocel.filters import Keep, ModuleFilter
 
 from ocelescope_module_ocel.util import variants as variant_util
 
@@ -33,7 +31,7 @@ class _ObjectIdKeep(ModuleFilter):
 
     object_ids: list[str]
 
-    def keep(self, ocel: OCELDb) -> Keep:
+    def keep(self, ocel: OCEL) -> Keep:
         return Keep(objects=pl.LazyFrame({OID_COL: self.object_ids}))
 
 
@@ -64,8 +62,7 @@ def download_ocel(
     summary="Download OCEL as a xes",
     operation_id="downloadFlatLog",
 )
-def download_flat_log(ocel_db: ApiOCELDb, object_type_name: str) -> TempFileResponse:
-    ocel = ocel_db.materialize()
+def download_flat_log(ocel: ApiOcel, object_type_name: str) -> TempFileResponse:
     name = ocel.meta.extra["name"]
     tmp_file_prefix = datetime.now().strftime("%Y%m%d-%H%M%S") + "-" + name
     file_response = TempFileResponse(
@@ -87,27 +84,20 @@ def download_flat_log(ocel_db: ApiOCELDb, object_type_name: str) -> TempFileResp
     operation_id="downloadVariantFlatLog",
 )
 def download_variant_flat_log(
-    ocel_db: ApiOCELDb,
+    ocel: ApiOcel,
     object_type: str,
     variant_ids: Annotated[list[str], Query(min_length=1)],
 ) -> TempFileResponse:
-    object_ids = variant_util.object_ids_for_variants(ocel_db, object_type, variant_ids)
+    object_ids = variant_util.object_ids_for_variants(ocel, object_type, variant_ids)
     if not object_ids:
         raise NotFound("No objects were found for the given variants")
 
-    name = ocel_db.meta.extra["name"]
+    name = ocel.meta.extra["name"]
     tmp_file_prefix = datetime.now().strftime("%Y%m%d-%H%M%S") + "-" + name
     file_response = TempFileResponse(
         prefix=tmp_file_prefix, suffix=".xes", filename=f"{name}_{object_type}.xes"
     )
 
-    with tempfile.TemporaryDirectory() as tmp:
-        filtered_db = Path(tmp) / "variant.duckdb"
-        apply_filters(
-            ocel_db.db_path, filtered_db, [_ObjectIdKeep(object_ids=object_ids)]
-        )
-        with OCELDb(filtered_db, meta=ocel_db.meta) as filtered:
-            variant_ocel = filtered.materialize()
-
-    variant_ocel.write_xes(object_type, Path(file_response.tmp_path))
+    with ocel.filter([_ObjectIdKeep(object_ids=object_ids)]) as variant_ocel:
+        variant_ocel.write_xes(object_type, Path(file_response.tmp_path))
     return file_response

@@ -124,6 +124,25 @@ class OCEL:
         """The DuckDB connection backing this OCEL."""
         return self._con
 
+    def sql(self, query: str, params: list[object] | None = None) -> duckdb.DuckDBPyRelation:
+        """Run a read query over the stored tables, returning a lazy relation.
+
+        The escape hatch for reads the managers cannot express -- multi-table joins,
+        list aggregation, window functions. Reference the stored tables by name
+        (``events``, ``objects``, ``e2o``, ``o2o``, ``object_changes``, and the
+        quantity tables when present); note those are the *stored* shapes, not the
+        reshaped ones the managers hand out.
+
+        The query runs on its own cursor, so its result can be combined with a
+        manager's table in a single follow-up query.
+
+        Bind caller-supplied values through ``params`` (``?`` placeholders) rather
+        than formatting them into ``query``, so they stay injection-safe.
+        """
+        cursor = self._con.cursor()
+        cursor.execute("SET TimeZone='UTC'")
+        return cursor.sql(query, params=params) if params else cursor.sql(query)
+
     def clean(self) -> None:
         """Drop everything the log no longer supports, in place.
 

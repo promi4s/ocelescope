@@ -1,4 +1,4 @@
-"""Attribute summaries over ``OCELDb``, computed entirely in DuckDB.
+"""Attribute summaries, computed entirely in DuckDB.
 
 A *merged table* exposes ``ocel:entity_id`` / ``ocel:entity_type`` plus one column per
 attribute -- one row per event (``merged_event_table``) or per object value incl.
@@ -25,7 +25,8 @@ from ocelescope.ocel.constants.pm4py import (
     OTYPE_COL,
     TIMESTAMP_COL,
 )
-from ocelescope_backend.app.internal.ocel.ocel_db import OCELDb
+
+from ocelescope import OCEL
 
 from ocelescope_module_ocel.models import AggregatedAttribute, TypedAttribute
 
@@ -91,7 +92,7 @@ def _present(name: str, duckdb_type: str) -> str:
 
 
 def merged_event_table(
-    ocel_db: OCELDb,
+    ocel: OCEL,
     attribute_names: list[str] | None = None,
     entity_names: list[str] | None = None,
 ) -> duckdb.DuckDBPyRelation:
@@ -103,7 +104,7 @@ def merged_event_table(
     """
     if attribute_names is None:
         meta = {EID_COL, ACTIVITY_COL, TIMESTAMP_COL}
-        attribute_names = [c for c in ocel_db.events.columns if c not in meta]
+        attribute_names = [c for c in ocel.events.table.columns if c not in meta]
 
     params: list[object] = []
     columns = ", ".join(
@@ -114,11 +115,11 @@ def merged_event_table(
         ]
     )
     where = _type_filter(_ident(ACTIVITY_COL), entity_names, params)
-    return ocel_db.sql(f"SELECT {columns} FROM events {where}", params)
+    return ocel.sql(f"SELECT {columns} FROM events {where}", params)
 
 
 def merged_object_table(
-    ocel_db: OCELDb,
+    ocel: OCEL,
     attribute_names: list[str] | None = None,
     entity_names: list[str] | None = None,
 ) -> duckdb.DuckDBPyRelation:
@@ -134,11 +135,11 @@ def merged_object_table(
     """
     if attribute_names is None:
         meta = {OID_COL, OTYPE_COL}
-        attribute_names = [c for c in ocel_db.objects.columns if c not in meta]
+        attribute_names = [c for c in ocel.objects.table.columns if c not in meta]
 
     # objects and object_changes share the attribute schema; UNION ALL BY NAME aligns
     # them and fills any attribute missing from one side with NULL there.
-    change_cols = set(ocel_db.object_changes.columns)
+    change_cols = set(ocel.objects.dynamic_attribute_names)
     object_columns = ", ".join(
         [
             f"{_ident(OID_COL)} AS {_ident(ENTITY_ID)}",
@@ -146,7 +147,7 @@ def merged_object_table(
             *(
                 _ident(name)
                 for name in attribute_names
-                if name in ocel_db.objects.columns
+                if name in ocel.objects.table.columns
             ),
         ]
     )
@@ -160,7 +161,7 @@ def merged_object_table(
     params: list[object] = []
     objects_where = _type_filter(_ident(OTYPE_COL), entity_names, params)
     changes_where = _type_filter(f"o.{_ident(OTYPE_COL)}", entity_names, params)
-    return ocel_db.sql(
+    return ocel.sql(
         f"SELECT {object_columns} FROM objects {objects_where} "
         f"UNION ALL BY NAME "
         f"SELECT {change_columns} FROM object_changes c "
@@ -170,18 +171,18 @@ def merged_object_table(
 
 
 def merged_table(
-    ocel_db: OCELDb,
+    ocel: OCEL,
     entity_type: EntityType,
     attribute_names: list[str] | None = None,
     entity_names: list[str] | None = None,
 ) -> duckdb.DuckDBPyRelation:
     """Dispatch to ``merged_event_table`` / ``merged_object_table`` by entity kind."""
     merged = merged_event_table if entity_type == "events" else merged_object_table
-    return merged(ocel_db, attribute_names, entity_names)
+    return merged(ocel, attribute_names, entity_names)
 
 
 def attribute_names(
-    ocel_db: OCELDb,
+    ocel: OCEL,
     entity_type: EntityType,
     attribute_names: list[str] | None = None,
     entity_names: list[str] | None = None,
@@ -194,7 +195,7 @@ def attribute_names(
     Present-filtering keeps this in step with ``aggregate_attributes`` (which omits
     value-less attributes), so pages and totals stay consistent.
     """
-    table = merged_table(ocel_db, entity_type, attribute_names, entity_names)
+    table = merged_table(ocel, entity_type, attribute_names, entity_names)
     types = dict(zip(table.columns, (str(t) for t in table.types)))
     names = [c for c in table.columns if c not in (ENTITY_ID, ENTITY_TYPE)]
     if not names:

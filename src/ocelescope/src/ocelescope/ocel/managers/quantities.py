@@ -38,6 +38,20 @@ class QuantityManager(BaseManager):
         qop: DataFrame containing *quantity operations* per event, object, and item type.
     """
 
+    @property
+    def has_quantities(self) -> bool:
+        """Whether the log stores initial quantities at all.
+
+        Asks whether the table is *there*, which is not the same as whether it has
+        rows -- a caller writing SQL against it needs to know before it runs.
+        """
+        return self._has_table(QUANTITIES_TABLE)
+
+    @property
+    def has_operations(self) -> bool:
+        """Whether the log stores quantity operations at all."""
+        return self._has_table(QUANTITY_OPERATIONS_TABLE)
+
     def _read(self, table: str, columns: list[str]) -> pd.DataFrame:
         """Read a quantity table, or an empty frame when the OCEL carries no extension.
 

@@ -20,7 +20,8 @@ from ocelescope.ocel.constants.pm4py import (
     OTYPE_COL,
 )
 from ocelescope_backend.app.internal.model.base import PaginatedResponse
-from ocelescope_backend.app.internal.ocel.ocel_db import OCELDb
+
+from ocelescope import OCEL
 
 from ocelescope_module_ocel.models import RelationCombination, RelationCountSummary
 
@@ -70,7 +71,7 @@ def _normalized_relation(kind: RelationKind, direction: Direction) -> str:
 
 
 def relation_summary(
-    ocel_db: OCELDb,
+    ocel: OCEL,
     kind: RelationKind,
     direction: Direction = "source",
     source_types: list[str] | None = None,
@@ -155,7 +156,7 @@ def relation_summary(
         select.append("q.qualifiers")
 
     query = f"WITH {', '.join(ctes)} SELECT {', '.join(select)} FROM summary s {join}"
-    rows = ocel_db.sql(query, params).fetchall()
+    rows = ocel.sql(query, params).fetchall()
 
     summaries: list[RelationCountSummary] = []
     for row in rows:
@@ -196,7 +197,7 @@ def relation_summary(
 
 
 def combinations(
-    ocel_db: OCELDb,
+    ocel: OCEL,
     kind: RelationKind,
     direction: Direction = "source",
 ) -> list[RelationCombination]:
@@ -212,5 +213,5 @@ def combinations(
     )
     return [
         RelationCombination(source=src_type, target=tgt_type, qualifier=qualifier or "")
-        for src_type, tgt_type, qualifier in ocel_db.sql(query).fetchall()
+        for src_type, tgt_type, qualifier in ocel.sql(query).fetchall()
     ]

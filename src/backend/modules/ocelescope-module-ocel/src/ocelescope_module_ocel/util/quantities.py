@@ -1,4 +1,4 @@
-"""Quantity-extension info over ``OCELDb`` (DuckDB SQL).
+"""Quantity-extension info, computed in DuckDB.
 
 Mirrors the ``QuantityManager``: rows with a zero ``qel:quantity`` are dropped
 (null is kept, matching the pandas ``.ne(0)`` mask); item types / objects come from
@@ -10,16 +10,17 @@ from __future__ import annotations
 
 from ocelescope.ocel.constants.pm4py import ACTIVITY_COL, EID_COL, OID_COL, OTYPE_COL
 from ocelescope.ocel.constants.quantity import QEL_ITEM_TYPE, QEL_QUANTITY
-from ocelescope_backend.app.internal.ocel.ocel_db import OCELDb
+
+from ocelescope import OCEL
 
 from ocelescope_module_ocel.models import QuantityInfo
 
 _CLEAN = f'("{QEL_QUANTITY}" != 0 OR "{QEL_QUANTITY}" IS NULL)'
 
 
-def quantity_info(ocel_db: OCELDb) -> QuantityInfo:
-    has_quantities = ocel_db.quantities is not None
-    has_operations = ocel_db.quantity_operations is not None
+def quantity_info(ocel: OCEL) -> QuantityInfo:
+    has_quantities = ocel.quantities.has_quantities
+    has_operations = ocel.quantities.has_operations
     if not has_quantities and not has_operations:
         return QuantityInfo(
             item_types=[],
@@ -43,7 +44,7 @@ def quantity_info(ocel_db: OCELDb) -> QuantityInfo:
         union = cleaned_union(column, operations_only=operations_only)
         if not union:
             return []
-        rows = ocel_db.sql(
+        rows = ocel.sql(
             f'SELECT DISTINCT "{column}" FROM ({union}) WHERE "{column}" IS NOT NULL'
         ).fetchall()
         return [row[0] for row in rows]
@@ -55,7 +56,7 @@ def quantity_info(ocel_db: OCELDb) -> QuantityInfo:
     object_types = (
         [
             row[0]
-            for row in ocel_db.sql(
+            for row in ocel.sql(
                 f'SELECT DISTINCT "{OTYPE_COL}" FROM objects '
                 f'WHERE "{OID_COL}" IN ('
                 f'SELECT "{OID_COL}" FROM ({object_union}) '
@@ -70,7 +71,7 @@ def quantity_info(ocel_db: OCELDb) -> QuantityInfo:
     activities = (
         [
             row[0]
-            for row in ocel_db.sql(
+            for row in ocel.sql(
                 f'SELECT DISTINCT "{ACTIVITY_COL}" FROM events '
                 f'WHERE "{EID_COL}" IN ('
                 f'SELECT "{EID_COL}" FROM ({event_union}) '

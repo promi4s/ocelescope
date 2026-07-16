@@ -7,7 +7,7 @@ from collections import defaultdict
 import pandas as pd
 from fastapi import APIRouter
 from ocelescope.ocel.constants.pm4py import ACTIVITY_COL, EID_COL, TIMESTAMP_COL
-from ocelescope_backend.app.dependencies import ApiOCELDb
+from ocelescope_backend.app.dependencies import ApiOcel
 from ocelescope_backend.app.internal.model.base import PaginatedResponse
 
 from ocelescope_module_ocel.models import Date_Distribution_Item, Entity_Time_Info
@@ -17,8 +17,8 @@ router = APIRouter()
 
 
 @router.get("/{ocel_id}/events/activityNames", operation_id="Activities")
-def get_activities(ocel_db: ApiOCELDb) -> list[str]:
-    activities = ocel_db.events.project(f'"{ACTIVITY_COL}"').distinct().fetchall()
+def get_activities(ocel: ApiOcel) -> list[str]:
+    activities = ocel.events.table.project(f'"{ACTIVITY_COL}"').distinct().fetchall()
     return sorted(row[0] for row in activities)
 
 
@@ -27,9 +27,9 @@ def get_activities(ocel_db: ApiOCELDb) -> list[str]:
     response_model=dict[str, int],
     operation_id="eventCounts",
 )
-def get_event_counts(ocel_db: ApiOCELDb) -> dict[str, int]:
+def get_event_counts(ocel: ApiOcel) -> dict[str, int]:
     counts = (
-        ocel_db.events.aggregate(
+        ocel.events.table.aggregate(
             f'"{ACTIVITY_COL}" AS activity, count(*) AS count',
             group_expr=f'"{ACTIVITY_COL}"',
         )
@@ -41,13 +41,13 @@ def get_event_counts(ocel_db: ApiOCELDb) -> dict[str, int]:
 
 @router.get("/{ocel_id}/events/ids", operation_id="eventIds")
 def get_event_ids(
-    ocel_db: ApiOCELDb,
+    ocel: ApiOcel,
     search: str | None = None,
     size: int = 10,
     page: int = 1,
 ) -> PaginatedResponse[list[str]]:
     return paginate_ids(
-        ocel_db.events, EID_COL, search, page, size, order_by=[TIMESTAMP_COL]
+        ocel.events.table, EID_COL, search, page, size, order_by=[TIMESTAMP_COL]
     )
 
 
@@ -57,10 +57,10 @@ def get_event_ids(
     operation_id="timeInfo",
 )
 def get_time_info(
-    ocel_db: ApiOCELDb, periods: int | None = None, freq: str | None = None
+    ocel: ApiOcel, periods: int | None = None, freq: str | None = None
 ) -> Entity_Time_Info:
 
-    span = ocel_db.events.aggregate(
+    span = ocel.events.table.aggregate(
         f'min("{TIMESTAMP_COL}") AS start, max("{TIMESTAMP_COL}") AS end'
     ).fetchone()
     assert span is not None
@@ -75,7 +75,7 @@ def get_time_info(
         )
     edges = [edge.to_pydatetime() for edge in bins]
 
-    rows = ocel_db.sql(
+    rows = ocel.sql(
         f"""
         WITH bounds AS (SELECT ? AS edges),
         windows AS (

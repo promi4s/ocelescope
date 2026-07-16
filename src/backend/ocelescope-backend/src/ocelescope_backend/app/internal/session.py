@@ -8,14 +8,13 @@ from pathlib import Path
 from typing import Any, Callable, Hashable, Sequence, Type, TypeVar, cast
 
 from ocelescope.ocel.extensions.base_extension import OCELExtension
-from ocelescope.ocel.io import convert_ocel_duckdb, dump_ocel_duckdb
+from ocelescope.ocel.io import convert_ocel_duckdb
 
 from ocelescope import OCEL
 from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.model.ocel import SessionOCEL
 from ocelescope_backend.app.internal.model.resource import ResourceApi, ResourceStore
 from ocelescope_backend.app.internal.ocel.filters import ModuleFilter
-from ocelescope_backend.app.internal.ocel.ocel_db import OCELDb
 from ocelescope_backend.app.internal.tasks.base import TaskBase
 from ocelescope_backend.app.sse_manager import InvalidationRequest, sse_manager
 
@@ -120,7 +119,7 @@ class Session:
         """Persist an in-memory OCEL to a DuckDB file and register a handle."""
         ocel_id = ocel.meta.id
         db_path = self._ocel_dir / f"{ocel_id}.duckdb"
-        dump_ocel_duckdb(ocel, db_path)
+        ocel.to_duckdb(db_path)
 
         return self._register_ocel(
             ocel_id,
@@ -151,12 +150,6 @@ class Session:
             raise NotFound(f"OCEL with id {ocel_id} not found")
 
         return self.ocels[ocel_id].ocel(use_original=use_original)
-
-    def get_ocel_db(self, ocel_id: str, use_original: bool = False) -> OCELDb:
-        if ocel_id not in self.ocels:
-            raise NotFound(f"OCEL with id {ocel_id} not found")
-
-        return self.ocels[ocel_id].ocel_db(use_original=use_original)
 
     def export_ocel(
         self, ocel_id: str, target_path: Path, use_original: bool = False
