@@ -13,7 +13,6 @@ from ocelescope.ocel.constants.pm4py import (
     TIMESTAMP_COL,
 )
 from ocelescope.ocel.managers.base import BaseManager
-from ocelescope.util.cache import instance_lru_cache
 
 TABLE = "objects"
 CHANGES_TABLE = "object_changes"
@@ -134,7 +133,7 @@ class ObjectsManager(BaseManager):
 
     @changes_table.setter
     def changes_table(self, contents: Any) -> None:
-        self._store_changes(contents)
+        self._replace(CHANGES_TABLE, contents)
 
     @property
     def changes(self) -> pd.DataFrame:
@@ -150,7 +149,7 @@ class ObjectsManager(BaseManager):
 
     @changes.setter
     def changes(self, contents: pd.DataFrame) -> None:
-        self._store_changes(contents)
+        self._replace(CHANGES_TABLE, contents)
 
     @property
     def changes_pl(self) -> pl.LazyFrame:
@@ -166,28 +165,9 @@ class ObjectsManager(BaseManager):
 
     @changes_pl.setter
     def changes_pl(self, contents: pl.LazyFrame | pl.DataFrame) -> None:
-        self._store_changes(contents)
-
-    def _store_changes(self, contents: Any) -> None:
-        """Store ``contents`` as the object changes, verbatim but for the derived columns.
-
-        Whatever columns the caller brings are the columns the table gets -- add an
-        attribute and it is simply there. The two exceptions are ``ocel:type`` and
-        ``ocel:field``, which :attr:`changes_table` computes on the way out; storing
-        them back would have the next read derive them a second time, leaving an
-        ``ocel:type_1`` behind on every round trip.
-
-        ``COLUMNS(...)`` drops them in SQL rather than here, which also means a
-        caller who never had them is not asked to have them.
-        """
-        self._replace(
-            CHANGES_TABLE,
-            contents,
-            f"COLUMNS(c -> c NOT IN ('{OTYPE_COL}', '{OBJECT_CHANGED_FIELD}'))",
-        )
+        self._replace(CHANGES_TABLE, contents)
 
     @property
-    @instance_lru_cache()
     def types(self) -> list[str]:
         """
         Return the list of all object types present in the log.
@@ -198,7 +178,6 @@ class ObjectsManager(BaseManager):
         return list(sorted(self.df[OTYPE_COL].unique().tolist()))
 
     @property
-    @instance_lru_cache()
     def counts(self) -> pd.Series:
         """
         Count how many objects exist for each object type.
@@ -209,7 +188,6 @@ class ObjectsManager(BaseManager):
         return self.df[OTYPE_COL].value_counts()
 
     @property
-    @instance_lru_cache()
     def type_by_id(self) -> pd.Series:
         """
         Return a mapping from object ID to object type.
@@ -270,18 +248,6 @@ class ObjectsManager(BaseManager):
         """
         dynamic = set(self.dynamic_attribute_names)
         return [name for name in self.attribute_names if name not in dynamic]
-
-    @property
-    @instance_lru_cache()
-    def attribute_summary(self) -> pd.DataFrame:
-        """Return an attribute summary for objects, grouped by object type.
-
-        RETURNS:
-            A pandas DataFrame indexed by (ATTRIBUTE_COL, OTYPE_COL) containing the
-            summary statistics produced by `get_summary`.
-        """
-
-        return self._ocel.attributes.get_object_summary()
 
     def object_attr_changes(
         self,

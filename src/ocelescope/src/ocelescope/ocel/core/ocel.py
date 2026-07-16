@@ -113,7 +113,6 @@ class OCEL:
         self.quantities = QuantityManager(self)
         self.e2o = E2OManager(self)
         self.o2o = O2OManager(self)
-        self.attributes = AttributeManager(self)
         self.executions = ExecutionsManager(self)
 
     # ------------------------------------------------------------------

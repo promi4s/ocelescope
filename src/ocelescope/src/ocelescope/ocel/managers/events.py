@@ -8,7 +8,6 @@ import polars as pl
 
 from ocelescope.ocel.constants.pm4py import ACTIVITY_COL, EID_COL, TIMESTAMP_COL
 from ocelescope.ocel.managers.base import BaseManager
-from ocelescope.util.cache import instance_lru_cache
 
 TABLE = "events"
 
@@ -83,7 +82,6 @@ class EventsManager(BaseManager):
         self._replace(TABLE, contents)
 
     @property
-    @instance_lru_cache()
     def activities(self) -> list[str]:
         """
         Return all activity names present in the log.
@@ -94,7 +92,6 @@ class EventsManager(BaseManager):
         return list(sorted(self.df[ACTIVITY_COL].unique().tolist()))
 
     @property
-    @instance_lru_cache()
     def activity_counts(self) -> pd.Series:
         """
         Return the frequency of each activity in the log.
@@ -105,7 +102,6 @@ class EventsManager(BaseManager):
         return self.df[ACTIVITY_COL].value_counts()
 
     @property
-    @instance_lru_cache()
     def activity_by_id(self) -> pd.Series:
         """
         Return a mapping from event ID to activity.
@@ -124,18 +120,6 @@ class EventsManager(BaseManager):
             list[str]: A sorted list of event attribute names.
         """
         return sorted([col for col in self.df.columns if not col.startswith("ocel:")])
-
-    @property
-    @instance_lru_cache()
-    def attribute_summary(self) -> pd.DataFrame:
-        """Return an attribute summary for events, grouped by activity.
-
-        RETURNS:
-            A pandas DataFrame indexed by (ATTRIBUTE_COL, ACTIVITY_COL) containing
-            the summary statistics produced by `get_summary`.
-        """
-
-        return self._ocel.attributes.get_activity_summary()
 
     def get_event_timestamp(self, event_id: str):
         """
