@@ -1,0 +1,1813 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Querying",
+    "version": "1.0"
+  },
+  "paths": {
+    "/modules/querying/v1/ocels/{ocel_id}/analytical-schema": {
+      "get": {
+        "tags": [
+          "querying"
+        ],
+        "summary": "Get Analytical Schema",
+        "operationId": "getAnalyticalSchema",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ocel Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticalSchemaResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "querying"
+        ],
+        "summary": "Update Analytical Schema",
+        "operationId": "updateAnalyticalSchema",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ocel Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAnalyticalSchemaRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticalSchemaResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/modules/querying/v1/ocels/{ocel_id}/queries/event-attribute-distribution": {
+      "post": {
+        "tags": [
+          "querying"
+        ],
+        "summary": "Query Event Attribute Distribution",
+        "operationId": "queryEventAttributeDistribution",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventAttributeDistributionQuery"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DistributionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/modules/querying/v1/ocels/{ocel_id}/queries/object-attribute-distribution/options": {
+      "get": {
+        "tags": [
+          "querying"
+        ],
+        "summary": "Object Attribute Distribution Options",
+        "operationId": "getObjectAttributeDistributionOptions",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ocel Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectAttributeDistributionOptionsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/modules/querying/v1/ocels/{ocel_id}/queries/object-attribute-distribution": {
+      "post": {
+        "tags": [
+          "querying"
+        ],
+        "summary": "Query Object Attribute Distribution",
+        "operationId": "queryObjectAttributeDistribution",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectAttributeDistributionQuery"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DistributionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/modules/querying/v1/ocels/{ocel_id}/queries/object-counts-per-event": {
+      "post": {
+        "tags": [
+          "querying"
+        ],
+        "summary": "Query Object Counts Per Event",
+        "operationId": "queryObjectCountsPerEvent",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectCountsPerEventQuery"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectCountsPerEventResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/modules/querying/v1/ocels/{ocel_id}/queries/object-type-combinations": {
+      "post": {
+        "tags": [
+          "querying"
+        ],
+        "summary": "Query Object Type Combinations",
+        "operationId": "queryObjectTypeCombinations",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectTypeCombinationsQuery"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectTypeCombinationsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/modules/querying/v1/ocels/{ocel_id}/queries/activity-execution-frequency": {
+      "post": {
+        "tags": [
+          "querying"
+        ],
+        "summary": "Query Activity Execution Frequency",
+        "operationId": "queryActivityExecutionFrequency",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActivityExecutionFrequencyQuery"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActivityExecutionFrequencyResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/modules/querying/v1/ocels/{ocel_id}/queries/object-involvement-distribution/options": {
+      "get": {
+        "tags": [
+          "querying"
+        ],
+        "summary": "Object Involvement Options",
+        "operationId": "getObjectInvolvementOptions",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ocel Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectInvolvementOptionsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/modules/querying/v1/ocels/{ocel_id}/queries/object-involvement-distribution": {
+      "post": {
+        "tags": [
+          "querying"
+        ],
+        "summary": "Query Object Involvement Distribution",
+        "operationId": "queryObjectInvolvementDistribution",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectInvolvementDistributionQuery"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DistributionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/modules/querying/v1/ocels/{ocel_id}/queries/time-between-activities": {
+      "post": {
+        "tags": [
+          "querying"
+        ],
+        "summary": "Query Time Between Activities",
+        "operationId": "queryTimeBetweenActivities",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TimeBetweenActivitiesQuery"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimeBetweenActivitiesResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ActivityEventCount": {
+        "properties": {
+          "activity": {
+            "type": "string",
+            "title": "Activity"
+          },
+          "event_count": {
+            "type": "integer",
+            "title": "Event Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "activity",
+          "event_count"
+        ],
+        "title": "ActivityEventCount"
+      },
+      "ActivityExecutionFrequencyQuery": {
+        "properties": {
+          "object_type": {
+            "type": "string",
+            "title": "Object Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "object_type"
+        ],
+        "title": "ActivityExecutionFrequencyQuery"
+      },
+      "ActivityExecutionFrequencyResponse": {
+        "properties": {
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/ActivityExecutionFrequencyRow"
+            },
+            "type": "array",
+            "title": "Rows"
+          },
+          "object_activity_pair_count": {
+            "type": "integer",
+            "title": "Object Activity Pair Count"
+          },
+          "object_count": {
+            "type": "integer",
+            "title": "Object Count"
+          },
+          "maximum_execution_count": {
+            "type": "integer",
+            "title": "Maximum Execution Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rows",
+          "object_activity_pair_count",
+          "object_count",
+          "maximum_execution_count"
+        ],
+        "title": "ActivityExecutionFrequencyResponse"
+      },
+      "ActivityExecutionFrequencyRow": {
+        "properties": {
+          "activity": {
+            "type": "string",
+            "title": "Activity"
+          },
+          "lower_bound": {
+            "type": "integer",
+            "title": "Lower Bound"
+          },
+          "upper_bound": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Upper Bound"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "object_count": {
+            "type": "integer",
+            "title": "Object Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "activity",
+          "lower_bound",
+          "upper_bound",
+          "label",
+          "object_count"
+        ],
+        "title": "ActivityExecutionFrequencyRow"
+      },
+      "ActivityObjectTypePair": {
+        "properties": {
+          "activity": {
+            "type": "string",
+            "title": "Activity"
+          },
+          "object_type": {
+            "type": "string",
+            "title": "Object Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "activity",
+          "object_type"
+        ],
+        "title": "ActivityObjectTypePair"
+      },
+      "ActivitySchemaItem": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "event_count": {
+            "type": "integer",
+            "title": "Event Count"
+          },
+          "attributes": {
+            "items": {
+              "$ref": "#/components/schemas/AttributeSchemaItem"
+            },
+            "type": "array",
+            "title": "Attributes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "event_count",
+          "attributes"
+        ],
+        "title": "ActivitySchemaItem"
+      },
+      "AnalyticalSchemaResponse": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "const": "1",
+            "title": "Schema Version",
+            "default": "1"
+          },
+          "activities": {
+            "items": {
+              "$ref": "#/components/schemas/ActivitySchemaItem"
+            },
+            "type": "array",
+            "title": "Activities"
+          },
+          "object_types": {
+            "items": {
+              "$ref": "#/components/schemas/ObjectTypeSchemaItem"
+            },
+            "type": "array",
+            "title": "Object Types"
+          }
+        },
+        "type": "object",
+        "required": [
+          "activities",
+          "object_types"
+        ],
+        "title": "AnalyticalSchemaResponse"
+      },
+      "AttributeClassificationOverride": {
+        "properties": {
+          "scope": {
+            "type": "string",
+            "enum": [
+              "event",
+              "object"
+            ],
+            "title": "Scope"
+          },
+          "entity_type": {
+            "type": "string",
+            "title": "Entity Type"
+          },
+          "attribute": {
+            "type": "string",
+            "title": "Attribute"
+          },
+          "analytical_type": {
+            "type": "string",
+            "enum": [
+              "categorical",
+              "discrete",
+              "continuous",
+              "temporal",
+              "unknown"
+            ],
+            "title": "Analytical Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "scope",
+          "entity_type",
+          "attribute",
+          "analytical_type"
+        ],
+        "title": "AttributeClassificationOverride"
+      },
+      "AttributeSchemaItem": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "physical_type": {
+            "type": "string",
+            "enum": [
+              "number",
+              "string",
+              "boolean",
+              "datetime",
+              "unknown"
+            ],
+            "title": "Physical Type"
+          },
+          "inferred_analytical_type": {
+            "type": "string",
+            "enum": [
+              "categorical",
+              "discrete",
+              "continuous",
+              "temporal",
+              "unknown"
+            ],
+            "title": "Inferred Analytical Type"
+          },
+          "analytical_type": {
+            "type": "string",
+            "enum": [
+              "categorical",
+              "discrete",
+              "continuous",
+              "temporal",
+              "unknown"
+            ],
+            "title": "Analytical Type"
+          },
+          "present_count": {
+            "type": "integer",
+            "title": "Present Count"
+          },
+          "missing_count": {
+            "type": "integer",
+            "title": "Missing Count"
+          },
+          "distinct_count": {
+            "type": "integer",
+            "title": "Distinct Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "physical_type",
+          "inferred_analytical_type",
+          "analytical_type",
+          "present_count",
+          "missing_count",
+          "distinct_count"
+        ],
+        "title": "AttributeSchemaItem"
+      },
+      "CategoryGrouping": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "categories",
+            "title": "Kind"
+          },
+          "limit": {
+            "type": "integer",
+            "maximum": 500.0,
+            "minimum": 1.0,
+            "title": "Limit",
+            "default": 50
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind"
+        ],
+        "title": "CategoryGrouping"
+      },
+      "DistributionBucket": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "value",
+              "range",
+              "missing",
+              "other"
+            ],
+            "title": "Kind"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          },
+          "lower": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lower"
+          },
+          "upper": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Upper"
+          },
+          "inclusive_upper": {
+            "type": "boolean",
+            "title": "Inclusive Upper",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "label",
+          "count",
+          "kind"
+        ],
+        "title": "DistributionBucket"
+      },
+      "DistributionResponse": {
+        "properties": {
+          "buckets": {
+            "items": {
+              "$ref": "#/components/schemas/DistributionBucket"
+            },
+            "type": "array",
+            "title": "Buckets"
+          },
+          "counts": {
+            "$ref": "#/components/schemas/QueryCounts"
+          },
+          "truncated": {
+            "type": "boolean",
+            "title": "Truncated"
+          }
+        },
+        "type": "object",
+        "required": [
+          "buckets",
+          "counts",
+          "truncated"
+        ],
+        "title": "DistributionResponse"
+      },
+      "EventAttributeDistributionQuery": {
+        "properties": {
+          "activity": {
+            "type": "string",
+            "title": "Activity"
+          },
+          "attribute": {
+            "type": "string",
+            "title": "Attribute"
+          },
+          "grouping": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CategoryGrouping"
+              },
+              {
+                "$ref": "#/components/schemas/NumericBinGrouping"
+              }
+            ],
+            "title": "Grouping",
+            "discriminator": {
+              "propertyName": "kind",
+              "mapping": {
+                "bins": "#/components/schemas/NumericBinGrouping",
+                "categories": "#/components/schemas/CategoryGrouping"
+              }
+            }
+          }
+        },
+        "type": "object",
+        "required": [
+          "activity",
+          "attribute",
+          "grouping"
+        ],
+        "title": "EventAttributeDistributionQuery"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "NumericBinGrouping": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "bins",
+            "title": "Kind"
+          },
+          "count": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 200.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind"
+        ],
+        "title": "NumericBinGrouping"
+      },
+      "ObjectAttributeDistributionOptionsResponse": {
+        "properties": {
+          "pairs": {
+            "items": {
+              "$ref": "#/components/schemas/ActivityObjectTypePair"
+            },
+            "type": "array",
+            "title": "Pairs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "pairs"
+        ],
+        "title": "ObjectAttributeDistributionOptionsResponse"
+      },
+      "ObjectAttributeDistributionQuery": {
+        "properties": {
+          "activity": {
+            "type": "string",
+            "title": "Activity"
+          },
+          "object_type": {
+            "type": "string",
+            "title": "Object Type"
+          },
+          "attribute": {
+            "type": "string",
+            "title": "Attribute"
+          },
+          "grouping": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CategoryGrouping"
+              },
+              {
+                "$ref": "#/components/schemas/NumericBinGrouping"
+              }
+            ],
+            "title": "Grouping",
+            "discriminator": {
+              "propertyName": "kind",
+              "mapping": {
+                "bins": "#/components/schemas/NumericBinGrouping",
+                "categories": "#/components/schemas/CategoryGrouping"
+              }
+            }
+          }
+        },
+        "type": "object",
+        "required": [
+          "activity",
+          "object_type",
+          "attribute",
+          "grouping"
+        ],
+        "title": "ObjectAttributeDistributionQuery"
+      },
+      "ObjectAttributeSchemaItem": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "physical_type": {
+            "type": "string",
+            "enum": [
+              "number",
+              "string",
+              "boolean",
+              "datetime",
+              "unknown"
+            ],
+            "title": "Physical Type"
+          },
+          "inferred_analytical_type": {
+            "type": "string",
+            "enum": [
+              "categorical",
+              "discrete",
+              "continuous",
+              "temporal",
+              "unknown"
+            ],
+            "title": "Inferred Analytical Type"
+          },
+          "analytical_type": {
+            "type": "string",
+            "enum": [
+              "categorical",
+              "discrete",
+              "continuous",
+              "temporal",
+              "unknown"
+            ],
+            "title": "Analytical Type"
+          },
+          "present_count": {
+            "type": "integer",
+            "title": "Present Count"
+          },
+          "missing_count": {
+            "type": "integer",
+            "title": "Missing Count"
+          },
+          "distinct_count": {
+            "type": "integer",
+            "title": "Distinct Count"
+          },
+          "behavior": {
+            "type": "string",
+            "enum": [
+              "static",
+              "dynamic"
+            ],
+            "title": "Behavior"
+          },
+          "initial_present_count": {
+            "type": "integer",
+            "title": "Initial Present Count"
+          },
+          "current_present_count": {
+            "type": "integer",
+            "title": "Current Present Count"
+          },
+          "observed_value_count": {
+            "type": "integer",
+            "title": "Observed Value Count"
+          },
+          "change_count": {
+            "type": "integer",
+            "title": "Change Count"
+          },
+          "changed_object_count": {
+            "type": "integer",
+            "title": "Changed Object Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "physical_type",
+          "inferred_analytical_type",
+          "analytical_type",
+          "present_count",
+          "missing_count",
+          "distinct_count",
+          "behavior",
+          "initial_present_count",
+          "current_present_count",
+          "observed_value_count",
+          "change_count",
+          "changed_object_count"
+        ],
+        "title": "ObjectAttributeSchemaItem"
+      },
+      "ObjectCountPerEventRow": {
+        "properties": {
+          "activity": {
+            "type": "string",
+            "title": "Activity"
+          },
+          "object_type": {
+            "type": "string",
+            "title": "Object Type"
+          },
+          "object_count": {
+            "type": "integer",
+            "title": "Object Count"
+          },
+          "event_count": {
+            "type": "integer",
+            "title": "Event Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "activity",
+          "object_type",
+          "object_count",
+          "event_count"
+        ],
+        "title": "ObjectCountPerEventRow"
+      },
+      "ObjectCountsPerEventQuery": {
+        "properties": {
+          "activities": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Activities"
+          }
+        },
+        "type": "object",
+        "title": "ObjectCountsPerEventQuery"
+      },
+      "ObjectCountsPerEventResponse": {
+        "properties": {
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/ObjectCountPerEventRow"
+            },
+            "type": "array",
+            "title": "Rows"
+          },
+          "activity_event_counts": {
+            "items": {
+              "$ref": "#/components/schemas/ActivityEventCount"
+            },
+            "type": "array",
+            "title": "Activity Event Counts"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rows",
+          "activity_event_counts"
+        ],
+        "title": "ObjectCountsPerEventResponse"
+      },
+      "ObjectInvolvementDistributionQuery": {
+        "properties": {
+          "activity": {
+            "type": "string",
+            "title": "Activity"
+          },
+          "object_type": {
+            "type": "string",
+            "title": "Object Type"
+          },
+          "grouping": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CategoryGrouping"
+              },
+              {
+                "$ref": "#/components/schemas/NumericBinGrouping"
+              }
+            ],
+            "title": "Grouping",
+            "discriminator": {
+              "propertyName": "kind",
+              "mapping": {
+                "bins": "#/components/schemas/NumericBinGrouping",
+                "categories": "#/components/schemas/CategoryGrouping"
+              }
+            }
+          }
+        },
+        "type": "object",
+        "required": [
+          "activity",
+          "object_type",
+          "grouping"
+        ],
+        "title": "ObjectInvolvementDistributionQuery"
+      },
+      "ObjectInvolvementOption": {
+        "properties": {
+          "activity": {
+            "type": "string",
+            "title": "Activity"
+          },
+          "object_type": {
+            "type": "string",
+            "title": "Object Type"
+          },
+          "minimum": {
+            "type": "integer",
+            "title": "Minimum"
+          },
+          "maximum": {
+            "type": "integer",
+            "title": "Maximum"
+          }
+        },
+        "type": "object",
+        "required": [
+          "activity",
+          "object_type",
+          "minimum",
+          "maximum"
+        ],
+        "title": "ObjectInvolvementOption"
+      },
+      "ObjectInvolvementOptionsResponse": {
+        "properties": {
+          "pairs": {
+            "items": {
+              "$ref": "#/components/schemas/ObjectInvolvementOption"
+            },
+            "type": "array",
+            "title": "Pairs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "pairs"
+        ],
+        "title": "ObjectInvolvementOptionsResponse"
+      },
+      "ObjectTypeCombinationRow": {
+        "properties": {
+          "object_types": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Object Types"
+          },
+          "activity": {
+            "type": "string",
+            "title": "Activity"
+          },
+          "event_count": {
+            "type": "integer",
+            "title": "Event Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "object_types",
+          "activity",
+          "event_count"
+        ],
+        "title": "ObjectTypeCombinationRow"
+      },
+      "ObjectTypeCombinationsQuery": {
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "maximum": 50.0,
+            "minimum": 1.0,
+            "title": "Limit",
+            "default": 15
+          },
+          "activities": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Activities"
+          }
+        },
+        "type": "object",
+        "title": "ObjectTypeCombinationsQuery"
+      },
+      "ObjectTypeCombinationsResponse": {
+        "properties": {
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/ObjectTypeCombinationRow"
+            },
+            "type": "array",
+            "title": "Rows"
+          },
+          "total_event_count": {
+            "type": "integer",
+            "title": "Total Event Count"
+          },
+          "represented_event_count": {
+            "type": "integer",
+            "title": "Represented Event Count"
+          },
+          "total_combination_count": {
+            "type": "integer",
+            "title": "Total Combination Count"
+          },
+          "truncated": {
+            "type": "boolean",
+            "title": "Truncated"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rows",
+          "total_event_count",
+          "represented_event_count",
+          "total_combination_count",
+          "truncated"
+        ],
+        "title": "ObjectTypeCombinationsResponse"
+      },
+      "ObjectTypeSchemaItem": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "object_count": {
+            "type": "integer",
+            "title": "Object Count"
+          },
+          "attributes": {
+            "items": {
+              "$ref": "#/components/schemas/ObjectAttributeSchemaItem"
+            },
+            "type": "array",
+            "title": "Attributes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "object_count",
+          "attributes"
+        ],
+        "title": "ObjectTypeSchemaItem"
+      },
+      "QueryCounts": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "present": {
+            "type": "integer",
+            "title": "Present"
+          },
+          "missing": {
+            "type": "integer",
+            "title": "Missing"
+          },
+          "represented": {
+            "type": "integer",
+            "title": "Represented"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "present",
+          "missing",
+          "represented"
+        ],
+        "title": "QueryCounts"
+      },
+      "TimeBetweenActivitiesQuery": {
+        "properties": {
+          "source_activity": {
+            "type": "string",
+            "title": "Source Activity"
+          },
+          "target_activity": {
+            "type": "string",
+            "title": "Target Activity"
+          },
+          "object_type": {
+            "type": "string",
+            "title": "Object Type"
+          },
+          "unit": {
+            "type": "string",
+            "enum": [
+              "seconds",
+              "minutes",
+              "hours",
+              "days"
+            ],
+            "title": "Unit"
+          },
+          "bin_count": {
+            "type": "integer",
+            "maximum": 200.0,
+            "minimum": 1.0,
+            "title": "Bin Count",
+            "default": 20
+          }
+        },
+        "type": "object",
+        "required": [
+          "source_activity",
+          "target_activity",
+          "object_type",
+          "unit"
+        ],
+        "title": "TimeBetweenActivitiesQuery"
+      },
+      "TimeBetweenActivitiesResponse": {
+        "properties": {
+          "buckets": {
+            "items": {
+              "$ref": "#/components/schemas/DistributionBucket"
+            },
+            "type": "array",
+            "title": "Buckets"
+          },
+          "counts": {
+            "$ref": "#/components/schemas/QueryCounts"
+          },
+          "truncated": {
+            "type": "boolean",
+            "title": "Truncated"
+          },
+          "unit": {
+            "type": "string",
+            "enum": [
+              "seconds",
+              "minutes",
+              "hours",
+              "days"
+            ],
+            "title": "Unit"
+          },
+          "pair_count": {
+            "type": "integer",
+            "title": "Pair Count"
+          },
+          "contributing_object_count": {
+            "type": "integer",
+            "title": "Contributing Object Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "buckets",
+          "counts",
+          "truncated",
+          "unit",
+          "pair_count",
+          "contributing_object_count"
+        ],
+        "title": "TimeBetweenActivitiesResponse"
+      },
+      "UpdateAnalyticalSchemaRequest": {
+        "properties": {
+          "overrides": {
+            "items": {
+              "$ref": "#/components/schemas/AttributeClassificationOverride"
+            },
+            "type": "array",
+            "title": "Overrides"
+          }
+        },
+        "type": "object",
+        "required": [
+          "overrides"
+        ],
+        "title": "UpdateAnalyticalSchemaRequest"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

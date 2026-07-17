@@ -1,153 +1,225 @@
 import {
-  ActionIcon,
   Alert,
+  Badge,
+  Box,
   Button,
-  Center,
+  Container,
+  Drawer,
   Group,
+  LoadingOverlay,
   Paper,
   SimpleGrid,
-  Skeleton,
   Stack,
   Text,
+  ThemeIcon,
   Title,
-  Tooltip,
 } from "@mantine/core";
-import type { OcelSchemaResponse } from "@ocelescope/api-querying";
-import { useOcelSchema } from "@ocelescope/api-querying";
-import { CircleAlertIcon, PlusIcon, RotateCcwIcon } from "lucide-react";
+import { PlusIcon, ShapesIcon } from "lucide-react";
 import { useState } from "react";
-
-import { queryErrorMessage } from "../lib/queryError";
-import type { ChartSpec } from "../model/chartSpec";
+import {
+  analysisDefinitions,
+  findAnalysisDefinition,
+} from "../analyses/registry";
+import { useGetAnalyticalSchema } from "../api/querying";
+import type { VisualizationSpec } from "../model/dashboard";
 import { useExplorationDashboard } from "../store/useExplorationDashboard";
-import { ChartEditor } from "./ChartEditor";
-import { ConfiguredChart } from "./ConfiguredChart";
+
+function createCardId() {
+  return globalThis.crypto.randomUUID();
+}
 
 export function ExplorationDashboard({ ocelId }: { ocelId: string }) {
-  const schemaQuery = useOcelSchema(ocelId);
-  const [editorOpened, setEditorOpened] = useState(false);
-  const [editingSpec, setEditingSpec] = useState<ChartSpec | null>(null);
+  const schema = useGetAnalyticalSchema(ocelId);
+  const { cards, setCards, loaded } = useExplorationDashboard(ocelId);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [selectedAnalysis, setSelectedAnalysis] = useState<string | null>(null);
+  const [editingCardId, setEditingCardId] = useState<string | null>(null);
+  const editingCard = cards.find((card) => card.id === editingCardId);
+  const activeAnalysisId = editingCard?.spec.analysis ?? selectedAnalysis;
+  const activeDefinition = activeAnalysisId
+    ? findAnalysisDefinition(activeAnalysisId)
+    : undefined;
+  const ActiveEditor = activeDefinition?.Editor;
 
-  if (schemaQuery.isPending) return <Skeleton h={420} />;
-  if (schemaQuery.error || !schemaQuery.data) {
+  const definitionCategories = Array.from(
+    new Set(analysisDefinitions.map((definition) => definition.category)),
+  ).map((category) => ({
+    category,
+    definitions: analysisDefinitions.filter(
+      (definition) => definition.category === category,
+    ),
+  }));
+
+  const closeDrawer = () => {
+    setDrawerOpen(false);
+    setSelectedAnalysis(null);
+    setEditingCardId(null);
+  };
+
+  const startAdding = () => {
+    setEditingCardId(null);
+    setSelectedAnalysis(null);
+    setDrawerOpen(true);
+  };
+
+  const saveSpec = (spec: VisualizationSpec) => {
+    if (editingCardId) {
+      setCards((current) =>
+        current.map((card) =>
+          card.id === editingCardId ? { ...card, spec } : card,
+        ),
+      );
+    } else {
+      setCards((current) => [...current, { id: createCardId(), spec }]);
+    }
+    closeDrawer();
+  };
+
+  if (schema.error) {
     return (
-      <Alert
-        color="red"
-        icon={<CircleAlertIcon size={16} />}
-        title="Unable to inspect the OCEL"
-      >
-        {queryErrorMessage(schemaQuery.error)}
-      </Alert>
+      <Container size="xl" py="xl">
+        <Alert color="red" title="Unable to load exploration schema">
+          {String(schema.error)}
+        </Alert>
+      </Container>
     );
   }
 
-  return (
-    <DashboardContent
-      key={ocelId}
-      ocelId={ocelId}
-      schema={schemaQuery.data}
-      editorOpened={editorOpened}
-      editingSpec={editingSpec}
-      onEditorOpenedChange={setEditorOpened}
-      onEditingSpecChange={setEditingSpec}
-    />
-  );
-}
-
-interface DashboardContentProps {
-  ocelId: string;
-  schema: OcelSchemaResponse;
-  editorOpened: boolean;
-  editingSpec: ChartSpec | null;
-  onEditorOpenedChange: (opened: boolean) => void;
-  onEditingSpecChange: (spec: ChartSpec | null) => void;
-}
-
-function DashboardContent({
-  ocelId,
-  schema,
-  editorOpened,
-  editingSpec,
-  onEditorOpenedChange,
-  onEditingSpecChange,
-}: DashboardContentProps) {
-  const dashboard = useExplorationDashboard(ocelId);
-
-  const openNewChart = () => {
-    onEditingSpecChange(null);
-    onEditorOpenedChange(true);
-  };
+  if (!schema.data || !loaded) return <LoadingOverlay visible />;
 
   return (
-    <Stack gap="md">
-      <Group justify="space-between" align="center">
-        <Title order={2}>Exploration</Title>
+    <Container fluid py="xl" px={{ base: "md", lg: "xl" }}>
+      <Stack gap="xl">
         <Group gap="xs">
-          <Tooltip label="Reset dashboard">
-            <ActionIcon
-              variant="subtle"
-              color="gray"
-              aria-label="Reset dashboard"
-              onClick={dashboard.resetDashboard}
-            >
-              <RotateCcwIcon size={16} />
-            </ActionIcon>
-          </Tooltip>
-          <Button leftSection={<PlusIcon size={16} />} onClick={openNewChart}>
+          <Button leftSection={<PlusIcon size={16} />} onClick={startAdding}>
             Add visualization
           </Button>
-        </Group>
-      </Group>
 
-      {!dashboard.ready ? (
-        <Skeleton h={420} />
-      ) : dashboard.charts.length === 0 ? (
-        <Paper withBorder p="xl" radius="md">
-          <Center mih={240}>
-            <Stack align="center" gap="sm">
-              <Text c="dimmed">This dashboard has no visualizations.</Text>
+          <Badge variant="default">
+            {cards.length} visualization{cards.length === 1 ? "" : "s"}
+          </Badge>
+        </Group>
+
+        {cards.length === 0 ? (
+          <Paper
+            withBorder
+            radius="lg"
+            p={48}
+            style={{ borderStyle: "dashed" }}
+          >
+            <Stack align="center" gap="sm" maw={520} mx="auto">
+              <ThemeIcon size={52} radius="xl" variant="light">
+                <ShapesIcon size={24} />
+              </ThemeIcon>
+              <Title order={3} ta="center">
+                Build your exploration workspace
+              </Title>
+              <Text c="dimmed" size="sm" ta="center">
+                Choose an analytical question, configure its OCEL scope, and
+                explicitly select a compatible visualization.
+              </Text>
               <Button
-                variant="light"
+                mt="xs"
                 leftSection={<PlusIcon size={16} />}
-                onClick={openNewChart}
+                onClick={startAdding}
               >
-                Add visualization
+                Add first visualization
               </Button>
             </Stack>
-          </Center>
-        </Paper>
-      ) : (
-        <SimpleGrid cols={{ base: 1, xl: 2 }} spacing="md">
-          {dashboard.charts.map((spec) => (
-            <div
-              key={spec.id}
-              style={{
-                gridColumn: spec.layout.width === "full" ? "1 / -1" : undefined,
-                minWidth: 0,
-              }}
-            >
-              <ConfiguredChart
-                ocelId={ocelId}
-                schema={schema}
-                spec={spec}
-                onEdit={() => {
-                  onEditingSpecChange(spec);
-                  onEditorOpenedChange(true);
-                }}
-                onRemove={() => dashboard.removeChart(spec.id)}
-              />
-            </div>
-          ))}
-        </SimpleGrid>
-      )}
+          </Paper>
+        ) : (
+          <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="lg">
+            {cards.map((card) => {
+              const definition = findAnalysisDefinition(card.spec.analysis);
+              if (!definition) return null;
+              const Card = definition.Card;
+              return (
+                <Box key={card.id} h={420}>
+                  <Card
+                    ocelId={ocelId}
+                    card={card}
+                    onEdit={() => {
+                      setSelectedAnalysis(null);
+                      setEditingCardId(card.id);
+                      setDrawerOpen(true);
+                    }}
+                    onDuplicate={() =>
+                      setCards((current) => [
+                        ...current,
+                        { id: createCardId(), spec: card.spec },
+                      ])
+                    }
+                    onRemove={() =>
+                      setCards((current) =>
+                        current.filter((candidate) => candidate.id !== card.id),
+                      )
+                    }
+                  />
+                </Box>
+              );
+            })}
+          </SimpleGrid>
+        )}
+      </Stack>
 
-      <ChartEditor
-        opened={editorOpened}
-        schema={schema}
-        initialSpec={editingSpec}
-        onClose={() => onEditorOpenedChange(false)}
-        onSave={dashboard.saveChart}
-      />
-    </Stack>
+      <Drawer
+        opened={drawerOpen}
+        onClose={closeDrawer}
+        position="right"
+        size="md"
+        title={editingCard ? "Edit visualization" : "Add visualization"}
+        padding="lg"
+      >
+        {activeDefinition && ActiveEditor ? (
+          <Stack gap="lg">
+            <div>
+              <Title order={4}>{activeDefinition.label}</Title>
+              <Text size="sm" c="dimmed" mt={4}>
+                {activeDefinition.description}
+              </Text>
+            </div>
+            <ActiveEditor
+              key={editingCard?.id ?? activeDefinition.id}
+              ocelId={ocelId}
+              schema={schema.data}
+              initial={editingCard?.spec}
+              onCancel={closeDrawer}
+              onSubmit={saveSpec}
+            />
+          </Stack>
+        ) : (
+          <Stack gap="lg">
+            <Text size="sm" c="dimmed">
+              Start with the analytical question. Its configuration will only
+              offer attributes and visualizations compatible with the schema.
+            </Text>
+            {definitionCategories.map(({ category, definitions }) => (
+              <Stack key={category} gap="xs">
+                <Text size="xs" fw={700} tt="uppercase" c="dimmed">
+                  {category}
+                </Text>
+                {definitions.map((definition) => (
+                  <Paper key={definition.id} withBorder radius="md" p="md">
+                    <Stack gap="xs">
+                      <Text fw={650}>{definition.label}</Text>
+                      <Text size="sm" c="dimmed">
+                        {definition.description}
+                      </Text>
+                      <Button
+                        variant="light"
+                        mt="xs"
+                        onClick={() => setSelectedAnalysis(definition.id)}
+                      >
+                        Configure
+                      </Button>
+                    </Stack>
+                  </Paper>
+                ))}
+              </Stack>
+            ))}
+          </Stack>
+        )}
+      </Drawer>
+    </Container>
   );
 }

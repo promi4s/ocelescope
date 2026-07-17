@@ -35,3 +35,8 @@ export interface BrushConfig {
   /** Which axis the line brush selects across. */
   axis: "x" | "y";
 }
+
+export type ChartEventHandler = (...args: unknown[]) => void;
+export type ChartEventMap = Record<string, ChartEventHandler>;
+
+export type ChartExportFormat = "png" | "svg";

@@ -9,9 +9,21 @@ catalogs:
     '@apidevtools/json-schema-ref-parser':
       specifier: ^15.3.1
       version: 15.4.0
+    '@dagrejs/dagre':
+      specifier: ^3.0.0
+      version: 3.0.0
     '@faker-js/faker':
       specifier: ^10.4.0
       version: 10.5.0
+    '@floating-ui/react':
+      specifier: ^0.27.18
+      version: 0.27.19
+    '@hpcc-js/wasm-graphviz':
+      specifier: ^1.21.0
+      version: 1.21.1
+    '@mantine/carousel':
+      specifier: ^9.4.0
+      version: 9.4.0
     '@mantine/charts':
       specifier: ^9.4.0
       version: 9.4.0
@@ -24,21 +36,39 @@ catalogs:
     '@mantine/dropzone':
       specifier: ^9.4.0
       version: 9.4.0
+    '@mantine/hooks':
+      specifier: ^9.4.0
+      version: 9.4.0
     '@mantine/notifications':
       specifier: ^9.4.0
       version: 9.4.0
+    '@marko19907/string-to-color':
+      specifier: ^1.0.2
+      version: 1.0.2
     '@ocelescope/ocelot':
       specifier: ^0.1.2
       version: 0.1.2
     '@r4pm/components':
       specifier: ^0.1.1
       version: 0.1.1
+    '@rjsf/core':
+      specifier: ^6.6.2
+      version: 6.6.2
     '@rjsf/mantine':
+      specifier: ^6.6.2
+      version: 6.6.2
+    '@rjsf/utils':
+      specifier: ^6.6.2
+      version: 6.6.2
+    '@rjsf/validator-ajv8':
       specifier: ^6.6.2
       version: 6.6.2
     '@storybook/react-vite':
       specifier: ^10.3.5
       version: 10.4.6
+    '@tanstack/react-query':
+      specifier: ^5.90.21
+      version: 5.90.21
     '@tsconfig/strictest':
       specifier: ^2.0.8
       version: 2.0.8
@@ -71,25 +101,28 @@ catalogs:
       version: 19.2.3
     '@xyflow/react':
       specifier: ^12.10.1
-      version: 12.11.1
+      version: 12.10.1
     axios:
       specifier: ^1.18.0
       version: 1.18.0
     bumpp:
-      specifier: ^10.3.2
-      version: 10.4.1
+      specifier: ^11.0.0
+      version: 11.1.0
     clsx:
       specifier: ^2.1.1
       version: 2.1.1
     content-disposition-attachment:
       specifier: ^0.3.1
       version: 0.3.1
+    cspell:
+      specifier: ^10.0.1
+      version: 10.0.1
     dayjs:
       specifier: ^1.11.19
       version: 1.11.19
     echarts:
-      specifier: ^5.6.0
-      version: 5.6.0
+      specifier: ^6.1.0
+      version: 6.1.0
     echarts-for-react:
       specifier: ^3.0.6
       version: 3.0.6
@@ -105,11 +138,6 @@ catalogs:
     file-saver:
       specifier: ^2.0.5
       version: 2.0.5
-      specifier: ^11.0.0
-      version: 11.1.0
-    cspell:
-      specifier: ^10.0.1
-      version: 10.0.1
     flat:
       specifier: ^6.0.1
       version: 6.0.1
@@ -122,12 +150,21 @@ catalogs:
     jspdf:
       specifier: ^4.2.1
       version: 4.2.1
+    lodash:
+      specifier: ^4.17.23
+      version: 4.18.1
+    lucide-react:
+      specifier: ^1.0.0
+      version: 1.21.0
     mantine-datatable:
       specifier: ^9.3.1
       version: 9.3.1
     next:
       specifier: ^16.1.6
       version: 16.2.10
+    object-hash:
+      specifier: ^3.0.0
+      version: 3.0.0
     orval:
       specifier: ^8.5.2
       version: 8.5.2
@@ -140,6 +177,18 @@ catalogs:
     react-dom:
       specifier: ^19.2.0
       version: 19.2.7
+    react-hook-form:
+      specifier: ^7.71.2
+      version: 7.71.2
+    react-plotly.js:
+      specifier: ^4.0.0
+      version: 4.0.0
+    react-zoom-pan-pinch:
+      specifier: ^4.0.0
+      version: 4.0.3
+    recharts:
+      specifier: ^3.2.1
+      version: 3.8.1
     storybook:
       specifier: ^10.3.5
       version: 10.4.6
@@ -149,17 +198,26 @@ catalogs:
     typescript:
       specifier: ^5.9.3
       version: 5.9.3
+    uniqolor:
+      specifier: ^1.1.1
+      version: 1.1.1
+    zod:
+      specifier: ^4.3.6
+      version: 4.3.6
+    zustand:
+      specifier: ^5.0.11
+      version: 5.0.11
 
 importers:
 
   .:
     dependencies:
-      echarts:
+      cspell:
         specifier: 'catalog:'
-        version: 5.6.0
-      echarts-for-react:
+        version: 10.0.1
+      orval:
         specifier: 'catalog:'
-        version: 3.0.6(echarts@5.6.0)(react@19.2.3)
+        version: 8.5.2(@faker-js/faker@10.5.0)(typescript@5.9.3)
     devDependencies:
       '@biomejs/biome':
         specifier: 2.5.1
@@ -167,12 +225,6 @@ importers:
       '@tsconfig/strictest':
         specifier: 'catalog:'
         version: 2.0.8
-      cspell:
-        specifier: 'catalog:'
-        version: 10.0.1
-      orval:
-        specifier: 'catalog:'
-        version: 8.5.2(@faker-js/faker@10.5.0)(typescript@5.9.3)
 
   src/frontend/app:
     dependencies:
@@ -197,12 +249,18 @@ importers:
       '@ocelescope/api-client':
         specifier: workspace:*
         version: link:../packages/api/client
+      '@ocelescope/charts':
+        specifier: workspace:*
+        version: link:../packages/charts
       '@ocelescope/core':
         specifier: workspace:*
         version: link:../packages/core
       '@ocelescope/discovery':
         specifier: workspace:*
         version: link:../modules/discovery
+      '@ocelescope/exploration':
+        specifier: workspace:*
+        version: link:../modules/exploration
       '@ocelescope/filter':
         specifier: workspace:*
         version: link:../modules/filter
@@ -336,8 +394,53 @@ importers:
         version: 1.0.0
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.2(@tsdown/css@0.22.2)(typescript@5.9.3)(unrun@0.2.32)
         version: 0.22.3(@tsdown/css@0.22.3)(oxc-resolver@11.21.3)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1))
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+
+  src/frontend/modules/exploration:
+    dependencies:
+      '@mantine/core':
+        specifier: 'catalog:'
+        version: 9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@ocelescope/api-client':
+        specifier: workspace:^
+        version: link:../../packages/api/client
+      '@ocelescope/core':
+        specifier: workspace:^
+        version: link:../../packages/core
+      '@tanstack/react-query':
+        specifier: 'catalog:'
+        version: 5.90.21(react@19.2.7)
+      axios:
+        specifier: 'catalog:'
+        version: 1.18.0
+      lucide-react:
+        specifier: 'catalog:'
+        version: 1.21.0(react@19.2.7)
+      react:
+        specifier: 'catalog:'
+        version: 19.2.7
+    devDependencies:
+      '@ocelescope/api-config':
+        specifier: workspace:^
+        version: link:../../packages/api/config
+      '@ocelescope/charts':
+        specifier: workspace:^
+        version: link:../../packages/charts
+      '@types/node':
+        specifier: 'catalog:'
+        version: 25.9.4
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.2.17
+      orval:
+        specifier: 'catalog:'
+        version: 8.5.2(@faker-js/faker@10.5.0)(typescript@5.9.3)
+      tsdown:
+        specifier: 'catalog:'
+        version: 0.22.3(@tsdown/css@0.22.3)(oxc-resolver@11.21.3)(typescript@5.9.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -432,27 +535,21 @@ importers:
       '@mantine/core':
         specifier: 'catalog:'
         version: 9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@mantine/hooks':
+        specifier: 'catalog:'
+        version: 9.4.0(react@19.2.7)
       '@marko19907/string-to-color':
         specifier: '*'
         version: 1.0.2
       '@ocelescope/api-base':
         specifier: workspace:^
         version: link:../../packages/api/base
-      '@ocelescope/api-client':
-        specifier: workspace:*
-        version: link:../../packages/api/client
-      '@ocelescope/charts':
-        specifier: workspace:*
-        version: link:../../packages/charts
       '@ocelescope/core':
         specifier: workspace:^
         version: link:../../packages/core
       '@ocelescope/resources':
         specifier: workspace:^
         version: link:../../packages/resources
-      '@tanstack/react-query':
-        specifier: 'catalog:'
-        version: 5.90.21(react@19.2.7)
       dayjs:
         specifier: 'catalog:'
         version: 1.11.19
@@ -469,9 +566,6 @@ importers:
         specifier: 'catalog:'
         version: 19.2.7(react@19.2.7)
     devDependencies:
-      '@ocelescope/api-config':
-        specifier: workspace:*
-        version: link:../../packages/api/config
       '@tsdown/css':
         specifier: 'catalog:'
         version: 0.22.3(jiti@2.6.1)(postcss@8.5.16)(tsdown@0.22.3)(yaml@2.9.0)
@@ -809,6 +903,49 @@ importers:
         specifier: 'catalog:'
         version: 5.9.3
 
+  src/frontend/packages/charts:
+    dependencies:
+      react:
+        specifier: 'catalog:'
+        version: 19.2.7
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.2.7(react@19.2.7)
+    devDependencies:
+      '@mantine/core':
+        specifier: 'catalog:'
+        version: 9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@storybook/react-vite':
+        specifier: 'catalog:'
+        version: 10.4.6(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(esbuild@0.28.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(storybook@10.4.6(@testing-library/dom@10.4.1)(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(typescript@5.9.3)(vite@8.0.10(@types/node@25.9.4)(esbuild@0.28.1)(jiti@2.6.1)(yaml@2.9.0))
+      '@types/node':
+        specifier: 'catalog:'
+        version: 25.9.4
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.2.17
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.2.3(@types/react@19.2.17)
+      echarts:
+        specifier: 'catalog:'
+        version: 6.1.0
+      echarts-for-react:
+        specifier: 'catalog:'
+        version: 3.0.6(echarts@6.1.0)(react@19.2.7)
+      lucide-react:
+        specifier: 'catalog:'
+        version: 1.21.0(react@19.2.7)
+      storybook:
+        specifier: 'catalog:'
+        version: 10.4.6(@testing-library/dom@10.4.1)(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      tsdown:
+        specifier: 'catalog:'
+        version: 0.22.3(@tsdown/css@0.22.3)(oxc-resolver@11.21.3)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.11.0)(@emnapi/runtime@1.11.0))
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+
   src/frontend/packages/core:
     dependencies:
       '@mantine/core':
@@ -1029,7 +1166,7 @@ importers:
         version: 10.4.6(@testing-library/dom@10.4.1)(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.3(@tsdown/css@0.22.3)(oxc-resolver@11.21.3)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.11.0)(@emnapi/runtime@1.11.0))
+        version: 0.22.3(@tsdown/css@0.22.3)(oxc-resolver@11.21.3)(typescript@5.9.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -4655,6 +4792,15 @@ packages:
   earcut@3.2.3:
     resolution: {integrity: sha512-vnS4AVwp1KHAF13i1vp1/2D5evWy3k5u/iW/B81QVsUZtV8cv2tU0b2VNFlqvh4kYwrFMDdjPCfAmfyJW9y14Q==}
 
+  echarts-for-react@3.0.6:
+    resolution: {integrity: sha512-4zqLgTGWS3JvkQDXjzkR1k1CHRdpd6by0988TWMJgnvDytegWLbeP/VNZmMa+0VJx2eD7Y632bi2JquXDgiGJg==}
+    peerDependencies:
+      echarts: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0
+      react: ^15.0.0 || >=16.0.0
+
+  echarts@6.1.0:
+    resolution: {integrity: sha512-q0yaFPggC9FUdsWH4blavRWFmxdrIodbkoKNAjJudAI6CA9gNPxHtV2RcZNEepZVlk4yvBYkOkbk6HIVpIyHZA==}
+
   electron-to-chromium@1.5.376:
     resolution: {integrity: sha512-cUVA7/RvbFTEuw/i3obUwDTRIXojaxkResf+ibByPFxjc6XK3VNtcQXV0NSbAlJ0FMjcJGgftVVB4Qo184EXvA==}
 
@@ -6594,8 +6740,8 @@ packages:
   zod@4.3.6:
     resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
 
-  zrender@5.6.1:
-    resolution: {integrity: sha512-OFXkDJKcrlx5su2XbzJvj/34Q3m6PvyCZkVPHGYpcCJ52ek4U/ymZyfuV1nKE23AyBJ51E/6Yr0mhZ7xGTO4ag==}
+  zrender@6.1.0:
+    resolution: {integrity: sha512-oEGMDB6pOP2S6OwRR4PdVv610zrjnA3Bh+JnSG12fYJlBKjtNAoEb5fSUoCOOINlH96I2fU38/A2UpRKs67xYQ==}
 
   zustand@4.5.7:
     resolution: {integrity: sha512-CHOUy7mu3lbD6o6LJLfllpjkzhHXSBlX8B9+qPddUsIfeF5S/UZ5q0kmCsnRqT1UHFQZchNFDDzMbQsuesHWlw==}
@@ -7519,13 +7665,6 @@ snapshots:
       '@tybys/wasm-util': 0.10.3
     optional: true
 
-  '@napi-rs/wasm-runtime@1.1.5(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)':
-    dependencies:
-      '@emnapi/core': 1.9.2
-      '@emnapi/runtime': 1.9.2
-      '@tybys/wasm-util': 0.10.3
-    optional: true
-
   '@napi-rs/wasm-runtime@1.1.6(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
     dependencies:
       '@emnapi/core': 1.10.0
@@ -7544,6 +7683,13 @@ snapshots:
     dependencies:
       '@emnapi/core': 1.11.1
       '@emnapi/runtime': 1.11.1
+      '@tybys/wasm-util': 0.10.3
+    optional: true
+
+  '@napi-rs/wasm-runtime@1.1.6(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)':
+    dependencies:
+      '@emnapi/core': 1.9.2
+      '@emnapi/runtime': 1.9.2
       '@tybys/wasm-util': 0.10.3
     optional: true
 
@@ -7768,7 +7914,7 @@ snapshots:
     dependencies:
       '@emnapi/core': 1.9.2
       '@emnapi/runtime': 1.9.2
-      '@napi-rs/wasm-runtime': 1.1.5(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)
+      '@napi-rs/wasm-runtime': 1.1.6(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)
     optional: true
 
   '@oxc-parser/binding-win32-arm64-msvc@0.127.0':
@@ -8891,6 +9037,14 @@ snapshots:
       '@napi-rs/wasm-runtime': 1.1.6(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
     optional: true
 
+  '@rolldown/binding-wasm32-wasi@1.0.0-rc.9':
+    dependencies:
+      '@napi-rs/wasm-runtime': 1.1.6(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)
+    transitivePeerDependencies:
+      - '@emnapi/core'
+      - '@emnapi/runtime'
+    optional: true
+
   '@rolldown/binding-wasm32-wasi@1.0.0-rc.9(@emnapi/core@1.11.0)(@emnapi/runtime@1.11.0)':
     dependencies:
       '@napi-rs/wasm-runtime': 1.1.6(@emnapi/core@1.11.0)(@emnapi/runtime@1.11.0)
@@ -8956,7 +9110,7 @@ snapshots:
     dependencies:
       '@types/estree': 1.0.9
       estree-walker: 2.0.2
-      picomatch: 4.0.4
+      picomatch: 4.0.5
 
   '@scalar/helpers@0.2.18': {}
 
@@ -10023,6 +10177,18 @@ snapshots:
   earcut@2.2.4: {}
 
   earcut@3.2.3: {}
+
+  echarts-for-react@3.0.6(echarts@6.1.0)(react@19.2.7):
+    dependencies:
+      echarts: 6.1.0
+      fast-deep-equal: 3.1.3
+      react: 19.2.7
+      size-sensor: 1.0.3
+
+  echarts@6.1.0:
+    dependencies:
+      tslib: 2.3.0
+      zrender: 6.1.0
 
   electron-to-chromium@1.5.376: {}
 
@@ -11634,7 +11800,7 @@ snapshots:
       '@rolldown/binding-linux-x64-gnu': 1.0.0-rc.9
       '@rolldown/binding-linux-x64-musl': 1.0.0-rc.9
       '@rolldown/binding-openharmony-arm64': 1.0.0-rc.9
-      '@rolldown/binding-wasm32-wasi': 1.0.0-rc.9(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)
+      '@rolldown/binding-wasm32-wasi': 1.0.0-rc.9
       '@rolldown/binding-win32-arm64-msvc': 1.0.0-rc.9
       '@rolldown/binding-win32-x64-msvc': 1.0.0-rc.9
     transitivePeerDependencies:
@@ -12158,7 +12324,7 @@ snapshots:
     dependencies:
       '@jridgewell/remapping': 2.3.5
       acorn: 8.17.0
-      picomatch: 4.0.4
+      picomatch: 4.0.5
       webpack-virtual-modules: 0.6.2
 
   unquote@1.1.1: {}
@@ -12305,6 +12471,10 @@ snapshots:
   yoctocolors@2.1.2: {}
 
   zod@4.3.6: {}
+
+  zrender@6.1.0:
+    dependencies:
+      tslib: 2.3.0
 
   zustand@4.5.7(@types/react@19.2.17)(immer@11.1.11)(react@19.2.7):
     dependencies:

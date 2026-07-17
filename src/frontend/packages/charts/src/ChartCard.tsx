@@ -1,20 +1,21 @@
-import { type ReactNode, useState } from "react";
 import {
   ActionIcon,
   Box,
   Divider,
   Group,
+  HoverCard,
   Paper,
   Popover,
   Stack,
   Text,
 } from "@mantine/core";
 import { InfoIcon, SettingsIcon } from "lucide-react";
+import { type ReactNode, useState } from "react";
 
 export interface ChartCardProps {
   title: string;
   subtitle?: string;
-  info?: string;
+  info?: ReactNode;
 
   controls?: ReactNode;
   settings?: ReactNode;
@@ -114,8 +115,15 @@ export function ChartCard({
             {actions}
 
             {info && (
-              <Popover width={280} withArrow shadow="sm" position="bottom-end">
-                <Popover.Target>
+              <HoverCard
+                width={340}
+                withArrow
+                shadow="md"
+                position="bottom-end"
+                openDelay={250}
+                closeDelay={100}
+              >
+                <HoverCard.Target>
                   <ActionIcon
                     variant="subtle"
                     color="gray"
@@ -124,12 +132,16 @@ export function ChartCard({
                   >
                     <InfoIcon size={14} />
                   </ActionIcon>
-                </Popover.Target>
+                </HoverCard.Target>
 
-                <Popover.Dropdown>
-                  <Text size="sm">{info}</Text>
-                </Popover.Dropdown>
-              </Popover>
+                <HoverCard.Dropdown>
+                  {typeof info === "string" ? (
+                    <Text size="sm">{info}</Text>
+                  ) : (
+                    info
+                  )}
+                </HoverCard.Dropdown>
+              </HoverCard>
             )}
           </Group>
         </Group>

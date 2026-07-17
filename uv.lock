@@ -18,6 +18,7 @@ members = [
     "ocelescope",
     "ocelescope-backend",
     "ocelescope-module-filter",
+    "ocelescope-module-querying",
     "ocelescope-workspace",
 ]
 
@@ -1790,6 +1791,27 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/40/39/4a3d037aab03d1e9590064a90a6e9f48527a0f3a45db727889894947bf35/ocelescope_module_ocelot-0.1.0.tar.gz", hash = "sha256:8c5027358eceb7a8b52c9b2cfcb20da9f079f14a2349e53285d387a74f291957", size = 3602, upload-time = "2026-06-30T12:02:41.458Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/d9/bf/786a84c0a20130e219e200d64c3e1efe9430c43f1a65e437377fbdeec8f4/ocelescope_module_ocelot-0.1.0-py3-none-any.whl", hash = "sha256:ec27a1dd5a096fd49941b524e8dd9797fc0a61f340feba481f5805dc730f4e15", size = 5810, upload-time = "2026-06-30T12:02:40.71Z" },
+]
+
+[[package]]
+name = "ocelescope-module-querying"
+version = "0.1.0"
+source = { editable = "src/backend/modules/ocelescope-module-querying" }
+dependencies = [
+    { name = "fastapi" },
+    { name = "numpy" },
+    { name = "ocelescope" },
+    { name = "ocelescope-backend" },
+    { name = "pandas" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "fastapi", specifier = ">=0.136.0" },
+    { name = "numpy", specifier = ">=2.3.2" },
+    { name = "ocelescope", editable = "src/ocelescope" },
+    { name = "ocelescope-backend", editable = "src/backend/ocelescope-backend" },
+    { name = "pandas", specifier = ">=2.3.1" },
 ]
 
 [[package]]

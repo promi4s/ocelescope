@@ -1,57 +1,82 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import type { ChartSpec } from "../model/chartSpec";
-import { isChartSpec } from "../model/chartSpec";
+import { useEffect, useState } from "react";
+import type {
+  ActivityExecutionFrequencySpec,
+  DashboardCardDefinition,
+  ObjectInvolvementDistributionSpec,
+  StoredDashboard,
+} from "../model/dashboard";
 
-const STORAGE_VERSION = "v4";
+const storageKey = (ocelId: string) => `ocelescope:exploration:${ocelId}`;
+
+function isStoredDashboard(value: unknown): value is StoredDashboard {
+  if (!value || typeof value !== "object") return false;
+  const dashboard = value as Partial<StoredDashboard>;
+  return dashboard.version === 1 && Array.isArray(dashboard.cards);
+}
+
+function migrateCards(cards: DashboardCardDefinition[]) {
+  return cards.map((card) => {
+    const analysis = (card.spec as { analysis: string }).analysis;
+    if (analysis === "activity-executions-per-object") {
+      return {
+        ...card,
+        spec: {
+          ...card.spec,
+          analysis: "activity-execution-frequency",
+        } as ActivityExecutionFrequencySpec,
+      };
+    }
+    if (analysis === "object-involvement-distribution") {
+      const spec = card.spec as unknown as {
+        query: { activity: string; object_type: string; grouping?: unknown };
+        visualization?: unknown;
+        title?: string;
+      };
+      if (spec.query.grouping && spec.visualization) return card;
+      return {
+        ...card,
+        spec: {
+          ...spec,
+          query: {
+            ...spec.query,
+            grouping: { kind: "categories", limit: 500 },
+          },
+          visualization: "bar",
+        } as ObjectInvolvementDistributionSpec,
+      };
+    }
+    return card;
+  });
+}
 
 export function useExplorationDashboard(ocelId: string) {
-  const storageKey = useMemo(
-    () => `ocelescope.exploration.dashboard.${STORAGE_VERSION}.${ocelId}`,
-    [ocelId],
-  );
-  const [charts, setCharts] = useState<ChartSpec[]>([]);
-  const [ready, setReady] = useState(false);
+  const [cards, setCards] = useState<DashboardCardDefinition[]>([]);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    setReady(false);
+    setLoaded(false);
     try {
-      const raw = window.localStorage.getItem(storageKey);
-      if (raw) {
-        const parsed = JSON.parse(raw) as unknown;
-        if (Array.isArray(parsed)) {
-          const valid = parsed.filter(isChartSpec);
-          setCharts(valid);
-          setReady(true);
-          return;
-        }
-      }
+      const stored = window.localStorage.getItem(storageKey(ocelId));
+      const parsed: unknown = stored ? JSON.parse(stored) : null;
+      setCards(isStoredDashboard(parsed) ? migrateCards(parsed.cards) : []);
     } catch {
-      // Invalid local state falls back to a fresh dashboard.
+      setCards([]);
     }
-    setCharts([]);
-    setReady(true);
-  }, [storageKey]);
+    setLoaded(true);
+  }, [ocelId]);
 
   useEffect(() => {
-    if (!ready) return;
-    window.localStorage.setItem(storageKey, JSON.stringify(charts));
-  }, [charts, ready, storageKey]);
+    if (!loaded) return;
+    const dashboard: StoredDashboard = { version: 1, cards };
+    try {
+      window.localStorage.setItem(
+        storageKey(ocelId),
+        JSON.stringify(dashboard),
+      );
+    } catch {
+      // The dashboard remains usable when browser storage is unavailable.
+    }
+  }, [cards, loaded, ocelId]);
 
-  const saveChart = useCallback((spec: ChartSpec) => {
-    setCharts((current) => {
-      const index = current.findIndex((chart) => chart.id === spec.id);
-      if (index < 0) return [...current, spec];
-      return current.map((chart) => (chart.id === spec.id ? spec : chart));
-    });
-  }, []);
-
-  const removeChart = useCallback((id: string) => {
-    setCharts((current) => current.filter((chart) => chart.id !== id));
-  }, []);
-
-  const resetDashboard = useCallback(() => {
-    setCharts([]);
-  }, []);
-
-  return { charts, ready, saveChart, removeChart, resetDashboard };
+  return { cards, setCards, loaded };
 }

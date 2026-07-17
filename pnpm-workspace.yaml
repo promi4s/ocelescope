@@ -51,7 +51,7 @@ catalog:
   cspell: ^10.0.1
   cytoscape: ^3.33.1
   dayjs: ^1.11.19
-  echarts: ^5.6.0
+  echarts: ^6.1.0
   echarts-for-react: ^3.0.6
   elkjs: ^0.11.0
   embla-carousel: ^8.6.0

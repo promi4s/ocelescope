@@ -1,46 +1,22 @@
 # @ocelescope/exploration
 
-Interactive, query-driven OCEL dashboards for Ocelescope.
+Interactive, schema-aware OCEL exploration. The module does not own or
+reproduce the log filter pipeline; analytical queries automatically use the
+active filtered OCEL.
 
-Every visualization consists of two independent parts:
+The dashboard is built from a registry of analytical questions. Every
+visualization uses an equal-size card with maximize, information, and image
+export actions. The first registered analysis shows event-attribute
+distributions as an explicitly selected histogram, bar chart, or donut chart.
+Object-attribute distributions reuse the same chart presentation while
+resolving dynamic values at the time of each matching event-object relation.
+Their editor progressively limits object types to those involved in the
+selected activity, based on stable options from the original OCEL.
+Dashboard configurations are versioned and stored locally per OCEL.
 
-- an `AnalysisQuery` describing source, predicates, dimension, optional series,
-  and measure;
-- a chart definition describing which query slots it accepts and how results
-  are rendered.
-
-Event attribute distributions are configured directly by selecting the event
-source, an optional activity scope, an attribute dimension, row count, and a
-compatible chart type.
-
-```ts
-const chart: ChartSpec = {
-  version: 3,
-  id: crypto.randomUUID(),
-  title: "Average cost by activity",
-  chart: { type: "bar", showLegend: false },
-  query: {
-    source: "events",
-    predicates: [],
-    dimension: {
-      expression: { kind: "field", field: "ocel:activity" },
-    },
-    measure: {
-      operation: "avg",
-      expression: { kind: "field", field: "cost" },
-    },
-    limit: 100,
-    order: "measure_desc",
-  },
-  interaction: { drilldown: true },
-  layout: { width: "full", height: "standard" },
-};
-```
-
-`analysisQuery.ts` owns the query AST and compilation to the current querying
-endpoint. `chartRegistry.ts` owns chart slot constraints. `chartFactory.ts`
-contains starter configurations. `chartRuntime.ts` maps stable query result
-aliases to ECharts.
-
-The dashboard starts empty. Users configure KPI, bar, line, area, donut, and
-histogram charts directly.
+A separate analytical-schema page presents physical and inferred analytical
+types, data coverage, and object-attribute lifecycle metadata. Compatible
+interpretations are configured once per OCEL and reused by analytical queries.
+Visualization compatibility is a frontend concern and is not included in the
+backend schema. The generated querying client is module-local under `src/api`,
+following the frontend module pattern.

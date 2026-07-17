@@ -35,11 +35,7 @@
     "orval": "catalog:"
   },
   "dependencies": {
-    "echarts": "catalog:",
-    "echarts-for-react": "catalog:"
-  }
     "orval": "catalog:",
     "cspell": "catalog:"
-  },
-  "dependencies": {}
+  }
 }

@@ -2,7 +2,7 @@
   "name": "@ocelescope/exploration",
   "type": "module",
   "version": "0.1.0",
-  "description": "Interactive OCEL exploration charts",
+  "description": "Interactive analytical dashboards for OCEL data",
   "license": "MIT",
   "exports": {
     ".": "./dist/index.js",
@@ -11,31 +11,29 @@
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
-  "publishConfig": {
-    "access": "public"
-  },
+  "files": ["dist"],
   "scripts": {
-    "build": "tsdown",
+    "build": "orval && tsdown",
     "dev": "tsdown --watch ./src",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "generate:api": "uv run ocelescope-backend openapi --module querying --path ./openapi.json && orval"
   },
   "peerDependencies": {
     "@mantine/core": "catalog:",
-    "@ocelescope/api-querying": "workspace:^",
-    "@ocelescope/charts": "workspace:*",
+    "@ocelescope/api-client": "workspace:^",
+    "@ocelescope/charts": "workspace:^",
     "@ocelescope/core": "workspace:^",
     "@tanstack/react-query": "catalog:",
+    "axios": "catalog:",
     "lucide-react": "catalog:",
-    "react": "catalog:",
-    "react-dom": "catalog:"
+    "react": "catalog:"
   },
   "devDependencies": {
+    "@ocelescope/api-config": "workspace:^",
+    "@ocelescope/charts": "workspace:^",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
-    "@types/react-dom": "catalog:",
+    "orval": "catalog:",
     "tsdown": "catalog:",
     "typescript": "catalog:"
   }

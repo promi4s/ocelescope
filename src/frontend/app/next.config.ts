@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
     "@ocelescope/plugin",
     "@ocelescope/filter",
     "@ocelescope/discovery",
+    "@ocelescope/exploration",
     "@ocelescope/log-overview",
     "@ocelescope/management",
     "@ocelescope/variants",

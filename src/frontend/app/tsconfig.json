@@ -17,6 +17,7 @@
       "@/*": ["./*"],
       "@ocelescope/resources": ["../packages/resources/src/index.ts"],
       "@ocelescope/discovery": ["../modules/discovery/src/index.ts"],
+      "@ocelescope/exploration": ["../modules/exploration/src/index.ts"],
       "@ocelescope/management": ["../modules/management/src/index.ts"],
       "@ocelescope/filter": ["../modules/filter/src/index.ts"],
       "@ocelescope/plugin": ["../modules/plugin/src/index.ts"],

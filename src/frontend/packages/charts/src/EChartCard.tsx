@@ -1,133 +1,193 @@
-import { ActionIcon, Modal, Tooltip } from "@mantine/core";
+import {
+  ActionIcon,
+  Alert,
+  Center,
+  Menu,
+  Modal,
+  Skeleton,
+  Text,
+  Tooltip,
+} from "@mantine/core";
 import type { EChartsOption } from "echarts";
-import ReactECharts from "echarts-for-react";
 import type ReactEChartsType from "echarts-for-react";
-import { DownloadIcon, Maximize2Icon, RotateCcwIcon } from "lucide-react";
-import { useCallback, useMemo, useRef, useState } from "react";
+import {
+  CircleAlertIcon,
+  DownloadIcon,
+  FileImageIcon,
+  FileType2Icon,
+  Maximize2Icon,
+  RotateCcwIcon,
+} from "lucide-react";
+import { type ReactNode, useMemo, useRef, useState } from "react";
 
+import { ChartCanvas } from "./ChartCanvas";
 import { ChartCard } from "./ChartCard";
-import type { BrushConfig, ChartPoint, ChartViewport, ZoomConfig } from "./types";
+import { enhanceChartOption } from "./chartOption";
+import type {
+  BrushConfig,
+  ChartEventMap,
+  ChartPoint,
+  ChartViewport,
+  ZoomConfig,
+} from "./types";
+import { useChartExport } from "./useChartExport";
+import { useEChartInteractions } from "./useEChartInteractions";
 
 export interface EChartCardProps {
-  // Identity / chrome
   title: string;
   subtitle?: string;
-  info?: string;
+  info?: ReactNode;
   filename?: string;
-
-  controls?: React.ReactNode;
-  settings?: React.ReactNode;
-  actions?: React.ReactNode;
-  note?: React.ReactNode;
-
+  controls?: ReactNode;
+  settings?: ReactNode;
+  actions?: ReactNode;
+  note?: ReactNode;
   compact?: boolean;
   height?: number | string;
-
   expandable?: boolean;
   expandedHeight?: number | string;
 
-  // Chart definition
-  option: EChartsOption;
+  option: EChartsOption | null;
+  loading?: boolean;
+  error?: ReactNode;
+  empty?: boolean;
+  emptyMessage?: ReactNode;
 
-  // Generic interactivity (opt-in)
   zoom?: ZoomConfig;
   brush?: BrushConfig;
-
-  // Controlled viewport (zoom/pan state)
   viewport?: ChartViewport | null;
   onViewportChange?: (viewport: ChartViewport | null) => void;
-
-  // Brush selection state (not controlled — emitted on settle)
   onSelection?: (selection: ChartViewport | null) => void;
-
-  // Drill-down / data point clicks
   onPointClick?: (point: ChartPoint) => void;
+  onEvents?: ChartEventMap;
 }
 
-const VIEWPORT_EPSILON = 1e-9;
+interface ChartActionsProps {
+  custom?: ReactNode;
+  ready: boolean;
+  expandable: boolean;
+  filename?: string;
+  canReset: boolean;
+  onReset: () => void;
+  onExpand: () => void;
+  onExport: (format: "png" | "svg") => void;
+}
 
-function approxEqRange(a: ChartViewport | null | undefined, b: ChartViewport | null): boolean {
-  if (a == null && b == null) return true;
-  if (a == null || b == null) return false;
-  const ax = a.x;
-  const bx = b.x;
-  if (!ax && !bx) return true;
-  if (!ax || !bx) return false;
+function ChartActions({
+  custom,
+  ready,
+  expandable,
+  filename,
+  canReset,
+  onReset,
+  onExpand,
+  onExport,
+}: ChartActionsProps) {
   return (
-    Math.abs(ax.min - bx.min) < VIEWPORT_EPSILON &&
-    Math.abs(ax.max - bx.max) < VIEWPORT_EPSILON
+    <>
+      {custom}
+      {canReset && (
+        <Tooltip label="Reset view">
+          <ActionIcon
+            variant="subtle"
+            color="gray"
+            size="sm"
+            onClick={onReset}
+            aria-label="Reset chart view"
+          >
+            <RotateCcwIcon size={14} />
+          </ActionIcon>
+        </Tooltip>
+      )}
+      {expandable && ready && (
+        <Tooltip label="Open larger chart">
+          <ActionIcon
+            variant="subtle"
+            color="gray"
+            size="sm"
+            aria-label="Open larger chart"
+            onClick={onExpand}
+          >
+            <Maximize2Icon size={14} />
+          </ActionIcon>
+        </Tooltip>
+      )}
+      {filename && ready && (
+        <Menu position="bottom-end" shadow="md">
+          <Menu.Target>
+            <Tooltip label="Download chart">
+              <ActionIcon
+                variant="light"
+                color="blue"
+                size="md"
+                aria-label="Download chart"
+              >
+                <DownloadIcon size={16} />
+              </ActionIcon>
+            </Tooltip>
+          </Menu.Target>
+          <Menu.Dropdown>
+            <Menu.Item
+              leftSection={<FileImageIcon size={14} />}
+              onClick={() => onExport("png")}
+            >
+              PNG image
+            </Menu.Item>
+            <Menu.Item
+              leftSection={<FileType2Icon size={14} />}
+              onClick={() => onExport("svg")}
+            >
+              SVG image
+            </Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
+      )}
+    </>
   );
 }
 
-interface DataZoomOption {
-  id: string;
-  type: "inside" | "slider";
-  xAxisIndex?: 0;
-  yAxisIndex?: 0;
-  startValue?: number;
-  endValue?: number;
-  start?: number;
-  end?: number;
-  height?: number;
-  bottom?: number;
-  brushSelect?: boolean;
-  showDetail?: boolean;
-  throttle?: number;
-}
-
-function buildDataZoom(zoom: ZoomConfig, viewport: ChartViewport | null | undefined): DataZoomOption[] {
-  const axis = zoom.axis ?? "x";
-  const slider = zoom.slider ?? true;
-  const mouse = zoom.mouse ?? true;
-
-  const axisProp = axis === "y" ? "yAxisIndex" : "xAxisIndex";
-  const result: DataZoomOption[] = [];
-
-  const range = axis === "y" ? viewport?.y : viewport?.x;
-  const rangeProps = range
-    ? { startValue: range.min, endValue: range.max }
-    : { start: 0, end: 100 };
-
-  if (mouse) {
-    result.push({
-      id: `zoom-inside-${axis}`,
-      type: "inside",
-      [axisProp]: 0,
-      throttle: 50,
-      ...rangeProps,
-    });
+function ChartContent({
+  chartRef,
+  option,
+  events,
+  loading,
+  error,
+  empty,
+  emptyMessage,
+}: {
+  chartRef: React.RefObject<ReactEChartsType | null>;
+  option: EChartsOption | null;
+  events: ChartEventMap;
+  loading: boolean;
+  error?: ReactNode;
+  empty: boolean;
+  emptyMessage: ReactNode;
+}) {
+  if (loading) return <Skeleton h="100%" />;
+  if (error) {
+    return (
+      <Center h="100%">
+        <Alert
+          icon={<CircleAlertIcon size={16} />}
+          color="red"
+          title="Unable to load chart"
+          maw={520}
+        >
+          {error}
+        </Alert>
+      </Center>
+    );
   }
-  if (slider) {
-    result.push({
-      id: `zoom-slider-${axis}`,
-      type: "slider",
-      [axisProp]: 0,
-      height: 18,
-      bottom: 8,
-      brushSelect: true,
-      showDetail: false,
-      ...rangeProps,
-    });
+  if (empty || !option) {
+    return (
+      <Center h="100%">
+        <Text c="dimmed" size="sm" ta="center">
+          {emptyMessage}
+        </Text>
+      </Center>
+    );
   }
-
-  return result;
-}
-
-interface BrushBatch {
-  areas: Array<{
-    coordRange?: [number, number];
-  }>;
-}
-
-interface DataZoomEventBatch {
-  startValue?: number;
-  endValue?: number;
-}
-
-interface ChartClickParams {
-  dataIndex: number;
-  value: unknown;
-  seriesName?: string;
+  return <ChartCanvas chartRef={chartRef} option={option} events={events} />;
 }
 
 export function EChartCard({
@@ -144,187 +204,44 @@ export function EChartCard({
   expandable = true,
   expandedHeight = 620,
   option,
+  loading = false,
+  error,
+  empty = false,
+  emptyMessage = "No data available for this chart.",
   zoom,
   brush,
-  viewport = null,
+  viewport,
   onViewportChange,
   onSelection,
   onPointClick,
+  onEvents,
 }: EChartCardProps) {
   const [expanded, setExpanded] = useState(false);
-  const [hasSelection, setHasSelection] = useState(false);
   const chartRef = useRef<ReactEChartsType>(null);
   const modalChartRef = useRef<ReactEChartsType>(null);
-
-  // Track the last viewport we emitted so we can suppress echoes from
-  // programmatic option updates that re-fire `datazoom`.
-  const lastEmittedViewport = useRef<ChartViewport | null>(viewport ?? null);
-
-  const mergedOption = useMemo<EChartsOption>(() => {
-    const merged: EChartsOption = { ...option };
-
-    if (zoom) {
-      // Bump bottom inset so the slider does not overlap axis labels.
-      const grid = (option.grid ?? {}) as { bottom?: number | string };
-      const wantsSlider = zoom.slider ?? true;
-      if (wantsSlider) {
-        const currentBottom =
-          typeof grid.bottom === "number" ? grid.bottom : 16;
-        merged.grid = { ...grid, bottom: Math.max(currentBottom, 56) };
-      }
-      merged.dataZoom = buildDataZoom(zoom, viewport);
-    }
-
-    if (brush) {
-      const brushType = brush.axis === "y" ? "lineY" : "lineX";
-      merged.brush = {
-        toolbox: [brushType, "clear"],
-        xAxisIndex: brush.axis === "x" ? 0 : undefined,
-        yAxisIndex: brush.axis === "y" ? 0 : undefined,
-        throttleType: "debounce",
-        throttleDelay: 100,
-      };
-    }
-
-    return merged;
-  }, [option, zoom, brush, viewport]);
-
-  const makeEvents = useCallback(
-    (ref: React.RefObject<ReactEChartsType | null>) => {
-      const handlers: Record<string, (...args: unknown[]) => void> = {};
-
-      if (zoom && onViewportChange) {
-        handlers.datazoom = () => {
-          const instance = ref.current?.getEchartsInstance();
-          if (!instance) return;
-          const fullOpt = instance.getOption() as { dataZoom?: DataZoomEventBatch[] };
-          const dz = fullOpt.dataZoom?.[0];
-          if (!dz || dz.startValue == null || dz.endValue == null) return;
-
-          const newViewport: ChartViewport = {
-            x: { min: dz.startValue, max: dz.endValue },
-          };
-
-          if (approxEqRange(lastEmittedViewport.current, newViewport)) return;
-          lastEmittedViewport.current = newViewport;
-          onViewportChange(newViewport);
-        };
-      }
-
-      if (brush && onSelection) {
-        handlers.brushEnd = (...args: unknown[]) => {
-          const params = args[0] as { areas?: BrushBatch["areas"] };
-          const area = params.areas?.[0];
-          if (!area?.coordRange) {
-            setHasSelection(false);
-            onSelection(null);
-            return;
-          }
-          const [a, b] = area.coordRange;
-          const min = Math.min(a, b);
-          const max = Math.max(a, b);
-          setHasSelection(true);
-          onSelection(
-            brush.axis === "y" ? { y: { min, max } } : { x: { min, max } },
-          );
-        };
-      }
-
-      if (onPointClick) {
-        handlers.click = (...args: unknown[]) => {
-          const params = args[0] as ChartClickParams;
-          if (params == null || params.dataIndex == null) return;
-          onPointClick({
-            dataIndex: params.dataIndex,
-            value: params.value,
-            seriesName: params.seriesName,
-          });
-        };
-      }
-
-      return handlers;
-    },
-    [zoom, brush, onViewportChange, onSelection, onPointClick],
+  const interaction = useEChartInteractions({
+    chartRef,
+    zoom,
+    brush,
+    viewport,
+    onViewportChange,
+    onSelection,
+    onPointClick,
+    onEvents,
+  });
+  const enhancedOption = useMemo(
+    () =>
+      option
+        ? enhanceChartOption(option, {
+            zoom,
+            brush,
+            viewport: interaction.viewport,
+          })
+        : null,
+    [brush, interaction.viewport, option, zoom],
   );
-
-  const events = useMemo(() => makeEvents(chartRef), [makeEvents]);
-  const modalEvents = useMemo(() => makeEvents(modalChartRef), [makeEvents]);
-
-  // Keep our memory of the last emitted viewport in sync with the prop, so
-  // controlled re-renders do not echo back through `onViewportChange`.
-  if (!approxEqRange(lastEmittedViewport.current, viewport ?? null)) {
-    lastEmittedViewport.current = viewport ?? null;
-  }
-
-  const handleDownload = useCallback(() => {
-    const instance = chartRef.current?.getEchartsInstance();
-    if (!instance || !filename) return;
-    const url = instance.getDataURL({ type: "png", pixelRatio: 2, backgroundColor: "#fff" });
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = `${filename}.png`;
-    anchor.click();
-  }, [filename]);
-
-  const handleReset = useCallback(() => {
-    if (hasSelection) {
-      const instance = chartRef.current?.getEchartsInstance();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (instance as any)?.dispatchAction?.({ type: "brush", areas: [] });
-      setHasSelection(false);
-      onSelection?.(null);
-    }
-    if (viewport != null) {
-      lastEmittedViewport.current = null;
-      onViewportChange?.(null);
-    }
-  }, [hasSelection, viewport, onSelection, onViewportChange]);
-
-  const showReset = viewport != null || hasSelection;
-
-  const extraActions = (
-    <>
-      {actions}
-
-      {showReset && (
-        <Tooltip label="Reset view">
-          <ActionIcon
-            variant="subtle"
-            color="gray"
-            size="sm"
-            onClick={handleReset}
-            aria-label="Reset chart view"
-          >
-            <RotateCcwIcon size={14} />
-          </ActionIcon>
-        </Tooltip>
-      )}
-
-      {expandable && (
-        <ActionIcon
-          variant="subtle"
-          color="gray"
-          size="sm"
-          aria-label="Open larger chart"
-          onClick={() => setExpanded(true)}
-        >
-          <Maximize2Icon size={14} />
-        </ActionIcon>
-      )}
-
-      {filename && (
-        <ActionIcon
-          variant="light"
-          color="blue"
-          size="md"
-          aria-label="Download as PNG"
-          onClick={handleDownload}
-        >
-          <DownloadIcon size={16} />
-        </ActionIcon>
-      )}
-    </>
-  );
+  const exportChart = useChartExport(chartRef, filename);
+  const ready = enhancedOption != null && !loading && !error && !empty;
 
   return (
     <>
@@ -334,43 +251,56 @@ export function EChartCard({
         info={info}
         controls={controls}
         settings={settings}
-        actions={extraActions}
+        actions={
+          <ChartActions
+            custom={actions}
+            ready={ready}
+            expandable={expandable}
+            filename={filename}
+            canReset={interaction.canReset}
+            onReset={interaction.reset}
+            onExpand={() => setExpanded(true)}
+            onExport={exportChart}
+          />
+        }
         note={note}
         compact={compact}
         height={height}
       >
-        <ReactECharts
-          ref={chartRef}
-          option={mergedOption}
-          notMerge={false}
-          lazyUpdate
-          style={{ width: "100%", height: "100%" }}
-          onEvents={events}
+        <ChartContent
+          chartRef={chartRef}
+          option={enhancedOption}
+          events={interaction.events}
+          loading={loading}
+          error={error}
+          empty={empty}
+          emptyMessage={emptyMessage}
         />
       </ChartCard>
 
       <Modal
-        opened={expanded}
+        opened={expanded && ready}
         onClose={() => setExpanded(false)}
-        onEnterTransitionEnd={() => modalChartRef.current?.getEchartsInstance()?.resize()}
+        onEnterTransitionEnd={() =>
+          modalChartRef.current?.getEchartsInstance()?.resize()
+        }
         title={title}
         size="90vw"
         centered
       >
         {subtitle && (
-          <div style={{ marginBottom: 12, color: "var(--mantine-color-dimmed)" }}>
+          <Text c="dimmed" size="sm" mb="sm">
             {subtitle}
-          </div>
+          </Text>
         )}
-
-        <ReactECharts
-          ref={modalChartRef}
-          option={mergedOption}
-          notMerge={false}
-          lazyUpdate
-          style={{ width: "100%", height: expandedHeight }}
-          onEvents={modalEvents}
-        />
+        {enhancedOption && (
+          <ChartCanvas
+            chartRef={modalChartRef}
+            option={enhancedOption}
+            events={interaction.events}
+            height={expandedHeight}
+          />
+        )}
       </Modal>
     </>
   );

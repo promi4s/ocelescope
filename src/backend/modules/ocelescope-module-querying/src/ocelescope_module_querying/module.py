@@ -1,6 +1,7 @@
 from fastapi import FastAPI
-from ocelescope_backend.app.modules import Module, ModuleMeta
 from packaging.version import Version
+
+from ocelescope_backend.app.modules import Module, ModuleMeta
 
 from ocelescope_module_querying.api.routes import router
 
@@ -11,12 +12,10 @@ class Querying(Module):
     @classmethod
     def create_app(cls) -> FastAPI:
         app = FastAPI(
-            title="OCEL Querying",
+            title="Querying",
             version=str(cls.meta.version),
             docs_url=None,
             redoc_url=None,
         )
-
         app.include_router(router)
-
         return app
