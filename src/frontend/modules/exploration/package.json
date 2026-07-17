@@ -1,0 +1,42 @@
+{
+  "name": "@ocelescope/exploration",
+  "type": "module",
+  "version": "0.1.0",
+  "description": "Interactive OCEL exploration charts",
+  "license": "MIT",
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch ./src",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@mantine/core": "catalog:",
+    "@ocelescope/api-querying": "workspace:^",
+    "@ocelescope/charts": "workspace:*",
+    "@ocelescope/core": "workspace:^",
+    "@tanstack/react-query": "catalog:",
+    "lucide-react": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "tsdown": "catalog:",
+    "typescript": "catalog:"
+  }
+}
