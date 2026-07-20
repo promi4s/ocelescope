@@ -6,9 +6,6 @@ settings:
 
 catalogs:
   default:
-    '@apidevtools/json-schema-ref-parser':
-      specifier: ^15.3.1
-      version: 15.4.0
     '@faker-js/faker':
       specifier: ^10.4.0
       version: 10.5.0
@@ -276,7 +273,7 @@ importers:
     devDependencies:
       '@apidevtools/json-schema-ref-parser':
         specifier: 'catalog:'
-        version: 15.4.0(@types/json-schema@7.0.15)
+        version: 15.5.0(@types/json-schema@7.0.15)
       '@rjsf/mantine':
         specifier: 'catalog:'
         version: 6.6.2(@mantine/core@9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/dates@9.4.0(@mantine/core@9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.0(react@19.2.7))(dayjs@1.11.19)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.0(react@19.2.7))(@rjsf/core@6.6.2(@rjsf/utils@6.6.2(react@19.2.7))(react@19.2.7))(@rjsf/utils@6.6.2(react@19.2.7))(react@19.2.7)
@@ -562,7 +559,7 @@ importers:
     devDependencies:
       '@apidevtools/json-schema-ref-parser':
         specifier: 'catalog:'
-        version: 15.4.0(@types/json-schema@7.0.15)
+        version: 15.5.0(@types/json-schema@7.0.15)
       '@mantine/charts':
         specifier: 'catalog:'
         version: 9.4.0(@mantine/core@9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.0(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(recharts@3.8.1(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react-is@18.3.1)(react@19.2.7)(redux@5.0.1))
@@ -993,8 +990,8 @@ packages:
   '@adobe/css-tools@4.5.0':
     resolution: {integrity: sha512-6OzddxPio9UiWTCemp4N8cYLV2ZN1ncRnV1cVGtve7dhPOtRkleRyx32GQCYSwDYgaHU3USMm84tNsvKzRCa1Q==}
 
-  '@apidevtools/json-schema-ref-parser@15.4.0':
-    resolution: {integrity: sha512-QbMJJlMZd27fZmi7Q+twCqwABlfaO4Qdc1YvbbwkqN2lILfELnfWfw9xFFl6CeF5jAeGQpokUVhvCkhz+rvEGg==}
+  '@apidevtools/json-schema-ref-parser@15.5.0':
+    resolution: {integrity: sha512-Ps4w0FwrDoeVK6hfYxWkVbkmxm+zN+6xoXF2ZfEhfiox0ZNbcSAiUWO6iAIvP5bc3DB270r+EaKcoT1IUyzfxw==}
     engines: {node: '>=20'}
     peerDependencies:
       '@types/json-schema': ^7.0.15
@@ -5177,8 +5174,8 @@ packages:
     resolution: {integrity: sha512-qQKT4zQxXl8lLwBtHMWwaTcGfFOZviOJet3Oy/xmGk2gZH677CJM9EvtfdSkgWcATZhj/55JZ0rmy3myCT5lsA==}
     hasBin: true
 
-  js-yaml@4.2.0:
-    resolution: {integrity: sha512-ePWsvanv0DWuDRsW8dnt+R4jQ31SCRCQ7hhNcPXZPsoBZiemuZNYGf7adZdqX2D86j6rvKp3RpCxVTSb8WQlOw==}
+  js-yaml@4.3.0:
+    resolution: {integrity: sha512-1td788aAnnZ5qs7V2QIRl1owjtYpbKt749Y3xauqQgwIIGF/xXWz1wMTEBx5O3LK3lXLVuqXPdPxj2BoFHaW9Q==}
     hasBin: true
 
   jsesc@3.1.0:
@@ -6579,10 +6576,10 @@ snapshots:
 
   '@adobe/css-tools@4.5.0': {}
 
-  '@apidevtools/json-schema-ref-parser@15.4.0(@types/json-schema@7.0.15)':
+  '@apidevtools/json-schema-ref-parser@15.5.0(@types/json-schema@7.0.15)':
     dependencies:
       '@types/json-schema': 7.0.15
-      js-yaml: 4.2.0
+      js-yaml: 4.3.0
 
   '@babel/code-frame@7.29.7':
     dependencies:
@@ -10596,7 +10593,7 @@ snapshots:
     dependencies:
       argparse: 2.0.1
 
-  js-yaml@4.2.0:
+  js-yaml@4.3.0:
     dependencies:
       argparse: 2.0.1
 
