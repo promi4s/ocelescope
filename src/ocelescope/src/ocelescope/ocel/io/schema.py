@@ -22,11 +22,10 @@ from ocelescope.ocel.constants.pm4py import (
     TIMESTAMP_COL,
 )
 from ocelescope.ocel.constants.tables import OBJECT_CHANGES_TABLE
+from ocelescope.util.sql import ident
 
-#: An ordered list of ``(column_name, arrow_type)`` pairs.
 SchemaDefinition = list[tuple[str, pa.DataType]]
 
-#: OCEL 2.0 attribute type -> Arrow type used for the generated columns.
 ATTRIBUTE_TYPE_TO_ARROW: dict[str, pa.DataType] = {
     "string": pa.string(),
     "time": pa.date64(),
@@ -96,7 +95,7 @@ def create_ocel_tables(
     """
     schemas = ocel_table_schemas(object_columns, event_columns)
     for table, schema in schemas.items():
-        con.execute(f'DROP TABLE IF EXISTS "{table}"')
+        con.execute(f"DROP TABLE IF EXISTS {ident(table)}")
         con.from_arrow(schema.empty_table()).create(table)
     return schemas
 
@@ -116,17 +115,23 @@ def drop_unchanged_columns(con: duckdb.DuckDBPyConnection) -> None:
     meta = (OID_COL, TIMESTAMP_COL)
     names = [
         name
-        for name, *_ in con.execute(f'DESCRIBE "{OBJECT_CHANGES_TABLE}"').fetchall()
+        for name, *_ in con.execute(f"DESCRIBE {ident(OBJECT_CHANGES_TABLE)}").fetchall()
         if name not in meta
     ]
     if not names:
         return
 
-    projection = ", ".join(f'bool_or("{name}" IS NOT NULL) AS "{name}"' for name in names)
-    row = con.execute(f'SELECT {projection} FROM "{OBJECT_CHANGES_TABLE}"').fetchall()[0]
+    projection = ", ".join(
+        f"bool_or({ident(name)} IS NOT NULL) AS {ident(name)}" for name in names
+    )
+    row = con.execute(
+        f"SELECT {projection} FROM {ident(OBJECT_CHANGES_TABLE)}"
+    ).fetchall()[0]
     for name, has_values in zip(names, row):
         if not has_values:
-            con.execute(f'ALTER TABLE "{OBJECT_CHANGES_TABLE}" DROP COLUMN "{name}"')
+            con.execute(
+                f"ALTER TABLE {ident(OBJECT_CHANGES_TABLE)} DROP COLUMN {ident(name)}"
+            )
 
 
 def merge_columns(columns: SchemaDefinition) -> SchemaDefinition:
