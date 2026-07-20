@@ -68,6 +68,7 @@ def _build_object(elem) -> dict:
                     "time": attr.get("time") or None,
                 }
                 for attr in child
+                if attr.text is not None
             ]
         elif tag == "objects":
             relationships = [
@@ -89,7 +90,11 @@ def _build_event(elem) -> dict:
     for child in elem:
         tag = _local(child.tag)
         if tag == "attributes":
-            attributes = [{"name": attr.get("name"), "value": attr.text} for attr in child]
+            attributes = [
+                {"name": attr.get("name"), "value": attr.text}
+                for attr in child
+                if attr.text is not None
+            ]
         elif tag == "objects":
             relationships = [
                 {"objectId": ref.get("object-id"), "qualifier": ref.get("qualifier")}
