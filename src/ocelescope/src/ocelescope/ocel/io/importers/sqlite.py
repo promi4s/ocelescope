@@ -27,6 +27,7 @@ from ocelescope.ocel.constants.tables import (
     OBJECTS_TABLE,
 )
 from ocelescope.ocel.io.connection import DuckDBTarget, connect_target
+from ocelescope.ocel.constants.quantity import SQL_ITEM_PROPERTIES
 from ocelescope.ocel.io.importers.quantities import import_quantities_sqlite
 from ocelescope.ocel.io.schema import (
     SchemaDefinition,
@@ -288,6 +289,23 @@ def _insert_object_changes(con: duckdb.DuckDBPyConnection, table: _TypeTable) ->
         )
 
 
+def _property_casts(cur: sqlite3.Cursor, present: set[str]) -> dict[str, str]:
+    """DuckDB types to read the quantity item-property columns back as.
+
+    Their declared types are only legible here, before the file is attached with
+    ``sqlite_all_varchar``. Only the columns that map to a non-text type are
+    listed -- the rest are already text and need no cast.
+    """
+    if SQL_ITEM_PROPERTIES not in present:
+        return {}
+    casts = {}
+    for row in cur.execute(f"PRAGMA table_info({ident(SQL_ITEM_PROPERTIES)})"):
+        duckdb_type = _ARROW_TO_DUCKDB_CAST.get(_arrow_type(row[2]))
+        if duckdb_type is not None:
+            casts[row[1]] = duckdb_type
+    return casts
+
+
 def import_ocel_sqlite(source: str | Path, target: DuckDBTarget) -> None:
     """Stream an OCEL 2.0 SQLite log into the DuckDB database at ``target``."""
 
@@ -296,6 +314,7 @@ def import_ocel_sqlite(source: str | Path, target: DuckDBTarget) -> None:
         present = _table_names(cur)
         event_tables = _discover(cur, "event", "event_map_type", present)
         object_tables = _discover(cur, "object", "object_map_type", present)
+        property_casts = _property_casts(cur, present)
 
     event_columns = merge_columns([attr for table in event_tables for attr in table.attributes])
     object_columns = merge_columns([attr for table in object_tables for attr in table.attributes])
@@ -343,6 +362,6 @@ def import_ocel_sqlite(source: str | Path, target: DuckDBTarget) -> None:
                     "event_object",
                 )
 
-            import_quantities_sqlite(con, present)
+            import_quantities_sqlite(con, present, property_casts)
         finally:
             con.execute("DETACH src")

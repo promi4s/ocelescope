@@ -300,3 +300,26 @@ def iter_events(con: duckdb.DuckDBPyConnection) -> Iterator[dict]:
                 "attributes": attributes,
                 "relationships": relationships,
             }
+
+
+def sqlite_decl(duckdb_type: str) -> str:
+    """A SQLite column type the importer maps back to ``duckdb_type``'s arrow type.
+
+    DuckDB's ``CREATE TABLE ... AS SELECT`` into SQLite only ever declares
+    ``BIGINT``/``DOUBLE``/``VARCHAR``, which would collapse ``boolean`` -> integer
+    and ``time`` -> string on re-import. So the type tables are created with
+    explicit DDL and values stored as text; the importer recovers the real type
+    from these declared names (see ``_SQLITE_TYPE_TO_ARROW``).
+    """
+    t = duckdb_type.upper()
+    if "BOOL" in t:
+        return "BOOLEAN"
+    if "TIMESTAMP" in t or t == "TIME":
+        return "TIMESTAMP"
+    if "DATE" in t:
+        return "DATE"
+    if "INT" in t:
+        return "BIGINT"
+    if any(kind in t for kind in ("DOUBLE", "FLOAT", "DECIMAL", "REAL", "NUMERIC")):
+        return "DOUBLE"
+    return "TEXT"

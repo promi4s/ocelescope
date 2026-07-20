@@ -45,7 +45,13 @@ from ocelescope.ocel.constants.quantity import (
     XML_QUANTITY_EXTENSION,
     XML_QUANTITY_TYPE,
 )
-from ocelescope.ocel.io.exporters.common import table_exists
+from ocelescope.ocel.io.exporters.common import (
+    _columns,
+    attribute_columns,
+    duckdb_type_to_ocel,
+    sqlite_decl,
+    table_exists,
+)
 
 
 def has_quantities(con: duckdb.DuckDBPyConnection) -> bool:
@@ -171,6 +177,16 @@ def xml_quantity_extension(con: duckdb.DuckDBPyConnection) -> etree.Element | No
     item_properties = etree.SubElement(root, XML_PROPERTIES)
     if table_exists(con, QUANTITY_ITEM_PROPERTIES_TABLE):
         property_columns = [c for c in _property_columns(con) if c != QEL_ITEM_TYPE]
+        # Declare each property's real OCEL type, as the object/event attribute
+        # declarations do -- writing them all as "string" loses a numeric property
+        # on re-import, since that attribute is the only type information the XML
+        # carries.
+        property_type = {
+            name: duckdb_type_to_ocel(dtype)
+            for name, dtype in attribute_columns(
+                con, QUANTITY_ITEM_PROPERTIES_TABLE, (QEL_ITEM_TYPE,)
+            )
+        }
         for row in _fetch_dicts(con, f'SELECT * FROM "{QUANTITY_ITEM_PROPERTIES_TABLE}"'):
             item_type = etree.SubElement(
                 item_properties,
@@ -183,7 +199,10 @@ def xml_quantity_extension(con: duckdb.DuckDBPyConnection) -> etree.Element | No
                 property_element = etree.SubElement(
                     item_type,
                     XML_PROPERTY,
-                    {XML_PROPERTY_NAME: column, XML_PROPERTY_TYPE: "string"},
+                    {
+                        XML_PROPERTY_NAME: column,
+                        XML_PROPERTY_TYPE: property_type.get(column, "string"),
+                    },
                 )
                 property_element.text = _xml_text(row[column])
 
@@ -193,6 +212,22 @@ def xml_quantity_extension(con: duckdb.DuckDBPyConnection) -> etree.Element | No
 # ---------------------------------------------------------------------------
 # SQLite
 # ---------------------------------------------------------------------------
+def item_properties_ddl(con: duckdb.DuckDBPyConnection) -> list[tuple[str, str]]:
+    """DDL columns for the SQLite ``itemProperties`` table, or empty if absent.
+
+    Split out so the SQLite exporter can create the table before it attaches the
+    file, which is the only way its declared types survive -- see
+    :func:`~.sqlite._create_tables`.
+    """
+    if not table_exists(con, QUANTITY_ITEM_PROPERTIES_TABLE):
+        return []
+    type_column = SQL_KEYMAP[QEL_ITEM_TYPE]
+    return [
+        (type_column if name == QEL_ITEM_TYPE else name, sqlite_decl(dtype))
+        for name, dtype in _columns(con, QUANTITY_ITEM_PROPERTIES_TABLE)
+    ]
+
+
 def export_quantities_sqlite(con: duckdb.DuckDBPyConnection) -> None:
     """Copy the quantity-extension tables into the attached ``out`` SQLite database.
 
@@ -218,12 +253,17 @@ def export_quantities_sqlite(con: duckdb.DuckDBPyConnection) -> None:
         )
 
     if table_exists(con, QUANTITY_ITEM_PROPERTIES_TABLE):
+        # The table was created ahead of the ATTACH by :func:`item_properties_ddl`,
+        # so only fill it here -- letting DuckDB create it would discard the
+        # declared types (a BOOLEAN property would land as an integer and a time
+        # one as text, neither of which reads back as itself).
         type_column = SQL_KEYMAP[QEL_ITEM_TYPE]
         projection = ", ".join(
             f'"{column}" AS "{type_column}"' if column == QEL_ITEM_TYPE else f'"{column}"'
             for column in _property_columns(con)
         )
+        columns = ", ".join(f'"{name}"' for name, _ in item_properties_ddl(con))
         con.execute(
-            f'CREATE TABLE out."{SQL_ITEM_PROPERTIES}" AS '
+            f'INSERT INTO out."{SQL_ITEM_PROPERTIES}" ({columns}) '
             f'SELECT {projection} FROM "{QUANTITY_ITEM_PROPERTIES_TABLE}"'
         )

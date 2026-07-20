@@ -35,15 +35,20 @@ from ocelescope.ocel.constants.pm4py import (
     OTYPE_COL,
     TIMESTAMP_COL,
 )
+from ocelescope.ocel.constants.quantity import SQL_ITEM_PROPERTIES
 from ocelescope.ocel.io.connection import DuckDBTarget, connect_target
 from ocelescope.ocel.io.exporters.common import (
     INITIAL_ATTR_TIME,
+    sqlite_decl,
     attribute_columns,
     changing_attributes,
     event_attribute_presence,
     object_attribute_presence,
 )
-from ocelescope.ocel.io.exporters.quantities import export_quantities_sqlite
+from ocelescope.ocel.io.exporters.quantities import (
+    export_quantities_sqlite,
+    item_properties_ddl,
+)
 from ocelescope.util.sql import ident
 
 _OBJECT_META = (OID_COL, OTYPE_COL)
@@ -78,29 +83,6 @@ def _ordered_present(ordered_attributes: list[tuple[str, str]], present: set[str
 def _iso(expr: str) -> str:
     """Render a ``TIMESTAMPTZ`` expression as ISO 8601 text, as the format expects."""
     return f"replace(replace(CAST({expr} AS VARCHAR), ' ', 'T'), '+00', '+00:00')"
-
-
-def _sqlite_decl(duckdb_type: str) -> str:
-    """A SQLite column type the importer maps back to ``duckdb_type``'s arrow type.
-
-    DuckDB's ``CREATE TABLE ... AS SELECT`` into SQLite only ever declares
-    ``BIGINT``/``DOUBLE``/``VARCHAR``, which would collapse ``boolean`` -> integer
-    and ``time`` -> string on re-import. So the type tables are created with
-    explicit DDL and values stored as text; the importer recovers the real type
-    from these declared names (see ``_SQLITE_TYPE_TO_ARROW``).
-    """
-    t = duckdb_type.upper()
-    if "BOOL" in t:
-        return "BOOLEAN"
-    if "TIMESTAMP" in t or t == "TIME":
-        return "TIMESTAMP"
-    if "DATE" in t:
-        return "DATE"
-    if "INT" in t:
-        return "BIGINT"
-    if any(kind in t for kind in ("DOUBLE", "FLOAT", "DECIMAL", "REAL", "NUMERIC")):
-        return "DOUBLE"
-    return "TEXT"
 
 
 #: One type table to write: ``(name, ddl columns, fill query, query params)``.
@@ -146,7 +128,7 @@ def _event_type_table(
     attr_type: dict[str, str],
 ) -> _TableSpec:
     ddl = [("ocel_id", "TEXT"), ("ocel_time", "TIMESTAMP")]
-    ddl += [(name, _sqlite_decl(attr_type[name])) for name in attrs]
+    ddl += [(name, sqlite_decl(attr_type[name])) for name in attrs]
     exprs = [f'CAST("{EID_COL}" AS VARCHAR)', _iso(f'"{TIMESTAMP_COL}"')]
     exprs += [f'CAST("{name}" AS VARCHAR)' for name in attrs]
     return (
@@ -175,7 +157,7 @@ def _object_type_table(
     attribute that never changes has no column there to read.
     """
     ddl = [("ocel_id", "TEXT"), ("ocel_time", "TIMESTAMP"), ("ocel_changed_field", "TEXT")]
-    ddl += [(name, _sqlite_decl(attr_type[name])) for name in attrs]
+    ddl += [(name, sqlite_decl(attr_type[name])) for name in attrs]
 
     initial = [
         f'CAST("{OID_COL}" AS VARCHAR)',
@@ -252,7 +234,13 @@ def export_ocel_sqlite(source: DuckDBTarget, target: str | Path) -> None:
                     [name for name in present if name in changing],
                 )
             )
+        # The quantity item-property table needs the same treatment: created
+        # here with real types, filled by export_quantities_sqlite after ATTACH.
+        qddl = item_properties_ddl(con)
+        if qddl:
+            specs.append((SQL_ITEM_PROPERTIES, qddl, "", []))
         _create_tables(target, specs)
+        specs = [s for s in specs if s[0] != SQL_ITEM_PROPERTIES]
 
         con.execute("INSTALL sqlite; LOAD sqlite;")
 

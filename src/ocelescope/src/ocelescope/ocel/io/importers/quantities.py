@@ -25,6 +25,7 @@ from typing import Any, cast
 import duckdb
 import ijson
 import pandas as pd
+import pyarrow as pa
 
 from ocelescope.ocel.constants.pm4py import EID_COL, OID_COL
 from ocelescope.ocel.constants.quantity import (
@@ -53,6 +54,7 @@ from ocelescope.ocel.constants.quantity import (
     XML_PROPERTIES_TYPE_NAME,
     XML_PROPERTY,
     XML_PROPERTY_NAME,
+    XML_PROPERTY_TYPE,
     XML_QUANTITIES,
     XML_QUANTITY,
     XML_QUANTITY_EXTENSION,
@@ -60,6 +62,7 @@ from ocelescope.ocel.constants.quantity import (
     inverse_keymap,
 )
 from ocelescope.ocel.io.connection import DuckDBTarget, connect_target
+from ocelescope.ocel.io.schema import ATTRIBUTE_TYPE_TO_ARROW
 
 
 def import_quantities(source: str | Path, target: DuckDBTarget) -> None:
@@ -82,6 +85,36 @@ def import_quantities(source: str | Path, target: DuckDBTarget) -> None:
 def _as_float(values: Any) -> pd.Series:
     """A quantity column as floats, with anything non-numeric turned into NaN."""
     return cast(pd.Series, pd.to_numeric(values, errors="coerce")).astype("float64")
+
+
+def _cast_properties(df: pd.DataFrame, property_type: dict[str, str]) -> pd.DataFrame:
+    """Cast item-property columns to the OCEL types the source declared.
+
+    The properties are parsed as text, so without this a ``float`` property would
+    be stored as a string. Anything that will not convert is left as NULL rather
+    than failing the import, matching how attribute values are read.
+    """
+    if not property_type:
+        return df
+    for column, declared in property_type.items():
+        if column not in df.columns:
+            continue
+        arrow_type = ATTRIBUTE_TYPE_TO_ARROW.get(declared)
+        if arrow_type is None or arrow_type == pa.string():
+            continue
+        if arrow_type == pa.bool_():
+            df[column] = (
+                df[column]
+                .map({"true": True, "True": True, "false": False, "False": False})
+                .astype("boolean")
+            )
+        elif arrow_type == pa.timestamp("us", tz="UTC"):
+            df[column] = pd.to_datetime(df[column], errors="coerce", utc=True)
+        elif arrow_type == pa.int64():
+            df[column] = pd.to_numeric(df[column], errors="coerce").astype("Int64")
+        else:
+            df[column] = pd.to_numeric(df[column], errors="coerce").astype("float64")
+    return df
 
 
 def _write_table(con: duckdb.DuckDBPyConnection, name: str, df: pd.DataFrame) -> None:
@@ -239,9 +272,17 @@ def import_quantities_xml(source: str | Path, target: DuckDBTarget) -> None:
             )
 
     item_property_data: list[dict] = []
+    # Each <property> declares its OCEL type; collect them so the assembled frame
+    # can be cast below. Without that every property stays the text it was parsed
+    # as, and a numeric one comes back as a string.
+    property_type: dict[str, str] = {}
     property_tree = quantity_ext.find(XML_PROPERTIES)
     if property_tree is not None:
         for item_type in property_tree.findall(XML_PROPERTIES_TYPE):
+            for prop in item_type.findall(XML_PROPERTY):
+                declared = prop.attrib.get(XML_PROPERTY_TYPE)
+                if declared:
+                    property_type.setdefault(prop.attrib[XML_PROPERTY_NAME], declared)
             item_property_data.append(
                 {
                     QEL_ITEM_TYPE: item_type.attrib[XML_PROPERTIES_TYPE_NAME],
@@ -262,6 +303,7 @@ def import_quantities_xml(source: str | Path, target: DuckDBTarget) -> None:
         if item_property_data
         else pd.DataFrame(columns=[QEL_ITEM_TYPE])
     )
+    item_properties = _cast_properties(item_properties, property_type)
 
     with connect_target(target) as con:
         _write_quantity_frames(con, oqty, qop, item_properties)
@@ -270,13 +312,22 @@ def import_quantities_xml(source: str | Path, target: DuckDBTarget) -> None:
 # ---------------------------------------------------------------------------
 # SQLite
 # ---------------------------------------------------------------------------
-def import_quantities_sqlite(con: duckdb.DuckDBPyConnection, present: set[str]) -> None:
+def import_quantities_sqlite(
+    con: duckdb.DuckDBPyConnection,
+    present: set[str],
+    property_casts: dict[str, str] | None = None,
+) -> None:
     """Copy the quantity-extension tables from the attached SQLite source.
 
     Requires the source to already be attached as ``src`` (as the SQLite importer
     does). Every copy is a single ``CREATE TABLE ... AS SELECT`` that DuckDB
     streams internally, so nothing flows through Python. ``present`` is the set of
     source table names, used to skip extension tables the file does not have.
+
+    ``property_casts`` maps an item-property column to the DuckDB type to read it
+    as, recovered from the file's declared types by the caller (which is the only
+    place they are still visible -- see :func:`~..sqlite.import_ocel_sqlite`).
+    Without it the properties come back as text.
     """
     if SQL_QUANTITIES in present:
         con.execute(
@@ -299,7 +350,10 @@ def import_quantities_sqlite(con: duckdb.DuckDBPyConnection, present: set[str]) 
 
     if SQL_ITEM_PROPERTIES in present:
         # Item-property columns are user-defined, so keep them all and only rename
-        # the item-type column to the canonical name.
+        # the item-type column to the canonical name. ``property_casts`` carries
+        # their declared SQLite types, which the attached copy no longer shows
+        # (``sqlite_all_varchar`` reports every column as VARCHAR), so a numeric
+        # property has to be cast back here or it stays text.
         columns = [
             description[0]
             for description in con.execute(
@@ -307,8 +361,15 @@ def import_quantities_sqlite(con: duckdb.DuckDBPyConnection, present: set[str]) 
             ).description
         ]
         type_column = SQL_KEYMAP[QEL_ITEM_TYPE]
+        casts = property_casts or {}
         projection = ", ".join(
-            f'"{column}" AS "{QEL_ITEM_TYPE}"' if column == type_column else f'"{column}"'
+            f'"{column}" AS "{QEL_ITEM_TYPE}"'
+            if column == type_column
+            else (
+                f'TRY_CAST("{column}" AS {casts[column]}) AS "{column}"'
+                if column in casts
+                else f'"{column}"'
+            )
             for column in columns
         )
         con.execute(
