@@ -22,6 +22,7 @@ from ocelescope.ocel.io.schema import (
     create_ocel_tables,
     drop_unchanged_columns,
 )
+from ocelescope.util.sql import set_utc
 
 
 def _as_strings(values: list) -> list:
@@ -69,6 +70,8 @@ class OCELWriter:
             self.con, self._owns_connection = target, False
         else:
             self.con, self._owns_connection = duckdb.connect(str(target)), True
+
+        set_utc(self.con)
         self.batch_size = batch_size
 
         self.schemas = create_ocel_tables(self.con, object_columns, event_columns)
