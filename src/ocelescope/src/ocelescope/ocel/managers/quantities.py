@@ -12,6 +12,7 @@ from ocelescope.ocel.constants.quantity import (
     QUANTITY_ITEM_PROPERTIES_TABLE,
     QUANTITY_OPERATIONS_TABLE,
 )
+from ocelescope.ocel.constants.tables import EVENTS_TABLE, OBJECTS_TABLE
 from ocelescope.ocel.managers.base import BaseManager
 
 _QUANTITY_AS_NUMBER = f'TRY_CAST("{QEL_QUANTITY}" AS DOUBLE) AS "{QEL_QUANTITY}"'
@@ -21,9 +22,6 @@ _QUANTITY_AS_NUMBER = f'TRY_CAST("{QEL_QUANTITY}" AS DOUBLE) AS "{QEL_QUANTITY}"
 #: true -- which is what makes this the same rule as the pandas ``.ne(0)`` the
 #: frame-returning reads apply.
 _CLEAN = f'("{QEL_QUANTITY}" != 0 OR "{QEL_QUANTITY}" IS NULL)'
-
-_OBJECTS_TABLE = "objects"
-_EVENTS_TABLE = "events"
 
 
 def _quantity_projection(columns: list[str]) -> str:
@@ -233,7 +231,7 @@ class QuantityManager(BaseManager):
         Returns:
             A list of object types
         """
-        return self._types_of(_OBJECTS_TABLE, OID_COL, OTYPE_COL, self._cleaned_union(OID_COL))
+        return self._types_of(OBJECTS_TABLE, OID_COL, OTYPE_COL, self._cleaned_union(OID_COL))
 
     def get_it_objects(self, item_type: str):
         """Return object ids involved for a given item type.
@@ -298,7 +296,7 @@ class QuantityManager(BaseManager):
             A list of activities
         """
         return self._types_of(
-            _EVENTS_TABLE,
+            EVENTS_TABLE,
             EID_COL,
             ACTIVITY_COL,
             self._cleaned_union(EID_COL, operations_only=True),

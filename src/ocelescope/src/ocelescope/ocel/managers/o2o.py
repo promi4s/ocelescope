@@ -15,10 +15,8 @@ from ocelescope.ocel.constants.pm4py import (
     OID_COL,
     OTYPE_COL,
 )
+from ocelescope.ocel.constants.tables import O2O_TABLE, OBJECTS_TABLE
 from ocelescope.ocel.managers.base import BaseManager
-
-TABLE = "o2o"
-_OBJECTS_TABLE = "objects"
 
 
 class O2OManager(BaseManager):
@@ -48,12 +46,12 @@ class O2OManager(BaseManager):
             DuckDBPyRelation: A lazy relation over all O2O relations.
         """
         return self._relation(
-            f'SELECT "{O2O_SOURCE_ID}", "{O2O_TARGET_ID}", "{O2O_QUALIFIER}" FROM {TABLE}'
+            f'SELECT "{O2O_SOURCE_ID}", "{O2O_TARGET_ID}", "{O2O_QUALIFIER}" FROM {O2O_TABLE}'
         )
 
     @table.setter
     def table(self, contents: Any) -> None:
-        self._replace(TABLE, contents)
+        self._replace(O2O_TABLE, contents)
 
     @property
     def df(self) -> pd.DataFrame:
@@ -73,7 +71,7 @@ class O2OManager(BaseManager):
 
     @df.setter
     def df(self, contents: pd.DataFrame) -> None:
-        self._replace(TABLE, contents)
+        self._replace(O2O_TABLE, contents)
 
     @property
     def pl(self) -> polars.LazyFrame:
@@ -93,7 +91,7 @@ class O2OManager(BaseManager):
 
     @pl.setter
     def pl(self, contents: polars.LazyFrame | polars.DataFrame) -> None:
-        self._replace(TABLE, contents)
+        self._replace(O2O_TABLE, contents)
 
     @property
     def typed_table(self) -> duckdb.DuckDBPyRelation:
@@ -115,9 +113,9 @@ class O2OManager(BaseManager):
             f'SELECT r.*, s."{OTYPE_COL}" AS "{O2O_SOURCE_TYPE}", '
             f't."{OTYPE_COL}" AS "{O2O_TARGET_TYPE}" '
             f'FROM (SELECT "{O2O_SOURCE_ID}", "{O2O_TARGET_ID}", "{O2O_QUALIFIER}" '
-            f"FROM {TABLE}) r "
-            f'LEFT JOIN {_OBJECTS_TABLE} s ON r."{O2O_SOURCE_ID}" = s."{OID_COL}" '
-            f'LEFT JOIN {_OBJECTS_TABLE} t ON r."{O2O_TARGET_ID}" = t."{OID_COL}"'
+            f"FROM {O2O_TABLE}) r "
+            f'LEFT JOIN {OBJECTS_TABLE} s ON r."{O2O_SOURCE_ID}" = s."{OID_COL}" '
+            f'LEFT JOIN {OBJECTS_TABLE} t ON r."{O2O_TARGET_ID}" = t."{OID_COL}"'
         )
 
     @property
@@ -149,6 +147,6 @@ class O2OManager(BaseManager):
             list[str]: Sorted list of unique qualifier names.
         """
         return self._column(
-            f'SELECT DISTINCT "{O2O_QUALIFIER}" FROM {TABLE} '
+            f'SELECT DISTINCT "{O2O_QUALIFIER}" FROM {O2O_TABLE} '
             f'WHERE "{O2O_QUALIFIER}" IS NOT NULL ORDER BY 1'
         )

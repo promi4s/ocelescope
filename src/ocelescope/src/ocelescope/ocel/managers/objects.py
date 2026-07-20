@@ -12,11 +12,9 @@ from ocelescope.ocel.constants.pm4py import (
     OTYPE_COL,
     TIMESTAMP_COL,
 )
+from ocelescope.ocel.constants.tables import OBJECT_CHANGES_TABLE, OBJECTS_TABLE
 from ocelescope.ocel.managers.base import BaseManager
 from ocelescope.util.sql import ident, literal
-
-TABLE = "objects"
-CHANGES_TABLE = "object_changes"
 
 
 class ObjectsManager(BaseManager):
@@ -44,11 +42,11 @@ class ObjectsManager(BaseManager):
         Returns:
             DuckDBPyRelation: A lazy relation over all objects.
         """
-        return self._relation(f"SELECT * FROM {TABLE}")
+        return self._relation(f"SELECT * FROM {OBJECTS_TABLE}")
 
     @table.setter
     def table(self, contents: Any) -> None:
-        self._replace(TABLE, contents)
+        self._replace(OBJECTS_TABLE, contents)
 
     @property
     def df(self) -> pd.DataFrame:
@@ -64,7 +62,7 @@ class ObjectsManager(BaseManager):
 
     @df.setter
     def df(self, contents: pd.DataFrame) -> None:
-        self._replace(TABLE, contents)
+        self._replace(OBJECTS_TABLE, contents)
 
     @property
     def pl(self) -> polars.LazyFrame:
@@ -84,7 +82,7 @@ class ObjectsManager(BaseManager):
 
     @pl.setter
     def pl(self, contents: polars.LazyFrame | polars.DataFrame) -> None:
-        self._replace(TABLE, contents)
+        self._replace(OBJECTS_TABLE, contents)
 
     @property
     def changes_table(self) -> duckdb.DuckDBPyRelation:
@@ -114,14 +112,14 @@ class ObjectsManager(BaseManager):
 
         return self._relation(
             f'SELECT c.*, o."{OTYPE_COL}", {field} AS "{OBJECT_CHANGED_FIELD}" '
-            f"FROM {CHANGES_TABLE} c "
-            f'JOIN {TABLE} o ON c."{OID_COL}" = o."{OID_COL}" '
+            f"FROM {OBJECT_CHANGES_TABLE} c "
+            f'JOIN {OBJECTS_TABLE} o ON c."{OID_COL}" = o."{OID_COL}" '
             f'ORDER BY c."{TIMESTAMP_COL}"'
         )
 
     @changes_table.setter
     def changes_table(self, contents: Any) -> None:
-        self._replace(CHANGES_TABLE, contents)
+        self._replace(OBJECT_CHANGES_TABLE, contents)
 
     @property
     def changes(self) -> pd.DataFrame:
@@ -137,7 +135,7 @@ class ObjectsManager(BaseManager):
 
     @changes.setter
     def changes(self, contents: pd.DataFrame) -> None:
-        self._replace(CHANGES_TABLE, contents)
+        self._replace(OBJECT_CHANGES_TABLE, contents)
 
     @property
     def changes_pl(self) -> polars.LazyFrame:
@@ -153,7 +151,7 @@ class ObjectsManager(BaseManager):
 
     @changes_pl.setter
     def changes_pl(self, contents: polars.LazyFrame | polars.DataFrame) -> None:
-        self._replace(CHANGES_TABLE, contents)
+        self._replace(OBJECT_CHANGES_TABLE, contents)
 
     @property
     def types(self) -> list[str]:
@@ -163,7 +161,7 @@ class ObjectsManager(BaseManager):
         Returns:
             list[str]: Sorted list of unique object type names.
         """
-        return self._column(f'SELECT DISTINCT "{OTYPE_COL}" FROM {TABLE} ORDER BY 1')
+        return self._column(f'SELECT DISTINCT "{OTYPE_COL}" FROM {OBJECTS_TABLE} ORDER BY 1')
 
     @property
     def counts(self) -> pd.Series:
@@ -178,7 +176,7 @@ class ObjectsManager(BaseManager):
             Series: A pandas Series indexed by object type with occurrence counts.
         """
         counts = self._relation(
-            f'SELECT "{OTYPE_COL}", count(*) AS "count" FROM {TABLE} '
+            f'SELECT "{OTYPE_COL}", count(*) AS "count" FROM {OBJECTS_TABLE} '
             f'GROUP BY 1 ORDER BY "count" DESC, 1'
         ).df()
         return cast(pd.Series, counts.set_index(OTYPE_COL)["count"])
@@ -191,7 +189,7 @@ class ObjectsManager(BaseManager):
         Returns:
             Series: A pandas Series indexed by object ID, containing object types as values.
         """
-        mapping = self._relation(f'SELECT "{OID_COL}", "{OTYPE_COL}" FROM {TABLE}').df()
+        mapping = self._relation(f'SELECT "{OID_COL}", "{OTYPE_COL}" FROM {OBJECTS_TABLE}').df()
         return cast(pd.Series, mapping.set_index(OID_COL)[OTYPE_COL])
 
     def has_types(self, types: Iterable[str]) -> bool:
@@ -212,7 +210,7 @@ class ObjectsManager(BaseManager):
             return True
         placeholders = ", ".join(["?"] * len(wanted))
         found = self._relation(
-            f'SELECT count(DISTINCT "{OTYPE_COL}") FROM {TABLE} '
+            f'SELECT count(DISTINCT "{OTYPE_COL}") FROM {OBJECTS_TABLE} '
             f'WHERE "{OTYPE_COL}" IN ({placeholders})',
             list(wanted),
         ).fetchall()[0][0]
@@ -229,7 +227,7 @@ class ObjectsManager(BaseManager):
         Returns:
             list[str]: Sorted list of all object attribute names.
         """
-        return self._attribute_names(TABLE)
+        return self._attribute_names(OBJECTS_TABLE)
 
     @property
     def dynamic_attribute_names(self) -> list[str]:
@@ -242,7 +240,7 @@ class ObjectsManager(BaseManager):
         Returns:
             list[str]: Sorted list of dynamic object attribute names.
         """
-        return self._attribute_names(CHANGES_TABLE)
+        return self._attribute_names(OBJECT_CHANGES_TABLE)
 
     @property
     def static_attribute_names(self) -> list[str]:
@@ -320,8 +318,8 @@ class ObjectsManager(BaseManager):
         source = (
             f'SELECT c."{OID_COL}", c."{TIMESTAMP_COL}", o."{OTYPE_COL}"{selected}, '
             f"row_number() OVER () AS _rn "
-            f"FROM {CHANGES_TABLE} c "
-            f'JOIN {TABLE} o ON c."{OID_COL}" = o."{OID_COL}" {where}'
+            f"FROM {OBJECT_CHANGES_TABLE} c "
+            f'JOIN {OBJECTS_TABLE} o ON c."{OID_COL}" = o."{OID_COL}" {where}'
         )
 
         filled = "".join(

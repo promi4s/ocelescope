@@ -51,6 +51,13 @@ from ocelescope.ocel.constants.pm4py import (
     OTYPE_COL,
     TIMESTAMP_COL,
 )
+from ocelescope.ocel.constants.tables import (
+    E2O_TABLE,
+    EVENTS_TABLE,
+    O2O_TABLE,
+    OBJECT_CHANGES_TABLE,
+    OBJECTS_TABLE,
+)
 from ocelescope.ocel.io.connection import DuckDBTarget, connect_target
 from ocelescope.ocel.io.importers.quantities import import_quantities_sqlite
 from ocelescope.ocel.io.schema import (
@@ -298,7 +305,7 @@ def _insert_objects(con: duckdb.DuckDBPyConnection, table: _TypeTable) -> None:
 
     if not table.attributes:
         con.execute(
-            f'INSERT INTO "objects" ({columns}) '
+            f'INSERT INTO "{OBJECTS_TABLE}" ({columns}) '
             f'SELECT "ocel_id", {otype} FROM src."object" WHERE "ocel_type" = {otype}'
         )
         return
@@ -314,7 +321,7 @@ def _insert_objects(con: duckdb.DuckDBPyConnection, table: _TypeTable) -> None:
     )
     projected = ", ".join(f"snapshot.{ident(name)}" for name, _ in table.attributes)
     con.execute(
-        f'INSERT INTO "objects" ({columns}) '
+        f'INSERT INTO "{OBJECTS_TABLE}" ({columns}) '
         f'SELECT core."ocel_id", {otype}, {projected} '
         f'FROM src."object" core LEFT JOIN ('
         f'SELECT "ocel_id", {initial} FROM src.{ident(table.name)} GROUP BY "ocel_id"'
@@ -343,7 +350,7 @@ def _insert_object_changes(con: duckdb.DuckDBPyConnection, table: _TypeTable) ->
     for name, dtype in table.attributes:
         cast = _cast_expr(name, dtype)
         con.execute(
-            f'INSERT INTO "object_changes" '
+            f'INSERT INTO "{OBJECT_CHANGES_TABLE}" '
             f"({ident(OID_COL)}, {ident(TIMESTAMP_COL)}, {ident(name)}) "
             f'SELECT "ocel_id", {stored_time}, {cast} FROM src.{ident(table.name)} '
             f"WHERE {cast} IS NOT NULL "
@@ -397,7 +404,7 @@ def import_ocel_sqlite(source: str | Path, target: DuckDBTarget) -> None:
                 attr_select = [_cast_expr(name, dtype) for name, dtype in table.attributes]
                 _insert(
                     con,
-                    "events",
+                    EVENTS_TABLE,
                     [EID_COL, ACTIVITY_COL, TIMESTAMP_COL, *attr_names],
                     ['"ocel_id"', literal(table.ocel_type), time, *attr_select],
                     table.name,
@@ -420,7 +427,7 @@ def import_ocel_sqlite(source: str | Path, target: DuckDBTarget) -> None:
             if "object_object" in present:
                 _insert(
                     con,
-                    "o2o",
+                    O2O_TABLE,
                     [O2O_SOURCE_ID, O2O_QUALIFIER, O2O_TARGET_ID],
                     ['"ocel_source_id"', '"ocel_qualifier"', '"ocel_target_id"'],
                     "object_object",
@@ -428,7 +435,7 @@ def import_ocel_sqlite(source: str | Path, target: DuckDBTarget) -> None:
             if "event_object" in present:
                 _insert(
                     con,
-                    "e2o",
+                    E2O_TABLE,
                     [EID_COL, E2O_QUALIFIER, OID_COL],
                     ['"ocel_event_id"', '"ocel_qualifier"', '"ocel_object_id"'],
                     "event_object",

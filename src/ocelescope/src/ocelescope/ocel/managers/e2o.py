@@ -16,11 +16,8 @@ from ocelescope.ocel.constants.pm4py import (
     OID_COL,
     TIMESTAMP_COL,
 )
+from ocelescope.ocel.constants.tables import E2O_TABLE, EVENTS_TABLE, OBJECTS_TABLE
 from ocelescope.ocel.managers.base import BaseManager
-
-TABLE = "e2o"
-_EVENTS_TABLE = "events"
-_OBJECTS_TABLE = "objects"
 
 
 class E2OManager(BaseManager):
@@ -58,9 +55,9 @@ class E2OManager(BaseManager):
         return self._relation(
             f'SELECT r."{E2O_EVENT_ID}", r."{E2O_OBJECT_ID}", r."{E2O_QUALIFIER}", '
             f'e."{E2O_ACTIVITY}", e."{TIMESTAMP_COL}", o."{E2O_OBJECT_TYPE}" '
-            f"FROM {TABLE} r "
-            f'JOIN {_EVENTS_TABLE} e ON r."{EID_COL}" = e."{EID_COL}" '
-            f'JOIN {_OBJECTS_TABLE} o ON r."{OID_COL}" = o."{OID_COL}" '
+            f"FROM {E2O_TABLE} r "
+            f'JOIN {EVENTS_TABLE} e ON r."{EID_COL}" = e."{EID_COL}" '
+            f'JOIN {OBJECTS_TABLE} o ON r."{OID_COL}" = o."{OID_COL}" '
             f'ORDER BY e."{TIMESTAMP_COL}"'
         )
 
@@ -109,7 +106,7 @@ class E2OManager(BaseManager):
     def _store(self, contents: Any) -> None:
         """Store ``contents`` as the E2O relations, dropping the derived columns."""
         projection = ", ".join(f'"{c}"' for c in (E2O_EVENT_ID, E2O_QUALIFIER, E2O_OBJECT_ID))
-        self._replace(TABLE, contents, projection)
+        self._replace(E2O_TABLE, contents, projection)
 
     @property
     def qualifiers(self) -> list[str]:
@@ -120,7 +117,7 @@ class E2OManager(BaseManager):
             list[str]: Sorted list of unique qualifier names.
         """
         return self._column(
-            f'SELECT DISTINCT "{E2O_QUALIFIER}" FROM {TABLE} '
+            f'SELECT DISTINCT "{E2O_QUALIFIER}" FROM {E2O_TABLE} '
             f'WHERE "{E2O_QUALIFIER}" IS NOT NULL ORDER BY 1'
         )
 
@@ -136,8 +133,8 @@ class E2OManager(BaseManager):
         """
         return (
             self._relation(
-                f'SELECT r."{EID_COL}" FROM {TABLE} r '
-                f'JOIN {_EVENTS_TABLE} e ON r."{EID_COL}" = e."{EID_COL}" '
+                f'SELECT r."{EID_COL}" FROM {E2O_TABLE} r '
+                f'JOIN {EVENTS_TABLE} e ON r."{EID_COL}" = e."{EID_COL}" '
                 f'WHERE r."{OID_COL}" = ? AND r."{EID_COL}" IS NOT NULL '
                 f'GROUP BY r."{EID_COL}" '
                 f'ORDER BY min(e."{TIMESTAMP_COL}"), r."{EID_COL}"',
@@ -156,8 +153,8 @@ class E2OManager(BaseManager):
         is what gets checked.
         """
         rows = self._relation(
-            f'SELECT arg_{which}(r."{EID_COL}", e."{TIMESTAMP_COL}") FROM {TABLE} r '
-            f'JOIN {_EVENTS_TABLE} e ON r."{EID_COL}" = e."{EID_COL}" '
+            f'SELECT arg_{which}(r."{EID_COL}", e."{TIMESTAMP_COL}") FROM {E2O_TABLE} r '
+            f'JOIN {EVENTS_TABLE} e ON r."{EID_COL}" = e."{EID_COL}" '
             f'WHERE r."{OID_COL}" = ?',
             [object_id],
         ).fetchall()

@@ -21,6 +21,7 @@ from ocelescope.ocel.constants.pm4py import (
     OTYPE_COL,
     TIMESTAMP_COL,
 )
+from ocelescope.ocel.constants.tables import OBJECT_CHANGES_TABLE
 
 #: An ordered list of ``(column_name, arrow_type)`` pairs.
 SchemaDefinition = list[tuple[str, pa.DataType]]
@@ -114,16 +115,18 @@ def drop_unchanged_columns(con: duckdb.DuckDBPyConnection) -> None:
     """
     meta = (OID_COL, TIMESTAMP_COL)
     names = [
-        name for name, *_ in con.execute('DESCRIBE "object_changes"').fetchall() if name not in meta
+        name
+        for name, *_ in con.execute(f'DESCRIBE "{OBJECT_CHANGES_TABLE}"').fetchall()
+        if name not in meta
     ]
     if not names:
         return
 
     projection = ", ".join(f'bool_or("{name}" IS NOT NULL) AS "{name}"' for name in names)
-    row = con.execute(f'SELECT {projection} FROM "object_changes"').fetchall()[0]
+    row = con.execute(f'SELECT {projection} FROM "{OBJECT_CHANGES_TABLE}"').fetchall()[0]
     for name, has_values in zip(names, row):
         if not has_values:
-            con.execute(f'ALTER TABLE "object_changes" DROP COLUMN "{name}"')
+            con.execute(f'ALTER TABLE "{OBJECT_CHANGES_TABLE}" DROP COLUMN "{name}"')
 
 
 def merge_columns(columns: SchemaDefinition) -> SchemaDefinition:

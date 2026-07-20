@@ -7,9 +7,8 @@ import pandas as pd
 import polars
 
 from ocelescope.ocel.constants.pm4py import ACTIVITY_COL, EID_COL, TIMESTAMP_COL
+from ocelescope.ocel.constants.tables import EVENTS_TABLE
 from ocelescope.ocel.managers.base import BaseManager
-
-TABLE = "events"
 
 
 class EventsManager(BaseManager):
@@ -38,11 +37,11 @@ class EventsManager(BaseManager):
         Returns:
             DuckDBPyRelation: A lazy relation over all events.
         """
-        return self._relation(f'SELECT * FROM {TABLE} ORDER BY "{TIMESTAMP_COL}"')
+        return self._relation(f'SELECT * FROM {EVENTS_TABLE} ORDER BY "{TIMESTAMP_COL}"')
 
     @table.setter
     def table(self, contents: Any) -> None:
-        self._replace(TABLE, contents)
+        self._replace(EVENTS_TABLE, contents)
 
     @property
     def df(self) -> pd.DataFrame:
@@ -58,7 +57,7 @@ class EventsManager(BaseManager):
 
     @df.setter
     def df(self, contents: pd.DataFrame) -> None:
-        self._replace(TABLE, contents)
+        self._replace(EVENTS_TABLE, contents)
 
     @property
     def pl(self) -> polars.LazyFrame:
@@ -79,7 +78,7 @@ class EventsManager(BaseManager):
 
     @pl.setter
     def pl(self, contents: polars.LazyFrame | polars.DataFrame) -> None:
-        self._replace(TABLE, contents)
+        self._replace(EVENTS_TABLE, contents)
 
     @property
     def activities(self) -> list[str]:
@@ -89,7 +88,7 @@ class EventsManager(BaseManager):
         Returns:
             list[str]: A sorted list of unique activity names.
         """
-        return self._column(f'SELECT DISTINCT "{ACTIVITY_COL}" FROM {TABLE} ORDER BY 1')
+        return self._column(f'SELECT DISTINCT "{ACTIVITY_COL}" FROM {EVENTS_TABLE} ORDER BY 1')
 
     @property
     def activity_counts(self) -> pd.Series:
@@ -104,7 +103,7 @@ class EventsManager(BaseManager):
             Series: A pandas Series indexed by activity name with occurrence counts.
         """
         counts = self._relation(
-            f'SELECT "{ACTIVITY_COL}", count(*) AS "count" FROM {TABLE} '
+            f'SELECT "{ACTIVITY_COL}", count(*) AS "count" FROM {EVENTS_TABLE} '
             f'GROUP BY 1 ORDER BY "count" DESC, 1'
         ).df()
         return cast(pd.Series, counts.set_index(ACTIVITY_COL)["count"])
@@ -118,7 +117,7 @@ class EventsManager(BaseManager):
             Series: A pandas Series indexed by event ID, containing activity names as values.
         """
         mapping = self._relation(
-            f'SELECT "{EID_COL}", "{ACTIVITY_COL}" FROM {TABLE} ORDER BY "{TIMESTAMP_COL}"'
+            f'SELECT "{EID_COL}", "{ACTIVITY_COL}" FROM {EVENTS_TABLE} ORDER BY "{TIMESTAMP_COL}"'
         ).df()
         return cast(pd.Series, mapping.set_index(EID_COL)[ACTIVITY_COL])
 
@@ -130,7 +129,7 @@ class EventsManager(BaseManager):
         Returns:
             list[str]: A sorted list of event attribute names.
         """
-        return self._attribute_names(TABLE)
+        return self._attribute_names(EVENTS_TABLE)
 
     def get_event_timestamp(self, event_id: str):
         """
@@ -138,7 +137,7 @@ class EventsManager(BaseManager):
         """
         return str(
             self._relation(
-                f'SELECT "{TIMESTAMP_COL}" FROM {TABLE} WHERE "{EID_COL}" = ?', [event_id]
+                f'SELECT "{TIMESTAMP_COL}" FROM {EVENTS_TABLE} WHERE "{EID_COL}" = ?', [event_id]
             )
             .df()[TIMESTAMP_COL]
             .iloc[0]
