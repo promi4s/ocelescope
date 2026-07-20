@@ -29,6 +29,7 @@ from ocelescope.ocel.managers import (
 )
 from ocelescope.ocel.managers.executions import ExecutionsManager
 from ocelescope.ocel.util.xes import create_ocel_from_xml, write_ocel_to_xes
+from ocelescope.util.sql import set_utc
 
 #: Name the destination database is attached under while :meth:`OCEL.to_duckdb` copies.
 _COPY_TARGET = "_copy_target"
@@ -135,7 +136,7 @@ class OCEL:
         than formatting them into ``query``, so they stay injection-safe.
         """
         cursor = self._con.cursor()
-        cursor.execute("SET TimeZone='UTC'")
+        set_utc(cursor)
         return cursor.sql(query, params=params) if params else cursor.sql(query)
 
     def clean(self) -> None:
@@ -234,7 +235,7 @@ class OCEL:
         """
         connection = duckdb.connect(":memory:")
         try:
-            connection.execute("SET TimeZone='UTC'")
+            set_utc(connection)
             ocel = cls(connection)
             # Each table goes in through its manager, which projects it back onto
             # the stored layout. Objects first: the object changes are stored with
@@ -346,7 +347,7 @@ class OCEL:
         connection = duckdb.connect(":memory:")
         try:
             convert_ocel_duckdb(path, connection)
-            connection.execute("SET TimeZone='UTC'")
+            set_utc(connection)
         except Exception:
             connection.close()
             raise
@@ -376,7 +377,7 @@ class OCEL:
         try:
             # DuckDB hands back TIMESTAMPTZ values in the session's zone; pin it to
             # UTC so the reshaped tables match a normal file read.
-            connection.execute("SET TimeZone='UTC'")
+            set_utc(connection)
         except Exception:
             connection.close()
             raise
@@ -523,7 +524,7 @@ class OCEL:
         """
         clone = duckdb.connect(":memory:")
         try:
-            clone.execute("SET TimeZone='UTC'")
+            set_utc(clone)
             tables = self._con.execute(
                 "SELECT table_name FROM information_schema.tables "
                 "WHERE table_schema = 'main' AND table_type = 'BASE TABLE'"

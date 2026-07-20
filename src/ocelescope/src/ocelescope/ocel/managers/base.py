@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, Iterator
 
 import duckdb
 
-from ocelescope.util.sql import ident
+from ocelescope.util.sql import ident, set_utc
 
 if TYPE_CHECKING:
     from ocelescope.ocel.core.ocel import OCEL
@@ -32,7 +32,7 @@ class BaseManager:
     def _relation(self, sql: str, params: list[object] | None = None) -> duckdb.DuckDBPyRelation:
         """A lazy relation for ``sql``, on its own DuckDB cursor."""
         cursor = self._ocel.con.cursor()
-        cursor.execute("SET TimeZone='UTC'")
+        set_utc(cursor)
         return cursor.sql(sql, params=params) if params else cursor.sql(sql)
 
     def _column(self, sql: str, params: list[object] | None = None) -> list[Any]:
