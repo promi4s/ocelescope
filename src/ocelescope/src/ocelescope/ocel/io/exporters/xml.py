@@ -115,8 +115,6 @@ def export_ocel_xml(source: DuckDBTarget, target: str | Path) -> None:
     tmp = target.with_suffix(target.suffix + ".tmp")
 
     with connect_target(source, read_only=True) as con:
-        con.execute("SET TimeZone='UTC'")
-
         with open(tmp, "wb") as stream:
             stream.write(b'<?xml version="1.0" encoding="UTF-8"?>\n<log>\n')
 

@@ -46,8 +46,6 @@ def export_ocel_json(source: DuckDBTarget, target: str | Path) -> None:
     tmp = target.with_suffix(target.suffix + ".tmp")
 
     with connect_target(source, read_only=True) as con:
-        con.execute("SET TimeZone='UTC'")
-
         object_type_decls = object_types(con)
         event_type_decls = event_types(con)
         quantity_extension = json_quantity_extension(con)

@@ -34,6 +34,7 @@ from ocelescope.ocel.constants.pm4py import (
     OTYPE_COL,
     TIMESTAMP_COL,
 )
+from ocelescope.ocel.io.connection import DuckDBTarget, connect_target
 from ocelescope.ocel.io.exporters.common import (
     INITIAL_ATTR_TIME,
     attribute_columns,
@@ -41,7 +42,6 @@ from ocelescope.ocel.io.exporters.common import (
     event_attribute_presence,
     object_attribute_presence,
 )
-from ocelescope.ocel.io.connection import DuckDBTarget, connect_target
 from ocelescope.ocel.io.exporters.quantities import export_quantities_sqlite
 
 _OBJECT_META = (OID_COL, OTYPE_COL)
@@ -199,13 +199,10 @@ def export_ocel_sqlite(source: DuckDBTarget, target: str | Path) -> None:
     if target.exists():
         target.unlink()
 
-    # Not read-only: attaching a writable SQLite output needs a writable connection.
     with connect_target(source) as con:
-        con.execute("SET TimeZone='UTC'")
         con.execute("INSTALL sqlite; LOAD sqlite;")
         con.execute(f"ATTACH '{target}' AS out (TYPE sqlite)")
         try:
-            # id -> type index tables
             con.execute(
                 f"CREATE TABLE out.object AS "
                 f'SELECT "{OID_COL}" AS ocel_id, "{OTYPE_COL}" AS ocel_type FROM objects'
