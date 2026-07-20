@@ -15,7 +15,10 @@ classifiers = [
 
 dependencies = [
   "cachetools>=6.1.0",
+  "duckdb>=1.5.4",
   "graphviz>=0.21",
+  "ijson>=3.5.0",
+  "lxml>=6.1.1",
   "matplotlib>=3.10.9",
   "numpy>=2.3.2",
   "orjson>=3.11.7",
@@ -23,6 +26,7 @@ dependencies = [
   "plotly>=6.3.1",
   "pm4py~=2.7.23",
   "polars>=1.40.1",
+  "pyarrow>=24.0.0",
   "pydantic>=2.11.7",
   "r4pm[polars]>=0.6.0",
 ]
@@ -50,6 +54,9 @@ plugin = [
 [build-system]
 requires = ["uv_build>=0.11.20,<0.12.0"]
 build-backend = "uv_build"
+
+[dependency-groups]
+dev = ["pyarrow-stubs>=20.0.0.20260625"]
 
 [tool.black]
 line-length = 100

@@ -1,37 +1,31 @@
-from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from typing import TYPE_CHECKING, Optional
+from __future__ import annotations
 
-from pandas import Series
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING, NamedTuple
+
+import polars as pl
 from pydantic import BaseModel
 
 if TYPE_CHECKING:
     from ocelescope.ocel.core.ocel import OCEL
 
 
-@dataclass()
-class FilterResult:
-    events: Optional[Series] = None
-    objects: Optional[Series] = None
+class Keep(NamedTuple):
+    """The ids a filter keeps.
 
-    def and_merge(self, other: "FilterResult") -> "FilterResult":
-        def _and(a, b):
-            if a is not None and b is not None:
-                return a & b
-            elif a is not None:
-                return a
-            elif b is not None:
-                return b
-            else:
-                return None
+    ``events`` / ``objects`` are single-column lazy frames of the surviving event /
+    object ids. ``None`` on a side means "keep all" of that entity, which is not
+    the same as an empty frame -- that keeps none.
+    """
 
-        return FilterResult(
-            events=_and(self.events, other.events),
-            objects=_and(self.objects, other.objects),
-        )
+    events: pl.LazyFrame | None = None
+    objects: pl.LazyFrame | None = None
 
 
-class BaseFilter(ABC, BaseModel):
+class BaseFilter(BaseModel, ABC):
+    """A valid subset of an OCEL, expressed as the event/object ids to keep."""
+
     @abstractmethod
-    def filter(self, ocel: "OCEL") -> FilterResult:
-        pass
+    def keep(self, ocel: "OCEL") -> Keep:
+        """Return the event/object ids to keep as a :class:`Keep`."""
+        ...

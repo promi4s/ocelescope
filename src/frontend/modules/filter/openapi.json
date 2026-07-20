@@ -30,37 +30,37 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/NativeActivityFilter"
+                        "$ref": "#/components/schemas/TimeFrameFilter"
                       },
                       {
-                        "$ref": "#/components/schemas/NativeObjectTypeFilter"
+                        "$ref": "#/components/schemas/ActivityFilter"
                       },
                       {
-                        "$ref": "#/components/schemas/NativeTimeFrameFilter"
+                        "$ref": "#/components/schemas/ObjectTypeFilter"
                       },
                       {
-                        "$ref": "#/components/schemas/NativeEventAttributeFilter"
+                        "$ref": "#/components/schemas/EventAttributeFilter"
                       },
                       {
-                        "$ref": "#/components/schemas/NativeObjectAttributeFilter"
+                        "$ref": "#/components/schemas/ObjectAttributeFilter"
                       },
                       {
-                        "$ref": "#/components/schemas/NativeE2OCountFilter"
+                        "$ref": "#/components/schemas/E2OCountFilter"
                       },
                       {
-                        "$ref": "#/components/schemas/NativeO2OCountFilter"
+                        "$ref": "#/components/schemas/O2OCountFilter"
                       }
                     ],
                     "discriminator": {
                       "propertyName": "type",
                       "mapping": {
-                        "activity": "#/components/schemas/NativeActivityFilter",
-                        "object_type": "#/components/schemas/NativeObjectTypeFilter",
-                        "time_frame": "#/components/schemas/NativeTimeFrameFilter",
-                        "event_attribute": "#/components/schemas/NativeEventAttributeFilter",
-                        "object_attribute": "#/components/schemas/NativeObjectAttributeFilter",
-                        "e2o_count": "#/components/schemas/NativeE2OCountFilter",
-                        "o2o_count": "#/components/schemas/NativeO2OCountFilter"
+                        "time_frame": "#/components/schemas/TimeFrameFilter",
+                        "activity": "#/components/schemas/ActivityFilter",
+                        "object_type": "#/components/schemas/ObjectTypeFilter",
+                        "event_attribute": "#/components/schemas/EventAttributeFilter",
+                        "object_attribute": "#/components/schemas/ObjectAttributeFilter",
+                        "e2o_count": "#/components/schemas/E2OCountFilter",
+                        "o2o_count": "#/components/schemas/O2OCountFilter"
                       }
                     }
                   },
@@ -104,37 +104,37 @@
                 "items": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/NativeActivityFilter"
+                      "$ref": "#/components/schemas/TimeFrameFilter"
                     },
                     {
-                      "$ref": "#/components/schemas/NativeObjectTypeFilter"
+                      "$ref": "#/components/schemas/ActivityFilter"
                     },
                     {
-                      "$ref": "#/components/schemas/NativeTimeFrameFilter"
+                      "$ref": "#/components/schemas/ObjectTypeFilter"
                     },
                     {
-                      "$ref": "#/components/schemas/NativeEventAttributeFilter"
+                      "$ref": "#/components/schemas/EventAttributeFilter"
                     },
                     {
-                      "$ref": "#/components/schemas/NativeObjectAttributeFilter"
+                      "$ref": "#/components/schemas/ObjectAttributeFilter"
                     },
                     {
-                      "$ref": "#/components/schemas/NativeE2OCountFilter"
+                      "$ref": "#/components/schemas/E2OCountFilter"
                     },
                     {
-                      "$ref": "#/components/schemas/NativeO2OCountFilter"
+                      "$ref": "#/components/schemas/O2OCountFilter"
                     }
                   ],
                   "discriminator": {
                     "propertyName": "type",
                     "mapping": {
-                      "activity": "#/components/schemas/NativeActivityFilter",
-                      "object_type": "#/components/schemas/NativeObjectTypeFilter",
-                      "time_frame": "#/components/schemas/NativeTimeFrameFilter",
-                      "event_attribute": "#/components/schemas/NativeEventAttributeFilter",
-                      "object_attribute": "#/components/schemas/NativeObjectAttributeFilter",
-                      "e2o_count": "#/components/schemas/NativeE2OCountFilter",
-                      "o2o_count": "#/components/schemas/NativeO2OCountFilter"
+                      "time_frame": "#/components/schemas/TimeFrameFilter",
+                      "activity": "#/components/schemas/ActivityFilter",
+                      "object_type": "#/components/schemas/ObjectTypeFilter",
+                      "event_attribute": "#/components/schemas/EventAttributeFilter",
+                      "object_attribute": "#/components/schemas/ObjectAttributeFilter",
+                      "e2o_count": "#/components/schemas/E2OCountFilter",
+                      "o2o_count": "#/components/schemas/O2OCountFilter"
                     }
                   }
                 },
@@ -168,20 +168,7 @@
   },
   "components": {
     "schemas": {
-      "HTTPValidationError": {
-        "properties": {
-          "detail": {
-            "items": {
-              "$ref": "#/components/schemas/ValidationError"
-            },
-            "type": "array",
-            "title": "Detail"
-          }
-        },
-        "type": "object",
-        "title": "HTTPValidationError"
-      },
-      "NativeActivityFilter": {
+      "ActivityFilter": {
         "properties": {
           "event_types": {
             "items": {
@@ -194,11 +181,11 @@
           "mode": {
             "type": "string",
             "enum": [
-              "exclude",
-              "include"
+              "include",
+              "exclude"
             ],
             "title": "Mode",
-            "default": "exclude"
+            "default": "include"
           },
           "type": {
             "type": "string",
@@ -211,9 +198,10 @@
           "event_types",
           "type"
         ],
-        "title": "NativeActivityFilter"
+        "title": "ActivityFilter",
+        "description": "Keep (or exclude) events of the given activities."
       },
-      "NativeE2OCountFilter": {
+      "E2OCountFilter": {
         "properties": {
           "source": {
             "type": "string",
@@ -284,9 +272,10 @@
           "range",
           "type"
         ],
-        "title": "NativeE2OCountFilter"
+        "title": "E2OCountFilter",
+        "description": "Keep events/objects by how many E2O relations of a given kind they have."
       },
-      "NativeEventAttributeFilter": {
+      "EventAttributeFilter": {
         "properties": {
           "target_type": {
             "anyOf": [
@@ -345,9 +334,6 @@
                   {
                     "anyOf": [
                       {
-                        "type": "integer"
-                      },
-                      {
                         "type": "number"
                       },
                       {
@@ -357,9 +343,6 @@
                   },
                   {
                     "anyOf": [
-                      {
-                        "type": "integer"
-                      },
                       {
                         "type": "number"
                       },
@@ -425,9 +408,23 @@
           "attribute",
           "type"
         ],
-        "title": "NativeEventAttributeFilter"
+        "title": "EventAttributeFilter",
+        "description": "Keep events whose attribute matches; activities without it are untouched."
       },
-      "NativeO2OCountFilter": {
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "O2OCountFilter": {
         "properties": {
           "source": {
             "type": "string",
@@ -498,9 +495,10 @@
           "range",
           "type"
         ],
-        "title": "NativeO2OCountFilter"
+        "title": "O2OCountFilter",
+        "description": "Keep objects by how many O2O relations of a given kind they have."
       },
-      "NativeObjectAttributeFilter": {
+      "ObjectAttributeFilter": {
         "properties": {
           "target_type": {
             "anyOf": [
@@ -559,9 +557,6 @@
                   {
                     "anyOf": [
                       {
-                        "type": "integer"
-                      },
-                      {
                         "type": "number"
                       },
                       {
@@ -571,9 +566,6 @@
                   },
                   {
                     "anyOf": [
-                      {
-                        "type": "integer"
-                      },
                       {
                         "type": "number"
                       },
@@ -639,9 +631,10 @@
           "attribute",
           "type"
         ],
-        "title": "NativeObjectAttributeFilter"
+        "title": "ObjectAttributeFilter",
+        "description": "Keep objects whose (static) attribute matches; types without it are untouched."
       },
-      "NativeObjectTypeFilter": {
+      "ObjectTypeFilter": {
         "properties": {
           "object_types": {
             "items": {
@@ -654,11 +647,11 @@
           "mode": {
             "type": "string",
             "enum": [
-              "exclude",
-              "include"
+              "include",
+              "exclude"
             ],
             "title": "Mode",
-            "default": "exclude"
+            "default": "include"
           },
           "type": {
             "type": "string",
@@ -671,9 +664,10 @@
           "object_types",
           "type"
         ],
-        "title": "NativeObjectTypeFilter"
+        "title": "ObjectTypeFilter",
+        "description": "Keep (or exclude) objects of the given object types."
       },
-      "NativeTimeFrameFilter": {
+      "TimeFrameFilter": {
         "properties": {
           "time_range": {
             "prefixItems": [
@@ -723,7 +717,8 @@
           "time_range",
           "type"
         ],
-        "title": "NativeTimeFrameFilter"
+        "title": "TimeFrameFilter",
+        "description": "Keep (or exclude) events whose timestamp falls in ``[start, end]``."
       },
       "ValidationError": {
         "properties": {

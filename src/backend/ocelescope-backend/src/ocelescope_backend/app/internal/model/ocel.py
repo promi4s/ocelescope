@@ -1,141 +1,105 @@
-from typing import Hashable, Self, Sequence, cast
+from pathlib import Path
+from typing import Sequence
 
-import pandas as pd
-from ocelescope.ocel.constants import ValueType
-from pydantic.main import BaseModel
+from ocelescope.ocel.extensions.base_extension import OCELExtension
+from ocelescope.ocel.io import export_duckdb_ocel
 
-from ocelescope import (
-    OCEL,
-)
-from ocelescope_backend.app.internal.registry import registry_manager
-from ocelescope_backend.app.internal.registry.extension import OCELExtensionDescription
-from ocelescope_backend.app.modules.base import ModuleFilter
-
-
-class OcelMetadata(BaseModel):
-    id: str
-    name: str
-    created_at: str
-    extensions: list[OCELExtensionDescription]
-    filter_applied: bool | None
-
-    @classmethod
-    def from_ocel(cls, ocel: OCEL, filter_applied: bool | None = None):
-        extension_descriptions = registry_manager.get_extension_descriptions()
-
-        return cls(
-            id=ocel.meta.id,
-            created_at=ocel.meta.extra["upload_date"],
-            name=ocel.meta.extra["name"],
-            extensions=[
-                extension_descriptions[extension.__class__.__name__]
-                for extension in ocel.extensions.all()
-                if extension.__class__.__name__ in extension_descriptions
-            ],
-            filter_applied=filter_applied,
-        )
+from ocelescope import OCEL, BaseFilter
 
 
 class SessionOCEL:
-    def __init__(self, ocel: OCEL):
-        self.origin: OCEL = ocel
-        self._applied_filter: list[ModuleFilter] = []
-        self._filtered_ocel: OCEL = ocel
+    """A handle to an OCEL persisted as a DuckDB file on disk.
+
+    The log is never held in the session. A global filter pipeline
+    (:class:`ModuleFilter` s, grouped by the module that set them) defines a *view*,
+    applied **once** -- when the pipeline changes -- into a filtered DuckDB file
+    beside the origin. Reads then open that file, so a per-request access never
+    re-runs the filter; ``use_original`` reads the origin instead.
+    """
+
+    def __init__(
+        self,
+        id: str,
+        db_path: Path,
+        name: str,
+        created_at: str,
+        extensions: list[OCELExtension] | None = None,
+    ):
+        self.id = id
+        self.db_path = db_path
+        self.name = name
+        self.created_at = created_at
+        self.extensions: list[OCELExtension] = extensions or []
+        self._filters_by_source: dict[str, list[BaseFilter]] = {}
+        self._filtered_db_path: Path | None = None
+
+    def _all_filters(self) -> list[BaseFilter]:
+        return [f for pipeline in self._filters_by_source.values() for f in pipeline]
+
+    def _active_path(self, use_original: bool) -> Path:
+        """The DuckDB file to read: the origin, or the (once-computed) filtered one.
+
+        The filtered file is built by reading the origin, applying the pipeline and
+        writing the result back out -- so the cost is paid here, when the pipeline
+        changes, rather than on every read.
+        """
+        filters = self._all_filters()
+        if use_original or not filters:
+            return self.db_path
+        if self._filtered_db_path is None:
+            filtered = self.db_path.with_suffix(".filtered.duckdb")
+            with OCEL.read_duckdb(self.db_path) as origin:
+                with origin.filter(filters) as subset:
+                    subset.to_duckdb(filtered)
+            self._filtered_db_path = filtered
+        return self._filtered_db_path
+
+    def ocel(self, use_original: bool = False) -> OCEL:
+        """The OCEL over the active DuckDB file (filtered unless ``use_original``).
+
+        Opened read-only: the file is the session's, and a request has no business
+        writing to it. Its tables are read out of the file only as they are asked
+        for, so this call itself loads nothing.
+        """
+        ocel = OCEL.read_duckdb(self._active_path(use_original))
+        if self.extensions:
+            ocel.extensions.set(self.extensions)
+        return ocel
+
+    def export(self, target_path: Path, use_original: bool = False) -> None:
+        """Write the OCEL to ``target_path`` straight from the DuckDB store.
+
+        Streams the log (and quantities) from the active DuckDB file entity-by-entity
+        rather than materializing the whole OCEL, then re-exports the in-memory
+        session extensions (which aren't persisted to DuckDB) so the output matches
+        :meth:`ocel` + :meth:`OCEL.write`. The target format is chosen from the file
+        extension (``.json`` / ``.xml`` / ``.sqlite``).
+        """
+        export_duckdb_ocel(self._active_path(use_original), target_path)
+        for extension in self.extensions:
+            if target_path.suffix in getattr(extension, "supported_extensions", []):
+                extension.export_extension(target_path)
+
+    def _drop_filtered(self) -> None:
+        if self._filtered_db_path is not None:
+            self._filtered_db_path.unlink(missing_ok=True)
+            self._filtered_db_path = None
 
     @property
-    def ocel(self):
-        return self._filtered_ocel
+    def is_filtered(self) -> bool:
+        return len(self._all_filters()) > 0
 
-    def get_filters(self, module_source: str | None) -> list[ModuleFilter]:
-        return [
-            filterItem
-            for filterItem in self._applied_filter
-            if module_source is None
-            or filterItem.OcelescopeModuleSource == module_source
-        ]
+    def delete(self) -> None:
+        self._drop_filtered()
+        self.db_path.unlink(missing_ok=True)
 
-    def set_filters(self, module_source: str, pipeline: Sequence[ModuleFilter]):
-        new_pipeline = [
-            filter
-            for filter in self._applied_filter
-            if filter.OcelescopeModuleSource != module_source
-        ] + [
-            module_filter
-            for module_filter in pipeline
-            if module_filter.OcelescopeModuleSource == module_source
-        ]
+    def get_filters(self, module_source: str | None = None) -> list[BaseFilter]:
+        if module_source is None:
+            return self._all_filters()
+        return list(self._filters_by_source.get(module_source, []))
 
-        self._filtered_ocel = self.origin.filter(pipeline)
-
-        self._applied_filter = new_pipeline
-
-
-class Attribute(BaseModel):
-    name: str
-    min: str | int | float
-    max: str | int | float
-    distinct_values: int
-    type: ValueType
-
-    @classmethod
-    def from_df_row(cls, row: tuple[Hashable, pd.Series]) -> Self:
-        attribute_name = cast(str, row[0])
-        series = row[1]
-
-        return cls(
-            name=attribute_name,
-            min=series["min"],
-            max=series["max"],
-            distinct_values=series["distinct_values"],
-            type=series["type"],
-        )
-
-    @classmethod
-    def from_df(cls, df: pd.DataFrame) -> list[Self]:
-        return [cls.from_df_row(row) for row in df.iterrows()]
-
-
-class AggregatedAttribute(Attribute):
-    entity_type_names: list[str]
-
-    @classmethod
-    def from_df_row(cls, row: tuple[Hashable, pd.Series]) -> Self:
-        base = Attribute.from_df_row(row)
-
-        return cls(
-            entity_type_names=row[1]["object_types"] + row[1]["activities"],
-            **base.model_dump(),
-        )
-
-
-class TypedAttribute(Attribute):
-    entity_type: str
-
-    @classmethod
-    def from_df_row(cls, row: tuple[Hashable, pd.Series]) -> "TypedAttribute":
-        index = cast(tuple[str, str], row[0])
-        entity_type = index[0]
-        base = Attribute.from_df_row((index[1], row[1]))
-
-        return cls(
-            entity_type=entity_type,
-            **base.model_dump(),
-        )
-
-
-class QuantityInfo(BaseModel):
-    item_types: list[str]
-    total_object_count: int
-    total_event_count: int
-    object_types: list[str]
-    activities: list[str]
-
-    @classmethod
-    def from_ocel(cls, ocel: OCEL) -> Self:
-        return cls(
-            item_types=ocel.quantities.item_types,
-            total_object_count=len(ocel.quantities.objects),
-            total_event_count=len(ocel.quantities.events),
-            object_types=ocel.quantities.object_types,
-            activities=ocel.quantities.activities,
-        )
+    def set_filters(self, module_source: str, pipeline: Sequence[BaseFilter]):
+        self._filters_by_source[module_source] = list(pipeline)
+        self._drop_filtered()
+        if self._all_filters():
+            self._active_path(use_original=False)
