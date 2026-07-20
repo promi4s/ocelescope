@@ -16,6 +16,8 @@ from typing import Iterator
 
 import duckdb
 
+from ocelescope.util.sql import set_utc
+
 DuckDBTarget = str | Path | duckdb.DuckDBPyConnection
 
 
@@ -30,12 +32,17 @@ def connect_target(
 
     ``read_only`` applies only when opening a path -- a borrowed connection is
     however its owner opened it.
+
+    Either way the connection is put in UTC by :func:`_set_utc`, so every importer
+    and exporter reads and writes the same instants.
     """
     if isinstance(target, duckdb.DuckDBPyConnection):
+        set_utc(target)
         yield target
         return
 
     con = duckdb.connect(str(target), read_only=read_only)
+    set_utc(con)
     try:
         yield con
     finally:
