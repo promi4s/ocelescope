@@ -1,36 +1,4 @@
-"""Streaming importer for OCEL 2.0 SQLite logs into DuckDB.
-
-Reads a log stored in the OCEL 2.0 SQLite format
-(https://www.ocel-standard.org/specification/formats/sqlite/) by attaching the
-file to DuckDB and moving every table across with a single ``INSERT ... SELECT``.
-DuckDB streams the rows internally, so the log never has to be materialised in
-Python memory, and the resulting five OCEL tables are identical to the ones the
-JSON/XML importers produce via :class:`OCELWriter`.
-
-The format stores one table per object/event type (``object_<suffix>`` /
-``event_<suffix>``), whose real type name and table suffix are related through
-the ``object_map_type`` / ``event_map_type`` tables.
-
-Real-world files vary, so the importer is deliberately defensive:
-
-* **Column names differ by exporter.** The timestamp is ``ocel_time`` (standard)
-  or ``ocel:timestamp`` (pm4py); the change marker is ``ocel_changed_field`` or
-  ``ocel:field``. Meta columns are matched by name, and everything else in a type
-  table is treated as an attribute.
-* **The initial-vs-change split is derived from timestamps, not the change
-  marker.** An attribute's earliest value is its initial value (-> ``objects``)
-  and every later value is a change (-> ``object_changes``). This matches
-  OCELWriter and works whether a file stores an explicit initial row (pm4py) or
-  only per-field change rows. A row with *no* time is an initial snapshot and so
-  counts as earliest of all -- which SQL does not believe by default, hence
-  :func:`_order_expr`.
-* **Objects without attributes** have an empty/absent type table, so the
-  ``objects`` rows are sourced from the core ``object`` table.
-* **Dirty data.** SQLite is dynamically typed, so a numeric column may hold stray
-  text (e.g. the literal ``'null'``). Columns are attached as VARCHAR and
-  recovered with ``TRY_CAST``, which turns unparseable values into NULL instead
-  of failing the import.
-"""
+"""Streaming importer for OCEL 2.0 SQLite logs into DuckDB."""
 
 from __future__ import annotations
 
@@ -68,30 +36,6 @@ from ocelescope.ocel.io.schema import (
 )
 from ocelescope.util.sql import ident, literal
 
-# ---------------------------------------------------------------------------
-# What the source SQLite file looks like (OCEL 2.0 SQLite format)
-# ---------------------------------------------------------------------------
-# There is NOT one big "events"/"objects" table. Instead the log is spread over
-# many tables, one per event/object *type*:
-#
-#   event                 (ocel_id, ocel_type)            -- id -> type index
-#   object                (ocel_id, ocel_type)            -- id -> type index
-#   event_map_type        (ocel_type, ocel_type_map)      -- "place order" -> "PlaceOrder"
-#   object_map_type       (ocel_type, ocel_type_map)      -- "order"       -> "Order"
-#   event_<suffix>        (ocel_id, ocel_time,  <attr columns...>)     e.g. event_PlaceOrder
-#   object_<suffix>       (ocel_id, ocel_time, ocel_changed_field, <attr columns...>)
-#   event_object          (ocel_event_id, ocel_object_id, ocel_qualifier)   -- e2o
-#   object_object         (ocel_source_id, ocel_target_id, ocel_qualifier)  -- o2o
-#
-# The real type name (e.g. "place order") can contain spaces, so it cannot be a
-# table name directly; the *_map_type tables translate it to a table-safe suffix
-# (e.g. "PlaceOrder"), giving the table name "event_PlaceOrder".
-#
-# Our job is to reshape those into the five flat DuckDB tables the rest of
-# ocelescope reads (events, objects, object_changes, e2o, o2o) -- exactly what
-# the JSON/XML importers build via OCELWriter.
-
-#: SQLite declared column type -> Arrow type used for the generated columns.
 _SQLITE_TYPE_TO_ARROW: dict[str, pa.DataType] = {
     "TEXT": pa.string(),
     "VARCHAR": pa.string(),
@@ -109,11 +53,10 @@ _SQLITE_TYPE_TO_ARROW: dict[str, pa.DataType] = {
     "BOOL": pa.bool_(),
     "TIMESTAMP": pa.timestamp("us", tz="UTC"),
     "DATETIME": pa.timestamp("us", tz="UTC"),
-    "DATE": pa.date64(),
+    "DATE": pa.timestamp("us", tz="UTC"),
 }
 
-#: Arrow attribute type -> DuckDB type to ``TRY_CAST`` the (VARCHAR) source into.
-#: ``string`` is omitted because such columns are already text and need no cast.
+
 _ARROW_TO_DUCKDB_CAST: dict[pa.DataType, str] = {
     pa.int64(): "BIGINT",
     pa.float64(): "DOUBLE",
@@ -121,17 +64,12 @@ _ARROW_TO_DUCKDB_CAST: dict[pa.DataType, str] = {
     pa.timestamp("us", tz="UTC"): "TIMESTAMPTZ",
 }
 
-#: Stands in for the time of a row that has none; see :func:`_order_expr`.
 _EARLIEST = "'-infinity'::TIMESTAMPTZ"
 
-#: Column names that carry the row timestamp (standard first, then pm4py).
 _TIME_COLUMNS = ("ocel_time", "ocel:timestamp", "ocel:time")
-#: Column names flagging which attribute a change row updates.
+
 _CHANGED_FIELD_COLUMNS = ("ocel_changed_field", "ocel:field")
-#: Non-attribute columns of a type table (everything else is an attribute).
-#: ``@@cumcount`` is pm4py's internal split-helper, which its own SQLite exporter
-#: writes into the type tables. It is read nowhere else, so it is dropped here
-#: rather than leaking into the flat tables as a user attribute.
+
 _META_COLUMNS = {
     "ocel_id",
     "ocel_type",
@@ -145,7 +83,6 @@ _META_COLUMNS = {
 
 def _arrow_type(sqlite_type: str | None) -> pa.DataType:
     """Map a SQLite declared column type to an Arrow type (default ``string``)."""
-    # Declared types can carry a size, e.g. "VARCHAR(255)" -> keep only "VARCHAR".
     base = (sqlite_type or "").upper().split("(", 1)[0].strip()
     return _SQLITE_TYPE_TO_ARROW.get(base, pa.string())
 
@@ -209,17 +146,15 @@ class _TypeTable:
     """
 
     def __init__(self, name: str, ocel_type: str, columns: list[tuple[str, str]]):
-        self.name = name  # physical table name, e.g. "event_PlaceOrder"
-        self.ocel_type = ocel_type  # real type name, e.g. "place order"
+        self.name = name
+        self.ocel_type = ocel_type
         self.time_column: str | None = None
         self.attributes: SchemaDefinition = []
 
-        # `columns` is a list of (column_name, sqlite_declared_type) pairs.
         for column, sqlite_type in columns:
             if column in _TIME_COLUMNS and self.time_column is None:
                 self.time_column = column
             elif column not in _META_COLUMNS:
-                # Not a known meta column -> it is a user-defined attribute.
                 self.attributes.append((column, _arrow_type(sqlite_type)))
 
 
@@ -255,9 +190,8 @@ def _discover(
     for ocel_type, suffix in _type_map(cur, map_table, present).items():
         name = f"{prefix}_{suffix}"
         if name not in present:
-            continue  # map references a table that isn't actually present
-        # PRAGMA table_info rows are (cid, name, type, notnull, default, pk);
-        # we keep column name (row[1]) and declared type (row[2]).
+            continue
+
         columns = [(row[1], row[2]) for row in cur.execute(f"PRAGMA table_info({ident(name)})")]
         tables.append(_TypeTable(name, ocel_type, columns))
     return tables
@@ -310,10 +244,6 @@ def _insert_objects(con: duckdb.DuckDBPyConnection, table: _TypeTable) -> None:
         )
         return
 
-    # Aggregate each attribute to its earliest value; arg_min skips rows where the
-    # value is NULL, so a change row that leaves an attribute alone doesn't claim
-    # it, and a dirty leading value (e.g. the text 'null') is ignored in favour of
-    # the first real one.
     order_key = _order_expr(table.time_column)
     initial = ", ".join(
         f"arg_min({_cast_expr(name, dtype)}, {order_key}) AS {ident(name)}"
@@ -360,44 +290,24 @@ def _insert_object_changes(con: duckdb.DuckDBPyConnection, table: _TypeTable) ->
 
 def import_ocel_sqlite(source: str | Path, target: DuckDBTarget) -> None:
     """Stream an OCEL 2.0 SQLite log into the DuckDB database at ``target``."""
-    # --- Step 1: inspect the source schema (metadata only, no row data) --------
-    # Open the SQLite file read-only just to learn which type tables exist and
-    # what columns they have. We use Python's sqlite3 here because PRAGMA
-    # table_info is the simplest way to read a column list.
+
     with sqlite3.connect(f"file:{Path(source)}?mode=ro", uri=True) as sqlite_con:
         cur = sqlite_con.cursor()
         present = _table_names(cur)
         event_tables = _discover(cur, "event", "event_map_type", present)
         object_tables = _discover(cur, "object", "object_map_type", present)
 
-    # --- Step 2: work out the shared attribute columns -------------------------
-    # Each type table declares only its own attributes; the flat `events` and
-    # `objects` tables need the *union* across all types. merge_columns folds
-    # duplicate names into one column (falling back to string on type clashes).
     event_columns = merge_columns([attr for table in event_tables for attr in table.attributes])
     object_columns = merge_columns([attr for table in object_tables for attr in table.attributes])
 
     with connect_target(target) as con:
-        # Create the five empty output tables (the shared layout every importer
-        # writes), then fill them below with bulk INSERTs.
         create_ocel_tables(con, object_columns, event_columns)
 
-        # --- Step 3: attach the SQLite file so DuckDB can read it directly -----
-        # After ATTACH, source tables are addressable as `src.<table>` and the
-        # whole copy happens inside DuckDB (streamed), never through Python.
-        # sqlite_all_varchar reads every column as text: SQLite is dynamically
-        # typed, so a column declared REAL may still hold stray text (e.g. the
-        # literal 'null'), which the scanner would otherwise refuse. We recover
-        # the real types via TRY_CAST in the SELECTs below.
         con.execute("INSTALL sqlite; LOAD sqlite;")
         con.execute("SET GLOBAL sqlite_all_varchar=true")
         con.execute(f"ATTACH '{Path(source)}' AS src (TYPE sqlite, READ_ONLY)")
 
         try:
-            # --- Step 4: events -> `events` table -----------------------------
-            # One INSERT per event type. The activity is a constant (the real
-            # type name from the map table), the timestamp is cast to UTC, and
-            # each type's attributes flow into their matching shared columns.
             for table in event_tables:
                 time = _timestamp_expr(table.time_column) if table.time_column else "NULL"
                 attr_names = [name for name, _ in table.attributes]
@@ -410,20 +320,12 @@ def import_ocel_sqlite(source: str | Path, target: DuckDBTarget) -> None:
                     table.name,
                 )
 
-            # --- Step 5: objects -> `objects` (initial) + `object_changes` ----
-            # An object's initial attribute values become one `objects` row; every
-            # later value of an attribute becomes an `object_changes` row. Both are
-            # derived by "earliest value wins" rather than trusting an explicit
-            # snapshot marker, so all format dialects behave the same (see helpers).
             for table in object_tables:
                 _insert_objects(con, table)
                 _insert_object_changes(con, table)
-            # Which attributes actually changed is only known now they are all in.
+
             drop_unchanged_columns(con)
 
-            # --- Step 6: relationship tables (straight column renames) --------
-            # These live in single source tables, so one INSERT each. Guarded by an
-            # existence check since a log may have no o2o (or no e2o) relations.
             if "object_object" in present:
                 _insert(
                     con,
@@ -441,10 +343,6 @@ def import_ocel_sqlite(source: str | Path, target: DuckDBTarget) -> None:
                     "event_object",
                 )
 
-            # --- Step 7: quantity extension (optional) ------------------------
-            # Copy the extension tables across the still-attached source, if present.
             import_quantities_sqlite(con, present)
         finally:
-            # The connection may be the caller's and outlive this import, so leave
-            # no `src` behind -- a later ATTACH on it would clash with the name.
             con.execute("DETACH src")
