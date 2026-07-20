@@ -498,13 +498,19 @@ class OCEL:
 
         write_ocel_to_xes(ocel=self, object_type=object_type, path=path)
 
-    def __deepcopy__(
-        self,
-    ):
+    def __deepcopy__(self, memo: dict | None = None) -> OCEL:
+        """Copy the log into a database of its own.
 
-        return OCEL(
-            self._copy_database(),
-        )
+        ``copy.deepcopy`` always passes its ``memo`` -- the map of objects it has
+        already copied -- so the parameter has to be here even though an OCEL owns
+        no Python-side graph worth walking. Recording the clone in it keeps a log
+        referenced twice from being copied twice, which for a database is the
+        difference between one copy and two.
+        """
+        clone = OCEL(self._copy_database())
+        if memo is not None:
+            memo[id(self)] = clone
+        return clone
 
     def _copy_database(self) -> duckdb.DuckDBPyConnection:
         """Copy every stored table into a new in-memory database.
