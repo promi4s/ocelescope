@@ -28,7 +28,7 @@ SchemaDefinition = list[tuple[str, pa.DataType]]
 
 ATTRIBUTE_TYPE_TO_ARROW: dict[str, pa.DataType] = {
     "string": pa.string(),
-    "time": pa.date64(),
+    "time": pa.timestamp("us", tz="UTC"),
     "integer": pa.int64(),
     "float": pa.float64(),
     "boolean": pa.bool_(),
