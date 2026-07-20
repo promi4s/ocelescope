@@ -8,21 +8,16 @@ import ijson
 
 from ocelescope.ocel.io.connection import DuckDBTarget
 from ocelescope.ocel.io.importers.quantities import import_quantities_json
+from ocelescope.ocel.io.importers.writer import OCELWriter
 from ocelescope.ocel.io.schema import (
     ATTRIBUTE_TYPE_TO_ARROW,
     SchemaDefinition,
     merge_columns,
 )
-from ocelescope.ocel.io.importers.writer import OCELWriter
 
 
 def _attribute_schemas(source: str | Path) -> tuple[SchemaDefinition, SchemaDefinition]:
-    """Read object- and event-type attribute columns in a single early pass.
-
-    In OCEL 2.0 JSON the ``objectTypes``/``eventTypes`` declarations precede the
-    ``objects``/``events`` data arrays, so we stop as soon as the first data
-    array begins instead of scanning the whole (potentially multi-GB) file.
-    """
+    """Read object- and event-type attribute columns in a single early pass."""
     object_attrs: SchemaDefinition = []
     event_attrs: SchemaDefinition = []
     current_name: str = ""
