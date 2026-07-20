@@ -121,17 +121,11 @@ def drop_unchanged_columns(con: duckdb.DuckDBPyConnection) -> None:
     if not names:
         return
 
-    projection = ", ".join(
-        f"bool_or({ident(name)} IS NOT NULL) AS {ident(name)}" for name in names
-    )
-    row = con.execute(
-        f"SELECT {projection} FROM {ident(OBJECT_CHANGES_TABLE)}"
-    ).fetchall()[0]
+    projection = ", ".join(f"bool_or({ident(name)} IS NOT NULL) AS {ident(name)}" for name in names)
+    row = con.execute(f"SELECT {projection} FROM {ident(OBJECT_CHANGES_TABLE)}").fetchall()[0]
     for name, has_values in zip(names, row):
         if not has_values:
-            con.execute(
-                f"ALTER TABLE {ident(OBJECT_CHANGES_TABLE)} DROP COLUMN {ident(name)}"
-            )
+            con.execute(f"ALTER TABLE {ident(OBJECT_CHANGES_TABLE)} DROP COLUMN {ident(name)}")
 
 
 def merge_columns(columns: SchemaDefinition) -> SchemaDefinition:
