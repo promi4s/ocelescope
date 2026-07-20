@@ -21,7 +21,6 @@ from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.model.response import TempFileResponse
 
 from ocelescope import OCEL, BaseFilter
-from ocelescope_module_ocel.util import variants as variant_util
 
 router = APIRouter()
 

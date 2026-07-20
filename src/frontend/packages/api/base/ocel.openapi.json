@@ -139,7 +139,9 @@
                 }
               ],
               "description": "Dataset version (optional)",
-              "examples": ["1.0"],
+              "examples": [
+                "1.0"
+              ],
               "title": "Version"
             },
             "description": "Dataset version (optional)"
@@ -360,7 +362,10 @@
             "in": "query",
             "required": false,
             "schema": {
-              "enum": ["events", "objects"],
+              "enum": [
+                "events",
+                "objects"
+              ],
               "type": "string",
               "default": "events",
               "title": "Entity Type"
@@ -421,7 +426,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -517,7 +525,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -617,7 +628,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -685,7 +699,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["events", "objects"],
+                  "enum": [
+                    "events",
+                    "objects"
+                  ],
                   "type": "string"
                 },
                 {
@@ -702,7 +719,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -770,7 +790,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -838,7 +861,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -942,7 +968,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1016,7 +1045,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1080,7 +1112,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1148,7 +1183,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1252,7 +1290,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1348,7 +1389,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1410,7 +1454,10 @@
             "in": "query",
             "required": false,
             "schema": {
-              "enum": ["source", "target"],
+              "enum": [
+                "source",
+                "target"
+              ],
               "type": "string",
               "default": "source",
               "title": "Direction"
@@ -1534,7 +1581,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1596,7 +1646,10 @@
             "in": "query",
             "required": false,
             "schema": {
-              "enum": ["source", "target"],
+              "enum": [
+                "source",
+                "target"
+              ],
               "type": "string",
               "default": "source",
               "title": "Direction"
@@ -1720,7 +1773,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1782,7 +1838,10 @@
             "in": "query",
             "required": false,
             "schema": {
-              "enum": ["source", "target"],
+              "enum": [
+                "source",
+                "target"
+              ],
               "type": "string",
               "default": "source",
               "title": "Direction"
@@ -1795,7 +1854,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1861,7 +1923,10 @@
             "in": "query",
             "required": false,
             "schema": {
-              "enum": ["source", "target"],
+              "enum": [
+                "source",
+                "target"
+              ],
               "type": "string",
               "default": "source",
               "title": "Direction"
@@ -1874,7 +1939,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1942,7 +2010,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1997,7 +2068,11 @@
             "in": "query",
             "required": false,
             "schema": {
-              "enum": [".xml", ".json", ".sqlite"],
+              "enum": [
+                ".xml",
+                ".json",
+                ".sqlite"
+              ],
               "type": "string",
               "default": ".json",
               "title": "Ext"
@@ -2010,7 +2085,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -2081,7 +2159,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -2166,7 +2247,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -2283,7 +2367,11 @@
           }
         },
         "type": "object",
-        "required": ["start_timestamp", "end_timestamp", "entity_count"],
+        "required": [
+          "start_timestamp",
+          "end_timestamp",
+          "entity_count"
+        ],
         "title": "Date_Distribution_Item"
       },
       "DefaultOCEL": {
@@ -2327,7 +2415,12 @@
           }
         },
         "type": "object",
-        "required": ["key", "name", "version", "file"],
+        "required": [
+          "key",
+          "name",
+          "version",
+          "file"
+        ],
         "title": "DefaultOCEL",
         "description": "Definition of a default OCEL on the server, for quick access. Supports pre-loading the OCEL on backend init."
       },
@@ -2350,7 +2443,11 @@
           }
         },
         "type": "object",
-        "required": ["start_time", "end_time", "date_distribution"],
+        "required": [
+          "start_time",
+          "end_time",
+          "date_distribution"
+        ],
         "title": "Entity_Time_Info"
       },
       "HTTPValidationError": {
@@ -2382,7 +2479,11 @@
           }
         },
         "type": "object",
-        "required": ["name", "label", "description"],
+        "required": [
+          "name",
+          "label",
+          "description"
+        ],
         "title": "OCELExtensionDescription"
       },
       "ObjectTypeVariants": {
@@ -2404,7 +2505,11 @@
           }
         },
         "type": "object",
-        "required": ["variants", "case_count", "event_count"],
+        "required": [
+          "variants",
+          "case_count",
+          "event_count"
+        ],
         "title": "ObjectTypeVariants",
         "description": "All variants of a single object type together with the totals across them.\n\nAttributes:\n    variants: The distinct variants, sorted by frequency (descending).\n    case_count: Total number of cases (objects) of the object type.\n    event_count: Total number of events across all cases of the object type."
       },
@@ -2431,9 +2536,14 @@
           }
         },
         "type": "object",
-        "required": ["variant_id", "activities", "event_count", "case_count"],
+        "required": [
+          "variant_id",
+          "activities",
+          "event_count",
+          "case_count"
+        ],
         "title": "ObjectVariant",
-        "description": "A single object variant: a distinct activity sequence objects of a type follow.\n\nAttributes:\n    variant_id: Identifier of the variant (``<object_type>_<index>``).\n    activities: The ordered activity sequence that defines the variant.\n    event_count: Number of events in the variant (length of ``activities``).\n    case_count: Number of objects (cases) that follow this variant."
+        "description": "A single object variant: a distinct activity sequence objects of a type follow.\n\nAttributes:\n    variant_id: Identifier of the variant\n        (``<object_type>_<hash of the activity sequence>``). It depends only\n        on the sequence, so it stays the same across filtered views of a log.\n    activities: The ordered activity sequence that defines the variant.\n    event_count: Number of events in the variant (length of ``activities``).\n    case_count: Number of objects (cases) that follow this variant."
       },
       "OcelMetadata": {
         "properties": {
@@ -2647,7 +2757,11 @@
           }
         },
         "type": "object",
-        "required": ["source", "target", "qualifier"],
+        "required": [
+          "source",
+          "target",
+          "qualifier"
+        ],
         "title": "RelationCombination",
         "description": "A distinct (source, target, qualifier) combination of a relation.\n\nAttributes:\n    source: The source object or event type.\n    target: The target object or event type.\n    qualifier: The relation qualifier (empty string when none applies)."
       },
@@ -2789,12 +2903,23 @@
           }
         },
         "type": "object",
-        "required": ["loc", "msg", "type"],
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
         "title": "ValidationError"
       },
       "ValueType": {
         "type": "string",
-        "enum": ["empty", "string", "bool", "int", "float", "date"],
+        "enum": [
+          "empty",
+          "string",
+          "bool",
+          "int",
+          "float",
+          "date"
+        ],
         "title": "ValueType"
       }
     }
