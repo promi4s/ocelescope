@@ -19,6 +19,7 @@ before any real change).
 from __future__ import annotations
 
 import re
+import sqlite3
 from pathlib import Path
 
 import duckdb
@@ -43,17 +44,17 @@ from ocelescope.ocel.io.exporters.common import (
     object_attribute_presence,
 )
 from ocelescope.ocel.io.exporters.quantities import export_quantities_sqlite
+from ocelescope.util.sql import ident
 
 _OBJECT_META = (OID_COL, OTYPE_COL)
 _EVENT_META = (EID_COL, ACTIVITY_COL, TIMESTAMP_COL)
 
 
 def _suffix_map(types: list[str]) -> dict[str, str]:
-    """Assign each real type name a unique, table-safe suffix (e.g. ``place order`` -> ``place_order``)."""
     used: set[str] = set()
     mapping: dict[str, str] = {}
     for type_name in types:
-        base = re.sub(r"\W+", "_", type_name).strip("_") or "type"
+        base = re.sub(r"\W+", "", type_name).strip("_") or "type"
         candidate, counter = base, 1
         while candidate in used:
             counter += 1
@@ -72,6 +73,11 @@ def _create_map_table(con: duckdb.DuckDBPyConnection, table: str, mapping: dict[
 def _ordered_present(ordered_attributes: list[tuple[str, str]], present: set[str]) -> list[str]:
     """The attribute names present for a type, in the flat table's column order."""
     return [name for name, _ in ordered_attributes if name in present]
+
+
+def _iso(expr: str) -> str:
+    """Render a ``TIMESTAMPTZ`` expression as ISO 8601 text, as the format expects."""
+    return f"replace(replace(CAST({expr} AS VARCHAR), ' ', 'T'), '+00', '+00:00')"
 
 
 def _sqlite_decl(duckdb_type: str) -> str:
@@ -97,37 +103,53 @@ def _sqlite_decl(duckdb_type: str) -> str:
     return "TEXT"
 
 
-def _create_and_fill(
-    con: duckdb.DuckDBPyConnection,
-    table: str,
-    ddl_columns: list[tuple[str, str]],
-    select_sql: str,
-    params: list,
-) -> None:
-    """Create ``out.<table>`` with explicit column types, then fill it from a SELECT.
+#: One type table to write: ``(name, ddl columns, fill query, query params)``.
+_TableSpec = tuple[str, list[tuple[str, str]], str, list]
+
+
+def _create_tables(target: Path, specs: list[_TableSpec]) -> None:
+    """Create the type tables through plain sqlite3, before DuckDB attaches the file.
+
+    DuckDB's SQLite writer picks its own declared type when it creates a table, and
+    it does not keep the ones :func:`_sqlite_decl` asks for: a ``TIMESTAMP`` column
+    lands as ``VARCHAR`` and a ``BOOLEAN`` as an integer. Since the importer reads
+    an attribute's type back off that declared name, a table DuckDB created cannot
+    round-trip a ``time`` or ``boolean`` attribute -- and the ``BOOLEAN`` -> integer
+    mapping makes inserting the text ``'true'`` fail outright.
+
+    So the tables are created here, with the declarations we want, and DuckDB is
+    left to do nothing but ``INSERT`` into them.
+    """
+    with sqlite3.connect(target) as con:
+        for table, ddl_columns, _, _ in specs:
+            column_ddl = ", ".join(f"{ident(name)} {decl}" for name, decl in ddl_columns)
+            con.execute(f"CREATE TABLE {ident(table)} ({column_ddl})")
+
+
+def _fill(con: duckdb.DuckDBPyConnection, spec: _TableSpec) -> None:
+    """Fill an already-created ``out.<table>`` from its SELECT.
 
     Every value is stored as text (the SELECT casts to VARCHAR), matching how the
-    importer reads OCEL SQLite files (``sqlite_all_varchar`` + ``TRY_CAST``).
+    importer reads OCEL SQLite files (``sqlite_all_varchar`` + ``TRY_CAST``). With
+    ``sqlite_all_varchar`` set here too, DuckDB sees the attached columns as
+    VARCHAR and the text goes in as-is rather than being cast to the column's type.
     """
-    column_ddl = ", ".join(f'"{name}" {decl}' for name, decl in ddl_columns)
-    con.execute(f'CREATE TABLE out."{table}" ({column_ddl})')
+    table, ddl_columns, select_sql, params = spec
     insert_columns = ", ".join(f'"{name}"' for name, _ in ddl_columns)
     con.execute(f'INSERT INTO out."{table}" ({insert_columns}) {select_sql}', params)
 
 
-def _create_event_type_table(
-    con: duckdb.DuckDBPyConnection,
+def _event_type_table(
     suffix: str,
     activity: str,
     attrs: list[str],
     attr_type: dict[str, str],
-) -> None:
+) -> _TableSpec:
     ddl = [("ocel_id", "TEXT"), ("ocel_time", "TIMESTAMP")]
     ddl += [(name, _sqlite_decl(attr_type[name])) for name in attrs]
-    exprs = [f'CAST("{EID_COL}" AS VARCHAR)', f'CAST("{TIMESTAMP_COL}" AS VARCHAR)']
+    exprs = [f'CAST("{EID_COL}" AS VARCHAR)', _iso(f'"{TIMESTAMP_COL}"')]
     exprs += [f'CAST("{name}" AS VARCHAR)' for name in attrs]
-    _create_and_fill(
-        con,
+    return (
         f"event_{suffix}",
         ddl,
         f'SELECT {", ".join(exprs)} FROM events WHERE "{ACTIVITY_COL}" = ?',
@@ -135,14 +157,13 @@ def _create_event_type_table(
     )
 
 
-def _create_object_type_table(
-    con: duckdb.DuckDBPyConnection,
+def _object_type_table(
     suffix: str,
     otype: str,
     attrs: list[str],
     attr_type: dict[str, str],
     changing: list[str],
-) -> None:
+) -> _TableSpec:
     """Rebuild one ``object_<suffix>`` table: the initial snapshot plus change rows.
 
     The snapshot row (``ocel_changed_field`` NULL) carries the initial values; each
@@ -172,7 +193,7 @@ def _create_object_type_table(
         ]
         change = [
             f'CAST(c."{OID_COL}" AS VARCHAR)',
-            f'CAST(c."{TIMESTAMP_COL}" AS VARCHAR)',
+            _iso(f'c."{TIMESTAMP_COL}"'),
             "CAST(? AS VARCHAR)",
             *values,
         ]
@@ -183,7 +204,7 @@ def _create_object_type_table(
         )
         params.extend([changed, otype])
 
-    _create_and_fill(con, f"object_{suffix}", ddl, " UNION ALL ".join(selects), params)
+    return f"object_{suffix}", ddl, " UNION ALL ".join(selects), params
 
 
 def export_ocel_sqlite(source: DuckDBTarget, target: str | Path) -> None:
@@ -200,7 +221,42 @@ def export_ocel_sqlite(source: DuckDBTarget, target: str | Path) -> None:
         target.unlink()
 
     with connect_target(source) as con:
+        object_presence = object_attribute_presence(con)
+        event_presence = event_attribute_presence(con)
+        object_attrs = attribute_columns(con, "objects", _OBJECT_META)
+        event_attrs = attribute_columns(con, "events", _EVENT_META)
+
+        object_suffix = _suffix_map(sorted(object_presence))
+        event_suffix = _suffix_map(sorted(event_presence))
+        event_attr_type = dict(event_attrs)
+        object_attr_type = dict(object_attrs)
+
+        specs = [
+            _event_type_table(
+                suffix,
+                activity,
+                _ordered_present(event_attrs, event_presence[activity]),
+                event_attr_type,
+            )
+            for activity, suffix in event_suffix.items()
+        ]
+        changing = set(changing_attributes(con))
+        for otype, suffix in object_suffix.items():
+            present = _ordered_present(object_attrs, object_presence[otype])
+            specs.append(
+                _object_type_table(
+                    suffix,
+                    otype,
+                    present,
+                    object_attr_type,
+                    [name for name in present if name in changing],
+                )
+            )
+        _create_tables(target, specs)
+
         con.execute("INSTALL sqlite; LOAD sqlite;")
+
+        con.execute("SET GLOBAL sqlite_all_varchar=true")
         con.execute(f"ATTACH '{target}' AS out (TYPE sqlite)")
         try:
             con.execute(
@@ -212,39 +268,11 @@ def export_ocel_sqlite(source: DuckDBTarget, target: str | Path) -> None:
                 f'SELECT "{EID_COL}" AS ocel_id, "{ACTIVITY_COL}" AS ocel_type FROM events'
             )
 
-            object_presence = object_attribute_presence(con)
-            event_presence = event_attribute_presence(con)
-            object_attrs = attribute_columns(con, "objects", _OBJECT_META)
-            event_attrs = attribute_columns(con, "events", _EVENT_META)
-
-            object_suffix = _suffix_map(sorted(object_presence))
-            event_suffix = _suffix_map(sorted(event_presence))
             _create_map_table(con, "object_map_type", object_suffix)
             _create_map_table(con, "event_map_type", event_suffix)
 
-            event_attr_type = dict(event_attrs)
-            object_attr_type = dict(object_attrs)
-
-            for activity, suffix in event_suffix.items():
-                _create_event_type_table(
-                    con,
-                    suffix,
-                    activity,
-                    _ordered_present(event_attrs, event_presence[activity]),
-                    event_attr_type,
-                )
-
-            changing = set(changing_attributes(con))
-            for otype, suffix in object_suffix.items():
-                present = _ordered_present(object_attrs, object_presence[otype])
-                _create_object_type_table(
-                    con,
-                    suffix,
-                    otype,
-                    present,
-                    object_attr_type,
-                    [name for name in present if name in changing],
-                )
+            for spec in specs:
+                _fill(con, spec)
 
             # Relationship tables
             con.execute(
