@@ -65,13 +65,11 @@ def _build_object(elem) -> dict:
                 {
                     "name": attr.get("name"),
                     "value": attr.text,
-                    # An attribute with no time has no recoverable one; keep it
-                    # null rather than inventing a timestamp for it.
                     "time": attr.get("time") or None,
                 }
                 for attr in child
             ]
-        elif tag == "objects":  # object-to-object relationships
+        elif tag == "objects":
             relationships = [
                 {"qualifier": ref.get("qualifier"), "objectId": ref.get("object-id")}
                 for ref in child
@@ -92,7 +90,7 @@ def _build_event(elem) -> dict:
         tag = _local(child.tag)
         if tag == "attributes":
             attributes = [{"name": attr.get("name"), "value": attr.text} for attr in child]
-        elif tag == "objects":  # event-to-object relationships
+        elif tag == "objects":
             relationships = [
                 {"objectId": ref.get("object-id"), "qualifier": ref.get("qualifier")}
                 for ref in child
