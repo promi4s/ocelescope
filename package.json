@@ -30,7 +30,7 @@
     "notebook": "uv run --with jupyterlab --with jupyter-ruff jupyter lab notebooks/"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.1",
+    "@biomejs/biome": "2.5.4",
     "@tsconfig/strictest": "catalog:",
     "orval": "catalog:",
     "cspell": "catalog:"
