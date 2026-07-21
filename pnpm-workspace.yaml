@@ -33,7 +33,7 @@ catalog:
   "@tanstack/react-query": ^5.90.21
   "@tanstack/react-query-devtools": ^5.91.3
   "@tsconfig/strictest": ^2.0.8
-  "@tsdown/css": ^0.22.0
+  "@tsdown/css": ^0.22.12
   "@types/css-modules": ^1.0.5
   "@types/file-saver": ^2.0.7
   "@types/lodash": ^4.17.23
@@ -64,7 +64,7 @@ catalog:
   mantine-datatable: ^9.3.1
   next: ^16.1.6
   object-hash: ^3.0.0
-  orval: ^8.5.2
+  orval: ^8.22.0
   qs: ^6.15.1
   react: ^19.2.0
   react-cytoscapejs: ^2.0.0
@@ -74,7 +74,7 @@ catalog:
   react-zoom-pan-pinch: ^4.0.0
   recharts: ^3.2.1
   storybook: ^10.3.5
-  tsdown: ^0.22.0
+  tsdown: ^0.22.12
   typescript: ^5.9.3
   uniqolor: ^1.1.1
   zod: ^4.3.6
@@ -98,3 +98,12 @@ minimumReleaseAgeExclude:
   - '@mantine/notifications@9.4.0'
   - '@mantine/store@9.4.0'
   - '@ocelescope/ocelot@0.1.2 || 0.1.3'
+  - '@biomejs/biome@2.5.5'
+  - '@biomejs/cli-darwin-arm64@2.5.5'
+  - '@biomejs/cli-darwin-x64@2.5.5'
+  - '@biomejs/cli-linux-arm64-musl@2.5.5'
+  - '@biomejs/cli-linux-arm64@2.5.5'
+  - '@biomejs/cli-linux-x64-musl@2.5.5'
+  - '@biomejs/cli-linux-x64@2.5.5'
+  - '@biomejs/cli-win32-arm64@2.5.5'
+  - '@biomejs/cli-win32-x64@2.5.5'
