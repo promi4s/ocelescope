@@ -9,21 +9,9 @@ catalogs:
     '@apidevtools/json-schema-ref-parser':
       specifier: ^15.3.1
       version: 15.5.0
-    '@dagrejs/dagre':
-      specifier: ^3.0.0
-      version: 3.0.0
     '@faker-js/faker':
       specifier: ^10.4.0
       version: 10.5.0
-    '@floating-ui/react':
-      specifier: ^0.27.18
-      version: 0.27.19
-    '@hpcc-js/wasm-graphviz':
-      specifier: ^1.21.0
-      version: 1.21.1
-    '@mantine/carousel':
-      specifier: ^9.4.0
-      version: 9.4.0
     '@mantine/charts':
       specifier: ^9.4.0
       version: 9.4.0
@@ -36,39 +24,21 @@ catalogs:
     '@mantine/dropzone':
       specifier: ^9.4.0
       version: 9.4.0
-    '@mantine/hooks':
-      specifier: ^9.4.0
-      version: 9.4.0
     '@mantine/notifications':
       specifier: ^9.4.0
       version: 9.4.0
-    '@marko19907/string-to-color':
-      specifier: ^1.0.2
-      version: 1.0.2
     '@ocelescope/ocelot':
       specifier: ^0.1.3
       version: 0.1.3
     '@r4pm/components':
       specifier: ^0.1.1
       version: 0.1.1
-    '@rjsf/core':
-      specifier: ^6.6.2
-      version: 6.6.2
     '@rjsf/mantine':
-      specifier: ^6.6.2
-      version: 6.6.2
-    '@rjsf/utils':
-      specifier: ^6.6.2
-      version: 6.6.2
-    '@rjsf/validator-ajv8':
       specifier: ^6.6.2
       version: 6.6.2
     '@storybook/react-vite':
       specifier: ^10.3.5
       version: 10.4.6
-    '@tanstack/react-query':
-      specifier: ^5.90.21
-      version: 5.90.21
     '@tsconfig/strictest':
       specifier: ^2.0.8
       version: 2.0.8
@@ -101,37 +71,16 @@ catalogs:
       version: 19.2.3
     '@xyflow/react':
       specifier: ^12.10.1
-      version: 12.10.1
+      version: 12.11.1
     axios:
       specifier: ^1.18.0
       version: 1.18.0
     bumpp:
       specifier: ^11.0.0
       version: 11.1.0
-    clsx:
-      specifier: ^2.1.1
-      version: 2.1.1
-    content-disposition-attachment:
-      specifier: ^0.3.1
-      version: 0.3.1
     cspell:
       specifier: ^10.0.1
       version: 10.0.1
-    dayjs:
-      specifier: ^1.11.19
-      version: 1.11.19
-    elkjs:
-      specifier: ^0.11.0
-      version: 0.11.1
-    embla-carousel:
-      specifier: ^8.6.0
-      version: 8.6.0
-    embla-carousel-react:
-      specifier: ^8.6.0
-      version: 8.6.0
-    file-saver:
-      specifier: ^2.0.5
-      version: 2.0.5
     flat:
       specifier: ^6.0.1
       version: 6.0.1
@@ -144,21 +93,12 @@ catalogs:
     jspdf:
       specifier: ^4.2.1
       version: 4.2.1
-    lodash:
-      specifier: ^4.17.23
-      version: 4.18.1
-    lucide-react:
-      specifier: ^1.0.0
-      version: 1.21.0
     mantine-datatable:
       specifier: ^9.3.1
       version: 9.3.1
     next:
       specifier: ^16.1.6
       version: 16.2.10
-    object-hash:
-      specifier: ^3.0.0
-      version: 3.0.0
     orval:
       specifier: ^8.22.0
       version: 8.22.0
@@ -171,18 +111,6 @@ catalogs:
     react-dom:
       specifier: ^19.2.0
       version: 19.2.7
-    react-hook-form:
-      specifier: ^7.71.2
-      version: 7.71.2
-    react-plotly.js:
-      specifier: ^4.0.0
-      version: 4.0.0
-    react-zoom-pan-pinch:
-      specifier: ^4.0.0
-      version: 4.0.3
-    recharts:
-      specifier: ^3.2.1
-      version: 3.8.1
     storybook:
       specifier: ^10.3.5
       version: 10.4.6
@@ -192,15 +120,6 @@ catalogs:
     typescript:
       specifier: ^5.9.3
       version: 5.9.3
-    uniqolor:
-      specifier: ^1.1.1
-      version: 1.1.1
-    zod:
-      specifier: ^4.3.6
-      version: 4.3.6
-    zustand:
-      specifier: ^5.0.11
-      version: 5.0.11
 
 importers:
 
@@ -259,7 +178,7 @@ importers:
         version: link:../modules/management
       '@ocelescope/ocelot':
         specifier: 'catalog:'
-        version: 0.1.3(f00aee31d939f268e3c0311d399d02e8)
+        version: 0.1.3(74438dab6a6040c86140f6cfc8a7bec2)
       '@ocelescope/plugin':
         specifier: workspace:*
         version: link:../modules/plugin
@@ -274,7 +193,7 @@ importers:
         version: 9.3.1(@mantine/core@9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.0(react@19.2.7))(clsx@2.1.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       next:
         specifier: 'catalog:'
-        version: 16.2.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 16.2.10(@babel/core@7.29.7)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react:
         specifier: 'catalog:'
         version: 19.2.7
@@ -802,7 +721,7 @@ importers:
         version: 19.2.3(@types/react@19.2.17)
       axios:
         specifier: 'catalog:'
-        version: 1.18.0
+        version: 1.18.0(debug@4.4.3)
       bumpp:
         specifier: 'catalog:'
         version: 11.1.0
@@ -7233,7 +7152,7 @@ snapshots:
   '@next/swc-win32-x64-msvc@16.2.10':
     optional: true
 
-  '@ocelescope/ocelot@0.1.3(f00aee31d939f268e3c0311d399d02e8)':
+  '@ocelescope/ocelot@0.1.3(74438dab6a6040c86140f6cfc8a7bec2)':
     dependencies:
       '@dagrejs/dagre': 3.0.0
       '@mantine/core': 9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -7243,7 +7162,7 @@ snapshots:
       '@ocelescope/core': link:src/frontend/packages/core
       '@tanstack/react-query': 5.90.21(react@19.2.7)
       '@xyflow/react': 12.11.1(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(immer@11.1.11)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      axios: 1.18.0
+      axios: 1.18.0(debug@4.4.3)
       dayjs: 1.11.19
       elkjs: 0.11.1
       file-saver: 2.0.5
@@ -9164,6 +9083,16 @@ snapshots:
       - debug
       - supports-color
 
+  axios@1.18.0(debug@4.4.3):
+    dependencies:
+      follow-redirects: 1.16.0(debug@4.4.3)
+      form-data: 4.0.6
+      https-proxy-agent: 5.0.1
+      proxy-from-env: 2.1.0
+    transitivePeerDependencies:
+      - debug
+      - supports-color
+
   balanced-match@4.0.4: {}
 
   base64-arraybuffer@1.0.2: {}
@@ -9891,6 +9820,10 @@ snapshots:
 
   follow-redirects@1.16.0: {}
 
+  follow-redirects@1.16.0(debug@4.4.3):
+    optionalDependencies:
+      debug: 4.4.3
+
   font-atlas@2.1.0:
     dependencies:
       css-font: 1.2.0
@@ -10491,6 +10424,30 @@ snapshots:
       - supports-color
 
   next-tick@1.1.0: {}
+
+  next@16.2.10(@babel/core@7.29.7)(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
+    dependencies:
+      '@next/env': 16.2.10
+      '@swc/helpers': 0.5.15
+      baseline-browser-mapping: 2.10.42
+      caniuse-lite: 1.0.30001800
+      postcss: 8.4.31
+      react: 19.2.7
+      react-dom: 19.2.7(react@19.2.7)
+      styled-jsx: 5.1.6(@babel/core@7.29.7)(react@19.2.7)
+    optionalDependencies:
+      '@next/swc-darwin-arm64': 16.2.10
+      '@next/swc-darwin-x64': 16.2.10
+      '@next/swc-linux-arm64-gnu': 16.2.10
+      '@next/swc-linux-arm64-musl': 16.2.10
+      '@next/swc-linux-x64-gnu': 16.2.10
+      '@next/swc-linux-x64-musl': 16.2.10
+      '@next/swc-win32-arm64-msvc': 16.2.10
+      '@next/swc-win32-x64-msvc': 16.2.10
+      sharp: 0.34.5
+    transitivePeerDependencies:
+      - '@babel/core'
+      - babel-plugin-macros
 
   next@16.2.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
     dependencies:
@@ -11432,6 +11389,13 @@ snapshots:
   strip-indent@4.1.1: {}
 
   strongly-connected-components@1.0.1: {}
+
+  styled-jsx@5.1.6(@babel/core@7.29.7)(react@19.2.7):
+    dependencies:
+      client-only: 0.0.1
+      react: 19.2.7
+    optionalDependencies:
+      '@babel/core': 7.29.7
 
   styled-jsx@5.1.6(react@19.2.7):
     dependencies:
