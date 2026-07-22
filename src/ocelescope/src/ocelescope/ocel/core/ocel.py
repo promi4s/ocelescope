@@ -15,8 +15,10 @@ from ocelescope.ocel.constants.pm4py import (
     O2O_QUALIFIER,
     O2O_SOURCE_ID,
     O2O_TARGET_ID,
+    OBJECT_CHANGED_FIELD,
     OBJECT_CHANGES_DF_COLS,
     OID_COL,
+    OTYPE_COL,
 )
 from ocelescope.ocel.extensions.manager import ExtensionManager
 from ocelescope.ocel.filter.base import BaseFilter
@@ -281,7 +283,7 @@ class OCEL:
             objects=ocel.objects,
             relations=ocel.relations,
             o2o=ocel.o2o.rename(columns=_O2O_FROM_PM4PY),
-            object_changes=ocel.object_changes,
+            object_changes=ocel.object_changes.drop([OBJECT_CHANGED_FIELD, OTYPE_COL], axis=1),
         )
 
     @staticmethod
@@ -330,12 +332,15 @@ class OCEL:
             # r4pm hands back PM4PY-named tables, so the O2O source column is
             # renamed on the way in -- exactly as in :meth:`from_pm4py`.
             o2o = tables.get("o2o")
+            object_changes = tables.get("object_changes")
             ocel = OCEL.from_frames(
                 events=tables["events"],
                 objects=tables["objects"],
                 relations=tables["relations"],
                 o2o=o2o.rename(_O2O_FROM_PM4PY) if o2o is not None else None,
-                object_changes=tables.get("object_changes"),
+                object_changes=object_changes.drop([OBJECT_CHANGED_FIELD, OTYPE_COL], strict=False)
+                if object_changes is not None
+                else None,
             )
             try:
                 import_quantities(path, ocel.con)
