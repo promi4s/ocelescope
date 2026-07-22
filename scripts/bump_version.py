@@ -34,10 +34,18 @@ dep_re = re.compile(rf'"({names})(\[[^\]]*\])?[<>=~!][^"]*"')
 
 for path in package_jsons:
     if "version" in json.loads(text := path.read_text()):
-        path.write_text(re.sub(r'"version": "[^"]+"', f'"version": "{new}"', text, count=1))
+        path.write_text(
+            re.sub(r'"version": "[^"]+"', f'"version": "{new}"', text, count=1)
+        )
 
 for path in pyprojects:
-    text = re.sub(r'^version = "[^"]+"', f'version = "{new}"', path.read_text(), count=1, flags=re.M)
+    text = re.sub(
+        r'^version = "[^"]+"',
+        f'version = "{new}"',
+        path.read_text(),
+        count=1,
+        flags=re.M,
+    )
     path.write_text(dep_re.sub(rf'"\1\2>={new},<{major}.{minor + 1}.0"', text))
 
 subprocess.run(["uv", "lock"], cwd=ROOT, check=True)
