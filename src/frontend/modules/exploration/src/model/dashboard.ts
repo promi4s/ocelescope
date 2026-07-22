@@ -7,7 +7,7 @@ import type {
   ObjectInvolvementDistributionQuery,
   ObjectTypeCombinationsQuery,
   TimeBetweenActivitiesQuery,
-} from "../api/querying";
+} from "../api/exploration";
 
 export type DistributionVisualization = "bar" | "donut" | "histogram";
 

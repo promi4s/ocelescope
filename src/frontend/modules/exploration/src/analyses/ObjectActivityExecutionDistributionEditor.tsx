@@ -1,14 +1,16 @@
 import { Button, Group, Select, Stack, TextInput } from "@mantine/core";
 import { useState } from "react";
+import { useObjectTypes } from "../api/ocel";
 import type { ObjectActivityExecutionDistributionSpec } from "../model/dashboard";
 import type { AnalysisEditorProps } from "./types";
 
 export function ObjectActivityExecutionDistributionEditor({
-  schema,
+  ocelId,
   initial,
   onCancel,
   onSubmit,
 }: AnalysisEditorProps) {
+  const objectTypes = useObjectTypes(ocelId, { ocel_version: "original" });
   const existing =
     initial?.analysis === "object-activity-execution-distribution"
       ? initial
@@ -21,9 +23,15 @@ export function ObjectActivityExecutionDistributionEditor({
     <Stack gap="md">
       <Select
         label="Object type"
-        data={schema.object_types.map((item) => item.name)}
+        data={objectTypes.data ?? []}
         value={objectType}
         onChange={setObjectType}
+        placeholder={
+          objectTypes.isPending
+            ? "Loading object types"
+            : "Select an object type"
+        }
+        disabled={objectTypes.isPending || objectTypes.isError}
         searchable
         allowDeselect={false}
       />

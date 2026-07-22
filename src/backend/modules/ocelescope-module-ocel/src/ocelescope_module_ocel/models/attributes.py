@@ -1,4 +1,5 @@
 from enum import StrEnum
+from typing import Literal
 
 from pydantic import BaseModel
 
@@ -12,12 +13,16 @@ class ValueType(StrEnum):
     DATE = "date"
 
 
+AnalyticalType = Literal["categorical", "discrete", "continuous", "temporal", "unknown"]
+
+
 class Attribute(BaseModel):
     name: str
     min: str | int | float
     max: str | int | float
     distinct_values: int
     type: ValueType
+    analytical_type: AnalyticalType
 
 
 class AggregatedAttribute(Attribute):

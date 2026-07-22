@@ -7,6 +7,7 @@ import {
   TextInput,
 } from "@mantine/core";
 import { useMemo, useState } from "react";
+import { useActivities, useEventAttributes } from "../api/ocel";
 import {
   compatibleVisualizations,
   type VisualizationKind,
@@ -29,11 +30,12 @@ const isDistributionVisualization = (
   value === "bar" || value === "donut" || value === "histogram";
 
 export function EventAttributeDistributionEditor({
-  schema,
+  ocelId,
   initial,
   onCancel,
   onSubmit,
 }: AnalysisEditorProps) {
+  const activities = useActivities(ocelId, { ocel_version: "original" });
   const existing =
     initial?.analysis === "event-attribute-distribution" ? initial : undefined;
   const [activity, setActivity] = useState(existing?.query.activity ?? null);
@@ -49,10 +51,12 @@ export function EventAttributeDistributionEditor({
       : 50,
   );
 
-  const activitySchema = schema.activities.find(
-    (candidate) => candidate.name === activity,
+  const activityAttributes = useEventAttributes(
+    ocelId,
+    { names: activity ? [activity] : [], ocel_version: "original" },
+    { query: { enabled: !!activity } },
   );
-  const attribute = activitySchema?.attributes.find(
+  const attribute = activityAttributes.data?.find(
     (candidate) => candidate.name === attributeName,
   );
   const visualizationOptions = useMemo(
@@ -97,14 +101,17 @@ export function EventAttributeDistributionEditor({
     <Stack gap="md">
       <Select
         label="Activity"
-        placeholder="Select an activity"
-        data={schema.activities.map((item) => item.name)}
+        placeholder={
+          activities.isPending ? "Loading activities" : "Select an activity"
+        }
+        data={activities.data ?? []}
         value={activity}
         onChange={(value) => {
           setActivity(value);
           setAttributeName(null);
           setVisualization(null);
         }}
+        disabled={activities.isPending || activities.isError}
         searchable
         allowDeselect={false}
       />
@@ -113,19 +120,19 @@ export function EventAttributeDistributionEditor({
         label="Attribute"
         description={
           attribute
-            ? `${attribute.physical_type} · ${attribute.analytical_type}`
-            : "Attributes are classified on the schema page."
+            ? `${attribute.type} · ${attribute.analytical_type}`
+            : undefined
         }
         placeholder={
           activity ? "Select an attribute" : "Select an activity first"
         }
-        data={(activitySchema?.attributes ?? []).map((item) => ({
+        data={(activityAttributes.data ?? []).map((item) => ({
           value: item.name,
           label: item.name,
         }))}
         value={attributeName}
         onChange={setSelectedAttribute}
-        disabled={!activity}
+        disabled={!activity || activityAttributes.isPending}
         searchable
         allowDeselect={false}
       />

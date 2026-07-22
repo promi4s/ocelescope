@@ -5,7 +5,7 @@ import {
   type HierarchyDatum,
 } from "@ocelescope/charts";
 import { useMemo } from "react";
-import { useQueryObjectActivityExecutionDistribution } from "../api/querying";
+import { useQueryObjectActivityExecutionDistribution } from "../api/exploration";
 import type { ObjectActivityExecutionDistributionSpec } from "../model/dashboard";
 import { AnalysisCardActions } from "./AnalysisCardActions";
 import type { AnalysisCardProps } from "./types";

@@ -1,15 +1,17 @@
 import { Button, Group, Select, Stack, TextInput } from "@mantine/core";
 import { useState } from "react";
 
+import { useObjectTypes } from "../api/ocel";
 import type { ActivityExecutionFrequencySpec } from "../model/dashboard";
 import type { AnalysisEditorProps } from "./types";
 
 export function ActivityExecutionFrequencyEditor({
-  schema,
+  ocelId,
   initial,
   onCancel,
   onSubmit,
 }: AnalysisEditorProps) {
+  const objectTypes = useObjectTypes(ocelId, { ocel_version: "original" });
   const existing =
     initial?.analysis === "activity-execution-frequency" ? initial : undefined;
   const [objectType, setObjectType] = useState<string | null>(
@@ -32,10 +34,15 @@ export function ActivityExecutionFrequencyEditor({
       <Select
         label="Object type"
         description="Each object is grouped by its final execution count for every activity."
-        data={schema.object_types.map((objectType) => objectType.name)}
+        data={objectTypes.data ?? []}
         value={objectType}
         onChange={setObjectType}
-        placeholder="Select an object type"
+        placeholder={
+          objectTypes.isPending
+            ? "Loading object types"
+            : "Select an object type"
+        }
+        disabled={objectTypes.isPending || objectTypes.isError}
         searchable
         allowDeselect={false}
       />

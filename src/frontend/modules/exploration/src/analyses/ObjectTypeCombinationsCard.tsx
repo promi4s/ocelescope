@@ -6,7 +6,7 @@ import {
 } from "@ocelescope/charts";
 import { useMemo } from "react";
 
-import { useQueryObjectTypeCombinations } from "../api/querying";
+import { useQueryObjectTypeCombinations } from "../api/exploration";
 import type { ObjectTypeCombinationsSpec } from "../model/dashboard";
 import { AnalysisCardActions } from "./AnalysisCardActions";
 import type { AnalysisCardProps } from "./types";

@@ -6,8 +6,8 @@ from pydantic import BaseModel
 from ocelescope import OCEL
 from ocelescope.ocel.constants import ACTIVITY_COL, EID_COL, OID_COL, OTYPE_COL
 
-from ocelescope_module_querying.errors import InvalidAnalysisQuery
-from ocelescope_module_querying.shared.distributions import (
+from ocelescope_module_exploration.errors import InvalidAnalysisQuery
+from ocelescope_module_exploration.shared.distributions import (
     DistributionGrouping,
     DistributionResponse,
     calculate_distribution,
@@ -18,17 +18,6 @@ class ObjectInvolvementDistributionQuery(BaseModel):
     activity: str
     object_type: str
     grouping: DistributionGrouping
-
-
-class ObjectInvolvementOption(BaseModel):
-    activity: str
-    object_type: str
-    minimum: int
-    maximum: int
-
-
-class ObjectInvolvementOptionsResponse(BaseModel):
-    pairs: list[ObjectInvolvementOption]
 
 
 def _variable_object_involvement_pairs(
@@ -114,23 +103,6 @@ def _object_involvement_counts(
         .fillna(0)
         .astype(int)
         .reset_index(drop=True)
-    )
-
-
-def get_object_involvement_options(
-    ocel: OCEL,
-) -> ObjectInvolvementOptionsResponse:
-    pairs = _variable_object_involvement_pairs(ocel.events.df, ocel.e2o.df)
-    return ObjectInvolvementOptionsResponse(
-        pairs=[
-            ObjectInvolvementOption(
-                activity=str(row[ACTIVITY_COL]),
-                object_type=str(row[OTYPE_COL]),
-                minimum=int(row["minimum"]),
-                maximum=int(row["maximum"]),
-            )
-            for _, row in pairs.iterrows()
-        ]
     )
 
 

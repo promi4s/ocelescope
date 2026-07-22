@@ -1,6 +1,6 @@
 import { Stack, Text } from "@mantine/core";
 
-import { useQueryObjectInvolvementDistribution } from "../api/querying";
+import { useQueryObjectInvolvementDistribution } from "../api/exploration";
 import type { ObjectInvolvementDistributionSpec } from "../model/dashboard";
 import { DistributionChartCard } from "./DistributionChartCard";
 import type { AnalysisCardProps } from "./types";

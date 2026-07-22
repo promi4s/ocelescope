@@ -3,9 +3,9 @@ import { defineConfig } from "@ocelescope/api-config";
 const asQuery = { query: { useQuery: true } } as const;
 
 export default defineConfig({
-  querying: {
+  exploration: {
     output: {
-      target: "./src/api/querying.ts",
+      target: "./src/api/exploration.ts",
       override: {
         operations: {
           queryEventAttributeDistribution: asQuery,
@@ -19,6 +19,12 @@ export default defineConfig({
           queryTotalObjectInvolvement: asQuery,
         },
       },
+    },
+  },
+  ocel: {
+    input: "./openapi-ocel.json",
+    output: {
+      target: "./src/api/ocel/index.ts",
     },
   },
 });

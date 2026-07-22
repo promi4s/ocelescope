@@ -1,5 +1,5 @@
 [project]
-name = "ocelescope-module-querying"
+name = "ocelescope-module-exploration"
 version = "0.1.0"
 description = "Typed analytical queries over the active OCEL in Ocelescope"
 readme = "README.md"
@@ -7,13 +7,14 @@ requires-python = ">=3.11"
 dependencies = [
   "fastapi>=0.136.0",
   "numpy>=2.3.2",
-  "ocelescope>=0.3.0,<0.4.0",
+  "ocelescope>=0.4.0,<0.5.0",
   "ocelescope-backend>=0.1.0,<0.2.0",
+  "ocelescope-module-ocel>=0.1.0,<0.2.0",
   "pandas>=2.3.1",
 ]
 
 [project.entry-points."ocelescope_backend.modules"]
-queryingV1 = "ocelescope_module_querying.module:Querying"
+explorationV1 = "ocelescope_module_exploration.module:Exploration"
 
 [build-system]
 requires = ["uv_build>=0.11.20,<0.12.0"]
@@ -25,3 +26,4 @@ package = true
 [tool.uv.sources]
 ocelescope = { workspace = true }
 ocelescope-backend = { workspace = true }
+ocelescope-module-ocel = { workspace = true }

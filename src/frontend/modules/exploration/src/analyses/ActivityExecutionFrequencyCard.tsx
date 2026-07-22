@@ -6,7 +6,7 @@ import {
 } from "@ocelescope/charts";
 import { useMemo } from "react";
 
-import { useQueryActivityExecutionFrequency } from "../api/querying";
+import { useQueryActivityExecutionFrequency } from "../api/exploration";
 import type { ActivityExecutionFrequencySpec } from "../model/dashboard";
 import { AnalysisCardActions } from "./AnalysisCardActions";
 import type { AnalysisCardProps } from "./types";

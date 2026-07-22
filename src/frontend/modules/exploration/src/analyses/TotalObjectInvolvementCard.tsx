@@ -4,7 +4,7 @@ import {
   EChartCard,
 } from "@ocelescope/charts";
 import { useMemo } from "react";
-import { useQueryTotalObjectInvolvement } from "../api/querying";
+import { useQueryTotalObjectInvolvement } from "../api/exploration";
 import type { TotalObjectInvolvementSpec } from "../model/dashboard";
 import { AnalysisCardActions } from "./AnalysisCardActions";
 import type { AnalysisCardProps } from "./types";

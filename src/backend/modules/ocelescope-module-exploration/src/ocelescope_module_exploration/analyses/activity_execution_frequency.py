@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from ocelescope import OCEL
 from ocelescope.ocel.constants import ACTIVITY_COL, EID_COL, OID_COL, OTYPE_COL
 
-from ocelescope_module_querying.errors import InvalidAnalysisQuery
+from ocelescope_module_exploration.errors import InvalidAnalysisQuery
 
 _EXECUTION_FREQUENCY_BANDS: tuple[tuple[int, int | None], ...] = (
     (1, 1),

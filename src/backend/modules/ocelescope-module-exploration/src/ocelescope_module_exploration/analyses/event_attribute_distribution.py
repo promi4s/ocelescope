@@ -7,13 +7,10 @@ from pydantic import BaseModel
 
 from ocelescope import OCEL
 from ocelescope.ocel.constants import ACTIVITY_COL
+from ocelescope_module_ocel.util.attributes import merged_event_table, typed_attributes
 
-from ocelescope_module_querying.errors import InvalidAnalysisQuery
-from ocelescope_module_querying.shared.attribute_types import (
-    attribute_type,
-    infer_analytical_type,
-)
-from ocelescope_module_querying.shared.distributions import (
+from ocelescope_module_exploration.errors import InvalidAnalysisQuery
+from ocelescope_module_exploration.shared.distributions import (
     DistributionGrouping,
     DistributionResponse,
     calculate_distribution,
@@ -48,15 +45,15 @@ def execute_event_attribute_distribution_query(
     *,
     classification_ocel: OCEL | None = None,
 ) -> DistributionResponse:
-    classification_values = _event_attribute_values(
-        classification_ocel or ocel, query.activity, query.attribute
-    )
+    reference_ocel = classification_ocel or ocel
+    _event_attribute_values(reference_ocel, query.activity, query.attribute)
     values = _event_attribute_values(
         ocel,
         query.activity,
         query.attribute,
         allow_empty_activity=classification_ocel is not None,
     )
-    physical_type = attribute_type(classification_values)
-    analytical_type = infer_analytical_type(classification_values, physical_type)
+    table = merged_event_table(reference_ocel, [query.attribute], [query.activity])
+    typed = typed_attributes(table)
+    analytical_type = typed[0].analytical_type if typed else "unknown"
     return calculate_distribution(values, analytical_type, query.grouping)

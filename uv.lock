@@ -17,8 +17,8 @@ resolution-markers = [
 members = [
     "ocelescope",
     "ocelescope-backend",
+    "ocelescope-module-exploration",
     "ocelescope-module-filter",
-    "ocelescope-module-querying",
     "ocelescope-module-ocel",
     "ocelescope-workspace",
 ]
@@ -1909,6 +1909,29 @@ requires-dist = [
 ]
 
 [[package]]
+name = "ocelescope-module-exploration"
+version = "0.1.0"
+source = { editable = "src/backend/modules/ocelescope-module-exploration" }
+dependencies = [
+    { name = "fastapi" },
+    { name = "numpy" },
+    { name = "ocelescope" },
+    { name = "ocelescope-backend" },
+    { name = "ocelescope-module-ocel" },
+    { name = "pandas" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "fastapi", specifier = ">=0.136.0" },
+    { name = "numpy", specifier = ">=2.3.2" },
+    { name = "ocelescope", editable = "src/ocelescope" },
+    { name = "ocelescope-backend", editable = "src/backend/ocelescope-backend" },
+    { name = "ocelescope-module-ocel", editable = "src/backend/modules/ocelescope-module-ocel" },
+    { name = "pandas", specifier = ">=2.3.1" },
+]
+
+[[package]]
 name = "ocelescope-module-filter"
 version = "0.2.0"
 source = { editable = "src/backend/modules/ocelescope-module-filter" }
@@ -1954,27 +1977,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/33/25/42b422bdd79f0937ccef8d24a809153934b458b808eb68956c4e876efe77/ocelescope_module_ocelot-0.1.1.tar.gz", hash = "sha256:46bc8348e93df949c6c8b03d7733e7ae3a947669a39fd85d91f81b125c133abd", size = 4201, upload-time = "2026-07-21T08:57:46.401Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/44/fa/3c20f28d46f8ccb28692d6735548a0587eea2041a39a2235b307b92e0fe8/ocelescope_module_ocelot-0.1.1-py3-none-any.whl", hash = "sha256:4ee79c31a5972bb69189accdcad8f1a1bad4d112322dcd0a538f21efda15656c", size = 6391, upload-time = "2026-07-21T08:57:45.637Z" },
-]
-
-[[package]]
-name = "ocelescope-module-querying"
-version = "0.1.0"
-source = { editable = "src/backend/modules/ocelescope-module-querying" }
-dependencies = [
-    { name = "fastapi" },
-    { name = "numpy" },
-    { name = "ocelescope" },
-    { name = "ocelescope-backend" },
-    { name = "pandas" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "fastapi", specifier = ">=0.136.0" },
-    { name = "numpy", specifier = ">=2.3.2" },
-    { name = "ocelescope", editable = "src/ocelescope" },
-    { name = "ocelescope-backend", editable = "src/backend/ocelescope-backend" },
-    { name = "pandas", specifier = ">=2.3.1" },
 ]
 
 [[package]]
@@ -2217,7 +2219,7 @@ name = "pexpect"
 version = "4.9.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "ptyprocess", marker = "sys_platform != 'emscripten' and sys_platform != 'win32'" },
+    { name = "ptyprocess" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/42/92/cc564bf6381ff43ce1f4d06852fc19a2f11d180f23dc32d9588bee2f149d/pexpect-4.9.0.tar.gz", hash = "sha256:ee7d41123f3c9911050ea2c2dac107568dc43b2d3b0c7557a33212c398ead30f", size = 166450, upload-time = "2023-11-25T09:07:26.339Z" }
 wheels = [

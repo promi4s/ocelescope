@@ -1,63 +1,14 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Querying",
+    "title": "Exploration",
     "version": "1.0"
   },
   "paths": {
-    "/modules/querying/v1/ocels/{ocel_id}/analytical-schema": {
-      "get": {
-        "tags": [
-          "querying"
-        ],
-        "summary": "Get Analytical Schema",
-        "operationId": "getAnalyticalSchema",
-        "parameters": [
-          {
-            "name": "ocel_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Ocel Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AnalyticalSchemaResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/modules/querying/v1/ocels/{ocel_id}/queries/event-attribute-distribution": {
+    "/modules/exploration/v1/ocels/{ocel_id}/queries/event-attribute-distribution": {
       "post": {
         "tags": [
-          "querying"
+          "exploration"
         ],
         "summary": "Query Event Attribute Distribution",
         "operationId": "queryEventAttributeDistribution",
@@ -134,59 +85,10 @@
         }
       }
     },
-    "/modules/querying/v1/ocels/{ocel_id}/queries/object-attribute-distribution/options": {
-      "get": {
-        "tags": [
-          "querying"
-        ],
-        "summary": "Object Attribute Distribution Options",
-        "operationId": "getObjectAttributeDistributionOptions",
-        "parameters": [
-          {
-            "name": "ocel_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Ocel Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ObjectAttributeDistributionOptionsResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/modules/querying/v1/ocels/{ocel_id}/queries/object-attribute-distribution": {
+    "/modules/exploration/v1/ocels/{ocel_id}/queries/object-attribute-distribution": {
       "post": {
         "tags": [
-          "querying"
+          "exploration"
         ],
         "summary": "Query Object Attribute Distribution",
         "operationId": "queryObjectAttributeDistribution",
@@ -263,10 +165,10 @@
         }
       }
     },
-    "/modules/querying/v1/ocels/{ocel_id}/queries/object-counts-per-event": {
+    "/modules/exploration/v1/ocels/{ocel_id}/queries/object-counts-per-event": {
       "post": {
         "tags": [
-          "querying"
+          "exploration"
         ],
         "summary": "Query Object Counts Per Event",
         "operationId": "queryObjectCountsPerEvent",
@@ -343,10 +245,10 @@
         }
       }
     },
-    "/modules/querying/v1/ocels/{ocel_id}/queries/object-type-combinations": {
+    "/modules/exploration/v1/ocels/{ocel_id}/queries/object-type-combinations": {
       "post": {
         "tags": [
-          "querying"
+          "exploration"
         ],
         "summary": "Query Object Type Combinations",
         "operationId": "queryObjectTypeCombinations",
@@ -423,10 +325,10 @@
         }
       }
     },
-    "/modules/querying/v1/ocels/{ocel_id}/queries/activity-execution-frequency": {
+    "/modules/exploration/v1/ocels/{ocel_id}/queries/activity-execution-frequency": {
       "post": {
         "tags": [
-          "querying"
+          "exploration"
         ],
         "summary": "Query Activity Execution Frequency",
         "operationId": "queryActivityExecutionFrequency",
@@ -503,59 +405,10 @@
         }
       }
     },
-    "/modules/querying/v1/ocels/{ocel_id}/queries/object-involvement-distribution/options": {
-      "get": {
-        "tags": [
-          "querying"
-        ],
-        "summary": "Object Involvement Options",
-        "operationId": "getObjectInvolvementOptions",
-        "parameters": [
-          {
-            "name": "ocel_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Ocel Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ObjectInvolvementOptionsResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/modules/querying/v1/ocels/{ocel_id}/queries/object-involvement-distribution": {
+    "/modules/exploration/v1/ocels/{ocel_id}/queries/object-involvement-distribution": {
       "post": {
         "tags": [
-          "querying"
+          "exploration"
         ],
         "summary": "Query Object Involvement Distribution",
         "operationId": "queryObjectInvolvementDistribution",
@@ -632,10 +485,10 @@
         }
       }
     },
-    "/modules/querying/v1/ocels/{ocel_id}/queries/time-between-activities": {
+    "/modules/exploration/v1/ocels/{ocel_id}/queries/time-between-activities": {
       "post": {
         "tags": [
-          "querying"
+          "exploration"
         ],
         "summary": "Query Time Between Activities",
         "operationId": "queryTimeBetweenActivities",
@@ -712,10 +565,10 @@
         }
       }
     },
-    "/modules/querying/v1/ocels/{ocel_id}/queries/object-activity-execution-distribution": {
+    "/modules/exploration/v1/ocels/{ocel_id}/queries/object-activity-execution-distribution": {
       "post": {
         "tags": [
-          "querying"
+          "exploration"
         ],
         "summary": "Query Object Activity Execution Distribution",
         "operationId": "queryObjectActivityExecutionDistribution",
@@ -792,10 +645,10 @@
         }
       }
     },
-    "/modules/querying/v1/ocels/{ocel_id}/queries/total-object-involvement": {
+    "/modules/exploration/v1/ocels/{ocel_id}/queries/total-object-involvement": {
       "post": {
         "tags": [
-          "querying"
+          "exploration"
         ],
         "summary": "Query Total Object Involvement",
         "operationId": "queryTotalObjectInvolvement",
@@ -966,132 +819,6 @@
           "object_count"
         ],
         "title": "ActivityExecutionFrequencyRow"
-      },
-      "ActivityObjectTypePair": {
-        "properties": {
-          "activity": {
-            "type": "string",
-            "title": "Activity"
-          },
-          "object_type": {
-            "type": "string",
-            "title": "Object Type"
-          }
-        },
-        "type": "object",
-        "required": [
-          "activity",
-          "object_type"
-        ],
-        "title": "ActivityObjectTypePair"
-      },
-      "ActivitySchemaItem": {
-        "properties": {
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "event_count": {
-            "type": "integer",
-            "title": "Event Count"
-          },
-          "attributes": {
-            "items": {
-              "$ref": "#/components/schemas/AttributeSchemaItem"
-            },
-            "type": "array",
-            "title": "Attributes"
-          }
-        },
-        "type": "object",
-        "required": [
-          "name",
-          "event_count",
-          "attributes"
-        ],
-        "title": "ActivitySchemaItem"
-      },
-      "AnalyticalSchemaResponse": {
-        "properties": {
-          "schema_version": {
-            "type": "string",
-            "const": "1",
-            "title": "Schema Version",
-            "default": "1"
-          },
-          "activities": {
-            "items": {
-              "$ref": "#/components/schemas/ActivitySchemaItem"
-            },
-            "type": "array",
-            "title": "Activities"
-          },
-          "object_types": {
-            "items": {
-              "$ref": "#/components/schemas/ObjectTypeSchemaItem"
-            },
-            "type": "array",
-            "title": "Object Types"
-          }
-        },
-        "type": "object",
-        "required": [
-          "activities",
-          "object_types"
-        ],
-        "title": "AnalyticalSchemaResponse"
-      },
-      "AttributeSchemaItem": {
-        "properties": {
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "physical_type": {
-            "type": "string",
-            "enum": [
-              "number",
-              "string",
-              "boolean",
-              "datetime",
-              "unknown"
-            ],
-            "title": "Physical Type"
-          },
-          "analytical_type": {
-            "type": "string",
-            "enum": [
-              "categorical",
-              "discrete",
-              "continuous",
-              "temporal",
-              "unknown"
-            ],
-            "title": "Analytical Type"
-          },
-          "present_count": {
-            "type": "integer",
-            "title": "Present Count"
-          },
-          "missing_count": {
-            "type": "integer",
-            "title": "Missing Count"
-          },
-          "distinct_count": {
-            "type": "integer",
-            "title": "Distinct Count"
-          }
-        },
-        "type": "object",
-        "required": [
-          "name",
-          "physical_type",
-          "analytical_type",
-          "present_count",
-          "missing_count",
-          "distinct_count"
-        ],
-        "title": "AttributeSchemaItem"
       },
       "CategoryGrouping": {
         "properties": {
@@ -1359,22 +1086,6 @@
         ],
         "title": "ObjectActivityExecutionDistributionRow"
       },
-      "ObjectAttributeDistributionOptionsResponse": {
-        "properties": {
-          "pairs": {
-            "items": {
-              "$ref": "#/components/schemas/ActivityObjectTypePair"
-            },
-            "type": "array",
-            "title": "Pairs"
-          }
-        },
-        "type": "object",
-        "required": [
-          "pairs"
-        ],
-        "title": "ObjectAttributeDistributionOptionsResponse"
-      },
       "ObjectAttributeDistributionQuery": {
         "properties": {
           "activity": {
@@ -1416,92 +1127,6 @@
           "grouping"
         ],
         "title": "ObjectAttributeDistributionQuery"
-      },
-      "ObjectAttributeSchemaItem": {
-        "properties": {
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "physical_type": {
-            "type": "string",
-            "enum": [
-              "number",
-              "string",
-              "boolean",
-              "datetime",
-              "unknown"
-            ],
-            "title": "Physical Type"
-          },
-          "analytical_type": {
-            "type": "string",
-            "enum": [
-              "categorical",
-              "discrete",
-              "continuous",
-              "temporal",
-              "unknown"
-            ],
-            "title": "Analytical Type"
-          },
-          "present_count": {
-            "type": "integer",
-            "title": "Present Count"
-          },
-          "missing_count": {
-            "type": "integer",
-            "title": "Missing Count"
-          },
-          "distinct_count": {
-            "type": "integer",
-            "title": "Distinct Count"
-          },
-          "behavior": {
-            "type": "string",
-            "enum": [
-              "static",
-              "dynamic"
-            ],
-            "title": "Behavior"
-          },
-          "initial_present_count": {
-            "type": "integer",
-            "title": "Initial Present Count"
-          },
-          "current_present_count": {
-            "type": "integer",
-            "title": "Current Present Count"
-          },
-          "observed_value_count": {
-            "type": "integer",
-            "title": "Observed Value Count"
-          },
-          "change_count": {
-            "type": "integer",
-            "title": "Change Count"
-          },
-          "changed_object_count": {
-            "type": "integer",
-            "title": "Changed Object Count"
-          }
-        },
-        "type": "object",
-        "required": [
-          "name",
-          "physical_type",
-          "analytical_type",
-          "present_count",
-          "missing_count",
-          "distinct_count",
-          "behavior",
-          "initial_present_count",
-          "current_present_count",
-          "observed_value_count",
-          "change_count",
-          "changed_object_count"
-        ],
-        "title": "ObjectAttributeSchemaItem"
       },
       "ObjectCountPerEventRow": {
         "properties": {
@@ -1605,50 +1230,6 @@
         ],
         "title": "ObjectInvolvementDistributionQuery"
       },
-      "ObjectInvolvementOption": {
-        "properties": {
-          "activity": {
-            "type": "string",
-            "title": "Activity"
-          },
-          "object_type": {
-            "type": "string",
-            "title": "Object Type"
-          },
-          "minimum": {
-            "type": "integer",
-            "title": "Minimum"
-          },
-          "maximum": {
-            "type": "integer",
-            "title": "Maximum"
-          }
-        },
-        "type": "object",
-        "required": [
-          "activity",
-          "object_type",
-          "minimum",
-          "maximum"
-        ],
-        "title": "ObjectInvolvementOption"
-      },
-      "ObjectInvolvementOptionsResponse": {
-        "properties": {
-          "pairs": {
-            "items": {
-              "$ref": "#/components/schemas/ObjectInvolvementOption"
-            },
-            "type": "array",
-            "title": "Pairs"
-          }
-        },
-        "type": "object",
-        "required": [
-          "pairs"
-        ],
-        "title": "ObjectInvolvementOptionsResponse"
-      },
       "ObjectTypeCombinationRow": {
         "properties": {
           "object_types": {
@@ -1730,32 +1311,6 @@
           "truncated"
         ],
         "title": "ObjectTypeCombinationsResponse"
-      },
-      "ObjectTypeSchemaItem": {
-        "properties": {
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "object_count": {
-            "type": "integer",
-            "title": "Object Count"
-          },
-          "attributes": {
-            "items": {
-              "$ref": "#/components/schemas/ObjectAttributeSchemaItem"
-            },
-            "type": "array",
-            "title": "Attributes"
-          }
-        },
-        "type": "object",
-        "required": [
-          "name",
-          "object_count",
-          "attributes"
-        ],
-        "title": "ObjectTypeSchemaItem"
       },
       "QueryCounts": {
         "properties": {

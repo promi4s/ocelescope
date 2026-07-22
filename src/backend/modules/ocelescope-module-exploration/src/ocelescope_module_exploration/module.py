@@ -3,16 +3,16 @@ from packaging.version import Version
 
 from ocelescope_backend.app.modules import Module, ModuleMeta
 
-from ocelescope_module_querying.routes import router
+from ocelescope_module_exploration.routes import router
 
 
-class Querying(Module):
-    meta = ModuleMeta(key="querying", version=Version("1.0"))
+class Exploration(Module):
+    meta = ModuleMeta(key="exploration", version=Version("1.0"))
 
     @classmethod
     def create_app(cls) -> FastAPI:
         app = FastAPI(
-            title="Querying",
+            title="Exploration",
             version=str(cls.meta.version),
             docs_url=None,
             redoc_url=None,

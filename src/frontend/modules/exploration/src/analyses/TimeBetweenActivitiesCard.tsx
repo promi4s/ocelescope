@@ -1,6 +1,6 @@
 import { Group, Stack, Text } from "@mantine/core";
 
-import { useQueryTimeBetweenActivities } from "../api/querying";
+import { useQueryTimeBetweenActivities } from "../api/exploration";
 import type { TimeBetweenActivitiesSpec } from "../model/dashboard";
 import { DistributionChartCard } from "./DistributionChartCard";
 import type { AnalysisCardProps } from "./types";

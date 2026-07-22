@@ -8,7 +8,7 @@ import {
   TextInput,
 } from "@mantine/core";
 import { useMemo, useState } from "react";
-import { useGetObjectAttributeDistributionOptions } from "../api/querying";
+import { useE2oCombinations, useObjectAttributes } from "../api/ocel";
 import {
   compatibleVisualizations,
   type VisualizationKind,
@@ -32,12 +32,31 @@ const isDistributionVisualization = (
 
 export function ObjectAttributeDistributionEditor({
   ocelId,
-  schema,
   initial,
   onCancel,
   onSubmit,
 }: AnalysisEditorProps) {
-  const relationshipOptions = useGetObjectAttributeDistributionOptions(ocelId);
+  const relationshipOptions = useE2oCombinations(ocelId, {
+    direction: "source",
+    ocel_version: "original",
+  });
+  const allObjectAttributes = useObjectAttributes(ocelId, {
+    ocel_version: "original",
+  });
+  const validRelationshipPairs = useMemo(() => {
+    const seen = new Set<string>();
+    const pairs: { activity: string; object_type: string }[] = [];
+    for (const combination of relationshipOptions.data ?? []) {
+      const key = `${combination.source} ${combination.target}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      pairs.push({
+        activity: combination.source,
+        object_type: combination.target,
+      });
+    }
+    return pairs;
+  }, [relationshipOptions.data]);
   const existing =
     initial?.analysis === "object-attribute-distribution" ? initial : undefined;
   const [activity, setActivity] = useState(existing?.query.activity ?? null);
@@ -56,44 +75,41 @@ export function ObjectAttributeDistributionEditor({
       : 50,
   );
 
-  const objectTypeSchema = schema.object_types.find(
-    (candidate) => candidate.name === objectType,
+  const objectTypeAttributes = useObjectAttributes(
+    ocelId,
+    { names: objectType ? [objectType] : [], ocel_version: "original" },
+    { query: { enabled: !!objectType } },
   );
-  const attribute = objectTypeSchema?.attributes.find(
+  const attribute = objectTypeAttributes.data?.find(
     (candidate) => candidate.name === attributeName,
   );
   const objectTypesWithAttributes = useMemo(
     () =>
-      new Set(
-        schema.object_types
-          .filter((candidate) => candidate.attributes.length > 0)
-          .map((candidate) => candidate.name),
-      ),
-    [schema.object_types],
+      new Set((allObjectAttributes.data ?? []).map((item) => item.entity_type)),
+    [allObjectAttributes.data],
   );
   const validPairs = useMemo(
     () =>
-      (relationshipOptions.data?.pairs ?? []).filter((pair) =>
+      validRelationshipPairs.filter((pair) =>
         objectTypesWithAttributes.has(pair.object_type),
       ),
-    [objectTypesWithAttributes, relationshipOptions.data?.pairs],
+    [objectTypesWithAttributes, validRelationshipPairs],
   );
-  const availableActivities = useMemo(() => {
-    const names = new Set(validPairs.map((pair) => pair.activity));
-    return schema.activities
-      .filter((candidate) => names.has(candidate.name))
-      .map((candidate) => candidate.name);
-  }, [schema.activities, validPairs]);
-  const availableObjectTypes = useMemo(() => {
-    const names = new Set(
-      validPairs
-        .filter((pair) => pair.activity === activity)
-        .map((pair) => pair.object_type),
-    );
-    return schema.object_types
-      .filter((candidate) => names.has(candidate.name))
-      .map((candidate) => candidate.name);
-  }, [activity, schema.object_types, validPairs]);
+  const availableActivities = useMemo(
+    () => Array.from(new Set(validPairs.map((pair) => pair.activity))),
+    [validPairs],
+  );
+  const availableObjectTypes = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          validPairs
+            .filter((pair) => pair.activity === activity)
+            .map((pair) => pair.object_type),
+        ),
+      ),
+    [activity, validPairs],
+  );
   const validSelectionPair = validPairs.some(
     (pair) => pair.activity === activity && pair.object_type === objectType,
   );
@@ -189,13 +205,13 @@ export function ObjectAttributeDistributionEditor({
         label="Object attribute"
         description={
           attribute
-            ? `${attribute.physical_type} · ${attribute.analytical_type} · ${attribute.behavior}`
-            : "Attributes are classified on the schema page."
+            ? `${attribute.type} · ${attribute.analytical_type}`
+            : undefined
         }
         placeholder={
           objectType ? "Select an attribute" : "Select an object type first"
         }
-        data={(objectTypeSchema?.attributes ?? []).map((item) => ({
+        data={(objectTypeAttributes.data ?? []).map((item) => ({
           value: item.name,
           label: item.name,
         }))}
@@ -204,7 +220,7 @@ export function ObjectAttributeDistributionEditor({
           setAttributeName(value);
           setVisualization(null);
         }}
-        disabled={!objectType}
+        disabled={!objectType || objectTypeAttributes.isPending}
         searchable
         allowDeselect={false}
       />

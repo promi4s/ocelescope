@@ -1,5 +1,5 @@
 import { Stack, Text } from "@mantine/core";
-import { useQueryObjectAttributeDistribution } from "../api/querying";
+import { useQueryObjectAttributeDistribution } from "../api/exploration";
 import type { ObjectAttributeDistributionSpec } from "../model/dashboard";
 import { DistributionChartCard } from "./DistributionChartCard";
 import type { AnalysisCardProps } from "./types";

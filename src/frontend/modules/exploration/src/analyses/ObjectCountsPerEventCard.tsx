@@ -10,7 +10,7 @@ import {
   type ActivityEventCount,
   type ObjectCountPerEventRow,
   useQueryObjectCountsPerEvent,
-} from "../api/querying";
+} from "../api/exploration";
 import type { ObjectCountsPerEventSpec } from "../model/dashboard";
 import { AnalysisCardActions } from "./AnalysisCardActions";
 import type { AnalysisCardProps } from "./types";

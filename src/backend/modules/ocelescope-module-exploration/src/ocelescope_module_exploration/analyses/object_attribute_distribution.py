@@ -1,24 +1,18 @@
 from __future__ import annotations
 
-from typing import cast
-
-import pandas as pd
 from pydantic import BaseModel
 
 from ocelescope import OCEL
 from ocelescope.ocel.constants import ACTIVITY_COL, OTYPE_COL
+from ocelescope_module_ocel.util.attributes import merged_object_table, typed_attributes
 
-from ocelescope_module_querying.errors import InvalidAnalysisQuery
-from ocelescope_module_querying.shared.attribute_types import (
-    attribute_type,
-    infer_analytical_type,
-)
-from ocelescope_module_querying.shared.distributions import (
+from ocelescope_module_exploration.errors import InvalidAnalysisQuery
+from ocelescope_module_exploration.shared.distributions import (
     DistributionGrouping,
     DistributionResponse,
     calculate_distribution,
 )
-from ocelescope_module_querying.shared.object_attributes import (
+from ocelescope_module_exploration.shared.object_attributes import (
     object_attribute_observations,
     object_attribute_values_at_activity,
 )
@@ -29,34 +23,6 @@ class ObjectAttributeDistributionQuery(BaseModel):
     object_type: str
     attribute: str
     grouping: DistributionGrouping
-
-
-class ActivityObjectTypePair(BaseModel):
-    activity: str
-    object_type: str
-
-
-class ObjectAttributeDistributionOptionsResponse(BaseModel):
-    pairs: list[ActivityObjectTypePair]
-
-
-def get_object_attribute_distribution_options(
-    ocel: OCEL,
-) -> ObjectAttributeDistributionOptionsResponse:
-    pairs = (
-        ocel.e2o.df.loc[:, [ACTIVITY_COL, OTYPE_COL]]
-        .dropna()
-        .drop_duplicates()
-        .sort_values([ACTIVITY_COL, OTYPE_COL], kind="stable")
-    )
-    return ObjectAttributeDistributionOptionsResponse(
-        pairs=[
-            ActivityObjectTypePair(
-                activity=str(row[ACTIVITY_COL]), object_type=str(row[OTYPE_COL])
-            )
-            for _, row in pairs.iterrows()
-        ]
-    )
 
 
 def execute_object_attribute_distribution_query(
@@ -88,11 +54,9 @@ def execute_object_attribute_distribution_query(
             f"Unknown object attribute '{query.attribute}' "
             f"for object type '{query.object_type}'"
         )
-    classification_values = cast(
-        pd.Series, observations[query.attribute].reset_index(drop=True)
-    )
-    physical_type = attribute_type(classification_values)
-    analytical_type = infer_analytical_type(classification_values, physical_type)
+    table = merged_object_table(reference_ocel, [query.attribute], [query.object_type])
+    typed = typed_attributes(table)
+    analytical_type = typed[0].analytical_type if typed else "unknown"
     values = object_attribute_values_at_activity(
         ocel, query.activity, query.object_type, query.attribute
     )

@@ -1,5 +1,4 @@
 import type { ComponentType } from "react";
-import type { AnalyticalSchemaResponse } from "../api/querying";
 import type {
   DashboardCardDefinition,
   VisualizationSpec,
@@ -7,7 +6,6 @@ import type {
 
 export interface AnalysisEditorProps {
   ocelId: string;
-  schema: AnalyticalSchemaResponse;
   initial?: VisualizationSpec;
   onCancel: () => void;
   onSubmit: (spec: VisualizationSpec) => void;

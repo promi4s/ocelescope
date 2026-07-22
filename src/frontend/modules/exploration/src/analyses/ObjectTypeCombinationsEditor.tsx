@@ -6,28 +6,32 @@ import {
   Stack,
   TextInput,
 } from "@mantine/core";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
+import { useActivities } from "../api/ocel";
 import type { ObjectTypeCombinationsSpec } from "../model/dashboard";
 import type { AnalysisEditorProps } from "./types";
 
 export function ObjectTypeCombinationsEditor({
-  schema,
+  ocelId,
   initial,
   onCancel,
   onSubmit,
 }: AnalysisEditorProps) {
+  const activitiesQuery = useActivities(ocelId, { ocel_version: "original" });
+  const allActivities = activitiesQuery.data ?? [];
   const existing =
     initial?.analysis === "object-type-combinations" ? initial : undefined;
-  const allActivities = useMemo(
-    () => schema.activities.map((activity) => activity.name),
-    [schema.activities],
-  );
   const [activities, setActivities] = useState<string[]>(
-    existing?.query.activities?.length
-      ? existing.query.activities
-      : allActivities,
+    existing?.query.activities ?? [],
   );
+  const [seeded, setSeeded] = useState(false);
+  useEffect(() => {
+    if (!seeded && !existing && activitiesQuery.data) {
+      setActivities(activitiesQuery.data);
+      setSeeded(true);
+    }
+  }, [seeded, existing, activitiesQuery.data]);
   const [limit, setLimit] = useState<number | string>(
     existing?.query.limit ?? 15,
   );
@@ -56,7 +60,12 @@ export function ObjectTypeCombinationsEditor({
         data={allActivities}
         value={activities}
         onChange={setActivities}
-        placeholder="Select one or more activities"
+        placeholder={
+          activitiesQuery.isPending
+            ? "Loading activities"
+            : "Select one or more activities"
+        }
+        disabled={activitiesQuery.isPending || activitiesQuery.isError}
         searchable
         clearable
         hidePickedOptions

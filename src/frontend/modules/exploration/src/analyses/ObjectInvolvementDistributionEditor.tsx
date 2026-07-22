@@ -1,7 +1,7 @@
 import { Alert, Button, Group, Select, Stack, TextInput } from "@mantine/core";
 import { useMemo, useState } from "react";
 
-import { useGetObjectInvolvementOptions } from "../api/querying";
+import { useE2o } from "../api/ocel";
 import type { ObjectInvolvementDistributionSpec } from "../model/dashboard";
 import type { AnalysisEditorProps } from "./types";
 
@@ -11,7 +11,13 @@ export function ObjectInvolvementDistributionEditor({
   onCancel,
   onSubmit,
 }: AnalysisEditorProps) {
-  const options = useGetObjectInvolvementOptions(ocelId);
+  const options = useE2o(ocelId, {
+    direction: "source",
+    with_qualifier: false,
+    drop_constant: true,
+    ocel_version: "original",
+  });
+  const pairs = options.data?.response;
   const existing =
     initial?.analysis === "object-involvement-distribution"
       ? initial
@@ -25,24 +31,21 @@ export function ObjectInvolvementDistributionEditor({
   );
   const [title, setTitle] = useState(existing?.title ?? "");
   const activities = useMemo(
-    () =>
-      Array.from(
-        new Set(options.data?.pairs.map((pair) => pair.activity) ?? []),
-      ),
-    [options.data],
+    () => Array.from(new Set(pairs?.map((pair) => pair.source) ?? [])),
+    [pairs],
   );
   const objectTypes = useMemo(
     () =>
-      (options.data?.pairs ?? [])
-        .filter((pair) => pair.activity === activity)
+      (pairs ?? [])
+        .filter((pair) => pair.source === activity)
         .map((pair) => ({
-          value: pair.object_type,
-          label: `${pair.object_type} (${pair.minimum}–${pair.maximum})`,
+          value: pair.target,
+          label: `${pair.target} (${pair.min_count}–${pair.max_count})`,
         })),
-    [activity, options.data],
+    [activity, pairs],
   );
-  const validPair = options.data?.pairs.some(
-    (pair) => pair.activity === activity && pair.object_type === objectType,
+  const validPair = pairs?.some(
+    (pair) => pair.source === activity && pair.target === objectType,
   );
 
   const submit = () => {

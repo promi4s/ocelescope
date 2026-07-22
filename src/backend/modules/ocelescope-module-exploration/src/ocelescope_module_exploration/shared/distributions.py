@@ -7,8 +7,9 @@ import numpy as np
 import pandas as pd
 from pydantic import BaseModel, Field
 
-from ocelescope_module_querying.errors import InvalidAnalysisQuery
-from ocelescope_module_querying.shared.attribute_types import AnalyticalType
+from ocelescope_module_ocel.models.attributes import AnalyticalType
+
+from ocelescope_module_exploration.errors import InvalidAnalysisQuery
 
 _MIN_AUTO_BINS = 5
 _MAX_AUTO_BINS = 80

@@ -1,6 +1,6 @@
-import type { AttributeSchemaItem } from "../api/querying";
+import type { TypedAttribute } from "../api/ocel";
 
-export type AnalyticalType = AttributeSchemaItem["analytical_type"];
+export type AnalyticalType = TypedAttribute["analytical_type"];
 
 export type VisualizationKind = "bar" | "donut" | "histogram" | "line";
 

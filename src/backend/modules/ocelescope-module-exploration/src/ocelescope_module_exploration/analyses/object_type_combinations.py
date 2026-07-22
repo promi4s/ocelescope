@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 from ocelescope import OCEL
 from ocelescope.ocel.constants import ACTIVITY_COL, EID_COL, OTYPE_COL
 
-from ocelescope_module_querying.errors import InvalidAnalysisQuery
+from ocelescope_module_exploration.errors import InvalidAnalysisQuery
 
 
 class ObjectTypeCombinationsQuery(BaseModel):

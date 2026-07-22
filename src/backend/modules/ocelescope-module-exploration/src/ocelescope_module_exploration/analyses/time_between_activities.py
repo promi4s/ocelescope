@@ -14,8 +14,8 @@ from ocelescope.ocel.constants import (
     TIMESTAMP_COL,
 )
 
-from ocelescope_module_querying.errors import InvalidAnalysisQuery
-from ocelescope_module_querying.shared.distributions import (
+from ocelescope_module_exploration.errors import InvalidAnalysisQuery
+from ocelescope_module_exploration.shared.distributions import (
     DistributionBucket,
     NumericBinGrouping,
     QueryCounts,

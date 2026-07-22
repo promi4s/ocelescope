@@ -1,10 +1,7 @@
 import { Button, Group, Select, Stack, TextInput } from "@mantine/core";
 import { useState } from "react";
-
-import {
-  type TimeBetweenActivitiesQueryUnit,
-  useGetObjectAttributeDistributionOptions,
-} from "../api/querying";
+import type { TimeBetweenActivitiesQueryUnit } from "../api/exploration";
+import { useE2oCombinations } from "../api/ocel";
 import type { TimeBetweenActivitiesSpec } from "../model/dashboard";
 import type { AnalysisEditorProps } from "./types";
 
@@ -22,7 +19,10 @@ export function TimeBetweenActivitiesEditor({
   onCancel,
   onSubmit,
 }: AnalysisEditorProps) {
-  const options = useGetObjectAttributeDistributionOptions(ocelId);
+  const options = useE2oCombinations(ocelId, {
+    direction: "source",
+    ocel_version: "original",
+  });
   const existing =
     initial?.analysis === "time-between-activities" ? initial : undefined;
   const [source, setSource] = useState<string | null>(
@@ -39,13 +39,13 @@ export function TimeBetweenActivitiesEditor({
   );
   const [title, setTitle] = useState(existing?.title ?? "");
   const availableObjectTypes = Array.from(
-    new Set(options.data?.pairs.map((pair) => pair.object_type) ?? []),
+    new Set(options.data?.map((combination) => combination.target) ?? []),
   ).sort();
   const activities = Array.from(
     new Set(
-      (options.data?.pairs ?? [])
-        .filter((pair) => pair.object_type === objectType)
-        .map((pair) => pair.activity),
+      (options.data ?? [])
+        .filter((combination) => combination.target === objectType)
+        .map((combination) => combination.source),
     ),
   ).sort();
 

@@ -1,5 +1,4 @@
 import {
-  Alert,
   Badge,
   Box,
   Button,
@@ -20,7 +19,6 @@ import {
   analysisDefinitions,
   findAnalysisDefinition,
 } from "../analyses/registry";
-import { useGetAnalyticalSchema } from "../api/querying";
 import type { VisualizationSpec } from "../model/dashboard";
 import { useExplorationDashboard } from "../store/useExplorationDashboard";
 
@@ -29,7 +27,6 @@ function createCardId() {
 }
 
 export function ExplorationDashboard({ ocelId }: { ocelId: string }) {
-  const schema = useGetAnalyticalSchema(ocelId);
   const { cards, setCards, loaded } = useExplorationDashboard(ocelId);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedAnalysis, setSelectedAnalysis] = useState<string | null>(null);
@@ -75,17 +72,7 @@ export function ExplorationDashboard({ ocelId }: { ocelId: string }) {
     closeDrawer();
   };
 
-  if (schema.error) {
-    return (
-      <Container size="xl" py="xl">
-        <Alert color="red" title="Unable to load exploration schema">
-          {String(schema.error)}
-        </Alert>
-      </Container>
-    );
-  }
-
-  if (!schema.data || !loaded) return <LoadingOverlay visible />;
+  if (!loaded) return <LoadingOverlay visible />;
 
   return (
     <Container fluid py="xl" px={{ base: "md", lg: "xl" }}>
@@ -181,7 +168,6 @@ export function ExplorationDashboard({ ocelId }: { ocelId: string }) {
             <ActiveEditor
               key={editingCard?.id ?? activeDefinition.id}
               ocelId={ocelId}
-              schema={schema.data}
               initial={editingCard?.spec}
               onCancel={closeDrawer}
               onSubmit={saveSpec}

@@ -27,7 +27,7 @@ from ocelescope.util.sql import ident
 
 from ocelescope import OCEL
 from ocelescope_module_ocel.models import AggregatedAttribute, TypedAttribute
-from ocelescope_module_ocel.models.attributes import ValueType
+from ocelescope_module_ocel.models.attributes import AnalyticalType, ValueType
 
 EntityType = Literal["events", "objects"]
 
@@ -39,6 +39,15 @@ _DUCKDB_TO_VALUE_TYPE = {
     "DOUBLE": ValueType.FLOAT,
     "BOOLEAN": ValueType.BOOL,
     "DATE": ValueType.DATE,
+}
+
+_VALUE_TYPE_TO_ANALYTICAL_TYPE: dict[ValueType, AnalyticalType] = {
+    ValueType.EMPTY: "unknown",
+    ValueType.STRING: "categorical",
+    ValueType.BOOL: "categorical",
+    ValueType.INT: "discrete",
+    ValueType.FLOAT: "continuous",
+    ValueType.DATE: "temporal",
 }
 
 
@@ -64,6 +73,16 @@ def _value_type(duckdb_type: str) -> ValueType:
     if base.startswith("TIMESTAMP"):
         return ValueType.DATE
     return _DUCKDB_TO_VALUE_TYPE.get(base, ValueType.STRING)
+
+
+def _analytical_type(value_type: ValueType) -> AnalyticalType:
+    """Map a ValueType to the analytical type its values should be treated as.
+
+    A pure function of the column's stored type -- DuckDB already distinguishes INT
+    (BIGINT) from FLOAT (DOUBLE) at import time, so no value inspection is needed to
+    tell discrete from continuous.
+    """
+    return _VALUE_TYPE_TO_ANALYTICAL_TYPE[value_type]
 
 
 def _marshal(value: Any, value_type: ValueType) -> Any:
@@ -239,6 +258,7 @@ def aggregate_attributes(
             AggregatedAttribute(
                 name=name,
                 type=value_type,
+                analytical_type=_analytical_type(value_type),
                 min=_marshal(minimum, value_type),
                 max=_marshal(maximum, value_type),
                 distinct_values=int(distinct or 0),
@@ -287,6 +307,7 @@ def typed_attributes(table: duckdb.DuckDBPyRelation) -> list[TypedAttribute]:
                     name=name,
                     entity_type=entity_type,
                     type=value_type,
+                    analytical_type=_analytical_type(value_type),
                     min=_marshal(minimum, value_type),
                     max=_marshal(maximum, value_type),
                     distinct_values=int(distinct or 0),

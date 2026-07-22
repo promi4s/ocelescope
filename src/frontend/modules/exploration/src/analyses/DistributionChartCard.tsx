@@ -7,7 +7,10 @@ import {
   type FrequencyDatum,
 } from "@ocelescope/charts";
 import { type ReactNode, useMemo } from "react";
-import type { DistributionBucket, DistributionResponse } from "../api/querying";
+import type {
+  DistributionBucket,
+  DistributionResponse,
+} from "../api/exploration";
 import type { DistributionVisualization } from "../model/dashboard";
 import { AnalysisCardActions } from "./AnalysisCardActions";
 
