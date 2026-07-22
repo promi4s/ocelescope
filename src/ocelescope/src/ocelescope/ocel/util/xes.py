@@ -1,7 +1,6 @@
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import orjson
 import pm4py
 import polars as pl
 import r4pm
@@ -27,25 +26,22 @@ RENAME_MAP = {
     f"case:{OTYPE_COL}": OTYPE_COL,
 }
 
-SPECIAL_NAMES = ["concept:name", "time:timestamp", OTYPE_COL]
-
 
 def create_ocel_from_xml(path: str, fallback_object_name: str = "LogObject") -> "OCEL":
     from ocelescope.ocel.core.ocel import OCEL
 
-    log, meta = r4pm.df.import_xes(path)
-
-    meta = orjson.loads(meta)
-
-    global_cols = [
-        attr["key"] for attr in meta.get("global_trace_attrs") if attr["key"] not in SPECIAL_NAMES
-    ]
-
-    event_cols = [
-        attr["key"] for attr in meta.get("global_event_attrs") if attr["key"] not in SPECIAL_NAMES
-    ]
+    log, _meta = r4pm.df.import_xes(path)
 
     log = log.rename({**RENAME_MAP}, strict=False)
+
+    global_cols = [col.removeprefix("case:") for col in log.columns if col.startswith("case:")]
+
+    event_cols = [
+        col
+        for col in log.columns
+        if not col.startswith("case:")
+        and col not in (EID_COL, OID_COL, ACTIVITY_COL, TIMESTAMP_COL, OTYPE_COL)
+    ]
 
     log = log.with_columns(
         pl.col(col).cast(pl.String) for col in (OID_COL, EID_COL) if col in log.columns
@@ -56,10 +52,7 @@ def create_ocel_from_xml(path: str, fallback_object_name: str = "LogObject") -> 
     elif fallback_object_name is not None:
         log = log.with_columns(pl.col(OTYPE_COL).fill_null(fallback_object_name))
 
-    if EID_COL not in event_cols:
-        if EID_COL in log.columns:
-            log = log.drop(EID_COL)
-
+    if EID_COL not in log.columns:
         log = log.with_row_index(EID_COL).with_columns(
             (
                 pl.col(ACTIVITY_COL)
@@ -77,7 +70,9 @@ def create_ocel_from_xml(path: str, fallback_object_name: str = "LogObject") -> 
         .rename({f"case:{col}": col for col in global_cols})
     )
 
-    event_table = log.select(event_cols + [EID_COL, ACTIVITY_COL, TIMESTAMP_COL])
+    event_table = log.select(event_cols + [EID_COL, ACTIVITY_COL, TIMESTAMP_COL]).unique(
+        subset=[EID_COL]
+    )
 
     e2o_table = log.select([EID_COL, OTYPE_COL, ACTIVITY_COL, OID_COL, TIMESTAMP_COL]).with_columns(
         pl.lit(None, dtype=pl.String).alias(E2O_QUALIFIER)

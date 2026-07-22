@@ -15,7 +15,6 @@ from ocelescope.ocel.constants.pm4py import (
     O2O_QUALIFIER,
     O2O_SOURCE_ID,
     O2O_TARGET_ID,
-    OBJECT_CHANGE_CUMCOUNT,
     OBJECT_CHANGED_FIELD,
     OID_COL,
     OTYPE_COL,
