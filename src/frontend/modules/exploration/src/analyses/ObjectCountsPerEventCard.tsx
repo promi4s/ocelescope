@@ -4,13 +4,12 @@ import {
   EChartCard,
   type HierarchyDatum,
 } from "@ocelescope/charts";
-import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
 import {
   type ActivityEventCount,
   type ObjectCountPerEventRow,
-  queryObjectCountsPerEvent,
+  useQueryObjectCountsPerEvent,
 } from "../api/querying";
 import type { ObjectCountsPerEventSpec } from "../model/dashboard";
 import { AnalysisCardActions } from "./AnalysisCardActions";
@@ -77,15 +76,8 @@ function ObjectCountsPerEventContent({
   onDuplicate,
   onRemove,
 }: ObjectCountsPerEventContentProps) {
-  const result = useQuery({
-    queryKey: [
-      `/api/external/modules/querying/v1/ocels/${ocelId}/queries/object-counts-per-event`,
-      spec.query,
-    ],
-    queryFn: () =>
-      queryObjectCountsPerEvent(ocelId, spec.query, {
-        ocel_version: "filtered",
-      }),
+  const result = useQueryObjectCountsPerEvent(ocelId, spec.query, {
+    ocel_version: "filtered",
   });
   const title = spec.title || "Objects involved per event";
   const option = useMemo(

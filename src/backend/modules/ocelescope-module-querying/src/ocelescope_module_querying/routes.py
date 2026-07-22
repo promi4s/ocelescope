@@ -1,80 +1,71 @@
 from fastapi import APIRouter, HTTPException
 
-from ocelescope_backend.app.dependencies import ApiOcel, ApiSession
-from ocelescope_backend.app.internal.exceptions import NotFound
+from ocelescope_backend.app.dependencies import ApiOcel
 
-from ocelescope_module_querying.api.schemas import (
+from ocelescope_module_querying.analyses.activity_execution_frequency import (
     ActivityExecutionFrequencyQuery,
     ActivityExecutionFrequencyResponse,
-    AnalyticalSchemaResponse,
-    DistributionResponse,
-    EventAttributeDistributionQuery,
-    ObjectCountsPerEventQuery,
-    ObjectCountsPerEventResponse,
-    ObjectTypeCombinationsQuery,
-    ObjectTypeCombinationsResponse,
-    ObjectAttributeDistributionQuery,
-    ObjectAttributeDistributionOptionsResponse,
-    ObjectInvolvementDistributionQuery,
-    ObjectInvolvementOptionsResponse,
-    UpdateAnalyticalSchemaRequest,
-    TimeBetweenActivitiesQuery,
-    TimeBetweenActivitiesResponse,
+    execute_activity_execution_frequency_query,
+)
+from ocelescope_module_querying.analyses.object_activity_execution_distribution import (
     ObjectActivityExecutionDistributionQuery,
     ObjectActivityExecutionDistributionResponse,
-    TotalObjectInvolvementResponse,
-)
-from ocelescope_module_querying.service import (
-    InvalidAnalysisQuery,
-    describe_analytical_schema,
-    execute_activity_execution_frequency_query,
-    execute_event_attribute_distribution_query,
-    execute_object_attribute_distribution_query,
-    execute_object_counts_per_event_query,
-    execute_object_involvement_distribution_query,
-    execute_object_type_combinations_query,
-    get_object_attribute_distribution_options,
-    get_object_involvement_options,
-    validate_schema_overrides,
-    execute_time_between_activities_query,
     execute_object_activity_execution_distribution_query,
+)
+from ocelescope_module_querying.analyses.object_attribute_distribution import (
+    ObjectAttributeDistributionOptionsResponse,
+    ObjectAttributeDistributionQuery,
+    execute_object_attribute_distribution_query,
+    get_object_attribute_distribution_options,
+)
+from ocelescope_module_querying.analyses.object_counts_per_event import (
+    ObjectCountsPerEventQuery,
+    ObjectCountsPerEventResponse,
+    execute_object_counts_per_event_query,
+)
+from ocelescope_module_querying.analyses.object_involvement_distribution import (
+    ObjectInvolvementDistributionQuery,
+    ObjectInvolvementOptionsResponse,
+    execute_object_involvement_distribution_query,
+    get_object_involvement_options,
+)
+from ocelescope_module_querying.analyses.object_type_combinations import (
+    ObjectTypeCombinationsQuery,
+    ObjectTypeCombinationsResponse,
+    execute_object_type_combinations_query,
+)
+from ocelescope_module_querying.analyses.event_attribute_distribution import (
+    EventAttributeDistributionQuery,
+    execute_event_attribute_distribution_query,
+)
+from ocelescope_module_querying.analyses.time_between_activities import (
+    TimeBetweenActivitiesQuery,
+    TimeBetweenActivitiesResponse,
+    execute_time_between_activities_query,
+)
+from ocelescope_module_querying.analyses.total_object_involvement import (
+    TotalObjectInvolvementResponse,
     execute_total_object_involvement_query,
 )
-from ocelescope_module_querying.state import QueryingState
+from ocelescope_module_querying.dependencies import (
+    ApiOriginalOcel,
+    known_activities,
+    known_object_types,
+)
+from ocelescope_module_querying.errors import InvalidAnalysisQuery
+from ocelescope_module_querying.schema.models import AnalyticalSchemaResponse
+from ocelescope_module_querying.schema.service import describe_analytical_schema
+from ocelescope_module_querying.shared.distributions import DistributionResponse
 
 router = APIRouter(prefix="/ocels", tags=["querying"])
 
 
 @router.get("/{ocel_id}/analytical-schema", operation_id="getAnalyticalSchema")
 def get_analytical_schema(
-    ocel_id: str, session: ApiSession
+    ocel_id: str, original_ocel: ApiOriginalOcel
 ) -> AnalyticalSchemaResponse:
-    try:
-        ocel = session.get_ocel(ocel_id, use_original=True)
-    except NotFound as error:
-        raise HTTPException(status_code=404, detail="OCEL not found") from error
-    state = session.get_module_state("querying", QueryingState)
-    return describe_analytical_schema(ocel, state.get_schema_overrides(ocel_id))
-
-
-@router.put("/{ocel_id}/analytical-schema", operation_id="updateAnalyticalSchema")
-def update_analytical_schema(
-    ocel_id: str,
-    session: ApiSession,
-    body: UpdateAnalyticalSchemaRequest,
-) -> AnalyticalSchemaResponse:
-    try:
-        ocel = session.get_ocel(ocel_id, use_original=True)
-        overrides = validate_schema_overrides(ocel, body.overrides)
-    except NotFound as error:
-        raise HTTPException(status_code=404, detail="OCEL not found") from error
-    except InvalidAnalysisQuery as error:
-        raise HTTPException(status_code=400, detail=str(error)) from error
-
-    state = session.get_module_state("querying", QueryingState)
-    state.set_schema_overrides(ocel_id, overrides)
-    session.update_state()
-    return describe_analytical_schema(ocel, overrides)
+    del ocel_id
+    return describe_analytical_schema(original_ocel)
 
 
 @router.post(
@@ -84,17 +75,15 @@ def update_analytical_schema(
 def query_event_attribute_distribution(
     ocel_id: str,
     ocel: ApiOcel,
-    session: ApiSession,
+    original_ocel: ApiOriginalOcel,
     body: EventAttributeDistributionQuery,
 ) -> DistributionResponse:
+    del ocel_id
     try:
-        original_ocel = session.get_ocel(ocel_id, use_original=True)
-        state = session.get_module_state("querying", QueryingState)
         return execute_event_attribute_distribution_query(
             ocel,
             body,
             classification_ocel=original_ocel,
-            overrides=state.get_schema_overrides(ocel_id),
         )
     except InvalidAnalysisQuery as error:
         raise HTTPException(status_code=400, detail=str(error)) from error
@@ -105,13 +94,10 @@ def query_event_attribute_distribution(
     operation_id="getObjectAttributeDistributionOptions",
 )
 def object_attribute_distribution_options(
-    ocel_id: str, session: ApiSession
+    ocel_id: str, original_ocel: ApiOriginalOcel
 ) -> ObjectAttributeDistributionOptionsResponse:
-    try:
-        ocel = session.get_ocel(ocel_id, use_original=True)
-    except NotFound as error:
-        raise HTTPException(status_code=404, detail="OCEL not found") from error
-    return get_object_attribute_distribution_options(ocel)
+    del ocel_id
+    return get_object_attribute_distribution_options(original_ocel)
 
 
 @router.post(
@@ -121,17 +107,15 @@ def object_attribute_distribution_options(
 def query_object_attribute_distribution(
     ocel_id: str,
     ocel: ApiOcel,
-    session: ApiSession,
+    original_ocel: ApiOriginalOcel,
     body: ObjectAttributeDistributionQuery,
 ) -> DistributionResponse:
+    del ocel_id
     try:
-        original_ocel = session.get_ocel(ocel_id, use_original=True)
-        state = session.get_module_state("querying", QueryingState)
         return execute_object_attribute_distribution_query(
             ocel,
             body,
             classification_ocel=original_ocel,
-            overrides=state.get_schema_overrides(ocel_id),
         )
     except InvalidAnalysisQuery as error:
         raise HTTPException(status_code=400, detail=str(error)) from error
@@ -144,17 +128,15 @@ def query_object_attribute_distribution(
 def query_object_counts_per_event(
     ocel_id: str,
     ocel: ApiOcel,
-    session: ApiSession,
+    original_ocel: ApiOriginalOcel,
     body: ObjectCountsPerEventQuery,
 ) -> ObjectCountsPerEventResponse:
+    del ocel_id
     try:
-        original_ocel = session.get_ocel(ocel_id, use_original=True)
         return execute_object_counts_per_event_query(
             ocel,
             body,
-            known_activities={
-                str(activity) for activity in original_ocel.events.activities
-            },
+            known_activities=known_activities(original_ocel),
         )
     except InvalidAnalysisQuery as error:
         raise HTTPException(status_code=400, detail=str(error)) from error
@@ -167,17 +149,15 @@ def query_object_counts_per_event(
 def query_object_type_combinations(
     ocel_id: str,
     ocel: ApiOcel,
-    session: ApiSession,
+    original_ocel: ApiOriginalOcel,
     body: ObjectTypeCombinationsQuery,
 ) -> ObjectTypeCombinationsResponse:
+    del ocel_id
     try:
-        original_ocel = session.get_ocel(ocel_id, use_original=True)
         return execute_object_type_combinations_query(
             ocel,
             body,
-            known_activities={
-                str(activity) for activity in original_ocel.events.activities
-            },
+            known_activities=known_activities(original_ocel),
         )
     except InvalidAnalysisQuery as error:
         raise HTTPException(status_code=400, detail=str(error)) from error
@@ -190,15 +170,15 @@ def query_object_type_combinations(
 def query_activity_execution_frequency(
     ocel_id: str,
     ocel: ApiOcel,
-    session: ApiSession,
+    original_ocel: ApiOriginalOcel,
     body: ActivityExecutionFrequencyQuery,
 ) -> ActivityExecutionFrequencyResponse:
+    del ocel_id
     try:
-        original_ocel = session.get_ocel(ocel_id, use_original=True)
         return execute_activity_execution_frequency_query(
             ocel,
             body,
-            known_object_types=set(original_ocel.objects.types),
+            known_object_types=known_object_types(original_ocel),
         )
     except InvalidAnalysisQuery as error:
         raise HTTPException(status_code=400, detail=str(error)) from error
@@ -210,13 +190,10 @@ def query_activity_execution_frequency(
 )
 def object_involvement_options(
     ocel_id: str,
-    session: ApiSession,
+    original_ocel: ApiOriginalOcel,
 ) -> ObjectInvolvementOptionsResponse:
-    try:
-        ocel = session.get_ocel(ocel_id, use_original=True)
-    except NotFound as error:
-        raise HTTPException(status_code=404, detail="OCEL not found") from error
-    return get_object_involvement_options(ocel)
+    del ocel_id
+    return get_object_involvement_options(original_ocel)
 
 
 @router.post(
@@ -226,11 +203,11 @@ def object_involvement_options(
 def query_object_involvement_distribution(
     ocel_id: str,
     ocel: ApiOcel,
-    session: ApiSession,
+    original_ocel: ApiOriginalOcel,
     body: ObjectInvolvementDistributionQuery,
 ) -> DistributionResponse:
+    del ocel_id
     try:
-        original_ocel = session.get_ocel(ocel_id, use_original=True)
         return execute_object_involvement_distribution_query(
             ocel,
             body,
@@ -247,18 +224,16 @@ def query_object_involvement_distribution(
 def query_time_between_activities(
     ocel_id: str,
     ocel: ApiOcel,
-    session: ApiSession,
+    original_ocel: ApiOriginalOcel,
     body: TimeBetweenActivitiesQuery,
 ) -> TimeBetweenActivitiesResponse:
+    del ocel_id
     try:
-        original_ocel = session.get_ocel(ocel_id, use_original=True)
         return execute_time_between_activities_query(
             ocel,
             body,
-            known_activities={
-                str(activity) for activity in original_ocel.events.activities
-            },
-            known_object_types=set(original_ocel.objects.types),
+            known_activities=known_activities(original_ocel),
+            known_object_types=known_object_types(original_ocel),
         )
     except InvalidAnalysisQuery as error:
         raise HTTPException(status_code=400, detail=str(error)) from error
@@ -271,15 +246,15 @@ def query_time_between_activities(
 def query_object_activity_execution_distribution(
     ocel_id: str,
     ocel: ApiOcel,
-    session: ApiSession,
+    original_ocel: ApiOriginalOcel,
     body: ObjectActivityExecutionDistributionQuery,
 ) -> ObjectActivityExecutionDistributionResponse:
+    del ocel_id
     try:
-        original_ocel = session.get_ocel(ocel_id, use_original=True)
         return execute_object_activity_execution_distribution_query(
             ocel,
             body,
-            known_object_types=set(original_ocel.objects.types),
+            known_object_types=known_object_types(original_ocel),
         )
     except InvalidAnalysisQuery as error:
         raise HTTPException(status_code=400, detail=str(error)) from error

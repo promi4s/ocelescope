@@ -1,7 +1,6 @@
 import { Stack, Text } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
 
-import { queryObjectInvolvementDistribution } from "../api/querying";
+import { useQueryObjectInvolvementDistribution } from "../api/querying";
 import type { ObjectInvolvementDistributionSpec } from "../model/dashboard";
 import { DistributionChartCard } from "./DistributionChartCard";
 import type { AnalysisCardProps } from "./types";
@@ -17,15 +16,8 @@ function ObjectInvolvementDistributionContent({
   onDuplicate,
   onRemove,
 }: ObjectInvolvementDistributionContentProps) {
-  const result = useQuery({
-    queryKey: [
-      `/api/external/modules/querying/v1/ocels/${ocelId}/queries/object-involvement-distribution`,
-      spec.query,
-    ],
-    queryFn: () =>
-      queryObjectInvolvementDistribution(ocelId, spec.query, {
-        ocel_version: "filtered",
-      }),
+  const result = useQueryObjectInvolvementDistribution(ocelId, spec.query, {
+    ocel_version: "filtered",
   });
   const title = spec.title || "Object involvement distribution";
 

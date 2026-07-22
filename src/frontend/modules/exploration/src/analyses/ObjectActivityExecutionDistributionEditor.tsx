@@ -34,7 +34,9 @@ export function ObjectActivityExecutionDistributionEditor({
         onChange={(event) => setTitle(event.currentTarget.value)}
       />
       <Group justify="flex-end">
-        <Button variant="default" onClick={onCancel}>Cancel</Button>
+        <Button variant="default" onClick={onCancel}>
+          Cancel
+        </Button>
         <Button
           disabled={!objectType}
           onClick={() => {

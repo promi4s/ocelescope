@@ -18,61 +18,18 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string",
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
               "title": "Ocel Id"
             }
           }
         ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AnalyticalSchemaResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "querying"
-        ],
-        "summary": "Update Analytical Schema",
-        "operationId": "updateAnalyticalSchema",
-        "parameters": [
-          {
-            "name": "ocel_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Ocel Id"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateAnalyticalSchemaRequest"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -190,7 +147,14 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string",
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
               "title": "Ocel Id"
             }
           }
@@ -552,7 +516,14 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string",
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
               "title": "Ocel Id"
             }
           }
@@ -724,6 +695,156 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/TimeBetweenActivitiesResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/modules/querying/v1/ocels/{ocel_id}/queries/object-activity-execution-distribution": {
+      "post": {
+        "tags": [
+          "querying"
+        ],
+        "summary": "Query Object Activity Execution Distribution",
+        "operationId": "queryObjectActivityExecutionDistribution",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectActivityExecutionDistributionQuery"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectActivityExecutionDistributionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/modules/querying/v1/ocels/{ocel_id}/queries/total-object-involvement": {
+      "post": {
+        "tags": [
+          "querying"
+        ],
+        "summary": "Query Total Object Involvement",
+        "operationId": "queryTotalObjectInvolvement",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TotalObjectInvolvementResponse"
                 }
               }
             }
@@ -920,45 +1041,6 @@
         ],
         "title": "AnalyticalSchemaResponse"
       },
-      "AttributeClassificationOverride": {
-        "properties": {
-          "scope": {
-            "type": "string",
-            "enum": [
-              "event",
-              "object"
-            ],
-            "title": "Scope"
-          },
-          "entity_type": {
-            "type": "string",
-            "title": "Entity Type"
-          },
-          "attribute": {
-            "type": "string",
-            "title": "Attribute"
-          },
-          "analytical_type": {
-            "type": "string",
-            "enum": [
-              "categorical",
-              "discrete",
-              "continuous",
-              "temporal",
-              "unknown"
-            ],
-            "title": "Analytical Type"
-          }
-        },
-        "type": "object",
-        "required": [
-          "scope",
-          "entity_type",
-          "attribute",
-          "analytical_type"
-        ],
-        "title": "AttributeClassificationOverride"
-      },
       "AttributeSchemaItem": {
         "properties": {
           "name": {
@@ -975,17 +1057,6 @@
               "unknown"
             ],
             "title": "Physical Type"
-          },
-          "inferred_analytical_type": {
-            "type": "string",
-            "enum": [
-              "categorical",
-              "discrete",
-              "continuous",
-              "temporal",
-              "unknown"
-            ],
-            "title": "Inferred Analytical Type"
           },
           "analytical_type": {
             "type": "string",
@@ -1015,7 +1086,6 @@
         "required": [
           "name",
           "physical_type",
-          "inferred_analytical_type",
           "analytical_type",
           "present_count",
           "missing_count",
@@ -1227,6 +1297,68 @@
         ],
         "title": "NumericBinGrouping"
       },
+      "ObjectActivityExecutionDistributionQuery": {
+        "properties": {
+          "object_type": {
+            "type": "string",
+            "title": "Object Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "object_type"
+        ],
+        "title": "ObjectActivityExecutionDistributionQuery"
+      },
+      "ObjectActivityExecutionDistributionResponse": {
+        "properties": {
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/ObjectActivityExecutionDistributionRow"
+            },
+            "type": "array",
+            "title": "Rows"
+          },
+          "contributing_object_count": {
+            "type": "integer",
+            "title": "Contributing Object Count"
+          },
+          "activity_count": {
+            "type": "integer",
+            "title": "Activity Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rows",
+          "contributing_object_count",
+          "activity_count"
+        ],
+        "title": "ObjectActivityExecutionDistributionResponse"
+      },
+      "ObjectActivityExecutionDistributionRow": {
+        "properties": {
+          "activity": {
+            "type": "string",
+            "title": "Activity"
+          },
+          "execution_count": {
+            "type": "integer",
+            "title": "Execution Count"
+          },
+          "object_count": {
+            "type": "integer",
+            "title": "Object Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "activity",
+          "execution_count",
+          "object_count"
+        ],
+        "title": "ObjectActivityExecutionDistributionRow"
+      },
       "ObjectAttributeDistributionOptionsResponse": {
         "properties": {
           "pairs": {
@@ -1302,17 +1434,6 @@
             ],
             "title": "Physical Type"
           },
-          "inferred_analytical_type": {
-            "type": "string",
-            "enum": [
-              "categorical",
-              "discrete",
-              "continuous",
-              "temporal",
-              "unknown"
-            ],
-            "title": "Inferred Analytical Type"
-          },
           "analytical_type": {
             "type": "string",
             "enum": [
@@ -1369,7 +1490,6 @@
         "required": [
           "name",
           "physical_type",
-          "inferred_analytical_type",
           "analytical_type",
           "present_count",
           "missing_count",
@@ -1690,11 +1810,17 @@
             "title": "Unit"
           },
           "bin_count": {
-            "type": "integer",
-            "maximum": 200.0,
-            "minimum": 1.0,
-            "title": "Bin Count",
-            "default": 20
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 200.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bin Count"
           }
         },
         "type": "object",
@@ -1752,21 +1878,49 @@
         ],
         "title": "TimeBetweenActivitiesResponse"
       },
-      "UpdateAnalyticalSchemaRequest": {
+      "TotalObjectInvolvementResponse": {
         "properties": {
-          "overrides": {
+          "rows": {
             "items": {
-              "$ref": "#/components/schemas/AttributeClassificationOverride"
+              "$ref": "#/components/schemas/TotalObjectInvolvementRow"
             },
             "type": "array",
-            "title": "Overrides"
+            "title": "Rows"
+          },
+          "event_count": {
+            "type": "integer",
+            "title": "Event Count"
           }
         },
         "type": "object",
         "required": [
-          "overrides"
+          "rows",
+          "event_count"
         ],
-        "title": "UpdateAnalyticalSchemaRequest"
+        "title": "TotalObjectInvolvementResponse"
+      },
+      "TotalObjectInvolvementRow": {
+        "properties": {
+          "activity": {
+            "type": "string",
+            "title": "Activity"
+          },
+          "object_count": {
+            "type": "integer",
+            "title": "Object Count"
+          },
+          "event_count": {
+            "type": "integer",
+            "title": "Event Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "activity",
+          "object_count",
+          "event_count"
+        ],
+        "title": "TotalObjectInvolvementRow"
       },
       "ValidationError": {
         "properties": {

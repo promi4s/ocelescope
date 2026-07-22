@@ -1,5 +1,7 @@
 import { EventAttributeDistributionCard } from "./EventAttributeDistributionCard";
 import { EventAttributeDistributionEditor } from "./EventAttributeDistributionEditor";
+import { ObjectActivityExecutionDistributionCard } from "./ObjectActivityExecutionDistributionCard";
+import { ObjectActivityExecutionDistributionEditor } from "./ObjectActivityExecutionDistributionEditor";
 import { ObjectAttributeDistributionCard } from "./ObjectAttributeDistributionCard";
 import { ObjectAttributeDistributionEditor } from "./ObjectAttributeDistributionEditor";
 import { ObjectCountsPerEventCard } from "./ObjectCountsPerEventCard";
@@ -8,13 +10,11 @@ import { ObjectInvolvementDistributionCard } from "./ObjectInvolvementDistributi
 import { ObjectInvolvementDistributionEditor } from "./ObjectInvolvementDistributionEditor";
 import { ObjectTypeCombinationsCard } from "./ObjectTypeCombinationsCard";
 import { ObjectTypeCombinationsEditor } from "./ObjectTypeCombinationsEditor";
-import type { AnalysisDefinition } from "./types";
 import { TimeBetweenActivitiesCard } from "./TimeBetweenActivitiesCard";
 import { TimeBetweenActivitiesEditor } from "./TimeBetweenActivitiesEditor";
-import { ObjectActivityExecutionDistributionCard } from "./ObjectActivityExecutionDistributionCard";
-import { ObjectActivityExecutionDistributionEditor } from "./ObjectActivityExecutionDistributionEditor";
 import { TotalObjectInvolvementCard } from "./TotalObjectInvolvementCard";
 import { TotalObjectInvolvementEditor } from "./TotalObjectInvolvementEditor";
+import type { AnalysisDefinition } from "./types";
 
 export const analysisDefinitions = [
   {

@@ -4,21 +4,23 @@ import {
   EChartCard,
   type HierarchyDatum,
 } from "@ocelescope/charts";
-import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { queryObjectActivityExecutionDistribution } from "../api/remainingDistributions";
+import { useQueryObjectActivityExecutionDistribution } from "../api/querying";
 import type { ObjectActivityExecutionDistributionSpec } from "../model/dashboard";
 import { AnalysisCardActions } from "./AnalysisCardActions";
 import type { AnalysisCardProps } from "./types";
 
-function Content(props: AnalysisCardProps & { spec: ObjectActivityExecutionDistributionSpec }) {
+function Content(
+  props: AnalysisCardProps & { spec: ObjectActivityExecutionDistributionSpec },
+) {
   const { ocelId, spec } = props;
-  const result = useQuery({
-    queryKey: ["object-activity-execution-distribution", ocelId, spec.query],
-    queryFn: () => queryObjectActivityExecutionDistribution(
-      ocelId, spec.query, { ocel_version: "filtered" },
-    ),
-  });
+  const result = useQueryObjectActivityExecutionDistribution(
+    ocelId,
+    spec.query,
+    {
+      ocel_version: "filtered",
+    },
+  );
   const option = useMemo(() => {
     if (!result.data) return null;
     const grouped = new Map<string, HierarchyDatum[]>();
@@ -31,7 +33,14 @@ function Content(props: AnalysisCardProps & { spec: ObjectActivityExecutionDistr
       grouped.set(row.activity, children);
     }
     return createSunburstChartOption(
-      Array.from(grouped, ([label, children]) => ({ label, children })),
+      Array.from(grouped, ([label, children]) => ({
+        label,
+        tooltipValue: children.reduce(
+          (sum, child) => sum + (child.value ?? 0),
+          0,
+        ),
+        children,
+      })),
       { seriesName: "Execution depth", valueName: "Objects" },
     );
   }, [result.data]);
@@ -42,8 +51,15 @@ function Content(props: AnalysisCardProps & { spec: ObjectActivityExecutionDistr
       subtitle={`Object type · ${spec.query.object_type}`}
       info={
         <Stack gap="xs">
-          <Text size="sm">Inner ring: activity. Outer ring: exact number of executions across each object's full lifecycle.</Text>
-          <Text size="sm">Segment size is the number of objects with that execution count. Activities where every participating object executed exactly once are omitted. Duplicate event–object relations are removed.</Text>
+          <Text size="sm">
+            Inner ring: activity. Outer ring: exact number of executions across
+            each object's full lifecycle.
+          </Text>
+          <Text size="sm">
+            Segment size is the number of objects with that execution count.
+            Activities where every participating object executed exactly once
+            are omitted. Duplicate event–object relations are removed.
+          </Text>
           <Text size="sm">The active filtered OCEL is used.</Text>
         </Stack>
       }
@@ -55,18 +71,33 @@ function Content(props: AnalysisCardProps & { spec: ObjectActivityExecutionDistr
       emptyMessage="No activities with variable execution counts are available."
       height={300}
       expandedHeight={680}
-      note={result.data ? (
-        <Group justify="space-between">
-          <Text size="xs" c="dimmed">{result.data.activity_count} activities</Text>
-          <Text size="xs" c="dimmed">{result.data.contributing_object_count.toLocaleString()} objects</Text>
-        </Group>
-      ) : undefined}
-      actions={<AnalysisCardActions onEdit={props.onEdit} onDuplicate={props.onDuplicate} onRemove={props.onRemove} />}
+      note={
+        result.data ? (
+          <Group justify="space-between">
+            <Text size="xs" c="dimmed">
+              {result.data.activity_count} activities
+            </Text>
+            <Text size="xs" c="dimmed">
+              {result.data.contributing_object_count.toLocaleString()} objects
+            </Text>
+          </Group>
+        ) : undefined
+      }
+      actions={
+        <AnalysisCardActions
+          onEdit={props.onEdit}
+          onDuplicate={props.onDuplicate}
+          onRemove={props.onRemove}
+        />
+      }
     />
   );
 }
 
-export function ObjectActivityExecutionDistributionCard(props: AnalysisCardProps) {
-  if (props.card.spec.analysis !== "object-activity-execution-distribution") return null;
+export function ObjectActivityExecutionDistributionCard(
+  props: AnalysisCardProps,
+) {
+  if (props.card.spec.analysis !== "object-activity-execution-distribution")
+    return null;
   return <Content {...props} spec={props.card.spec} />;
 }

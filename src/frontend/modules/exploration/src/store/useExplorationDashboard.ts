@@ -11,7 +11,7 @@ const storageKey = (ocelId: string) => `ocelescope:exploration:${ocelId}`;
 function isStoredDashboard(value: unknown): value is StoredDashboard {
   if (!value || typeof value !== "object") return false;
   const dashboard = value as Partial<StoredDashboard>;
-  return dashboard.version === 1 && Array.isArray(dashboard.cards);
+  return Array.isArray(dashboard.cards);
 }
 
 function migrateCards(cards: DashboardCardDefinition[]) {
@@ -67,7 +67,7 @@ export function useExplorationDashboard(ocelId: string) {
 
   useEffect(() => {
     if (!loaded) return;
-    const dashboard: StoredDashboard = { version: 1, cards };
+    const dashboard: StoredDashboard = { cards };
     try {
       window.localStorage.setItem(
         storageKey(ocelId),

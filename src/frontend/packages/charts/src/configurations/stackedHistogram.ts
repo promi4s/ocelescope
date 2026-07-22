@@ -13,8 +13,15 @@ export interface StackedHistogramConfig {
 }
 
 const COLORS = [
-  "#228be6", "#15aabf", "#12b886", "#82c91e", "#fab005",
-  "#fd7e14", "#fa5252", "#be4bdb", "#7950f2",
+  "#228be6",
+  "#15aabf",
+  "#12b886",
+  "#82c91e",
+  "#fab005",
+  "#fd7e14",
+  "#fa5252",
+  "#be4bdb",
+  "#7950f2",
 ];
 
 export function createStackedHistogramChartOption(
@@ -22,6 +29,12 @@ export function createStackedHistogramChartOption(
   config: StackedHistogramConfig = {},
 ): EChartsOption {
   const seriesNames = Array.from(new Set(data.map((item) => item.series)));
+  const xValues = Array.from(new Set(data.map((item) => item.x))).sort(
+    (a, b) => a - b,
+  );
+  const values = new Map(
+    data.map((item) => [`${item.x} ${item.series}`, item.value]),
+  );
   const totals = new Map<number, number>();
   for (const item of data) {
     totals.set(item.x, (totals.get(item.x) ?? 0) + item.value);
@@ -73,9 +86,9 @@ export function createStackedHistogramChartOption(
       type: "bar",
       stack: config.seriesName ?? "events",
       barMaxWidth: 48,
-      data: data
-        .filter((item) => item.series === name)
-        .map((item) => ({ value: [item.x, item.value] })),
+      data: xValues.map((x) => ({
+        value: [x, values.get(`${x} ${name}`) ?? 0],
+      })),
     })),
   };
 }

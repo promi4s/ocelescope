@@ -3,7 +3,7 @@ from packaging.version import Version
 
 from ocelescope_backend.app.modules import Module, ModuleMeta
 
-from ocelescope_module_querying.api.routes import router
+from ocelescope_module_querying.routes import router
 
 
 class Querying(Module):

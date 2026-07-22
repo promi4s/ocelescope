@@ -1,22 +1,56 @@
 from __future__ import annotations
 
 import math
+from typing import Annotated, Literal
 
 import numpy as np
 import pandas as pd
+from pydantic import BaseModel, Field
 
-from ocelescope_module_querying.api.schemas import (
-    AnalyticalType,
-    DistributionBucket,
-    DistributionGrouping,
-    DistributionResponse,
-    NumericBinGrouping,
-    QueryCounts,
-)
 from ocelescope_module_querying.errors import InvalidAnalysisQuery
+from ocelescope_module_querying.shared.attribute_types import AnalyticalType
 
 _MIN_AUTO_BINS = 5
 _MAX_AUTO_BINS = 80
+
+
+class CategoryGrouping(BaseModel):
+    kind: Literal["categories"]
+    limit: int = Field(default=50, ge=1, le=500)
+
+
+class NumericBinGrouping(BaseModel):
+    kind: Literal["bins"]
+    count: int | None = Field(default=None, ge=1, le=200)
+
+
+DistributionGrouping = Annotated[
+    CategoryGrouping | NumericBinGrouping, Field(discriminator="kind")
+]
+
+
+class DistributionBucket(BaseModel):
+    key: str
+    label: str
+    count: int
+    kind: Literal["value", "range", "missing", "other"]
+    value: str | int | float | bool | None = None
+    lower: float | None = None
+    upper: float | None = None
+    inclusive_upper: bool = False
+
+
+class QueryCounts(BaseModel):
+    total: int
+    present: int
+    missing: int
+    represented: int
+
+
+class DistributionResponse(BaseModel):
+    buckets: list[DistributionBucket]
+    counts: QueryCounts
+    truncated: bool
 
 
 def _auto_bin_count(values: np.ndarray) -> int:

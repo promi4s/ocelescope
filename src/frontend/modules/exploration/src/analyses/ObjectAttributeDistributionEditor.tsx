@@ -50,11 +50,6 @@ export function ObjectAttributeDistributionEditor({
   const [visualization, setVisualization] =
     useState<DistributionVisualization | null>(existing?.visualization ?? null);
   const [title, setTitle] = useState(existing?.title ?? "");
-  const [binCount, setBinCount] = useState<number | string>(
-    existing?.query.grouping.kind === "bins"
-      ? (existing.query.grouping.count ?? 20)
-      : 20,
-  );
   const [categoryLimit, setCategoryLimit] = useState<number | string>(
     existing?.query.grouping.kind === "categories"
       ? (existing.query.grouping.limit ?? 50)
@@ -111,8 +106,6 @@ export function ObjectAttributeDistributionEditor({
         : [],
     [attribute],
   );
-  const validBinCount =
-    typeof binCount === "number" && binCount >= 1 && binCount <= 200;
   const validCategoryLimit =
     typeof categoryLimit === "number" &&
     categoryLimit >= 1 &&
@@ -127,7 +120,6 @@ export function ObjectAttributeDistributionEditor({
       !visualization
     )
       return;
-    if (visualization === "histogram" && !validBinCount) return;
     if (visualization !== "histogram" && !validCategoryLimit) return;
     const spec: ObjectAttributeDistributionSpec = {
       analysis: "object-attribute-distribution",
@@ -137,7 +129,7 @@ export function ObjectAttributeDistributionEditor({
         attribute: attributeName,
         grouping:
           visualization === "histogram"
-            ? { kind: "bins", count: binCount as number }
+            ? { kind: "bins" }
             : { kind: "categories", limit: categoryLimit as number },
       },
       visualization,
@@ -232,17 +224,6 @@ export function ObjectAttributeDistributionEditor({
         allowDeselect={false}
       />
 
-      {visualization === "histogram" && (
-        <NumberInput
-          label="Number of bins"
-          value={binCount}
-          onChange={setBinCount}
-          min={1}
-          max={200}
-          clampBehavior="strict"
-        />
-      )}
-
       {(visualization === "bar" || visualization === "donut") && (
         <NumberInput
           label="Maximum categories"
@@ -277,7 +258,6 @@ export function ObjectAttributeDistributionEditor({
             !validSelectionPair ||
             !attributeName ||
             !visualization ||
-            (visualization === "histogram" && !validBinCount) ||
             (visualization !== "histogram" && !validCategoryLimit)
           }
         >

@@ -1,13 +1,13 @@
 import type {
   ActivityExecutionFrequencyQuery,
   EventAttributeDistributionQuery,
+  ObjectActivityExecutionDistributionQuery,
   ObjectAttributeDistributionQuery,
   ObjectCountsPerEventQuery,
   ObjectInvolvementDistributionQuery,
   ObjectTypeCombinationsQuery,
+  TimeBetweenActivitiesQuery,
 } from "../api/querying";
-import type { TimeBetweenActivitiesQuery } from "../api/timeBetweenActivities";
-import type { ObjectActivityExecutionDistributionQuery } from "../api/remainingDistributions";
 
 export type DistributionVisualization = "bar" | "donut" | "histogram";
 
@@ -84,6 +84,5 @@ export interface DashboardCardDefinition {
 }
 
 export interface StoredDashboard {
-  version: 1;
   cards: DashboardCardDefinition[];
 }

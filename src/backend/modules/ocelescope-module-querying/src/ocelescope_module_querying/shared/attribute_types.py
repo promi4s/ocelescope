@@ -1,13 +1,15 @@
 from __future__ import annotations
 
+from typing import Literal
+
 import numpy as np
 import pandas as pd
 
 from ocelescope.ocel.constants import ValueType
 from ocelescope.util.pandas import infer_column_dtype
 
-from ocelescope_module_querying.api.schemas import AnalyticalType, AttributeDataType
-from ocelescope_module_querying.errors import InvalidAnalysisQuery
+AttributeDataType = Literal["number", "string", "boolean", "datetime", "unknown"]
+AnalyticalType = Literal["categorical", "discrete", "continuous", "temporal", "unknown"]
 
 
 def attribute_type(series: pd.Series) -> AttributeDataType:
@@ -38,31 +40,3 @@ def infer_analytical_type(
         )
         return "discrete" if integer_valued else "continuous"
     return "unknown"
-
-
-def supported_analytical_types(
-    physical_type: AttributeDataType,
-) -> list[AnalyticalType]:
-    supported: dict[AttributeDataType, list[AnalyticalType]] = {
-        "number": ["discrete", "continuous", "categorical"],
-        "string": ["categorical"],
-        "boolean": ["categorical"],
-        "datetime": ["temporal", "categorical"],
-        "unknown": ["unknown", "categorical"],
-    }
-    return supported[physical_type]
-
-
-def effective_analytical_type(
-    values: pd.Series,
-    physical_type: AttributeDataType,
-    override: AnalyticalType | None,
-) -> AnalyticalType:
-    inferred = infer_analytical_type(values, physical_type)
-    if override is None:
-        return inferred
-    if override not in supported_analytical_types(physical_type):
-        raise InvalidAnalysisQuery(
-            f"'{override}' is not a valid interpretation for {physical_type} values"
-        )
-    return override

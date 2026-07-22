@@ -4,10 +4,9 @@ import {
   EChartCard,
   type StackedBarDatum,
 } from "@ocelescope/charts";
-import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
-import { queryObjectTypeCombinations } from "../api/querying";
+import { useQueryObjectTypeCombinations } from "../api/querying";
 import type { ObjectTypeCombinationsSpec } from "../model/dashboard";
 import { AnalysisCardActions } from "./AnalysisCardActions";
 import type { AnalysisCardProps } from "./types";
@@ -54,15 +53,8 @@ function ObjectTypeCombinationsContent({
   onDuplicate,
   onRemove,
 }: ObjectTypeCombinationsContentProps) {
-  const result = useQuery({
-    queryKey: [
-      `/api/external/modules/querying/v1/ocels/${ocelId}/queries/object-type-combinations`,
-      spec.query,
-    ],
-    queryFn: () =>
-      queryObjectTypeCombinations(ocelId, spec.query, {
-        ocel_version: "filtered",
-      }),
+  const result = useQueryObjectTypeCombinations(ocelId, spec.query, {
+    ocel_version: "filtered",
   });
   const title = spec.title || "Object-type combinations per event";
   const selectedActivities = spec.query.activities ?? [];

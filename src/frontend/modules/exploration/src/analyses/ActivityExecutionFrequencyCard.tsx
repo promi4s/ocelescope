@@ -4,10 +4,9 @@ import {
   EChartCard,
   type StackedBarDatum,
 } from "@ocelescope/charts";
-import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
-import { queryActivityExecutionFrequency } from "../api/querying";
+import { useQueryActivityExecutionFrequency } from "../api/querying";
 import type { ActivityExecutionFrequencySpec } from "../model/dashboard";
 import { AnalysisCardActions } from "./AnalysisCardActions";
 import type { AnalysisCardProps } from "./types";
@@ -32,15 +31,8 @@ function ActivityExecutionFrequencyContent({
   onDuplicate,
   onRemove,
 }: ActivityExecutionFrequencyContentProps) {
-  const result = useQuery({
-    queryKey: [
-      `/api/external/modules/querying/v1/ocels/${ocelId}/queries/activity-execution-frequency`,
-      spec.query,
-    ],
-    queryFn: () =>
-      queryActivityExecutionFrequency(ocelId, spec.query, {
-        ocel_version: "filtered",
-      }),
+  const result = useQueryActivityExecutionFrequency(ocelId, spec.query, {
+    ocel_version: "filtered",
   });
   const title = spec.title || "Activity execution frequency";
   const option = useMemo(() => {

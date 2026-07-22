@@ -1,12 +1,4 @@
-import {
-  Alert,
-  Button,
-  Group,
-  NumberInput,
-  Select,
-  Stack,
-  TextInput,
-} from "@mantine/core";
+import { Alert, Button, Group, Select, Stack, TextInput } from "@mantine/core";
 import { useMemo, useState } from "react";
 
 import { useGetObjectInvolvementOptions } from "../api/querying";
@@ -31,11 +23,6 @@ export function ObjectInvolvementDistributionEditor({
   const [visualization, setVisualization] = useState<"bar" | "histogram">(
     existing?.visualization ?? "bar",
   );
-  const [binCount, setBinCount] = useState<number | string>(
-    existing?.query.grouping.kind === "bins"
-      ? (existing.query.grouping.count ?? 10)
-      : 10,
-  );
   const [title, setTitle] = useState(existing?.title ?? "");
   const activities = useMemo(
     () =>
@@ -57,12 +44,9 @@ export function ObjectInvolvementDistributionEditor({
   const validPair = options.data?.pairs.some(
     (pair) => pair.activity === activity && pair.object_type === objectType,
   );
-  const validBinCount =
-    typeof binCount === "number" && binCount >= 1 && binCount <= 200;
 
   const submit = () => {
     if (!activity || !objectType || !validPair) return;
-    if (visualization === "histogram" && !validBinCount) return;
     const spec: ObjectInvolvementDistributionSpec = {
       analysis: "object-involvement-distribution",
       query: {
@@ -70,7 +54,7 @@ export function ObjectInvolvementDistributionEditor({
         object_type: objectType,
         grouping:
           visualization === "histogram"
-            ? { kind: "bins", count: binCount as number }
+            ? { kind: "bins" }
             : { kind: "categories", limit: 500 },
       },
       visualization,
@@ -131,18 +115,6 @@ export function ObjectInvolvementDistributionEditor({
         allowDeselect={false}
       />
 
-      {visualization === "histogram" && (
-        <NumberInput
-          label="Number of bins"
-          description="Object counts are grouped into numerical intervals."
-          value={binCount}
-          onChange={setBinCount}
-          min={1}
-          max={200}
-          clampBehavior="strict"
-        />
-      )}
-
       <TextInput
         label="Custom title"
         description="Optional"
@@ -157,12 +129,7 @@ export function ObjectInvolvementDistributionEditor({
         </Button>
         <Button
           onClick={submit}
-          disabled={
-            !activity ||
-            !objectType ||
-            !validPair ||
-            (visualization === "histogram" && !validBinCount)
-          }
+          disabled={!activity || !objectType || !validPair}
         >
           {existing ? "Save changes" : "Add visualization"}
         </Button>

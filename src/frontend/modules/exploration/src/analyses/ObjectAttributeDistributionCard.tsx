@@ -1,6 +1,5 @@
 import { Stack, Text } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
-import { queryObjectAttributeDistribution } from "../api/querying";
+import { useQueryObjectAttributeDistribution } from "../api/querying";
 import type { ObjectAttributeDistributionSpec } from "../model/dashboard";
 import { DistributionChartCard } from "./DistributionChartCard";
 import type { AnalysisCardProps } from "./types";
@@ -16,15 +15,8 @@ function ObjectAttributeDistributionContent({
   onDuplicate,
   onRemove,
 }: ObjectAttributeDistributionContentProps) {
-  const result = useQuery({
-    queryKey: [
-      `/api/external/modules/querying/v1/ocels/${ocelId}/queries/object-attribute-distribution`,
-      spec.query,
-    ],
-    queryFn: () =>
-      queryObjectAttributeDistribution(ocelId, spec.query, {
-        ocel_version: "filtered",
-      }),
+  const result = useQueryObjectAttributeDistribution(ocelId, spec.query, {
+    ocel_version: "filtered",
   });
   const title = spec.title || `${spec.query.attribute} distribution`;
 

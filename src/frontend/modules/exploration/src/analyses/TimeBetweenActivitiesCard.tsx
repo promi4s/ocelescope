@@ -1,7 +1,6 @@
 import { Group, Stack, Text } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
 
-import { queryTimeBetweenActivities } from "../api/timeBetweenActivities";
+import { useQueryTimeBetweenActivities } from "../api/querying";
 import type { TimeBetweenActivitiesSpec } from "../model/dashboard";
 import { DistributionChartCard } from "./DistributionChartCard";
 import type { AnalysisCardProps } from "./types";
@@ -17,15 +16,8 @@ function TimeBetweenActivitiesContent({
   onDuplicate,
   onRemove,
 }: TimeBetweenActivitiesContentProps) {
-  const result = useQuery({
-    queryKey: [
-      `/api/external/modules/querying/v1/ocels/${ocelId}/queries/time-between-activities`,
-      spec.query,
-    ],
-    queryFn: () =>
-      queryTimeBetweenActivities(ocelId, spec.query, {
-        ocel_version: "filtered",
-      }),
+  const result = useQueryTimeBetweenActivities(ocelId, spec.query, {
+    ocel_version: "filtered",
   });
   const title = spec.title || "Time between activities";
 
@@ -38,9 +30,9 @@ function TimeBetweenActivitiesContent({
       </Text>
       <Text size="sm">
         Each object trace is first filtered to the two selected activities. A
-        duration is measured whenever a target directly follows a source in
-        that filtered trace, so unrelated activities may occur between them in
-        the original trace.
+        duration is measured whenever a target directly follows a source in that
+        filtered trace, so unrelated activities may occur between them in the
+        original trace.
       </Text>
       <Text size="sm">
         One object can contribute multiple pairs. Duplicate event–object

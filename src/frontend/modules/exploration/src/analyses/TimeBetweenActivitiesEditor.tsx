@@ -1,24 +1,20 @@
-import {
-  Button,
-  Group,
-  NumberInput,
-  Select,
-  Stack,
-  TextInput,
-} from "@mantine/core";
+import { Button, Group, Select, Stack, TextInput } from "@mantine/core";
 import { useState } from "react";
 
-import { useGetObjectAttributeDistributionOptions } from "../api/querying";
-import type { TimeUnit } from "../api/timeBetweenActivities";
+import {
+  type TimeBetweenActivitiesQueryUnit,
+  useGetObjectAttributeDistributionOptions,
+} from "../api/querying";
 import type { TimeBetweenActivitiesSpec } from "../model/dashboard";
 import type { AnalysisEditorProps } from "./types";
 
-const unitOptions: { value: TimeUnit; label: string }[] = [
-  { value: "seconds", label: "Seconds" },
-  { value: "minutes", label: "Minutes" },
-  { value: "hours", label: "Hours" },
-  { value: "days", label: "Days" },
-];
+const unitOptions: { value: TimeBetweenActivitiesQueryUnit; label: string }[] =
+  [
+    { value: "seconds", label: "Seconds" },
+    { value: "minutes", label: "Minutes" },
+    { value: "hours", label: "Hours" },
+    { value: "days", label: "Days" },
+  ];
 
 export function TimeBetweenActivitiesEditor({
   ocelId,
@@ -38,11 +34,8 @@ export function TimeBetweenActivitiesEditor({
   const [objectType, setObjectType] = useState<string | null>(
     existing?.query.object_type ?? null,
   );
-  const [unit, setUnit] = useState<TimeUnit>(
+  const [unit, setUnit] = useState<TimeBetweenActivitiesQueryUnit>(
     existing?.query.unit ?? "hours",
-  );
-  const [binCount, setBinCount] = useState<number | string>(
-    existing?.query.bin_count ?? 20,
   );
   const [title, setTitle] = useState(existing?.title ?? "");
   const availableObjectTypes = Array.from(
@@ -55,11 +48,9 @@ export function TimeBetweenActivitiesEditor({
         .map((pair) => pair.activity),
     ),
   ).sort();
-  const validBinCount =
-    typeof binCount === "number" && binCount >= 1 && binCount <= 200;
 
   const submit = () => {
-    if (!source || !target || !objectType || !validBinCount) return;
+    if (!source || !target || !objectType) return;
     const spec: TimeBetweenActivitiesSpec = {
       analysis: "time-between-activities",
       query: {
@@ -67,7 +58,6 @@ export function TimeBetweenActivitiesEditor({
         target_activity: target,
         object_type: objectType,
         unit,
-        bin_count: binCount,
       },
       ...(title.trim() ? { title: title.trim() } : {}),
     };
@@ -99,7 +89,9 @@ export function TimeBetweenActivitiesEditor({
         value={source}
         onChange={setSource}
         placeholder={
-          objectType ? "Select the source activity" : "Select an object type first"
+          objectType
+            ? "Select the source activity"
+            : "Select an object type first"
         }
         disabled={!objectType}
         searchable
@@ -112,29 +104,23 @@ export function TimeBetweenActivitiesEditor({
         value={target}
         onChange={setTarget}
         placeholder={
-          objectType ? "Select the target activity" : "Select an object type first"
+          objectType
+            ? "Select the target activity"
+            : "Select an object type first"
         }
         disabled={!objectType}
         searchable
         allowDeselect={false}
       />
-      <Group grow align="flex-start">
-        <Select
-          label="Time unit"
-          data={unitOptions}
-          value={unit}
-          onChange={(value) => setUnit((value as TimeUnit) ?? "hours")}
-          allowDeselect={false}
-        />
-        <NumberInput
-          label="Number of bins"
-          value={binCount}
-          onChange={setBinCount}
-          min={1}
-          max={200}
-          clampBehavior="strict"
-        />
-      </Group>
+      <Select
+        label="Time unit"
+        data={unitOptions}
+        value={unit}
+        onChange={(value) =>
+          setUnit((value as TimeBetweenActivitiesQueryUnit) ?? "hours")
+        }
+        allowDeselect={false}
+      />
       <TextInput
         label="Custom title"
         description="Optional"
@@ -146,10 +132,7 @@ export function TimeBetweenActivitiesEditor({
         <Button variant="default" onClick={onCancel}>
           Cancel
         </Button>
-        <Button
-          onClick={submit}
-          disabled={!source || !target || !objectType || !validBinCount}
-        >
+        <Button onClick={submit} disabled={!source || !target || !objectType}>
           {existing ? "Save changes" : "Add visualization"}
         </Button>
       </Group>

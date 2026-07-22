@@ -4,12 +4,12 @@ export { createHistogramChartOption } from "./histogram";
 export { createHorizontalStackedBarChartOption } from "./horizontalStackedBar";
 export { DEFAULT_FREQUENCY_CHART_COLORS } from "./shared";
 export { createStackedBarChartOption } from "./stackedBar";
-export { createSunburstChartOption } from "./sunburst";
 export {
   createStackedHistogramChartOption,
   type StackedHistogramConfig,
   type StackedHistogramDatum,
 } from "./stackedHistogram";
+export { createSunburstChartOption } from "./sunburst";
 export type {
   CartesianFrequencyChartConfig,
   FrequencyChartColors,
