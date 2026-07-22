@@ -16,9 +16,9 @@ from ocelescope.ocel.constants.pm4py import (
     O2O_SOURCE_ID,
     O2O_TARGET_ID,
     OBJECT_CHANGED_FIELD,
-    OBJECT_CHANGES_DF_COLS,
     OID_COL,
     OTYPE_COL,
+    TIMESTAMP_COL,
 )
 from ocelescope.ocel.extensions.manager import ExtensionManager
 from ocelescope.ocel.filter.base import BaseFilter
@@ -239,21 +239,31 @@ class OCEL:
         try:
             set_utc(connection)
             ocel = cls(connection)
-            # Each table goes in through its manager, which projects it back onto
-            # the stored layout. Objects first: the object changes are stored with
-            # one column per object attribute, so that table has to exist already.
             ocel.objects.table = objects
             ocel.events.table = events
             ocel.e2o.table = relations
             ocel.o2o.table = (
                 o2o
                 if o2o is not None
-                else pd.DataFrame(columns=[O2O_SOURCE_ID, O2O_TARGET_ID, O2O_QUALIFIER])
+                else pl.DataFrame(
+                    schema={
+                        O2O_SOURCE_ID: pl.String,
+                        O2O_TARGET_ID: pl.String,
+                        O2O_QUALIFIER: pl.String,
+                    }
+                )
             )
             ocel.objects.changes_table = (
                 object_changes
                 if object_changes is not None
-                else pd.DataFrame(columns=OBJECT_CHANGES_DF_COLS)
+                else pl.DataFrame(
+                    schema={
+                        OID_COL: pl.String,
+                        OTYPE_COL: pl.String,
+                        TIMESTAMP_COL: pl.Datetime(time_zone="UTC"),
+                        OBJECT_CHANGED_FIELD: pl.String,
+                    }
+                )
             )
             if quantityExtension is not None:
                 oqty, qop, properties = quantityExtension
@@ -415,7 +425,7 @@ class OCEL:
 
     @staticmethod
     def read_xes(path: str | PathLike, fallback_object_name: str = "LogObject") -> OCEL:
-        return OCEL.from_pm4py(create_ocel_from_xml(str(path), fallback_object_name))
+        return create_ocel_from_xml(str(path), fallback_object_name)
 
     # ------------------------------------------------------------------
     # PM4PY interop

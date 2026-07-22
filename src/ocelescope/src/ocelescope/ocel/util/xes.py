@@ -1,12 +1,9 @@
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import orjson
-import pandas as pd
 import pm4py
 import polars as pl
 import r4pm
-from pm4py.objects.ocel.obj import OCEL as PM4PYOCEL
 
 from ocelescope.ocel.constants.pm4py import (
     ACTIVITY_COL,
@@ -16,6 +13,7 @@ from ocelescope.ocel.constants.pm4py import (
     OTYPE_COL,
     TIMESTAMP_COL,
 )
+from ocelescope.ocel.filter.filters.entity_type import ObjectTypeFilter
 
 if TYPE_CHECKING:
     from ocelescope.ocel.core.ocel import OCEL
@@ -28,34 +26,33 @@ RENAME_MAP = {
     f"case:{OTYPE_COL}": OTYPE_COL,
 }
 
-SPECIAL_NAMES = ["concept:name", "time:timestamp", OTYPE_COL]
 
+def create_ocel_from_xml(path: str, fallback_object_name: str = "LogObject") -> "OCEL":
+    from ocelescope.ocel.core.ocel import OCEL
 
-def create_ocel_from_xml(path: str, fallback_object_name: str = "LogObject") -> pm4py.OCEL:
-
-    log, meta = r4pm.df.import_xes(path)
-
-    meta = orjson.loads(meta)
-
-    global_cols = [
-        attr["key"] for attr in meta.get("global_trace_attrs") if attr["key"] not in SPECIAL_NAMES
-    ]
-
-    event_cols = [
-        attr["key"] for attr in meta.get("global_event_attrs") if attr["key"] not in SPECIAL_NAMES
-    ]
+    log, _meta = r4pm.df.import_xes(path)
 
     log = log.rename({**RENAME_MAP}, strict=False)
+
+    global_cols = [col.removeprefix("case:") for col in log.columns if col.startswith("case:")]
+
+    event_cols = [
+        col
+        for col in log.columns
+        if not col.startswith("case:")
+        and col not in (EID_COL, OID_COL, ACTIVITY_COL, TIMESTAMP_COL, OTYPE_COL)
+    ]
+
+    log = log.with_columns(
+        pl.col(col).cast(pl.String) for col in (OID_COL, EID_COL) if col in log.columns
+    )
 
     if OTYPE_COL not in log.columns:
         log = log.with_columns(pl.lit(fallback_object_name).alias(OTYPE_COL))
     elif fallback_object_name is not None:
         log = log.with_columns(pl.col(OTYPE_COL).fill_null(fallback_object_name))
 
-    if EID_COL not in event_cols:
-        if EID_COL in log.columns:
-            log = log.drop(EID_COL)
-
+    if EID_COL not in log.columns:
         log = log.with_row_index(EID_COL).with_columns(
             (
                 pl.col(ACTIVITY_COL)
@@ -73,44 +70,34 @@ def create_ocel_from_xml(path: str, fallback_object_name: str = "LogObject") -> 
         .rename({f"case:{col}": col for col in global_cols})
     )
 
-    event_table = log.select(event_cols + [EID_COL, ACTIVITY_COL, TIMESTAMP_COL])
+    event_table = log.select(event_cols + [EID_COL, ACTIVITY_COL, TIMESTAMP_COL]).unique(
+        subset=[EID_COL]
+    )
 
     e2o_table = log.select([EID_COL, OTYPE_COL, ACTIVITY_COL, OID_COL, TIMESTAMP_COL]).with_columns(
         pl.lit(None, dtype=pl.String).alias(E2O_QUALIFIER)
     )
 
-    return pm4py.OCEL(
-        events=event_table.to_pandas(),
-        objects=object_table.to_pandas(),
-        relations=e2o_table.to_pandas(),
+    return OCEL.from_frames(
+        events=event_table,
+        objects=object_table,
+        relations=e2o_table,
     )
 
 
 def write_ocel_to_xes(ocel: "OCEL", object_type: str, path: str | Path):
-    attr = (
-        ocel.objects.attribute_states(object_types=[object_type])
+
+    filtered_ocel = ocel.filter([ObjectTypeFilter(object_types=[object_type], mode="include")])
+
+    filtered_ocel.objects.df = (
+        filtered_ocel.objects.attribute_states()
         .sort_values([TIMESTAMP_COL, OID_COL])
-        .drop_duplicates(subset=OID_COL, keep="last")
-        .set_index([OID_COL])
-    )[ocel.objects.dynamic_attribute_names].dropna(axis=1, how="all")
-
-    objects = ocel.objects.df.set_index(OID_COL)
-
-    missing_col = [col for col in attr.columns if col not in objects.columns]
-    objects[missing_col] = pd.NA
-    objects.update(attr)
-
-    base = ocel.ocel
-    flattening_ocel = PM4PYOCEL(
-        events=base.events,
-        objects=objects.reset_index(),
-        relations=base.relations,
-        o2o=base.o2o,
-        object_changes=base.object_changes,
+        .drop_duplicates([OID_COL], keep="last")
+        .drop(TIMESTAMP_COL, axis=1)
     )
 
     pm4py.write_xes(
-        pm4py.ocel_flattening(flattening_ocel, object_type),
+        pm4py.ocel_flattening(filtered_ocel.ocel, object_type),
         str(path),
         variant_str="r4pm/rustxes",
     )
