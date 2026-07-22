@@ -4,15 +4,12 @@ import { PlusIcon, XIcon } from "lucide-react";
 import type { DataTableColumn } from "mantine-datatable";
 import { useMemo, useState } from "react";
 import { type Control, useFieldArray } from "react-hook-form";
-import type {
-  NativeEventAttributeFilter,
-  NativeObjectAttributeFilter,
-} from "../api/base";
+import type { EventAttributeFilter, ObjectAttributeFilter } from "../api/base";
 import { AttributeInputField } from "../components/inputs/AttributeInputField";
 import type { GroupedFilter } from "../types/filter";
 
 type FilterRecord = Omit<
-  NativeEventAttributeFilter | NativeObjectAttributeFilter,
+  EventAttributeFilter | ObjectAttributeFilter,
   "target_type" | "type" | "attribute"
 >;
 

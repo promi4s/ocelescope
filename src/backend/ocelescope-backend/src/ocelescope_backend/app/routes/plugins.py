@@ -125,8 +125,7 @@ def save_plugin_results(
         name = default_result_name(plugin_id, method_name, index)
 
         if isinstance(entity, OCEL):
-            entity.meta.extra["name"] = name
-            saved.ocel_ids.append(session.add_ocel(entity))
+            saved.ocel_ids.append(session.add_ocel(entity, name))
         else:
             saved.resource_ids.append(
                 session.add_resource(
@@ -260,7 +259,7 @@ def delete_plugin(plugin_id: str, session: ApiSession):
     sse_manager.send_safe(
         session.id,
         InvalidationRequest(
-            routes=["plugins"],
+            routes=["plugins", "discoveryMethods"],
         ),
     )
 

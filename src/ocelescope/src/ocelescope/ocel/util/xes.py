@@ -101,8 +101,6 @@ def write_ocel_to_xes(ocel: "OCEL", object_type: str, path: str | Path):
     objects[missing_col] = pd.NA
     objects.update(attr)
 
-    # Build a dedicated PM4PY OCEL with the enriched object table for flattening,
-    # so the OCEL's own DataFrames are left untouched.
     base = ocel.ocel
     flattening_ocel = PM4PYOCEL(
         events=base.events,

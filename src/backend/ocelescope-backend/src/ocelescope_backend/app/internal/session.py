@@ -1,15 +1,20 @@
 from __future__ import annotations
 
 import json
-import uuid
+import tempfile
+from datetime import datetime
+from pathlib import Path
 from typing import Any, Callable, Hashable, Sequence, Type, TypeVar, cast
+from uuid import uuid4
 
-from ocelescope import OCEL
+from ocelescope.ocel.extensions.base_extension import OCELExtension
+from ocelescope.ocel.io import convert_ocel_duckdb
+
+from ocelescope import OCEL, BaseFilter
 from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.model.ocel import SessionOCEL
 from ocelescope_backend.app.internal.model.resource import ResourceApi, ResourceStore
 from ocelescope_backend.app.internal.tasks.base import TaskBase
-from ocelescope_backend.app.modules.base import ModuleFilter
 from ocelescope_backend.app.sse_manager import InvalidationRequest, sse_manager
 
 S = TypeVar("S", bound=TaskBase)
@@ -23,7 +28,7 @@ class Session:
         self,
         id: str | None = None,
     ):
-        self.id = id or str(uuid.uuid4())
+        self.id = id or str(uuid4())
 
         # Tasks
         self._tasks: dict[str, TaskBase] = {}
@@ -38,6 +43,7 @@ class Session:
 
         # OCELS
         self.ocels: dict[str, SessionOCEL] = {}
+        self._ocel_dir = Path(tempfile.mkdtemp(prefix=f"ocelescope_{self.id}_"))
 
         self.response_cache: dict[str, Any] = {}
         # Set first state to UUID, to be updated on each response
@@ -87,43 +93,100 @@ class Session:
         )
 
     def update_state(self):
-        self.state = str(uuid.uuid4())
+        self.state = str(uuid4())
 
     # region OCEL management
-    def add_ocel(self, ocel: OCEL) -> str:
-        self.ocels[ocel.meta.id] = SessionOCEL(ocel)
-
+    def _register_ocel(
+        self,
+        id: str,
+        db_path: Path,
+        name: str,
+        created_at: str,
+        extensions: list[OCELExtension] | None = None,
+    ) -> str:
+        self.ocels[id] = SessionOCEL(
+            id=id,
+            db_path=db_path,
+            name=name,
+            created_at=created_at,
+            extensions=extensions,
+        )
         sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
+        return id
 
-        return ocel.meta.id
+    def add_ocel(self, ocel: OCEL, name: str) -> str:
+        """Persist an in-memory OCEL to a DuckDB file and register a handle."""
+        ocel_id = str(uuid4())
+
+        db_path = self._ocel_dir / f"{ocel_id}.duckdb"
+        ocel.to_duckdb(db_path)
+
+        return self._register_ocel(
+            ocel_id,
+            db_path,
+            name,
+            created_at=datetime.now().isoformat(),
+            extensions=ocel.extensions.all(),
+        )
+
+    def add_ocel_from_file(self, source_path: Path, name: str, created_at: str) -> str:
+        """Stream an OCEL file straight into a DuckDB file without materializing it."""
+        ocel_id = str(uuid4())
+        db_path = self._ocel_dir / f"{ocel_id}.duckdb"
+        convert_ocel_duckdb(source_path, db_path)
+
+        return self._register_ocel(ocel_id, db_path, name=name, created_at=created_at)
+
+    def set_ocel_extensions(self, ocel_id: str, extensions: list[OCELExtension]):
+        """Attach in-memory extension instances to an already registered OCEL."""
+        if ocel_id not in self.ocels:
+            raise NotFound(f"OCEL with id {ocel_id} not found")
+
+        self.ocels[ocel_id].extensions = extensions
+        sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
 
     def get_ocel(self, ocel_id: str, use_original: bool = False) -> OCEL:
         if ocel_id not in self.ocels:
             raise NotFound(f"OCEL with id {ocel_id} not found")
 
-        return (
-            self.ocels[ocel_id].ocel if not use_original else self.ocels[ocel_id].origin
-        )
+        return self.ocels[ocel_id].ocel(use_original=use_original)
+
+    def export_ocel(
+        self, ocel_id: str, target_path: Path, use_original: bool = False
+    ) -> None:
+        """Stream an OCEL to a file straight from its DuckDB store (no full load)."""
+        if ocel_id not in self.ocels:
+            raise NotFound(f"OCEL with id {ocel_id} not found")
+
+        self.ocels[ocel_id].export(target_path, use_original=use_original)
+
+    def rename_ocel(self, ocel_id: str, new_name: str):
+        if ocel_id not in self.ocels:
+            raise NotFound(f"OCEL with id {ocel_id} not found")
+
+        self.ocels[ocel_id].name = new_name
+        sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
 
     def delete_ocel(self, ocel_id: str):
-        if ocel_id not in self.ocels:
+        handle = self.ocels.pop(ocel_id, None)
+        if handle is None:
             return
 
-        self.ocels.pop(ocel_id, None)
+        handle.delete()
         sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
 
     # endregion
     # region Resource management
     def get_filter(
         self, ocel_id: str, module_source: str | None = None
-    ) -> list[ModuleFilter]:
+    ) -> list[BaseFilter]:
         if ocel_id not in self.ocels:
             raise NotFound(f"OCEL with id {ocel_id} not found")
 
         return self.ocels[ocel_id].get_filters(module_source)
 
     def set_filter(
-        self, ocel_id: str, module_source: str, pipeline: Sequence[ModuleFilter]
+        self, ocel_id: str, module_source: str, pipeline: Sequence[BaseFilter]
     ):
         if ocel_id not in self.ocels:
             raise NotFound(f"OCEL with id {ocel_id} not found")
@@ -133,7 +196,7 @@ class Session:
     # endregion
     # region Resource management
     def add_resource(self, resource: ResourceStore) -> str:
-        id = str(uuid.uuid4())
+        id = str(uuid4())
 
         self._resources[id] = resource
 

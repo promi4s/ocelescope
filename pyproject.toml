@@ -4,7 +4,10 @@ version = "0.1.0"
 description = "Workspace for ocelescope package"
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = ["ocelescope-module-ocelot>=0.1.0"]
+dependencies = [
+  "ocelescope-module-ocel>=0.1.0",
+  "ocelescope-module-ocelot>=0.1.1",
+]
 
 [tool.uv.workspace]
 members = [
@@ -12,6 +15,9 @@ members = [
   "src/backend/ocelescope-backend",
   "src/backend/modules/*",
 ]
+
+[tool.uv.sources]
+ocelescope-module-ocel = { workspace = true }
 
 [tool.ruff.lint]
 ignore = ["E731"]
@@ -28,7 +34,7 @@ dev = [{ include-group = "lint" }, { include-group = "typecheck" }]
 
 lint = ["ruff>=0.15.7"]
 
-typecheck = ["ty>=0.0.51"]
+typecheck = ["lxml-stubs>=0.5.1", "ty>=0.0.51"]
 
 docs = [
   "mkdocs>=1.6.1",

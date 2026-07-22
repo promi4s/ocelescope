@@ -49,10 +49,18 @@ const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
   });
 
   const {
-    data: methods = [],
+    data: rawMethods = [],
     isLoading: isMethodsLoading,
     error: methodsError,
   } = useListDiscoveryMethods();
+
+  const methods = useMemo(
+    () =>
+      rawMethods
+        .map((m) => ({ ...m, variants: m.variants.filter((v) => v.enabled) }))
+        .filter((m) => m.variants.length),
+    [rawMethods],
+  );
 
   const { data: availableFilters = [] } = useListDiscoveryFilters();
 
@@ -74,6 +82,23 @@ const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
       })),
     );
   }, [filtersInitialized, availableFilters, ocelId, initializeFilters]);
+
+  // Clear selection if the selected method was disabled/removed
+  useEffect(() => {
+    if (!selectedMethodId || isMethodsLoading) return;
+    const allVariantIds = methods.flatMap((m) =>
+      m.variants.map((v) => v.methodId),
+    );
+    if (!allVariantIds.includes(selectedMethodId)) {
+      setSelectedMethodId(ocelId, null);
+    }
+  }, [
+    methods,
+    selectedMethodId,
+    isMethodsLoading,
+    ocelId,
+    setSelectedMethodId,
+  ]);
 
   // Auto-select first method only if nothing was restored
   useEffect(() => {
@@ -163,25 +188,15 @@ const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
     [activeFormData],
   );
 
-  const activeFilters = useMemo(
-    () =>
-      filters.filter((entry) =>
-        Object.values(entry.payload).every(
-          (v) => !Array.isArray(v) || v.length > 0,
-        ),
-      ),
-    [filters],
-  );
-
   const requestSignature = useMemo(
     () =>
       JSON.stringify({
         selectedMethodId,
         requestPayload,
         ocelId,
-        filters: activeFilters,
+        filters: filters,
       }),
-    [ocelId, requestPayload, selectedMethodId, activeFilters],
+    [ocelId, requestPayload, selectedMethodId, filters],
   );
 
   useEffect(() => {
@@ -192,7 +207,7 @@ const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
         data: {
           methodId: selectedMethodId,
           parameters: requestPayload,
-          filters: activeFilters,
+          filters: filters,
         },
       });
     }, 650);
@@ -203,7 +218,7 @@ const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
     requestSignature,
     requestPayload,
     selectedMethodId,
-    activeFilters,
+    filters,
   ]);
 
   const isDiscovering =

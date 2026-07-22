@@ -16,8 +16,8 @@ const MantineSliderWidget = ({
   label,
   required,
 }: WidgetProps) => {
-  const min = schema.minimum as number;
-  const max = schema.maximum as number;
+  const min = (schema.minimum ?? schema.exclusiveMinimum) as number;
+  const max = (schema.maximum ?? schema.exclusiveMaximum) as number;
   const description = schema.description;
   return (
     <>
@@ -84,8 +84,8 @@ const buildUiSchema = (schema: DiscoverySchema) => {
       uiSchema[key] = { "ui:field": prop.fieldType };
     } else if (
       (prop.type === "number" || prop.type === "integer") &&
-      prop.minimum !== undefined &&
-      prop.maximum !== undefined
+      (prop.minimum !== undefined || prop.exclusiveMinimum !== undefined) &&
+      (prop.maximum !== undefined || prop.exclusiveMaximum !== undefined)
     ) {
       uiSchema[key] = { "ui:widget": "mantine-slider" };
     }

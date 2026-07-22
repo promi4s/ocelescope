@@ -3,16 +3,14 @@ import shutil
 import sys
 from typing import Any, Dict
 
+from ocelescope.discovery import algorithms
 from typing_extensions import TypedDict
 
 from ocelescope import DirectlyFollowsGraph, PetriNet, Plugin, Resource
-
 from ocelescope_backend.app.internal.config import config
-from ocelescope_backend.app.internal.discovery import (
-    register_discovery_methods_from_module,
-)
 from ocelescope_backend.app.internal.model.plugin import PluginApi
 from ocelescope_backend.app.internal.model.resource import ResourceStore
+from ocelescope_backend.app.internal.registry.discovery import DiscoveryRegistry
 from ocelescope_backend.app.internal.registry.extension import ExtensionRegistry
 from ocelescope_backend.app.internal.registry.plugin import PluginRegistry
 from ocelescope_backend.app.internal.registry.resource import ResourceRegistry
@@ -34,7 +32,13 @@ class RegistryManager:
         self._plugin_registry = PluginRegistry()
         self._resource_registry = ResourceRegistry()
         self._extension_registry = ExtensionRegistry()
+        self._discovery_registry = DiscoveryRegistry()
         self._register_core_resources()
+        self._discovery_registry.register(algorithms)
+
+    @property
+    def discovery_registry(self) -> DiscoveryRegistry:
+        return self._discovery_registry
 
     def _register_core_resources(self):
         for resource_class in (PetriNet, DirectlyFollowsGraph):
@@ -153,7 +157,7 @@ class RegistryManager:
                                     id, resource_type
                                 )
 
-                        for info in register_discovery_methods_from_module(module):
+                        for info in self._discovery_registry.register(module):
                             self._resource_registry.register_resource(
                                 id, info.resource_type
                             )
@@ -177,6 +181,7 @@ class RegistryManager:
             self._plugin_registry.unload_module(id)
             self._extension_registry.unload_module(id)
             self._resource_registry.unload_module(id)
+            self._discovery_registry.unload_module(id)
 
     def get_resource_info(self) -> Dict[str, ResourceInfo]:
         return {

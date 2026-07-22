@@ -43,7 +43,7 @@ class ErrorNotification(BaseModel):
 
 class InvalidationRequest(BaseModel):
     type: Literal["invalidation"] = "invalidation"
-    routes: list[Literal["resources", "ocels", "tasks", "plugins"]]
+    routes: list[Literal["resources", "ocels", "tasks", "plugins", "discoveryMethods"]]
 
 
 SSEMessage = Annotated[

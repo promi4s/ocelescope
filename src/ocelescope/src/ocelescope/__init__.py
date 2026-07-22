@@ -14,7 +14,6 @@ from ocelescope.ocel import (
     ObjectTypeFrequencyFilter,
     OCELExtension,
     TimeFrameFilter,
-    VariantFilter,
 )
 from ocelescope.plugin import (
     COMPUTED_SELECTION,
@@ -66,7 +65,6 @@ __all__ = [
     "ObjectTypeFilter",
     "ObjectTypeFrequencyFilter",
     "TimeFrameFilter",
-    "VariantFilter",
     "Visualization",
     "PetriNet",
     "DirectlyFollowsGraph",

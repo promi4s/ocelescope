@@ -31,6 +31,8 @@ class DiscoveryVariant(ApiBaseModel):
     resource_type: str
     input_schema: dict[str, Any]
     description: str | None = None
+    plugin_id: str | None = None
+    enabled: bool = True
 
 
 class DiscoveryMethodMeta(ApiBaseModel):

@@ -48,6 +48,6 @@
     "typescript": "catalog:"
   },
   "dependencies": {
-    "orval": "^8.4.0"
+    "orval": "catalog:"
   }
 }
