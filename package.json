@@ -27,7 +27,8 @@
     "docker:up": "docker compose -f docker-compose.yml up --build",
     "docker:down": "docker compose down",
     "spellcheck": "cspell \"README.md\" \"CONTRIBUTING.md\" \"docs/**/*.md\" \".github/**/*.yml\" \"src/**/*.py\" \"src/**/*.ts\" \"src/**/*.tsx\" --no-progress --no-must-find-files",
-    "notebook": "uv run --with jupyterlab --with jupyter-ruff jupyter lab notebooks/"
+    "notebook": "uv run --with jupyterlab --with jupyter-ruff jupyter lab notebooks/",
+    "version:bump": "uv run scripts/bump_version.py"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.5",

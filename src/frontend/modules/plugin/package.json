@@ -1,7 +1,7 @@
 {
   "name": "@ocelescope/plugin",
   "type": "module",
-  "version": "0.1.2",
+  "version": "0.5.0",
   "description": "A module for inspections of OCELs",
   "author": "Görkem-Emre Öztürk <goerkem.oeztuerk@rwth-aachen.de>",
   "license": "MIT",

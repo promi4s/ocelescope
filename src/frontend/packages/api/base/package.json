@@ -1,7 +1,7 @@
 {
   "name": "@ocelescope/api-base",
   "type": "module",
-  "version": "0.2.0",
+  "version": "0.5.0",
   "description": "Generated, type-safe client + hooks for the Ocelescope Base backend.",
   "author": "Görkem-Emre Öztürk <goerkem.oeztuerk@rwth-aachen.de>",
   "license": "MIT",
@@ -37,9 +37,9 @@
   "peerDependencies": {
     "@ocelescope/api-client": "workspace:^",
     "@tanstack/react-query": "catalog:",
+    "axios": "catalog:",
     "react": "catalog:",
-    "react-dom": "catalog:",
-    "axios": "catalog:"
+    "react-dom": "catalog:"
   },
   "devDependencies": {
     "@ocelescope/api-config": "workspace:^",
