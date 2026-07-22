@@ -1,7 +1,7 @@
 {
   "name": "@ocelescope/discovery",
   "type": "module",
-  "version": "0.1.2",
+  "version": "0.5.0",
   "description": "A module for discovery of OCELs",
   "author": "Sebastian Menne <sebastian.menne@rwth-aachen.de>",
   "license": "MIT",

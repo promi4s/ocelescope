@@ -1814,7 +1814,7 @@ wheels = [
 
 [[package]]
 name = "ocelescope"
-version = "0.4.0"
+version = "0.5.0"
 source = { editable = "src/ocelescope" }
 dependencies = [
     { name = "cachetools" },
@@ -1876,7 +1876,7 @@ dev = [{ name = "pyarrow-stubs", specifier = ">=20.0.0.20260625" }]
 
 [[package]]
 name = "ocelescope-backend"
-version = "0.2.0"
+version = "0.5.0"
 source = { editable = "src/backend/ocelescope-backend" }
 dependencies = [
     { name = "cachetools" },
@@ -1909,7 +1909,7 @@ requires-dist = [
 
 [[package]]
 name = "ocelescope-module-filter"
-version = "0.2.0"
+version = "0.5.0"
 source = { editable = "src/backend/modules/ocelescope-module-filter" }
 dependencies = [
     { name = "fastapi" },
@@ -1926,7 +1926,7 @@ requires-dist = [
 
 [[package]]
 name = "ocelescope-module-ocel"
-version = "0.1.0"
+version = "0.5.0"
 source = { editable = "src/backend/modules/ocelescope-module-ocel" }
 dependencies = [
     { name = "fastapi" },
@@ -1957,7 +1957,7 @@ wheels = [
 
 [[package]]
 name = "ocelescope-workspace"
-version = "0.1.0"
+version = "0.5.0"
 source = { virtual = "." }
 dependencies = [
     { name = "ocelescope-module-ocel" },

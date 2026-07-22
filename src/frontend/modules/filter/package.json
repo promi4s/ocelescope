@@ -1,7 +1,7 @@
 {
   "name": "@ocelescope/filter",
   "type": "module",
-  "version": "0.2.0",
+  "version": "0.5.0",
   "description": "A module for basic filtering of OCELs",
   "author": "Görkem-Emre Öztürk <goerkem.oeztuerk@rwth-aachen.de>",
   "license": "MIT",
@@ -47,12 +47,12 @@
     "dayjs": "catalog:",
     "lucide-react": "catalog:",
     "mantine-datatable": "catalog:",
+    "next": "catalog:",
+    "object-hash": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-hook-form": "catalog:",
-    "recharts": "catalog:",
-    "object-hash": "catalog:",
-    "next": "catalog:"
+    "recharts": "catalog:"
   },
   "devDependencies": {
     "@mantine/notifications": "catalog:",

@@ -1,7 +1,7 @@
 {
   "name": "@ocelescope/management",
   "type": "module",
-  "version": "0.1.2",
+  "version": "0.5.0",
   "description": "A tool for managing Resources and OCEL",
   "author": "Görkem-Emre Öztürk <goerkem.oeztuerk@rwth-aachen.de>",
   "license": "MIT",
@@ -33,13 +33,13 @@
   },
   "peerDependencies": {
     "@mantine/core": "catalog:",
-    "mantine-datatable": "catalog:",
+    "@marko19907/string-to-color": "*",
     "@ocelescope/api-base": "workspace:^",
     "@ocelescope/core": "workspace:^",
-    "@marko19907/string-to-color": "*",
     "@ocelescope/resources": "workspace:^",
     "dayjs": "catalog:",
     "lucide-react": "catalog:",
+    "mantine-datatable": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"
   },
