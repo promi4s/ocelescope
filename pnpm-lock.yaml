@@ -46,8 +46,8 @@ catalogs:
       specifier: ^0.1.3
       version: 0.1.3
     '@r4pm/components':
-      specifier: ^0.1.1
-      version: 0.1.1
+      specifier: ^0.2.0
+      version: 0.2.0
     '@rjsf/core':
       specifier: ^6.7.0
       version: 6.7.0
@@ -685,7 +685,7 @@ importers:
         version: link:../../packages/resources
       '@r4pm/components':
         specifier: 'catalog:'
-        version: 0.1.1(@tanstack/react-query@5.90.21(react@19.2.7))(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(plotly.js@3.4.0(mapbox-gl@1.13.3))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 0.2.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(plotly.js@3.4.0(mapbox-gl@1.13.3))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@tanstack/react-query':
         specifier: 'catalog:'
         version: 5.90.21(react@19.2.7)
@@ -2145,10 +2145,9 @@ packages:
   '@quansync/fs@1.0.0':
     resolution: {integrity: sha512-4TJ3DFtlf1L5LDMaM6CanJ/0lckGNtJcMjQ1NAV6zDmA0tEHKZtxNKin8EgPaVX1YzljbxckyT2tJrpQKAtngQ==}
 
-  '@r4pm/components@0.1.1':
-    resolution: {integrity: sha512-c3KXEZU+tFI6N9dpcB5zGJdoVTaYxhNiNotK/AZD2Vl2+LSFcxOoR0mZqhSkfDILIDQYUGw2go+ZLnwIIv/rdQ==}
+  '@r4pm/components@0.2.0':
+    resolution: {integrity: sha512-XXXeR9Mj4IdLoBvdZUv9bltKkQN4P5aPETOATSqixNPa2/Rxcq55Hr7P6G36ZvZI27sMCj+5TiLKwbUtk03GSA==}
     peerDependencies:
-      '@tanstack/react-query': '>=5'
       react: '>=18'
       react-dom: '>=18'
 
@@ -6759,10 +6758,9 @@ snapshots:
     dependencies:
       quansync: 1.0.0
 
-  '@r4pm/components@0.1.1(@tanstack/react-query@5.90.21(react@19.2.7))(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(plotly.js@3.4.0(mapbox-gl@1.13.3))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@r4pm/components@0.2.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(plotly.js@3.4.0(mapbox-gl@1.13.3))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
       '@radix-ui/themes': 3.3.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/react-query': 5.90.21(react@19.2.7)
       '@tanstack/react-virtual': 3.14.5(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@xyflow/react': 12.11.1(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(immer@11.1.11)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       elkjs: 0.10.2
