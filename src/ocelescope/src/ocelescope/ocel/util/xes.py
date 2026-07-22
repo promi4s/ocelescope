@@ -88,8 +88,7 @@ def create_ocel_from_xml(path: str, fallback_object_name: str = "LogObject") -> 
 
 def write_ocel_to_xes(ocel: "OCEL", object_type: str, path: str | Path):
     attr = (
-        ocel.objects.object_attr_changes(object_types=[object_type])
-        .reset_index()
+        ocel.objects.attribute_states(object_types=[object_type])
         .sort_values([TIMESTAMP_COL, OID_COL])
         .drop_duplicates(subset=OID_COL, keep="last")
         .set_index([OID_COL])

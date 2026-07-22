@@ -256,90 +256,74 @@ class ObjectsManager(BaseManager):
         dynamic = set(self.dynamic_attribute_names)
         return [name for name in self.attribute_names if name not in dynamic]
 
-    def object_attr_changes(
+    def attribute_states(
         self,
-        object_types: Iterable[Any] | None = None,
-        objects: Iterable[Any] | None = None,
-        attributes: Iterable[Any] | None = None,
+        object_types: Iterable[str] | None = None,
+        attributes: Iterable[str] | None = None,
     ) -> pd.DataFrame:
         """
-        Return dynamic object attributes over time.
+        Return every object's full attribute state at every change timestamp.
 
-        Filters `object_changes` by object type and/or object id, forward-fills
-        attribute values per object, and returns one row per `(object_id, timestamp)`.
-
-        Filtering, forward-filling and de-duplication all happen in DuckDB, so only
-        the resulting rows are read. A change row holds a single attribute's new
-        value, so forward-filling is what turns the log's one-attribute-at-a-time
-        rows into the object's full state at each point in time.
-
-        Where several attributes change at the same timestamp the log has one row
-        each, and only the last is kept -- forward-filling makes that the one row
-        carrying all of them.
+        One row per (object, change timestamp), one column per attribute, each
+        carrying the attribute's value at that moment -- the value written
+        then, or the last earlier one carried forward, starting from the
+        initial values in the objects table.
 
         Args:
-            object_types: Optional object types to include.
-            objects: Optional object ids to include.
-            attributes: Optional dynamic attribute names to include. If omitted, all
-                dynamic attributes are returned.
+            object_types: Object types to include. None means all, an empty
+                iterable means none.
+            attributes: Attribute names to include. None means all; unknown
+                names are ignored.
 
         Returns:
-            pandas.DataFrame: DataFrame indexed by `(ocel:oid, ocel:timestamp)` with
-            the selected dynamic attribute columns and the object type column
-            (`ocel:type`).
+            DataFrame: A pandas DataFrame with ``ocel:oid``, ``ocel:type``,
+            ``ocel:timestamp`` and the selected attribute columns.
         """
-        attr_cols = [
-            attr_name
-            for attr_name in self.dynamic_attribute_names
-            if attributes is None or attr_name in attributes
-        ]
+        oid, ts, otype = ident(OID_COL), ident(TIMESTAMP_COL), ident(OTYPE_COL)
 
+        type_filter = ""
         params: list[object] = []
-        conditions: list[str] = []
+        if object_types is not None:
+            type_filter = f"WHERE list_contains(?, {otype})"
+            params = [list(object_types)]
 
-        def add_filter(column: str, values: Iterable[Any] | None) -> None:
-            """Restrict ``column`` to ``values``; None = no filter, empty = nothing."""
-            if values is None:
-                return
-            wanted = list(values)
-            if not wanted:
-                conditions.append("false")
-                return
-            params.extend(wanted)
-            conditions.append(f"{column} IN ({', '.join(['?'] * len(wanted))})")
+        if attributes is None:
+            kept = self.attribute_names
+            object_cols, change_cols = f"* EXCLUDE ({otype})", "*"
+        else:
+            keep = set(attributes)
+            kept = [n for n in self.attribute_names if n in keep]
+            dynamic = [n for n in self.dynamic_attribute_names if n in keep]
+            object_cols = ", ".join([oid, *map(ident, kept)])
+            change_cols = ", ".join([oid, ts, *map(ident, dynamic)])
 
-        add_filter(f'o."{OTYPE_COL}"', object_types)
-        add_filter(f'c."{OID_COL}"', objects)
-        where = ("WHERE " + " AND ".join(conditions)) if conditions else ""
+        collapse = f", any_value(COLUMNS(* EXCLUDE ({oid}, {ts})))" if kept else ""
+        fill = f", last_value(COLUMNS(* EXCLUDE ({oid}, {ts})) IGNORE NULLS) OVER w" if kept else ""
+        selected = f", s.* EXCLUDE ({oid}, {ts})" if kept else ""
 
-        # _rn pins the stored order, to break ties between changes to the same
-        # object at the same timestamp -- for the fill order and the row kept.
-        selected = "".join(f", c.{ident(name)}" for name in attr_cols)
-        source = (
-            f'SELECT c."{OID_COL}", c."{TIMESTAMP_COL}", o."{OTYPE_COL}"{selected}, '
-            f"row_number() OVER () AS _rn "
-            f"FROM {OBJECT_CHANGES_TABLE} c "
-            f'JOIN {OBJECTS_TABLE} o ON c."{OID_COL}" = o."{OID_COL}" {where}'
-        )
-
-        filled = "".join(
-            f", last_value({ident(name)} IGNORE NULLS) OVER w AS {ident(name)}"
-            for name in attr_cols
-        )
-        query = (
-            f"WITH source AS ({source}), "
-            f'filled AS (SELECT "{OID_COL}", "{TIMESTAMP_COL}", "{OTYPE_COL}", _rn{filled} '
-            f"FROM source "
-            f'WINDOW w AS (PARTITION BY "{OID_COL}" ORDER BY "{TIMESTAMP_COL}", _rn '
+        return self._relation(
+            # the objects table, cut down to the wanted types
+            f"WITH objs AS (SELECT * FROM {OBJECTS_TABLE} {type_filter}), "
+            # t0: just before the first change
+            f"bounds AS (SELECT coalesce(min({ts}), TIMESTAMP '1970-01-01') "
+            f"- INTERVAL 1 SECOND AS t0 FROM {OBJECT_CHANGES_TABLE}), "
+            # stack initial values (at t0) and changes into one stream
+            f"source AS (SELECT {object_cols}, (SELECT t0 FROM bounds) AS {ts} "
+            f"FROM objs UNION ALL BY NAME "
+            f"SELECT {change_cols} FROM {OBJECT_CHANGES_TABLE} "
+            f"WHERE {oid} IN (SELECT {oid} FROM objs)), "
+            # collapse to one row per (oid, timestamp)
+            f"collapsed AS (SELECT {oid}, {ts}{collapse} FROM source GROUP BY ALL), "
+            # forward-fill every attribute per object
+            f"states AS (SELECT {oid}, {ts}{fill} "
+            f"FROM collapsed WINDOW w AS (PARTITION BY {oid} ORDER BY {ts} "
             f"ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)) "
-            f"SELECT * EXCLUDE (_rn) FROM filled "
-            f'QUALIFY row_number() OVER (PARTITION BY "{OID_COL}", "{TIMESTAMP_COL}" '
-            f"ORDER BY _rn DESC) = 1 "
-            f'ORDER BY "{TIMESTAMP_COL}", "{OID_COL}"'
-        )
-
-        frame = self._relation(query, params).df()
-        return cast(
-            pd.DataFrame,
-            frame.set_index([OID_COL, TIMESTAMP_COL], drop=True)[attr_cols + [OTYPE_COL]],
-        )
+            # add the object type, drop the t0 rows
+            f"SELECT s.{oid}, o.{otype}, s.{ts}{selected} "
+            f"FROM states s "
+            f"JOIN objs o ON s.{oid} = o.{oid} "
+            f"CROSS JOIN bounds b "
+            f"WHERE s.{ts} > b.t0 "
+            f"ORDER BY s.{oid}, s.{ts}",
+            params,
+        ).df()
