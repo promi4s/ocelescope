@@ -4,10 +4,10 @@
 
 Ocelescope is part of a project by the Chair of Process and Data Science ([PADS](https://www.pads.rwth-aachen.de/go/id/pnbx/)) at RWTH Aachen University. 
 
-> ⚠️ **Project Status: Under Construction**
+> ⚠️ **Project Status: Active Development**
 >
-> This repository is under active development and is **not production-ready** yet.
-> Expect frequent changes, incomplete features, and potential bugs.
+> This repository is under active development.
+> Expect frequent changes, incomplete features on seperate branches, and potential bugs.
 >
 > Contributions, feedback, and testing are welcome!
 
