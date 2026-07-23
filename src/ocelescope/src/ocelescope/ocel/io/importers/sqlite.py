@@ -19,6 +19,7 @@ from ocelescope.ocel.constants.pm4py import (
     OTYPE_COL,
     TIMESTAMP_COL,
 )
+from ocelescope.ocel.constants.quantity import SQL_ITEM_PROPERTIES
 from ocelescope.ocel.constants.tables import (
     E2O_TABLE,
     EVENTS_TABLE,
@@ -27,12 +28,10 @@ from ocelescope.ocel.constants.tables import (
     OBJECTS_TABLE,
 )
 from ocelescope.ocel.io.connection import DuckDBTarget, connect_target
-from ocelescope.ocel.constants.quantity import SQL_ITEM_PROPERTIES
 from ocelescope.ocel.io.importers.quantities import import_quantities_sqlite
 from ocelescope.ocel.io.schema import (
     SchemaDefinition,
     create_ocel_tables,
-    drop_unchanged_columns,
     merge_columns,
 )
 from ocelescope.util.sql import ident, literal
@@ -262,30 +261,25 @@ def _insert_objects(con: duckdb.DuckDBPyConnection, table: _TypeTable) -> None:
 
 
 def _insert_object_changes(con: duckdb.DuckDBPyConnection, table: _TypeTable) -> None:
-    """Fill ``object_changes`` with every *non-initial* attribute value.
+    """Fill ``object_changes`` with every attribute value in the type table.
 
-    One INSERT per attribute: rows are ranked per object by time, and the
-    earliest (rank 1, the initial value already stored in ``objects``) is
-    dropped, leaving only genuine changes. Each change becomes a row carrying
-    that single attribute, matching the shape OCELWriter produces.
-
-    The rank is taken over :func:`_order_expr` so that an untimed snapshot row
-    ranks first and drops out, while the stored timestamp stays the row's real
-    one -- otherwise the snapshot would rank last, survive as a bogus change with
-    no timestamp, and push the first real change into ``objects`` in its place.
+    One INSERT per attribute: each row's non-NULL cells are fanned out into one
+    ``object_changes`` row per attribute, so a row that sets several attributes
+    at once (e.g. an initial snapshot) is split into single-attribute rows --
+    the shape OCELWriter produces. Nothing is filtered beyond that:
+    ``object_changes`` is the full value history, initial values included,
+    while ``objects`` caches each attribute's earliest value (see
+    :func:`_insert_objects`). The stored timestamp is kept as-is -- NULL when
+    the row (or the whole type table) has no time.
     """
-    if not table.time_column:  # no timestamps -> no notion of a change
-        return
-    stored_time = _timestamp_expr(table.time_column)
-    order_key = _order_expr(table.time_column)
+    stored_time = _timestamp_expr(table.time_column) if table.time_column else "NULL"
     for name, dtype in table.attributes:
         cast = _cast_expr(name, dtype)
         con.execute(
             f'INSERT INTO "{OBJECT_CHANGES_TABLE}" '
             f"({ident(OID_COL)}, {ident(TIMESTAMP_COL)}, {ident(name)}) "
             f'SELECT "ocel_id", {stored_time}, {cast} FROM src.{ident(table.name)} '
-            f"WHERE {cast} IS NOT NULL "
-            f'QUALIFY row_number() OVER (PARTITION BY "ocel_id" ORDER BY {order_key}) > 1'
+            f"WHERE {cast} IS NOT NULL"
         )
 
 
@@ -342,8 +336,6 @@ def import_ocel_sqlite(source: str | Path, target: DuckDBTarget) -> None:
             for table in object_tables:
                 _insert_objects(con, table)
                 _insert_object_changes(con, table)
-
-            drop_unchanged_columns(con)
 
             if "object_object" in present:
                 _insert(
