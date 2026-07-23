@@ -22,6 +22,7 @@
   },
   "peerDependencies": {
     "@mantine/core": "catalog:",
+    "@mantine/hooks": "catalog:",
     "@ocelescope/api-client": "workspace:^",
     "@ocelescope/charts": "workspace:^",
     "@ocelescope/core": "workspace:^",

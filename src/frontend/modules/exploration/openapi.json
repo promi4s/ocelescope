@@ -714,6 +714,86 @@
           }
         }
       }
+    },
+    "/modules/exploration/v1/ocels/{ocel_id}/queries/object-attribute-timeline": {
+      "post": {
+        "tags": [
+          "exploration"
+        ],
+        "summary": "Query Object Attribute Timeline",
+        "operationId": "queryObjectAttributeTimeline",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectAttributeTimelineQuery"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectAttributeTimelineResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1127,6 +1207,117 @@
           "grouping"
         ],
         "title": "ObjectAttributeDistributionQuery"
+      },
+      "ObjectAttributeTimelinePoint": {
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "event_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Event Id"
+          },
+          "activity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Activity"
+          }
+        },
+        "type": "object",
+        "required": [
+          "timestamp"
+        ],
+        "title": "ObjectAttributeTimelinePoint"
+      },
+      "ObjectAttributeTimelineQuery": {
+        "properties": {
+          "object_id": {
+            "type": "string",
+            "title": "Object Id"
+          },
+          "attributes": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attributes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "object_id"
+        ],
+        "title": "ObjectAttributeTimelineQuery"
+      },
+      "ObjectAttributeTimelineResponse": {
+        "properties": {
+          "object_type": {
+            "type": "string",
+            "title": "Object Type"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/ObjectAttributeTimelinePoint"
+            },
+            "type": "array",
+            "title": "Points"
+          },
+          "series": {
+            "additionalProperties": {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "type": "array"
+            },
+            "type": "object",
+            "title": "Series"
+          }
+        },
+        "type": "object",
+        "required": [
+          "object_type",
+          "points",
+          "series"
+        ],
+        "title": "ObjectAttributeTimelineResponse"
       },
       "ObjectCountPerEventRow": {
         "properties": {

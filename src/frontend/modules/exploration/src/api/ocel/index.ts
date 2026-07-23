@@ -4,10 +4,7 @@
  * OCEL
  * OpenAPI spec version: 1.0
  */
-import {
-  useMutation,
-  useQuery
-} from '@tanstack/react-query';
+
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -20,31 +17,31 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult
-} from '@tanstack/react-query';
+  UseQueryResult,
+} from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
-import { customFetch } from '../../lib/fetcher';
-export type AggregatedAttributeAnalyticalType = typeof AggregatedAttributeAnalyticalType[keyof typeof AggregatedAttributeAnalyticalType];
-
+import { customFetch } from "../../lib/fetcher";
+export type AggregatedAttributeAnalyticalType =
+  (typeof AggregatedAttributeAnalyticalType)[keyof typeof AggregatedAttributeAnalyticalType];
 
 export const AggregatedAttributeAnalyticalType = {
-  categorical: 'categorical',
-  discrete: 'discrete',
-  continuous: 'continuous',
-  temporal: 'temporal',
-  unknown: 'unknown',
+  categorical: "categorical",
+  discrete: "discrete",
+  continuous: "continuous",
+  temporal: "temporal",
+  unknown: "unknown",
 } as const;
 
-export type ValueType = typeof ValueType[keyof typeof ValueType];
-
+export type ValueType = (typeof ValueType)[keyof typeof ValueType];
 
 export const ValueType = {
-  empty: 'empty',
-  string: 'string',
-  bool: 'bool',
-  int: 'int',
-  float: 'float',
-  date: 'date',
+  empty: "empty",
+  string: "string",
+  bool: "bool",
+  int: "int",
+  float: "float",
+  date: "date",
 } as const;
 
 /**
@@ -60,7 +57,7 @@ export interface AggregatedAttribute {
   entity_type_names: string[];
 }
 
-export type DateDistributionItemEntityCount = {[key: string]: number};
+export type DateDistributionItemEntityCount = { [key: string]: number };
 
 export interface DateDistributionItem {
   start_timestamp: string;
@@ -220,15 +217,15 @@ export interface RelationCombination {
   qualifier: string;
 }
 
-export type TypedAttributeAnalyticalType = typeof TypedAttributeAnalyticalType[keyof typeof TypedAttributeAnalyticalType];
-
+export type TypedAttributeAnalyticalType =
+  (typeof TypedAttributeAnalyticalType)[keyof typeof TypedAttributeAnalyticalType];
 
 export const TypedAttributeAnalyticalType = {
-  categorical: 'categorical',
-  discrete: 'discrete',
-  continuous: 'continuous',
-  temporal: 'temporal',
-  unknown: 'unknown',
+  categorical: "categorical",
+  discrete: "discrete",
+  continuous: "continuous",
+  temporal: "temporal",
+  unknown: "unknown",
 } as const;
 
 /**
@@ -245,390 +242,410 @@ export interface TypedAttribute {
 }
 
 export type GetOcelsParams = {
-extension_name?: string | null;
+  extension_name?: string | null;
 };
 
 export type GetDefaultOcelParams = {
-only_latest_versions?: boolean;
-only_preloaded?: boolean;
+  only_latest_versions?: boolean;
+  only_preloaded?: boolean;
 };
 
 export type ImportDefaultOcelParams = {
-/**
- * Default OCEL key
- */
-key: string;
-/**
- * Dataset version (optional)
- */
-version?: string | null;
+  /**
+   * Default OCEL key
+   */
+  key: string;
+  /**
+   * Dataset version (optional)
+   */
+  version?: string | null;
 };
 
-export type GetExtensionMeta200 = {[key: string]: OCELExtensionDescription};
+export type GetExtensionMeta200 = { [key: string]: OCELExtensionDescription };
 
 export type RenameOcelParams = {
-new_name: string;
+  new_name: string;
 };
 
 export type AggregatedAttributesParams = {
-/**
- * @minimum 1
- */
-page?: number;
-page_size?: number;
-entity_type?: AggregatedAttributesEntityType;
-attribute_names?: string[] | null;
-entity_names?: string[] | null;
-drop_constant?: boolean;
-ocel_version?: AggregatedAttributesOcelVersion;
+  /**
+   * @minimum 1
+   */
+  page?: number;
+  page_size?: number;
+  entity_type?: AggregatedAttributesEntityType;
+  attribute_names?: string[] | null;
+  entity_names?: string[] | null;
+  drop_constant?: boolean;
+  ocel_version?: AggregatedAttributesOcelVersion;
 };
 
-export type AggregatedAttributesEntityType = typeof AggregatedAttributesEntityType[keyof typeof AggregatedAttributesEntityType];
-
+export type AggregatedAttributesEntityType =
+  (typeof AggregatedAttributesEntityType)[keyof typeof AggregatedAttributesEntityType];
 
 export const AggregatedAttributesEntityType = {
-  events: 'events',
-  objects: 'objects',
+  events: "events",
+  objects: "objects",
 } as const;
 
-export type AggregatedAttributesOcelVersion = typeof AggregatedAttributesOcelVersion[keyof typeof AggregatedAttributesOcelVersion] | null;
-
+export type AggregatedAttributesOcelVersion =
+  | (typeof AggregatedAttributesOcelVersion)[keyof typeof AggregatedAttributesOcelVersion]
+  | null;
 
 export const AggregatedAttributesOcelVersion = {
-  original: 'original',
-  filtered: 'filtered',
+  original: "original",
+  filtered: "filtered",
 } as const;
 
 export type ObjectAttributesParams = {
-attribute_names?: string[];
-names?: string[] | null;
-ocel_version?: ObjectAttributesOcelVersion;
+  attribute_names?: string[];
+  names?: string[] | null;
+  ocel_version?: ObjectAttributesOcelVersion;
 };
 
-export type ObjectAttributesOcelVersion = typeof ObjectAttributesOcelVersion[keyof typeof ObjectAttributesOcelVersion] | null;
-
+export type ObjectAttributesOcelVersion =
+  | (typeof ObjectAttributesOcelVersion)[keyof typeof ObjectAttributesOcelVersion]
+  | null;
 
 export const ObjectAttributesOcelVersion = {
-  original: 'original',
-  filtered: 'filtered',
+  original: "original",
+  filtered: "filtered",
 } as const;
 
 export type EventAttributesParams = {
-attribute_names?: string[];
-names?: string[] | null;
-ocel_version?: EventAttributesOcelVersion;
+  attribute_names?: string[];
+  names?: string[] | null;
+  ocel_version?: EventAttributesOcelVersion;
 };
 
-export type EventAttributesOcelVersion = typeof EventAttributesOcelVersion[keyof typeof EventAttributesOcelVersion] | null;
-
+export type EventAttributesOcelVersion =
+  | (typeof EventAttributesOcelVersion)[keyof typeof EventAttributesOcelVersion]
+  | null;
 
 export const EventAttributesOcelVersion = {
-  original: 'original',
-  filtered: 'filtered',
+  original: "original",
+  filtered: "filtered",
 } as const;
 
 export type AttributeNamesParams = {
-entity_type?: AttributeNamesEntityType;
-ocel_version?: AttributeNamesOcelVersion;
+  entity_type?: AttributeNamesEntityType;
+  ocel_version?: AttributeNamesOcelVersion;
 };
 
-export type AttributeNamesEntityType = typeof AttributeNamesEntityType[keyof typeof AttributeNamesEntityType] | null;
-
+export type AttributeNamesEntityType =
+  | (typeof AttributeNamesEntityType)[keyof typeof AttributeNamesEntityType]
+  | null;
 
 export const AttributeNamesEntityType = {
-  events: 'events',
-  objects: 'objects',
+  events: "events",
+  objects: "objects",
 } as const;
 
-export type AttributeNamesOcelVersion = typeof AttributeNamesOcelVersion[keyof typeof AttributeNamesOcelVersion] | null;
-
+export type AttributeNamesOcelVersion =
+  | (typeof AttributeNamesOcelVersion)[keyof typeof AttributeNamesOcelVersion]
+  | null;
 
 export const AttributeNamesOcelVersion = {
-  original: 'original',
-  filtered: 'filtered',
+  original: "original",
+  filtered: "filtered",
 } as const;
 
 export type ObjectTypesParams = {
-ocel_version?: ObjectTypesOcelVersion;
+  ocel_version?: ObjectTypesOcelVersion;
 };
 
-export type ObjectTypesOcelVersion = typeof ObjectTypesOcelVersion[keyof typeof ObjectTypesOcelVersion] | null;
-
+export type ObjectTypesOcelVersion =
+  | (typeof ObjectTypesOcelVersion)[keyof typeof ObjectTypesOcelVersion]
+  | null;
 
 export const ObjectTypesOcelVersion = {
-  original: 'original',
-  filtered: 'filtered',
+  original: "original",
+  filtered: "filtered",
 } as const;
 
 export type ObjectCountsParams = {
-ocel_version?: ObjectCountsOcelVersion;
+  ocel_version?: ObjectCountsOcelVersion;
 };
 
-export type ObjectCountsOcelVersion = typeof ObjectCountsOcelVersion[keyof typeof ObjectCountsOcelVersion] | null;
-
+export type ObjectCountsOcelVersion =
+  | (typeof ObjectCountsOcelVersion)[keyof typeof ObjectCountsOcelVersion]
+  | null;
 
 export const ObjectCountsOcelVersion = {
-  original: 'original',
-  filtered: 'filtered',
+  original: "original",
+  filtered: "filtered",
 } as const;
 
-export type ObjectCounts200 = {[key: string]: number};
+export type ObjectCounts200 = { [key: string]: number };
 
 export type ObjectIdsParams = {
-search?: string | null;
-size?: number;
-page?: number;
-ocel_version?: ObjectIdsOcelVersion;
+  search?: string | null;
+  size?: number;
+  page?: number;
+  ocel_version?: ObjectIdsOcelVersion;
 };
 
-export type ObjectIdsOcelVersion = typeof ObjectIdsOcelVersion[keyof typeof ObjectIdsOcelVersion] | null;
-
+export type ObjectIdsOcelVersion =
+  | (typeof ObjectIdsOcelVersion)[keyof typeof ObjectIdsOcelVersion]
+  | null;
 
 export const ObjectIdsOcelVersion = {
-  original: 'original',
-  filtered: 'filtered',
+  original: "original",
+  filtered: "filtered",
 } as const;
 
 export type ObjectVariantsParams = {
-object_type: string;
-ocel_version?: ObjectVariantsOcelVersion;
+  object_type: string;
+  ocel_version?: ObjectVariantsOcelVersion;
 };
 
-export type ObjectVariantsOcelVersion = typeof ObjectVariantsOcelVersion[keyof typeof ObjectVariantsOcelVersion] | null;
-
+export type ObjectVariantsOcelVersion =
+  | (typeof ObjectVariantsOcelVersion)[keyof typeof ObjectVariantsOcelVersion]
+  | null;
 
 export const ObjectVariantsOcelVersion = {
-  original: 'original',
-  filtered: 'filtered',
+  original: "original",
+  filtered: "filtered",
 } as const;
 
 export type ActivitiesParams = {
-ocel_version?: ActivitiesOcelVersion;
+  ocel_version?: ActivitiesOcelVersion;
 };
 
-export type ActivitiesOcelVersion = typeof ActivitiesOcelVersion[keyof typeof ActivitiesOcelVersion] | null;
-
+export type ActivitiesOcelVersion =
+  | (typeof ActivitiesOcelVersion)[keyof typeof ActivitiesOcelVersion]
+  | null;
 
 export const ActivitiesOcelVersion = {
-  original: 'original',
-  filtered: 'filtered',
+  original: "original",
+  filtered: "filtered",
 } as const;
 
 export type EventCountsParams = {
-ocel_version?: EventCountsOcelVersion;
+  ocel_version?: EventCountsOcelVersion;
 };
 
-export type EventCountsOcelVersion = typeof EventCountsOcelVersion[keyof typeof EventCountsOcelVersion] | null;
-
+export type EventCountsOcelVersion =
+  | (typeof EventCountsOcelVersion)[keyof typeof EventCountsOcelVersion]
+  | null;
 
 export const EventCountsOcelVersion = {
-  original: 'original',
-  filtered: 'filtered',
+  original: "original",
+  filtered: "filtered",
 } as const;
 
-export type EventCounts200 = {[key: string]: number};
+export type EventCounts200 = { [key: string]: number };
 
 export type EventIdsParams = {
-search?: string | null;
-size?: number;
-page?: number;
-ocel_version?: EventIdsOcelVersion;
+  search?: string | null;
+  size?: number;
+  page?: number;
+  ocel_version?: EventIdsOcelVersion;
 };
 
-export type EventIdsOcelVersion = typeof EventIdsOcelVersion[keyof typeof EventIdsOcelVersion] | null;
-
+export type EventIdsOcelVersion =
+  | (typeof EventIdsOcelVersion)[keyof typeof EventIdsOcelVersion]
+  | null;
 
 export const EventIdsOcelVersion = {
-  original: 'original',
-  filtered: 'filtered',
+  original: "original",
+  filtered: "filtered",
 } as const;
 
 export type TimeInfoParams = {
-periods?: number | null;
-freq?: string | null;
-ocel_version?: TimeInfoOcelVersion;
+  periods?: number | null;
+  freq?: string | null;
+  ocel_version?: TimeInfoOcelVersion;
 };
 
-export type TimeInfoOcelVersion = typeof TimeInfoOcelVersion[keyof typeof TimeInfoOcelVersion] | null;
-
+export type TimeInfoOcelVersion =
+  | (typeof TimeInfoOcelVersion)[keyof typeof TimeInfoOcelVersion]
+  | null;
 
 export const TimeInfoOcelVersion = {
-  original: 'original',
-  filtered: 'filtered',
+  original: "original",
+  filtered: "filtered",
 } as const;
 
 export type E2oParams = {
-direction?: E2oDirection;
-source_types?: string[] | null;
-target_types?: string[] | null;
-qualifiers?: string[] | null;
-page?: number | null;
-page_size?: number | null;
-with_qualifier?: boolean;
-drop_constant?: boolean;
-ocel_version?: E2oOcelVersion;
+  direction?: E2oDirection;
+  source_types?: string[] | null;
+  target_types?: string[] | null;
+  qualifiers?: string[] | null;
+  page?: number | null;
+  page_size?: number | null;
+  with_qualifier?: boolean;
+  drop_constant?: boolean;
+  ocel_version?: E2oOcelVersion;
 };
 
-export type E2oDirection = typeof E2oDirection[keyof typeof E2oDirection];
-
+export type E2oDirection = (typeof E2oDirection)[keyof typeof E2oDirection];
 
 export const E2oDirection = {
-  source: 'source',
-  target: 'target',
+  source: "source",
+  target: "target",
 } as const;
 
-export type E2oOcelVersion = typeof E2oOcelVersion[keyof typeof E2oOcelVersion] | null;
-
+export type E2oOcelVersion =
+  | (typeof E2oOcelVersion)[keyof typeof E2oOcelVersion]
+  | null;
 
 export const E2oOcelVersion = {
-  original: 'original',
-  filtered: 'filtered',
+  original: "original",
+  filtered: "filtered",
 } as const;
 
 export type O2oParams = {
-direction?: O2oDirection;
-source_types?: string[] | null;
-target_types?: string[] | null;
-qualifiers?: string[] | null;
-page?: number | null;
-page_size?: number | null;
-with_qualifier?: boolean;
-drop_constant?: boolean;
-ocel_version?: O2oOcelVersion;
+  direction?: O2oDirection;
+  source_types?: string[] | null;
+  target_types?: string[] | null;
+  qualifiers?: string[] | null;
+  page?: number | null;
+  page_size?: number | null;
+  with_qualifier?: boolean;
+  drop_constant?: boolean;
+  ocel_version?: O2oOcelVersion;
 };
 
-export type O2oDirection = typeof O2oDirection[keyof typeof O2oDirection];
-
+export type O2oDirection = (typeof O2oDirection)[keyof typeof O2oDirection];
 
 export const O2oDirection = {
-  source: 'source',
-  target: 'target',
+  source: "source",
+  target: "target",
 } as const;
 
-export type O2oOcelVersion = typeof O2oOcelVersion[keyof typeof O2oOcelVersion] | null;
-
+export type O2oOcelVersion =
+  | (typeof O2oOcelVersion)[keyof typeof O2oOcelVersion]
+  | null;
 
 export const O2oOcelVersion = {
-  original: 'original',
-  filtered: 'filtered',
+  original: "original",
+  filtered: "filtered",
 } as const;
 
 export type E2oCombinationsParams = {
-direction?: E2oCombinationsDirection;
-ocel_version?: E2oCombinationsOcelVersion;
+  direction?: E2oCombinationsDirection;
+  ocel_version?: E2oCombinationsOcelVersion;
 };
 
-export type E2oCombinationsDirection = typeof E2oCombinationsDirection[keyof typeof E2oCombinationsDirection];
-
+export type E2oCombinationsDirection =
+  (typeof E2oCombinationsDirection)[keyof typeof E2oCombinationsDirection];
 
 export const E2oCombinationsDirection = {
-  source: 'source',
-  target: 'target',
+  source: "source",
+  target: "target",
 } as const;
 
-export type E2oCombinationsOcelVersion = typeof E2oCombinationsOcelVersion[keyof typeof E2oCombinationsOcelVersion] | null;
-
+export type E2oCombinationsOcelVersion =
+  | (typeof E2oCombinationsOcelVersion)[keyof typeof E2oCombinationsOcelVersion]
+  | null;
 
 export const E2oCombinationsOcelVersion = {
-  original: 'original',
-  filtered: 'filtered',
+  original: "original",
+  filtered: "filtered",
 } as const;
 
 export type O2oCombinationsParams = {
-direction?: O2oCombinationsDirection;
-ocel_version?: O2oCombinationsOcelVersion;
+  direction?: O2oCombinationsDirection;
+  ocel_version?: O2oCombinationsOcelVersion;
 };
 
-export type O2oCombinationsDirection = typeof O2oCombinationsDirection[keyof typeof O2oCombinationsDirection];
-
+export type O2oCombinationsDirection =
+  (typeof O2oCombinationsDirection)[keyof typeof O2oCombinationsDirection];
 
 export const O2oCombinationsDirection = {
-  source: 'source',
-  target: 'target',
+  source: "source",
+  target: "target",
 } as const;
 
-export type O2oCombinationsOcelVersion = typeof O2oCombinationsOcelVersion[keyof typeof O2oCombinationsOcelVersion] | null;
-
+export type O2oCombinationsOcelVersion =
+  | (typeof O2oCombinationsOcelVersion)[keyof typeof O2oCombinationsOcelVersion]
+  | null;
 
 export const O2oCombinationsOcelVersion = {
-  original: 'original',
-  filtered: 'filtered',
+  original: "original",
+  filtered: "filtered",
 } as const;
 
 export type QuantityInfoParams = {
-ocel_version?: QuantityInfoOcelVersion;
+  ocel_version?: QuantityInfoOcelVersion;
 };
 
-export type QuantityInfoOcelVersion = typeof QuantityInfoOcelVersion[keyof typeof QuantityInfoOcelVersion] | null;
-
+export type QuantityInfoOcelVersion =
+  | (typeof QuantityInfoOcelVersion)[keyof typeof QuantityInfoOcelVersion]
+  | null;
 
 export const QuantityInfoOcelVersion = {
-  original: 'original',
-  filtered: 'filtered',
+  original: "original",
+  filtered: "filtered",
 } as const;
 
 export type DownloadOCELParams = {
-ext?: DownloadOCELExt;
-ocel_version?: DownloadOCELOcelVersion;
+  ext?: DownloadOCELExt;
+  ocel_version?: DownloadOCELOcelVersion;
 };
 
-export type DownloadOCELExt = typeof DownloadOCELExt[keyof typeof DownloadOCELExt];
-
+export type DownloadOCELExt =
+  (typeof DownloadOCELExt)[keyof typeof DownloadOCELExt];
 
 export const DownloadOCELExt = {
-  xml: '.xml',
-  json: '.json',
-  sqlite: '.sqlite',
+  xml: ".xml",
+  json: ".json",
+  sqlite: ".sqlite",
 } as const;
 
-export type DownloadOCELOcelVersion = typeof DownloadOCELOcelVersion[keyof typeof DownloadOCELOcelVersion] | null;
-
+export type DownloadOCELOcelVersion =
+  | (typeof DownloadOCELOcelVersion)[keyof typeof DownloadOCELOcelVersion]
+  | null;
 
 export const DownloadOCELOcelVersion = {
-  original: 'original',
-  filtered: 'filtered',
+  original: "original",
+  filtered: "filtered",
 } as const;
 
 export type DownloadFlatLogParams = {
-object_type_name: string;
-ocel_version?: DownloadFlatLogOcelVersion;
+  object_type_name: string;
+  ocel_version?: DownloadFlatLogOcelVersion;
 };
 
-export type DownloadFlatLogOcelVersion = typeof DownloadFlatLogOcelVersion[keyof typeof DownloadFlatLogOcelVersion] | null;
-
+export type DownloadFlatLogOcelVersion =
+  | (typeof DownloadFlatLogOcelVersion)[keyof typeof DownloadFlatLogOcelVersion]
+  | null;
 
 export const DownloadFlatLogOcelVersion = {
-  original: 'original',
-  filtered: 'filtered',
+  original: "original",
+  filtered: "filtered",
 } as const;
 
 export type DownloadVariantFlatLogParams = {
-object_type: string;
-/**
- * @minItems 1
- */
-variant_ids: string[];
-ocel_version?: DownloadVariantFlatLogOcelVersion;
+  object_type: string;
+  /**
+   * @minItems 1
+   */
+  variant_ids: string[];
+  ocel_version?: DownloadVariantFlatLogOcelVersion;
 };
 
-export type DownloadVariantFlatLogOcelVersion = typeof DownloadVariantFlatLogOcelVersion[keyof typeof DownloadVariantFlatLogOcelVersion] | null;
-
+export type DownloadVariantFlatLogOcelVersion =
+  | (typeof DownloadVariantFlatLogOcelVersion)[keyof typeof DownloadVariantFlatLogOcelVersion]
+  | null;
 
 export const DownloadVariantFlatLogOcelVersion = {
-  original: 'original',
-  filtered: 'filtered',
+  original: "original",
+  filtered: "filtered",
 } as const;
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
-
-
-const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKey: K } => {
+const withQueryKey = <T extends object, K>(
+  query: T,
+  queryKey: K,
+): T & { queryKey: K } => {
   const result = { queryKey } as T & { queryKey: K };
   for (const key of Object.keys(query)) {
     // The explicit queryKey always wins, matching the previous
     // `{ ...query, queryKey }` spread where it was set last.
-    if (key === 'queryKey') continue;
+    if (key === "queryKey") continue;
     Object.defineProperty(result, key, {
       enumerable: true,
       configurable: true,
@@ -643,2582 +660,4276 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
  * @summary List uploaded and uploading OCELs
  */
 export const getOcels = (
-    params?: GetOcelsParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  params?: GetOcelsParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<OcelMetadata[]>(
-      {url: `/api/external/modules/ocel/v1/ocels`, method: 'GET',
-        params, signal
+  return customFetch<OcelMetadata[]>(
+    {
+      url: `/api/external/modules/ocel/v1/ocels`,
+      method: "GET",
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
+export const getGetOcelsQueryKey = (params?: GetOcelsParams) => {
+  return [
+    `/api/external/modules/ocel/v1/ocels`,
+    ...(params ? [params] : []),
+  ] as const;
+};
 
-
-
-export const getGetOcelsQueryKey = (params?: GetOcelsParams,) => {
-    return [
-    `/api/external/modules/ocel/v1/ocels`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getGetOcelsQueryOptions = <TData = Awaited<ReturnType<typeof getOcels>>, TError = HTTPValidationError>(params?: GetOcelsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOcels>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetOcelsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getOcels>>,
+  TError = HTTPValidationError,
+>(
+  params?: GetOcelsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getOcels>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getGetOcelsQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getGetOcelsQueryKey(params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getOcels>>> = ({
+    signal,
+  }) => getOcels(params, requestOptions, signal);
 
+  return {
+    queryKey,
+    queryFn,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof getOcels>>, TError, TData> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+};
 
+export type GetOcelsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getOcels>>
+>;
+export type GetOcelsQueryError = HTTPValidationError;
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getOcels>>> = ({ signal }) => getOcels(params, requestOptions, signal);
-
-
-
-
-
-   return  { queryKey, queryFn,   staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getOcels>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetOcelsQueryResult = NonNullable<Awaited<ReturnType<typeof getOcels>>>
-export type GetOcelsQueryError = HTTPValidationError
-
-
-export function useGetOcels<TData = Awaited<ReturnType<typeof getOcels>>, TError = HTTPValidationError>(
- params: undefined |  GetOcelsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOcels>>, TError, TData>> & Pick<
+export function useGetOcels<
+  TData = Awaited<ReturnType<typeof getOcels>>,
+  TError = HTTPValidationError,
+>(
+  params: undefined | GetOcelsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getOcels>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getOcels>>,
           TError,
           Awaited<ReturnType<typeof getOcels>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetOcels<TData = Awaited<ReturnType<typeof getOcels>>, TError = HTTPValidationError>(
- params?: GetOcelsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOcels>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetOcels<
+  TData = Awaited<ReturnType<typeof getOcels>>,
+  TError = HTTPValidationError,
+>(
+  params?: GetOcelsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getOcels>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getOcels>>,
           TError,
           Awaited<ReturnType<typeof getOcels>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetOcels<TData = Awaited<ReturnType<typeof getOcels>>, TError = HTTPValidationError>(
- params?: GetOcelsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOcels>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetOcels<
+  TData = Awaited<ReturnType<typeof getOcels>>,
+  TError = HTTPValidationError,
+>(
+  params?: GetOcelsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getOcels>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary List uploaded and uploading OCELs
  */
 
-export function useGetOcels<TData = Awaited<ReturnType<typeof getOcels>>, TError = HTTPValidationError>(
- params?: GetOcelsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOcels>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useGetOcels<
+  TData = Awaited<ReturnType<typeof getOcels>>,
+  TError = HTTPValidationError,
+>(
+  params?: GetOcelsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getOcels>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetOcelsQueryOptions(params, options);
 
-  const queryOptions = getGetOcelsQueryOptions(params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
-
-
-
-
-
-
 
 /**
  * @summary Get default OCEL metadata
  */
 export const getDefaultOcel = (
-    params?: GetDefaultOcelParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  params?: GetDefaultOcelParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<DefaultOCEL[]>(
-      {url: `/api/external/modules/ocel/v1/default`, method: 'GET',
-        params, signal
+  return customFetch<DefaultOCEL[]>(
+    {
+      url: `/api/external/modules/ocel/v1/default`,
+      method: "GET",
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
+export const getGetDefaultOcelQueryKey = (params?: GetDefaultOcelParams) => {
+  return [
+    `/api/external/modules/ocel/v1/default`,
+    ...(params ? [params] : []),
+  ] as const;
+};
 
-
-
-export const getGetDefaultOcelQueryKey = (params?: GetDefaultOcelParams,) => {
-    return [
-    `/api/external/modules/ocel/v1/default`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getGetDefaultOcelQueryOptions = <TData = Awaited<ReturnType<typeof getDefaultOcel>>, TError = HTTPValidationError>(params?: GetDefaultOcelParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDefaultOcel>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetDefaultOcelQueryOptions = <
+  TData = Awaited<ReturnType<typeof getDefaultOcel>>,
+  TError = HTTPValidationError,
+>(
+  params?: GetDefaultOcelParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getDefaultOcel>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getGetDefaultOcelQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getGetDefaultOcelQueryKey(params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getDefaultOcel>>> = ({
+    signal,
+  }) => getDefaultOcel(params, requestOptions, signal);
 
+  return {
+    queryKey,
+    queryFn,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getDefaultOcel>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
+export type GetDefaultOcelQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getDefaultOcel>>
+>;
+export type GetDefaultOcelQueryError = HTTPValidationError;
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDefaultOcel>>> = ({ signal }) => getDefaultOcel(params, requestOptions, signal);
-
-
-
-
-
-   return  { queryKey, queryFn,   staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getDefaultOcel>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetDefaultOcelQueryResult = NonNullable<Awaited<ReturnType<typeof getDefaultOcel>>>
-export type GetDefaultOcelQueryError = HTTPValidationError
-
-
-export function useGetDefaultOcel<TData = Awaited<ReturnType<typeof getDefaultOcel>>, TError = HTTPValidationError>(
- params: undefined |  GetDefaultOcelParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDefaultOcel>>, TError, TData>> & Pick<
+export function useGetDefaultOcel<
+  TData = Awaited<ReturnType<typeof getDefaultOcel>>,
+  TError = HTTPValidationError,
+>(
+  params: undefined | GetDefaultOcelParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getDefaultOcel>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getDefaultOcel>>,
           TError,
           Awaited<ReturnType<typeof getDefaultOcel>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetDefaultOcel<TData = Awaited<ReturnType<typeof getDefaultOcel>>, TError = HTTPValidationError>(
- params?: GetDefaultOcelParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDefaultOcel>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetDefaultOcel<
+  TData = Awaited<ReturnType<typeof getDefaultOcel>>,
+  TError = HTTPValidationError,
+>(
+  params?: GetDefaultOcelParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getDefaultOcel>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getDefaultOcel>>,
           TError,
           Awaited<ReturnType<typeof getDefaultOcel>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetDefaultOcel<TData = Awaited<ReturnType<typeof getDefaultOcel>>, TError = HTTPValidationError>(
- params?: GetDefaultOcelParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDefaultOcel>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetDefaultOcel<
+  TData = Awaited<ReturnType<typeof getDefaultOcel>>,
+  TError = HTTPValidationError,
+>(
+  params?: GetDefaultOcelParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getDefaultOcel>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get default OCEL metadata
  */
 
-export function useGetDefaultOcel<TData = Awaited<ReturnType<typeof getDefaultOcel>>, TError = HTTPValidationError>(
- params?: GetDefaultOcelParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDefaultOcel>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useGetDefaultOcel<
+  TData = Awaited<ReturnType<typeof getDefaultOcel>>,
+  TError = HTTPValidationError,
+>(
+  params?: GetDefaultOcelParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getDefaultOcel>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetDefaultOcelQueryOptions(params, options);
 
-  const queryOptions = getGetDefaultOcelQueryOptions(params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
-
-
-
-
-
-
 
 /**
  * @summary Import default OCEL
  */
 export const importDefaultOcel = (
-    params: ImportDefaultOcelParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  params: ImportDefaultOcelParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<unknown>(
-      {url: `/api/external/modules/ocel/v1/default`, method: 'POST',
-        params, signal
+  return customFetch<unknown>(
+    {
+      url: `/api/external/modules/ocel/v1/default`,
+      method: "POST",
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
+export const getImportDefaultOcelMutationOptions = <
+  TError = HTTPValidationError,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof importDefaultOcel>>,
+    TError,
+    { params: ImportDefaultOcelParams },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof importDefaultOcel>>,
+  TError,
+  { params: ImportDefaultOcelParams },
+  TContext
+> => {
+  const mutationKey = ["importDefaultOcel"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof importDefaultOcel>>,
+    { params: ImportDefaultOcelParams }
+  > = (props) => {
+    const { params } = props ?? {};
 
+    return importDefaultOcel(params, requestOptions);
+  };
 
-export const getImportDefaultOcelMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof importDefaultOcel>>, TError,{params: ImportDefaultOcelParams}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof importDefaultOcel>>, TError,{params: ImportDefaultOcelParams}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['importDefaultOcel'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type ImportDefaultOcelMutationResult = NonNullable<
+  Awaited<ReturnType<typeof importDefaultOcel>>
+>;
 
+export type ImportDefaultOcelMutationError = HTTPValidationError;
 
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof importDefaultOcel>>, {params: ImportDefaultOcelParams}> = (props) => {
-          const {params} = props ?? {};
-
-          return  importDefaultOcel(params,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ImportDefaultOcelMutationResult = NonNullable<Awaited<ReturnType<typeof importDefaultOcel>>>
-
-    export type ImportDefaultOcelMutationError = HTTPValidationError
-
-    /**
+/**
  * @summary Import default OCEL
  */
-export const useImportDefaultOcel = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof importDefaultOcel>>, TError,{params: ImportDefaultOcelParams}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof importDefaultOcel>>,
-        TError,
-        {params: ImportDefaultOcelParams},
-        TContext
-      > => {
-      return useMutation(getImportDefaultOcelMutationOptions(options), queryClient);
-    }
+export const useImportDefaultOcel = <
+  TError = HTTPValidationError,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof importDefaultOcel>>,
+      TError,
+      { params: ImportDefaultOcelParams },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof importDefaultOcel>>,
+  TError,
+  { params: ImportDefaultOcelParams },
+  TContext
+> => {
+  return useMutation(getImportDefaultOcelMutationOptions(options), queryClient);
+};
 
 /**
  * @summary Get Extension Meta
  */
 export const getExtensionMeta = (
-
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<GetExtensionMeta200>(
-      {url: `/api/external/modules/ocel/v1/extension/meta`, method: 'GET', signal
+  return customFetch<GetExtensionMeta200>(
+    {
+      url: `/api/external/modules/ocel/v1/extension/meta`,
+      method: "GET",
+      signal,
     },
-      options);
-    }
-
-
-
+    options,
+  );
+};
 
 export const getGetExtensionMetaQueryKey = () => {
-    return [
-    `/api/external/modules/ocel/v1/extension/meta`
-    ] as const;
-    }
+  return [`/api/external/modules/ocel/v1/extension/meta`] as const;
+};
 
+export const getGetExtensionMetaQueryOptions = <
+  TData = Awaited<ReturnType<typeof getExtensionMeta>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof getExtensionMeta>>, TError, TData>
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-export const getGetExtensionMetaQueryOptions = <TData = Awaited<ReturnType<typeof getExtensionMeta>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getExtensionMeta>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
+  const queryKey = queryOptions?.queryKey ?? getGetExtensionMetaQueryKey();
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getExtensionMeta>>
+  > = ({ signal }) => getExtensionMeta(requestOptions, signal);
 
-  const queryKey =  queryOptions?.queryKey ?? getGetExtensionMetaQueryKey();
+  return {
+    queryKey,
+    queryFn,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getExtensionMeta>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
+export type GetExtensionMetaQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getExtensionMeta>>
+>;
+export type GetExtensionMetaQueryError = unknown;
 
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getExtensionMeta>>> = ({ signal }) => getExtensionMeta(requestOptions, signal);
-
-
-
-
-
-   return  { queryKey, queryFn,   staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getExtensionMeta>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetExtensionMetaQueryResult = NonNullable<Awaited<ReturnType<typeof getExtensionMeta>>>
-export type GetExtensionMetaQueryError = unknown
-
-
-export function useGetExtensionMeta<TData = Awaited<ReturnType<typeof getExtensionMeta>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getExtensionMeta>>, TError, TData>> & Pick<
+export function useGetExtensionMeta<
+  TData = Awaited<ReturnType<typeof getExtensionMeta>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getExtensionMeta>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getExtensionMeta>>,
           TError,
           Awaited<ReturnType<typeof getExtensionMeta>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetExtensionMeta<TData = Awaited<ReturnType<typeof getExtensionMeta>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getExtensionMeta>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetExtensionMeta<
+  TData = Awaited<ReturnType<typeof getExtensionMeta>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getExtensionMeta>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getExtensionMeta>>,
           TError,
           Awaited<ReturnType<typeof getExtensionMeta>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetExtensionMeta<TData = Awaited<ReturnType<typeof getExtensionMeta>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getExtensionMeta>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetExtensionMeta<
+  TData = Awaited<ReturnType<typeof getExtensionMeta>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getExtensionMeta>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get Extension Meta
  */
 
-export function useGetExtensionMeta<TData = Awaited<ReturnType<typeof getExtensionMeta>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getExtensionMeta>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useGetExtensionMeta<
+  TData = Awaited<ReturnType<typeof getExtensionMeta>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getExtensionMeta>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetExtensionMetaQueryOptions(options);
 
-  const queryOptions = getGetExtensionMetaQueryOptions(options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
-
-
-
-
-
-
 
 /**
  * @summary Get general information about a OCEL
  */
 export const getOcel = (
-    ocelId: string,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  ocelId: string,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
+  return customFetch<OcelMetadata>(
+    { url: `/api/external/modules/ocel/v1/${ocelId}`, method: "GET", signal },
+    options,
+  );
+};
 
+export const getGetOcelQueryKey = (ocelId: string) => {
+  return [`/api/external/modules/ocel/v1/${ocelId}`] as const;
+};
 
-      return customFetch<OcelMetadata>(
-      {url: `/api/external/modules/ocel/v1/${ocelId}`, method: 'GET', signal
-    },
-      options);
-    }
-
-
-
-
-export const getGetOcelQueryKey = (ocelId: string,) => {
-    return [
-    `/api/external/modules/ocel/v1/${ocelId}`
-    ] as const;
-    }
-
-
-export const getGetOcelQueryOptions = <TData = Awaited<ReturnType<typeof getOcel>>, TError = HTTPValidationError>(ocelId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOcel>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetOcelQueryOptions = <
+  TData = Awaited<ReturnType<typeof getOcel>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getOcel>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getGetOcelQueryKey(ocelId);
 
-  const queryKey =  queryOptions?.queryKey ?? getGetOcelQueryKey(ocelId);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getOcel>>> = ({
+    signal,
+  }) => getOcel(ocelId, requestOptions, signal);
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: ocelId !== null && ocelId !== undefined,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof getOcel>>, TError, TData> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+};
 
+export type GetOcelQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getOcel>>
+>;
+export type GetOcelQueryError = HTTPValidationError;
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getOcel>>> = ({ signal }) => getOcel(ocelId, requestOptions, signal);
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: ocelId !== null && ocelId !== undefined,  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getOcel>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetOcelQueryResult = NonNullable<Awaited<ReturnType<typeof getOcel>>>
-export type GetOcelQueryError = HTTPValidationError
-
-
-export function useGetOcel<TData = Awaited<ReturnType<typeof getOcel>>, TError = HTTPValidationError>(
- ocelId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOcel>>, TError, TData>> & Pick<
+export function useGetOcel<
+  TData = Awaited<ReturnType<typeof getOcel>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getOcel>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getOcel>>,
           TError,
           Awaited<ReturnType<typeof getOcel>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetOcel<TData = Awaited<ReturnType<typeof getOcel>>, TError = HTTPValidationError>(
- ocelId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOcel>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetOcel<
+  TData = Awaited<ReturnType<typeof getOcel>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getOcel>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getOcel>>,
           TError,
           Awaited<ReturnType<typeof getOcel>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetOcel<TData = Awaited<ReturnType<typeof getOcel>>, TError = HTTPValidationError>(
- ocelId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOcel>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetOcel<
+  TData = Awaited<ReturnType<typeof getOcel>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getOcel>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get general information about a OCEL
  */
 
-export function useGetOcel<TData = Awaited<ReturnType<typeof getOcel>>, TError = HTTPValidationError>(
- ocelId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOcel>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useGetOcel<
+  TData = Awaited<ReturnType<typeof getOcel>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getOcel>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetOcelQueryOptions(ocelId, options);
 
-  const queryOptions = getGetOcelQueryOptions(ocelId,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
-
-
-
-
-
-
 
 /**
  * Deletes the uploaded OCEL with the given `ocel_id`.
  * @summary Delete an uploaded OCEL
  */
 export const deleteOcel = (
-    ocelId: string,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  ocelId: string,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<unknown>(
-      {url: `/api/external/modules/ocel/v1/${ocelId}/delete`, method: 'POST', signal
+  return customFetch<unknown>(
+    {
+      url: `/api/external/modules/ocel/v1/${ocelId}/delete`,
+      method: "POST",
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
+export const getDeleteOcelMutationOptions = <
+  TError = HTTPValidationError,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteOcel>>,
+    TError,
+    { ocelId: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteOcel>>,
+  TError,
+  { ocelId: string },
+  TContext
+> => {
+  const mutationKey = ["deleteOcel"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteOcel>>,
+    { ocelId: string }
+  > = (props) => {
+    const { ocelId } = props ?? {};
 
+    return deleteOcel(ocelId, requestOptions);
+  };
 
-export const getDeleteOcelMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteOcel>>, TError,{ocelId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteOcel>>, TError,{ocelId: string}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['deleteOcel'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type DeleteOcelMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteOcel>>
+>;
 
+export type DeleteOcelMutationError = HTTPValidationError;
 
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteOcel>>, {ocelId: string}> = (props) => {
-          const {ocelId} = props ?? {};
-
-          return  deleteOcel(ocelId,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type DeleteOcelMutationResult = NonNullable<Awaited<ReturnType<typeof deleteOcel>>>
-
-    export type DeleteOcelMutationError = HTTPValidationError
-
-    /**
+/**
  * @summary Delete an uploaded OCEL
  */
-export const useDeleteOcel = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteOcel>>, TError,{ocelId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof deleteOcel>>,
-        TError,
-        {ocelId: string},
-        TContext
-      > => {
-      return useMutation(getDeleteOcelMutationOptions(options), queryClient);
-    }
+export const useDeleteOcel = <TError = HTTPValidationError, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteOcel>>,
+      TError,
+      { ocelId: string },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof deleteOcel>>,
+  TError,
+  { ocelId: string },
+  TContext
+> => {
+  return useMutation(getDeleteOcelMutationOptions(options), queryClient);
+};
 
 /**
  * Renames the OCEL with the given `ocel_id` to `new_name`.
  * @summary Rename an uploaded OCEL
  */
 export const renameOcel = (
-    ocelId: string,
-    params: RenameOcelParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  ocelId: string,
+  params: RenameOcelParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<unknown>(
-      {url: `/api/external/modules/ocel/v1/${ocelId}/rename`, method: 'POST',
-        params, signal
+  return customFetch<unknown>(
+    {
+      url: `/api/external/modules/ocel/v1/${ocelId}/rename`,
+      method: "POST",
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
+export const getRenameOcelMutationOptions = <
+  TError = HTTPValidationError,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof renameOcel>>,
+    TError,
+    { ocelId: string; params: RenameOcelParams },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof renameOcel>>,
+  TError,
+  { ocelId: string; params: RenameOcelParams },
+  TContext
+> => {
+  const mutationKey = ["renameOcel"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof renameOcel>>,
+    { ocelId: string; params: RenameOcelParams }
+  > = (props) => {
+    const { ocelId, params } = props ?? {};
 
+    return renameOcel(ocelId, params, requestOptions);
+  };
 
-export const getRenameOcelMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof renameOcel>>, TError,{ocelId: string;params: RenameOcelParams}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof renameOcel>>, TError,{ocelId: string;params: RenameOcelParams}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['renameOcel'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type RenameOcelMutationResult = NonNullable<
+  Awaited<ReturnType<typeof renameOcel>>
+>;
 
+export type RenameOcelMutationError = HTTPValidationError;
 
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof renameOcel>>, {ocelId: string;params: RenameOcelParams}> = (props) => {
-          const {ocelId,params} = props ?? {};
-
-          return  renameOcel(ocelId,params,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type RenameOcelMutationResult = NonNullable<Awaited<ReturnType<typeof renameOcel>>>
-
-    export type RenameOcelMutationError = HTTPValidationError
-
-    /**
+/**
  * @summary Rename an uploaded OCEL
  */
-export const useRenameOcel = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof renameOcel>>, TError,{ocelId: string;params: RenameOcelParams}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof renameOcel>>,
-        TError,
-        {ocelId: string;params: RenameOcelParams},
-        TContext
-      > => {
-      return useMutation(getRenameOcelMutationOptions(options), queryClient);
-    }
+export const useRenameOcel = <TError = HTTPValidationError, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof renameOcel>>,
+      TError,
+      { ocelId: string; params: RenameOcelParams },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof renameOcel>>,
+  TError,
+  { ocelId: string; params: RenameOcelParams },
+  TContext
+> => {
+  return useMutation(getRenameOcelMutationOptions(options), queryClient);
+};
 
 /**
  * @summary Get Aggr Attributes
  */
 export const aggregatedAttributes = (
-    ocelId: string | null,
-    params?: AggregatedAttributesParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  ocelId: string | null,
+  params?: AggregatedAttributesParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<PaginatedResponseListAggregatedAttribute>(
-      {url: `/api/external/modules/ocel/v1/${ocelId}/attributes`, method: 'GET',
-        params, signal
+  return customFetch<PaginatedResponseListAggregatedAttribute>(
+    {
+      url: `/api/external/modules/ocel/v1/${ocelId}/attributes`,
+      method: "GET",
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
-
-
-
-export const getAggregatedAttributesQueryKey = (ocelId: string | null,
-    params?: AggregatedAttributesParams,) => {
-    return [
-    `/api/external/modules/ocel/v1/${ocelId}/attributes`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getAggregatedAttributesQueryOptions = <TData = Awaited<ReturnType<typeof aggregatedAttributes>>, TError = HTTPValidationError>(ocelId: string | null,
-    params?: AggregatedAttributesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof aggregatedAttributes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getAggregatedAttributesQueryKey = (
+  ocelId: string | null,
+  params?: AggregatedAttributesParams,
 ) => {
+  return [
+    `/api/external/modules/ocel/v1/${ocelId}/attributes`,
+    ...(params ? [params] : []),
+  ] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getAggregatedAttributesQueryOptions = <
+  TData = Awaited<ReturnType<typeof aggregatedAttributes>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: AggregatedAttributesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof aggregatedAttributes>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getAggregatedAttributesQueryKey(ocelId,params);
+  const queryKey =
+    queryOptions?.queryKey ?? getAggregatedAttributesQueryKey(ocelId, params);
 
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof aggregatedAttributes>>
+  > = ({ signal }) =>
+    aggregatedAttributes(ocelId, params, requestOptions, signal);
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: ocelId !== null && ocelId !== undefined,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof aggregatedAttributes>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof aggregatedAttributes>>> = ({ signal }) => aggregatedAttributes(ocelId,params, requestOptions, signal);
+export type AggregatedAttributesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof aggregatedAttributes>>
+>;
+export type AggregatedAttributesQueryError = HTTPValidationError;
 
-
-
-
-
-   return  { queryKey, queryFn, enabled: ocelId !== null && ocelId !== undefined,  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof aggregatedAttributes>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type AggregatedAttributesQueryResult = NonNullable<Awaited<ReturnType<typeof aggregatedAttributes>>>
-export type AggregatedAttributesQueryError = HTTPValidationError
-
-
-export function useAggregatedAttributes<TData = Awaited<ReturnType<typeof aggregatedAttributes>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params: undefined |  AggregatedAttributesParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof aggregatedAttributes>>, TError, TData>> & Pick<
+export function useAggregatedAttributes<
+  TData = Awaited<ReturnType<typeof aggregatedAttributes>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params: undefined | AggregatedAttributesParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof aggregatedAttributes>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof aggregatedAttributes>>,
           TError,
           Awaited<ReturnType<typeof aggregatedAttributes>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAggregatedAttributes<TData = Awaited<ReturnType<typeof aggregatedAttributes>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: AggregatedAttributesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof aggregatedAttributes>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useAggregatedAttributes<
+  TData = Awaited<ReturnType<typeof aggregatedAttributes>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: AggregatedAttributesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof aggregatedAttributes>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof aggregatedAttributes>>,
           TError,
           Awaited<ReturnType<typeof aggregatedAttributes>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAggregatedAttributes<TData = Awaited<ReturnType<typeof aggregatedAttributes>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: AggregatedAttributesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof aggregatedAttributes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useAggregatedAttributes<
+  TData = Awaited<ReturnType<typeof aggregatedAttributes>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: AggregatedAttributesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof aggregatedAttributes>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get Aggr Attributes
  */
 
-export function useAggregatedAttributes<TData = Awaited<ReturnType<typeof aggregatedAttributes>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: AggregatedAttributesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof aggregatedAttributes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useAggregatedAttributes<
+  TData = Awaited<ReturnType<typeof aggregatedAttributes>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: AggregatedAttributesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof aggregatedAttributes>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getAggregatedAttributesQueryOptions(
+    ocelId,
+    params,
+    options,
+  );
 
-  const queryOptions = getAggregatedAttributesQueryOptions(ocelId,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
-
-
-
-
-
-
 
 /**
  * @summary Get Object Attributes
  */
 export const objectAttributes = (
-    ocelId: string | null,
-    params?: ObjectAttributesParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  ocelId: string | null,
+  params?: ObjectAttributesParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<TypedAttribute[]>(
-      {url: `/api/external/modules/ocel/v1/${ocelId}/objects/attributes`, method: 'GET',
-        params, signal
+  return customFetch<TypedAttribute[]>(
+    {
+      url: `/api/external/modules/ocel/v1/${ocelId}/objects/attributes`,
+      method: "GET",
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
-
-
-
-export const getObjectAttributesQueryKey = (ocelId: string | null,
-    params?: ObjectAttributesParams,) => {
-    return [
-    `/api/external/modules/ocel/v1/${ocelId}/objects/attributes`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getObjectAttributesQueryOptions = <TData = Awaited<ReturnType<typeof objectAttributes>>, TError = HTTPValidationError>(ocelId: string | null,
-    params?: ObjectAttributesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof objectAttributes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getObjectAttributesQueryKey = (
+  ocelId: string | null,
+  params?: ObjectAttributesParams,
 ) => {
+  return [
+    `/api/external/modules/ocel/v1/${ocelId}/objects/attributes`,
+    ...(params ? [params] : []),
+  ] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getObjectAttributesQueryOptions = <
+  TData = Awaited<ReturnType<typeof objectAttributes>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: ObjectAttributesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof objectAttributes>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getObjectAttributesQueryKey(ocelId,params);
+  const queryKey =
+    queryOptions?.queryKey ?? getObjectAttributesQueryKey(ocelId, params);
 
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof objectAttributes>>
+  > = ({ signal }) => objectAttributes(ocelId, params, requestOptions, signal);
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: ocelId !== null && ocelId !== undefined,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof objectAttributes>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof objectAttributes>>> = ({ signal }) => objectAttributes(ocelId,params, requestOptions, signal);
+export type ObjectAttributesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof objectAttributes>>
+>;
+export type ObjectAttributesQueryError = HTTPValidationError;
 
-
-
-
-
-   return  { queryKey, queryFn, enabled: ocelId !== null && ocelId !== undefined,  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof objectAttributes>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ObjectAttributesQueryResult = NonNullable<Awaited<ReturnType<typeof objectAttributes>>>
-export type ObjectAttributesQueryError = HTTPValidationError
-
-
-export function useObjectAttributes<TData = Awaited<ReturnType<typeof objectAttributes>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params: undefined |  ObjectAttributesParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof objectAttributes>>, TError, TData>> & Pick<
+export function useObjectAttributes<
+  TData = Awaited<ReturnType<typeof objectAttributes>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params: undefined | ObjectAttributesParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof objectAttributes>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof objectAttributes>>,
           TError,
           Awaited<ReturnType<typeof objectAttributes>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useObjectAttributes<TData = Awaited<ReturnType<typeof objectAttributes>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: ObjectAttributesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof objectAttributes>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useObjectAttributes<
+  TData = Awaited<ReturnType<typeof objectAttributes>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: ObjectAttributesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof objectAttributes>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof objectAttributes>>,
           TError,
           Awaited<ReturnType<typeof objectAttributes>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useObjectAttributes<TData = Awaited<ReturnType<typeof objectAttributes>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: ObjectAttributesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof objectAttributes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useObjectAttributes<
+  TData = Awaited<ReturnType<typeof objectAttributes>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: ObjectAttributesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof objectAttributes>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get Object Attributes
  */
 
-export function useObjectAttributes<TData = Awaited<ReturnType<typeof objectAttributes>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: ObjectAttributesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof objectAttributes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useObjectAttributes<
+  TData = Awaited<ReturnType<typeof objectAttributes>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: ObjectAttributesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof objectAttributes>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getObjectAttributesQueryOptions(ocelId, params, options);
 
-  const queryOptions = getObjectAttributesQueryOptions(ocelId,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
-
-
-
-
-
-
 
 /**
  * @summary Get Event Attributes
  */
 export const eventAttributes = (
-    ocelId: string | null,
-    params?: EventAttributesParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  ocelId: string | null,
+  params?: EventAttributesParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<TypedAttribute[]>(
-      {url: `/api/external/modules/ocel/v1/${ocelId}/events/attributes`, method: 'GET',
-        params, signal
+  return customFetch<TypedAttribute[]>(
+    {
+      url: `/api/external/modules/ocel/v1/${ocelId}/events/attributes`,
+      method: "GET",
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
-
-
-
-export const getEventAttributesQueryKey = (ocelId: string | null,
-    params?: EventAttributesParams,) => {
-    return [
-    `/api/external/modules/ocel/v1/${ocelId}/events/attributes`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getEventAttributesQueryOptions = <TData = Awaited<ReturnType<typeof eventAttributes>>, TError = HTTPValidationError>(ocelId: string | null,
-    params?: EventAttributesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getEventAttributesQueryKey = (
+  ocelId: string | null,
+  params?: EventAttributesParams,
 ) => {
+  return [
+    `/api/external/modules/ocel/v1/${ocelId}/events/attributes`,
+    ...(params ? [params] : []),
+  ] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getEventAttributesQueryOptions = <
+  TData = Awaited<ReturnType<typeof eventAttributes>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: EventAttributesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof eventAttributes>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getEventAttributesQueryKey(ocelId,params);
+  const queryKey =
+    queryOptions?.queryKey ?? getEventAttributesQueryKey(ocelId, params);
 
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof eventAttributes>>> = ({
+    signal,
+  }) => eventAttributes(ocelId, params, requestOptions, signal);
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: ocelId !== null && ocelId !== undefined,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof eventAttributes>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof eventAttributes>>> = ({ signal }) => eventAttributes(ocelId,params, requestOptions, signal);
+export type EventAttributesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof eventAttributes>>
+>;
+export type EventAttributesQueryError = HTTPValidationError;
 
-
-
-
-
-   return  { queryKey, queryFn, enabled: ocelId !== null && ocelId !== undefined,  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof eventAttributes>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type EventAttributesQueryResult = NonNullable<Awaited<ReturnType<typeof eventAttributes>>>
-export type EventAttributesQueryError = HTTPValidationError
-
-
-export function useEventAttributes<TData = Awaited<ReturnType<typeof eventAttributes>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params: undefined |  EventAttributesParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributes>>, TError, TData>> & Pick<
+export function useEventAttributes<
+  TData = Awaited<ReturnType<typeof eventAttributes>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params: undefined | EventAttributesParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof eventAttributes>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof eventAttributes>>,
           TError,
           Awaited<ReturnType<typeof eventAttributes>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEventAttributes<TData = Awaited<ReturnType<typeof eventAttributes>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: EventAttributesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributes>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useEventAttributes<
+  TData = Awaited<ReturnType<typeof eventAttributes>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: EventAttributesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof eventAttributes>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof eventAttributes>>,
           TError,
           Awaited<ReturnType<typeof eventAttributes>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEventAttributes<TData = Awaited<ReturnType<typeof eventAttributes>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: EventAttributesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useEventAttributes<
+  TData = Awaited<ReturnType<typeof eventAttributes>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: EventAttributesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof eventAttributes>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get Event Attributes
  */
 
-export function useEventAttributes<TData = Awaited<ReturnType<typeof eventAttributes>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: EventAttributesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventAttributes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useEventAttributes<
+  TData = Awaited<ReturnType<typeof eventAttributes>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: EventAttributesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof eventAttributes>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getEventAttributesQueryOptions(ocelId, params, options);
 
-  const queryOptions = getEventAttributesQueryOptions(ocelId,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
-
-
-
-
-
-
 
 /**
  * @summary Get Attribute Names
  */
 export const attributeNames = (
-    ocelId: string | null,
-    params?: AttributeNamesParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  ocelId: string | null,
+  params?: AttributeNamesParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<string[]>(
-      {url: `/api/external/modules/ocel/v1/${ocelId}/attribute/names`, method: 'GET',
-        params, signal
+  return customFetch<string[]>(
+    {
+      url: `/api/external/modules/ocel/v1/${ocelId}/attribute/names`,
+      method: "GET",
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
-
-
-
-export const getAttributeNamesQueryKey = (ocelId: string | null,
-    params?: AttributeNamesParams,) => {
-    return [
-    `/api/external/modules/ocel/v1/${ocelId}/attribute/names`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getAttributeNamesQueryOptions = <TData = Awaited<ReturnType<typeof attributeNames>>, TError = HTTPValidationError>(ocelId: string | null,
-    params?: AttributeNamesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attributeNames>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getAttributeNamesQueryKey = (
+  ocelId: string | null,
+  params?: AttributeNamesParams,
 ) => {
+  return [
+    `/api/external/modules/ocel/v1/${ocelId}/attribute/names`,
+    ...(params ? [params] : []),
+  ] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getAttributeNamesQueryOptions = <
+  TData = Awaited<ReturnType<typeof attributeNames>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: AttributeNamesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof attributeNames>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getAttributeNamesQueryKey(ocelId,params);
+  const queryKey =
+    queryOptions?.queryKey ?? getAttributeNamesQueryKey(ocelId, params);
 
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof attributeNames>>> = ({
+    signal,
+  }) => attributeNames(ocelId, params, requestOptions, signal);
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: ocelId !== null && ocelId !== undefined,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof attributeNames>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof attributeNames>>> = ({ signal }) => attributeNames(ocelId,params, requestOptions, signal);
+export type AttributeNamesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof attributeNames>>
+>;
+export type AttributeNamesQueryError = HTTPValidationError;
 
-
-
-
-
-   return  { queryKey, queryFn, enabled: ocelId !== null && ocelId !== undefined,  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof attributeNames>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type AttributeNamesQueryResult = NonNullable<Awaited<ReturnType<typeof attributeNames>>>
-export type AttributeNamesQueryError = HTTPValidationError
-
-
-export function useAttributeNames<TData = Awaited<ReturnType<typeof attributeNames>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params: undefined |  AttributeNamesParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof attributeNames>>, TError, TData>> & Pick<
+export function useAttributeNames<
+  TData = Awaited<ReturnType<typeof attributeNames>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params: undefined | AttributeNamesParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof attributeNames>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof attributeNames>>,
           TError,
           Awaited<ReturnType<typeof attributeNames>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAttributeNames<TData = Awaited<ReturnType<typeof attributeNames>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: AttributeNamesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attributeNames>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useAttributeNames<
+  TData = Awaited<ReturnType<typeof attributeNames>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: AttributeNamesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof attributeNames>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof attributeNames>>,
           TError,
           Awaited<ReturnType<typeof attributeNames>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAttributeNames<TData = Awaited<ReturnType<typeof attributeNames>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: AttributeNamesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attributeNames>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useAttributeNames<
+  TData = Awaited<ReturnType<typeof attributeNames>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: AttributeNamesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof attributeNames>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get Attribute Names
  */
 
-export function useAttributeNames<TData = Awaited<ReturnType<typeof attributeNames>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: AttributeNamesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof attributeNames>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useAttributeNames<
+  TData = Awaited<ReturnType<typeof attributeNames>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: AttributeNamesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof attributeNames>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getAttributeNamesQueryOptions(ocelId, params, options);
 
-  const queryOptions = getAttributeNamesQueryOptions(ocelId,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
-
-
-
-
-
-
 
 /**
  * @summary Get Object Types
  */
 export const objectTypes = (
-    ocelId: string | null,
-    params?: ObjectTypesParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  ocelId: string | null,
+  params?: ObjectTypesParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<string[]>(
-      {url: `/api/external/modules/ocel/v1/${ocelId}/objects/types`, method: 'GET',
-        params, signal
+  return customFetch<string[]>(
+    {
+      url: `/api/external/modules/ocel/v1/${ocelId}/objects/types`,
+      method: "GET",
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
-
-
-
-export const getObjectTypesQueryKey = (ocelId: string | null,
-    params?: ObjectTypesParams,) => {
-    return [
-    `/api/external/modules/ocel/v1/${ocelId}/objects/types`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getObjectTypesQueryOptions = <TData = Awaited<ReturnType<typeof objectTypes>>, TError = HTTPValidationError>(ocelId: string | null,
-    params?: ObjectTypesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof objectTypes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getObjectTypesQueryKey = (
+  ocelId: string | null,
+  params?: ObjectTypesParams,
 ) => {
+  return [
+    `/api/external/modules/ocel/v1/${ocelId}/objects/types`,
+    ...(params ? [params] : []),
+  ] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getObjectTypesQueryOptions = <
+  TData = Awaited<ReturnType<typeof objectTypes>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: ObjectTypesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof objectTypes>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getObjectTypesQueryKey(ocelId,params);
+  const queryKey =
+    queryOptions?.queryKey ?? getObjectTypesQueryKey(ocelId, params);
 
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof objectTypes>>> = ({
+    signal,
+  }) => objectTypes(ocelId, params, requestOptions, signal);
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: ocelId !== null && ocelId !== undefined,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof objectTypes>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof objectTypes>>> = ({ signal }) => objectTypes(ocelId,params, requestOptions, signal);
+export type ObjectTypesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof objectTypes>>
+>;
+export type ObjectTypesQueryError = HTTPValidationError;
 
-
-
-
-
-   return  { queryKey, queryFn, enabled: ocelId !== null && ocelId !== undefined,  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof objectTypes>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ObjectTypesQueryResult = NonNullable<Awaited<ReturnType<typeof objectTypes>>>
-export type ObjectTypesQueryError = HTTPValidationError
-
-
-export function useObjectTypes<TData = Awaited<ReturnType<typeof objectTypes>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params: undefined |  ObjectTypesParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof objectTypes>>, TError, TData>> & Pick<
+export function useObjectTypes<
+  TData = Awaited<ReturnType<typeof objectTypes>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params: undefined | ObjectTypesParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof objectTypes>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof objectTypes>>,
           TError,
           Awaited<ReturnType<typeof objectTypes>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useObjectTypes<TData = Awaited<ReturnType<typeof objectTypes>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: ObjectTypesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof objectTypes>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useObjectTypes<
+  TData = Awaited<ReturnType<typeof objectTypes>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: ObjectTypesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof objectTypes>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof objectTypes>>,
           TError,
           Awaited<ReturnType<typeof objectTypes>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useObjectTypes<TData = Awaited<ReturnType<typeof objectTypes>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: ObjectTypesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof objectTypes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useObjectTypes<
+  TData = Awaited<ReturnType<typeof objectTypes>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: ObjectTypesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof objectTypes>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get Object Types
  */
 
-export function useObjectTypes<TData = Awaited<ReturnType<typeof objectTypes>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: ObjectTypesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof objectTypes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useObjectTypes<
+  TData = Awaited<ReturnType<typeof objectTypes>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: ObjectTypesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof objectTypes>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getObjectTypesQueryOptions(ocelId, params, options);
 
-  const queryOptions = getObjectTypesQueryOptions(ocelId,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
-
-
-
-
-
-
 
 /**
  * @summary Get Object Counts
  */
 export const objectCounts = (
-    ocelId: string | null,
-    params?: ObjectCountsParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  ocelId: string | null,
+  params?: ObjectCountsParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<ObjectCounts200>(
-      {url: `/api/external/modules/ocel/v1/${ocelId}/objects/counts`, method: 'GET',
-        params, signal
+  return customFetch<ObjectCounts200>(
+    {
+      url: `/api/external/modules/ocel/v1/${ocelId}/objects/counts`,
+      method: "GET",
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
-
-
-
-export const getObjectCountsQueryKey = (ocelId: string | null,
-    params?: ObjectCountsParams,) => {
-    return [
-    `/api/external/modules/ocel/v1/${ocelId}/objects/counts`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getObjectCountsQueryOptions = <TData = Awaited<ReturnType<typeof objectCounts>>, TError = HTTPValidationError>(ocelId: string | null,
-    params?: ObjectCountsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof objectCounts>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getObjectCountsQueryKey = (
+  ocelId: string | null,
+  params?: ObjectCountsParams,
 ) => {
+  return [
+    `/api/external/modules/ocel/v1/${ocelId}/objects/counts`,
+    ...(params ? [params] : []),
+  ] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getObjectCountsQueryOptions = <
+  TData = Awaited<ReturnType<typeof objectCounts>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: ObjectCountsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof objectCounts>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getObjectCountsQueryKey(ocelId,params);
+  const queryKey =
+    queryOptions?.queryKey ?? getObjectCountsQueryKey(ocelId, params);
 
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof objectCounts>>> = ({
+    signal,
+  }) => objectCounts(ocelId, params, requestOptions, signal);
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: ocelId !== null && ocelId !== undefined,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof objectCounts>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof objectCounts>>> = ({ signal }) => objectCounts(ocelId,params, requestOptions, signal);
+export type ObjectCountsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof objectCounts>>
+>;
+export type ObjectCountsQueryError = HTTPValidationError;
 
-
-
-
-
-   return  { queryKey, queryFn, enabled: ocelId !== null && ocelId !== undefined,  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof objectCounts>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ObjectCountsQueryResult = NonNullable<Awaited<ReturnType<typeof objectCounts>>>
-export type ObjectCountsQueryError = HTTPValidationError
-
-
-export function useObjectCounts<TData = Awaited<ReturnType<typeof objectCounts>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params: undefined |  ObjectCountsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof objectCounts>>, TError, TData>> & Pick<
+export function useObjectCounts<
+  TData = Awaited<ReturnType<typeof objectCounts>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params: undefined | ObjectCountsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof objectCounts>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof objectCounts>>,
           TError,
           Awaited<ReturnType<typeof objectCounts>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useObjectCounts<TData = Awaited<ReturnType<typeof objectCounts>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: ObjectCountsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof objectCounts>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useObjectCounts<
+  TData = Awaited<ReturnType<typeof objectCounts>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: ObjectCountsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof objectCounts>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof objectCounts>>,
           TError,
           Awaited<ReturnType<typeof objectCounts>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useObjectCounts<TData = Awaited<ReturnType<typeof objectCounts>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: ObjectCountsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof objectCounts>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useObjectCounts<
+  TData = Awaited<ReturnType<typeof objectCounts>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: ObjectCountsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof objectCounts>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get Object Counts
  */
 
-export function useObjectCounts<TData = Awaited<ReturnType<typeof objectCounts>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: ObjectCountsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof objectCounts>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useObjectCounts<
+  TData = Awaited<ReturnType<typeof objectCounts>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: ObjectCountsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof objectCounts>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getObjectCountsQueryOptions(ocelId, params, options);
 
-  const queryOptions = getObjectCountsQueryOptions(ocelId,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
-
-
-
-
-
-
 
 /**
  * @summary Get Object Ids
  */
 export const objectIds = (
-    ocelId: string | null,
-    params?: ObjectIdsParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  ocelId: string | null,
+  params?: ObjectIdsParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<PaginatedResponseListStr>(
-      {url: `/api/external/modules/ocel/v1/${ocelId}/objects/ids`, method: 'GET',
-        params, signal
+  return customFetch<PaginatedResponseListStr>(
+    {
+      url: `/api/external/modules/ocel/v1/${ocelId}/objects/ids`,
+      method: "GET",
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
-
-
-
-export const getObjectIdsQueryKey = (ocelId: string | null,
-    params?: ObjectIdsParams,) => {
-    return [
-    `/api/external/modules/ocel/v1/${ocelId}/objects/ids`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getObjectIdsQueryOptions = <TData = Awaited<ReturnType<typeof objectIds>>, TError = HTTPValidationError>(ocelId: string | null,
-    params?: ObjectIdsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof objectIds>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getObjectIdsQueryKey = (
+  ocelId: string | null,
+  params?: ObjectIdsParams,
 ) => {
+  return [
+    `/api/external/modules/ocel/v1/${ocelId}/objects/ids`,
+    ...(params ? [params] : []),
+  ] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getObjectIdsQueryOptions = <
+  TData = Awaited<ReturnType<typeof objectIds>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: ObjectIdsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof objectIds>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getObjectIdsQueryKey(ocelId,params);
+  const queryKey =
+    queryOptions?.queryKey ?? getObjectIdsQueryKey(ocelId, params);
 
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof objectIds>>> = ({
+    signal,
+  }) => objectIds(ocelId, params, requestOptions, signal);
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: ocelId !== null && ocelId !== undefined,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof objectIds>>, TError, TData> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof objectIds>>> = ({ signal }) => objectIds(ocelId,params, requestOptions, signal);
+export type ObjectIdsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof objectIds>>
+>;
+export type ObjectIdsQueryError = HTTPValidationError;
 
-
-
-
-
-   return  { queryKey, queryFn, enabled: ocelId !== null && ocelId !== undefined,  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof objectIds>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ObjectIdsQueryResult = NonNullable<Awaited<ReturnType<typeof objectIds>>>
-export type ObjectIdsQueryError = HTTPValidationError
-
-
-export function useObjectIds<TData = Awaited<ReturnType<typeof objectIds>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params: undefined |  ObjectIdsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof objectIds>>, TError, TData>> & Pick<
+export function useObjectIds<
+  TData = Awaited<ReturnType<typeof objectIds>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params: undefined | ObjectIdsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof objectIds>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof objectIds>>,
           TError,
           Awaited<ReturnType<typeof objectIds>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useObjectIds<TData = Awaited<ReturnType<typeof objectIds>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: ObjectIdsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof objectIds>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useObjectIds<
+  TData = Awaited<ReturnType<typeof objectIds>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: ObjectIdsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof objectIds>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof objectIds>>,
           TError,
           Awaited<ReturnType<typeof objectIds>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useObjectIds<TData = Awaited<ReturnType<typeof objectIds>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: ObjectIdsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof objectIds>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useObjectIds<
+  TData = Awaited<ReturnType<typeof objectIds>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: ObjectIdsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof objectIds>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get Object Ids
  */
 
-export function useObjectIds<TData = Awaited<ReturnType<typeof objectIds>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: ObjectIdsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof objectIds>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useObjectIds<
+  TData = Awaited<ReturnType<typeof objectIds>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: ObjectIdsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof objectIds>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getObjectIdsQueryOptions(ocelId, params, options);
 
-  const queryOptions = getObjectIdsQueryOptions(ocelId,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
-
-
-
-
-
-
 
 /**
  * Returns the object variants for a single object type. Each variant is a distinct activity sequence, together with the number of events it contains and the number of cases (objects) that follow it.
  * @summary Get the variants of an object type
  */
 export const objectVariants = (
-    ocelId: string | null,
-    params: ObjectVariantsParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  ocelId: string | null,
+  params: ObjectVariantsParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<ObjectTypeVariants>(
-      {url: `/api/external/modules/ocel/v1/${ocelId}/objects/variants`, method: 'GET',
-        params, signal
+  return customFetch<ObjectTypeVariants>(
+    {
+      url: `/api/external/modules/ocel/v1/${ocelId}/objects/variants`,
+      method: "GET",
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
-
-
-
-export const getObjectVariantsQueryKey = (ocelId: string | null,
-    params?: ObjectVariantsParams,) => {
-    return [
-    `/api/external/modules/ocel/v1/${ocelId}/objects/variants`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getObjectVariantsQueryOptions = <TData = Awaited<ReturnType<typeof objectVariants>>, TError = HTTPValidationError>(ocelId: string | null,
-    params: ObjectVariantsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof objectVariants>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getObjectVariantsQueryKey = (
+  ocelId: string | null,
+  params?: ObjectVariantsParams,
 ) => {
+  return [
+    `/api/external/modules/ocel/v1/${ocelId}/objects/variants`,
+    ...(params ? [params] : []),
+  ] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getObjectVariantsQueryOptions = <
+  TData = Awaited<ReturnType<typeof objectVariants>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params: ObjectVariantsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof objectVariants>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getObjectVariantsQueryKey(ocelId,params);
+  const queryKey =
+    queryOptions?.queryKey ?? getObjectVariantsQueryKey(ocelId, params);
 
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof objectVariants>>> = ({
+    signal,
+  }) => objectVariants(ocelId, params, requestOptions, signal);
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: ocelId !== null && ocelId !== undefined,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof objectVariants>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof objectVariants>>> = ({ signal }) => objectVariants(ocelId,params, requestOptions, signal);
+export type ObjectVariantsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof objectVariants>>
+>;
+export type ObjectVariantsQueryError = HTTPValidationError;
 
-
-
-
-
-   return  { queryKey, queryFn, enabled: ocelId !== null && ocelId !== undefined,  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof objectVariants>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ObjectVariantsQueryResult = NonNullable<Awaited<ReturnType<typeof objectVariants>>>
-export type ObjectVariantsQueryError = HTTPValidationError
-
-
-export function useObjectVariants<TData = Awaited<ReturnType<typeof objectVariants>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params: ObjectVariantsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof objectVariants>>, TError, TData>> & Pick<
+export function useObjectVariants<
+  TData = Awaited<ReturnType<typeof objectVariants>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params: ObjectVariantsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof objectVariants>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof objectVariants>>,
           TError,
           Awaited<ReturnType<typeof objectVariants>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useObjectVariants<TData = Awaited<ReturnType<typeof objectVariants>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params: ObjectVariantsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof objectVariants>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useObjectVariants<
+  TData = Awaited<ReturnType<typeof objectVariants>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params: ObjectVariantsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof objectVariants>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof objectVariants>>,
           TError,
           Awaited<ReturnType<typeof objectVariants>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useObjectVariants<TData = Awaited<ReturnType<typeof objectVariants>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params: ObjectVariantsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof objectVariants>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useObjectVariants<
+  TData = Awaited<ReturnType<typeof objectVariants>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params: ObjectVariantsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof objectVariants>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get the variants of an object type
  */
 
-export function useObjectVariants<TData = Awaited<ReturnType<typeof objectVariants>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params: ObjectVariantsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof objectVariants>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useObjectVariants<
+  TData = Awaited<ReturnType<typeof objectVariants>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params: ObjectVariantsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof objectVariants>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getObjectVariantsQueryOptions(ocelId, params, options);
 
-  const queryOptions = getObjectVariantsQueryOptions(ocelId,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
-
-
-
-
-
-
 
 /**
  * @summary Get Activities
  */
 export const activities = (
-    ocelId: string | null,
-    params?: ActivitiesParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  ocelId: string | null,
+  params?: ActivitiesParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<string[]>(
-      {url: `/api/external/modules/ocel/v1/${ocelId}/events/activityNames`, method: 'GET',
-        params, signal
+  return customFetch<string[]>(
+    {
+      url: `/api/external/modules/ocel/v1/${ocelId}/events/activityNames`,
+      method: "GET",
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
-
-
-
-export const getActivitiesQueryKey = (ocelId: string | null,
-    params?: ActivitiesParams,) => {
-    return [
-    `/api/external/modules/ocel/v1/${ocelId}/events/activityNames`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getActivitiesQueryOptions = <TData = Awaited<ReturnType<typeof activities>>, TError = HTTPValidationError>(ocelId: string | null,
-    params?: ActivitiesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof activities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getActivitiesQueryKey = (
+  ocelId: string | null,
+  params?: ActivitiesParams,
 ) => {
+  return [
+    `/api/external/modules/ocel/v1/${ocelId}/events/activityNames`,
+    ...(params ? [params] : []),
+  ] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getActivitiesQueryOptions = <
+  TData = Awaited<ReturnType<typeof activities>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: ActivitiesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof activities>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getActivitiesQueryKey(ocelId,params);
+  const queryKey =
+    queryOptions?.queryKey ?? getActivitiesQueryKey(ocelId, params);
 
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof activities>>> = ({
+    signal,
+  }) => activities(ocelId, params, requestOptions, signal);
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: ocelId !== null && ocelId !== undefined,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof activities>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof activities>>> = ({ signal }) => activities(ocelId,params, requestOptions, signal);
+export type ActivitiesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof activities>>
+>;
+export type ActivitiesQueryError = HTTPValidationError;
 
-
-
-
-
-   return  { queryKey, queryFn, enabled: ocelId !== null && ocelId !== undefined,  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof activities>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ActivitiesQueryResult = NonNullable<Awaited<ReturnType<typeof activities>>>
-export type ActivitiesQueryError = HTTPValidationError
-
-
-export function useActivities<TData = Awaited<ReturnType<typeof activities>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params: undefined |  ActivitiesParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof activities>>, TError, TData>> & Pick<
+export function useActivities<
+  TData = Awaited<ReturnType<typeof activities>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params: undefined | ActivitiesParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof activities>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof activities>>,
           TError,
           Awaited<ReturnType<typeof activities>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useActivities<TData = Awaited<ReturnType<typeof activities>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: ActivitiesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof activities>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useActivities<
+  TData = Awaited<ReturnType<typeof activities>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: ActivitiesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof activities>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof activities>>,
           TError,
           Awaited<ReturnType<typeof activities>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useActivities<TData = Awaited<ReturnType<typeof activities>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: ActivitiesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof activities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useActivities<
+  TData = Awaited<ReturnType<typeof activities>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: ActivitiesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof activities>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get Activities
  */
 
-export function useActivities<TData = Awaited<ReturnType<typeof activities>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: ActivitiesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof activities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useActivities<
+  TData = Awaited<ReturnType<typeof activities>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: ActivitiesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof activities>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getActivitiesQueryOptions(ocelId, params, options);
 
-  const queryOptions = getActivitiesQueryOptions(ocelId,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
-
-
-
-
-
-
 
 /**
  * @summary Get Event Counts
  */
 export const eventCounts = (
-    ocelId: string | null,
-    params?: EventCountsParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  ocelId: string | null,
+  params?: EventCountsParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<EventCounts200>(
-      {url: `/api/external/modules/ocel/v1/${ocelId}/events/counts`, method: 'GET',
-        params, signal
+  return customFetch<EventCounts200>(
+    {
+      url: `/api/external/modules/ocel/v1/${ocelId}/events/counts`,
+      method: "GET",
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
-
-
-
-export const getEventCountsQueryKey = (ocelId: string | null,
-    params?: EventCountsParams,) => {
-    return [
-    `/api/external/modules/ocel/v1/${ocelId}/events/counts`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getEventCountsQueryOptions = <TData = Awaited<ReturnType<typeof eventCounts>>, TError = HTTPValidationError>(ocelId: string | null,
-    params?: EventCountsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventCounts>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getEventCountsQueryKey = (
+  ocelId: string | null,
+  params?: EventCountsParams,
 ) => {
+  return [
+    `/api/external/modules/ocel/v1/${ocelId}/events/counts`,
+    ...(params ? [params] : []),
+  ] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getEventCountsQueryOptions = <
+  TData = Awaited<ReturnType<typeof eventCounts>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: EventCountsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof eventCounts>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getEventCountsQueryKey(ocelId,params);
+  const queryKey =
+    queryOptions?.queryKey ?? getEventCountsQueryKey(ocelId, params);
 
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof eventCounts>>> = ({
+    signal,
+  }) => eventCounts(ocelId, params, requestOptions, signal);
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: ocelId !== null && ocelId !== undefined,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof eventCounts>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof eventCounts>>> = ({ signal }) => eventCounts(ocelId,params, requestOptions, signal);
+export type EventCountsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof eventCounts>>
+>;
+export type EventCountsQueryError = HTTPValidationError;
 
-
-
-
-
-   return  { queryKey, queryFn, enabled: ocelId !== null && ocelId !== undefined,  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof eventCounts>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type EventCountsQueryResult = NonNullable<Awaited<ReturnType<typeof eventCounts>>>
-export type EventCountsQueryError = HTTPValidationError
-
-
-export function useEventCounts<TData = Awaited<ReturnType<typeof eventCounts>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params: undefined |  EventCountsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventCounts>>, TError, TData>> & Pick<
+export function useEventCounts<
+  TData = Awaited<ReturnType<typeof eventCounts>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params: undefined | EventCountsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof eventCounts>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof eventCounts>>,
           TError,
           Awaited<ReturnType<typeof eventCounts>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEventCounts<TData = Awaited<ReturnType<typeof eventCounts>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: EventCountsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventCounts>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useEventCounts<
+  TData = Awaited<ReturnType<typeof eventCounts>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: EventCountsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof eventCounts>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof eventCounts>>,
           TError,
           Awaited<ReturnType<typeof eventCounts>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEventCounts<TData = Awaited<ReturnType<typeof eventCounts>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: EventCountsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventCounts>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useEventCounts<
+  TData = Awaited<ReturnType<typeof eventCounts>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: EventCountsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof eventCounts>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get Event Counts
  */
 
-export function useEventCounts<TData = Awaited<ReturnType<typeof eventCounts>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: EventCountsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventCounts>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useEventCounts<
+  TData = Awaited<ReturnType<typeof eventCounts>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: EventCountsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof eventCounts>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getEventCountsQueryOptions(ocelId, params, options);
 
-  const queryOptions = getEventCountsQueryOptions(ocelId,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
-
-
-
-
-
-
 
 /**
  * @summary Get Event Ids
  */
 export const eventIds = (
-    ocelId: string | null,
-    params?: EventIdsParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  ocelId: string | null,
+  params?: EventIdsParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<PaginatedResponseListStr>(
-      {url: `/api/external/modules/ocel/v1/${ocelId}/events/ids`, method: 'GET',
-        params, signal
+  return customFetch<PaginatedResponseListStr>(
+    {
+      url: `/api/external/modules/ocel/v1/${ocelId}/events/ids`,
+      method: "GET",
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
-
-
-
-export const getEventIdsQueryKey = (ocelId: string | null,
-    params?: EventIdsParams,) => {
-    return [
-    `/api/external/modules/ocel/v1/${ocelId}/events/ids`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getEventIdsQueryOptions = <TData = Awaited<ReturnType<typeof eventIds>>, TError = HTTPValidationError>(ocelId: string | null,
-    params?: EventIdsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventIds>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getEventIdsQueryKey = (
+  ocelId: string | null,
+  params?: EventIdsParams,
 ) => {
+  return [
+    `/api/external/modules/ocel/v1/${ocelId}/events/ids`,
+    ...(params ? [params] : []),
+  ] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getEventIdsQueryOptions = <
+  TData = Awaited<ReturnType<typeof eventIds>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: EventIdsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof eventIds>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getEventIdsQueryKey(ocelId,params);
+  const queryKey =
+    queryOptions?.queryKey ?? getEventIdsQueryKey(ocelId, params);
 
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof eventIds>>> = ({
+    signal,
+  }) => eventIds(ocelId, params, requestOptions, signal);
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: ocelId !== null && ocelId !== undefined,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof eventIds>>, TError, TData> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof eventIds>>> = ({ signal }) => eventIds(ocelId,params, requestOptions, signal);
+export type EventIdsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof eventIds>>
+>;
+export type EventIdsQueryError = HTTPValidationError;
 
-
-
-
-
-   return  { queryKey, queryFn, enabled: ocelId !== null && ocelId !== undefined,  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof eventIds>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type EventIdsQueryResult = NonNullable<Awaited<ReturnType<typeof eventIds>>>
-export type EventIdsQueryError = HTTPValidationError
-
-
-export function useEventIds<TData = Awaited<ReturnType<typeof eventIds>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params: undefined |  EventIdsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventIds>>, TError, TData>> & Pick<
+export function useEventIds<
+  TData = Awaited<ReturnType<typeof eventIds>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params: undefined | EventIdsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof eventIds>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof eventIds>>,
           TError,
           Awaited<ReturnType<typeof eventIds>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEventIds<TData = Awaited<ReturnType<typeof eventIds>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: EventIdsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventIds>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useEventIds<
+  TData = Awaited<ReturnType<typeof eventIds>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: EventIdsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof eventIds>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof eventIds>>,
           TError,
           Awaited<ReturnType<typeof eventIds>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEventIds<TData = Awaited<ReturnType<typeof eventIds>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: EventIdsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventIds>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useEventIds<
+  TData = Awaited<ReturnType<typeof eventIds>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: EventIdsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof eventIds>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get Event Ids
  */
 
-export function useEventIds<TData = Awaited<ReturnType<typeof eventIds>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: EventIdsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventIds>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useEventIds<
+  TData = Awaited<ReturnType<typeof eventIds>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: EventIdsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof eventIds>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getEventIdsQueryOptions(ocelId, params, options);
 
-  const queryOptions = getEventIdsQueryOptions(ocelId,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
-
-
-
-
-
-
 
 /**
  * @summary Get Time Info
  */
 export const timeInfo = (
-    ocelId: string | null,
-    params?: TimeInfoParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  ocelId: string | null,
+  params?: TimeInfoParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<EntityTimeInfo>(
-      {url: `/api/external/modules/ocel/v1/${ocelId}/events/time`, method: 'GET',
-        params, signal
+  return customFetch<EntityTimeInfo>(
+    {
+      url: `/api/external/modules/ocel/v1/${ocelId}/events/time`,
+      method: "GET",
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
-
-
-
-export const getTimeInfoQueryKey = (ocelId: string | null,
-    params?: TimeInfoParams,) => {
-    return [
-    `/api/external/modules/ocel/v1/${ocelId}/events/time`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getTimeInfoQueryOptions = <TData = Awaited<ReturnType<typeof timeInfo>>, TError = HTTPValidationError>(ocelId: string | null,
-    params?: TimeInfoParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof timeInfo>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getTimeInfoQueryKey = (
+  ocelId: string | null,
+  params?: TimeInfoParams,
 ) => {
+  return [
+    `/api/external/modules/ocel/v1/${ocelId}/events/time`,
+    ...(params ? [params] : []),
+  ] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getTimeInfoQueryOptions = <
+  TData = Awaited<ReturnType<typeof timeInfo>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: TimeInfoParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof timeInfo>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getTimeInfoQueryKey(ocelId,params);
+  const queryKey =
+    queryOptions?.queryKey ?? getTimeInfoQueryKey(ocelId, params);
 
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof timeInfo>>> = ({
+    signal,
+  }) => timeInfo(ocelId, params, requestOptions, signal);
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: ocelId !== null && ocelId !== undefined,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof timeInfo>>, TError, TData> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof timeInfo>>> = ({ signal }) => timeInfo(ocelId,params, requestOptions, signal);
+export type TimeInfoQueryResult = NonNullable<
+  Awaited<ReturnType<typeof timeInfo>>
+>;
+export type TimeInfoQueryError = HTTPValidationError;
 
-
-
-
-
-   return  { queryKey, queryFn, enabled: ocelId !== null && ocelId !== undefined,  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof timeInfo>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type TimeInfoQueryResult = NonNullable<Awaited<ReturnType<typeof timeInfo>>>
-export type TimeInfoQueryError = HTTPValidationError
-
-
-export function useTimeInfo<TData = Awaited<ReturnType<typeof timeInfo>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params: undefined |  TimeInfoParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof timeInfo>>, TError, TData>> & Pick<
+export function useTimeInfo<
+  TData = Awaited<ReturnType<typeof timeInfo>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params: undefined | TimeInfoParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof timeInfo>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof timeInfo>>,
           TError,
           Awaited<ReturnType<typeof timeInfo>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTimeInfo<TData = Awaited<ReturnType<typeof timeInfo>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: TimeInfoParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof timeInfo>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useTimeInfo<
+  TData = Awaited<ReturnType<typeof timeInfo>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: TimeInfoParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof timeInfo>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof timeInfo>>,
           TError,
           Awaited<ReturnType<typeof timeInfo>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTimeInfo<TData = Awaited<ReturnType<typeof timeInfo>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: TimeInfoParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof timeInfo>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useTimeInfo<
+  TData = Awaited<ReturnType<typeof timeInfo>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: TimeInfoParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof timeInfo>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get Time Info
  */
 
-export function useTimeInfo<TData = Awaited<ReturnType<typeof timeInfo>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: TimeInfoParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof timeInfo>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useTimeInfo<
+  TData = Awaited<ReturnType<typeof timeInfo>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: TimeInfoParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof timeInfo>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getTimeInfoQueryOptions(ocelId, params, options);
 
-  const queryOptions = getTimeInfoQueryOptions(ocelId,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
-
-
-
-
-
-
 
 /**
  * @summary Get E2O
  */
 export const e2o = (
-    ocelId: string | null,
-    params?: E2oParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  ocelId: string | null,
+  params?: E2oParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<PaginatedResponseListRelationCountSummary>(
-      {url: `/api/external/modules/ocel/v1/${ocelId}/relations/e2o`, method: 'GET',
-        params, signal
+  return customFetch<PaginatedResponseListRelationCountSummary>(
+    {
+      url: `/api/external/modules/ocel/v1/${ocelId}/relations/e2o`,
+      method: "GET",
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
+export const getE2oQueryKey = (ocelId: string | null, params?: E2oParams) => {
+  return [
+    `/api/external/modules/ocel/v1/${ocelId}/relations/e2o`,
+    ...(params ? [params] : []),
+  ] as const;
+};
 
-
-
-export const getE2oQueryKey = (ocelId: string | null,
-    params?: E2oParams,) => {
-    return [
-    `/api/external/modules/ocel/v1/${ocelId}/relations/e2o`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getE2oQueryOptions = <TData = Awaited<ReturnType<typeof e2o>>, TError = HTTPValidationError>(ocelId: string | null,
-    params?: E2oParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof e2o>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getE2oQueryOptions = <
+  TData = Awaited<ReturnType<typeof e2o>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: E2oParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof e2o>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getE2oQueryKey(ocelId, params);
 
-  const queryKey =  queryOptions?.queryKey ?? getE2oQueryKey(ocelId,params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof e2o>>> = ({
+    signal,
+  }) => e2o(ocelId, params, requestOptions, signal);
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: ocelId !== null && ocelId !== undefined,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof e2o>>, TError, TData> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+};
 
+export type E2oQueryResult = NonNullable<Awaited<ReturnType<typeof e2o>>>;
+export type E2oQueryError = HTTPValidationError;
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof e2o>>> = ({ signal }) => e2o(ocelId,params, requestOptions, signal);
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: ocelId !== null && ocelId !== undefined,  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof e2o>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type E2oQueryResult = NonNullable<Awaited<ReturnType<typeof e2o>>>
-export type E2oQueryError = HTTPValidationError
-
-
-export function useE2o<TData = Awaited<ReturnType<typeof e2o>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params: undefined |  E2oParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof e2o>>, TError, TData>> & Pick<
+export function useE2o<
+  TData = Awaited<ReturnType<typeof e2o>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params: undefined | E2oParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof e2o>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof e2o>>,
           TError,
           Awaited<ReturnType<typeof e2o>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useE2o<TData = Awaited<ReturnType<typeof e2o>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: E2oParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof e2o>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useE2o<
+  TData = Awaited<ReturnType<typeof e2o>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: E2oParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof e2o>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof e2o>>,
           TError,
           Awaited<ReturnType<typeof e2o>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useE2o<TData = Awaited<ReturnType<typeof e2o>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: E2oParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof e2o>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useE2o<
+  TData = Awaited<ReturnType<typeof e2o>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: E2oParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof e2o>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get E2O
  */
 
-export function useE2o<TData = Awaited<ReturnType<typeof e2o>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: E2oParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof e2o>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useE2o<
+  TData = Awaited<ReturnType<typeof e2o>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: E2oParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof e2o>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getE2oQueryOptions(ocelId, params, options);
 
-  const queryOptions = getE2oQueryOptions(ocelId,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
-
-
-
-
-
-
 
 /**
  * @summary Get O2O
  */
 export const o2o = (
-    ocelId: string | null,
-    params?: O2oParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  ocelId: string | null,
+  params?: O2oParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<PaginatedResponseListRelationCountSummary>(
-      {url: `/api/external/modules/ocel/v1/${ocelId}/relations/o2o`, method: 'GET',
-        params, signal
+  return customFetch<PaginatedResponseListRelationCountSummary>(
+    {
+      url: `/api/external/modules/ocel/v1/${ocelId}/relations/o2o`,
+      method: "GET",
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
+export const getO2oQueryKey = (ocelId: string | null, params?: O2oParams) => {
+  return [
+    `/api/external/modules/ocel/v1/${ocelId}/relations/o2o`,
+    ...(params ? [params] : []),
+  ] as const;
+};
 
-
-
-export const getO2oQueryKey = (ocelId: string | null,
-    params?: O2oParams,) => {
-    return [
-    `/api/external/modules/ocel/v1/${ocelId}/relations/o2o`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getO2oQueryOptions = <TData = Awaited<ReturnType<typeof o2o>>, TError = HTTPValidationError>(ocelId: string | null,
-    params?: O2oParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof o2o>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getO2oQueryOptions = <
+  TData = Awaited<ReturnType<typeof o2o>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: O2oParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof o2o>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getO2oQueryKey(ocelId, params);
 
-  const queryKey =  queryOptions?.queryKey ?? getO2oQueryKey(ocelId,params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof o2o>>> = ({
+    signal,
+  }) => o2o(ocelId, params, requestOptions, signal);
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: ocelId !== null && ocelId !== undefined,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof o2o>>, TError, TData> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+};
 
+export type O2oQueryResult = NonNullable<Awaited<ReturnType<typeof o2o>>>;
+export type O2oQueryError = HTTPValidationError;
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof o2o>>> = ({ signal }) => o2o(ocelId,params, requestOptions, signal);
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: ocelId !== null && ocelId !== undefined,  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof o2o>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type O2oQueryResult = NonNullable<Awaited<ReturnType<typeof o2o>>>
-export type O2oQueryError = HTTPValidationError
-
-
-export function useO2o<TData = Awaited<ReturnType<typeof o2o>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params: undefined |  O2oParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof o2o>>, TError, TData>> & Pick<
+export function useO2o<
+  TData = Awaited<ReturnType<typeof o2o>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params: undefined | O2oParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof o2o>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof o2o>>,
           TError,
           Awaited<ReturnType<typeof o2o>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useO2o<TData = Awaited<ReturnType<typeof o2o>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: O2oParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof o2o>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useO2o<
+  TData = Awaited<ReturnType<typeof o2o>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: O2oParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof o2o>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof o2o>>,
           TError,
           Awaited<ReturnType<typeof o2o>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useO2o<TData = Awaited<ReturnType<typeof o2o>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: O2oParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof o2o>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useO2o<
+  TData = Awaited<ReturnType<typeof o2o>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: O2oParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof o2o>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get O2O
  */
 
-export function useO2o<TData = Awaited<ReturnType<typeof o2o>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: O2oParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof o2o>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useO2o<
+  TData = Awaited<ReturnType<typeof o2o>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: O2oParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof o2o>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getO2oQueryOptions(ocelId, params, options);
 
-  const queryOptions = getO2oQueryOptions(ocelId,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
-
-
-
-
-
-
 
 /**
  * @summary Get E2O Combinations
  */
 export const e2oCombinations = (
-    ocelId: string | null,
-    params?: E2oCombinationsParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  ocelId: string | null,
+  params?: E2oCombinationsParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<RelationCombination[]>(
-      {url: `/api/external/modules/ocel/v1/${ocelId}/relations/e2o/combinations`, method: 'GET',
-        params, signal
+  return customFetch<RelationCombination[]>(
+    {
+      url: `/api/external/modules/ocel/v1/${ocelId}/relations/e2o/combinations`,
+      method: "GET",
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
-
-
-
-export const getE2oCombinationsQueryKey = (ocelId: string | null,
-    params?: E2oCombinationsParams,) => {
-    return [
-    `/api/external/modules/ocel/v1/${ocelId}/relations/e2o/combinations`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getE2oCombinationsQueryOptions = <TData = Awaited<ReturnType<typeof e2oCombinations>>, TError = HTTPValidationError>(ocelId: string | null,
-    params?: E2oCombinationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof e2oCombinations>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getE2oCombinationsQueryKey = (
+  ocelId: string | null,
+  params?: E2oCombinationsParams,
 ) => {
+  return [
+    `/api/external/modules/ocel/v1/${ocelId}/relations/e2o/combinations`,
+    ...(params ? [params] : []),
+  ] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getE2oCombinationsQueryOptions = <
+  TData = Awaited<ReturnType<typeof e2oCombinations>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: E2oCombinationsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof e2oCombinations>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getE2oCombinationsQueryKey(ocelId,params);
+  const queryKey =
+    queryOptions?.queryKey ?? getE2oCombinationsQueryKey(ocelId, params);
 
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof e2oCombinations>>> = ({
+    signal,
+  }) => e2oCombinations(ocelId, params, requestOptions, signal);
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: ocelId !== null && ocelId !== undefined,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof e2oCombinations>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof e2oCombinations>>> = ({ signal }) => e2oCombinations(ocelId,params, requestOptions, signal);
+export type E2oCombinationsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof e2oCombinations>>
+>;
+export type E2oCombinationsQueryError = HTTPValidationError;
 
-
-
-
-
-   return  { queryKey, queryFn, enabled: ocelId !== null && ocelId !== undefined,  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof e2oCombinations>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type E2oCombinationsQueryResult = NonNullable<Awaited<ReturnType<typeof e2oCombinations>>>
-export type E2oCombinationsQueryError = HTTPValidationError
-
-
-export function useE2oCombinations<TData = Awaited<ReturnType<typeof e2oCombinations>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params: undefined |  E2oCombinationsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof e2oCombinations>>, TError, TData>> & Pick<
+export function useE2oCombinations<
+  TData = Awaited<ReturnType<typeof e2oCombinations>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params: undefined | E2oCombinationsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof e2oCombinations>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof e2oCombinations>>,
           TError,
           Awaited<ReturnType<typeof e2oCombinations>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useE2oCombinations<TData = Awaited<ReturnType<typeof e2oCombinations>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: E2oCombinationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof e2oCombinations>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useE2oCombinations<
+  TData = Awaited<ReturnType<typeof e2oCombinations>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: E2oCombinationsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof e2oCombinations>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof e2oCombinations>>,
           TError,
           Awaited<ReturnType<typeof e2oCombinations>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useE2oCombinations<TData = Awaited<ReturnType<typeof e2oCombinations>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: E2oCombinationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof e2oCombinations>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useE2oCombinations<
+  TData = Awaited<ReturnType<typeof e2oCombinations>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: E2oCombinationsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof e2oCombinations>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get E2O Combinations
  */
 
-export function useE2oCombinations<TData = Awaited<ReturnType<typeof e2oCombinations>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: E2oCombinationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof e2oCombinations>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useE2oCombinations<
+  TData = Awaited<ReturnType<typeof e2oCombinations>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: E2oCombinationsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof e2oCombinations>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getE2oCombinationsQueryOptions(ocelId, params, options);
 
-  const queryOptions = getE2oCombinationsQueryOptions(ocelId,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
-
-
-
-
-
-
 
 /**
  * @summary Get O2O Combinations
  */
 export const o2oCombinations = (
-    ocelId: string | null,
-    params?: O2oCombinationsParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  ocelId: string | null,
+  params?: O2oCombinationsParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<RelationCombination[]>(
-      {url: `/api/external/modules/ocel/v1/${ocelId}/relations/o2o/combinations`, method: 'GET',
-        params, signal
+  return customFetch<RelationCombination[]>(
+    {
+      url: `/api/external/modules/ocel/v1/${ocelId}/relations/o2o/combinations`,
+      method: "GET",
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
-
-
-
-export const getO2oCombinationsQueryKey = (ocelId: string | null,
-    params?: O2oCombinationsParams,) => {
-    return [
-    `/api/external/modules/ocel/v1/${ocelId}/relations/o2o/combinations`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getO2oCombinationsQueryOptions = <TData = Awaited<ReturnType<typeof o2oCombinations>>, TError = HTTPValidationError>(ocelId: string | null,
-    params?: O2oCombinationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof o2oCombinations>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getO2oCombinationsQueryKey = (
+  ocelId: string | null,
+  params?: O2oCombinationsParams,
 ) => {
+  return [
+    `/api/external/modules/ocel/v1/${ocelId}/relations/o2o/combinations`,
+    ...(params ? [params] : []),
+  ] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getO2oCombinationsQueryOptions = <
+  TData = Awaited<ReturnType<typeof o2oCombinations>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: O2oCombinationsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof o2oCombinations>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getO2oCombinationsQueryKey(ocelId,params);
+  const queryKey =
+    queryOptions?.queryKey ?? getO2oCombinationsQueryKey(ocelId, params);
 
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof o2oCombinations>>> = ({
+    signal,
+  }) => o2oCombinations(ocelId, params, requestOptions, signal);
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: ocelId !== null && ocelId !== undefined,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof o2oCombinations>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof o2oCombinations>>> = ({ signal }) => o2oCombinations(ocelId,params, requestOptions, signal);
+export type O2oCombinationsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof o2oCombinations>>
+>;
+export type O2oCombinationsQueryError = HTTPValidationError;
 
-
-
-
-
-   return  { queryKey, queryFn, enabled: ocelId !== null && ocelId !== undefined,  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof o2oCombinations>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type O2oCombinationsQueryResult = NonNullable<Awaited<ReturnType<typeof o2oCombinations>>>
-export type O2oCombinationsQueryError = HTTPValidationError
-
-
-export function useO2oCombinations<TData = Awaited<ReturnType<typeof o2oCombinations>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params: undefined |  O2oCombinationsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof o2oCombinations>>, TError, TData>> & Pick<
+export function useO2oCombinations<
+  TData = Awaited<ReturnType<typeof o2oCombinations>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params: undefined | O2oCombinationsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof o2oCombinations>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof o2oCombinations>>,
           TError,
           Awaited<ReturnType<typeof o2oCombinations>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useO2oCombinations<TData = Awaited<ReturnType<typeof o2oCombinations>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: O2oCombinationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof o2oCombinations>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useO2oCombinations<
+  TData = Awaited<ReturnType<typeof o2oCombinations>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: O2oCombinationsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof o2oCombinations>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof o2oCombinations>>,
           TError,
           Awaited<ReturnType<typeof o2oCombinations>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useO2oCombinations<TData = Awaited<ReturnType<typeof o2oCombinations>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: O2oCombinationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof o2oCombinations>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useO2oCombinations<
+  TData = Awaited<ReturnType<typeof o2oCombinations>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: O2oCombinationsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof o2oCombinations>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get O2O Combinations
  */
 
-export function useO2oCombinations<TData = Awaited<ReturnType<typeof o2oCombinations>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: O2oCombinationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof o2oCombinations>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useO2oCombinations<
+  TData = Awaited<ReturnType<typeof o2oCombinations>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: O2oCombinationsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof o2oCombinations>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getO2oCombinationsQueryOptions(ocelId, params, options);
 
-  const queryOptions = getO2oCombinationsQueryOptions(ocelId,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
-
-
-
-
-
-
 
 /**
  * @summary Get Quantity Info
  */
 export const quantityInfo = (
-    ocelId: string | null,
-    params?: QuantityInfoParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  ocelId: string | null,
+  params?: QuantityInfoParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<QuantityInfo>(
-      {url: `/api/external/modules/ocel/v1/${ocelId}/quantity/info`, method: 'GET',
-        params, signal
+  return customFetch<QuantityInfo>(
+    {
+      url: `/api/external/modules/ocel/v1/${ocelId}/quantity/info`,
+      method: "GET",
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
-
-
-
-export const getQuantityInfoQueryKey = (ocelId: string | null,
-    params?: QuantityInfoParams,) => {
-    return [
-    `/api/external/modules/ocel/v1/${ocelId}/quantity/info`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getQuantityInfoQueryOptions = <TData = Awaited<ReturnType<typeof quantityInfo>>, TError = HTTPValidationError>(ocelId: string | null,
-    params?: QuantityInfoParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof quantityInfo>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getQuantityInfoQueryKey = (
+  ocelId: string | null,
+  params?: QuantityInfoParams,
 ) => {
+  return [
+    `/api/external/modules/ocel/v1/${ocelId}/quantity/info`,
+    ...(params ? [params] : []),
+  ] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getQuantityInfoQueryOptions = <
+  TData = Awaited<ReturnType<typeof quantityInfo>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: QuantityInfoParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof quantityInfo>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getQuantityInfoQueryKey(ocelId,params);
+  const queryKey =
+    queryOptions?.queryKey ?? getQuantityInfoQueryKey(ocelId, params);
 
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof quantityInfo>>> = ({
+    signal,
+  }) => quantityInfo(ocelId, params, requestOptions, signal);
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: ocelId !== null && ocelId !== undefined,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof quantityInfo>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof quantityInfo>>> = ({ signal }) => quantityInfo(ocelId,params, requestOptions, signal);
+export type QuantityInfoQueryResult = NonNullable<
+  Awaited<ReturnType<typeof quantityInfo>>
+>;
+export type QuantityInfoQueryError = HTTPValidationError;
 
-
-
-
-
-   return  { queryKey, queryFn, enabled: ocelId !== null && ocelId !== undefined,  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof quantityInfo>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type QuantityInfoQueryResult = NonNullable<Awaited<ReturnType<typeof quantityInfo>>>
-export type QuantityInfoQueryError = HTTPValidationError
-
-
-export function useQuantityInfo<TData = Awaited<ReturnType<typeof quantityInfo>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params: undefined |  QuantityInfoParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof quantityInfo>>, TError, TData>> & Pick<
+export function useQuantityInfo<
+  TData = Awaited<ReturnType<typeof quantityInfo>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params: undefined | QuantityInfoParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof quantityInfo>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof quantityInfo>>,
           TError,
           Awaited<ReturnType<typeof quantityInfo>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useQuantityInfo<TData = Awaited<ReturnType<typeof quantityInfo>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: QuantityInfoParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof quantityInfo>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useQuantityInfo<
+  TData = Awaited<ReturnType<typeof quantityInfo>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: QuantityInfoParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof quantityInfo>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof quantityInfo>>,
           TError,
           Awaited<ReturnType<typeof quantityInfo>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useQuantityInfo<TData = Awaited<ReturnType<typeof quantityInfo>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: QuantityInfoParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof quantityInfo>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useQuantityInfo<
+  TData = Awaited<ReturnType<typeof quantityInfo>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: QuantityInfoParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof quantityInfo>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get Quantity Info
  */
 
-export function useQuantityInfo<TData = Awaited<ReturnType<typeof quantityInfo>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: QuantityInfoParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof quantityInfo>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useQuantityInfo<
+  TData = Awaited<ReturnType<typeof quantityInfo>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: QuantityInfoParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof quantityInfo>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getQuantityInfoQueryOptions(ocelId, params, options);
 
-  const queryOptions = getQuantityInfoQueryOptions(ocelId,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
-
-
-
-
-
-
 
 /**
  * @summary Download OCEL
  */
 export const downloadOCEL = (
-    ocelId: string,
-    params?: DownloadOCELParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  ocelId: string,
+  params?: DownloadOCELParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<unknown>(
-      {url: `/api/external/modules/ocel/v1/${ocelId}/download`, method: 'GET',
-        params, signal
+  return customFetch<unknown>(
+    {
+      url: `/api/external/modules/ocel/v1/${ocelId}/download`,
+      method: "GET",
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
-
-
-
-export const getDownloadOCELQueryKey = (ocelId: string,
-    params?: DownloadOCELParams,) => {
-    return [
-    `/api/external/modules/ocel/v1/${ocelId}/download`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getDownloadOCELQueryOptions = <TData = Awaited<ReturnType<typeof downloadOCEL>>, TError = HTTPValidationError>(ocelId: string,
-    params?: DownloadOCELParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadOCEL>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getDownloadOCELQueryKey = (
+  ocelId: string,
+  params?: DownloadOCELParams,
 ) => {
+  return [
+    `/api/external/modules/ocel/v1/${ocelId}/download`,
+    ...(params ? [params] : []),
+  ] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getDownloadOCELQueryOptions = <
+  TData = Awaited<ReturnType<typeof downloadOCEL>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string,
+  params?: DownloadOCELParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof downloadOCEL>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getDownloadOCELQueryKey(ocelId,params);
+  const queryKey =
+    queryOptions?.queryKey ?? getDownloadOCELQueryKey(ocelId, params);
 
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof downloadOCEL>>> = ({
+    signal,
+  }) => downloadOCEL(ocelId, params, requestOptions, signal);
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: ocelId !== null && ocelId !== undefined,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof downloadOCEL>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof downloadOCEL>>> = ({ signal }) => downloadOCEL(ocelId,params, requestOptions, signal);
+export type DownloadOCELQueryResult = NonNullable<
+  Awaited<ReturnType<typeof downloadOCEL>>
+>;
+export type DownloadOCELQueryError = HTTPValidationError;
 
-
-
-
-
-   return  { queryKey, queryFn, enabled: ocelId !== null && ocelId !== undefined,  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof downloadOCEL>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type DownloadOCELQueryResult = NonNullable<Awaited<ReturnType<typeof downloadOCEL>>>
-export type DownloadOCELQueryError = HTTPValidationError
-
-
-export function useDownloadOCEL<TData = Awaited<ReturnType<typeof downloadOCEL>>, TError = HTTPValidationError>(
- ocelId: string,
-    params: undefined |  DownloadOCELParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadOCEL>>, TError, TData>> & Pick<
+export function useDownloadOCEL<
+  TData = Awaited<ReturnType<typeof downloadOCEL>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string,
+  params: undefined | DownloadOCELParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof downloadOCEL>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof downloadOCEL>>,
           TError,
           Awaited<ReturnType<typeof downloadOCEL>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useDownloadOCEL<TData = Awaited<ReturnType<typeof downloadOCEL>>, TError = HTTPValidationError>(
- ocelId: string,
-    params?: DownloadOCELParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadOCEL>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useDownloadOCEL<
+  TData = Awaited<ReturnType<typeof downloadOCEL>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string,
+  params?: DownloadOCELParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof downloadOCEL>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof downloadOCEL>>,
           TError,
           Awaited<ReturnType<typeof downloadOCEL>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useDownloadOCEL<TData = Awaited<ReturnType<typeof downloadOCEL>>, TError = HTTPValidationError>(
- ocelId: string,
-    params?: DownloadOCELParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadOCEL>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useDownloadOCEL<
+  TData = Awaited<ReturnType<typeof downloadOCEL>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string,
+  params?: DownloadOCELParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof downloadOCEL>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Download OCEL
  */
 
-export function useDownloadOCEL<TData = Awaited<ReturnType<typeof downloadOCEL>>, TError = HTTPValidationError>(
- ocelId: string,
-    params?: DownloadOCELParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadOCEL>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useDownloadOCEL<
+  TData = Awaited<ReturnType<typeof downloadOCEL>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string,
+  params?: DownloadOCELParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof downloadOCEL>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getDownloadOCELQueryOptions(ocelId, params, options);
 
-  const queryOptions = getDownloadOCELQueryOptions(ocelId,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
-
-
-
-
-
-
 
 /**
  * @summary Download OCEL as a xes
  */
 export const downloadFlatLog = (
-    ocelId: string | null,
-    params: DownloadFlatLogParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  ocelId: string | null,
+  params: DownloadFlatLogParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<unknown>(
-      {url: `/api/external/modules/ocel/v1/${ocelId}/download/xes`, method: 'GET',
-        params, signal
+  return customFetch<unknown>(
+    {
+      url: `/api/external/modules/ocel/v1/${ocelId}/download/xes`,
+      method: "GET",
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
-
-
-
-export const getDownloadFlatLogQueryKey = (ocelId: string | null,
-    params?: DownloadFlatLogParams,) => {
-    return [
-    `/api/external/modules/ocel/v1/${ocelId}/download/xes`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getDownloadFlatLogQueryOptions = <TData = Awaited<ReturnType<typeof downloadFlatLog>>, TError = HTTPValidationError>(ocelId: string | null,
-    params: DownloadFlatLogParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadFlatLog>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getDownloadFlatLogQueryKey = (
+  ocelId: string | null,
+  params?: DownloadFlatLogParams,
 ) => {
+  return [
+    `/api/external/modules/ocel/v1/${ocelId}/download/xes`,
+    ...(params ? [params] : []),
+  ] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getDownloadFlatLogQueryOptions = <
+  TData = Awaited<ReturnType<typeof downloadFlatLog>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params: DownloadFlatLogParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof downloadFlatLog>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getDownloadFlatLogQueryKey(ocelId,params);
+  const queryKey =
+    queryOptions?.queryKey ?? getDownloadFlatLogQueryKey(ocelId, params);
 
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof downloadFlatLog>>> = ({
+    signal,
+  }) => downloadFlatLog(ocelId, params, requestOptions, signal);
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: ocelId !== null && ocelId !== undefined,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof downloadFlatLog>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof downloadFlatLog>>> = ({ signal }) => downloadFlatLog(ocelId,params, requestOptions, signal);
+export type DownloadFlatLogQueryResult = NonNullable<
+  Awaited<ReturnType<typeof downloadFlatLog>>
+>;
+export type DownloadFlatLogQueryError = HTTPValidationError;
 
-
-
-
-
-   return  { queryKey, queryFn, enabled: ocelId !== null && ocelId !== undefined,  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof downloadFlatLog>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type DownloadFlatLogQueryResult = NonNullable<Awaited<ReturnType<typeof downloadFlatLog>>>
-export type DownloadFlatLogQueryError = HTTPValidationError
-
-
-export function useDownloadFlatLog<TData = Awaited<ReturnType<typeof downloadFlatLog>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params: DownloadFlatLogParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadFlatLog>>, TError, TData>> & Pick<
+export function useDownloadFlatLog<
+  TData = Awaited<ReturnType<typeof downloadFlatLog>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params: DownloadFlatLogParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof downloadFlatLog>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof downloadFlatLog>>,
           TError,
           Awaited<ReturnType<typeof downloadFlatLog>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useDownloadFlatLog<TData = Awaited<ReturnType<typeof downloadFlatLog>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params: DownloadFlatLogParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadFlatLog>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useDownloadFlatLog<
+  TData = Awaited<ReturnType<typeof downloadFlatLog>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params: DownloadFlatLogParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof downloadFlatLog>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof downloadFlatLog>>,
           TError,
           Awaited<ReturnType<typeof downloadFlatLog>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useDownloadFlatLog<TData = Awaited<ReturnType<typeof downloadFlatLog>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params: DownloadFlatLogParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadFlatLog>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useDownloadFlatLog<
+  TData = Awaited<ReturnType<typeof downloadFlatLog>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params: DownloadFlatLogParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof downloadFlatLog>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Download OCEL as a xes
  */
 
-export function useDownloadFlatLog<TData = Awaited<ReturnType<typeof downloadFlatLog>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params: DownloadFlatLogParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadFlatLog>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useDownloadFlatLog<
+  TData = Awaited<ReturnType<typeof downloadFlatLog>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params: DownloadFlatLogParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof downloadFlatLog>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getDownloadFlatLogQueryOptions(ocelId, params, options);
 
-  const queryOptions = getDownloadFlatLogQueryOptions(ocelId,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
-
-
-
-
-
-
 
 /**
  * Filters the OCEL to the objects of `object_type` that follow any of the given `variant_ids`, then flattens that sub-log by `object_type` into a XES file (one trace per object).
  * @summary Download selected object variants as a flat XES log
  */
 export const downloadVariantFlatLog = (
-    ocelId: string | null,
-    params: DownloadVariantFlatLogParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  ocelId: string | null,
+  params: DownloadVariantFlatLogParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<unknown>(
-      {url: `/api/external/modules/ocel/v1/${ocelId}/objects/variants/download/xes`, method: 'GET',
-        params, signal
+  return customFetch<unknown>(
+    {
+      url: `/api/external/modules/ocel/v1/${ocelId}/objects/variants/download/xes`,
+      method: "GET",
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
-
-
-
-export const getDownloadVariantFlatLogQueryKey = (ocelId: string | null,
-    params?: DownloadVariantFlatLogParams,) => {
-    return [
-    `/api/external/modules/ocel/v1/${ocelId}/objects/variants/download/xes`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getDownloadVariantFlatLogQueryOptions = <TData = Awaited<ReturnType<typeof downloadVariantFlatLog>>, TError = HTTPValidationError>(ocelId: string | null,
-    params: DownloadVariantFlatLogParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadVariantFlatLog>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getDownloadVariantFlatLogQueryKey = (
+  ocelId: string | null,
+  params?: DownloadVariantFlatLogParams,
 ) => {
+  return [
+    `/api/external/modules/ocel/v1/${ocelId}/objects/variants/download/xes`,
+    ...(params ? [params] : []),
+  ] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getDownloadVariantFlatLogQueryOptions = <
+  TData = Awaited<ReturnType<typeof downloadVariantFlatLog>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params: DownloadVariantFlatLogParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof downloadVariantFlatLog>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getDownloadVariantFlatLogQueryKey(ocelId,params);
+  const queryKey =
+    queryOptions?.queryKey ?? getDownloadVariantFlatLogQueryKey(ocelId, params);
 
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof downloadVariantFlatLog>>
+  > = ({ signal }) =>
+    downloadVariantFlatLog(ocelId, params, requestOptions, signal);
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: ocelId !== null && ocelId !== undefined,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof downloadVariantFlatLog>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof downloadVariantFlatLog>>> = ({ signal }) => downloadVariantFlatLog(ocelId,params, requestOptions, signal);
+export type DownloadVariantFlatLogQueryResult = NonNullable<
+  Awaited<ReturnType<typeof downloadVariantFlatLog>>
+>;
+export type DownloadVariantFlatLogQueryError = HTTPValidationError;
 
-
-
-
-
-   return  { queryKey, queryFn, enabled: ocelId !== null && ocelId !== undefined,  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof downloadVariantFlatLog>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type DownloadVariantFlatLogQueryResult = NonNullable<Awaited<ReturnType<typeof downloadVariantFlatLog>>>
-export type DownloadVariantFlatLogQueryError = HTTPValidationError
-
-
-export function useDownloadVariantFlatLog<TData = Awaited<ReturnType<typeof downloadVariantFlatLog>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params: DownloadVariantFlatLogParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadVariantFlatLog>>, TError, TData>> & Pick<
+export function useDownloadVariantFlatLog<
+  TData = Awaited<ReturnType<typeof downloadVariantFlatLog>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params: DownloadVariantFlatLogParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof downloadVariantFlatLog>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof downloadVariantFlatLog>>,
           TError,
           Awaited<ReturnType<typeof downloadVariantFlatLog>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useDownloadVariantFlatLog<TData = Awaited<ReturnType<typeof downloadVariantFlatLog>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params: DownloadVariantFlatLogParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadVariantFlatLog>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useDownloadVariantFlatLog<
+  TData = Awaited<ReturnType<typeof downloadVariantFlatLog>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params: DownloadVariantFlatLogParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof downloadVariantFlatLog>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof downloadVariantFlatLog>>,
           TError,
           Awaited<ReturnType<typeof downloadVariantFlatLog>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useDownloadVariantFlatLog<TData = Awaited<ReturnType<typeof downloadVariantFlatLog>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params: DownloadVariantFlatLogParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadVariantFlatLog>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useDownloadVariantFlatLog<
+  TData = Awaited<ReturnType<typeof downloadVariantFlatLog>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params: DownloadVariantFlatLogParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof downloadVariantFlatLog>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Download selected object variants as a flat XES log
  */
 
-export function useDownloadVariantFlatLog<TData = Awaited<ReturnType<typeof downloadVariantFlatLog>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params: DownloadVariantFlatLogParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadVariantFlatLog>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useDownloadVariantFlatLog<
+  TData = Awaited<ReturnType<typeof downloadVariantFlatLog>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params: DownloadVariantFlatLogParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof downloadVariantFlatLog>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getDownloadVariantFlatLogQueryOptions(
+    ocelId,
+    params,
+    options,
+  );
 
-  const queryOptions = getDownloadVariantFlatLogQueryOptions(ocelId,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }

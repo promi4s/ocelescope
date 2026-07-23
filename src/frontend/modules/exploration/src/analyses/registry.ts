@@ -4,6 +4,8 @@ import { ObjectActivityExecutionDistributionCard } from "./ObjectActivityExecuti
 import { ObjectActivityExecutionDistributionEditor } from "./ObjectActivityExecutionDistributionEditor";
 import { ObjectAttributeDistributionCard } from "./ObjectAttributeDistributionCard";
 import { ObjectAttributeDistributionEditor } from "./ObjectAttributeDistributionEditor";
+import { ObjectAttributeTimelineCard } from "./ObjectAttributeTimelineCard";
+import { ObjectAttributeTimelineEditor } from "./ObjectAttributeTimelineEditor";
 import { ObjectCountsPerEventCard } from "./ObjectCountsPerEventCard";
 import { ObjectCountsPerEventEditor } from "./ObjectCountsPerEventEditor";
 import { ObjectInvolvementDistributionCard } from "./ObjectInvolvementDistributionCard";
@@ -97,6 +99,15 @@ export const analysisDefinitions = [
       "Compare object attribute values at the time objects participate in events of a selected activity.",
     Editor: ObjectAttributeDistributionEditor,
     Card: ObjectAttributeDistributionCard,
+  },
+  {
+    id: "object-attribute-timeline",
+    category: "Attributes",
+    label: "Object attribute value development",
+    description:
+      "Track how every attribute of a single object changed over its lifetime, alongside its own events.",
+    Editor: ObjectAttributeTimelineEditor,
+    Card: ObjectAttributeTimelineCard,
   },
 ] as const satisfies readonly AnalysisDefinition[];
 

@@ -17,6 +17,7 @@ export default defineConfig({
           queryTimeBetweenActivities: asQuery,
           queryObjectActivityExecutionDistribution: asQuery,
           queryTotalObjectInvolvement: asQuery,
+          queryObjectAttributeTimeline: asQuery,
         },
       },
     },

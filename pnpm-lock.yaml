@@ -101,7 +101,7 @@ catalogs:
       version: 19.2.3
     '@xyflow/react':
       specifier: ^12.10.1
-      version: 12.10.1
+      version: 12.11.1
     axios:
       specifier: ^1.18.0
       version: 1.18.0
@@ -394,7 +394,7 @@ importers:
         version: 1.0.0
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.12(@tsdown/css@0.22.12)(oxc-resolver@11.21.3)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2))
+        version: 0.22.12(@tsdown/css@0.22.12)(oxc-resolver@11.21.3)(typescript@5.9.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -404,6 +404,9 @@ importers:
       '@mantine/core':
         specifier: 'catalog:'
         version: 9.4.0(@mantine/hooks@9.4.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@mantine/hooks':
+        specifier: 'catalog:'
+        version: 9.4.0(react@19.2.7)
       '@ocelescope/api-client':
         specifier: workspace:^
         version: link:../../packages/api/client
@@ -440,7 +443,7 @@ importers:
         version: 8.22.0(@faker-js/faker@10.5.0)(typescript@5.9.3)
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.12(@tsdown/css@0.22.12)(oxc-resolver@11.21.3)(typescript@5.9.3)(unrun@0.2.32)
+        version: 0.22.12(@tsdown/css@0.22.12)(oxc-resolver@11.21.3)(typescript@5.9.3)(unrun@0.2.32(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2))
       typescript:
         specifier: 'catalog:'
         version: 5.9.3

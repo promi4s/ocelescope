@@ -16,6 +16,11 @@ from ocelescope_module_exploration.analyses.object_attribute_distribution import
     ObjectAttributeDistributionQuery,
     execute_object_attribute_distribution_query,
 )
+from ocelescope_module_exploration.analyses.object_attribute_timeline import (
+    ObjectAttributeTimelineQuery,
+    ObjectAttributeTimelineResponse,
+    execute_object_attribute_timeline_query,
+)
 from ocelescope_module_exploration.analyses.object_counts_per_event import (
     ObjectCountsPerEventQuery,
     ObjectCountsPerEventResponse,
@@ -233,3 +238,19 @@ def query_total_object_involvement(
 ) -> TotalObjectInvolvementResponse:
     del ocel_id
     return execute_total_object_involvement_query(ocel)
+
+
+@router.post(
+    "/{ocel_id}/queries/object-attribute-timeline",
+    operation_id="queryObjectAttributeTimeline",
+)
+def query_object_attribute_timeline(
+    ocel_id: str,
+    ocel: ApiOcel,
+    body: ObjectAttributeTimelineQuery,
+) -> ObjectAttributeTimelineResponse:
+    del ocel_id
+    try:
+        return execute_object_attribute_timeline_query(ocel, body)
+    except InvalidAnalysisQuery as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error

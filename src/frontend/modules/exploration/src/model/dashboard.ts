@@ -3,6 +3,7 @@ import type {
   EventAttributeDistributionQuery,
   ObjectActivityExecutionDistributionQuery,
   ObjectAttributeDistributionQuery,
+  ObjectAttributeTimelineQuery,
   ObjectCountsPerEventQuery,
   ObjectInvolvementDistributionQuery,
   ObjectTypeCombinationsQuery,
@@ -67,6 +68,12 @@ export interface TotalObjectInvolvementSpec {
   title?: string;
 }
 
+export interface ObjectAttributeTimelineSpec {
+  analysis: "object-attribute-timeline";
+  query: ObjectAttributeTimelineQuery;
+  title?: string;
+}
+
 export type VisualizationSpec =
   | ActivityExecutionFrequencySpec
   | EventAttributeDistributionSpec
@@ -76,7 +83,8 @@ export type VisualizationSpec =
   | ObjectTypeCombinationsSpec
   | TimeBetweenActivitiesSpec
   | ObjectActivityExecutionDistributionSpec
-  | TotalObjectInvolvementSpec;
+  | TotalObjectInvolvementSpec
+  | ObjectAttributeTimelineSpec;
 
 export interface DashboardCardDefinition {
   id: string;

@@ -4,9 +4,7 @@
  * Exploration
  * OpenAPI spec version: 1.0
  */
-import {
-  useQuery
-} from '@tanstack/react-query';
+
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -16,10 +14,11 @@ import type {
   QueryKey,
   UndefinedInitialDataOptions,
   UseQueryOptions,
-  UseQueryResult
-} from '@tanstack/react-query';
+  UseQueryResult,
+} from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
-import { customFetch } from '../lib/fetcher';
+import { customFetch } from "../lib/fetcher";
 export interface ActivityEventCount {
   activity: string;
   event_count: number;
@@ -45,22 +44,22 @@ export interface ActivityExecutionFrequencyResponse {
 }
 
 export interface CategoryGrouping {
-  kind: 'categories';
+  kind: "categories";
   /**
-     * @minimum 1
-     * @maximum 500
-     */
+   * @minimum 1
+   * @maximum 500
+   */
   limit?: number;
 }
 
-export type DistributionBucketKind = typeof DistributionBucketKind[keyof typeof DistributionBucketKind];
-
+export type DistributionBucketKind =
+  (typeof DistributionBucketKind)[keyof typeof DistributionBucketKind];
 
 export const DistributionBucketKind = {
-  value: 'value',
-  range: 'range',
-  missing: 'missing',
-  other: 'other',
+  value: "value",
+  range: "range",
+  missing: "missing",
+  other: "other",
 } as const;
 
 export interface DistributionBucket {
@@ -88,7 +87,7 @@ export interface DistributionResponse {
 }
 
 export interface NumericBinGrouping {
-  kind: 'bins';
+  kind: "bins";
   count?: number | null;
 }
 
@@ -135,6 +134,27 @@ export interface ObjectAttributeDistributionQuery {
   grouping: CategoryGrouping | NumericBinGrouping;
 }
 
+export interface ObjectAttributeTimelinePoint {
+  timestamp: string;
+  event_id?: string | null;
+  activity?: string | null;
+}
+
+export interface ObjectAttributeTimelineQuery {
+  object_id: string;
+  attributes?: string[] | null;
+}
+
+export type ObjectAttributeTimelineResponseSeries = {
+  [key: string]: (string | number | boolean | null)[];
+};
+
+export interface ObjectAttributeTimelineResponse {
+  object_type: string;
+  points: ObjectAttributeTimelinePoint[];
+  series: ObjectAttributeTimelineResponseSeries;
+}
+
 export interface ObjectCountPerEventRow {
   activity: string;
   object_type: string;
@@ -165,9 +185,9 @@ export interface ObjectTypeCombinationRow {
 
 export interface ObjectTypeCombinationsQuery {
   /**
-     * @minimum 1
-     * @maximum 50
-     */
+   * @minimum 1
+   * @maximum 50
+   */
   limit?: number;
   activities?: string[];
 }
@@ -180,14 +200,14 @@ export interface ObjectTypeCombinationsResponse {
   truncated: boolean;
 }
 
-export type TimeBetweenActivitiesQueryUnit = typeof TimeBetweenActivitiesQueryUnit[keyof typeof TimeBetweenActivitiesQueryUnit];
-
+export type TimeBetweenActivitiesQueryUnit =
+  (typeof TimeBetweenActivitiesQueryUnit)[keyof typeof TimeBetweenActivitiesQueryUnit];
 
 export const TimeBetweenActivitiesQueryUnit = {
-  seconds: 'seconds',
-  minutes: 'minutes',
-  hours: 'hours',
-  days: 'days',
+  seconds: "seconds",
+  minutes: "minutes",
+  hours: "hours",
+  days: "days",
 } as const;
 
 export interface TimeBetweenActivitiesQuery {
@@ -198,14 +218,14 @@ export interface TimeBetweenActivitiesQuery {
   bin_count?: number | null;
 }
 
-export type TimeBetweenActivitiesResponseUnit = typeof TimeBetweenActivitiesResponseUnit[keyof typeof TimeBetweenActivitiesResponseUnit];
-
+export type TimeBetweenActivitiesResponseUnit =
+  (typeof TimeBetweenActivitiesResponseUnit)[keyof typeof TimeBetweenActivitiesResponseUnit];
 
 export const TimeBetweenActivitiesResponseUnit = {
-  seconds: 'seconds',
-  minutes: 'minutes',
-  hours: 'hours',
-  days: 'days',
+  seconds: "seconds",
+  minutes: "minutes",
+  hours: "hours",
+  days: "days",
 } as const;
 
 export interface TimeBetweenActivitiesResponse {
@@ -229,123 +249,146 @@ export interface TotalObjectInvolvementResponse {
 }
 
 export type QueryEventAttributeDistributionParams = {
-ocel_version?: QueryEventAttributeDistributionOcelVersion;
+  ocel_version?: QueryEventAttributeDistributionOcelVersion;
 };
 
-export type QueryEventAttributeDistributionOcelVersion = typeof QueryEventAttributeDistributionOcelVersion[keyof typeof QueryEventAttributeDistributionOcelVersion] | null;
-
+export type QueryEventAttributeDistributionOcelVersion =
+  | (typeof QueryEventAttributeDistributionOcelVersion)[keyof typeof QueryEventAttributeDistributionOcelVersion]
+  | null;
 
 export const QueryEventAttributeDistributionOcelVersion = {
-  original: 'original',
-  filtered: 'filtered',
+  original: "original",
+  filtered: "filtered",
 } as const;
 
 export type QueryObjectAttributeDistributionParams = {
-ocel_version?: QueryObjectAttributeDistributionOcelVersion;
+  ocel_version?: QueryObjectAttributeDistributionOcelVersion;
 };
 
-export type QueryObjectAttributeDistributionOcelVersion = typeof QueryObjectAttributeDistributionOcelVersion[keyof typeof QueryObjectAttributeDistributionOcelVersion] | null;
-
+export type QueryObjectAttributeDistributionOcelVersion =
+  | (typeof QueryObjectAttributeDistributionOcelVersion)[keyof typeof QueryObjectAttributeDistributionOcelVersion]
+  | null;
 
 export const QueryObjectAttributeDistributionOcelVersion = {
-  original: 'original',
-  filtered: 'filtered',
+  original: "original",
+  filtered: "filtered",
 } as const;
 
 export type QueryObjectCountsPerEventParams = {
-ocel_version?: QueryObjectCountsPerEventOcelVersion;
+  ocel_version?: QueryObjectCountsPerEventOcelVersion;
 };
 
-export type QueryObjectCountsPerEventOcelVersion = typeof QueryObjectCountsPerEventOcelVersion[keyof typeof QueryObjectCountsPerEventOcelVersion] | null;
-
+export type QueryObjectCountsPerEventOcelVersion =
+  | (typeof QueryObjectCountsPerEventOcelVersion)[keyof typeof QueryObjectCountsPerEventOcelVersion]
+  | null;
 
 export const QueryObjectCountsPerEventOcelVersion = {
-  original: 'original',
-  filtered: 'filtered',
+  original: "original",
+  filtered: "filtered",
 } as const;
 
 export type QueryObjectTypeCombinationsParams = {
-ocel_version?: QueryObjectTypeCombinationsOcelVersion;
+  ocel_version?: QueryObjectTypeCombinationsOcelVersion;
 };
 
-export type QueryObjectTypeCombinationsOcelVersion = typeof QueryObjectTypeCombinationsOcelVersion[keyof typeof QueryObjectTypeCombinationsOcelVersion] | null;
-
+export type QueryObjectTypeCombinationsOcelVersion =
+  | (typeof QueryObjectTypeCombinationsOcelVersion)[keyof typeof QueryObjectTypeCombinationsOcelVersion]
+  | null;
 
 export const QueryObjectTypeCombinationsOcelVersion = {
-  original: 'original',
-  filtered: 'filtered',
+  original: "original",
+  filtered: "filtered",
 } as const;
 
 export type QueryActivityExecutionFrequencyParams = {
-ocel_version?: QueryActivityExecutionFrequencyOcelVersion;
+  ocel_version?: QueryActivityExecutionFrequencyOcelVersion;
 };
 
-export type QueryActivityExecutionFrequencyOcelVersion = typeof QueryActivityExecutionFrequencyOcelVersion[keyof typeof QueryActivityExecutionFrequencyOcelVersion] | null;
-
+export type QueryActivityExecutionFrequencyOcelVersion =
+  | (typeof QueryActivityExecutionFrequencyOcelVersion)[keyof typeof QueryActivityExecutionFrequencyOcelVersion]
+  | null;
 
 export const QueryActivityExecutionFrequencyOcelVersion = {
-  original: 'original',
-  filtered: 'filtered',
+  original: "original",
+  filtered: "filtered",
 } as const;
 
 export type QueryObjectInvolvementDistributionParams = {
-ocel_version?: QueryObjectInvolvementDistributionOcelVersion;
+  ocel_version?: QueryObjectInvolvementDistributionOcelVersion;
 };
 
-export type QueryObjectInvolvementDistributionOcelVersion = typeof QueryObjectInvolvementDistributionOcelVersion[keyof typeof QueryObjectInvolvementDistributionOcelVersion] | null;
-
+export type QueryObjectInvolvementDistributionOcelVersion =
+  | (typeof QueryObjectInvolvementDistributionOcelVersion)[keyof typeof QueryObjectInvolvementDistributionOcelVersion]
+  | null;
 
 export const QueryObjectInvolvementDistributionOcelVersion = {
-  original: 'original',
-  filtered: 'filtered',
+  original: "original",
+  filtered: "filtered",
 } as const;
 
 export type QueryTimeBetweenActivitiesParams = {
-ocel_version?: QueryTimeBetweenActivitiesOcelVersion;
+  ocel_version?: QueryTimeBetweenActivitiesOcelVersion;
 };
 
-export type QueryTimeBetweenActivitiesOcelVersion = typeof QueryTimeBetweenActivitiesOcelVersion[keyof typeof QueryTimeBetweenActivitiesOcelVersion] | null;
-
+export type QueryTimeBetweenActivitiesOcelVersion =
+  | (typeof QueryTimeBetweenActivitiesOcelVersion)[keyof typeof QueryTimeBetweenActivitiesOcelVersion]
+  | null;
 
 export const QueryTimeBetweenActivitiesOcelVersion = {
-  original: 'original',
-  filtered: 'filtered',
+  original: "original",
+  filtered: "filtered",
 } as const;
 
 export type QueryObjectActivityExecutionDistributionParams = {
-ocel_version?: QueryObjectActivityExecutionDistributionOcelVersion;
+  ocel_version?: QueryObjectActivityExecutionDistributionOcelVersion;
 };
 
-export type QueryObjectActivityExecutionDistributionOcelVersion = typeof QueryObjectActivityExecutionDistributionOcelVersion[keyof typeof QueryObjectActivityExecutionDistributionOcelVersion] | null;
-
+export type QueryObjectActivityExecutionDistributionOcelVersion =
+  | (typeof QueryObjectActivityExecutionDistributionOcelVersion)[keyof typeof QueryObjectActivityExecutionDistributionOcelVersion]
+  | null;
 
 export const QueryObjectActivityExecutionDistributionOcelVersion = {
-  original: 'original',
-  filtered: 'filtered',
+  original: "original",
+  filtered: "filtered",
 } as const;
 
 export type QueryTotalObjectInvolvementParams = {
-ocel_version?: QueryTotalObjectInvolvementOcelVersion;
+  ocel_version?: QueryTotalObjectInvolvementOcelVersion;
 };
 
-export type QueryTotalObjectInvolvementOcelVersion = typeof QueryTotalObjectInvolvementOcelVersion[keyof typeof QueryTotalObjectInvolvementOcelVersion] | null;
-
+export type QueryTotalObjectInvolvementOcelVersion =
+  | (typeof QueryTotalObjectInvolvementOcelVersion)[keyof typeof QueryTotalObjectInvolvementOcelVersion]
+  | null;
 
 export const QueryTotalObjectInvolvementOcelVersion = {
-  original: 'original',
-  filtered: 'filtered',
+  original: "original",
+  filtered: "filtered",
+} as const;
+
+export type QueryObjectAttributeTimelineParams = {
+  ocel_version?: QueryObjectAttributeTimelineOcelVersion;
+};
+
+export type QueryObjectAttributeTimelineOcelVersion =
+  | (typeof QueryObjectAttributeTimelineOcelVersion)[keyof typeof QueryObjectAttributeTimelineOcelVersion]
+  | null;
+
+export const QueryObjectAttributeTimelineOcelVersion = {
+  original: "original",
+  filtered: "filtered",
 } as const;
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
-
-
-const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKey: K } => {
+const withQueryKey = <T extends object, K>(
+  query: T,
+  queryKey: K,
+): T & { queryKey: K } => {
   const result = { queryKey } as T & { queryKey: K };
   for (const key of Object.keys(query)) {
     // The explicit queryKey always wins, matching the previous
     // `{ ...query, queryKey }` spread where it was set last.
-    if (key === 'queryKey') continue;
+    if (key === "queryKey") continue;
     Object.defineProperty(result, key, {
       enumerable: true,
       configurable: true,
@@ -359,973 +402,2098 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
  * @summary Query Event Attribute Distribution
  */
 export const queryEventAttributeDistribution = (
-    ocelId: string | null,
-    eventAttributeDistributionQuery: EventAttributeDistributionQuery,
-    params?: QueryEventAttributeDistributionParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  ocelId: string | null,
+  eventAttributeDistributionQuery: EventAttributeDistributionQuery,
+  params?: QueryEventAttributeDistributionParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<DistributionResponse>(
-      {url: `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/event-attribute-distribution`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
+  return customFetch<DistributionResponse>(
+    {
+      url: `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/event-attribute-distribution`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       data: eventAttributeDistributionQuery,
-        params, signal
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
-
-
-
-export const getQueryEventAttributeDistributionQueryKey = (ocelId: string | null,
-    eventAttributeDistributionQuery?: EventAttributeDistributionQuery,
-    params?: QueryEventAttributeDistributionParams,) => {
-    return [
-    'POST', `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/event-attribute-distribution`, ...(params ? [params] : []), eventAttributeDistributionQuery
-    ] as const;
-    }
-
-
-export const getQueryEventAttributeDistributionQueryOptions = <TData = Awaited<ReturnType<typeof queryEventAttributeDistribution>>, TError = HTTPValidationError>(ocelId: string | null,
-    eventAttributeDistributionQuery: EventAttributeDistributionQuery,
-    params?: QueryEventAttributeDistributionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryEventAttributeDistribution>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getQueryEventAttributeDistributionQueryKey = (
+  ocelId: string | null,
+  eventAttributeDistributionQuery?: EventAttributeDistributionQuery,
+  params?: QueryEventAttributeDistributionParams,
 ) => {
+  return [
+    "POST",
+    `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/event-attribute-distribution`,
+    ...(params ? [params] : []),
+    eventAttributeDistributionQuery,
+  ] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getQueryEventAttributeDistributionQueryOptions = <
+  TData = Awaited<ReturnType<typeof queryEventAttributeDistribution>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  eventAttributeDistributionQuery: EventAttributeDistributionQuery,
+  params?: QueryEventAttributeDistributionParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryEventAttributeDistribution>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getQueryEventAttributeDistributionQueryKey(ocelId,eventAttributeDistributionQuery,params);
+  const queryKey =
+    queryOptions?.queryKey ??
+    getQueryEventAttributeDistributionQueryKey(
+      ocelId,
+      eventAttributeDistributionQuery,
+      params,
+    );
 
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof queryEventAttributeDistribution>>
+  > = ({ signal }) =>
+    queryEventAttributeDistribution(
+      ocelId,
+      eventAttributeDistributionQuery,
+      params,
+      requestOptions,
+      signal,
+    );
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: ocelId !== null && ocelId !== undefined,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof queryEventAttributeDistribution>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof queryEventAttributeDistribution>>> = ({ signal }) => queryEventAttributeDistribution(ocelId,eventAttributeDistributionQuery,params, requestOptions, signal);
+export type QueryEventAttributeDistributionQueryResult = NonNullable<
+  Awaited<ReturnType<typeof queryEventAttributeDistribution>>
+>;
+export type QueryEventAttributeDistributionQueryError = HTTPValidationError;
 
-
-
-
-
-   return  { queryKey, queryFn, enabled: ocelId !== null && ocelId !== undefined,  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof queryEventAttributeDistribution>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type QueryEventAttributeDistributionQueryResult = NonNullable<Awaited<ReturnType<typeof queryEventAttributeDistribution>>>
-export type QueryEventAttributeDistributionQueryError = HTTPValidationError
-
-
-export function useQueryEventAttributeDistribution<TData = Awaited<ReturnType<typeof queryEventAttributeDistribution>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    eventAttributeDistributionQuery: EventAttributeDistributionQuery,
-    params: undefined |  QueryEventAttributeDistributionParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryEventAttributeDistribution>>, TError, TData>> & Pick<
+export function useQueryEventAttributeDistribution<
+  TData = Awaited<ReturnType<typeof queryEventAttributeDistribution>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  eventAttributeDistributionQuery: EventAttributeDistributionQuery,
+  params: undefined | QueryEventAttributeDistributionParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryEventAttributeDistribution>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof queryEventAttributeDistribution>>,
           TError,
           Awaited<ReturnType<typeof queryEventAttributeDistribution>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useQueryEventAttributeDistribution<TData = Awaited<ReturnType<typeof queryEventAttributeDistribution>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    eventAttributeDistributionQuery: EventAttributeDistributionQuery,
-    params?: QueryEventAttributeDistributionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryEventAttributeDistribution>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useQueryEventAttributeDistribution<
+  TData = Awaited<ReturnType<typeof queryEventAttributeDistribution>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  eventAttributeDistributionQuery: EventAttributeDistributionQuery,
+  params?: QueryEventAttributeDistributionParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryEventAttributeDistribution>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof queryEventAttributeDistribution>>,
           TError,
           Awaited<ReturnType<typeof queryEventAttributeDistribution>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useQueryEventAttributeDistribution<TData = Awaited<ReturnType<typeof queryEventAttributeDistribution>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    eventAttributeDistributionQuery: EventAttributeDistributionQuery,
-    params?: QueryEventAttributeDistributionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryEventAttributeDistribution>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useQueryEventAttributeDistribution<
+  TData = Awaited<ReturnType<typeof queryEventAttributeDistribution>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  eventAttributeDistributionQuery: EventAttributeDistributionQuery,
+  params?: QueryEventAttributeDistributionParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryEventAttributeDistribution>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Query Event Attribute Distribution
  */
 
-export function useQueryEventAttributeDistribution<TData = Awaited<ReturnType<typeof queryEventAttributeDistribution>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    eventAttributeDistributionQuery: EventAttributeDistributionQuery,
-    params?: QueryEventAttributeDistributionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryEventAttributeDistribution>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useQueryEventAttributeDistribution<
+  TData = Awaited<ReturnType<typeof queryEventAttributeDistribution>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  eventAttributeDistributionQuery: EventAttributeDistributionQuery,
+  params?: QueryEventAttributeDistributionParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryEventAttributeDistribution>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getQueryEventAttributeDistributionQueryOptions(
+    ocelId,
+    eventAttributeDistributionQuery,
+    params,
+    options,
+  );
 
-  const queryOptions = getQueryEventAttributeDistributionQueryOptions(ocelId,eventAttributeDistributionQuery,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
-
-
-
-
-
-
 
 /**
  * @summary Query Object Attribute Distribution
  */
 export const queryObjectAttributeDistribution = (
-    ocelId: string | null,
-    objectAttributeDistributionQuery: ObjectAttributeDistributionQuery,
-    params?: QueryObjectAttributeDistributionParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  ocelId: string | null,
+  objectAttributeDistributionQuery: ObjectAttributeDistributionQuery,
+  params?: QueryObjectAttributeDistributionParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<DistributionResponse>(
-      {url: `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/object-attribute-distribution`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
+  return customFetch<DistributionResponse>(
+    {
+      url: `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/object-attribute-distribution`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       data: objectAttributeDistributionQuery,
-        params, signal
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
-
-
-
-export const getQueryObjectAttributeDistributionQueryKey = (ocelId: string | null,
-    objectAttributeDistributionQuery?: ObjectAttributeDistributionQuery,
-    params?: QueryObjectAttributeDistributionParams,) => {
-    return [
-    'POST', `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/object-attribute-distribution`, ...(params ? [params] : []), objectAttributeDistributionQuery
-    ] as const;
-    }
-
-
-export const getQueryObjectAttributeDistributionQueryOptions = <TData = Awaited<ReturnType<typeof queryObjectAttributeDistribution>>, TError = HTTPValidationError>(ocelId: string | null,
-    objectAttributeDistributionQuery: ObjectAttributeDistributionQuery,
-    params?: QueryObjectAttributeDistributionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryObjectAttributeDistribution>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getQueryObjectAttributeDistributionQueryKey = (
+  ocelId: string | null,
+  objectAttributeDistributionQuery?: ObjectAttributeDistributionQuery,
+  params?: QueryObjectAttributeDistributionParams,
 ) => {
+  return [
+    "POST",
+    `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/object-attribute-distribution`,
+    ...(params ? [params] : []),
+    objectAttributeDistributionQuery,
+  ] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getQueryObjectAttributeDistributionQueryOptions = <
+  TData = Awaited<ReturnType<typeof queryObjectAttributeDistribution>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  objectAttributeDistributionQuery: ObjectAttributeDistributionQuery,
+  params?: QueryObjectAttributeDistributionParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryObjectAttributeDistribution>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getQueryObjectAttributeDistributionQueryKey(ocelId,objectAttributeDistributionQuery,params);
+  const queryKey =
+    queryOptions?.queryKey ??
+    getQueryObjectAttributeDistributionQueryKey(
+      ocelId,
+      objectAttributeDistributionQuery,
+      params,
+    );
 
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof queryObjectAttributeDistribution>>
+  > = ({ signal }) =>
+    queryObjectAttributeDistribution(
+      ocelId,
+      objectAttributeDistributionQuery,
+      params,
+      requestOptions,
+      signal,
+    );
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: ocelId !== null && ocelId !== undefined,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof queryObjectAttributeDistribution>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof queryObjectAttributeDistribution>>> = ({ signal }) => queryObjectAttributeDistribution(ocelId,objectAttributeDistributionQuery,params, requestOptions, signal);
+export type QueryObjectAttributeDistributionQueryResult = NonNullable<
+  Awaited<ReturnType<typeof queryObjectAttributeDistribution>>
+>;
+export type QueryObjectAttributeDistributionQueryError = HTTPValidationError;
 
-
-
-
-
-   return  { queryKey, queryFn, enabled: ocelId !== null && ocelId !== undefined,  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof queryObjectAttributeDistribution>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type QueryObjectAttributeDistributionQueryResult = NonNullable<Awaited<ReturnType<typeof queryObjectAttributeDistribution>>>
-export type QueryObjectAttributeDistributionQueryError = HTTPValidationError
-
-
-export function useQueryObjectAttributeDistribution<TData = Awaited<ReturnType<typeof queryObjectAttributeDistribution>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    objectAttributeDistributionQuery: ObjectAttributeDistributionQuery,
-    params: undefined |  QueryObjectAttributeDistributionParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryObjectAttributeDistribution>>, TError, TData>> & Pick<
+export function useQueryObjectAttributeDistribution<
+  TData = Awaited<ReturnType<typeof queryObjectAttributeDistribution>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  objectAttributeDistributionQuery: ObjectAttributeDistributionQuery,
+  params: undefined | QueryObjectAttributeDistributionParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryObjectAttributeDistribution>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof queryObjectAttributeDistribution>>,
           TError,
           Awaited<ReturnType<typeof queryObjectAttributeDistribution>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useQueryObjectAttributeDistribution<TData = Awaited<ReturnType<typeof queryObjectAttributeDistribution>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    objectAttributeDistributionQuery: ObjectAttributeDistributionQuery,
-    params?: QueryObjectAttributeDistributionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryObjectAttributeDistribution>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useQueryObjectAttributeDistribution<
+  TData = Awaited<ReturnType<typeof queryObjectAttributeDistribution>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  objectAttributeDistributionQuery: ObjectAttributeDistributionQuery,
+  params?: QueryObjectAttributeDistributionParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryObjectAttributeDistribution>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof queryObjectAttributeDistribution>>,
           TError,
           Awaited<ReturnType<typeof queryObjectAttributeDistribution>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useQueryObjectAttributeDistribution<TData = Awaited<ReturnType<typeof queryObjectAttributeDistribution>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    objectAttributeDistributionQuery: ObjectAttributeDistributionQuery,
-    params?: QueryObjectAttributeDistributionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryObjectAttributeDistribution>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useQueryObjectAttributeDistribution<
+  TData = Awaited<ReturnType<typeof queryObjectAttributeDistribution>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  objectAttributeDistributionQuery: ObjectAttributeDistributionQuery,
+  params?: QueryObjectAttributeDistributionParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryObjectAttributeDistribution>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Query Object Attribute Distribution
  */
 
-export function useQueryObjectAttributeDistribution<TData = Awaited<ReturnType<typeof queryObjectAttributeDistribution>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    objectAttributeDistributionQuery: ObjectAttributeDistributionQuery,
-    params?: QueryObjectAttributeDistributionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryObjectAttributeDistribution>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useQueryObjectAttributeDistribution<
+  TData = Awaited<ReturnType<typeof queryObjectAttributeDistribution>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  objectAttributeDistributionQuery: ObjectAttributeDistributionQuery,
+  params?: QueryObjectAttributeDistributionParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryObjectAttributeDistribution>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getQueryObjectAttributeDistributionQueryOptions(
+    ocelId,
+    objectAttributeDistributionQuery,
+    params,
+    options,
+  );
 
-  const queryOptions = getQueryObjectAttributeDistributionQueryOptions(ocelId,objectAttributeDistributionQuery,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
-
-
-
-
-
-
 
 /**
  * @summary Query Object Counts Per Event
  */
 export const queryObjectCountsPerEvent = (
-    ocelId: string | null,
-    objectCountsPerEventQuery: ObjectCountsPerEventQuery,
-    params?: QueryObjectCountsPerEventParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  ocelId: string | null,
+  objectCountsPerEventQuery: ObjectCountsPerEventQuery,
+  params?: QueryObjectCountsPerEventParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<ObjectCountsPerEventResponse>(
-      {url: `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/object-counts-per-event`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
+  return customFetch<ObjectCountsPerEventResponse>(
+    {
+      url: `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/object-counts-per-event`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       data: objectCountsPerEventQuery,
-        params, signal
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
-
-
-
-export const getQueryObjectCountsPerEventQueryKey = (ocelId: string | null,
-    objectCountsPerEventQuery?: ObjectCountsPerEventQuery,
-    params?: QueryObjectCountsPerEventParams,) => {
-    return [
-    'POST', `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/object-counts-per-event`, ...(params ? [params] : []), objectCountsPerEventQuery
-    ] as const;
-    }
-
-
-export const getQueryObjectCountsPerEventQueryOptions = <TData = Awaited<ReturnType<typeof queryObjectCountsPerEvent>>, TError = HTTPValidationError>(ocelId: string | null,
-    objectCountsPerEventQuery: ObjectCountsPerEventQuery,
-    params?: QueryObjectCountsPerEventParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryObjectCountsPerEvent>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getQueryObjectCountsPerEventQueryKey = (
+  ocelId: string | null,
+  objectCountsPerEventQuery?: ObjectCountsPerEventQuery,
+  params?: QueryObjectCountsPerEventParams,
 ) => {
+  return [
+    "POST",
+    `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/object-counts-per-event`,
+    ...(params ? [params] : []),
+    objectCountsPerEventQuery,
+  ] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getQueryObjectCountsPerEventQueryOptions = <
+  TData = Awaited<ReturnType<typeof queryObjectCountsPerEvent>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  objectCountsPerEventQuery: ObjectCountsPerEventQuery,
+  params?: QueryObjectCountsPerEventParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryObjectCountsPerEvent>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getQueryObjectCountsPerEventQueryKey(ocelId,objectCountsPerEventQuery,params);
+  const queryKey =
+    queryOptions?.queryKey ??
+    getQueryObjectCountsPerEventQueryKey(
+      ocelId,
+      objectCountsPerEventQuery,
+      params,
+    );
 
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof queryObjectCountsPerEvent>>
+  > = ({ signal }) =>
+    queryObjectCountsPerEvent(
+      ocelId,
+      objectCountsPerEventQuery,
+      params,
+      requestOptions,
+      signal,
+    );
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: ocelId !== null && ocelId !== undefined,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof queryObjectCountsPerEvent>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof queryObjectCountsPerEvent>>> = ({ signal }) => queryObjectCountsPerEvent(ocelId,objectCountsPerEventQuery,params, requestOptions, signal);
+export type QueryObjectCountsPerEventQueryResult = NonNullable<
+  Awaited<ReturnType<typeof queryObjectCountsPerEvent>>
+>;
+export type QueryObjectCountsPerEventQueryError = HTTPValidationError;
 
-
-
-
-
-   return  { queryKey, queryFn, enabled: ocelId !== null && ocelId !== undefined,  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof queryObjectCountsPerEvent>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type QueryObjectCountsPerEventQueryResult = NonNullable<Awaited<ReturnType<typeof queryObjectCountsPerEvent>>>
-export type QueryObjectCountsPerEventQueryError = HTTPValidationError
-
-
-export function useQueryObjectCountsPerEvent<TData = Awaited<ReturnType<typeof queryObjectCountsPerEvent>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    objectCountsPerEventQuery: ObjectCountsPerEventQuery,
-    params: undefined |  QueryObjectCountsPerEventParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryObjectCountsPerEvent>>, TError, TData>> & Pick<
+export function useQueryObjectCountsPerEvent<
+  TData = Awaited<ReturnType<typeof queryObjectCountsPerEvent>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  objectCountsPerEventQuery: ObjectCountsPerEventQuery,
+  params: undefined | QueryObjectCountsPerEventParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryObjectCountsPerEvent>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof queryObjectCountsPerEvent>>,
           TError,
           Awaited<ReturnType<typeof queryObjectCountsPerEvent>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useQueryObjectCountsPerEvent<TData = Awaited<ReturnType<typeof queryObjectCountsPerEvent>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    objectCountsPerEventQuery: ObjectCountsPerEventQuery,
-    params?: QueryObjectCountsPerEventParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryObjectCountsPerEvent>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useQueryObjectCountsPerEvent<
+  TData = Awaited<ReturnType<typeof queryObjectCountsPerEvent>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  objectCountsPerEventQuery: ObjectCountsPerEventQuery,
+  params?: QueryObjectCountsPerEventParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryObjectCountsPerEvent>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof queryObjectCountsPerEvent>>,
           TError,
           Awaited<ReturnType<typeof queryObjectCountsPerEvent>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useQueryObjectCountsPerEvent<TData = Awaited<ReturnType<typeof queryObjectCountsPerEvent>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    objectCountsPerEventQuery: ObjectCountsPerEventQuery,
-    params?: QueryObjectCountsPerEventParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryObjectCountsPerEvent>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useQueryObjectCountsPerEvent<
+  TData = Awaited<ReturnType<typeof queryObjectCountsPerEvent>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  objectCountsPerEventQuery: ObjectCountsPerEventQuery,
+  params?: QueryObjectCountsPerEventParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryObjectCountsPerEvent>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Query Object Counts Per Event
  */
 
-export function useQueryObjectCountsPerEvent<TData = Awaited<ReturnType<typeof queryObjectCountsPerEvent>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    objectCountsPerEventQuery: ObjectCountsPerEventQuery,
-    params?: QueryObjectCountsPerEventParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryObjectCountsPerEvent>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useQueryObjectCountsPerEvent<
+  TData = Awaited<ReturnType<typeof queryObjectCountsPerEvent>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  objectCountsPerEventQuery: ObjectCountsPerEventQuery,
+  params?: QueryObjectCountsPerEventParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryObjectCountsPerEvent>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getQueryObjectCountsPerEventQueryOptions(
+    ocelId,
+    objectCountsPerEventQuery,
+    params,
+    options,
+  );
 
-  const queryOptions = getQueryObjectCountsPerEventQueryOptions(ocelId,objectCountsPerEventQuery,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
-
-
-
-
-
-
 
 /**
  * @summary Query Object Type Combinations
  */
 export const queryObjectTypeCombinations = (
-    ocelId: string | null,
-    objectTypeCombinationsQuery: ObjectTypeCombinationsQuery,
-    params?: QueryObjectTypeCombinationsParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  ocelId: string | null,
+  objectTypeCombinationsQuery: ObjectTypeCombinationsQuery,
+  params?: QueryObjectTypeCombinationsParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<ObjectTypeCombinationsResponse>(
-      {url: `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/object-type-combinations`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
+  return customFetch<ObjectTypeCombinationsResponse>(
+    {
+      url: `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/object-type-combinations`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       data: objectTypeCombinationsQuery,
-        params, signal
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
-
-
-
-export const getQueryObjectTypeCombinationsQueryKey = (ocelId: string | null,
-    objectTypeCombinationsQuery?: ObjectTypeCombinationsQuery,
-    params?: QueryObjectTypeCombinationsParams,) => {
-    return [
-    'POST', `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/object-type-combinations`, ...(params ? [params] : []), objectTypeCombinationsQuery
-    ] as const;
-    }
-
-
-export const getQueryObjectTypeCombinationsQueryOptions = <TData = Awaited<ReturnType<typeof queryObjectTypeCombinations>>, TError = HTTPValidationError>(ocelId: string | null,
-    objectTypeCombinationsQuery: ObjectTypeCombinationsQuery,
-    params?: QueryObjectTypeCombinationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryObjectTypeCombinations>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getQueryObjectTypeCombinationsQueryKey = (
+  ocelId: string | null,
+  objectTypeCombinationsQuery?: ObjectTypeCombinationsQuery,
+  params?: QueryObjectTypeCombinationsParams,
 ) => {
+  return [
+    "POST",
+    `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/object-type-combinations`,
+    ...(params ? [params] : []),
+    objectTypeCombinationsQuery,
+  ] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getQueryObjectTypeCombinationsQueryOptions = <
+  TData = Awaited<ReturnType<typeof queryObjectTypeCombinations>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  objectTypeCombinationsQuery: ObjectTypeCombinationsQuery,
+  params?: QueryObjectTypeCombinationsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryObjectTypeCombinations>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getQueryObjectTypeCombinationsQueryKey(ocelId,objectTypeCombinationsQuery,params);
+  const queryKey =
+    queryOptions?.queryKey ??
+    getQueryObjectTypeCombinationsQueryKey(
+      ocelId,
+      objectTypeCombinationsQuery,
+      params,
+    );
 
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof queryObjectTypeCombinations>>
+  > = ({ signal }) =>
+    queryObjectTypeCombinations(
+      ocelId,
+      objectTypeCombinationsQuery,
+      params,
+      requestOptions,
+      signal,
+    );
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: ocelId !== null && ocelId !== undefined,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof queryObjectTypeCombinations>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof queryObjectTypeCombinations>>> = ({ signal }) => queryObjectTypeCombinations(ocelId,objectTypeCombinationsQuery,params, requestOptions, signal);
+export type QueryObjectTypeCombinationsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof queryObjectTypeCombinations>>
+>;
+export type QueryObjectTypeCombinationsQueryError = HTTPValidationError;
 
-
-
-
-
-   return  { queryKey, queryFn, enabled: ocelId !== null && ocelId !== undefined,  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof queryObjectTypeCombinations>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type QueryObjectTypeCombinationsQueryResult = NonNullable<Awaited<ReturnType<typeof queryObjectTypeCombinations>>>
-export type QueryObjectTypeCombinationsQueryError = HTTPValidationError
-
-
-export function useQueryObjectTypeCombinations<TData = Awaited<ReturnType<typeof queryObjectTypeCombinations>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    objectTypeCombinationsQuery: ObjectTypeCombinationsQuery,
-    params: undefined |  QueryObjectTypeCombinationsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryObjectTypeCombinations>>, TError, TData>> & Pick<
+export function useQueryObjectTypeCombinations<
+  TData = Awaited<ReturnType<typeof queryObjectTypeCombinations>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  objectTypeCombinationsQuery: ObjectTypeCombinationsQuery,
+  params: undefined | QueryObjectTypeCombinationsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryObjectTypeCombinations>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof queryObjectTypeCombinations>>,
           TError,
           Awaited<ReturnType<typeof queryObjectTypeCombinations>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useQueryObjectTypeCombinations<TData = Awaited<ReturnType<typeof queryObjectTypeCombinations>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    objectTypeCombinationsQuery: ObjectTypeCombinationsQuery,
-    params?: QueryObjectTypeCombinationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryObjectTypeCombinations>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useQueryObjectTypeCombinations<
+  TData = Awaited<ReturnType<typeof queryObjectTypeCombinations>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  objectTypeCombinationsQuery: ObjectTypeCombinationsQuery,
+  params?: QueryObjectTypeCombinationsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryObjectTypeCombinations>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof queryObjectTypeCombinations>>,
           TError,
           Awaited<ReturnType<typeof queryObjectTypeCombinations>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useQueryObjectTypeCombinations<TData = Awaited<ReturnType<typeof queryObjectTypeCombinations>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    objectTypeCombinationsQuery: ObjectTypeCombinationsQuery,
-    params?: QueryObjectTypeCombinationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryObjectTypeCombinations>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useQueryObjectTypeCombinations<
+  TData = Awaited<ReturnType<typeof queryObjectTypeCombinations>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  objectTypeCombinationsQuery: ObjectTypeCombinationsQuery,
+  params?: QueryObjectTypeCombinationsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryObjectTypeCombinations>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Query Object Type Combinations
  */
 
-export function useQueryObjectTypeCombinations<TData = Awaited<ReturnType<typeof queryObjectTypeCombinations>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    objectTypeCombinationsQuery: ObjectTypeCombinationsQuery,
-    params?: QueryObjectTypeCombinationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryObjectTypeCombinations>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useQueryObjectTypeCombinations<
+  TData = Awaited<ReturnType<typeof queryObjectTypeCombinations>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  objectTypeCombinationsQuery: ObjectTypeCombinationsQuery,
+  params?: QueryObjectTypeCombinationsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryObjectTypeCombinations>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getQueryObjectTypeCombinationsQueryOptions(
+    ocelId,
+    objectTypeCombinationsQuery,
+    params,
+    options,
+  );
 
-  const queryOptions = getQueryObjectTypeCombinationsQueryOptions(ocelId,objectTypeCombinationsQuery,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
-
-
-
-
-
-
 
 /**
  * @summary Query Activity Execution Frequency
  */
 export const queryActivityExecutionFrequency = (
-    ocelId: string | null,
-    activityExecutionFrequencyQuery: ActivityExecutionFrequencyQuery,
-    params?: QueryActivityExecutionFrequencyParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  ocelId: string | null,
+  activityExecutionFrequencyQuery: ActivityExecutionFrequencyQuery,
+  params?: QueryActivityExecutionFrequencyParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<ActivityExecutionFrequencyResponse>(
-      {url: `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/activity-execution-frequency`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
+  return customFetch<ActivityExecutionFrequencyResponse>(
+    {
+      url: `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/activity-execution-frequency`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       data: activityExecutionFrequencyQuery,
-        params, signal
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
-
-
-
-export const getQueryActivityExecutionFrequencyQueryKey = (ocelId: string | null,
-    activityExecutionFrequencyQuery?: ActivityExecutionFrequencyQuery,
-    params?: QueryActivityExecutionFrequencyParams,) => {
-    return [
-    'POST', `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/activity-execution-frequency`, ...(params ? [params] : []), activityExecutionFrequencyQuery
-    ] as const;
-    }
-
-
-export const getQueryActivityExecutionFrequencyQueryOptions = <TData = Awaited<ReturnType<typeof queryActivityExecutionFrequency>>, TError = HTTPValidationError>(ocelId: string | null,
-    activityExecutionFrequencyQuery: ActivityExecutionFrequencyQuery,
-    params?: QueryActivityExecutionFrequencyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryActivityExecutionFrequency>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getQueryActivityExecutionFrequencyQueryKey = (
+  ocelId: string | null,
+  activityExecutionFrequencyQuery?: ActivityExecutionFrequencyQuery,
+  params?: QueryActivityExecutionFrequencyParams,
 ) => {
+  return [
+    "POST",
+    `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/activity-execution-frequency`,
+    ...(params ? [params] : []),
+    activityExecutionFrequencyQuery,
+  ] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getQueryActivityExecutionFrequencyQueryOptions = <
+  TData = Awaited<ReturnType<typeof queryActivityExecutionFrequency>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  activityExecutionFrequencyQuery: ActivityExecutionFrequencyQuery,
+  params?: QueryActivityExecutionFrequencyParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryActivityExecutionFrequency>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getQueryActivityExecutionFrequencyQueryKey(ocelId,activityExecutionFrequencyQuery,params);
+  const queryKey =
+    queryOptions?.queryKey ??
+    getQueryActivityExecutionFrequencyQueryKey(
+      ocelId,
+      activityExecutionFrequencyQuery,
+      params,
+    );
 
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof queryActivityExecutionFrequency>>
+  > = ({ signal }) =>
+    queryActivityExecutionFrequency(
+      ocelId,
+      activityExecutionFrequencyQuery,
+      params,
+      requestOptions,
+      signal,
+    );
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: ocelId !== null && ocelId !== undefined,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof queryActivityExecutionFrequency>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof queryActivityExecutionFrequency>>> = ({ signal }) => queryActivityExecutionFrequency(ocelId,activityExecutionFrequencyQuery,params, requestOptions, signal);
+export type QueryActivityExecutionFrequencyQueryResult = NonNullable<
+  Awaited<ReturnType<typeof queryActivityExecutionFrequency>>
+>;
+export type QueryActivityExecutionFrequencyQueryError = HTTPValidationError;
 
-
-
-
-
-   return  { queryKey, queryFn, enabled: ocelId !== null && ocelId !== undefined,  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof queryActivityExecutionFrequency>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type QueryActivityExecutionFrequencyQueryResult = NonNullable<Awaited<ReturnType<typeof queryActivityExecutionFrequency>>>
-export type QueryActivityExecutionFrequencyQueryError = HTTPValidationError
-
-
-export function useQueryActivityExecutionFrequency<TData = Awaited<ReturnType<typeof queryActivityExecutionFrequency>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    activityExecutionFrequencyQuery: ActivityExecutionFrequencyQuery,
-    params: undefined |  QueryActivityExecutionFrequencyParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryActivityExecutionFrequency>>, TError, TData>> & Pick<
+export function useQueryActivityExecutionFrequency<
+  TData = Awaited<ReturnType<typeof queryActivityExecutionFrequency>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  activityExecutionFrequencyQuery: ActivityExecutionFrequencyQuery,
+  params: undefined | QueryActivityExecutionFrequencyParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryActivityExecutionFrequency>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof queryActivityExecutionFrequency>>,
           TError,
           Awaited<ReturnType<typeof queryActivityExecutionFrequency>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useQueryActivityExecutionFrequency<TData = Awaited<ReturnType<typeof queryActivityExecutionFrequency>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    activityExecutionFrequencyQuery: ActivityExecutionFrequencyQuery,
-    params?: QueryActivityExecutionFrequencyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryActivityExecutionFrequency>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useQueryActivityExecutionFrequency<
+  TData = Awaited<ReturnType<typeof queryActivityExecutionFrequency>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  activityExecutionFrequencyQuery: ActivityExecutionFrequencyQuery,
+  params?: QueryActivityExecutionFrequencyParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryActivityExecutionFrequency>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof queryActivityExecutionFrequency>>,
           TError,
           Awaited<ReturnType<typeof queryActivityExecutionFrequency>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useQueryActivityExecutionFrequency<TData = Awaited<ReturnType<typeof queryActivityExecutionFrequency>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    activityExecutionFrequencyQuery: ActivityExecutionFrequencyQuery,
-    params?: QueryActivityExecutionFrequencyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryActivityExecutionFrequency>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useQueryActivityExecutionFrequency<
+  TData = Awaited<ReturnType<typeof queryActivityExecutionFrequency>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  activityExecutionFrequencyQuery: ActivityExecutionFrequencyQuery,
+  params?: QueryActivityExecutionFrequencyParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryActivityExecutionFrequency>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Query Activity Execution Frequency
  */
 
-export function useQueryActivityExecutionFrequency<TData = Awaited<ReturnType<typeof queryActivityExecutionFrequency>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    activityExecutionFrequencyQuery: ActivityExecutionFrequencyQuery,
-    params?: QueryActivityExecutionFrequencyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryActivityExecutionFrequency>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useQueryActivityExecutionFrequency<
+  TData = Awaited<ReturnType<typeof queryActivityExecutionFrequency>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  activityExecutionFrequencyQuery: ActivityExecutionFrequencyQuery,
+  params?: QueryActivityExecutionFrequencyParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryActivityExecutionFrequency>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getQueryActivityExecutionFrequencyQueryOptions(
+    ocelId,
+    activityExecutionFrequencyQuery,
+    params,
+    options,
+  );
 
-  const queryOptions = getQueryActivityExecutionFrequencyQueryOptions(ocelId,activityExecutionFrequencyQuery,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
-
-
-
-
-
-
 
 /**
  * @summary Query Object Involvement Distribution
  */
 export const queryObjectInvolvementDistribution = (
-    ocelId: string | null,
-    objectInvolvementDistributionQuery: ObjectInvolvementDistributionQuery,
-    params?: QueryObjectInvolvementDistributionParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  ocelId: string | null,
+  objectInvolvementDistributionQuery: ObjectInvolvementDistributionQuery,
+  params?: QueryObjectInvolvementDistributionParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<DistributionResponse>(
-      {url: `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/object-involvement-distribution`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
+  return customFetch<DistributionResponse>(
+    {
+      url: `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/object-involvement-distribution`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       data: objectInvolvementDistributionQuery,
-        params, signal
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
-
-
-
-export const getQueryObjectInvolvementDistributionQueryKey = (ocelId: string | null,
-    objectInvolvementDistributionQuery?: ObjectInvolvementDistributionQuery,
-    params?: QueryObjectInvolvementDistributionParams,) => {
-    return [
-    'POST', `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/object-involvement-distribution`, ...(params ? [params] : []), objectInvolvementDistributionQuery
-    ] as const;
-    }
-
-
-export const getQueryObjectInvolvementDistributionQueryOptions = <TData = Awaited<ReturnType<typeof queryObjectInvolvementDistribution>>, TError = HTTPValidationError>(ocelId: string | null,
-    objectInvolvementDistributionQuery: ObjectInvolvementDistributionQuery,
-    params?: QueryObjectInvolvementDistributionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryObjectInvolvementDistribution>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getQueryObjectInvolvementDistributionQueryKey = (
+  ocelId: string | null,
+  objectInvolvementDistributionQuery?: ObjectInvolvementDistributionQuery,
+  params?: QueryObjectInvolvementDistributionParams,
 ) => {
+  return [
+    "POST",
+    `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/object-involvement-distribution`,
+    ...(params ? [params] : []),
+    objectInvolvementDistributionQuery,
+  ] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getQueryObjectInvolvementDistributionQueryOptions = <
+  TData = Awaited<ReturnType<typeof queryObjectInvolvementDistribution>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  objectInvolvementDistributionQuery: ObjectInvolvementDistributionQuery,
+  params?: QueryObjectInvolvementDistributionParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryObjectInvolvementDistribution>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getQueryObjectInvolvementDistributionQueryKey(ocelId,objectInvolvementDistributionQuery,params);
+  const queryKey =
+    queryOptions?.queryKey ??
+    getQueryObjectInvolvementDistributionQueryKey(
+      ocelId,
+      objectInvolvementDistributionQuery,
+      params,
+    );
 
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof queryObjectInvolvementDistribution>>
+  > = ({ signal }) =>
+    queryObjectInvolvementDistribution(
+      ocelId,
+      objectInvolvementDistributionQuery,
+      params,
+      requestOptions,
+      signal,
+    );
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: ocelId !== null && ocelId !== undefined,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof queryObjectInvolvementDistribution>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof queryObjectInvolvementDistribution>>> = ({ signal }) => queryObjectInvolvementDistribution(ocelId,objectInvolvementDistributionQuery,params, requestOptions, signal);
+export type QueryObjectInvolvementDistributionQueryResult = NonNullable<
+  Awaited<ReturnType<typeof queryObjectInvolvementDistribution>>
+>;
+export type QueryObjectInvolvementDistributionQueryError = HTTPValidationError;
 
-
-
-
-
-   return  { queryKey, queryFn, enabled: ocelId !== null && ocelId !== undefined,  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof queryObjectInvolvementDistribution>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type QueryObjectInvolvementDistributionQueryResult = NonNullable<Awaited<ReturnType<typeof queryObjectInvolvementDistribution>>>
-export type QueryObjectInvolvementDistributionQueryError = HTTPValidationError
-
-
-export function useQueryObjectInvolvementDistribution<TData = Awaited<ReturnType<typeof queryObjectInvolvementDistribution>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    objectInvolvementDistributionQuery: ObjectInvolvementDistributionQuery,
-    params: undefined |  QueryObjectInvolvementDistributionParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryObjectInvolvementDistribution>>, TError, TData>> & Pick<
+export function useQueryObjectInvolvementDistribution<
+  TData = Awaited<ReturnType<typeof queryObjectInvolvementDistribution>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  objectInvolvementDistributionQuery: ObjectInvolvementDistributionQuery,
+  params: undefined | QueryObjectInvolvementDistributionParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryObjectInvolvementDistribution>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof queryObjectInvolvementDistribution>>,
           TError,
           Awaited<ReturnType<typeof queryObjectInvolvementDistribution>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useQueryObjectInvolvementDistribution<TData = Awaited<ReturnType<typeof queryObjectInvolvementDistribution>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    objectInvolvementDistributionQuery: ObjectInvolvementDistributionQuery,
-    params?: QueryObjectInvolvementDistributionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryObjectInvolvementDistribution>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useQueryObjectInvolvementDistribution<
+  TData = Awaited<ReturnType<typeof queryObjectInvolvementDistribution>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  objectInvolvementDistributionQuery: ObjectInvolvementDistributionQuery,
+  params?: QueryObjectInvolvementDistributionParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryObjectInvolvementDistribution>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof queryObjectInvolvementDistribution>>,
           TError,
           Awaited<ReturnType<typeof queryObjectInvolvementDistribution>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useQueryObjectInvolvementDistribution<TData = Awaited<ReturnType<typeof queryObjectInvolvementDistribution>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    objectInvolvementDistributionQuery: ObjectInvolvementDistributionQuery,
-    params?: QueryObjectInvolvementDistributionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryObjectInvolvementDistribution>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useQueryObjectInvolvementDistribution<
+  TData = Awaited<ReturnType<typeof queryObjectInvolvementDistribution>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  objectInvolvementDistributionQuery: ObjectInvolvementDistributionQuery,
+  params?: QueryObjectInvolvementDistributionParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryObjectInvolvementDistribution>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Query Object Involvement Distribution
  */
 
-export function useQueryObjectInvolvementDistribution<TData = Awaited<ReturnType<typeof queryObjectInvolvementDistribution>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    objectInvolvementDistributionQuery: ObjectInvolvementDistributionQuery,
-    params?: QueryObjectInvolvementDistributionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryObjectInvolvementDistribution>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useQueryObjectInvolvementDistribution<
+  TData = Awaited<ReturnType<typeof queryObjectInvolvementDistribution>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  objectInvolvementDistributionQuery: ObjectInvolvementDistributionQuery,
+  params?: QueryObjectInvolvementDistributionParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryObjectInvolvementDistribution>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getQueryObjectInvolvementDistributionQueryOptions(
+    ocelId,
+    objectInvolvementDistributionQuery,
+    params,
+    options,
+  );
 
-  const queryOptions = getQueryObjectInvolvementDistributionQueryOptions(ocelId,objectInvolvementDistributionQuery,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
-
-
-
-
-
-
 
 /**
  * @summary Query Time Between Activities
  */
 export const queryTimeBetweenActivities = (
-    ocelId: string | null,
-    timeBetweenActivitiesQuery: TimeBetweenActivitiesQuery,
-    params?: QueryTimeBetweenActivitiesParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  ocelId: string | null,
+  timeBetweenActivitiesQuery: TimeBetweenActivitiesQuery,
+  params?: QueryTimeBetweenActivitiesParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<TimeBetweenActivitiesResponse>(
-      {url: `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/time-between-activities`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
+  return customFetch<TimeBetweenActivitiesResponse>(
+    {
+      url: `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/time-between-activities`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       data: timeBetweenActivitiesQuery,
-        params, signal
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
-
-
-
-export const getQueryTimeBetweenActivitiesQueryKey = (ocelId: string | null,
-    timeBetweenActivitiesQuery?: TimeBetweenActivitiesQuery,
-    params?: QueryTimeBetweenActivitiesParams,) => {
-    return [
-    'POST', `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/time-between-activities`, ...(params ? [params] : []), timeBetweenActivitiesQuery
-    ] as const;
-    }
-
-
-export const getQueryTimeBetweenActivitiesQueryOptions = <TData = Awaited<ReturnType<typeof queryTimeBetweenActivities>>, TError = HTTPValidationError>(ocelId: string | null,
-    timeBetweenActivitiesQuery: TimeBetweenActivitiesQuery,
-    params?: QueryTimeBetweenActivitiesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryTimeBetweenActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getQueryTimeBetweenActivitiesQueryKey = (
+  ocelId: string | null,
+  timeBetweenActivitiesQuery?: TimeBetweenActivitiesQuery,
+  params?: QueryTimeBetweenActivitiesParams,
 ) => {
+  return [
+    "POST",
+    `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/time-between-activities`,
+    ...(params ? [params] : []),
+    timeBetweenActivitiesQuery,
+  ] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getQueryTimeBetweenActivitiesQueryOptions = <
+  TData = Awaited<ReturnType<typeof queryTimeBetweenActivities>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  timeBetweenActivitiesQuery: TimeBetweenActivitiesQuery,
+  params?: QueryTimeBetweenActivitiesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryTimeBetweenActivities>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getQueryTimeBetweenActivitiesQueryKey(ocelId,timeBetweenActivitiesQuery,params);
+  const queryKey =
+    queryOptions?.queryKey ??
+    getQueryTimeBetweenActivitiesQueryKey(
+      ocelId,
+      timeBetweenActivitiesQuery,
+      params,
+    );
 
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof queryTimeBetweenActivities>>
+  > = ({ signal }) =>
+    queryTimeBetweenActivities(
+      ocelId,
+      timeBetweenActivitiesQuery,
+      params,
+      requestOptions,
+      signal,
+    );
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: ocelId !== null && ocelId !== undefined,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof queryTimeBetweenActivities>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof queryTimeBetweenActivities>>> = ({ signal }) => queryTimeBetweenActivities(ocelId,timeBetweenActivitiesQuery,params, requestOptions, signal);
+export type QueryTimeBetweenActivitiesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof queryTimeBetweenActivities>>
+>;
+export type QueryTimeBetweenActivitiesQueryError = HTTPValidationError;
 
-
-
-
-
-   return  { queryKey, queryFn, enabled: ocelId !== null && ocelId !== undefined,  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof queryTimeBetweenActivities>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type QueryTimeBetweenActivitiesQueryResult = NonNullable<Awaited<ReturnType<typeof queryTimeBetweenActivities>>>
-export type QueryTimeBetweenActivitiesQueryError = HTTPValidationError
-
-
-export function useQueryTimeBetweenActivities<TData = Awaited<ReturnType<typeof queryTimeBetweenActivities>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    timeBetweenActivitiesQuery: TimeBetweenActivitiesQuery,
-    params: undefined |  QueryTimeBetweenActivitiesParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryTimeBetweenActivities>>, TError, TData>> & Pick<
+export function useQueryTimeBetweenActivities<
+  TData = Awaited<ReturnType<typeof queryTimeBetweenActivities>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  timeBetweenActivitiesQuery: TimeBetweenActivitiesQuery,
+  params: undefined | QueryTimeBetweenActivitiesParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryTimeBetweenActivities>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof queryTimeBetweenActivities>>,
           TError,
           Awaited<ReturnType<typeof queryTimeBetweenActivities>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useQueryTimeBetweenActivities<TData = Awaited<ReturnType<typeof queryTimeBetweenActivities>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    timeBetweenActivitiesQuery: TimeBetweenActivitiesQuery,
-    params?: QueryTimeBetweenActivitiesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryTimeBetweenActivities>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useQueryTimeBetweenActivities<
+  TData = Awaited<ReturnType<typeof queryTimeBetweenActivities>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  timeBetweenActivitiesQuery: TimeBetweenActivitiesQuery,
+  params?: QueryTimeBetweenActivitiesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryTimeBetweenActivities>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof queryTimeBetweenActivities>>,
           TError,
           Awaited<ReturnType<typeof queryTimeBetweenActivities>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useQueryTimeBetweenActivities<TData = Awaited<ReturnType<typeof queryTimeBetweenActivities>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    timeBetweenActivitiesQuery: TimeBetweenActivitiesQuery,
-    params?: QueryTimeBetweenActivitiesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryTimeBetweenActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useQueryTimeBetweenActivities<
+  TData = Awaited<ReturnType<typeof queryTimeBetweenActivities>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  timeBetweenActivitiesQuery: TimeBetweenActivitiesQuery,
+  params?: QueryTimeBetweenActivitiesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryTimeBetweenActivities>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Query Time Between Activities
  */
 
-export function useQueryTimeBetweenActivities<TData = Awaited<ReturnType<typeof queryTimeBetweenActivities>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    timeBetweenActivitiesQuery: TimeBetweenActivitiesQuery,
-    params?: QueryTimeBetweenActivitiesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryTimeBetweenActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useQueryTimeBetweenActivities<
+  TData = Awaited<ReturnType<typeof queryTimeBetweenActivities>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  timeBetweenActivitiesQuery: TimeBetweenActivitiesQuery,
+  params?: QueryTimeBetweenActivitiesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryTimeBetweenActivities>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getQueryTimeBetweenActivitiesQueryOptions(
+    ocelId,
+    timeBetweenActivitiesQuery,
+    params,
+    options,
+  );
 
-  const queryOptions = getQueryTimeBetweenActivitiesQueryOptions(ocelId,timeBetweenActivitiesQuery,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
-
-
-
-
-
-
 
 /**
  * @summary Query Object Activity Execution Distribution
  */
 export const queryObjectActivityExecutionDistribution = (
-    ocelId: string | null,
-    objectActivityExecutionDistributionQuery: ObjectActivityExecutionDistributionQuery,
-    params?: QueryObjectActivityExecutionDistributionParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  ocelId: string | null,
+  objectActivityExecutionDistributionQuery: ObjectActivityExecutionDistributionQuery,
+  params?: QueryObjectActivityExecutionDistributionParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<ObjectActivityExecutionDistributionResponse>(
-      {url: `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/object-activity-execution-distribution`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
+  return customFetch<ObjectActivityExecutionDistributionResponse>(
+    {
+      url: `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/object-activity-execution-distribution`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       data: objectActivityExecutionDistributionQuery,
-        params, signal
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
-
-
-
-export const getQueryObjectActivityExecutionDistributionQueryKey = (ocelId: string | null,
-    objectActivityExecutionDistributionQuery?: ObjectActivityExecutionDistributionQuery,
-    params?: QueryObjectActivityExecutionDistributionParams,) => {
-    return [
-    'POST', `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/object-activity-execution-distribution`, ...(params ? [params] : []), objectActivityExecutionDistributionQuery
-    ] as const;
-    }
-
-
-export const getQueryObjectActivityExecutionDistributionQueryOptions = <TData = Awaited<ReturnType<typeof queryObjectActivityExecutionDistribution>>, TError = HTTPValidationError>(ocelId: string | null,
-    objectActivityExecutionDistributionQuery: ObjectActivityExecutionDistributionQuery,
-    params?: QueryObjectActivityExecutionDistributionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryObjectActivityExecutionDistribution>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getQueryObjectActivityExecutionDistributionQueryKey = (
+  ocelId: string | null,
+  objectActivityExecutionDistributionQuery?: ObjectActivityExecutionDistributionQuery,
+  params?: QueryObjectActivityExecutionDistributionParams,
 ) => {
+  return [
+    "POST",
+    `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/object-activity-execution-distribution`,
+    ...(params ? [params] : []),
+    objectActivityExecutionDistributionQuery,
+  ] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getQueryObjectActivityExecutionDistributionQueryOptions = <
+  TData = Awaited<ReturnType<typeof queryObjectActivityExecutionDistribution>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  objectActivityExecutionDistributionQuery: ObjectActivityExecutionDistributionQuery,
+  params?: QueryObjectActivityExecutionDistributionParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryObjectActivityExecutionDistribution>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getQueryObjectActivityExecutionDistributionQueryKey(ocelId,objectActivityExecutionDistributionQuery,params);
+  const queryKey =
+    queryOptions?.queryKey ??
+    getQueryObjectActivityExecutionDistributionQueryKey(
+      ocelId,
+      objectActivityExecutionDistributionQuery,
+      params,
+    );
 
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof queryObjectActivityExecutionDistribution>>
+  > = ({ signal }) =>
+    queryObjectActivityExecutionDistribution(
+      ocelId,
+      objectActivityExecutionDistributionQuery,
+      params,
+      requestOptions,
+      signal,
+    );
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: ocelId !== null && ocelId !== undefined,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof queryObjectActivityExecutionDistribution>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof queryObjectActivityExecutionDistribution>>> = ({ signal }) => queryObjectActivityExecutionDistribution(ocelId,objectActivityExecutionDistributionQuery,params, requestOptions, signal);
+export type QueryObjectActivityExecutionDistributionQueryResult = NonNullable<
+  Awaited<ReturnType<typeof queryObjectActivityExecutionDistribution>>
+>;
+export type QueryObjectActivityExecutionDistributionQueryError =
+  HTTPValidationError;
 
-
-
-
-
-   return  { queryKey, queryFn, enabled: ocelId !== null && ocelId !== undefined,  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof queryObjectActivityExecutionDistribution>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type QueryObjectActivityExecutionDistributionQueryResult = NonNullable<Awaited<ReturnType<typeof queryObjectActivityExecutionDistribution>>>
-export type QueryObjectActivityExecutionDistributionQueryError = HTTPValidationError
-
-
-export function useQueryObjectActivityExecutionDistribution<TData = Awaited<ReturnType<typeof queryObjectActivityExecutionDistribution>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    objectActivityExecutionDistributionQuery: ObjectActivityExecutionDistributionQuery,
-    params: undefined |  QueryObjectActivityExecutionDistributionParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryObjectActivityExecutionDistribution>>, TError, TData>> & Pick<
+export function useQueryObjectActivityExecutionDistribution<
+  TData = Awaited<ReturnType<typeof queryObjectActivityExecutionDistribution>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  objectActivityExecutionDistributionQuery: ObjectActivityExecutionDistributionQuery,
+  params: undefined | QueryObjectActivityExecutionDistributionParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryObjectActivityExecutionDistribution>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof queryObjectActivityExecutionDistribution>>,
           TError,
           Awaited<ReturnType<typeof queryObjectActivityExecutionDistribution>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useQueryObjectActivityExecutionDistribution<TData = Awaited<ReturnType<typeof queryObjectActivityExecutionDistribution>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    objectActivityExecutionDistributionQuery: ObjectActivityExecutionDistributionQuery,
-    params?: QueryObjectActivityExecutionDistributionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryObjectActivityExecutionDistribution>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useQueryObjectActivityExecutionDistribution<
+  TData = Awaited<ReturnType<typeof queryObjectActivityExecutionDistribution>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  objectActivityExecutionDistributionQuery: ObjectActivityExecutionDistributionQuery,
+  params?: QueryObjectActivityExecutionDistributionParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryObjectActivityExecutionDistribution>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof queryObjectActivityExecutionDistribution>>,
           TError,
           Awaited<ReturnType<typeof queryObjectActivityExecutionDistribution>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useQueryObjectActivityExecutionDistribution<TData = Awaited<ReturnType<typeof queryObjectActivityExecutionDistribution>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    objectActivityExecutionDistributionQuery: ObjectActivityExecutionDistributionQuery,
-    params?: QueryObjectActivityExecutionDistributionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryObjectActivityExecutionDistribution>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useQueryObjectActivityExecutionDistribution<
+  TData = Awaited<ReturnType<typeof queryObjectActivityExecutionDistribution>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  objectActivityExecutionDistributionQuery: ObjectActivityExecutionDistributionQuery,
+  params?: QueryObjectActivityExecutionDistributionParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryObjectActivityExecutionDistribution>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Query Object Activity Execution Distribution
  */
 
-export function useQueryObjectActivityExecutionDistribution<TData = Awaited<ReturnType<typeof queryObjectActivityExecutionDistribution>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    objectActivityExecutionDistributionQuery: ObjectActivityExecutionDistributionQuery,
-    params?: QueryObjectActivityExecutionDistributionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryObjectActivityExecutionDistribution>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useQueryObjectActivityExecutionDistribution<
+  TData = Awaited<ReturnType<typeof queryObjectActivityExecutionDistribution>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  objectActivityExecutionDistributionQuery: ObjectActivityExecutionDistributionQuery,
+  params?: QueryObjectActivityExecutionDistributionParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryObjectActivityExecutionDistribution>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getQueryObjectActivityExecutionDistributionQueryOptions(
+    ocelId,
+    objectActivityExecutionDistributionQuery,
+    params,
+    options,
+  );
 
-  const queryOptions = getQueryObjectActivityExecutionDistributionQueryOptions(ocelId,objectActivityExecutionDistributionQuery,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
-
-
-
-
-
-
 
 /**
  * @summary Query Total Object Involvement
  */
 export const queryTotalObjectInvolvement = (
-    ocelId: string | null,
-    params?: QueryTotalObjectInvolvementParams,
- options?: SecondParameter<typeof customFetch>,signal?: AbortSignal
+  ocelId: string | null,
+  params?: QueryTotalObjectInvolvementParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
 ) => {
-
-
-      return customFetch<TotalObjectInvolvementResponse>(
-      {url: `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/total-object-involvement`, method: 'POST',
-        params, signal
+  return customFetch<TotalObjectInvolvementResponse>(
+    {
+      url: `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/total-object-involvement`,
+      method: "POST",
+      params,
+      signal,
     },
-      options);
-    }
+    options,
+  );
+};
 
-
-
-
-export const getQueryTotalObjectInvolvementQueryKey = (ocelId: string | null,
-    params?: QueryTotalObjectInvolvementParams,) => {
-    return [
-    'POST', `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/total-object-involvement`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getQueryTotalObjectInvolvementQueryOptions = <TData = Awaited<ReturnType<typeof queryTotalObjectInvolvement>>, TError = HTTPValidationError>(ocelId: string | null,
-    params?: QueryTotalObjectInvolvementParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryTotalObjectInvolvement>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getQueryTotalObjectInvolvementQueryKey = (
+  ocelId: string | null,
+  params?: QueryTotalObjectInvolvementParams,
 ) => {
+  return [
+    "POST",
+    `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/total-object-involvement`,
+    ...(params ? [params] : []),
+  ] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getQueryTotalObjectInvolvementQueryOptions = <
+  TData = Awaited<ReturnType<typeof queryTotalObjectInvolvement>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: QueryTotalObjectInvolvementParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryTotalObjectInvolvement>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getQueryTotalObjectInvolvementQueryKey(ocelId,params);
+  const queryKey =
+    queryOptions?.queryKey ??
+    getQueryTotalObjectInvolvementQueryKey(ocelId, params);
 
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof queryTotalObjectInvolvement>>
+  > = ({ signal }) =>
+    queryTotalObjectInvolvement(ocelId, params, requestOptions, signal);
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: ocelId !== null && ocelId !== undefined,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof queryTotalObjectInvolvement>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof queryTotalObjectInvolvement>>> = ({ signal }) => queryTotalObjectInvolvement(ocelId,params, requestOptions, signal);
+export type QueryTotalObjectInvolvementQueryResult = NonNullable<
+  Awaited<ReturnType<typeof queryTotalObjectInvolvement>>
+>;
+export type QueryTotalObjectInvolvementQueryError = HTTPValidationError;
 
-
-
-
-
-   return  { queryKey, queryFn, enabled: ocelId !== null && ocelId !== undefined,  staleTime: 300000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof queryTotalObjectInvolvement>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type QueryTotalObjectInvolvementQueryResult = NonNullable<Awaited<ReturnType<typeof queryTotalObjectInvolvement>>>
-export type QueryTotalObjectInvolvementQueryError = HTTPValidationError
-
-
-export function useQueryTotalObjectInvolvement<TData = Awaited<ReturnType<typeof queryTotalObjectInvolvement>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params: undefined |  QueryTotalObjectInvolvementParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryTotalObjectInvolvement>>, TError, TData>> & Pick<
+export function useQueryTotalObjectInvolvement<
+  TData = Awaited<ReturnType<typeof queryTotalObjectInvolvement>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params: undefined | QueryTotalObjectInvolvementParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryTotalObjectInvolvement>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof queryTotalObjectInvolvement>>,
           TError,
           Awaited<ReturnType<typeof queryTotalObjectInvolvement>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useQueryTotalObjectInvolvement<TData = Awaited<ReturnType<typeof queryTotalObjectInvolvement>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: QueryTotalObjectInvolvementParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryTotalObjectInvolvement>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useQueryTotalObjectInvolvement<
+  TData = Awaited<ReturnType<typeof queryTotalObjectInvolvement>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: QueryTotalObjectInvolvementParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryTotalObjectInvolvement>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof queryTotalObjectInvolvement>>,
           TError,
           Awaited<ReturnType<typeof queryTotalObjectInvolvement>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useQueryTotalObjectInvolvement<TData = Awaited<ReturnType<typeof queryTotalObjectInvolvement>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: QueryTotalObjectInvolvementParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryTotalObjectInvolvement>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useQueryTotalObjectInvolvement<
+  TData = Awaited<ReturnType<typeof queryTotalObjectInvolvement>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: QueryTotalObjectInvolvementParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryTotalObjectInvolvement>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Query Total Object Involvement
  */
 
-export function useQueryTotalObjectInvolvement<TData = Awaited<ReturnType<typeof queryTotalObjectInvolvement>>, TError = HTTPValidationError>(
- ocelId: string | null,
-    params?: QueryTotalObjectInvolvementParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof queryTotalObjectInvolvement>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useQueryTotalObjectInvolvement<
+  TData = Awaited<ReturnType<typeof queryTotalObjectInvolvement>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  params?: QueryTotalObjectInvolvementParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryTotalObjectInvolvement>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getQueryTotalObjectInvolvementQueryOptions(
+    ocelId,
+    params,
+    options,
+  );
 
-  const queryOptions = getQueryTotalObjectInvolvementQueryOptions(ocelId,params,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+/**
+ * @summary Query Object Attribute Timeline
+ */
+export const queryObjectAttributeTimeline = (
+  ocelId: string | null,
+  objectAttributeTimelineQuery: ObjectAttributeTimelineQuery,
+  params?: QueryObjectAttributeTimelineParams,
+  options?: SecondParameter<typeof customFetch>,
+  signal?: AbortSignal,
+) => {
+  return customFetch<ObjectAttributeTimelineResponse>(
+    {
+      url: `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/object-attribute-timeline`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: objectAttributeTimelineQuery,
+      params,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getQueryObjectAttributeTimelineQueryKey = (
+  ocelId: string | null,
+  objectAttributeTimelineQuery?: ObjectAttributeTimelineQuery,
+  params?: QueryObjectAttributeTimelineParams,
+) => {
+  return [
+    "POST",
+    `/api/external/modules/exploration/v1/ocels/${ocelId}/queries/object-attribute-timeline`,
+    ...(params ? [params] : []),
+    objectAttributeTimelineQuery,
+  ] as const;
+};
+
+export const getQueryObjectAttributeTimelineQueryOptions = <
+  TData = Awaited<ReturnType<typeof queryObjectAttributeTimeline>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  objectAttributeTimelineQuery: ObjectAttributeTimelineQuery,
+  params?: QueryObjectAttributeTimelineParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryObjectAttributeTimeline>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getQueryObjectAttributeTimelineQueryKey(
+      ocelId,
+      objectAttributeTimelineQuery,
+      params,
+    );
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof queryObjectAttributeTimeline>>
+  > = ({ signal }) =>
+    queryObjectAttributeTimeline(
+      ocelId,
+      objectAttributeTimelineQuery,
+      params,
+      requestOptions,
+      signal,
+    );
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: ocelId !== null && ocelId !== undefined,
+    staleTime: 300000,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof queryObjectAttributeTimeline>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type QueryObjectAttributeTimelineQueryResult = NonNullable<
+  Awaited<ReturnType<typeof queryObjectAttributeTimeline>>
+>;
+export type QueryObjectAttributeTimelineQueryError = HTTPValidationError;
+
+export function useQueryObjectAttributeTimeline<
+  TData = Awaited<ReturnType<typeof queryObjectAttributeTimeline>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  objectAttributeTimelineQuery: ObjectAttributeTimelineQuery,
+  params: undefined | QueryObjectAttributeTimelineParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryObjectAttributeTimeline>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof queryObjectAttributeTimeline>>,
+          TError,
+          Awaited<ReturnType<typeof queryObjectAttributeTimeline>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useQueryObjectAttributeTimeline<
+  TData = Awaited<ReturnType<typeof queryObjectAttributeTimeline>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  objectAttributeTimelineQuery: ObjectAttributeTimelineQuery,
+  params?: QueryObjectAttributeTimelineParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryObjectAttributeTimeline>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof queryObjectAttributeTimeline>>,
+          TError,
+          Awaited<ReturnType<typeof queryObjectAttributeTimeline>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useQueryObjectAttributeTimeline<
+  TData = Awaited<ReturnType<typeof queryObjectAttributeTimeline>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  objectAttributeTimelineQuery: ObjectAttributeTimelineQuery,
+  params?: QueryObjectAttributeTimelineParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryObjectAttributeTimeline>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Query Object Attribute Timeline
+ */
+
+export function useQueryObjectAttributeTimeline<
+  TData = Awaited<ReturnType<typeof queryObjectAttributeTimeline>>,
+  TError = HTTPValidationError,
+>(
+  ocelId: string | null,
+  objectAttributeTimelineQuery: ObjectAttributeTimelineQuery,
+  params?: QueryObjectAttributeTimelineParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof queryObjectAttributeTimeline>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getQueryObjectAttributeTimelineQueryOptions(
+    ocelId,
+    objectAttributeTimelineQuery,
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }

@@ -2,6 +2,12 @@ export { createBarChartOption } from "./bar";
 export { createDonutChartOption } from "./donut";
 export { createHistogramChartOption } from "./histogram";
 export { createHorizontalStackedBarChartOption } from "./horizontalStackedBar";
+export {
+  createObjectAttributeTimelineChartOption,
+  type ObjectAttributeTimelineConfig,
+  type ObjectAttributeTimelinePoint,
+  type ObjectAttributeTimelineValue,
+} from "./objectAttributeTimeline";
 export { DEFAULT_FREQUENCY_CHART_COLORS } from "./shared";
 export { createStackedBarChartOption } from "./stackedBar";
 export {
