@@ -22,7 +22,6 @@ from ocelescope.ocel.io.connection import DuckDBTarget
 from ocelescope.ocel.io.schema import (
     SchemaDefinition,
     create_ocel_tables,
-    drop_unchanged_columns,
 )
 from ocelescope.util.sql import set_utc
 
@@ -164,14 +163,9 @@ class OCELWriter:
             values.clear()
 
     def close(self) -> None:
-        """Flush any remaining buffered rows, closing a connection we opened.
-
-        Once everything is in, the object-attribute columns nothing ever changed
-        are dropped -- which attributes those are is only known now.
-        """
+        """Flush any remaining buffered rows, closing a connection we opened."""
         for table in self.schemas:
             self._flush(table)
-        drop_unchanged_columns(self.con)
         if self._owns_connection:
             self.con.close()
 

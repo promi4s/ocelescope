@@ -21,7 +21,6 @@ from ocelescope.ocel.constants.pm4py import (
     OTYPE_COL,
     TIMESTAMP_COL,
 )
-from ocelescope.ocel.constants.tables import OBJECT_CHANGES_TABLE
 from ocelescope.util.sql import ident
 
 SchemaDefinition = list[tuple[str, pa.DataType]]
@@ -98,34 +97,6 @@ def create_ocel_tables(
         con.execute(f"DROP TABLE IF EXISTS {ident(table)}")
         con.from_arrow(schema.empty_table()).create(table)
     return schemas
-
-
-def drop_unchanged_columns(con: duckdb.DuckDBPyConnection) -> None:
-    """Drop the ``object_changes`` columns that turned out to hold nothing.
-
-    The tables are created from the log's type declarations, before a single row
-    has been read, so ``object_changes`` starts with a column per *declared*
-    object attribute. Only the attributes that actually change ever get a value;
-    the rest are all-NULL padding, which no reader wants and every exporter has to
-    step around. Which is which is only knowable once the table is filled, so the
-    importers call this at the end rather than guessing up front.
-
-    One aggregate decides them all -- the table is never materialised to find out.
-    """
-    meta = (OID_COL, TIMESTAMP_COL)
-    names = [
-        name
-        for name, *_ in con.execute(f"DESCRIBE {ident(OBJECT_CHANGES_TABLE)}").fetchall()
-        if name not in meta
-    ]
-    if not names:
-        return
-
-    projection = ", ".join(f"bool_or({ident(name)} IS NOT NULL) AS {ident(name)}" for name in names)
-    row = con.execute(f"SELECT {projection} FROM {ident(OBJECT_CHANGES_TABLE)}").fetchall()[0]
-    for name, has_values in zip(names, row):
-        if not has_values:
-            con.execute(f"ALTER TABLE {ident(OBJECT_CHANGES_TABLE)} DROP COLUMN {ident(name)}")
 
 
 def merge_columns(columns: SchemaDefinition) -> SchemaDefinition:
