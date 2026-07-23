@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import datetime
+
 import duckdb
 import pyarrow as pa
 
@@ -23,6 +25,8 @@ from ocelescope.ocel.io.schema import (
     drop_unchanged_columns,
 )
 from ocelescope.util.sql import set_utc
+
+STATIC_OBJECT_ATTRIBUTE_TIMESTAMP = datetime.fromtimestamp(0).isoformat()
 
 
 def _as_strings(values: list) -> list:
@@ -94,15 +98,15 @@ class OCELWriter:
         ):
             if attribute["name"] not in object_row:
                 object_row[attribute["name"]] = attribute["value"]
-            else:
-                self._add_row(
-                    "object_changes",
-                    {
-                        OID_COL: obj["id"],
-                        attribute["name"]: attribute["value"],
-                        TIMESTAMP_COL: attribute["time"],
-                    },
-                )
+
+            self._add_row(
+                "object_changes",
+                {
+                    OID_COL: obj["id"],
+                    attribute["name"]: attribute["value"],
+                    TIMESTAMP_COL: attribute.get("time", STATIC_OBJECT_ATTRIBUTE_TIMESTAMP),
+                },
+            )
 
         for relationship in obj.get("relationships", []):
             self._add_row(
