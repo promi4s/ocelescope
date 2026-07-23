@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.5.0",
   "description": "Core React component and style library for Ocelescope (Mantine + React Query).",
-  "author": "Görkem-Emre Öztürk <goerkem.oeztuerk@rwth-aachen.de>",
+  "author": "G\u00f6rkem-Emre \u00d6zt\u00fcrk <goerkem.oeztuerk@rwth-aachen.de>",
   "license": "MIT",
   "homepage": "https://www.ocelescope.org",
   "repository": {
@@ -42,7 +42,7 @@
     "@ocelescope/api-client": "workspace:^",
     "@ocelescope/resources": "workspace:^",
     "@tanstack/react-query": "catalog:",
-    "@tanstack/react-query-devtools": "^5.91.3",
+    "@tanstack/react-query-devtools": "catalog:",
     "clsx": "catalog:",
     "content-disposition-attachment": "catalog:",
     "dayjs": "catalog:",
@@ -59,13 +59,11 @@
   "devDependencies": {
     "@mantine/notifications": "catalog:",
     "@tsdown/css": "catalog:",
-    "@types/css-modules": "catalog:",
     "@types/file-saver": "catalog:",
     "@types/node": "catalog:",
     "@types/qs": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "bumpp": "catalog:",
     "qs": "catalog:",
     "tsdown": "catalog:",
     "typescript": "catalog:"

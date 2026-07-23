@@ -10,9 +10,9 @@ allowBuilds:
   sharp: true
 
 catalog:
-  "@apidevtools/json-schema-ref-parser": ^15.3.1
+  "@apidevtools/json-schema-ref-parser": ^15.5.0
+  '@biomejs/biome': 2.5.5
   "@dagrejs/dagre": ^3.0.0
-  "@faker-js/faker": ^10.4.0
   "@floating-ui/react": ^0.27.18
   "@hpcc-js/wasm-graphviz": ^1.21.0
   "@mantine/carousel": ^9.4.2
@@ -24,32 +24,27 @@ catalog:
   "@mantine/notifications": ^9.4.2
   "@marko19907/string-to-color": ^1.0.2
   '@ocelescope/ocelot': ^0.1.3
-  '@r4pm/components': ^0.1.1
+  '@r4pm/components': ^0.2.0
   "@rjsf/core": ^6.7.0
   "@rjsf/mantine": ^6.7.0
   "@rjsf/utils": ^6.7.0
   "@rjsf/validator-ajv8": ^6.7.0
-  "@storybook/react-vite": ^10.3.5
   "@tanstack/react-query": ^5.90.21
   "@tanstack/react-query-devtools": ^5.91.3
   "@tsconfig/strictest": ^2.0.8
   "@tsdown/css": ^0.22.12
-  "@types/css-modules": ^1.0.5
   "@types/file-saver": ^2.0.7
-  "@types/lodash": ^4.17.23
-  "@types/node": ^25.0.3
+  "@types/node": ^26.1.1
   '@types/object-hash': ^3.0.6
   "@types/qs": ^6.15.1
-  "@types/react": ^19.2.7
-  "@types/react-cytoscapejs": ^1.2.6
+  "@types/react": ^19.2.17
   "@types/react-dom": ^19.2.3
-  "@xyflow/react": ^12.10.1
-  axios: ^1.18.0
-  bumpp: ^11.0.0
+  "@xyflow/react": ^12.11.2
+  axios: ^1.18.1
+  bumpp: ^12.0.0
   clsx: ^2.1.1
   content-disposition-attachment: ^0.3.1
   cspell: ^10.0.1
-  cytoscape: ^3.33.1
   dayjs: ^1.11.19
   elkjs: ^0.11.0
   embla-carousel: ^8.6.0
@@ -59,21 +54,18 @@ catalog:
   html-to-image: 1.11.13
   json-schema-traverse: ^1.0.0
   jspdf: ^4.2.1
-  lodash: ^4.17.23
   lucide-react: ^1.0.0
   mantine-datatable: ^9.4.0
-  next: ^16.1.6
+  next: ^16.2.10
   object-hash: ^3.0.0
   orval: ^8.22.0
-  qs: ^6.15.1
-  react: ^19.2.0
-  react-cytoscapejs: ^2.0.0
-  react-dom: ^19.2.0
+  qs: ^6.15.3
+  react: ^19.2.7
+  react-dom: ^19.2.7
   react-hook-form: ^7.71.2
   react-plotly.js: ^4.0.0
   react-zoom-pan-pinch: ^4.0.0
   recharts: ^3.2.1
-  storybook: ^10.3.5
   tsdown: ^0.22.12
   typescript: ^5.9.3
   uniqolor: ^1.1.1

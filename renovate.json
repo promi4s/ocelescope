@@ -19,6 +19,12 @@
       "matchDepTypes": ["devDependencies"],
       "matchUpdateTypes": ["patch"],
       "automerge": true
+    },
+    {
+      "description": "TypeScript 7 is not yet supported by Next.js or typedoc",
+      "matchPackageNames": ["typescript"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
     }
   ]
 }

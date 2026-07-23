@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.5.0",
   "description": "Ocelescope module for exploring object trace variants: the distinct activity sequences objects of each type follow, with per-variant event and case counts.",
-  "author": "Görkem-Emre Öztürk <goerkem.oeztuerk@rwth-aachen.de>",
+  "author": "G\u00f6rkem-Emre \u00d6zt\u00fcrk <goerkem.oeztuerk@rwth-aachen.de>",
   "license": "MIT",
   "homepage": "https://www.ocelescope.org",
   "repository": {
@@ -46,7 +46,6 @@
   },
   "devDependencies": {
     "@tsdown/css": "catalog:",
-    "@types/css-modules": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
