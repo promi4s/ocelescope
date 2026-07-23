@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.5.0",
   "description": "Core client + session/hooks layer used by Ocelescope API packages.",
-  "author": "Görkem-Emre Öztürk <goerkem.oeztuerk@rwth-aachen.de>",
+  "author": "G\u00f6rkem-Emre \u00d6zt\u00fcrk <goerkem.oeztuerk@rwth-aachen.de>",
   "license": "MIT",
   "homepage": "https://www.ocelescope.org",
   "repository": {
@@ -43,7 +43,6 @@
   "devDependencies": {
     "@types/node": "catalog:",
     "@types/react": "catalog:",
-    "@types/react-dom": "catalog:",
     "axios": "catalog:",
     "bumpp": "catalog:",
     "tsdown": "catalog:",

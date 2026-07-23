@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.5.0",
   "description": "Ocelescope resources: helpers and UI components for rendering and exporting data.",
-  "author": "Görkem-Emre Öztürk <goerkem.oeztuerk@rwth-aachen.de>",
+  "author": "G\u00f6rkem-Emre \u00d6zt\u00fcrk <goerkem.oeztuerk@rwth-aachen.de>",
   "license": "MIT",
   "homepage": "https://www.ocelescope.org",
   "repository": {
@@ -49,7 +49,6 @@
     "dayjs": "catalog:",
     "elkjs": "catalog:",
     "file-saver": "catalog:",
-    "lodash": "catalog:",
     "lucide-react": "catalog:",
     "mantine-datatable": "catalog:",
     "next": "catalog:",
@@ -61,7 +60,6 @@
   "devDependencies": {
     "@tsdown/css": "catalog:",
     "@types/file-saver": "catalog:",
-    "@types/lodash": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",

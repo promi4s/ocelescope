@@ -14,13 +14,11 @@ classifiers = [
 ]
 
 dependencies = [
-  "cachetools>=6.1.0",
   "duckdb>=1.5.4",
   "graphviz>=0.21",
   "ijson>=3.5.0",
   "lxml>=6.1.1",
   "matplotlib>=3.10.9",
-  "numpy>=2.3.2",
   "orjson>=3.11.7",
   "pandas>=2.3.1",
   "plotly>=6.3.1",
@@ -48,6 +46,7 @@ plugin = [
   "more-itertools>=11.1.0",
   "networkx>=3.5",
   "pulp>=3.3.2",
+  "numpy>=2.3.2",
   "scikit-learn>=1.9.0",
 ]
 

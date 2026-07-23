@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.5.0",
   "description": "A module for inspections of OCELs",
-  "author": "Görkem-Emre Öztürk <goerkem.oeztuerk@rwth-aachen.de>",
+  "author": "G\u00f6rkem-Emre \u00d6zt\u00fcrk <goerkem.oeztuerk@rwth-aachen.de>",
   "license": "MIT",
   "homepage": "https://www.ocelescope.org",
   "repository": {
@@ -34,7 +34,6 @@
   "peerDependencies": {
     "@apidevtools/json-schema-ref-parser": "catalog:",
     "@mantine/carousel": "catalog:",
-    "@mantine/charts": "catalog:",
     "@mantine/core": "catalog:",
     "@mantine/hooks": "catalog:",
     "@marko19907/string-to-color": "catalog:",
@@ -58,7 +57,6 @@
   },
   "devDependencies": {
     "@apidevtools/json-schema-ref-parser": "catalog:",
-    "@mantine/charts": "catalog:",
     "@rjsf/mantine": "catalog:",
     "@types/file-saver": "catalog:",
     "@types/node": "catalog:",
