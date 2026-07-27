@@ -1,24 +1,4 @@
-"""Shared helpers for the DuckDB -> OCEL exporters.
-
-The exporters are the inverse of the importers: they read the flat DuckDB tables
-and reconstruct an OCEL 2.0 log. Two reconstructions are non-trivial and live
-here so the JSON and XML writers can share them:
-
-* **Type declarations.** The flat ``objects``/``events`` tables hold the *union*
-  of every type's attributes, so ``object_types`` / ``event_types`` recover which
-  attributes actually occur per type (any non-null value in the snapshot or a
-  change) and map each DuckDB column type back to an OCEL attribute type.
-* **Per-entity records.** ``iter_objects`` / ``iter_events`` yield one dict per
-  object/event -- shaped exactly like the importer input -- by letting DuckDB do
-  the grouping (initial values + timestamped changes + relationships) and
-  streaming the result a row at a time, so peak memory stays bounded by the log's
-  widest single entity rather than the whole log.
-
-The ``objects`` table carries no timestamp, so an object's initial attribute
-values have no recoverable time; :data:`INITIAL_ATTR_TIME` is emitted in their
-place. It sorts before any real timestamp, so a re-import still treats them as the
-initial value.
-"""
+"""Shared helpers for the DuckDB -> OCEL exporters."""
 
 from __future__ import annotations
 
@@ -44,28 +24,110 @@ from ocelescope.ocel.constants.tables import (
     OBJECT_CHANGES_TABLE,
     OBJECTS_TABLE,
 )
-from ocelescope.util.sql import ident
+from ocelescope.util.sql import ident, literal
 
-#: Placeholder time for initial (snapshot) attribute values; see module docstring.
-INITIAL_ATTR_TIME = "1970-01-01T00:00:00+00:00"
-
-#: Rows fetched per batch when streaming a table.
 _BATCH = 10_000
 
-_OBJECT_META = (OID_COL, OTYPE_COL)
 _EVENT_META = (EID_COL, ACTIVITY_COL, TIMESTAMP_COL)
 _CHANGES_META = (OID_COL, TIMESTAMP_COL)
 
+_PLACEHOLDER = "__ocel_no_attribute"
 
-def changing_attributes(con: duckdb.DuckDBPyConnection) -> list[str]:
-    """The attributes ``object_changes`` carries -- only those ever change.
+_CHANGES = "__ocel_changes"
+_RELS = "__ocel_rels"
 
-    An object attribute that never changes has no column there, so the change
-    table has to be asked what it holds rather than told by the objects table.
+
+def _attribute_rows(table: str, meta: tuple[str, ...]) -> str:
+    """A relation of ``(meta..., name, value)``: one row per set attribute cell."""
+    meta_list = ", ".join(ident(name) for name in meta)
+    return f"""(
+        UNPIVOT (
+            SELECT {meta_list},
+                   NULL::VARCHAR AS {ident(_PLACEHOLDER)},
+                   COLUMNS(* EXCLUDE ({meta_list}))::VARCHAR
+            FROM {ident(table)}
+        ) ON COLUMNS(* EXCLUDE ({meta_list}))
+    )"""
+
+
+_CHANGE_ROWS = _attribute_rows(OBJECT_CHANGES_TABLE, _CHANGES_META)
+_EVENT_ROWS = _attribute_rows(EVENTS_TABLE, _EVENT_META)
+
+
+def _column_types(table: str) -> str:
+    """A relation of ``table``'s ``(column_name, data_type, column_index)``.
+
+    ``column_index`` is what puts a type's attributes in the flat table's column
+    order, which ``DESCRIBE`` cannot be asked for inside a query. The database and
+    schema are pinned to the current ones because ``duckdb_columns()`` spans every
+    attached database, and a second one holding a table of the same name would
+    otherwise contribute its columns too.
     """
-    if not table_exists(con, OBJECT_CHANGES_TABLE):
-        return []
-    return [name for name, _ in attribute_columns(con, OBJECT_CHANGES_TABLE, _CHANGES_META)]
+    return f"""(
+        SELECT column_name, data_type, column_index
+        FROM duckdb_columns()
+        WHERE table_name = {literal(table)}
+          AND database_name = current_database()
+          AND schema_name = current_schema()
+    )"""
+
+
+_OBJECT_TYPE_ATTRIBUTES_SQL = f"""
+    SELECT t.{ident(OTYPE_COL)}, def.column_name, def.data_type
+    FROM (SELECT DISTINCT {ident(OTYPE_COL)} FROM {ident(OBJECTS_TABLE)}) t
+    LEFT JOIN (
+        SELECT DISTINCT o.{ident(OTYPE_COL)}, chg.name
+        FROM {_CHANGE_ROWS} chg
+        JOIN {ident(OBJECTS_TABLE)} o USING ({ident(OID_COL)})
+    ) used ON used.{ident(OTYPE_COL)} = t.{ident(OTYPE_COL)}
+    LEFT JOIN {_column_types(OBJECT_CHANGES_TABLE)} def ON def.column_name = used.name
+    ORDER BY 1, def.column_index
+"""
+
+_EVENT_TYPE_ATTRIBUTES_SQL = f"""
+    SELECT t.{ident(ACTIVITY_COL)}, def.column_name, def.data_type
+    FROM (SELECT DISTINCT {ident(ACTIVITY_COL)} FROM {ident(EVENTS_TABLE)}) t
+    LEFT JOIN (
+        SELECT DISTINCT {ident(ACTIVITY_COL)}, name
+        FROM {_EVENT_ROWS}
+    ) used ON used.{ident(ACTIVITY_COL)} = t.{ident(ACTIVITY_COL)}
+    LEFT JOIN {_column_types(EVENTS_TABLE)} def ON def.column_name = used.name
+    ORDER BY 1, def.column_index
+"""
+
+_O2O_SQL = f"""
+    SELECT {ident(O2O_SOURCE_ID)} AS oid,
+           list(struct_pack("objectId" := {ident(O2O_TARGET_ID)}, qualifier := {ident(O2O_QUALIFIER)})) AS rels
+    FROM {ident(O2O_TABLE)}
+    GROUP BY 1
+"""
+
+_E2O_SQL = f"""
+    SELECT {ident(EID_COL)} AS eid,
+           list(struct_pack("objectId" := {ident(OID_COL)}, qualifier := {ident(E2O_QUALIFIER)})) AS rels
+    FROM {ident(E2O_TABLE)}
+    GROUP BY 1
+"""
+
+
+_EVENTS_SQL = f"""
+    SELECT e.*, rel.rels AS {ident(_RELS)}
+    FROM {ident(EVENTS_TABLE)} e
+    LEFT JOIN ({_E2O_SQL}) rel ON rel.eid = e.{ident(EID_COL)}
+"""
+
+_OBJECTS_SQL = f"""
+    SELECT o.*, chg.changes AS {ident(_CHANGES)}, rel.rels AS {ident(_RELS)}
+    FROM {ident(OBJECTS_TABLE)} o
+    LEFT JOIN (
+        SELECT {ident(OID_COL)} AS oid,
+               list(struct_pack(name := name, "time" := {ident(TIMESTAMP_COL)}, value := value)
+                    ORDER BY {ident(TIMESTAMP_COL)}) AS changes
+        FROM {_CHANGE_ROWS}
+        GROUP BY 1
+    ) chg ON chg.oid = o.{ident(OID_COL)}
+    LEFT JOIN ({_O2O_SQL}) rel ON rel.oid = o.{ident(OID_COL)}
+"""
 
 
 def table_exists(con: duckdb.DuckDBPyConnection, name: str) -> bool:
@@ -108,152 +170,80 @@ def duckdb_type_to_ocel(duckdb_type: str) -> str:
     return "string"
 
 
-def _presence(
-    con: duckdb.DuckDBPyConnection, sql: str, attr_names: list[str]
-) -> dict[str, set[str]]:
-    """Run a ``GROUP BY type`` ``bool_or`` query into ``{type: {present attrs}}``.
+def _type_attributes(con: duckdb.DuckDBPyConnection, sql: str) -> dict[str, list[tuple[str, str]]]:
+    """Group ``(type, attribute, DuckDB type)`` rows into ``{type: [(attribute, type)]}``.
 
-    ``sql`` must select the type in the first column and, for each attribute in
-    ``attr_names`` (same order), a boolean of whether it ever occurs non-null.
+    Types come out sorted and each one's attributes in the flat table's column order,
+    both from the query's ``ORDER BY``. A type that uses no attribute arrives as a row
+    with none and maps to an empty list rather than vanishing -- the exporters drive
+    their type tables (and the type map) off these keys.
     """
-    presence: dict[str, set[str]] = {}
-    for row in con.execute(sql).fetchall():
-        presence[row[0]] = {attr_names[i] for i, flag in enumerate(row[1:]) if flag}
-    return presence
+    attributes: dict[str, list[tuple[str, str]]] = {}
+    for type_name, name, dtype in con.execute(sql).fetchall():
+        entries = attributes.setdefault(type_name, [])
+        if name is not None:
+            entries.append((name, dtype))
+    return attributes
 
 
-def object_attribute_presence(con: duckdb.DuckDBPyConnection) -> dict[str, set[str]]:
-    """Which attributes each object type actually uses (in a snapshot *or* a change)."""
-    names = [name for name, _ in attribute_columns(con, OBJECTS_TABLE, _OBJECT_META)]
-    projection = "".join(f", bool_or({ident(name)} IS NOT NULL) AS {ident(name)}" for name in names)
-    presence = _presence(
-        con,
-        f"SELECT {ident(OTYPE_COL)}{projection} FROM {ident(OBJECTS_TABLE)} GROUP BY 1",
-        names,
-    )
+def object_type_attributes(con: duckdb.DuckDBPyConnection) -> dict[str, list[tuple[str, str]]]:
+    """Each object type's attributes, in column order, with their DuckDB types.
 
-    # Attributes that only ever appear as a *change* still belong to the type.
-    changing = changing_attributes(con)
-    if changing:
-        change_projection = "".join(
-            f", bool_or(c.{ident(name)} IS NOT NULL) AS {ident(name)}" for name in changing
-        )
-        change_presence = _presence(
-            con,
-            f"SELECT o.{ident(OTYPE_COL)}{change_projection} "
-            f"FROM {ident(OBJECT_CHANGES_TABLE)} c "
-            f"JOIN {ident(OBJECTS_TABLE)} o ON c.{ident(OID_COL)} = o.{ident(OID_COL)} "
-            f"GROUP BY 1",
-            changing,
-        )
-        for type_name, present in change_presence.items():
-            presence.setdefault(type_name, set()).update(present)
-    return presence
+    ``object_changes`` holds the full value history, so it alone answers which
+    attributes a type uses -- and it is also where the values themselves are read
+    from, so an attribute can never be declared off a column the values don't have.
+    """
+    return _type_attributes(con, _OBJECT_TYPE_ATTRIBUTES_SQL)
 
 
-def event_attribute_presence(con: duckdb.DuckDBPyConnection) -> dict[str, set[str]]:
-    """Which attributes each event type (activity) actually uses."""
-    names = [name for name, _ in attribute_columns(con, EVENTS_TABLE, _EVENT_META)]
-    projection = "".join(f", bool_or({ident(name)} IS NOT NULL) AS {ident(name)}" for name in names)
-    return _presence(
-        con,
-        f"SELECT {ident(ACTIVITY_COL)}{projection} FROM {ident(EVENTS_TABLE)} GROUP BY 1",
-        names,
-    )
+def event_type_attributes(con: duckdb.DuckDBPyConnection) -> dict[str, list[tuple[str, str]]]:
+    """Each event type's (activity's) attributes, in column order, with their DuckDB types."""
+    return _type_attributes(con, _EVENT_TYPE_ATTRIBUTES_SQL)
 
 
-def _type_declarations(
-    ordered_attributes: list[tuple[str, str]], presence: dict[str, set[str]]
-) -> list[dict]:
-    """Turn ``{type: present attrs}`` into OCEL type declarations with attribute types."""
-    ocel_type = {name: duckdb_type_to_ocel(dtype) for name, dtype in ordered_attributes}
+def _declarations(type_attributes: dict[str, list[tuple[str, str]]]) -> list[dict]:
+    """Turn per-type attributes into OCEL type declarations, mapping the types over."""
     return [
         {
             "name": type_name,
             "attributes": [
-                {"name": name, "type": ocel_type[name]}
-                for name, _ in ordered_attributes
-                if name in present
+                {"name": name, "type": duckdb_type_to_ocel(dtype)} for name, dtype in attributes
             ],
         }
-        for type_name, present in sorted(presence.items())
+        for type_name, attributes in type_attributes.items()
     ]
 
 
 def object_types(con: duckdb.DuckDBPyConnection) -> list[dict]:
     """OCEL object-type declarations reconstructed from the flat tables."""
-    attributes = attribute_columns(con, OBJECTS_TABLE, _OBJECT_META)
-    return _type_declarations(attributes, object_attribute_presence(con))
+    return _declarations(object_type_attributes(con))
 
 
 def event_types(con: duckdb.DuckDBPyConnection) -> list[dict]:
     """OCEL event-type declarations reconstructed from the flat tables."""
-    attributes = attribute_columns(con, EVENTS_TABLE, _EVENT_META)
-    return _type_declarations(attributes, event_attribute_presence(con))
-
-
-def _objects_query(change_cols: list[str]) -> str:
-    """SQL yielding one row per object with its changes and relationships nested.
-
-    ``change_cols`` are the attributes ``object_changes`` holds, which is only the
-    ones that ever change -- the initial values come from ``objects`` via ``o.*``.
-    Each is cast to text before being unpivoted into ``(name, time, value)`` change
-    structs (``UNPIVOT`` needs one common type and drops NULLs), and
-    object-to-object relationships are aggregated per source. DuckDB performs the
-    grouping/joins; the caller streams the result.
-    """
-    joins = ""
-    changes_select = "NULL"
-    if change_cols:
-        casts = ", ".join(
-            f"CAST({ident(name)} AS VARCHAR) AS {ident(name)}" for name in change_cols
-        )
-        in_list = ", ".join(ident(name) for name in change_cols)
-        joins += (
-            f" LEFT JOIN (SELECT {ident(OID_COL)} AS oid, "
-            f'list(struct_pack(name := field, "time" := ts, value := val) ORDER BY ts) AS changes '
-            f"FROM (SELECT {ident(OID_COL)}, {ident(TIMESTAMP_COL)} AS ts, {casts} "
-            f"FROM {ident(OBJECT_CHANGES_TABLE)}) "
-            f"UNPIVOT (val FOR field IN ({in_list})) GROUP BY 1) chg "
-            f"ON chg.oid = o.{ident(OID_COL)}"
-        )
-        changes_select = "chg.changes"
-
-    joins += (
-        f" LEFT JOIN (SELECT {ident(O2O_SOURCE_ID)} AS oid, "
-        f'list(struct_pack("objectId" := {ident(O2O_TARGET_ID)}, '
-        f"qualifier := {ident(O2O_QUALIFIER)})) AS rels "
-        f"FROM {ident(O2O_TABLE)} GROUP BY 1) rel ON rel.oid = o.{ident(OID_COL)}"
-    )
-
-    return (
-        f"SELECT o.*, {changes_select} AS __changes, rel.rels AS __rels "
-        f"FROM {ident(OBJECTS_TABLE)} o{joins}"
-    )
+    return _declarations(event_type_attributes(con))
 
 
 def iter_objects(con: duckdb.DuckDBPyConnection) -> Iterator[dict]:
-    """Stream objects shaped like the importer input (id/type/attributes/relationships)."""
-    attr_cols = [name for name, _ in attribute_columns(con, OBJECTS_TABLE, _OBJECT_META)]
+    """Stream objects shaped like the importer input (id/type/attributes/relationships).
+
+    DuckDB does the grouping and the joins; this only reshapes one row at a time,
+    so peak memory stays bounded by the widest single object.
+    """
     cursor = con.cursor()
-    cursor.execute(_objects_query(changing_attributes(con)))
+    cursor.execute(_OBJECTS_SQL)
     names = [description[0] for description in cursor.description]
 
     while batch := cursor.fetchmany(_BATCH):
         for row in batch:
             record = dict(zip(names, row))
             attributes = [
-                {"name": name, "value": record[name], "time": INITIAL_ATTR_TIME}
-                for name in attr_cols
-                if record[name] is not None
+                {"name": change["name"], "value": change["value"], "time": change["time"]}
+                for change in record[_CHANGES] or []
             ]
-            for change in record["__changes"] or []:
-                attributes.append(
-                    {"name": change["name"], "value": change["value"], "time": change["time"]}
-                )
             relationships = [
                 {"objectId": rel["objectId"], "qualifier": rel["qualifier"]}
-                for rel in record["__rels"] or []
+                for rel in record[_RELS] or []
             ]
             yield {
                 "id": record[OID_COL],
@@ -263,23 +253,16 @@ def iter_objects(con: duckdb.DuckDBPyConnection) -> Iterator[dict]:
             }
 
 
-def _events_query() -> str:
-    """SQL yielding one row per event with its object relationships nested."""
-    return (
-        f"SELECT e.*, rel.rels AS __rels FROM {ident(EVENTS_TABLE)} e "
-        f"LEFT JOIN (SELECT {ident(EID_COL)} AS eid, "
-        f'list(struct_pack("objectId" := {ident(OID_COL)}, '
-        f"qualifier := {ident(E2O_QUALIFIER)})) AS rels "
-        f"FROM {ident(E2O_TABLE)} GROUP BY 1) rel ON rel.eid = e.{ident(EID_COL)}"
-    )
-
-
 def iter_events(con: duckdb.DuckDBPyConnection) -> Iterator[dict]:
-    """Stream events shaped like the importer input (id/type/time/attributes/relationships)."""
-    attr_cols = [name for name, _ in attribute_columns(con, EVENTS_TABLE, _EVENT_META)]
+    """Stream events shaped like the importer input (id/type/time/attributes/relationships).
+
+    The attribute columns are whatever the query returned beyond the fixed ones, so
+    the events table is never asked twice what it holds.
+    """
     cursor = con.cursor()
-    cursor.execute(_events_query())
+    cursor.execute(_EVENTS_SQL)
     names = [description[0] for description in cursor.description]
+    attr_cols = [name for name in names if name not in _EVENT_META and name != _RELS]
 
     while batch := cursor.fetchmany(_BATCH):
         for row in batch:
@@ -291,7 +274,7 @@ def iter_events(con: duckdb.DuckDBPyConnection) -> Iterator[dict]:
             ]
             relationships = [
                 {"objectId": rel["objectId"], "qualifier": rel["qualifier"]}
-                for rel in record["__rels"] or []
+                for rel in record[_RELS] or []
             ]
             yield {
                 "id": record[EID_COL],
