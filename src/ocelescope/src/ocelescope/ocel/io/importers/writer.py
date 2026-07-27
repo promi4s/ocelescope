@@ -14,6 +14,7 @@ from ocelescope.ocel.constants.pm4py import (
     O2O_QUALIFIER,
     O2O_SOURCE_ID,
     O2O_TARGET_ID,
+    OBJECT_CHANGED_FIELD,
     OID_COL,
     OTYPE_COL,
     TIMESTAMP_COL,
@@ -103,6 +104,7 @@ class OCELWriter:
                 "object_changes",
                 {
                     OID_COL: obj["id"],
+                    OBJECT_CHANGED_FIELD: attribute["name"],
                     attribute["name"]: attribute["value"],
                     TIMESTAMP_COL: attribute.get("time", STATIC_OBJECT_ATTRIBUTE_TIMESTAMP),
                 },
