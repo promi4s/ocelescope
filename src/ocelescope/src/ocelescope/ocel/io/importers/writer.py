@@ -20,12 +20,13 @@ from ocelescope.ocel.constants.pm4py import (
 )
 from ocelescope.ocel.io.connection import DuckDBTarget
 from ocelescope.ocel.io.schema import (
+    TIMESTAMP_TYPE,
     SchemaDefinition,
     create_ocel_tables,
 )
-from ocelescope.util.sql import set_utc
+from ocelescope.util.sql import ident, set_utc, utc_timestamp
 
-STATIC_OBJECT_ATTRIBUTE_TIMESTAMP = datetime.fromtimestamp(0).isoformat()
+STATIC_OBJECT_ATTRIBUTE_TIMESTAMP = datetime(1970, 1, 1).isoformat()
 
 
 def _as_strings(values: list) -> list:
@@ -158,9 +159,24 @@ class OCELWriter:
 
         arrays = [pa.array(_as_strings(values), type=pa.string()) for values in buffer.values()]
         batch = pa.table(arrays, names=list(buffer))
-        self.con.from_arrow(batch).insert_into(table)
+        self.con.from_arrow(batch).project(self._projection(table)).insert_into(table)
         for values in buffer.values():
             values.clear()
+
+    def _projection(self, table: str) -> str:
+        """Column expressions turning the buffered text into the table's types.
+
+        Everything but a timestamp is left to DuckDB's implicit cast on insert.
+        A timestamp cannot be: the column is zone-less, so a direct cast would
+        keep the printed digits of an offset-carrying value and throw the offset
+        away. :func:`~ocelescope.util.sql.utc_timestamp` resolves it instead.
+        """
+        return ", ".join(
+            f"{utc_timestamp(ident(field.name))} AS {ident(field.name)}"
+            if field.type == TIMESTAMP_TYPE
+            else ident(field.name)
+            for field in self.schemas[table]
+        )
 
     def close(self) -> None:
         """Flush any remaining buffered rows, closing a connection we opened."""

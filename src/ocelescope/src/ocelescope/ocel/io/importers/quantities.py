@@ -62,7 +62,7 @@ from ocelescope.ocel.constants.quantity import (
     inverse_keymap,
 )
 from ocelescope.ocel.io.connection import DuckDBTarget, connect_target
-from ocelescope.ocel.io.schema import ATTRIBUTE_TYPE_TO_ARROW
+from ocelescope.ocel.io.schema import ATTRIBUTE_TYPE_TO_ARROW, TIMESTAMP_TYPE
 
 
 def import_quantities(source: str | Path, target: DuckDBTarget) -> None:
@@ -108,8 +108,8 @@ def _cast_properties(df: pd.DataFrame, property_type: dict[str, str]) -> pd.Data
                 .map({"true": True, "True": True, "false": False, "False": False})
                 .astype("boolean")
             )
-        elif arrow_type == pa.timestamp("us", tz="UTC"):
-            df[column] = pd.to_datetime(df[column], errors="coerce", utc=True)
+        elif arrow_type == TIMESTAMP_TYPE:
+            df[column] = pd.to_datetime(df[column], errors="coerce", utc=True).dt.tz_localize(None)
         elif arrow_type == pa.int64():
             df[column] = pd.to_numeric(df[column], errors="coerce").astype("Int64")
         else:

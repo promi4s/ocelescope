@@ -25,9 +25,16 @@ from ocelescope.util.sql import ident
 
 SchemaDefinition = list[tuple[str, pa.DataType]]
 
+#: OCEL timestamps are stored zone-less, already normalized to UTC by
+#: :func:`~ocelescope.util.sql.utc_timestamp`. A zone-aware column would render
+#: differently depending on the reading session's ``TimeZone``, and would make an
+#: offset-less source value mean whatever zone the importing machine happened to
+#: be in.
+TIMESTAMP_TYPE = pa.timestamp("us")
+
 ATTRIBUTE_TYPE_TO_ARROW: dict[str, pa.DataType] = {
     "string": pa.string(),
-    "time": pa.timestamp("us", tz="UTC"),
+    "time": TIMESTAMP_TYPE,
     "integer": pa.int64(),
     "float": pa.float64(),
     "boolean": pa.bool_(),
@@ -41,12 +48,12 @@ OBJECT_TABLE_BASE_SCHEMA: SchemaDefinition = [
 EVENT_TABLE_BASE_SCHEMA: SchemaDefinition = [
     (EID_COL, pa.string()),
     (ACTIVITY_COL, pa.string()),
-    (TIMESTAMP_COL, pa.timestamp("us", tz="UTC")),
+    (TIMESTAMP_COL, TIMESTAMP_TYPE),
 ]
 
 OBJECT_CHANGES_TABLE_SCHEMA: SchemaDefinition = [
     (OID_COL, pa.string()),
-    (TIMESTAMP_COL, pa.timestamp("us", tz="UTC")),
+    (TIMESTAMP_COL, TIMESTAMP_TYPE),
 ]
 
 O2O_TABLE_SCHEMA: SchemaDefinition = [
