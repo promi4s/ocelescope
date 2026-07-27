@@ -85,20 +85,33 @@ class ObjectsManager(BaseManager):
         self._replace(OBJECTS_TABLE, contents)
 
     @property
+    def _stores_changed_field(self) -> bool:
+        """Whether the change table keeps its own ``ocel:field`` column.
+
+        The importers fill one, but the table can be assigned back without it (see
+        :attr:`changes_table`), so nothing may read it unconditionally.
+        """
+        return OBJECT_CHANGED_FIELD in self._column_names(OBJECT_CHANGES_TABLE)
+
+    @property
     def changes_table(self) -> duckdb.DuckDBPyRelation:
         """
         Return the dynamic object attribute change table as a lazy relation.
 
-        ``ocel:type`` and ``ocel:field`` are derived here (joined on / recovered
-        from the changed column) rather than stored, so assigning this table back
-        drops them again.
+        ``ocel:type`` is derived here (joined on) rather than stored, so assigning
+        this table back drops it again.
+
+        ``ocel:field`` is stored, and only recovered from the changed column where
+        it is missing -- a change that clears an attribute leaves no non-null
+        column to name, so a written field cannot be reconstructed from the values.
 
         Returns:
             DuckDBPyRelation: A lazy relation over all dynamic attribute updates.
         """
         names = self.dynamic_attribute_names
-        # The stored table is wide with exactly one non-null attribute value per
-        # row, so `ocel:field` is the name of whichever column that is.
+        # Without a stored field, the table is wide with exactly one non-null
+        # attribute value per row, so `ocel:field` is the name of whichever
+        # column that is.
         if names:
             field = (
                 "CASE "
@@ -110,8 +123,14 @@ class ObjectsManager(BaseManager):
         else:
             field = "NULL"
 
+        if self._stores_changed_field:
+            changes = f'c.* EXCLUDE ("{OBJECT_CHANGED_FIELD}")'
+            field = f'COALESCE(c."{OBJECT_CHANGED_FIELD}", {field})'
+        else:
+            changes = "c.*"
+
         return self._relation(
-            f'SELECT c.*, o."{OTYPE_COL}", {field} AS "{OBJECT_CHANGED_FIELD}" '
+            f'SELECT {changes}, o."{OTYPE_COL}", {field} AS "{OBJECT_CHANGED_FIELD}" '
             f"FROM {OBJECT_CHANGES_TABLE} c "
             f'JOIN {OBJECTS_TABLE} o ON c."{OID_COL}" = o."{OID_COL}" '
             f'ORDER BY c."{TIMESTAMP_COL}"'
@@ -289,7 +308,12 @@ class ObjectsManager(BaseManager):
 
         if attributes is None:
             kept = self.attribute_names
-            object_cols, change_cols = f"* EXCLUDE ({otype})", "*"
+            # ocel:field names the changed attribute rather than being one, so it
+            # is dropped here as ocel:type is on the other side of the union.
+            object_cols = f"* EXCLUDE ({otype})"
+            change_cols = (
+                f"* EXCLUDE ({ident(OBJECT_CHANGED_FIELD)})" if self._stores_changed_field else "*"
+            )
         else:
             keep = set(attributes)
             kept = [n for n in self.attribute_names if n in keep]

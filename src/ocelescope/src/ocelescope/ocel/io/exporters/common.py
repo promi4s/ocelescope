@@ -13,6 +13,7 @@ from ocelescope.ocel.constants.pm4py import (
     O2O_QUALIFIER,
     O2O_SOURCE_ID,
     O2O_TARGET_ID,
+    OBJECT_CHANGED_FIELD,
     OID_COL,
     OTYPE_COL,
     TIMESTAMP_COL,
@@ -29,7 +30,8 @@ from ocelescope.util.sql import ident, literal
 _BATCH = 10_000
 
 _EVENT_META = (EID_COL, ACTIVITY_COL, TIMESTAMP_COL)
-_CHANGES_META = (OID_COL, TIMESTAMP_COL)
+
+_CHANGES_META = (OID_COL, TIMESTAMP_COL, OBJECT_CHANGED_FIELD)
 
 _PLACEHOLDER = "__ocel_no_attribute"
 

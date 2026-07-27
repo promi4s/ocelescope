@@ -17,6 +17,7 @@ from ocelescope.ocel.constants.pm4py import (
     O2O_QUALIFIER,
     O2O_SOURCE_ID,
     O2O_TARGET_ID,
+    OBJECT_CHANGED_FIELD,
     OID_COL,
     OTYPE_COL,
     TIMESTAMP_COL,
@@ -51,9 +52,16 @@ EVENT_TABLE_BASE_SCHEMA: SchemaDefinition = [
     (TIMESTAMP_COL, TIMESTAMP_TYPE),
 ]
 
+#: ``ocel:field`` names the attribute a change row writes. It is stored rather
+#: than derived because the value itself is not enough to recover it: a change
+#: that clears an attribute leaves every column of its row NULL. An importer that
+#: does not know the field leaves it NULL, and readers fall back to the one
+#: non-NULL column (see
+#: :attr:`~ocelescope.ocel.managers.objects.ObjectsManager.changes_table`).
 OBJECT_CHANGES_TABLE_SCHEMA: SchemaDefinition = [
     (OID_COL, pa.string()),
     (TIMESTAMP_COL, TIMESTAMP_TYPE),
+    (OBJECT_CHANGED_FIELD, pa.string()),
 ]
 
 O2O_TABLE_SCHEMA: SchemaDefinition = [
