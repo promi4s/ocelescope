@@ -39,20 +39,34 @@ _CHANGES = "__ocel_changes"
 _RELS = "__ocel_rels"
 
 
-def _attribute_rows(table: str, meta: tuple[str, ...]) -> str:
-    """A relation of ``(meta..., name, value)``: one row per set attribute cell."""
+def _attribute_rows(table: str, meta: tuple[str, ...], field: str | None = None) -> str:
+    """A relation of ``(meta..., name, value)``: one row per attribute cell that counts."""
     meta_list = ", ".join(ident(name) for name in meta)
-    return f"""(
+    placeholder = "NULL::VARCHAR"
+    values = f"COLUMNS(* EXCLUDE ({meta_list}))::VARCHAR"
+    if field is not None:
+        placeholder = f"struct_pack(v := {placeholder})"
+        values = f"struct_pack(v := {values})"
+
+    unpivoted = f"""(
         UNPIVOT (
             SELECT {meta_list},
-                   NULL::VARCHAR AS {ident(_PLACEHOLDER)},
-                   COLUMNS(* EXCLUDE ({meta_list}))::VARCHAR
+                   {placeholder} AS {ident(_PLACEHOLDER)},
+                   {values}
             FROM {ident(table)}
         ) ON COLUMNS(* EXCLUDE ({meta_list}))
     )"""
 
+    if field is None:
+        return unpivoted
+    return f"""(
+        SELECT * EXCLUDE (value), value.v AS value
+        FROM {unpivoted}
+        WHERE name = {ident(field)}
+    )"""
 
-_CHANGE_ROWS = _attribute_rows(OBJECT_CHANGES_TABLE, _CHANGES_META)
+
+_CHANGE_ROWS = _attribute_rows(OBJECT_CHANGES_TABLE, _CHANGES_META, field=OBJECT_CHANGED_FIELD)
 _EVENT_ROWS = _attribute_rows(EVENTS_TABLE, _EVENT_META)
 
 
@@ -226,6 +240,17 @@ def event_types(con: duckdb.DuckDBPyConnection) -> list[dict]:
     return _declarations(event_type_attributes(con))
 
 
+def _relationships(rels: list | None) -> list[dict]:
+    """Reshape a row's relationships, giving a NULL qualifier back the empty string.
+
+    Neither format can write a null qualifier -- the schema says string -- and a
+    reader that holds to it (r4pm) rejects one written as null or left out.
+    """
+    return [
+        {"objectId": rel["objectId"], "qualifier": rel["qualifier"] or ""} for rel in rels or []
+    ]
+
+
 def iter_objects(con: duckdb.DuckDBPyConnection) -> Iterator[dict]:
     """Stream objects shaped like the importer input (id/type/attributes/relationships).
 
@@ -243,15 +268,11 @@ def iter_objects(con: duckdb.DuckDBPyConnection) -> Iterator[dict]:
                 {"name": change["name"], "value": change["value"], "time": change["time"]}
                 for change in record[_CHANGES] or []
             ]
-            relationships = [
-                {"objectId": rel["objectId"], "qualifier": rel["qualifier"]}
-                for rel in record[_RELS] or []
-            ]
             yield {
                 "id": record[OID_COL],
                 "type": record[OTYPE_COL],
                 "attributes": attributes,
-                "relationships": relationships,
+                "relationships": _relationships(record[_RELS]),
             }
 
 
@@ -274,16 +295,12 @@ def iter_events(con: duckdb.DuckDBPyConnection) -> Iterator[dict]:
                 for name in attr_cols
                 if record[name] is not None
             ]
-            relationships = [
-                {"objectId": rel["objectId"], "qualifier": rel["qualifier"]}
-                for rel in record[_RELS] or []
-            ]
             yield {
                 "id": record[EID_COL],
                 "type": record[ACTIVITY_COL],
                 "time": record[TIMESTAMP_COL],
                 "attributes": attributes,
-                "relationships": relationships,
+                "relationships": _relationships(record[_RELS]),
             }
 
 

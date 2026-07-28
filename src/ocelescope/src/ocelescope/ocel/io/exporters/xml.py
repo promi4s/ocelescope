@@ -22,8 +22,16 @@ def _isoformat(value: datetime) -> str:
     return f"{value.isoformat()}+00:00"
 
 
-def _value_text(value: object) -> str:
-    """Render an attribute value as element text the importer can cast back."""
+def _value_text(value: object) -> str | None:
+    """Render an attribute value as element text the importer can cast back.
+
+    ``None`` becomes no text at all rather than the string ``"None"``: XML has no
+    null literal, and an empty element is what the importer reads back as a value
+    that is not there. A change that sets an attribute to NULL is a real change,
+    so it has to survive the round trip as one.
+    """
+    if value is None:
+        return None
     if isinstance(value, bool):
         return "true" if value else "false"
     if isinstance(value, datetime):
@@ -55,10 +63,14 @@ def _relationships_element(relationships: list[dict]) -> etree.Element | None:
         return None
     container = etree.Element("objects")
     for relationship in relationships:
-        attribs = {"object-id": str(relationship["objectId"])}
-        if relationship["qualifier"] is not None:
-            attribs["qualifier"] = str(relationship["qualifier"])
-        etree.SubElement(container, "relationship", attribs)
+        etree.SubElement(
+            container,
+            "relationship",
+            {
+                "object-id": str(relationship["objectId"]),
+                "qualifier": str(relationship["qualifier"]),
+            },
+        )
     return container
 
 

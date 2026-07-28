@@ -28,6 +28,7 @@ from ocelescope.ocel.constants.pm4py import (
     O2O_QUALIFIER,
     O2O_SOURCE_ID,
     O2O_TARGET_ID,
+    OBJECT_CHANGED_FIELD,
     OID_COL,
     OTYPE_COL,
     TIMESTAMP_COL,
@@ -138,6 +139,10 @@ def _object_type_table(suffix: str, otype: str, attributes: _Attributes) -> _Tab
 
     ``attributes`` are the type's attributes, which are read off ``object_changes``
     in the first place, so each of them has a column there to read.
+
+    A row is matched on the field it names rather than on having a non-NULL value:
+    a change that sets an attribute to NULL is still a change, and matching on the
+    value would drop it from the log entirely.
     """
     ddl = [("ocel_id", "TEXT"), ("ocel_time", "TIMESTAMP"), ("ocel_changed_field", "TEXT")]
     ddl += [(name, sqlite_decl(dtype)) for name, dtype in attributes]
@@ -153,15 +158,15 @@ def _object_type_table(suffix: str, otype: str, attributes: _Attributes) -> _Tab
         change = [
             f'CAST(c."{OID_COL}" AS VARCHAR)',
             _iso(f'c."{TIMESTAMP_COL}"'),
-            "CAST(? AS VARCHAR)",
+            f'CAST(c."{OBJECT_CHANGED_FIELD}" AS VARCHAR)',
             *values,
         ]
         selects.append(
             f"SELECT {', '.join(change)} FROM object_changes c "
             f'JOIN objects o ON c."{OID_COL}" = o."{OID_COL}" '
-            f'WHERE o."{OTYPE_COL}" = ? AND c."{changed}" IS NOT NULL'
+            f'WHERE o."{OTYPE_COL}" = ? AND c."{OBJECT_CHANGED_FIELD}" = ?'
         )
-        params.extend([changed, otype])
+        params.extend([otype, changed])
 
     return f"object_{suffix}", ddl, " UNION ALL ".join(selects), params
 
