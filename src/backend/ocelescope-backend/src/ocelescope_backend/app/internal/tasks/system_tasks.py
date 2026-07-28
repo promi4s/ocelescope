@@ -3,7 +3,6 @@ import shutil
 import tempfile
 import traceback
 import zipfile
-from datetime import datetime
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import Literal
@@ -64,7 +63,6 @@ def _import_ocel(
         ocel_id = session.add_ocel_from_file(
             read_path,
             name=name,
-            created_at=datetime.now().isoformat(),
         )
 
         extensions = import_extensions(

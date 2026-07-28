@@ -49,6 +49,15 @@ class OceanConfig(BaseSettings):
         default="development", description="The mode in which the backend is running"
     )
 
+    OCEL_STREAM_THRESHOLD_MB: int = Field(
+        default=200,
+        description=(
+            "Size in MB above which an uploaded OCEL is streamed straight into its "
+            "DuckDB file instead of being parsed into memory first. Lower it if the "
+            "backend runs out of memory on large uploads."
+        ),
+    )
+
     class Config:
         env_file = ".env"
 
