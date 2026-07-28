@@ -10,7 +10,7 @@
         "tags": [
           "session"
         ],
-        "summary": "Upload ocels, resources or tasks",
+        "summary": "Upload logs, plugins, or resources",
         "operationId": "upload",
         "requestBody": {
           "content": {
