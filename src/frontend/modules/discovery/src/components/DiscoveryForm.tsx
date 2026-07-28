@@ -1,10 +1,4 @@
-import {
-  Input,
-  MultiSelect,
-  NumberInput,
-  Select,
-  Slider,
-} from "@mantine/core";
+import { Input, MultiSelect, NumberInput, Select, Slider } from "@mantine/core";
 import type {
   DescriptionFieldProps,
   FieldProps,
