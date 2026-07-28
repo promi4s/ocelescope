@@ -1,5 +1,10 @@
 import { Input, MultiSelect, NumberInput, Select, Slider } from "@mantine/core";
-import type { FieldProps, FieldTemplateProps, WidgetProps } from "@rjsf/utils";
+import type {
+  DescriptionFieldProps,
+  FieldProps,
+  FieldTemplateProps,
+  WidgetProps,
+} from "@rjsf/utils";
 import validator from "@rjsf/validator-ajv8";
 import dynamic from "next/dynamic";
 import { memo, useMemo } from "react";
@@ -71,7 +76,17 @@ const FieldTemplate = ({
   );
 };
 
-const TEMPLATES = { FieldTemplate };
+const DescriptionFieldTemplate = ({
+  id,
+  description,
+}: DescriptionFieldProps) =>
+  description ? (
+    <Input.Description id={id} mt={-8} mb={8}>
+      {description}
+    </Input.Description>
+  ) : null;
+
+const TEMPLATES = { DescriptionFieldTemplate, FieldTemplate };
 
 const UI_SCHEMA_BASE = {
   "ui:submitButtonOptions": { norender: true },

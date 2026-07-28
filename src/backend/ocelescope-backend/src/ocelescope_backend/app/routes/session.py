@@ -11,8 +11,8 @@ from ocelescope_backend.app.dependencies import ApiSession
 from ocelescope_backend.app.internal.config import config
 from ocelescope_backend.app.internal.session import Session
 from ocelescope_backend.app.internal.tasks.system_tasks import (
+    import_archive,
     import_ocel_task,
-    import_plugin,
     import_resource,
     import_xes_task,
 )
@@ -23,7 +23,7 @@ session_router = APIRouter(prefix="/session", tags=["session"])
 
 
 @session_router.post(
-    "/upload", summary="Upload ocels, resources or tasks", operation_id="upload"
+    "/upload", summary="Upload logs, plugins, or resources", operation_id="upload"
 )
 async def upload(session: ApiSession, files: list[UploadFile] = File(...)) -> list[str]:
     tasks = []
@@ -34,16 +34,19 @@ async def upload(session: ApiSession, files: list[UploadFile] = File(...)) -> li
         file_path = Path(file.filename)
 
         task_method = None
-        match file_path.suffix:
+        match file_path.suffix.lower():
             case ".zip":
-                task_method = import_plugin
+                task_method = import_archive
             case ".ocelescope":
                 task_method = import_resource
             case ".xml" | ".xmlocel" | ".json" | ".jsonocel" | ".sqlite":
                 task_method = import_ocel_task
             case ".xes":
                 task_method = import_xes_task
-            case ".gz" if file_path.suffixes[-2:] == [".xes", ".gz"]:
+            case ".gz" if [suffix.lower() for suffix in file_path.suffixes[-2:]] == [
+                ".xes",
+                ".gz",
+            ]:
                 task_method = import_xes_task
 
         if task_method is None:

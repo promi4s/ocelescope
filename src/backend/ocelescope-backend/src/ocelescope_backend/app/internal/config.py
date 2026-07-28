@@ -34,6 +34,17 @@ class OceanConfig(BaseSettings):
         description="Path to the directory, where plugins are stored",
     )
 
+    ARCHIVE_MAX_FILES: int = Field(
+        default=1_000,
+        ge=1,
+        description="Maximum number of files accepted in an uploaded zip archive",
+    )
+    ARCHIVE_MAX_UNCOMPRESSED_BYTES: int = Field(
+        default=5 * 1024 * 1024 * 1024,  # 5gb
+        ge=1,
+        description="Maximum total expanded size accepted for an uploaded zip archive",
+    )
+
     MODE: Literal["production", "development"] | None = Field(
         default="development", description="The mode in which the backend is running"
     )
