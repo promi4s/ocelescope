@@ -15,6 +15,7 @@ from typing import Literal, NamedTuple
 import duckdb
 import pyarrow as pa
 
+from ocelescope.ocel.constants.misc import EPOCH_SQL
 from ocelescope.ocel.constants.pm4py import (
     ACTIVITY_COL,
     E2O_QUALIFIER,
@@ -98,8 +99,6 @@ _ARROW_TO_DUCKDB_CAST: dict[pa.DataType, str] = {
     pa.bool_(): "BOOLEAN",
 }
 
-
-_EARLIEST = "'-infinity'::TIMESTAMP"
 
 #: Groups one attribute change on its own during the object_changes reshape. The
 #: source row's identity is not enough: several attributes can change at one
@@ -251,24 +250,6 @@ def _insert_events(con: duckdb.DuckDBPyConnection, type_tables: TypeTables) -> N
 def _insert_object_changes(con: duckdb.DuckDBPyConnection, type_tables: TypeTables) -> None:
     """Fill ``object_changes``, one statement per object type.
 
-    One row per written attribute value: the source row is fanned out by
-    ``UNPIVOT`` and pivoted straight back, so every output row carries exactly one
-    attribute and names it in ``ocel:field``. ``row_number`` keys the round trip --
-    the source row's identity is not enough, since several attributes can be
-    written at one instant and grouping by ``(id, time)`` would merge them back
-    into one row.
-
-    Which cells survive the fan-out depends on what the source row is:
-
-    * An *initial* row (no ``ocel_changed_field``) states every attribute at once,
-      so each of its set cells becomes its own row. Empty ones say nothing and are
-      dropped.
-    * A *change* row names the one attribute it writes, so it is kept whatever the
-      value -- a cleared attribute is a change like any other, and the empty string
-      real files write for it is normalised to NULL.
-
-    ``object_changes`` is the full value history, initial values included, while
-    ``objects`` caches each attribute's earliest value (see
     :func:`_insert_objects`).
     """
     for table in type_tables.values():
@@ -287,7 +268,7 @@ def _insert_object_changes(con: duckdb.DuckDBPyConnection, type_tables: TypeTabl
             {ident(OBJECT_CHANGES_TABLE)} BY NAME
             SELECT
             {ident(SQLITE_OCEL_ID_FIELD)} as {ident(OID_COL)},
-            {table.stored_time} as {ident(TIMESTAMP_COL)},
+            COALESCE({table.stored_time}, {EPOCH_SQL}) as {ident(TIMESTAMP_COL)},
             {field}{attribute_selects(table.attributes)}
             FROM
             (
@@ -315,15 +296,7 @@ def _insert_object_changes(con: duckdb.DuckDBPyConnection, type_tables: TypeTabl
 
 
 def _insert_objects(con: duckdb.DuckDBPyConnection) -> None:
-    """Fill the ``objects`` snapshot from the core table and ``object_changes``.
-
-    The id and type of *every* object come from the core ``object`` table: an
-    object type with no attributes has an empty (or absent) type table, so driving
-    off the type tables would silently drop those objects. Each attribute's
-    initial value is its earliest non-NULL value -- ``arg_min`` over the whole
-    change history at once, since ``object_changes`` already holds every type's
-    attributes in one wide table.
-    """
+    """Fill the ``objects`` snapshot from the core table and ``object_changes``."""
     con.execute(f"""
         INSERT INTO
         {ident(OBJECTS_TABLE)} BY NAME
@@ -340,7 +313,7 @@ def _insert_objects(con: duckdb.DuckDBPyConnection) -> None:
         LEFT JOIN (
             SELECT
             {ident(OID_COL)},
-            arg_min(COLUMNS (* EXCLUDE ({ident(OID_COL)}, {ident(TIMESTAMP_COL)}, {ident(OBJECT_CHANGED_FIELD)})), COALESCE({ident(TIMESTAMP_COL)}, {_EARLIEST}))
+            arg_min(COLUMNS (* EXCLUDE ({ident(OID_COL)}, {ident(TIMESTAMP_COL)}, {ident(OBJECT_CHANGED_FIELD)})), {ident(TIMESTAMP_COL)})
             FROM
             {ident(OBJECT_CHANGES_TABLE)}
             GROUP BY
