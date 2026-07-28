@@ -43,6 +43,7 @@ class SessionOCEL:
         The filtered file is built by reading the origin, applying the pipeline and
         writing the result back out -- so the cost is paid here, when the pipeline
         changes, rather than on every read.
+
         """
         filters = self._all_filters()
         if use_original or not filters:

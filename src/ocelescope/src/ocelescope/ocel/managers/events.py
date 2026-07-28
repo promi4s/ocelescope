@@ -9,7 +9,6 @@ import polars
 from ocelescope.ocel.constants.pm4py import ACTIVITY_COL, EID_COL, TIMESTAMP_COL
 from ocelescope.ocel.constants.tables import EVENTS_TABLE
 from ocelescope.ocel.managers.base import BaseManager
-from ocelescope.util.sql import literal
 
 
 class EventsManager(BaseManager):
