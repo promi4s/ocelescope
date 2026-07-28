@@ -157,13 +157,21 @@ class ObjectsManager(BaseManager):
         return self._column(f'SELECT DISTINCT "{OTYPE_COL}" FROM {OBJECTS_TABLE} ORDER BY 1')
 
     @property
+    def count(self) -> int:
+        """
+        Return the number of events in the log.
+
+        Returns:
+            int: The number of distinct events.
+        """
+        return self._relation(
+            f'SELECT count(DISTINCT "{OID_COL}") FROM {OBJECTS_TABLE}'
+        ).fetchall()[0][0]
+
+    @property
     def counts(self) -> pd.Series:
         """
         Count how many objects exist for each object type.
-
-        Counted by DuckDB, so only one row per object type is read rather than the
-        whole objects table. Ordered like ``value_counts``: most frequent first,
-        ties broken by name.
 
         Returns:
             Series: A pandas Series indexed by object type with occurrence counts.

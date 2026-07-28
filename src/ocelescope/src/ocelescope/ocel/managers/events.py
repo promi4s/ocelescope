@@ -9,6 +9,7 @@ import polars
 from ocelescope.ocel.constants.pm4py import ACTIVITY_COL, EID_COL, TIMESTAMP_COL
 from ocelescope.ocel.constants.tables import EVENTS_TABLE
 from ocelescope.ocel.managers.base import BaseManager
+from ocelescope.util.sql import literal
 
 
 class EventsManager(BaseManager):
@@ -79,6 +80,18 @@ class EventsManager(BaseManager):
     @pl.setter
     def pl(self, contents: polars.LazyFrame | polars.DataFrame) -> None:
         self._replace(EVENTS_TABLE, contents)
+
+    @property
+    def count(self) -> int:
+        """
+        Return the number of events in the log.
+
+        Returns:
+            int: The number of distinct events.
+        """
+        return self._relation(f'SELECT count(DISTINCT "{EID_COL}") FROM {EVENTS_TABLE}').fetchall()[
+            0
+        ][0]
 
     @property
     def activities(self) -> list[str]:
