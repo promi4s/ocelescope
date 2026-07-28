@@ -108,7 +108,8 @@ def _import_xes(
     finally:
         file_path.unlink(missing_ok=True)
 
-    ocel_id = session.add_ocel(ocel, name=original_name.stem)
+    with ocel:
+        ocel_id = session.add_ocel(ocel, name=original_name.stem)
 
     return [
         SystemNotification(

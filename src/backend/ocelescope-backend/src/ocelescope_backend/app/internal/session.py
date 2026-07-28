@@ -138,15 +138,12 @@ class Session:
         straight into its own DuckDB file -- never materialized as a whole.
         """
         threshold = config.OCEL_STREAM_THRESHOLD_MB * 1024 * 1024
-        return self.add_ocel(
-            OCEL.read(
-                source_path,
-                variant="r4pm"
-                if source_path.stat().st_size <= threshold
-                else "streamed",
-            ),
-            name=name,
-        )
+
+        with OCEL.read(
+            source_path,
+            variant="r4pm" if source_path.stat().st_size <= threshold else "streamed",
+        ) as ocel:
+            return self.add_ocel(ocel, name=name)
 
     def set_ocel_extensions(self, ocel_id: str, extensions: list[OCELExtension]):
         """Attach in-memory extension instances to an already registered OCEL."""

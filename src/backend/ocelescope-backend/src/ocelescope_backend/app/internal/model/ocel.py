@@ -32,6 +32,7 @@ class SessionOCEL:
         self.extensions: list[OCELExtension] = extensions or []
         self._filters_by_source: dict[str, list[BaseFilter]] = {}
         self._filtered_db_path: Path | None = None
+        self._filtered_generation = 0
 
     def _all_filters(self) -> list[BaseFilter]:
         return [f for pipeline in self._filters_by_source.values() for f in pipeline]
@@ -47,7 +48,10 @@ class SessionOCEL:
         if use_original or not filters:
             return self.db_path
         if self._filtered_db_path is None:
-            filtered = self.db_path.with_suffix(".filtered.duckdb")
+            self._filtered_generation += 1
+            filtered = self.db_path.with_suffix(
+                f".filtered.{self._filtered_generation}.duckdb"
+            )
             with OCEL.read_duckdb(self.db_path) as origin:
                 with origin.filter(filters) as subset:
                     subset.to_duckdb(filtered)
