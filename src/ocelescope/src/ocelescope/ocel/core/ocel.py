@@ -260,7 +260,7 @@ class OCEL:
                     schema={
                         OID_COL: pl.String,
                         OTYPE_COL: pl.String,
-                        TIMESTAMP_COL: pl.Datetime(time_zone="UTC"),
+                        TIMESTAMP_COL: pl.Datetime("us"),
                         OBJECT_CHANGED_FIELD: pl.String,
                     }
                 )

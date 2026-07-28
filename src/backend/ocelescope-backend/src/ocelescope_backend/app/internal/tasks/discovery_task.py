@@ -1,3 +1,4 @@
+from contextlib import ExitStack
 from typing import Any, Hashable, Sequence, cast
 
 from ocelescope import Resource, Visualization
@@ -41,13 +42,19 @@ class DiscoveryTask(TaskBase):
                 parameters = info.parse_parameters(
                     cast(dict[str, Any], self.request.parameters)
                 )
-                ocel = self.session.get_ocel(self.request.ocel_id)
-                if self.request.filters:
-                    ocel = ocel.filter(self.request.filters)
-                resource = cast(
-                    Resource,
-                    info.run(ocel=ocel, parameters=parameters),
-                )
+                # Both the session's OCEL and the filtered one it may be replaced
+                # by own a connection, and the discovered resource carries neither
+                # past this block -- so the stack closes whichever were opened.
+                with ExitStack() as ocels:
+                    ocel = ocels.enter_context(
+                        self.session.get_ocel(self.request.ocel_id)
+                    )
+                    if self.request.filters:
+                        ocel = ocels.enter_context(ocel.filter(self.request.filters))
+                    resource = cast(
+                        Resource,
+                        info.run(ocel=ocel, parameters=parameters),
+                    )
             except KeyError as exc:
                 raise BadRequest(str(exc)) from exc
 
