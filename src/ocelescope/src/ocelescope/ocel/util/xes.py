@@ -86,18 +86,23 @@ def create_ocel_from_xml(path: str, fallback_object_name: str = "LogObject") -> 
 
 
 def write_ocel_to_xes(ocel: "OCEL", object_type: str, path: str | Path):
+    with ocel.filter(
+        [ObjectTypeFilter(object_types=[object_type], mode="include")]
+    ) as filtered_ocel:
+        latest_states = (
+            filtered_ocel.objects.attribute_states()
+            .sort_values([TIMESTAMP_COL, OID_COL])
+            .drop_duplicates([OID_COL], keep="last")
+            .drop(columns=[TIMESTAMP_COL, OTYPE_COL])
+            .set_index(OID_COL)
+        )
+        export_ocel = filtered_ocel.ocel
+        export_objects = export_ocel.objects.set_index(OID_COL)
+        export_objects.update(latest_states)
+        export_ocel.objects = export_objects.reset_index()
 
-    filtered_ocel = ocel.filter([ObjectTypeFilter(object_types=[object_type], mode="include")])
-
-    filtered_ocel.objects.df = (
-        filtered_ocel.objects.attribute_states()
-        .sort_values([TIMESTAMP_COL, OID_COL])
-        .drop_duplicates([OID_COL], keep="last")
-        .drop(TIMESTAMP_COL, axis=1)
-    )
-
-    pm4py.write_xes(
-        pm4py.ocel_flattening(filtered_ocel.ocel, object_type),
-        str(path),
-        variant_str="r4pm/rustxes",
-    )
+        pm4py.write_xes(
+            pm4py.ocel_flattening(export_ocel, object_type),
+            str(path),
+            variant_str="r4pm/rustxes",
+        )
