@@ -76,11 +76,7 @@ class EventAttributeFilter(_AttributeFilter):
 
 
 class ObjectAttributeFilter(_AttributeFilter):
-    """Keep the objects whose attribute matches; types without it are untouched.
-
-    Matches on an object's *static* value only -- the dynamic values in
-    ``object_changes`` are not folded in.
-    """
+    """Keep the objects whose attribute matches; types without it are untouched."""
 
     def keep(self, ocel) -> Keep:
         return Keep(objects=self._keep(lambda: ocel.objects.pl, OTYPE_COL, OID_COL))
