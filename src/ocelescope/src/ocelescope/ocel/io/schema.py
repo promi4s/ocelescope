@@ -54,9 +54,8 @@ EVENT_TABLE_BASE_SCHEMA: SchemaDefinition = [
 
 #: ``ocel:field`` names the attribute a change row writes. It is stored rather
 #: than derived because the value itself is not enough to recover it: a change
-#: that clears an attribute leaves every column of its row NULL. An importer that
-#: does not know the field leaves it NULL, and readers fall back to the one
-#: non-NULL column (see
+#: that clears an attribute leaves every column of its row NULL. Every importer
+#: fills it, and readers rely on it (see
 #: :attr:`~ocelescope.ocel.managers.objects.ObjectsManager.changes_table`).
 OBJECT_CHANGES_TABLE_SCHEMA: SchemaDefinition = [
     (OID_COL, pa.string()),

@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
-from datetime import datetime
-
 import duckdb
 import pyarrow as pa
 
+from ocelescope.ocel.constants.misc import EPOCH
 from ocelescope.ocel.constants.pm4py import (
     ACTIVITY_COL,
     E2O_QUALIFIER,
@@ -27,7 +26,7 @@ from ocelescope.ocel.io.schema import (
 )
 from ocelescope.util.sql import ident, set_utc, utc_timestamp
 
-STATIC_OBJECT_ATTRIBUTE_TIMESTAMP = datetime(1970, 1, 1).isoformat()
+STATIC_OBJECT_ATTRIBUTE_TIMESTAMP = EPOCH.isoformat()
 
 
 def _as_strings(values: list) -> list:
