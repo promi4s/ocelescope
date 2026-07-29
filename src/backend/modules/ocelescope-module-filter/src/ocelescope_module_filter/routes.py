@@ -4,6 +4,7 @@ from typing import cast
 from fastapi import APIRouter
 from ocelescope_backend.app.dependencies import ApiSession
 from ocelescope_backend.app.sse_manager import (
+    InvalidationRequest,
     SystemNotification,
     sse_manager,
 )
@@ -36,6 +37,11 @@ async def setFilter(ocel_id: str, body: list[NativeFilter], session: ApiSession)
     ):
         event_difference = original_ocel.events.count - filtered_ocel.events.count
         object_difference = original_ocel.objects.count - filtered_ocel.objects.count
+
+    await sse_manager.send(
+        session_id=session.id,
+        message=InvalidationRequest(routes=["ocels"]),
+    )
 
     await sse_manager.send(
         session_id=session.id,
