@@ -90,7 +90,7 @@ class DiscoveryTask(TaskBase):
                     f"Successfully discovered {resource_type} "
                     f"with {self.request.name} "
                     f"for {self.session.ocels[self.request.ocel_id].name}"
-                    f"({duration})"
+                    f"{duration}"
                 ),
                 notification_type="info",
             )
