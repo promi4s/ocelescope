@@ -3,34 +3,45 @@
 from __future__ import annotations
 
 import os
-from datetime import date, datetime
+import xml.etree.ElementTree as etree
+from datetime import datetime
 from pathlib import Path
 from typing import IO
 
-import xml.etree.ElementTree as etree
-
+from ocelescope.ocel.io.connection import DuckDBTarget, connect_target
 from ocelescope.ocel.io.exporters.common import (
     event_types,
     iter_events,
     iter_objects,
     object_types,
 )
-from ocelescope.ocel.io.connection import DuckDBTarget, connect_target
 from ocelescope.ocel.io.exporters.quantities import xml_quantity_extension
 
 
-def _value_text(value: object) -> str:
-    """Render an attribute value as element text the importer can cast back."""
+def _isoformat(value: datetime) -> str:
+    return f"{value.isoformat()}+00:00"
+
+
+def _value_text(value: object) -> str | None:
+    """Render an attribute value as element text the importer can cast back.
+
+    ``None`` becomes no text at all rather than the string ``"None"``: XML has no
+    null literal, and an empty element is what the importer reads back as a value
+    that is not there. A change that sets an attribute to NULL is a real change,
+    so it has to survive the round trip as one.
+    """
+    if value is None:
+        return None
     if isinstance(value, bool):
         return "true" if value else "false"
-    if isinstance(value, (datetime, date)):
-        return value.isoformat()
+    if isinstance(value, datetime):
+        return _isoformat(value)
     return str(value)
 
 
 def _time_text(value: object) -> str:
     """Render an attribute timestamp (a real datetime or the initial sentinel)."""
-    return value.isoformat() if isinstance(value, (datetime, date)) else str(value)
+    return _isoformat(value) if isinstance(value, datetime) else str(value)
 
 
 def _types_element(container: str, member: str, declarations: list[dict]) -> etree.Element:
@@ -52,10 +63,14 @@ def _relationships_element(relationships: list[dict]) -> etree.Element | None:
         return None
     container = etree.Element("objects")
     for relationship in relationships:
-        attribs = {"object-id": str(relationship["objectId"])}
-        if relationship["qualifier"] is not None:
-            attribs["qualifier"] = str(relationship["qualifier"])
-        etree.SubElement(container, "relationship", attribs)
+        etree.SubElement(
+            container,
+            "relationship",
+            {
+                "object-id": str(relationship["objectId"]),
+                "qualifier": str(relationship["qualifier"]),
+            },
+        )
     return container
 
 
@@ -64,9 +79,6 @@ def _object_element(obj: dict) -> etree.Element:
     attributes = etree.SubElement(element, "attributes")
     for attribute in obj["attributes"]:
         attribs = {"name": str(attribute["name"])}
-        # A change whose time didn't survive the source log is left without one,
-        # rather than rendered as the text "None" or backdated to a time it never
-        # had. That mirrors the null a JSON export writes, and reads back as null.
         if attribute["time"] is not None:
             attribs["time"] = _time_text(attribute["time"])
         attribute_element = etree.SubElement(attributes, "attribute", attribs)

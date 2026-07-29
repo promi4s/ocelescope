@@ -6,6 +6,7 @@ import duckdb
 import pandas as pd
 import polars
 
+from ocelescope.ocel.constants.misc import EPOCH_SQL
 from ocelescope.ocel.constants.pm4py import (
     OBJECT_CHANGED_FIELD,
     OID_COL,
@@ -89,37 +90,29 @@ class ObjectsManager(BaseManager):
         """
         Return the dynamic object attribute change table as a lazy relation.
 
-        ``ocel:type`` and ``ocel:field`` are derived here (joined on / recovered
-        from the changed column) rather than stored, so assigning this table back
-        drops them again.
-
         Returns:
             DuckDBPyRelation: A lazy relation over all dynamic attribute updates.
         """
-        names = self.dynamic_attribute_names
-        # The stored table is wide with exactly one non-null attribute value per
-        # row, so `ocel:field` is the name of whichever column that is.
-        if names:
-            field = (
-                "CASE "
-                + " ".join(
-                    f"WHEN c.{ident(name)} IS NOT NULL THEN {literal(name)}" for name in names
-                )
-                + " END"
-            )
-        else:
-            field = "NULL"
 
         return self._relation(
-            f'SELECT c.*, o."{OTYPE_COL}", {field} AS "{OBJECT_CHANGED_FIELD}" '
+            f"SELECT c.*, o.{ident(OTYPE_COL)} "
             f"FROM {OBJECT_CHANGES_TABLE} c "
-            f'JOIN {OBJECTS_TABLE} o ON c."{OID_COL}" = o."{OID_COL}" '
-            f'ORDER BY c."{TIMESTAMP_COL}"'
+            f"JOIN {OBJECTS_TABLE} o ON c.{ident(OID_COL)} = o.{ident(OID_COL)} "
+            f"ORDER BY c.{ident(TIMESTAMP_COL)}"
         )
+
+    def _store_changes(self, contents: Any) -> None:
+        """Store ``contents`` as the change table, without any ``ocel:type``.
+
+        The getters join the type on rather than reading it from the table, so a
+        table taken off one of them can be handed straight back. The lambda picks
+        the columns to keep, which leaves contents that never had a type alone.
+        """
+        self._replace(OBJECT_CHANGES_TABLE, contents, f"COLUMNS(c -> c != {literal(OTYPE_COL)})")
 
     @changes_table.setter
     def changes_table(self, contents: Any) -> None:
-        self._replace(OBJECT_CHANGES_TABLE, contents)
+        self._store_changes(contents)
 
     @property
     def changes(self) -> pd.DataFrame:
@@ -135,7 +128,7 @@ class ObjectsManager(BaseManager):
 
     @changes.setter
     def changes(self, contents: pd.DataFrame) -> None:
-        self._replace(OBJECT_CHANGES_TABLE, contents)
+        self._store_changes(contents)
 
     @property
     def changes_pl(self) -> polars.LazyFrame:
@@ -151,7 +144,7 @@ class ObjectsManager(BaseManager):
 
     @changes_pl.setter
     def changes_pl(self, contents: polars.LazyFrame | polars.DataFrame) -> None:
-        self._replace(OBJECT_CHANGES_TABLE, contents)
+        self._store_changes(contents)
 
     @property
     def types(self) -> list[str]:
@@ -164,13 +157,21 @@ class ObjectsManager(BaseManager):
         return self._column(f'SELECT DISTINCT "{OTYPE_COL}" FROM {OBJECTS_TABLE} ORDER BY 1')
 
     @property
+    def count(self) -> int:
+        """
+        Return the number of events in the log.
+
+        Returns:
+            int: The number of distinct events.
+        """
+        return self._relation(
+            f'SELECT count(DISTINCT "{OID_COL}") FROM {OBJECTS_TABLE}'
+        ).fetchall()[0][0]
+
+    @property
     def counts(self) -> pd.Series:
         """
         Count how many objects exist for each object type.
-
-        Counted by DuckDB, so only one row per object type is read rather than the
-        whole objects table. Ordered like ``value_counts``: most frequent first,
-        ties broken by name.
 
         Returns:
             Series: A pandas Series indexed by object type with occurrence counts.
@@ -240,7 +241,14 @@ class ObjectsManager(BaseManager):
         Returns:
             list[str]: Sorted list of dynamic object attribute names.
         """
-        return self._attribute_names(OBJECT_CHANGES_TABLE)
+
+        static_attributes = self.static_attribute_names
+
+        return [
+            attribute
+            for attribute in self._attribute_names(OBJECT_CHANGES_TABLE)
+            if attribute not in static_attributes
+        ]
 
     @property
     def static_attribute_names(self) -> list[str]:
@@ -253,8 +261,16 @@ class ObjectsManager(BaseManager):
         Returns:
             list[str]: Sorted list of static object attribute names.
         """
-        dynamic = set(self.dynamic_attribute_names)
-        return [name for name in self.attribute_names if name not in dynamic]
+        field = ident(OBJECT_CHANGED_FIELD)
+        ts = ident(TIMESTAMP_COL)
+
+        names = self._relation(
+            f"SELECT {field} FROM {OBJECT_CHANGES_TABLE} "
+            f"GROUP BY {field} "
+            f"HAVING count(DISTINCT {ts}) = 1 AND min({ts}) = {EPOCH_SQL} "
+            f"ORDER BY {field}"
+        ).fetchall()
+        return [name for (name,) in names]
 
     def attribute_states(
         self,
@@ -289,7 +305,10 @@ class ObjectsManager(BaseManager):
 
         if attributes is None:
             kept = self.attribute_names
-            object_cols, change_cols = f"* EXCLUDE ({otype})", "*"
+            # ocel:field names the changed attribute rather than being one, so it
+            # is dropped here as ocel:type is on the other side of the union.
+            object_cols = f"* EXCLUDE ({otype})"
+            change_cols = f"* EXCLUDE ({ident(OBJECT_CHANGED_FIELD)})"
         else:
             keep = set(attributes)
             kept = [n for n in self.attribute_names if n in keep]
@@ -305,7 +324,7 @@ class ObjectsManager(BaseManager):
             # the objects table, cut down to the wanted types
             f"WITH objs AS (SELECT * FROM {OBJECTS_TABLE} {type_filter}), "
             # t0: just before the first change
-            f"bounds AS (SELECT coalesce(min({ts}), TIMESTAMP '1970-01-01') "
+            f"bounds AS (SELECT coalesce(min({ts}), {EPOCH_SQL}) "
             f"- INTERVAL 1 SECOND AS t0 FROM {OBJECT_CHANGES_TABLE}), "
             # stack initial values (at t0) and changes into one stream
             f"source AS (SELECT {object_cols}, (SELECT t0 FROM bounds) AS {ts} "

@@ -260,7 +260,7 @@ class OCEL:
                     schema={
                         OID_COL: pl.String,
                         OTYPE_COL: pl.String,
-                        TIMESTAMP_COL: pl.Datetime(time_zone="UTC"),
+                        TIMESTAMP_COL: pl.Datetime("us"),
                         OBJECT_CHANGED_FIELD: pl.String,
                     }
                 )
@@ -284,16 +284,13 @@ class OCEL:
         """
         Build an :class:`OCEL` from an existing PM4PY OCEL by writing its
         DataFrames into a fresh in-memory database.
-
-        PM4PY's naming is ours but for the O2O source column, and this is the
-        boundary it arrives at, so that is renamed here.
         """
         return cls.from_frames(
             events=ocel.events,
             objects=ocel.objects,
             relations=ocel.relations,
             o2o=ocel.o2o.rename(columns=_O2O_FROM_PM4PY),
-            object_changes=ocel.object_changes.drop([OBJECT_CHANGED_FIELD, OTYPE_COL], axis=1),
+            object_changes=ocel.object_changes.drop([OTYPE_COL], axis=1),
         )
 
     @staticmethod
@@ -324,10 +321,7 @@ class OCEL:
                 so peak memory stays bounded by the log's widest single entity
                 rather than the whole log -- use it for logs too big to hold.
 
-                **``.sqlite`` logs are always streamed.** r4pm has no SQLite
-                reader worth the name: it assumes every object-type table carries
-                an ``ocel_changed_field`` column and errors out on the many real
-                logs that don't.
+                **``.sqlite`` logs are always streamed.**
 
         Returns:
             OCEL: A fully constructed OCEL wrapper instance.
@@ -339,8 +333,6 @@ class OCEL:
 
         if variant == "r4pm" and path.suffix in _R4PM_SUFFIXES:
             tables = r4pm.df.import_ocel(str(path))
-            # r4pm hands back PM4PY-named tables, so the O2O source column is
-            # renamed on the way in -- exactly as in :meth:`from_pm4py`.
             o2o = tables.get("o2o")
             object_changes = tables.get("object_changes")
             ocel = OCEL.from_frames(
@@ -348,7 +340,7 @@ class OCEL:
                 objects=tables["objects"],
                 relations=tables["relations"],
                 o2o=o2o.rename(_O2O_FROM_PM4PY) if o2o is not None else None,
-                object_changes=object_changes.drop([OBJECT_CHANGED_FIELD, OTYPE_COL], strict=False)
+                object_changes=object_changes.drop([OTYPE_COL], strict=False)
                 if object_changes is not None
                 else None,
             )
@@ -390,8 +382,6 @@ class OCEL:
         """
         connection = duckdb.connect(str(db_path), read_only=True)
         try:
-            # DuckDB hands back TIMESTAMPTZ values in the session's zone; pin it to
-            # UTC so the reshaped tables match a normal file read.
             set_utc(connection)
         except Exception:
             connection.close()
@@ -412,9 +402,6 @@ class OCEL:
         db_path = Path(db_path)
         db_path.unlink(missing_ok=True)
 
-        # An in-memory database is called "memory", a file-backed one after its
-        # file, so ask rather than assume. (fetchall, because fetchone is typed
-        # optional -- a scalar SELECT always has its row.)
         source = self._con.execute("SELECT current_database()").fetchall()[0][0]
 
         self._con.execute(f"ATTACH '{db_path}' AS {_COPY_TARGET}")

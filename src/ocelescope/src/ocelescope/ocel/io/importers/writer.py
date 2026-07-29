@@ -5,6 +5,7 @@ from __future__ import annotations
 import duckdb
 import pyarrow as pa
 
+from ocelescope.ocel.constants.misc import EPOCH
 from ocelescope.ocel.constants.pm4py import (
     ACTIVITY_COL,
     E2O_QUALIFIER,
@@ -12,17 +13,20 @@ from ocelescope.ocel.constants.pm4py import (
     O2O_QUALIFIER,
     O2O_SOURCE_ID,
     O2O_TARGET_ID,
+    OBJECT_CHANGED_FIELD,
     OID_COL,
     OTYPE_COL,
     TIMESTAMP_COL,
 )
 from ocelescope.ocel.io.connection import DuckDBTarget
 from ocelescope.ocel.io.schema import (
+    TIMESTAMP_TYPE,
     SchemaDefinition,
     create_ocel_tables,
-    drop_unchanged_columns,
 )
-from ocelescope.util.sql import set_utc
+from ocelescope.util.sql import ident, set_utc, utc_timestamp
+
+STATIC_OBJECT_ATTRIBUTE_TIMESTAMP = EPOCH.isoformat()
 
 
 def _as_strings(values: list) -> list:
@@ -94,15 +98,16 @@ class OCELWriter:
         ):
             if attribute["name"] not in object_row:
                 object_row[attribute["name"]] = attribute["value"]
-            else:
-                self._add_row(
-                    "object_changes",
-                    {
-                        OID_COL: obj["id"],
-                        attribute["name"]: attribute["value"],
-                        TIMESTAMP_COL: attribute["time"],
-                    },
-                )
+
+            self._add_row(
+                "object_changes",
+                {
+                    OID_COL: obj["id"],
+                    OBJECT_CHANGED_FIELD: attribute["name"],
+                    attribute["name"]: attribute["value"],
+                    TIMESTAMP_COL: attribute.get("time", STATIC_OBJECT_ATTRIBUTE_TIMESTAMP),
+                },
+            )
 
         for relationship in obj.get("relationships", []):
             self._add_row(
@@ -155,19 +160,29 @@ class OCELWriter:
 
         arrays = [pa.array(_as_strings(values), type=pa.string()) for values in buffer.values()]
         batch = pa.table(arrays, names=list(buffer))
-        self.con.from_arrow(batch).insert_into(table)
+        self.con.from_arrow(batch).project(self._projection(table)).insert_into(table)
         for values in buffer.values():
             values.clear()
 
-    def close(self) -> None:
-        """Flush any remaining buffered rows, closing a connection we opened.
+    def _projection(self, table: str) -> str:
+        """Column expressions turning the buffered text into the table's types.
 
-        Once everything is in, the object-attribute columns nothing ever changed
-        are dropped -- which attributes those are is only known now.
+        Everything but a timestamp is left to DuckDB's implicit cast on insert.
+        A timestamp cannot be: the column is zone-less, so a direct cast would
+        keep the printed digits of an offset-carrying value and throw the offset
+        away. :func:`~ocelescope.util.sql.utc_timestamp` resolves it instead.
         """
+        return ", ".join(
+            f"{utc_timestamp(ident(field.name))} AS {ident(field.name)}"
+            if field.type == TIMESTAMP_TYPE
+            else ident(field.name)
+            for field in self.schemas[table]
+        )
+
+    def close(self) -> None:
+        """Flush any remaining buffered rows, closing a connection we opened."""
         for table in self.schemas:
             self._flush(table)
-        drop_unchanged_columns(self.con)
         if self._owns_connection:
             self.con.close()
 

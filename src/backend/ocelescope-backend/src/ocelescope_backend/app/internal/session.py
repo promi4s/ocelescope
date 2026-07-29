@@ -8,9 +8,9 @@ from typing import Any, Callable, Hashable, Sequence, Type, TypeVar, cast
 from uuid import uuid4
 
 from ocelescope.ocel.extensions.base_extension import OCELExtension
-from ocelescope.ocel.io import convert_ocel_duckdb
 
 from ocelescope import OCEL, BaseFilter
+from ocelescope_backend.app.internal.config import config
 from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.model.ocel import SessionOCEL
 from ocelescope_backend.app.internal.model.resource import ResourceApi, ResourceStore
@@ -129,13 +129,21 @@ class Session:
             extensions=ocel.extensions.all(),
         )
 
-    def add_ocel_from_file(self, source_path: Path, name: str, created_at: str) -> str:
-        """Stream an OCEL file straight into a DuckDB file without materializing it."""
-        ocel_id = str(uuid4())
-        db_path = self._ocel_dir / f"{ocel_id}.duckdb"
-        convert_ocel_duckdb(source_path, db_path)
+    def add_ocel_from_file(self, source_path: Path, name: str) -> str:
+        """Register an OCEL file, picking the importer by how big the file is.
 
-        return self._register_ocel(ocel_id, db_path, name=name, created_at=created_at)
+        Small logs go through r4pm, which parses the whole file at once and is the
+        faster of the two. Past ``OCEL_STREAM_THRESHOLD_MB`` that parse is what runs
+        the backend out of memory, so the log is instead streamed entity by entity
+        straight into its own DuckDB file -- never materialized as a whole.
+        """
+        threshold = config.OCEL_STREAM_THRESHOLD_MB * 1024 * 1024
+
+        with OCEL.read(
+            source_path,
+            variant="r4pm" if source_path.stat().st_size <= threshold else "streamed",
+        ) as ocel:
+            return self.add_ocel(ocel, name=name)
 
     def set_ocel_extensions(self, ocel_id: str, extensions: list[OCELExtension]):
         """Attach in-memory extension instances to an already registered OCEL."""

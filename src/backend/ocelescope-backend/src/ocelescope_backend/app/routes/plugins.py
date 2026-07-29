@@ -1,6 +1,7 @@
 import json
 import shutil
 import zipfile
+from contextlib import ExitStack
 from datetime import datetime
 from pathlib import Path
 from tempfile import NamedTemporaryFile
@@ -216,30 +217,31 @@ def get_computed(
     if fn is None:
         raise KeyError(f"{method_name}.{provider} not found")
 
-    ocel_args: dict[str, OCEL] = {
-        key: session.get_ocel(ocel_id)
-        for key, ocel_id in input_ocels.items()
-        if ocel_id is not None
-    }
+    with ExitStack() as ocels:
+        ocel_args: dict[str, OCEL] = {
+            key: ocels.enter_context(session.get_ocel(ocel_id))
+            for key, ocel_id in input_ocels.items()
+            if ocel_id is not None
+        }
 
-    resource_args: dict[str, Resource | None] = {}
+        resource_args: dict[str, Resource | None] = {}
 
-    for key, resource_id in input_resources.items():
-        if not resource_id:
-            continue
+        for key, resource_id in input_resources.items():
+            if not resource_id:
+                continue
 
-        resource = registry_manager.get_resource_instance(
-            session.get_resource(resource_id), plugin_id=plugin_id
-        )
+            resource = registry_manager.get_resource_instance(
+                session.get_resource(resource_id), plugin_id=plugin_id
+            )
 
-        resource_args[key] = resource
+            resource_args[key] = resource
 
-    kwargs = {**ocel_args, **resource_args, "input": input}
+        kwargs = {**ocel_args, **resource_args, "input": input}
 
-    try:
-        return _call_with_known_params(fn, **kwargs)
-    except Exception:
-        return []
+        try:
+            return _call_with_known_params(fn, **kwargs)
+        except Exception:
+            return []
 
 
 @plugin_router.delete("/{plugin_id}", operation_id="deletePlugin")

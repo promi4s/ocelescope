@@ -114,9 +114,10 @@ def merged_object_table(
 ) -> duckdb.DuckDBPyRelation:
     """One row per object value: entity_id (ocel:oid), entity_type (ocel:type), + attrs.
 
-    Unions the objects table (initial value) with object_changes (every subsequent
-    value), so every value an attribute ever held is covered; an oid recurs once per
-    change, typed by its object. Columns match ``merged_event_table``.
+    Read from object_changes alone: the importers write every value an attribute ever
+    held there, initial ones included, so the objects table adds no value of its own and
+    is only joined for the type. An oid recurs once per change. Columns match
+    ``merged_event_table``.
 
     ``attribute_names`` = the attribute columns to include (``None`` = every object
     attribute). ``entity_names`` optionally restricts to those object types (``None`` =
@@ -125,32 +126,19 @@ def merged_object_table(
     if attribute_names is None:
         attribute_names = ocel.objects.attribute_names
 
-    # objects and object_changes share the attribute schema; UNION ALL BY NAME aligns
-    # them and fills any attribute missing from one side with NULL there.
-    change_cols = set(ocel.objects.dynamic_attribute_names)
-    object_cols = set(ocel.objects.attribute_names)
-    object_columns = ", ".join(
-        [
-            f"{ident(OID_COL)} AS {ident(ENTITY_ID)}",
-            f"{ident(OTYPE_COL)} AS {ident(ENTITY_TYPE)}",
-            *(ident(name) for name in attribute_names if name in object_cols),
-        ]
-    )
-    change_columns = ", ".join(
+    columns = set(ocel.objects.attribute_names)
+    selected = ", ".join(
         [
             f"c.{ident(OID_COL)} AS {ident(ENTITY_ID)}",
             f"o.{ident(OTYPE_COL)} AS {ident(ENTITY_TYPE)}",
-            *(f"c.{ident(name)}" for name in attribute_names if name in change_cols),
+            *(f"c.{ident(name)}" for name in attribute_names if name in columns),
         ]
     )
     params: list[object] = []
-    objects_where = _type_filter(ident(OTYPE_COL), entity_names, params)
-    changes_where = _type_filter(f"o.{ident(OTYPE_COL)}", entity_names, params)
+    where = _type_filter(f"o.{ident(OTYPE_COL)}", entity_names, params)
     return ocel.sql(
-        f"SELECT {object_columns} FROM objects {objects_where} "
-        f"UNION ALL BY NAME "
-        f"SELECT {change_columns} FROM object_changes c "
-        f"JOIN objects o ON c.{ident(OID_COL)} = o.{ident(OID_COL)} {changes_where}",
+        f"SELECT {selected} FROM object_changes c "
+        f"JOIN objects o ON c.{ident(OID_COL)} = o.{ident(OID_COL)} {where}",
         params,
     )
 

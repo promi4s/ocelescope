@@ -1,4 +1,5 @@
 import functools
+import time
 import traceback
 from typing import (
     TYPE_CHECKING,
@@ -21,6 +22,7 @@ from ocelescope_backend.app.internal.tasks.base import (
 from ocelescope_backend.app.sse_manager import (
     ErrorNotification,
     SSEMessage,
+    SystemNotification,
     sse_manager,
 )
 
@@ -46,7 +48,6 @@ class SystemTask(TaskBase, Generic[P]):
         metadata: dict[str, Any] = {},
         session: "Session",
     ):
-        # TaskBase in your setup expects (fn, args, kwargs)
         super().__init__()
         self.args = args
         self.kwargs = kwargs
@@ -59,6 +60,7 @@ class SystemTask(TaskBase, Generic[P]):
 
     def run(self):
         self.state = TaskState.STARTED
+        started_at = time.perf_counter()
         try:
             self.result = _call_with_known_params(
                 self.fn,
@@ -82,6 +84,15 @@ class SystemTask(TaskBase, Generic[P]):
                 )
             ]
         finally:
+            duration = time.perf_counter() - started_at
+            self.result = [
+                result.model_copy(
+                    update={"message": f"{result.message} ({duration:.3f}s)"}
+                )
+                if isinstance(result, SystemNotification)
+                else result
+                for result in self.result
+            ]
             self.session.running_tasks.pop(self.id, None)
             for result in self.result:
                 sse_manager.send_safe(self.session.id, result)

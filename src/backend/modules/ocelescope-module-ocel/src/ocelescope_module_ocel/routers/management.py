@@ -72,9 +72,8 @@ def import_default_ocel(
     if default_ocel is None:
         raise NotFound("The given default OCEL was not found")
 
-    ocel = default_ocel.get_ocel_copy(use_abbreviations=False)
-
-    session.add_ocel(ocel, name=default_ocel.name)
+    with default_ocel.get_ocel_copy(use_abbreviations=False) as ocel:
+        session.add_ocel(ocel, name=default_ocel.name)
     response.status_code = 200
     return response
 

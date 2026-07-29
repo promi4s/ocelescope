@@ -81,6 +81,18 @@ class EventsManager(BaseManager):
         self._replace(EVENTS_TABLE, contents)
 
     @property
+    def count(self) -> int:
+        """
+        Return the number of events in the log.
+
+        Returns:
+            int: The number of distinct events.
+        """
+        return self._relation(f'SELECT count(DISTINCT "{EID_COL}") FROM {EVENTS_TABLE}').fetchall()[
+            0
+        ][0]
+
+    @property
     def activities(self) -> list[str]:
         """
         Return all activity names present in the log.

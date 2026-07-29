@@ -17,18 +17,25 @@ from ocelescope.ocel.constants.pm4py import (
     O2O_QUALIFIER,
     O2O_SOURCE_ID,
     O2O_TARGET_ID,
+    OBJECT_CHANGED_FIELD,
     OID_COL,
     OTYPE_COL,
     TIMESTAMP_COL,
 )
-from ocelescope.ocel.constants.tables import OBJECT_CHANGES_TABLE
 from ocelescope.util.sql import ident
 
 SchemaDefinition = list[tuple[str, pa.DataType]]
 
+#: OCEL timestamps are stored zone-less, already normalized to UTC by
+#: :func:`~ocelescope.util.sql.utc_timestamp`. A zone-aware column would render
+#: differently depending on the reading session's ``TimeZone``, and would make an
+#: offset-less source value mean whatever zone the importing machine happened to
+#: be in.
+TIMESTAMP_TYPE = pa.timestamp("us")
+
 ATTRIBUTE_TYPE_TO_ARROW: dict[str, pa.DataType] = {
     "string": pa.string(),
-    "time": pa.timestamp("us", tz="UTC"),
+    "time": TIMESTAMP_TYPE,
     "integer": pa.int64(),
     "float": pa.float64(),
     "boolean": pa.bool_(),
@@ -42,12 +49,18 @@ OBJECT_TABLE_BASE_SCHEMA: SchemaDefinition = [
 EVENT_TABLE_BASE_SCHEMA: SchemaDefinition = [
     (EID_COL, pa.string()),
     (ACTIVITY_COL, pa.string()),
-    (TIMESTAMP_COL, pa.timestamp("us", tz="UTC")),
+    (TIMESTAMP_COL, TIMESTAMP_TYPE),
 ]
 
+#: ``ocel:field`` names the attribute a change row writes. It is stored rather
+#: than derived because the value itself is not enough to recover it: a change
+#: that clears an attribute leaves every column of its row NULL. Every importer
+#: fills it, and readers rely on it (see
+#: :attr:`~ocelescope.ocel.managers.objects.ObjectsManager.changes_table`).
 OBJECT_CHANGES_TABLE_SCHEMA: SchemaDefinition = [
     (OID_COL, pa.string()),
-    (TIMESTAMP_COL, pa.timestamp("us", tz="UTC")),
+    (TIMESTAMP_COL, TIMESTAMP_TYPE),
+    (OBJECT_CHANGED_FIELD, pa.string()),
 ]
 
 O2O_TABLE_SCHEMA: SchemaDefinition = [
@@ -98,34 +111,6 @@ def create_ocel_tables(
         con.execute(f"DROP TABLE IF EXISTS {ident(table)}")
         con.from_arrow(schema.empty_table()).create(table)
     return schemas
-
-
-def drop_unchanged_columns(con: duckdb.DuckDBPyConnection) -> None:
-    """Drop the ``object_changes`` columns that turned out to hold nothing.
-
-    The tables are created from the log's type declarations, before a single row
-    has been read, so ``object_changes`` starts with a column per *declared*
-    object attribute. Only the attributes that actually change ever get a value;
-    the rest are all-NULL padding, which no reader wants and every exporter has to
-    step around. Which is which is only knowable once the table is filled, so the
-    importers call this at the end rather than guessing up front.
-
-    One aggregate decides them all -- the table is never materialised to find out.
-    """
-    meta = (OID_COL, TIMESTAMP_COL)
-    names = [
-        name
-        for name, *_ in con.execute(f"DESCRIBE {ident(OBJECT_CHANGES_TABLE)}").fetchall()
-        if name not in meta
-    ]
-    if not names:
-        return
-
-    projection = ", ".join(f"bool_or({ident(name)} IS NOT NULL) AS {ident(name)}" for name in names)
-    row = con.execute(f"SELECT {projection} FROM {ident(OBJECT_CHANGES_TABLE)}").fetchall()[0]
-    for name, has_values in zip(names, row):
-        if not has_values:
-            con.execute(f"ALTER TABLE {ident(OBJECT_CHANGES_TABLE)} DROP COLUMN {ident(name)}")
 
 
 def merge_columns(columns: SchemaDefinition) -> SchemaDefinition:

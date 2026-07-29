@@ -54,6 +54,11 @@ class PluginTask(TaskBase, Generic[P]):
         self.result: list[OCEL | Resource] | None = None
         self.session = session
 
+    def _copy_session_ocel(self, ocel_id: str) -> OCEL:
+        """An in-memory copy of a session OCEL, for the plugin to do as it likes with."""
+        with self.session.get_ocel(ocel_id) as session_ocel:
+            return deepcopy(session_ocel)
+
     def run(self):
         self.state = TaskState.STARTED
         try:
@@ -62,7 +67,7 @@ class PluginTask(TaskBase, Generic[P]):
             )
 
             ocel_args: dict[str, OCEL] = {
-                key: deepcopy(self.session.get_ocel(self.input["ocels"][key]))
+                key: self._copy_session_ocel(self.input["ocels"][key])
                 for key in method.input_ocels.keys()
             }
 

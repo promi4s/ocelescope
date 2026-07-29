@@ -8,15 +8,21 @@ from typing import IO, Iterable
 
 import orjson
 
+from ocelescope.ocel.constants.quantity import JSON_QUANTITY_EXTENSION
+from ocelescope.ocel.io.connection import DuckDBTarget, connect_target
 from ocelescope.ocel.io.exporters.common import (
     event_types,
     iter_events,
     iter_objects,
     object_types,
 )
-from ocelescope.ocel.io.connection import DuckDBTarget, connect_target
 from ocelescope.ocel.io.exporters.quantities import json_quantity_extension
-from ocelescope.ocel.constants.quantity import JSON_QUANTITY_EXTENSION
+
+_DUMP_OPTS = orjson.OPT_NAIVE_UTC | orjson.OPT_UTC_Z
+
+
+def _dumps(value: object) -> bytes:
+    return orjson.dumps(value, option=_DUMP_OPTS)
 
 
 def _stream_array(stream: IO[bytes], items: Iterable[dict]) -> None:
@@ -25,7 +31,7 @@ def _stream_array(stream: IO[bytes], items: Iterable[dict]) -> None:
     for item in items:
         if not first:
             stream.write(b",")
-        stream.write(orjson.dumps(item))
+        stream.write(_dumps(item))
         first = False
 
 
@@ -52,9 +58,9 @@ def export_ocel_json(source: DuckDBTarget, target: str | Path) -> None:
 
         with open(tmp, "wb") as stream:
             stream.write(b'{"objectTypes":')
-            stream.write(orjson.dumps(object_type_decls))
+            stream.write(_dumps(object_type_decls))
             stream.write(b',"eventTypes":')
-            stream.write(orjson.dumps(event_type_decls))
+            stream.write(_dumps(event_type_decls))
 
             stream.write(b',"objects":[')
             _stream_array(stream, iter_objects(con))
@@ -64,7 +70,7 @@ def export_ocel_json(source: DuckDBTarget, target: str | Path) -> None:
 
             if quantity_extension is not None:
                 stream.write(b',"' + JSON_QUANTITY_EXTENSION.encode() + b'":')
-                stream.write(orjson.dumps(quantity_extension))
+                stream.write(_dumps(quantity_extension))
 
             stream.write(b"}")
 

@@ -1,3 +1,5 @@
+import time
+from contextlib import ExitStack
 from typing import Any, Hashable, Sequence, cast
 
 from ocelescope import Resource, Visualization
@@ -31,23 +33,29 @@ class DiscoveryTask(TaskBase):
         self.request = request
         self.result: Resource | None = None
         self.error: BaseException | None = None
+        self.duration: float | None = None
         self._actual_resource_type = request.resource_type
 
     def run(self):
         self.state = TaskState.STARTED
+        started_at = time.perf_counter()
         try:
             try:
                 info = registry_manager.discovery_registry.get(self.request.method_id)
                 parameters = info.parse_parameters(
                     cast(dict[str, Any], self.request.parameters)
                 )
-                ocel = self.session.get_ocel(self.request.ocel_id)
-                if self.request.filters:
-                    ocel = ocel.filter(self.request.filters)
-                resource = cast(
-                    Resource,
-                    info.run(ocel=ocel, parameters=parameters),
-                )
+
+                with ExitStack() as ocels:
+                    ocel = ocels.enter_context(
+                        self.session.get_ocel(self.request.ocel_id)
+                    )
+                    if self.request.filters:
+                        ocel = ocels.enter_context(ocel.filter(self.request.filters))
+                    resource = cast(
+                        Resource,
+                        info.run(ocel=ocel, parameters=parameters),
+                    )
             except KeyError as exc:
                 raise BadRequest(str(exc)) from exc
 
@@ -60,6 +68,7 @@ class DiscoveryTask(TaskBase):
             self.state = TaskState.FAILURE
             raise
         finally:
+            self.duration = time.perf_counter() - started_at
             self.session.running_tasks.pop(self.id, None)
             sse_manager.send_safe(
                 self.session.id,
@@ -73,13 +82,15 @@ class DiscoveryTask(TaskBase):
     def _build_notification(self) -> SystemNotification:
         resource_type = self._actual_resource_type
         if self.state == TaskState.SUCCESS:
+            duration = f" in {self.duration:.3f}s" if self.duration is not None else ""
             return SystemNotification(
                 type="notification",
                 title="Discovery finished",
                 message=(
                     f"Successfully discovered {resource_type} "
                     f"with {self.request.name} "
-                    f"for {self.request.ocel_id}"
+                    f"for {self.session.ocels[self.request.ocel_id].name}"
+                    f"{duration}"
                 ),
                 notification_type="info",
             )

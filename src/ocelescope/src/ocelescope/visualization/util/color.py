@@ -46,4 +46,4 @@ def generate_color_map(strings: list[str], scale: str | Literal["custom"] = "Pas
         cmap = plt.get_cmap(scale, len(unique_strings))
         palette = [mcolors.to_hex(cmap(i)) for i in range(len(unique_strings))]
 
-    return {s: c for s, c in zip(unique_strings, palette)}
+    return {s: palette[i % len(palette)] for i, s in enumerate(unique_strings)}

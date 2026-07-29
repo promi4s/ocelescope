@@ -22,16 +22,24 @@ const BarChartSelect: React.FC<BarChartSelectProps> = memo(
       );
     }, [values]);
 
+    const data = useMemo(
+      () =>
+        [...values]
+          .sort((a, b) => b.value - a.value)
+          .map(({ value, key }) => ({
+            key,
+            value,
+            color: selected.includes(key)
+              ? colorMap[key]
+              : "rgba(128, 128, 128, 0.3)",
+          })),
+      [values, selected, colorMap],
+    );
+
     return (
       <BarChart
         h={BAR_HEIGHT * values.length}
-        data={values.map(({ value, key }) => ({
-          key,
-          value,
-          color: selected.includes(key)
-            ? colorMap[key]
-            : "rgba(128, 128, 128, 0.3)",
-        }))}
+        data={data}
         minBarSize={30}
         tooltipProps={{
           content: ({ label }) => (

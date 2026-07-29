@@ -68,7 +68,6 @@ def _build_object(elem) -> dict:
                     "time": attr.get("time") or None,
                 }
                 for attr in child
-                if attr.text is not None
             ]
         elif tag == "objects":
             relationships = [

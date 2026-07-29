@@ -2,13 +2,12 @@
 
 from __future__ import annotations
 
-from datetime import datetime
 from typing import Callable, Optional, Union
 
 import polars as pl
 
 from ocelescope.ocel.constants.pm4py import ACTIVITY_COL, EID_COL, OID_COL, OTYPE_COL
-from ocelescope.ocel.filter.base import BaseFilter, Keep
+from ocelescope.ocel.filter.base import BaseFilter, Keep, utc_bound
 
 
 class _AttributeFilter(BaseFilter):
@@ -39,11 +38,11 @@ class _AttributeFilter(BaseFilter):
             if high is not None:
                 predicate = predicate & (numeric <= float(high))
         if self.time_range is not None:
-            low, high = self.time_range
+            low, high = (utc_bound(bound) for bound in self.time_range)
             if low is not None:
-                predicate = predicate & (column >= datetime.fromisoformat(low))
+                predicate = predicate & (column >= low)
             if high is not None:
-                predicate = predicate & (column <= datetime.fromisoformat(high))
+                predicate = predicate & (column <= high)
         if self.values is not None:
             predicate = predicate & column.is_in(self.values)
         if self.regex is not None:
@@ -76,11 +75,7 @@ class EventAttributeFilter(_AttributeFilter):
 
 
 class ObjectAttributeFilter(_AttributeFilter):
-    """Keep the objects whose attribute matches; types without it are untouched.
-
-    Matches on an object's *static* value only -- the dynamic values in
-    ``object_changes`` are not folded in.
-    """
+    """Keep the objects whose attribute matches; types without it are untouched."""
 
     def keep(self, ocel) -> Keep:
         return Keep(objects=self._keep(lambda: ocel.objects.pl, OTYPE_COL, OID_COL))

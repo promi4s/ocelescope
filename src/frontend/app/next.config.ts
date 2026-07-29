@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   experimental: {
     proxyClientMaxBodySize: "1000gb",
+    proxyTimeout: 30 * 60 * 1000,
   },
   transpilePackages: [
     "@mantine/charts",

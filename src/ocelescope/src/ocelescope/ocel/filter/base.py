@@ -1,13 +1,26 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, NamedTuple
+from datetime import datetime, timezone
+from typing import TYPE_CHECKING, NamedTuple, Optional
 
 import polars as pl
 from pydantic import BaseModel
 
 if TYPE_CHECKING:
     from ocelescope.ocel.core.ocel import OCEL
+
+
+def utc_bound(value: Optional[str]) -> Optional[datetime]:
+    """An ISO bound as the zone-less UTC timestamps are stored as -- an offset is
+    converted, not dropped. Polars will not compare a zone-aware literal against a
+    zone-less column at all, so the zone has to go before the comparison is built."""
+    if value is None:
+        return None
+    parsed = datetime.fromisoformat(value)
+    if parsed.tzinfo is None:
+        return parsed
+    return parsed.astimezone(timezone.utc).replace(tzinfo=None)
 
 
 class Keep(NamedTuple):
