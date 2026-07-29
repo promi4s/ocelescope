@@ -46,7 +46,7 @@ async def setFilter(ocel_id: str, body: list[NativeFilter], session: ApiSession)
     await sse_manager.send(
         session_id=session.id,
         message=SystemNotification(
-            title=f"Succefully filtered {ocel_name}",
+            title=f"Successfully filtered {ocel_name}",
             message=f"Filtered out {event_difference} events and {object_difference} objects in {duration:.3f}s",
             notification_type="info",
         ),
