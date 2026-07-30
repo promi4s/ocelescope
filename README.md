@@ -7,7 +7,7 @@ Ocelescope is part of a project by the Chair of Process and Data Science ([PADS]
 > ⚠️ **Project Status: Active Development**
 >
 > This repository is under active development.
-> Expect frequent changes, incomplete features on seperate branches, and potential bugs.
+> Expect frequent changes, incomplete features on separate branches, and potential bugs.
 >
 > Contributions, feedback, and testing are welcome!
 

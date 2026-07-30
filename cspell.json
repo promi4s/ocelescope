@@ -16,7 +16,6 @@
     "pnml",
     "Pnml",
     "pnpm",
-    "mkdocs",
     "uvicorn",
     "dotenv",
     "orval",
@@ -176,7 +175,6 @@
     "**/dist/**",
     "**/*.svg",
     "**/*.min.js",
-    "docs/data/pluginEnviroment.txt",
     "**/api/base.ts"
   ],
   "ignoreRegExpList": ["\\{%[\\s\\S]*?%\\}", "\\{\\{[\\s\\S]*?\\}\\}"]
