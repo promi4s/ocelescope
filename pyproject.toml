@@ -7,7 +7,7 @@ requires-python = ">=3.11"
 dependencies = [
   "ocelescope-module-filter>=0.5.0,<0.6.0",
   "ocelescope-module-ocel>=0.5.0,<0.6.0",
-  "ocelescope-module-ocelot>=0.1.1",
+  "ocelescope-module-ocelot>=0.5.0,<0.6.0",
 ]
 
 [tool.uv.workspace]

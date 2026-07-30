@@ -23,7 +23,7 @@ catalog:
   "@mantine/hooks": ^9.4.2
   "@mantine/notifications": ^9.4.2
   "@marko19907/string-to-color": ^1.0.2
-  '@ocelescope/ocelot': ^0.1.3
+  '@ocelescope/ocelot': ^0.5.0
   '@r4pm/components': ^0.2.0
   "@rjsf/core": ^6.7.0
   "@rjsf/mantine": ^6.7.0
@@ -89,7 +89,7 @@ minimumReleaseAgeExclude:
   - '@mantine/hooks@9.4.2'
   - '@mantine/notifications@9.4.2'
   - '@mantine/store@9.4.2'
-  - '@ocelescope/ocelot@0.1.2 || 0.1.3'
+  - '@ocelescope/ocelot@0.5.0'
   - '@biomejs/biome@2.5.5'
   - '@biomejs/cli-darwin-arm64@2.5.5'
   - '@biomejs/cli-darwin-x64@2.5.5'
