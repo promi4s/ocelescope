@@ -154,7 +154,6 @@ jobs:
           files: |
             README.md
             CONTRIBUTING.md
-            docs/**/*.md
             .github/**/*.yml
             src/**/*.py
             src/**/*.ts

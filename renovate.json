@@ -5,7 +5,6 @@
   "dependencyDashboard": true,
   "prConcurrentLimit": 10,
   "prHourlyLimit": 2,
-  "ignorePaths": ["docs/**"],
   "commitMessagePrefix": ":arrow_up: ",
   "lockFileMaintenance": {
     "enabled": true
