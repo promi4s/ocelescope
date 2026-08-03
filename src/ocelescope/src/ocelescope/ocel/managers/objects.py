@@ -86,6 +86,11 @@ class ObjectsManager(BaseManager):
         describe are the ones being replaced. Dynamic attributes are left alone,
         epoch rows included: those are a dynamic attribute's initial value, not
         the object's own column.
+
+        A value is only written where the object has no history of that attribute
+        at all. Tools that keep an attribute's first value in both tables (PM4PY
+        and r4pm do) would otherwise have it stored twice: once at its own time,
+        once more at the epoch, as a change that never happened.
         """
         oid, otype = ident(OID_COL), ident(OTYPE_COL)
         ts, field = ident(TIMESTAMP_COL), ident(OBJECT_CHANGED_FIELD)
@@ -119,7 +124,9 @@ class ObjectsManager(BaseManager):
                 con.execute(
                     f"INSERT INTO {OBJECT_CHANGES_TABLE} BY NAME "
                     f"SELECT {oid}, {EPOCH_SQL} AS {ts}, {literal(name)} AS {field}, {ident(name)} "
-                    f"FROM {incoming} WHERE {ident(name)} IS NOT NULL"
+                    f"FROM {incoming} i WHERE i.{ident(name)} IS NOT NULL "
+                    f"AND NOT EXISTS (SELECT 1 FROM {OBJECT_CHANGES_TABLE} c "
+                    f"WHERE c.{oid} = i.{oid} AND c.{field} = {literal(name)})"
                 )
 
             con.execute(
@@ -200,7 +207,9 @@ class ObjectsManager(BaseManager):
           values is several changes, and stored as one it would be unreadable,
           the field being what says which column a row wrote,
         * a row with no timestamp is written at the epoch, where an initial value
-          with no time of its own belongs (see :attr:`static_attribute_names`),
+          with no time of its own belongs (see :attr:`static_attribute_names`);
+          the column is stored at the schema's microsecond precision however fine
+          the contents keep it,
         * one row is kept per object, attribute and timestamp: an attribute holds
           one value at one moment, so rows that agree on all three are the same
           change written twice.
@@ -228,7 +237,7 @@ class ObjectsManager(BaseManager):
             # the rows that name their field, which also settles the stored types
             con.execute(
                 f"CREATE OR REPLACE TABLE {OBJECT_CHANGES_TABLE} AS "
-                f"SELECT * REPLACE (coalesce({ts}, {EPOCH_SQL}) AS {ts}) "
+                f"SELECT * REPLACE (coalesce({ts}, {EPOCH_SQL})::TIMESTAMP AS {ts}) "
                 f"FROM (SELECT {kept} FROM {incoming}) "
                 f"WHERE {field} IS NOT NULL"
             )
@@ -236,7 +245,7 @@ class ObjectsManager(BaseManager):
             for name in names:
                 con.execute(
                     f"INSERT INTO {OBJECT_CHANGES_TABLE} BY NAME SELECT {oid}, "
-                    f"coalesce({ts}, {EPOCH_SQL}) AS {ts}, {literal(name)} AS {field}, {ident(name)} "
+                    f"coalesce({ts}, {EPOCH_SQL})::TIMESTAMP AS {ts}, {literal(name)} AS {field}, {ident(name)} "
                     f"FROM {incoming} WHERE {field} IS NULL AND {ident(name)} IS NOT NULL"
                 )
 
