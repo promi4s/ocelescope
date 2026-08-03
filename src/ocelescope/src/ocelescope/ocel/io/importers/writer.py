@@ -96,9 +96,6 @@ class OCELWriter:
         for attribute in sorted(
             obj.get("attributes", []), key=lambda a: (a["time"] is None, a["time"])
         ):
-            if attribute["name"] not in object_row:
-                object_row[attribute["name"]] = attribute["value"]
-
             self._add_row(
                 "object_changes",
                 {

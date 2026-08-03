@@ -310,15 +310,6 @@ def _insert_objects(con: duckdb.DuckDBPyConnection) -> None:
             FROM
             src.{ident(SQLITE_OBJECT_TABLE)}
         )
-        LEFT JOIN (
-            SELECT
-            {ident(OID_COL)},
-            arg_min(COLUMNS (* EXCLUDE ({ident(OID_COL)}, {ident(TIMESTAMP_COL)}, {ident(OBJECT_CHANGED_FIELD)})), {ident(TIMESTAMP_COL)})
-            FROM
-            {ident(OBJECT_CHANGES_TABLE)}
-            GROUP BY
-            {ident(OID_COL)}
-        ) USING ({ident(OID_COL)})
     """)
 
 
