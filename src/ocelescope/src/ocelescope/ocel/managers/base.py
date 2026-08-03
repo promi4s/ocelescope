@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, Iterator
 
 import duckdb
 
-from ocelescope.util.sql import ident, set_utc
+from ocelescope.util.sql import set_utc
 
 if TYPE_CHECKING:
     from ocelescope.ocel.core.ocel import OCEL
@@ -42,14 +42,6 @@ class BaseManager:
         names, qualifiers -- where a frame would be a detour.
         """
         return [row[0] for row in self._relation(sql, params).fetchall()]
-
-    def _column_names(self, table: str) -> list[str]:
-        """The columns of a stored table, in their stored order."""
-        return [name for name, *_ in self._ocel.con.execute(f"DESCRIBE {ident(table)}").fetchall()]
-
-    def _attribute_names(self, table: str) -> list[str]:
-        """The attribute columns of a stored table: its columns minus the OCEL ones."""
-        return sorted(name for name in self._column_names(table) if not name.startswith("ocel:"))
 
     @contextmanager
     def _bound(self, contents: Any) -> Iterator[str]:

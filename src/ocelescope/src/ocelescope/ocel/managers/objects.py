@@ -37,13 +37,38 @@ class ObjectsManager(BaseManager):
         """
         Return the object table as a lazy DuckDB relation.
 
+        One row per object, carrying its type and its static attributes. A static
+        attribute is stored like any other -- as a row in ``object_changes``,
+        timestamped at the epoch -- so the wide table is assembled here rather
+        than read, one ``any_value`` per attribute joined back onto every object.
+
         Nothing is read until the relation is consumed (``.df()``, ``.pl()``,
         ``.fetchall()`` ...).
 
         Returns:
             DuckDBPyRelation: A lazy relation over all objects.
         """
-        return self._relation(f"SELECT * FROM {OBJECTS_TABLE}")
+        oid, otype = ident(OID_COL), ident(OTYPE_COL)
+
+        names = self.static_attribute_names
+        if not names:
+            return self._relation(f"SELECT * FROM {OBJECTS_TABLE} ORDER BY {otype}, {oid}")
+
+        field = ident(OBJECT_CHANGED_FIELD)
+        wanted = ", ".join(literal(name) for name in names)
+        values = ", ".join(
+            f"any_value({ident(name)}) FILTER (WHERE {field} = {literal(name)}) AS {ident(name)}"
+            for name in names
+        )
+        projection = ", ".join(f"static.{ident(name)}" for name in names)
+
+        return self._relation(
+            f"SELECT o.*, {projection} "
+            f"FROM (SELECT {oid}, {values} FROM {OBJECT_CHANGES_TABLE} "
+            f"WHERE {field} IN ({wanted}) GROUP BY {oid}) static "
+            f"RIGHT JOIN {OBJECTS_TABLE} o ON o.{oid} = static.{oid} "
+            f"ORDER BY o.{otype}, o.{oid}"
+        )
 
     @table.setter
     def table(self, contents: Any) -> None:
@@ -90,15 +115,26 @@ class ObjectsManager(BaseManager):
         """
         Return the dynamic object attribute change table as a lazy relation.
 
+        Only the dynamic attributes are reported, rows and columns both: a static
+        one is stored here too, as a single row at the epoch, but that is the
+        object's own column (see :attr:`table`) rather than an update to it.
+
         Returns:
             DuckDBPyRelation: A lazy relation over all dynamic attribute updates.
         """
+        oid, ts = ident(OID_COL), ident(TIMESTAMP_COL)
+        field, otype = ident(OBJECT_CHANGED_FIELD), ident(OTYPE_COL)
+
+        names = self.dynamic_attribute_names
+        columns = "".join(f", c.{ident(name)}" for name in names)
+        wanted = ", ".join(literal(name) for name in names) or "NULL"
 
         return self._relation(
-            f"SELECT c.*, o.{ident(OTYPE_COL)} "
+            f"SELECT {oid}, o.{otype}, c.{ts}, c.{field}{columns} "
             f"FROM {OBJECT_CHANGES_TABLE} c "
-            f"JOIN {OBJECTS_TABLE} o ON c.{ident(OID_COL)} = o.{ident(OID_COL)} "
-            f"ORDER BY c.{ident(TIMESTAMP_COL)}"
+            f"JOIN {OBJECTS_TABLE} o USING ({oid}) "
+            f"WHERE c.{field} IN ({wanted}) "
+            f"ORDER BY c.{ts}"
         )
 
     def _store_changes(self, contents: Any) -> None:
@@ -222,41 +258,51 @@ class ObjectsManager(BaseManager):
         """
         Return all object attribute names.
 
-        Every object attribute has a column in the objects table, whether or not
-        it ever changes.
+        Every object attribute is named by the ``ocel:field`` of the change rows
+        that write it, whether or not it ever changes.
 
         Returns:
             list[str]: Sorted list of all object attribute names.
         """
-        return self._attribute_names(OBJECTS_TABLE)
+        field = ident(OBJECT_CHANGED_FIELD)
+
+        names = self._relation(
+            f"SELECT DISTINCT {field} FROM {OBJECT_CHANGES_TABLE} ORDER BY {field}"
+        ).fetchall()
+
+        return [name for (name,) in names]
 
     @property
     def dynamic_attribute_names(self) -> list[str]:
         """
         Return the names of all dynamic object attributes.
 
-        Dynamic attributes are the ones that change, which is exactly what the
-        object_changes table stores.
+        Dynamic attributes are the ones that change: those the object_changes
+        table writes at a real timestamp rather than only at the epoch.
 
         Returns:
             list[str]: Sorted list of dynamic object attribute names.
         """
+        field = ident(OBJECT_CHANGED_FIELD)
+        ts = ident(TIMESTAMP_COL)
 
-        static_attributes = self.static_attribute_names
+        names = self._relation(
+            f"SELECT {field} FROM {OBJECT_CHANGES_TABLE} "
+            f"GROUP BY {field} "
+            f"HAVING max({ts}) > {EPOCH_SQL} "
+            f"ORDER BY {field}"
+        ).fetchall()
 
-        return [
-            attribute
-            for attribute in self._attribute_names(OBJECT_CHANGES_TABLE)
-            if attribute not in static_attributes
-        ]
+        return [name for (name,) in names]
 
     @property
     def static_attribute_names(self) -> list[str]:
         """
         Return the names of all static object attributes.
 
-        Static attributes are the ones that never change: every attribute the
-        object_changes table does not carry.
+        Static attributes are the ones that never change: those the
+        object_changes table only ever writes at the epoch, which is where an
+        initial value with no time of its own is recorded.
 
         Returns:
             list[str]: Sorted list of static object attribute names.
@@ -267,7 +313,7 @@ class ObjectsManager(BaseManager):
         names = self._relation(
             f"SELECT {field} FROM {OBJECT_CHANGES_TABLE} "
             f"GROUP BY {field} "
-            f"HAVING count(DISTINCT {ts}) = 1 AND min({ts}) = {EPOCH_SQL} "
+            f"HAVING max({ts}) = {EPOCH_SQL} "
             f"ORDER BY {field}"
         ).fetchall()
         return [name for (name,) in names]
@@ -276,14 +322,17 @@ class ObjectsManager(BaseManager):
         self,
         object_types: Iterable[str] | None = None,
         attributes: Iterable[str] | None = None,
-    ) -> pd.DataFrame:
+    ) -> duckdb.DuckDBPyRelation:
         """
         Return every object's full attribute state at every change timestamp.
 
         One row per (object, change timestamp), one column per attribute, each
-        carrying the attribute's value at that moment -- the value written
-        then, or the last earlier one carried forward, starting from the
-        initial values in the objects table.
+        carrying the attribute's value at that moment -- the value written then,
+        or the last earlier one carried forward. An initial value with no time of
+        its own is written at the epoch, so it is the first row of its object.
+
+        Nothing is read until the relation is consumed: ``.df()`` for pandas,
+        ``.pl()`` for polars, ``.fetchall()`` for rows.
 
         Args:
             object_types: Object types to include. None means all, an empty
@@ -292,7 +341,7 @@ class ObjectsManager(BaseManager):
                 names are ignored.
 
         Returns:
-            DataFrame: A pandas DataFrame with ``ocel:oid``, ``ocel:type``,
+            DuckDBPyRelation: A lazy relation with ``ocel:oid``, ``ocel:type``,
             ``ocel:timestamp`` and the selected attribute columns.
         """
         oid, ts, otype = ident(OID_COL), ident(TIMESTAMP_COL), ident(OTYPE_COL)
@@ -303,46 +352,28 @@ class ObjectsManager(BaseManager):
             type_filter = f"WHERE list_contains(?, {otype})"
             params = [list(object_types)]
 
-        if attributes is None:
-            kept = self.attribute_names
-            # ocel:field names the changed attribute rather than being one, so it
-            # is dropped here as ocel:type is on the other side of the union.
-            object_cols = f"* EXCLUDE ({otype})"
-            change_cols = f"* EXCLUDE ({ident(OBJECT_CHANGED_FIELD)})"
-        else:
+        names = self.attribute_names
+        if attributes is not None:
             keep = set(attributes)
-            kept = [n for n in self.attribute_names if n in keep]
-            dynamic = [n for n in self.dynamic_attribute_names if n in keep]
-            object_cols = ", ".join([oid, *map(ident, kept)])
-            change_cols = ", ".join([oid, ts, *map(ident, dynamic)])
+            names = [name for name in names if name in keep]
 
-        collapse = f", any_value(COLUMNS(* EXCLUDE ({oid}, {ts})))" if kept else ""
-        fill = f", last_value(COLUMNS(* EXCLUDE ({oid}, {ts})) IGNORE NULLS) OVER w" if kept else ""
-        selected = f", s.* EXCLUDE ({oid}, {ts})" if kept else ""
+        meta = f"{oid}, {otype}, {ts}"
+        columns = "".join(f", c.{ident(name)}" for name in names)
+        collapse = f", any_value(COLUMNS(* EXCLUDE ({meta})))" if names else ""
+        fill = f", last_value(COLUMNS(* EXCLUDE ({meta})) IGNORE NULLS) OVER w" if names else ""
 
         return self._relation(
             # the objects table, cut down to the wanted types
-            f"WITH objs AS (SELECT * FROM {OBJECTS_TABLE} {type_filter}), "
-            # t0: just before the first change
-            f"bounds AS (SELECT coalesce(min({ts}), {EPOCH_SQL}) "
-            f"- INTERVAL 1 SECOND AS t0 FROM {OBJECT_CHANGES_TABLE}), "
-            # stack initial values (at t0) and changes into one stream
-            f"source AS (SELECT {object_cols}, (SELECT t0 FROM bounds) AS {ts} "
-            f"FROM objs UNION ALL BY NAME "
-            f"SELECT {change_cols} FROM {OBJECT_CHANGES_TABLE} "
-            f"WHERE {oid} IN (SELECT {oid} FROM objs)), "
-            # collapse to one row per (oid, timestamp)
-            f"collapsed AS (SELECT {oid}, {ts}{collapse} FROM source GROUP BY ALL), "
+            f"WITH objs AS (SELECT {oid}, {otype} FROM {OBJECTS_TABLE} {type_filter}), "
+            # collapse to one row per (oid, timestamp), the type carried along
+            f"collapsed AS (SELECT {meta}{collapse} FROM "
+            f"(SELECT c.{oid}, o.{otype}, c.{ts}{columns} "
+            f"FROM {OBJECT_CHANGES_TABLE} c JOIN objs o USING ({oid})) "
+            f"GROUP BY {meta}) "
             # forward-fill every attribute per object
-            f"states AS (SELECT {oid}, {ts}{fill} "
-            f"FROM collapsed WINDOW w AS (PARTITION BY {oid} ORDER BY {ts} "
-            f"ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)) "
-            # add the object type, drop the t0 rows
-            f"SELECT s.{oid}, o.{otype}, s.{ts}{selected} "
-            f"FROM states s "
-            f"JOIN objs o ON s.{oid} = o.{oid} "
-            f"CROSS JOIN bounds b "
-            f"WHERE s.{ts} > b.t0 "
-            f"ORDER BY s.{oid}, s.{ts}",
+            f"SELECT {meta}{fill} FROM collapsed "
+            f"WINDOW w AS (PARTITION BY {oid} ORDER BY {ts} "
+            f"ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) "
+            f"ORDER BY {oid}, {ts}",
             params,
-        ).df()
+        )
