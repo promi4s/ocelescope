@@ -44,6 +44,7 @@ from ocelescope.ocel.io.schema import (
     create_ocel_tables,
     merge_columns,
 )
+from ocelescope.ocel.util.changes import collapse_object_changes
 from ocelescope.util.sql import ident, literal, utc_timestamp
 
 SQLITE_OCEL_ID_FIELD = "ocel_id"
@@ -387,6 +388,7 @@ def import_ocel_sqlite(source: str | Path, target: DuckDBTarget) -> None:
         try:
             _insert_events(con, event_type_tables)
             _insert_object_changes(con, object_type_tables)
+            collapse_object_changes(con)
             _insert_objects(con)
 
             if SQLITE_O2O_TABLE in present:

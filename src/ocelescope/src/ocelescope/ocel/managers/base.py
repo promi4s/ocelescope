@@ -4,6 +4,7 @@ from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, Iterator
 
 import duckdb
+import polars
 
 from ocelescope.util.sql import set_utc
 
@@ -45,10 +46,18 @@ class BaseManager:
 
     @contextmanager
     def _bound(self, contents: Any) -> Iterator[str]:
-        """Bind ``contents`` to the OCEL's connection for one query, as a view."""
+        """Bind ``contents`` to the OCEL's connection for one query, as a view.
+
+        Anything still lazy is read out first. A relation or a LazyFrame taken off
+        a getter reads the very tables the caller is about to write, and a writer
+        that takes more than one statement would otherwise see it change under it:
+        the rows it means to store are gone by the time it stores them.
+        """
         con = self._ocel.con
         if isinstance(contents, duckdb.DuckDBPyRelation):
             contents = contents.to_arrow_table()
+        elif isinstance(contents, polars.LazyFrame):
+            contents = contents.collect()
         con.register(_INCOMING, contents)
         try:
             yield _INCOMING

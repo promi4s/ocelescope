@@ -8,6 +8,7 @@ import polars
 
 from ocelescope.ocel.constants.misc import EPOCH_SQL
 from ocelescope.ocel.constants.pm4py import (
+    OBJECT_CHANGE_CUMCOUNT,
     OBJECT_CHANGED_FIELD,
     OID_COL,
     OTYPE_COL,
@@ -15,6 +16,7 @@ from ocelescope.ocel.constants.pm4py import (
 )
 from ocelescope.ocel.constants.tables import OBJECT_CHANGES_TABLE, OBJECTS_TABLE
 from ocelescope.ocel.managers.base import BaseManager
+from ocelescope.ocel.util.changes import collapse_object_changes
 from ocelescope.util.sql import ident, literal
 
 
@@ -72,7 +74,57 @@ class ObjectsManager(BaseManager):
 
     @table.setter
     def table(self, contents: Any) -> None:
-        self._replace(OBJECTS_TABLE, contents)
+        """Store ``contents`` as the objects table, its attributes going to the changes.
+
+        The objects table itself only keeps the id and the type, so every other
+        column of ``contents`` is a static attribute and is written the way the
+        importers write one: a change row at the epoch, one per object that has a
+        value. This is the inverse of the getter, so a table taken off it can be
+        handed straight back.
+
+        The static rows already stored are dropped first -- the objects they
+        describe are the ones being replaced. Dynamic attributes are left alone,
+        epoch rows included: those are a dynamic attribute's initial value, not
+        the object's own column.
+        """
+        oid, otype = ident(OID_COL), ident(OTYPE_COL)
+        ts, field = ident(TIMESTAMP_COL), ident(OBJECT_CHANGED_FIELD)
+        con = self._ocel.con
+
+        with self._bound(contents) as incoming:
+            # a fresh database has no change table until something is stored
+            if not self._has_table(OBJECT_CHANGES_TABLE):
+                con.execute(
+                    f"CREATE TABLE {OBJECT_CHANGES_TABLE} "
+                    f"({oid} VARCHAR, {ts} TIMESTAMP, {field} VARCHAR)"
+                )
+
+            stale = self.static_attribute_names
+            if stale:
+                con.execute(
+                    f"DELETE FROM {OBJECT_CHANGES_TABLE} WHERE {field} IN "
+                    f"({', '.join(literal(name) for name in stale)})"
+                )
+
+            columns = [
+                (name, dtype)
+                for name, dtype, *_ in con.execute(f"DESCRIBE {incoming}").fetchall()
+                if name not in (OID_COL, OTYPE_COL)
+            ]
+            for name, dtype in columns:
+                con.execute(
+                    f"ALTER TABLE {OBJECT_CHANGES_TABLE} "
+                    f"ADD COLUMN IF NOT EXISTS {ident(name)} {dtype}"
+                )
+                con.execute(
+                    f"INSERT INTO {OBJECT_CHANGES_TABLE} BY NAME "
+                    f"SELECT {oid}, {EPOCH_SQL} AS {ts}, {literal(name)} AS {field}, {ident(name)} "
+                    f"FROM {incoming} WHERE {ident(name)} IS NOT NULL"
+                )
+
+            con.execute(
+                f"CREATE OR REPLACE TABLE {OBJECTS_TABLE} AS SELECT {oid}, {otype} FROM {incoming}"
+            )
 
     @property
     def df(self) -> pd.DataFrame:
@@ -88,7 +140,7 @@ class ObjectsManager(BaseManager):
 
     @df.setter
     def df(self, contents: pd.DataFrame) -> None:
-        self._replace(OBJECTS_TABLE, contents)
+        self.table = contents
 
     @property
     def pl(self) -> polars.LazyFrame:
@@ -108,79 +160,119 @@ class ObjectsManager(BaseManager):
 
     @pl.setter
     def pl(self, contents: polars.LazyFrame | polars.DataFrame) -> None:
-        self._replace(OBJECTS_TABLE, contents)
+        self.table = contents
 
     @property
     def changes_table(self) -> duckdb.DuckDBPyRelation:
         """
-        Return the dynamic object attribute change table as a lazy relation.
+        Return the object attribute change table as a lazy relation.
 
-        Only the dynamic attributes are reported, rows and columns both: a static
-        one is stored here too, as a single row at the epoch, but that is the
-        object's own column (see :attr:`table`) rather than an update to it.
+        Every attribute value the log holds is a row here, static ones included:
+        those are written once, at the epoch, and are also the objects table's own
+        columns (see :attr:`table`).
 
         Returns:
-            DuckDBPyRelation: A lazy relation over all dynamic attribute updates.
+            DuckDBPyRelation: A lazy relation over all object attribute changes.
         """
         oid, ts = ident(OID_COL), ident(TIMESTAMP_COL)
         field, otype = ident(OBJECT_CHANGED_FIELD), ident(OTYPE_COL)
 
-        names = self.dynamic_attribute_names
-        columns = "".join(f", c.{ident(name)}" for name in names)
-        wanted = ", ".join(literal(name) for name in names) or "NULL"
-
         return self._relation(
-            f"SELECT {oid}, o.{otype}, c.{ts}, c.{field}{columns} "
+            f"SELECT {oid}, o.{otype}, c.{ts}, c.{field}, "
+            f"c.* EXCLUDE ({oid}, {ts}, {field}) "
             f"FROM {OBJECT_CHANGES_TABLE} c "
             f"JOIN {OBJECTS_TABLE} o USING ({oid}) "
-            f"WHERE c.{field} IN ({wanted}) "
             f"ORDER BY c.{ts}"
         )
 
-    def _store_changes(self, contents: Any) -> None:
-        """Store ``contents`` as the change table, without any ``ocel:type``.
-
-        The getters join the type on rather than reading it from the table, so a
-        table taken off one of them can be handed straight back. The lambda picks
-        the columns to keep, which leaves contents that never had a type alone.
-        """
-        self._replace(OBJECT_CHANGES_TABLE, contents, f"COLUMNS(c -> c != {literal(OTYPE_COL)})")
-
     @changes_table.setter
     def changes_table(self, contents: Any) -> None:
-        self._store_changes(contents)
+        """Store ``contents`` as the change table, one attribute value per row.
+
+        The whole table is replaced, static rows included, so what the setter
+        stores is exactly what the getter reports.
+
+        ``contents`` is normalized on the way in, which is what lets a table from
+        another tool be handed over as it comes:
+
+        * a row that names no ``ocel:field`` is split into one row per value it
+          carries, each naming its own attribute -- a wide row holding several
+          values is several changes, and stored as one it would be unreadable,
+          the field being what says which column a row wrote,
+        * a row with no timestamp is written at the epoch, where an initial value
+          with no time of its own belongs (see :attr:`static_attribute_names`),
+        * one row is kept per object, attribute and timestamp: an attribute holds
+          one value at one moment, so rows that agree on all three are the same
+          change written twice.
+
+        ``ocel:type`` and PM4PY's ``@@cumcount`` are dropped. The getters join the
+        type on rather than reading it from the table, so a table taken off one of
+        them can be handed straight back, and the cumcount is PM4PY's own row
+        counter rather than anything the log holds. The lambda leaves contents
+        that carry neither alone.
+        """
+        oid, ts = ident(OID_COL), ident(TIMESTAMP_COL)
+        field = ident(OBJECT_CHANGED_FIELD)
+        con = self._ocel.con
+
+        with self._bound(contents) as incoming:
+            dropped = [OTYPE_COL, OBJECT_CHANGE_CUMCOUNT]
+            meta = [OID_COL, TIMESTAMP_COL, OBJECT_CHANGED_FIELD, *dropped]
+            names = [
+                name
+                for name, *_ in con.execute(f"DESCRIBE {incoming}").fetchall()
+                if name not in meta
+            ]
+            kept = f"COLUMNS(c -> c NOT IN ({', '.join(literal(name) for name in dropped)}))"
+
+            # the rows that name their field, which also settles the stored types
+            con.execute(
+                f"CREATE OR REPLACE TABLE {OBJECT_CHANGES_TABLE} AS "
+                f"SELECT * REPLACE (coalesce({ts}, {EPOCH_SQL}) AS {ts}) "
+                f"FROM (SELECT {kept} FROM {incoming}) "
+                f"WHERE {field} IS NOT NULL"
+            )
+
+            for name in names:
+                con.execute(
+                    f"INSERT INTO {OBJECT_CHANGES_TABLE} BY NAME SELECT {oid}, "
+                    f"coalesce({ts}, {EPOCH_SQL}) AS {ts}, {literal(name)} AS {field}, {ident(name)} "
+                    f"FROM {incoming} WHERE {field} IS NULL AND {ident(name)} IS NOT NULL"
+                )
+
+            collapse_object_changes(con)
 
     @property
     def changes(self) -> pd.DataFrame:
         """
-        Return the dynamic object attribute change table.
+        Return the object attribute change table.
 
         Read from the OCEL's DuckDB database on every access.
 
         Returns:
-            DataFrame: A pandas DataFrame containing all dynamic updates to object attributes.
+            DataFrame: A pandas DataFrame containing every update to an object attribute.
         """
         return self.changes_table.df()
 
     @changes.setter
     def changes(self, contents: pd.DataFrame) -> None:
-        self._store_changes(contents)
+        self.changes_table = contents
 
     @property
     def changes_pl(self) -> polars.LazyFrame:
         """
-        Return the dynamic object attribute change table as a polars LazyFrame.
+        Return the object attribute change table as a polars LazyFrame.
 
         Nothing is read until it is collected.
 
         Returns:
-            polars.LazyFrame: All dynamic updates to object attributes.
+            polars.LazyFrame: Every update to an object attribute.
         """
         return self.changes_table.pl(lazy=True)
 
     @changes_pl.setter
     def changes_pl(self, contents: polars.LazyFrame | polars.DataFrame) -> None:
-        self._store_changes(contents)
+        self.changes_table = contents
 
     @property
     def types(self) -> list[str]:

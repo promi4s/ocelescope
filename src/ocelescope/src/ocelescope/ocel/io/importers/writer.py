@@ -24,6 +24,7 @@ from ocelescope.ocel.io.schema import (
     SchemaDefinition,
     create_ocel_tables,
 )
+from ocelescope.ocel.util.changes import collapse_object_changes
 from ocelescope.util.sql import ident, set_utc, utc_timestamp
 
 STATIC_OBJECT_ATTRIBUTE_TIMESTAMP = EPOCH.isoformat()
@@ -177,9 +178,14 @@ class OCELWriter:
         )
 
     def close(self) -> None:
-        """Flush any remaining buffered rows, closing a connection we opened."""
+        """Flush any remaining buffered rows, closing a connection we opened.
+
+        The changes are collapsed once everything is in: a source can write the
+        same change twice, and only a complete table can be read for duplicates.
+        """
         for table in self.schemas:
             self._flush(table)
+        collapse_object_changes(self.con)
         if self._owns_connection:
             self.con.close()
 
