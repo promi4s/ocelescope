@@ -18,10 +18,21 @@ from typing import TYPE_CHECKING, Sequence
 import polars as pl
 
 from ocelescope.ocel.constants.pm4py import EID_COL, OID_COL
+from ocelescope.ocel.constants.tables import EVENTS_TABLE, OBJECTS_TABLE
 from ocelescope.ocel.filter.base import BaseFilter, Keep
+from ocelescope.util.sql import ident
 
 if TYPE_CHECKING:
     from ocelescope.ocel.core.ocel import OCEL
+
+
+def _all_ids(ocel: "OCEL", table: str, id_col: str) -> pl.LazyFrame:
+    """Every id ``table`` holds -- what a side no filter constrains keeps.
+
+    Read as the bare column rather than off the manager: the objects table is
+    assembled from the change rows, and an id needs none of that.
+    """
+    return ocel.sql(f"SELECT {ident(id_col)} FROM {ident(table)}").pl(lazy=True)
 
 
 def _intersect(frames: list[pl.LazyFrame], all_ids: pl.LazyFrame, id_col: str) -> pl.LazyFrame:
@@ -45,9 +56,15 @@ def apply_filters(ocel: "OCEL", filters: Sequence[BaseFilter]) -> "OCEL":
 
     kept_events, kept_objects = pl.collect_all(
         [
-            _intersect([k.events for k in keeps if k.events is not None], ocel.events.pl, EID_COL),
             _intersect(
-                [k.objects for k in keeps if k.objects is not None], ocel.objects.pl, OID_COL
+                [k.events for k in keeps if k.events is not None],
+                _all_ids(ocel, EVENTS_TABLE, EID_COL),
+                EID_COL,
+            ),
+            _intersect(
+                [k.objects for k in keeps if k.objects is not None],
+                _all_ids(ocel, OBJECTS_TABLE, OID_COL),
+                OID_COL,
             ),
         ]
     )
