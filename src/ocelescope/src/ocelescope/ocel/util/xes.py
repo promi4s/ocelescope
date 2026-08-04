@@ -103,18 +103,6 @@ def create_ocel_from_xml(path: str, fallback_object_name: str = "LogObject") -> 
 def write_ocel_to_xes(ocel: "OCEL", object_type: str, path: str | Path) -> None:
     """Write the log flattened on ``object_type`` to an XES file.
 
-    Every object of the type becomes a case holding the events it takes part in;
-    an event shared by two of them belongs to both. Objects in no event are left
-    out, having no trace to write.
-
-    The columns are named the way XES asks for: ``case:concept:name`` is the
-    object, ``concept:name`` the activity, ``time:timestamp`` the time. An object
-    attribute that never changes belongs to the case, as ``case:<name>``; one that
-    does belongs to the event, as ``object:<name>``, and holds the value the object
-    had at that event rather than the one it ended up with. Event attributes keep
-    their own names, as do ``ocel:eid`` and ``ocel:qualifier``. An attribute is
-    written where it has a value, so an event carries only its own.
-
     Args:
         ocel: The log to flatten.
         object_type: The object type whose objects become the cases.
