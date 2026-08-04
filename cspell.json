@@ -160,7 +160,8 @@
     "ctes",
     "pydatetime",
     "RJEM",
-    "qddl"
+    "qddl",
+    "unpivoting"
   ],
   "ignorePaths": [
     "pnpm-lock.yaml",
