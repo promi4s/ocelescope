@@ -29,13 +29,14 @@ def get_aggr_attributes(
         ocel, entity_type, attribute_names, entity_names, drop_constant
     )
     page_names = names[(page - 1) * page_size : page * page_size]
-    table = attribute_util.merged_table(ocel, entity_type, page_names, entity_names)
 
     return PaginatedResponse(
         page=page,
         page_size=page_size,
         total_items=len(names),
-        response=attribute_util.aggregate_attributes(table),
+        response=attribute_util.aggregate_attributes(
+            ocel, entity_type, page_names, entity_names
+        ),
     )
 
 
@@ -49,8 +50,9 @@ def get_object_attributes(
     attribute_names: Annotated[list[str], Query()] = [],
     names: Annotated[list[str] | None, Query()] = None,
 ) -> list[TypedAttribute]:
-    table = attribute_util.merged_object_table(ocel, attribute_names or None, names)
-    return attribute_util.typed_attributes(table)
+    return attribute_util.typed_attributes(
+        ocel, "objects", attribute_names or None, names
+    )
 
 
 @router.get(
@@ -63,8 +65,9 @@ def get_event_attributes(
     attribute_names: Annotated[list[str], Query()] = [],
     names: Annotated[list[str] | None, Query()] = None,
 ) -> list[TypedAttribute]:
-    table = attribute_util.merged_event_table(ocel, attribute_names or None, names)
-    return attribute_util.typed_attributes(table)
+    return attribute_util.typed_attributes(
+        ocel, "events", attribute_names or None, names
+    )
 
 
 @router.get("/{ocel_id}/attribute/names", operation_id="AttributeNames")

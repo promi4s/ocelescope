@@ -97,19 +97,16 @@ def relation_summary(
     key_sql = ", ".join(keys)
 
     params: list[object] = []
-    conditions: list[str] = []
     # A qualifier-grouped row needs a qualifier (drop null-qualifier relations).
-    if with_qualifier:
-        conditions.append("qualifier IS NOT NULL")
-
-    def add_filter(column: str, values: list[str] | None) -> None:
+    conditions = ["qualifier IS NOT NULL"] if with_qualifier else []
+    for column, values in (
+        ("src_type", source_types),
+        ("tgt_type", target_types),
+        ("qualifier", qualifiers),
+    ):
         if values is not None:
             params.extend(values)
             conditions.append(f"{column} IN ({', '.join(['?'] * len(values))})")
-
-    add_filter("src_type", source_types)
-    add_filter("tgt_type", target_types)
-    add_filter("qualifier", qualifiers)
     where = ("WHERE " + " AND ".join(conditions)) if conditions else ""
 
     # All instances of the source type -- so min can drop to 0 when some don't relate.
@@ -118,62 +115,61 @@ def relation_summary(
     else:
         instances = f"SELECT {ident(OTYPE_COL)} AS src_type FROM objects"
 
-    ctes = [
-        f"rel AS ({_normalized_relation(kind, direction)})",
-        f"filtered AS (SELECT * FROM rel {where})",
-        f"per_source AS (SELECT {key_sql}, src_id, count(*) AS cnt "
-        f"FROM filtered GROUP BY {key_sql}, src_id)",
-        f"summary AS (SELECT {key_sql}, min(cnt) AS min_count, max(cnt) AS max_count, "
-        f"sum(cnt) AS total_sum, count(*) AS contributing FROM per_source GROUP BY {key_sql})",
-        f"totals AS (SELECT src_type, count(*) AS total FROM ({instances}) GROUP BY src_type)",
-    ]
-
-    select = ["s.src_type", "s.tgt_type"]
-    join = "JOIN totals t ON s.src_type = t.src_type"
     if with_qualifier:
-        select.append("s.qualifier")
+        # the group is keyed by its qualifier, so it already names the only one it covers
+        one, covered = "s.qualifier", "[s.qualifier]"
+        collected, join = "", ""
     else:
-        # Aggregated pairs list every qualifier seen for that (source, target).
-        ctes.append(
-            "pair_qualifiers AS (SELECT src_type, tgt_type, "
-            "array_agg(DISTINCT qualifier) AS qualifiers FROM filtered "
-            "WHERE qualifier IS NOT NULL GROUP BY src_type, tgt_type)"
+        # a pair-keyed group covers every qualifier the pair is ever related by
+        one, covered = "''", "q.qualifiers"
+        collected = f""",
+        group_qualifiers AS (
+            SELECT {key_sql}, array_agg(DISTINCT qualifier) AS qualifiers
+            FROM filtered WHERE qualifier IS NOT NULL GROUP BY {key_sql}
+        )"""
+        join = " AND ".join(f"q.{key} = s.{key}" for key in keys)
+        join = f"LEFT JOIN group_qualifiers q ON {join}"
+
+    query = f"""
+        WITH filtered AS (
+            SELECT * FROM ({_normalized_relation(kind, direction)}) {where}
+        ),
+        -- how many targets one source instance relates to
+        per_source AS (
+            SELECT {key_sql}, src_id, count(*) AS cnt
+            FROM filtered GROUP BY {key_sql}, src_id
+        ),
+        summary AS (
+            SELECT {key_sql}, min(cnt) AS min_count, max(cnt) AS max_count,
+                   sum(cnt) AS total_sum, count(*) AS contributing
+            FROM per_source GROUP BY {key_sql}
+        ),
+        -- every instance of the source type, those in no relation included
+        totals AS (
+            SELECT src_type, count(*) AS total FROM ({instances}) GROUP BY src_type
+        ){collected}
+        SELECT s.src_type, s.tgt_type, {one},
+               CASE WHEN s.contributing < t.total THEN 0 ELSE s.min_count END,
+               s.max_count, s.total_sum, {covered}
+        FROM summary s
+        JOIN totals t ON t.src_type = s.src_type
+        {join}
+    """
+
+    summaries = [
+        RelationCountSummary(
+            source=src_type,
+            target=tgt_type,
+            qualifier=qualifier or "",
+            qualifiers=sorted(q for q in (row_qualifiers or []) if q is not None),
+            min_count=int(min_count),
+            max_count=int(max_count),
+            sum=int(total_sum),
         )
-        join += (
-            " LEFT JOIN pair_qualifiers q "
-            "ON s.src_type = q.src_type AND s.tgt_type = q.tgt_type"
-        )
-    select += [
-        "CASE WHEN s.contributing < t.total THEN 0 ELSE s.min_count END AS min_count",
-        "s.max_count",
-        "s.total_sum",
+        for src_type, tgt_type, qualifier, min_count, max_count, total_sum, row_qualifiers in ocel.sql(
+            query, params
+        ).fetchall()
     ]
-    if not with_qualifier:
-        select.append("q.qualifiers")
-
-    query = f"WITH {', '.join(ctes)} SELECT {', '.join(select)} FROM summary s {join}"
-    rows = ocel.sql(query, params).fetchall()
-
-    summaries: list[RelationCountSummary] = []
-    for row in rows:
-        if with_qualifier:
-            src_type, tgt_type, qualifier, min_count, max_count, total_sum = row
-            row_qualifiers = [qualifier]
-        else:
-            src_type, tgt_type, min_count, max_count, total_sum, quals = row
-            qualifier = ""
-            row_qualifiers = sorted(q for q in (quals or []) if q is not None)
-        summaries.append(
-            RelationCountSummary(
-                source=src_type,
-                target=tgt_type,
-                qualifier=qualifier or "",
-                qualifiers=row_qualifiers,
-                min_count=int(min_count),
-                max_count=int(max_count),
-                sum=int(total_sum),
-            )
-        )
 
     if drop_constant:
         summaries = [s for s in summaries if s.min_count != s.max_count]

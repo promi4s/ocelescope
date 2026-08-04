@@ -91,6 +91,7 @@ def write_ocel_to_xes(ocel: "OCEL", object_type: str, path: str | Path):
     ) as filtered_ocel:
         latest_states = (
             filtered_ocel.objects.attribute_states()
+            .df()
             .sort_values([TIMESTAMP_COL, OID_COL])
             .drop_duplicates([OID_COL], keep="last")
             .drop(columns=[TIMESTAMP_COL, OTYPE_COL])

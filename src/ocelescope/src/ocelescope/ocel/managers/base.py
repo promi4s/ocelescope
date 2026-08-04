@@ -4,8 +4,9 @@ from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, Iterator
 
 import duckdb
+import polars
 
-from ocelescope.util.sql import ident, set_utc
+from ocelescope.util.sql import set_utc
 
 if TYPE_CHECKING:
     from ocelescope.ocel.core.ocel import OCEL
@@ -43,20 +44,20 @@ class BaseManager:
         """
         return [row[0] for row in self._relation(sql, params).fetchall()]
 
-    def _column_names(self, table: str) -> list[str]:
-        """The columns of a stored table, in their stored order."""
-        return [name for name, *_ in self._ocel.con.execute(f"DESCRIBE {ident(table)}").fetchall()]
-
-    def _attribute_names(self, table: str) -> list[str]:
-        """The attribute columns of a stored table: its columns minus the OCEL ones."""
-        return sorted(name for name in self._column_names(table) if not name.startswith("ocel:"))
-
     @contextmanager
     def _bound(self, contents: Any) -> Iterator[str]:
-        """Bind ``contents`` to the OCEL's connection for one query, as a view."""
+        """Bind ``contents`` to the OCEL's connection for one query, as a view.
+
+        Anything still lazy is read out first. A relation or a LazyFrame taken off
+        a getter reads the very tables the caller is about to write, and a writer
+        that takes more than one statement would otherwise see it change under it:
+        the rows it means to store are gone by the time it stores them.
+        """
         con = self._ocel.con
         if isinstance(contents, duckdb.DuckDBPyRelation):
             contents = contents.to_arrow_table()
+        elif isinstance(contents, polars.LazyFrame):
+            contents = contents.collect()
         con.register(_INCOMING, contents)
         try:
             yield _INCOMING

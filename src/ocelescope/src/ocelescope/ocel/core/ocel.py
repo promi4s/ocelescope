@@ -239,6 +239,19 @@ class OCEL:
         try:
             set_utc(connection)
             ocel = cls(connection)
+            # before the objects, which append their static attributes to it
+            ocel.objects.changes_table = (
+                object_changes
+                if object_changes is not None
+                else pl.DataFrame(
+                    schema={
+                        OID_COL: pl.String,
+                        OTYPE_COL: pl.String,
+                        TIMESTAMP_COL: pl.Datetime("us"),
+                        OBJECT_CHANGED_FIELD: pl.String,
+                    }
+                )
+            )
             ocel.objects.table = objects
             ocel.events.table = events
             ocel.e2o.table = relations
@@ -250,18 +263,6 @@ class OCEL:
                         O2O_SOURCE_ID: pl.String,
                         O2O_TARGET_ID: pl.String,
                         O2O_QUALIFIER: pl.String,
-                    }
-                )
-            )
-            ocel.objects.changes_table = (
-                object_changes
-                if object_changes is not None
-                else pl.DataFrame(
-                    schema={
-                        OID_COL: pl.String,
-                        OTYPE_COL: pl.String,
-                        TIMESTAMP_COL: pl.Datetime("us"),
-                        OBJECT_CHANGED_FIELD: pl.String,
                     }
                 )
             )

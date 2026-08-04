@@ -85,7 +85,7 @@ def ocel_table_schemas(
     append to the fixed base columns of each table.
     """
     return {
-        "objects": pa.schema(OBJECT_TABLE_BASE_SCHEMA + object_columns),
+        "objects": pa.schema(OBJECT_TABLE_BASE_SCHEMA),
         "object_changes": pa.schema(OBJECT_CHANGES_TABLE_SCHEMA + object_columns),
         "o2o": pa.schema(O2O_TABLE_SCHEMA),
         "events": pa.schema(EVENT_TABLE_BASE_SCHEMA + event_columns),
