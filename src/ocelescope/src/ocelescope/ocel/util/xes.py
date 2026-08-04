@@ -1,19 +1,26 @@
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import pm4py
 import polars as pl
 import r4pm
 
+from ocelescope.ocel.constants.misc import EPOCH_SQL
 from ocelescope.ocel.constants.pm4py import (
     ACTIVITY_COL,
     E2O_QUALIFIER,
     EID_COL,
+    OBJECT_CHANGED_FIELD,
     OID_COL,
     OTYPE_COL,
     TIMESTAMP_COL,
 )
-from ocelescope.ocel.filter.filters.entity_type import ObjectTypeFilter
+from ocelescope.ocel.constants.tables import (
+    E2O_TABLE,
+    EVENTS_TABLE,
+    OBJECT_CHANGES_TABLE,
+    OBJECTS_TABLE,
+)
+from ocelescope.util.sql import ident, literal
 
 if TYPE_CHECKING:
     from ocelescope.ocel.core.ocel import OCEL
@@ -25,6 +32,14 @@ RENAME_MAP = {
     "time:timestamp": TIMESTAMP_COL,
     f"case:{OTYPE_COL}": OTYPE_COL,
 }
+
+#: The same names the other way round, which is what the exporter writes.
+XES_NAMES = {column: name for name, column in RENAME_MAP.items()}
+
+#: What a dynamic object attribute is written under. It changes per event, so it
+#: cannot take the ``case:`` prefix a static one does, and its bare name would
+#: collide with an event attribute called the same.
+DYNAMIC_PREFIX = "object:"
 
 
 def create_ocel_from_xml(path: str, fallback_object_name: str = "LogObject") -> "OCEL":
@@ -85,25 +100,74 @@ def create_ocel_from_xml(path: str, fallback_object_name: str = "LogObject") -> 
     )
 
 
-def write_ocel_to_xes(ocel: "OCEL", object_type: str, path: str | Path):
-    with ocel.filter(
-        [ObjectTypeFilter(object_types=[object_type], mode="include")]
-    ) as filtered_ocel:
-        latest_states = (
-            filtered_ocel.objects.attribute_states()
-            .df()
-            .sort_values([TIMESTAMP_COL, OID_COL])
-            .drop_duplicates([OID_COL], keep="last")
-            .drop(columns=[TIMESTAMP_COL, OTYPE_COL])
-            .set_index(OID_COL)
-        )
-        export_ocel = filtered_ocel.ocel
-        export_objects = export_ocel.objects.set_index(OID_COL)
-        export_objects.update(latest_states)
-        export_ocel.objects = export_objects.reset_index()
+def write_ocel_to_xes(ocel: "OCEL", object_type: str, path: str | Path) -> None:
+    """Write the log flattened on ``object_type`` to an XES file.
 
-        pm4py.write_xes(
-            pm4py.ocel_flattening(export_ocel, object_type),
-            str(path),
-            variant_str="r4pm/rustxes",
+    Every object of the type becomes a case holding the events it takes part in;
+    an event shared by two of them belongs to both. Objects in no event are left
+    out, having no trace to write.
+
+    The columns are named the way XES asks for: ``case:concept:name`` is the
+    object, ``concept:name`` the activity, ``time:timestamp`` the time. An object
+    attribute that never changes belongs to the case, as ``case:<name>``; one that
+    does belongs to the event, as ``object:<name>``, and holds the value the object
+    had at that event rather than the one it ended up with. Event attributes keep
+    their own names, as do ``ocel:eid`` and ``ocel:qualifier``. An attribute is
+    written where it has a value, so an event carries only its own.
+
+    Args:
+        ocel: The log to flatten.
+        object_type: The object type whose objects become the cases.
+        path: Where to write the file.
+    """
+    oid, otype, ts = ident(OID_COL), ident(OTYPE_COL), ident(TIMESTAMP_COL)
+    eid, activity, field = ident(EID_COL), ident(ACTIVITY_COL), ident(OBJECT_CHANGED_FIELD)
+
+    kinds = ocel.sql(
+        f"SELECT {field}, max({ts}) = {EPOCH_SQL} AS is_static "
+        f"FROM {OBJECT_CHANGES_TABLE} "
+        f"WHERE {oid} IN (SELECT {oid} FROM {OBJECTS_TABLE} WHERE {otype} = ?) "
+        f"GROUP BY {field} ORDER BY {field}",
+        [object_type],
+    ).fetchall()
+    static = [name for name, is_static in kinds if is_static]
+    dynamic = [name for name, is_static in kinds if not is_static]
+
+    static_cte, static_join = "", ""
+    if static:
+        values = ", ".join(
+            f"any_value({ident(name)}) AS {ident(f'case:{name}')}" for name in static
         )
+        static_cte = (
+            f"static_values AS ("
+            f"SELECT {oid}, {values} FROM {OBJECT_CHANGES_TABLE} "
+            f"JOIN object_ids USING ({oid}) GROUP BY {oid}), "
+        )
+        static_join = f"LEFT JOIN static_values USING ({oid})"
+
+    columns = [
+        f"f.{eid}",
+        f"f.{ident(E2O_QUALIFIER)}",
+        f"f.{oid} AS {ident(XES_NAMES[OID_COL])}",
+        f"{literal(object_type)} AS {ident(XES_NAMES[OTYPE_COL])}",
+        f"f.{activity} AS {ident(XES_NAMES[ACTIVITY_COL])}",
+        f"f.{ts} AS {ident(XES_NAMES[TIMESTAMP_COL])}",
+        *(f"f.{ident(name)}" for name in ocel.events.attribute_names),
+        *(f"f.{ident(f'case:{name}')}" for name in static),
+        *(f"s.{ident(name)} AS {ident(f'{DYNAMIC_PREFIX}{name}')}" for name in dynamic),
+    ]
+
+    flattened = ocel.objects.attribute_states(object_types=[object_type], attributes=dynamic).query(
+        "attribute_states",
+        f"WITH object_ids AS "
+        f"(SELECT {oid} FROM {OBJECTS_TABLE} WHERE {otype} = {literal(object_type)}), "
+        f"{static_cte}"
+        f"flattened AS (SELECT * FROM {E2O_TABLE} JOIN object_ids USING ({oid}) "
+        f"LEFT JOIN {EVENTS_TABLE} USING ({eid}) {static_join}) "
+        f"SELECT {', '.join(columns)} FROM flattened f "
+        f"ASOF LEFT JOIN attribute_states s "
+        f"ON f.{oid} = s.{oid} AND f.{ts} >= s.{ts} "
+        f"ORDER BY f.{oid}, f.{ts}",
+    )
+
+    r4pm.df.export_xes(flattened.pl().with_columns(pl.col(pl.String) + ""), str(path))
