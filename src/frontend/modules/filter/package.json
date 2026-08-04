@@ -1,7 +1,7 @@
 {
   "name": "@ocelescope/filter",
   "type": "module",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "A module for basic filtering of OCELs",
   "author": "Görkem-Emre Öztürk <goerkem.oeztuerk@rwth-aachen.de>",
   "license": "MIT",

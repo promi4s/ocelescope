@@ -1,7 +1,7 @@
 {
   "name": "@ocelescope/resources",
   "type": "module",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Ocelescope resources: helpers and UI components for rendering and exporting data.",
   "author": "G\u00f6rkem-Emre \u00d6zt\u00fcrk <goerkem.oeztuerk@rwth-aachen.de>",
   "license": "MIT",
