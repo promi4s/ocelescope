@@ -227,26 +227,33 @@ class ObjectsManager(BaseManager):
         with self._bound(contents) as incoming:
             dropped = [OTYPE_COL, OBJECT_CHANGE_CUMCOUNT]
             meta = [OID_COL, TIMESTAMP_COL, OBJECT_CHANGED_FIELD, *dropped]
-            names = [
-                name
-                for name, *_ in con.execute(f"DESCRIBE {incoming}").fetchall()
-                if name not in meta
-            ]
+            columns = [name for name, *_ in con.execute(f"DESCRIBE {incoming}").fetchall()]
+            names = [name for name in columns if name not in meta]
+
             kept = f"COLUMNS(c -> c NOT IN ({', '.join(literal(name) for name in dropped)}))"
+            # a table that leaves a column out says the same as one holding NULLs
+            absent = "".join(
+                f", NULL::{dtype} AS {ident(column)}"
+                for column, dtype in (
+                    (TIMESTAMP_COL, "TIMESTAMP"),
+                    (OBJECT_CHANGED_FIELD, "VARCHAR"),
+                )
+                if column not in columns
+            )
+            source = f"(SELECT {kept}{absent} FROM {incoming})"
 
             # the rows that name their field, which also settles the stored types
             con.execute(
                 f"CREATE OR REPLACE TABLE {OBJECT_CHANGES_TABLE} AS "
                 f"SELECT * REPLACE (coalesce({ts}, {EPOCH_SQL})::TIMESTAMP AS {ts}) "
-                f"FROM (SELECT {kept} FROM {incoming}) "
-                f"WHERE {field} IS NOT NULL"
+                f"FROM {source} WHERE {field} IS NOT NULL"
             )
 
             for name in names:
                 con.execute(
                     f"INSERT INTO {OBJECT_CHANGES_TABLE} BY NAME SELECT {oid}, "
                     f"coalesce({ts}, {EPOCH_SQL})::TIMESTAMP AS {ts}, {literal(name)} AS {field}, {ident(name)} "
-                    f"FROM {incoming} WHERE {field} IS NULL AND {ident(name)} IS NOT NULL"
+                    f"FROM {source} WHERE {field} IS NULL AND {ident(name)} IS NOT NULL"
                 )
 
             collapse_object_changes(con)
@@ -475,6 +482,6 @@ class ObjectsManager(BaseManager):
             f"SELECT {meta}{fill} FROM collapsed "
             f"WINDOW w AS (PARTITION BY {oid} ORDER BY {ts} "
             f"ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) "
-            f"ORDER BY {oid}, {ts}",
+            f"ORDER BY {ts}, {oid}",
             params,
         )
