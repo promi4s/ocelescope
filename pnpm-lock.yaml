@@ -6,24 +6,9 @@ settings:
 
 catalogs:
   default:
-    '@apidevtools/json-schema-ref-parser':
-      specifier: ^15.5.0
-      version: 15.5.0
     '@biomejs/biome':
       specifier: 2.5.5
       version: 2.5.5
-    '@dagrejs/dagre':
-      specifier: ^3.0.0
-      version: 3.0.0
-    '@floating-ui/react':
-      specifier: ^0.27.18
-      version: 0.27.20
-    '@hpcc-js/wasm-graphviz':
-      specifier: ^1.21.0
-      version: 1.21.1
-    '@mantine/carousel':
-      specifier: ^9.4.2
-      version: 9.4.2
     '@mantine/charts':
       specifier: ^9.4.2
       version: 9.4.2
@@ -36,39 +21,18 @@ catalogs:
     '@mantine/dropzone':
       specifier: ^9.4.2
       version: 9.4.2
-    '@mantine/hooks':
-      specifier: ^9.4.2
-      version: 9.4.2
     '@mantine/notifications':
       specifier: ^9.4.2
       version: 9.4.2
-    '@marko19907/string-to-color':
-      specifier: ^1.0.2
-      version: 1.0.2
     '@ocelescope/ocelot':
       specifier: ^0.5.0
       version: 0.5.0
     '@r4pm/components':
       specifier: ^0.2.0
       version: 0.2.0
-    '@rjsf/core':
-      specifier: ^6.7.0
-      version: 6.7.0
     '@rjsf/mantine':
       specifier: ^6.7.0
       version: 6.7.0
-    '@rjsf/utils':
-      specifier: ^6.7.0
-      version: 6.7.0
-    '@rjsf/validator-ajv8':
-      specifier: ^6.7.0
-      version: 6.7.0
-    '@tanstack/react-query':
-      specifier: ^5.90.21
-      version: 5.90.21
-    '@tanstack/react-query-devtools':
-      specifier: ^5.91.3
-      version: 5.91.3
     '@tsconfig/strictest':
       specifier: ^2.0.8
       version: 2.0.8
@@ -102,30 +66,9 @@ catalogs:
     bumpp:
       specifier: ^12.0.0
       version: 12.0.0
-    clsx:
-      specifier: ^2.1.1
-      version: 2.1.1
-    content-disposition-attachment:
-      specifier: ^0.3.1
-      version: 0.3.1
     cspell:
       specifier: ^10.0.1
       version: 10.0.1
-    dayjs:
-      specifier: ^1.11.19
-      version: 1.11.21
-    elkjs:
-      specifier: ^0.11.0
-      version: 0.11.1
-    embla-carousel:
-      specifier: ^8.6.0
-      version: 8.6.0
-    embla-carousel-react:
-      specifier: ^8.6.0
-      version: 8.6.0
-    file-saver:
-      specifier: ^2.0.5
-      version: 2.0.5
     flat:
       specifier: ^6.0.1
       version: 6.0.1
@@ -138,18 +81,12 @@ catalogs:
     jspdf:
       specifier: ^4.2.1
       version: 4.2.1
-    lucide-react:
-      specifier: ^1.0.0
-      version: 1.21.0
     mantine-datatable:
       specifier: ^9.4.0
       version: 9.4.0
     next:
       specifier: ^16.2.10
       version: 16.2.10
-    object-hash:
-      specifier: ^3.0.0
-      version: 3.0.0
     orval:
       specifier: ^8.22.0
       version: 8.22.0
@@ -162,33 +99,12 @@ catalogs:
     react-dom:
       specifier: ^19.2.7
       version: 19.2.7
-    react-hook-form:
-      specifier: ^7.71.2
-      version: 7.71.2
-    react-plotly.js:
-      specifier: ^4.0.0
-      version: 4.0.0
-    react-zoom-pan-pinch:
-      specifier: ^4.0.0
-      version: 4.0.3
-    recharts:
-      specifier: ^3.2.1
-      version: 3.8.1
     tsdown:
       specifier: ^0.22.12
       version: 0.22.12
     typescript:
       specifier: ^5.9.3
       version: 5.9.3
-    uniqolor:
-      specifier: ^1.1.1
-      version: 1.1.1
-    zod:
-      specifier: ^4.3.6
-      version: 4.3.6
-    zustand:
-      specifier: ^5.0.11
-      version: 5.0.11
 
 importers:
 
@@ -616,7 +532,7 @@ importers:
     devDependencies:
       '@apidevtools/json-schema-ref-parser':
         specifier: 'catalog:'
-        version: 15.5.0(@types/json-schema@7.0.15)
+        version: 15.5.1(@types/json-schema@7.0.15)
       '@rjsf/mantine':
         specifier: 'catalog:'
         version: 6.7.0(@mantine/core@9.4.2(@mantine/hooks@9.4.2(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/dates@9.4.2(@mantine/core@9.4.2(@mantine/hooks@9.4.2(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.2(react@19.2.7))(dayjs@1.11.21)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.2(react@19.2.7))(@rjsf/core@6.7.0(@rjsf/utils@6.7.0(react@19.2.7))(react@19.2.7))(@rjsf/utils@6.7.0(react@19.2.7))(react@19.2.7)
@@ -977,8 +893,8 @@ importers:
 
 packages:
 
-  '@apidevtools/json-schema-ref-parser@15.5.0':
-    resolution: {integrity: sha512-Ps4w0FwrDoeVK6hfYxWkVbkmxm+zN+6xoXF2ZfEhfiox0ZNbcSAiUWO6iAIvP5bc3DB270r+EaKcoT1IUyzfxw==}
+  '@apidevtools/json-schema-ref-parser@15.5.1':
+    resolution: {integrity: sha512-69KDKWQvk5jfDQfSTzAUHkI731X7CaJLwQxlS87AXyFHoJzsd/Pufrqsz7PqXMgrtAA99D9Y6NujkEkzli6kVA==}
     engines: {node: '>=20'}
     peerDependencies:
       '@types/json-schema': ^7.0.15
@@ -4431,8 +4347,8 @@ packages:
     resolution: {integrity: sha512-ePWsvanv0DWuDRsW8dnt+R4jQ31SCRCQ7hhNcPXZPsoBZiemuZNYGf7adZdqX2D86j6rvKp3RpCxVTSb8WQlOw==}
     hasBin: true
 
-  js-yaml@4.3.0:
-    resolution: {integrity: sha512-1td788aAnnZ5qs7V2QIRl1owjtYpbKt749Y3xauqQgwIIGF/xXWz1wMTEBx5O3LK3lXLVuqXPdPxj2BoFHaW9Q==}
+  js-yaml@5.2.3:
+    resolution: {integrity: sha512-n+mUVyUX5bVv7G/G2zyIHOhdxfuU1dY2NOFzTQUWiMUbFss8b57NFlgCCaggU78wSw5KVS9cllzeLyzyR+n5nw==}
     hasBin: true
 
   jsesc@3.1.0:
@@ -5426,6 +5342,10 @@ packages:
   undici-types@8.3.0:
     resolution: {integrity: sha512-j375ScV60dom+YkPFIfTLcOiPxkN/buHz5GobjLhixFuANaNs3C9l4GmrWqejgXWJ7BbJcFYpTEUkS1Ge8bpZQ==}
 
+  undici@6.28.0:
+    resolution: {integrity: sha512-LIY910g9TI13YS95lrMFrs8Rm/u/irgHeTWoKCoteeJ04CUJ92eEfj0rVn+7VKMPBpUPiUoBKfhNyLI23EE/KA==}
+    engines: {node: '>=18.17'}
+
   unicorn-magic@0.3.0:
     resolution: {integrity: sha512-+QBBXBCvifc56fsbuxZQ6Sic3wqqc3WWaqxs58gvJrcOuN83HGTCwz3oS5phzU9LthRNE9VrJCFCLUgHeeFnfA==}
     engines: {node: '>=18'}
@@ -5603,10 +5523,11 @@ packages:
 
 snapshots:
 
-  '@apidevtools/json-schema-ref-parser@15.5.0(@types/json-schema@7.0.15)':
+  '@apidevtools/json-schema-ref-parser@15.5.1(@types/json-schema@7.0.15)':
     dependencies:
       '@types/json-schema': 7.0.15
-      js-yaml: 4.3.0
+      js-yaml: 5.2.3
+      undici: 6.28.0
 
   '@babel/code-frame@7.29.7':
     dependencies:
@@ -9021,7 +8942,7 @@ snapshots:
     dependencies:
       argparse: 2.0.1
 
-  js-yaml@4.3.0:
+  js-yaml@5.2.3:
     dependencies:
       argparse: 2.0.1
 
@@ -10194,6 +10115,8 @@ snapshots:
       unconfig-core: 7.5.0
 
   undici-types@8.3.0: {}
+
+  undici@6.28.0: {}
 
   unicorn-magic@0.3.0: {}
 
