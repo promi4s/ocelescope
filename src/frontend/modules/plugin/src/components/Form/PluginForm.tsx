@@ -2,9 +2,9 @@ import validator from "@rjsf/validator-ajv8";
 import { useMemo } from "react";
 import { type Control, Controller } from "react-hook-form";
 import type { PluginInputType } from ".";
+import CustomSchemaField from "./Fields";
 import { Form } from "./MantineForm";
 import { PluginFormProvider } from "./PluginFormContext";
-import CustomSchemaField from "./Fields";
 
 type PluginFormProps = {
   schema: { [key: string]: any };

@@ -3,6 +3,7 @@ import type { FieldProps } from "@rjsf/utils";
 import type { ComponentType } from "react";
 import { CodeField } from "./CodeField";
 import { ComputedSelect } from "./ComputedSelect";
+import { EnumMultiSelect, isStringEnumArray } from "./EnumMultiSelect";
 import { OCELField } from "./OCELField";
 import { SliderField } from "./SliderField";
 
@@ -15,10 +16,25 @@ const CUSTOM_FORM_MAP: Record<string, ComponentType<FieldProps>> = {
   slider: SliderField,
 };
 
-const CustomSchemaField: React.FC<FieldProps> = (props) => {
-  const uiType = props.schema["x-ui-meta"]?.type;
+const resolveField = ({
+  schema,
+  registry,
+}: FieldProps): ComponentType<FieldProps> | undefined => {
+  const uiType = schema["x-ui-meta"]?.type;
 
-  const FormComponent = uiType ? CUSTOM_FORM_MAP[uiType] : undefined;
+  if (uiType) {
+    return CUSTOM_FORM_MAP[uiType];
+  }
+
+  if (isStringEnumArray(schema, registry)) {
+    return EnumMultiSelect;
+  }
+
+  return undefined;
+};
+
+const CustomSchemaField: React.FC<FieldProps> = (props) => {
+  const FormComponent = resolveField(props);
 
   return FormComponent ? (
     <FormComponent {...props} />
