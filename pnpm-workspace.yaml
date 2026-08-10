@@ -10,7 +10,6 @@ allowBuilds:
   sharp: true
 
 catalog:
-  "@apidevtools/json-schema-ref-parser": ^15.5.0
   '@biomejs/biome': 2.5.5
   "@dagrejs/dagre": ^3.0.0
   "@floating-ui/react": ^0.27.18
@@ -23,6 +22,7 @@ catalog:
   "@mantine/hooks": ^9.4.2
   "@mantine/notifications": ^9.4.2
   "@marko19907/string-to-color": ^1.0.2
+  "@monaco-editor/react": ^4.7.0
   '@ocelescope/ocelot': ^0.6.0
   '@r4pm/components': ^0.2.0
   "@rjsf/core": ^6.7.0
@@ -50,9 +50,7 @@ catalog:
   embla-carousel: ^8.6.0
   embla-carousel-react: ^8.6.0
   file-saver: ^2.0.5
-  flat: ^6.0.1
   html-to-image: 1.11.13
-  json-schema-traverse: ^1.0.0
   jspdf: ^4.2.1
   lucide-react: ^1.0.0
   mantine-datatable: ^9.4.0

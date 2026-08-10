@@ -161,7 +161,9 @@
     "pydatetime",
     "RJEM",
     "qddl",
-    "unpivoting"
+    "unpivoting",
+    "monaco",
+    "Monaco"
   ],
   "ignorePaths": [
     "pnpm-lock.yaml",

@@ -48,6 +48,103 @@ def OCEL_FIELD(
     )
 
 
+def SLIDER_FIELD(
+    *,
+    min: float,
+    max: float,
+    step: Optional[float] = None,
+    marks: Optional[list[float]] = None,
+    title: Optional[str] = None,
+    description: Optional[str] = None,
+    default: Any = ...,
+) -> Any:
+    """Create a Pydantic `Field` rendered as a slider.
+
+    `min` and `max` become real `ge`/`le` constraints, not just UI bounds, so a
+    value outside the range is rejected on validation rather than only being
+    unreachable by dragging.
+
+    Annotate the field as `int` to get whole-number steps, or `float` for
+    fractional ones.
+
+    Args:
+        min: Lowest selectable value.
+        max: Highest selectable value.
+        step: Increment between selectable values. Defaults to 1 for `int`
+            fields and to a hundredth of the range for `float` fields.
+        marks: Optional values to label on the track.
+        title: Optional UI title for the field.
+        description: Optional UI help text for the field.
+        default: Default value, or `...` to make the field required.
+    """
+    meta: dict[str, Any] = {"type": "slider", "min": min, "max": max}
+
+    if step is not None:
+        meta["step"] = step
+    if marks:
+        meta["marks"] = marks
+
+    return Field(
+        default=default,
+        title=title,
+        description=description,
+        ge=min,
+        le=max,
+        json_schema_extra={"x-ui-meta": meta},
+    )
+
+
+def CODE_FIELD(
+    *,
+    language: str,
+    title: Optional[str] = None,
+    description: Optional[str] = None,
+    default: Any = ...,
+) -> Any:
+    """Create a Pydantic `Field` rendered as a code editor.
+
+    The value is a plain string; syntax highlighting is presentation only, so the
+    plugin stays responsible for validating what the user typed.
+
+    Args:
+        language: Language id used for highlighting, as understood by the
+            frontend's editor -- for example `"sql"`, `"python"`, `"json"`,
+            `"yaml"` or `"xml"`. An unknown id degrades to plain text.
+        title: Optional UI title for the field.
+        description: Optional UI help text for the field.
+        default: Default value, or `...` to make the field required.
+    """
+    return Field(
+        default=default,
+        title=title,
+        description=description,
+        json_schema_extra={"x-ui-meta": {"type": "code", "language": language}},
+    )
+
+
+def SQL_FIELD(
+    *,
+    title: Optional[str] = None,
+    description: Optional[str] = None,
+    default: Any = ...,
+) -> Any:
+    """Create a Pydantic `Field` rendered as a SQL editor.
+
+    Shorthand for `CODE_FIELD(language="sql")`.
+
+    Args:
+        title: Optional UI title for the field.
+        description: Optional UI help text for the field.
+        default: Default value, or `...` to make the field required.
+    """
+    return CODE_FIELD(
+        language="sql",
+        title=title,
+        description=description,
+        default=default,
+    )
+
+
 def COMPUTED_SELECTION(
     *,
     title: Optional[str] = None,
