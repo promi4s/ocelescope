@@ -23,7 +23,6 @@ const PluginForm: React.FC<PluginFormProps> = ({
   methodName,
   onSubmit,
 }) => {
-  // The method name is already the heading above the form.
   const formSchema = useMemo(() => ({ ...schema, title: "" }), [schema]);
 
   return (

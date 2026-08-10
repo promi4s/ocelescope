@@ -12,7 +12,7 @@ const PluginFormContext = createContext<PluginFormContextValue | undefined>(
   undefined,
 );
 
-const usePluginForm = () => {
+export const usePluginForm = () => {
   const context = useContext(PluginFormContext);
 
   if (!context) {
