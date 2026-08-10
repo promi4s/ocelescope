@@ -1,4 +1,4 @@
-import { Input, Slider } from "@mantine/core";
+import { Box, Input, Slider } from "@mantine/core";
 import type { FieldProps } from "@rjsf/utils";
 import { memo, useMemo } from "react";
 
@@ -49,18 +49,19 @@ export const SliderField = memo(
         required={required}
         error={rawErrors?.[0]}
       >
-        <Slider
-          mt="xs"
-          mb={marks ? "lg" : undefined}
-          min={min}
-          max={max}
-          step={step}
-          marks={marks}
-          label={(current) => current.toFixed(decimals)}
-          value={value}
-          onChange={(current) => onChange(current, path)}
-          disabled={disabled || readonly}
-        />
+        <Box px={marks ? "md" : undefined} pb={marks ? "xl" : undefined}>
+          <Slider
+            mt="xs"
+            min={min}
+            max={max}
+            step={step}
+            marks={marks}
+            label={(current) => current.toFixed(decimals)}
+            value={value}
+            onChange={(current) => onChange(current, path)}
+            disabled={disabled || readonly}
+          />
+        </Box>
       </Input.Wrapper>
     );
   },
