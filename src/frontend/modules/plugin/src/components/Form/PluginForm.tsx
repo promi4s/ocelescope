@@ -1,14 +1,10 @@
-import RefParser from "@apidevtools/json-schema-ref-parser";
-import type { UiSchema } from "@rjsf/utils";
 import validator from "@rjsf/validator-ajv8";
-import { unflatten } from "flat";
-import traverse from "json-schema-traverse";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { type Control, Controller } from "react-hook-form";
 import type { PluginInputType } from ".";
-import { getComputedSelect } from "./Fields/custom";
-import { wrapFieldsWithContext } from "./Fields/ocel";
 import { Form } from "./MantineForm";
+import { PluginFormProvider } from "./PluginFormContext";
+import CustomSchemaField from "./Fields";
 
 type PluginFormProps = {
   schema: { [key: string]: any };
@@ -18,45 +14,7 @@ type PluginFormProps = {
   methodName: string;
 };
 
-export const buildUiSchemaV2 = async ({
-  schema,
-}: {
-  schema: { [key: string]: unknown };
-}) => {
-  const deref = await RefParser.dereference(schema as any, {
-    dereference: { circular: "ignore" },
-  });
-
-  const uiSchema: UiSchema = {};
-
-  traverse(deref, {
-    allKeys: true,
-    cb: (subschema, pointer) => {
-      const pointerComponents = pointer.split("/").slice(1);
-
-      //so only the root is getting skipped
-      if (pointerComponents[0] !== "properties") return;
-
-      if (
-        pointerComponents[0] === "properties" &&
-        pointerComponents.at(-1) === "x-ui-meta"
-      ) {
-        const path = pointerComponents
-          .filter(
-            (pathComponent) =>
-              !["x-ui-meta", "properties"].includes(pathComponent),
-          )
-          .join(".");
-
-        uiSchema[path] = {
-          "ui:field": subschema.field_type ?? subschema.type,
-        };
-      }
-    },
-  });
-
-  return unflatten(uiSchema);
-};
+const FIELDS = { SchemaField: CustomSchemaField };
 
 const PluginForm: React.FC<PluginFormProps> = ({
   schema,
@@ -65,47 +23,30 @@ const PluginForm: React.FC<PluginFormProps> = ({
   methodName,
   onSubmit,
 }) => {
-  const [uiSchema, setUiSchema] = useState<UiSchema | undefined>(undefined);
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      const ui = await buildUiSchemaV2({ schema });
-      if (!cancelled) setUiSchema(ui as UiSchema);
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [schema]);
-
-  const fields = useMemo(() => wrapFieldsWithContext(control), [control]);
-
-  const computedFields = useMemo(
-    () => getComputedSelect({ methodName, pluginId, control }),
-    [methodName, pluginId, control],
-  );
+  // The method name is already the heading above the form.
+  const formSchema = useMemo(() => ({ ...schema, title: "" }), [schema]);
 
   return (
-    <Controller
+    <PluginFormProvider
       control={control}
-      name="input"
-      render={({ field }) => (
-        <>
+      pluginId={pluginId}
+      methodName={methodName}
+    >
+      <Controller
+        control={control}
+        name="input"
+        render={({ field }) => (
           <Form
-            schema={{ ...schema, title: "" }}
+            schema={formSchema}
             formData={field.value}
             validator={validator}
-            uiSchema={uiSchema}
-            fields={{ ...fields, ...computedFields }}
-            onChange={(data) => {
-              field.onChange(data.formData);
-            }}
+            fields={FIELDS}
+            onChange={({ formData }) => field.onChange(formData)}
             onSubmit={onSubmit}
           />
-        </>
-      )}
-    />
+        )}
+      />
+    </PluginFormProvider>
   );
 };
 

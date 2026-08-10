@@ -9,131 +9,133 @@ import {
   useObjectIds,
 } from "@ocelescope/api-base";
 import type { FieldProps } from "@rjsf/utils";
-import type React from "react";
-import { memo, useState } from "react";
-import { type Control, useWatch } from "react-hook-form";
-import type { PluginInputType } from "..";
+import { type ComponentType, memo, useEffect, useMemo, useState } from "react";
+import { useOcelId } from "../PluginFormContext";
 
-type OcelFieldProps = {
-  value: any;
-  isMulti: boolean;
-  onChange: (data: any) => void;
+type OcelSelectProps = {
   ocelId: string;
+  isMulti: boolean;
+  value: any;
+  onChange: (value: any) => void;
   label?: string;
   description?: string;
   required?: boolean;
+  disabled?: boolean;
 };
 
-const AttributeSelector: (
-  query: typeof useObjectAttributes | typeof useEventAttributes,
-) => React.FC<OcelFieldProps> =
-  (query) =>
-  ({ isMulti, ocelId, onChange, value, label, required, description }) => {
-    const { data: attributes = [] } = query(ocelId);
-    const attributeNames = new Set(attributes.map(({ name }) => name));
+const AttributeSelect =
+  (
+    useAttributes: typeof useObjectAttributes | typeof useEventAttributes,
+  ): React.FC<OcelSelectProps> =>
+  ({ ocelId, isMulti, value, ...props }) => {
+    const { data: attributes } = useAttributes(ocelId);
+
+    const names = useMemo(
+      () => [...new Set((attributes ?? []).map(({ name }) => name))],
+      [attributes],
+    );
 
     const SelectComponent = isMulti ? MultiSelect : Select;
 
     return (
       <SelectComponent
         value={value ?? (isMulti ? [] : null)}
-        label={label}
-        onChange={onChange}
-        required={required}
-        description={description}
+        {...props}
+        data={names}
+        disabled={!ocelId}
         clearable
-        data={[...attributeNames]}
       />
     );
   };
 
-const TypeSelector: (
-  query: typeof useEventCounts | typeof useObjectCounts,
-) => React.FC<OcelFieldProps> =
-  (query) =>
-  ({ ocelId, onChange, required, value, isMulti, label, description }) => {
-    const { data = {} } = query(ocelId);
+const TypeSelect =
+  (
+    useCounts: typeof useEventCounts | typeof useObjectCounts,
+  ): React.FC<OcelSelectProps> =>
+  ({ ocelId, isMulti, value, ...props }) => {
+    const { data: counts } = useCounts(ocelId);
+
+    const types = useMemo(() => Object.keys(counts ?? {}), [counts]);
 
     const SelectComponent = isMulti ? MultiSelect : Select;
 
     return (
       <SelectComponent
+        {...props}
         value={value ?? (isMulti ? [] : null)}
-        label={label}
-        required={required}
+        data={types}
         clearable
-        description={description}
-        onChange={onChange}
-        data={Object.keys(data)}
       />
     );
   };
 
-const IdSelect: (
-  query: typeof useEventIds | typeof useObjectIds,
-) => React.FC<OcelFieldProps> =
-  (query) =>
-  ({ ocelId, isMulti, value, ...rest }) => {
-    const [searchValue, setSearchValue] = useState<undefined | string>();
-    const [debouncedSearch] = useDebouncedValue(searchValue, 300);
+const IdSelect =
+  (
+    useIds: typeof useEventIds | typeof useObjectIds,
+  ): React.FC<OcelSelectProps> =>
+  ({ ocelId, isMulti, value, ...props }) => {
+    const [search, setSearch] = useState<string | undefined>();
+    const [debouncedSearch] = useDebouncedValue(search, 300);
 
-    const { data: ids } = query(ocelId, {
-      search: debouncedSearch,
-    });
+    const { data: ids } = useIds(ocelId, { search: debouncedSearch });
 
     const SelectComponent = isMulti ? MultiSelect : Select;
 
     return (
       <SelectComponent
-        searchable
-        searchValue={searchValue}
-        onSearchChange={(newSearchValue) => setSearchValue(newSearchValue)}
+        {...props}
+        value={value ?? (isMulti ? [] : null)}
         data={ids?.response}
-        value={value ?? (isMulti ? [] : null)}
-        {...rest}
+        searchValue={search}
+        onSearchChange={setSearch}
+        searchable
       />
     );
   };
 
-const ocelFieldMap: Record<string, React.FC<OcelFieldProps>> = {
-  event_type: TypeSelector(useEventCounts),
-  object_type: TypeSelector(useObjectCounts),
-  event_attribute: AttributeSelector(useEventAttributes),
-  object_attribute: AttributeSelector(useObjectAttributes),
+const OCEL_FIELDS: Record<string, ComponentType<OcelSelectProps>> = {
+  event_type: TypeSelect(useEventCounts),
+  object_type: TypeSelect(useObjectCounts),
+  event_attribute: AttributeSelect(useEventAttributes),
+  object_attribute: AttributeSelect(useObjectAttributes),
   event_id: IdSelect(useEventIds),
   object_id: IdSelect(useObjectIds),
 };
 
-export const wrapFieldsWithContext = (control: Control<PluginInputType>) => {
-  const wrapped: Record<string, React.FC<FieldProps>> = {};
+export const OCELField = memo(
+  ({
+    schema,
+    required,
+    formData,
+    onChange,
+    fieldPathId: { path },
+  }: FieldProps) => {
+    const ocelRef = schema["x-ui-meta"]?.["ocel_id"];
+    const ocelFieldType = schema["x-ui-meta"]?.["field_type"];
 
-  for (const [name, Field] of Object.entries(ocelFieldMap)) {
-    const Comp: React.FC<FieldProps> = ({
-      schema,
-      required,
-      formData,
-      fieldPathId: { path },
-      onChange,
-    }) => {
-      const ocelRef = schema?.["x-ui-meta"]?.ocel_id;
-      const isMulti = schema?.type === "array";
-      const ocelId = useWatch({ control, name: `input_ocels.${ocelRef}` });
+    const ocelId = useOcelId(ocelRef);
+    const isMulti = schema.type === "array";
 
-      return (
-        <Field
-          label={schema?.title}
-          required={required}
-          description={schema?.description}
-          isMulti={isMulti}
-          onChange={(data) => onChange(data, path)}
-          value={formData}
+    useEffect(() => {
+      onChange(isMulti ? [] : undefined, path);
+    }, [ocelId, isMulti, onChange, path]);
+
+    const Selector = OCEL_FIELDS[ocelFieldType];
+
+    return (
+      Selector && (
+        <Selector
+          key={ocelId}
           ocelId={ocelId}
+          isMulti={isMulti}
+          value={formData}
+          onChange={(value) => onChange(value, path)}
+          label={schema.title}
+          description={schema.description}
+          disabled={!ocelId}
+          required={required}
         />
-      );
-    };
-
-    wrapped[name] = memo(Comp);
-  }
-
-  return wrapped;
-};
+      )
+    );
+  },
+);

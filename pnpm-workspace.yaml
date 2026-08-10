@@ -10,7 +10,6 @@ allowBuilds:
   sharp: true
 
 catalog:
-  "@apidevtools/json-schema-ref-parser": ^15.5.0
   '@biomejs/biome': 2.5.5
   "@dagrejs/dagre": ^3.0.0
   "@floating-ui/react": ^0.27.18
@@ -50,9 +49,7 @@ catalog:
   embla-carousel: ^8.6.0
   embla-carousel-react: ^8.6.0
   file-saver: ^2.0.5
-  flat: ^6.0.1
   html-to-image: 1.11.13
-  json-schema-traverse: ^1.0.0
   jspdf: ^4.2.1
   lucide-react: ^1.0.0
   mantine-datatable: ^9.4.0
