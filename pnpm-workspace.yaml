@@ -22,6 +22,7 @@ catalog:
   "@mantine/hooks": ^9.4.2
   "@mantine/notifications": ^9.4.2
   "@marko19907/string-to-color": ^1.0.2
+  "@monaco-editor/react": ^4.7.0
   '@ocelescope/ocelot': ^0.6.0
   '@r4pm/components': ^0.2.0
   "@rjsf/core": ^6.7.0
