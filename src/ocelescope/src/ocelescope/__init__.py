@@ -16,6 +16,7 @@ from ocelescope.ocel import (
     TimeFrameFilter,
 )
 from ocelescope.plugin import (
+    CODE_FIELD,
     COMPUTED_SELECTION,
     OCEL_FIELD,
     OCELAnnotation,
@@ -25,6 +26,7 @@ from ocelescope.plugin import (
     PluginMethod,
     PluginResult,
     ResourceAnnotation,
+    SQL_FIELD,
     plugin_method,
 )
 from ocelescope.resource import DirectlyFollowsGraph, PetriNet, Resource
@@ -76,6 +78,8 @@ __all__ = [
     "PluginMethod",
     "COMPUTED_SELECTION",
     "OCEL_FIELD",
+    "CODE_FIELD",
+    "SQL_FIELD",
     "PluginInput",
     "PluginResult",
     "plugin_method",

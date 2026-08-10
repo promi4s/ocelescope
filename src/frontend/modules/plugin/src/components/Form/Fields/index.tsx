@@ -1,6 +1,7 @@
 import { getDefaultRegistry } from "@rjsf/core";
 import type { FieldProps } from "@rjsf/utils";
 import type { ComponentType } from "react";
+import { CodeField } from "./CodeField";
 import { ComputedSelect } from "./ComputedSelect";
 import { OCELField } from "./OCELField";
 
@@ -9,6 +10,7 @@ const DefaultSchemaField = getDefaultRegistry().fields.SchemaField!;
 const CUSTOM_FORM_MAP: Record<string, ComponentType<FieldProps>> = {
   ocel: OCELField,
   computed_select: ComputedSelect,
+  code: CodeField,
 };
 
 const CustomSchemaField: React.FC<FieldProps> = (props) => {

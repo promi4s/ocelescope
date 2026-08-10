@@ -36,6 +36,7 @@
     "@mantine/core": "catalog:",
     "@mantine/hooks": "catalog:",
     "@marko19907/string-to-color": "catalog:",
+    "@monaco-editor/react": "catalog:",
     "@ocelescope/api-base": "workspace:^",
     "@ocelescope/core": "workspace:^",
     "@ocelescope/resources": "workspace:^",
