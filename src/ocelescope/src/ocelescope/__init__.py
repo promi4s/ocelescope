@@ -26,6 +26,7 @@ from ocelescope.plugin import (
     PluginMethod,
     PluginResult,
     ResourceAnnotation,
+    SLIDER_FIELD,
     SQL_FIELD,
     plugin_method,
 )
@@ -79,6 +80,7 @@ __all__ = [
     "COMPUTED_SELECTION",
     "OCEL_FIELD",
     "CODE_FIELD",
+    "SLIDER_FIELD",
     "SQL_FIELD",
     "PluginInput",
     "PluginResult",

@@ -10,6 +10,7 @@ from ocelescope.plugin.input import (
     OCEL_FIELD,
     COMPUTED_SELECTION,
     CODE_FIELD,
+    SLIDER_FIELD,
     SQL_FIELD,
 )
 
@@ -26,5 +27,6 @@ __all__ = [
     "OCEL_FIELD",
     "COMPUTED_SELECTION",
     "CODE_FIELD",
+    "SLIDER_FIELD",
     "SQL_FIELD",
 ]
