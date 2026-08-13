@@ -32,7 +32,7 @@ catalog:
   "@tanstack/react-query": ^5.90.21
   "@tanstack/react-query-devtools": ^5.91.3
   "@tsconfig/strictest": ^2.0.8
-  "@tsdown/css": ^0.22.12
+  "@tsdown/css": ^0.22.14
   "@types/file-saver": ^2.0.7
   "@types/node": ^26.1.1
   '@types/object-hash': ^3.0.6
@@ -64,7 +64,7 @@ catalog:
   react-plotly.js: ^4.0.0
   react-zoom-pan-pinch: ^4.0.0
   recharts: ^3.2.1
-  tsdown: ^0.22.12
+  tsdown: ^0.22.14
   typescript: ^5.9.3
   uniqolor: ^1.1.1
   zod: ^4.3.6
