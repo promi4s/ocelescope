@@ -11,6 +11,11 @@
   },
   "packageRules": [
     {
+      "description": "Action version and digest bumps are low-risk; majors are still held back by the rule below",
+      "matchManagers": ["github-actions"],
+      "automerge": true
+    },
+    {
       "matchUpdateTypes": ["major"],
       "automerge": false
     },
