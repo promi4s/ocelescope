@@ -163,7 +163,11 @@
     "qddl",
     "unpivoting",
     "monaco",
-    "Monaco"
+    "Monaco",
+    "iqty",
+    "itype",
+    "ilvl",
+    "itlvl"
   ],
   "ignorePaths": [
     "pnpm-lock.yaml",
