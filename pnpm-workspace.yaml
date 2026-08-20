@@ -10,7 +10,7 @@ allowBuilds:
   sharp: true
 
 catalog:
-  '@biomejs/biome': 2.5.7
+  '@biomejs/biome': 2.5.9
   "@dagrejs/dagre": ^3.0.0
   "@floating-ui/react": ^0.27.18
   "@hpcc-js/wasm-graphviz": ^1.21.0
@@ -34,11 +34,11 @@ catalog:
   "@tsconfig/strictest": ^2.0.8
   "@tsdown/css": ^0.22.14
   "@types/file-saver": ^2.0.7
-  "@types/node": ^26.1.1
+  "@types/node": ^26.2.0
   '@types/object-hash': ^3.0.6
   "@types/qs": ^6.15.1
-  "@types/react": ^19.2.17
-  "@types/react-dom": ^19.2.3
+  "@types/react": ^19.2.18
+  "@types/react-dom": ^19.2.4
   "@xyflow/react": ^12.11.2
   axios: ^1.18.1
   bumpp: ^12.0.0
@@ -54,18 +54,22 @@ catalog:
   jspdf: ^4.2.1
   lucide-react: ^1.0.0
   mantine-datatable: ^9.4.0
-  next: ^16.2.10
+  # Pinned: 16.3.1 bumped @swc/helpers to 0.5.23, whose `module-sync` exports
+  # condition the output file tracer ignores, so `output: standalone` ships
+  # without @swc/helpers/esm and crashes on boot under pnpm. 16.3.0 still pins
+  # 0.5.15. Already fixed in next canary -- unpin once 16.3.2 is out.
+  next: 16.3.0
   object-hash: ^3.0.0
   orval: ^8.22.0
   qs: ^6.15.3
-  react: ^19.2.7
-  react-dom: ^19.2.7
+  react: ^19.2.8
+  react-dom: ^19.2.8
   react-hook-form: ^7.71.2
   react-plotly.js: ^4.0.0
   react-zoom-pan-pinch: ^4.0.0
   recharts: ^3.2.1
   tsdown: ^0.22.14
-  typescript: ^5.9.3
+  typescript: ^6.0.3
   uniqolor: ^1.1.1
   zod: ^4.3.6
   zustand: ^5.0.11
