@@ -32,7 +32,7 @@ catalogs:
       version: 0.2.0
     '@rjsf/mantine':
       specifier: ^6.7.0
-      version: 6.7.0
+      version: 6.8.0
     '@tsconfig/strictest':
       specifier: ^2.0.8
       version: 2.0.8
@@ -127,7 +127,7 @@ importers:
         version: 9.4.2(@mantine/hooks@9.4.2(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@mantine/dates':
         specifier: 'catalog:'
-        version: 9.4.2(@mantine/core@9.4.2(@mantine/hooks@9.4.2(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.2(react@19.2.7))(dayjs@1.11.21)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 9.4.2(@mantine/core@9.4.2(@mantine/hooks@9.4.2(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.2(react@19.2.7))(dayjs@1.11.23)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@mantine/dropzone':
         specifier: 'catalog:'
         version: 9.4.2(@mantine/core@9.4.2(@mantine/hooks@9.4.2(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.2(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -157,7 +157,7 @@ importers:
         version: link:../modules/management
       '@ocelescope/ocelot':
         specifier: 'catalog:'
-        version: 0.6.0(3965e8aa252c7bf664b7a90ccd56d6a1)
+        version: 0.6.0(e51658f818143ccd3baa17e2cc38e6b2)
       '@ocelescope/plugin':
         specifier: workspace:^
         version: link:../modules/plugin
@@ -215,10 +215,10 @@ importers:
         version: link:../../packages/resources
       '@rjsf/core':
         specifier: 'catalog:'
-        version: 6.7.0(@rjsf/utils@6.7.0(react@19.2.7))(react@19.2.7)
+        version: 6.8.0(@rjsf/utils@6.8.0(react@19.2.7))(react@19.2.7)
       '@rjsf/utils':
         specifier: 'catalog:'
-        version: 6.7.0(react@19.2.7)
+        version: 6.8.0(react@19.2.7)
       '@rjsf/validator-ajv8':
         specifier: 'catalog:'
         version: 6.7.0(@rjsf/utils@6.7.0(react@19.2.7))
@@ -255,7 +255,7 @@ importers:
     devDependencies:
       '@rjsf/mantine':
         specifier: 'catalog:'
-        version: 6.7.0(@mantine/core@9.4.2(@mantine/hooks@9.4.2(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/dates@9.4.2(@mantine/core@9.4.2(@mantine/hooks@9.4.2(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.2(react@19.2.7))(dayjs@1.11.21)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.2(react@19.2.7))(@rjsf/core@6.7.0(@rjsf/utils@6.7.0(react@19.2.7))(react@19.2.7))(@rjsf/utils@6.7.0(react@19.2.7))(react@19.2.7)
+        version: 6.8.0(@mantine/core@9.4.2(@mantine/hooks@9.4.2(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/dates@9.4.2(@mantine/core@9.4.2(@mantine/hooks@9.4.2(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.2(react@19.2.7))(dayjs@1.11.23)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.2(react@19.2.7))(@rjsf/core@6.8.0(@rjsf/utils@6.8.0(react@19.2.7))(react@19.2.7))(@rjsf/utils@6.8.0(react@19.2.7))(react@19.2.7)
       '@types/file-saver':
         specifier: 'catalog:'
         version: 2.0.7
@@ -495,10 +495,10 @@ importers:
         version: link:../../packages/resources
       '@rjsf/core':
         specifier: 'catalog:'
-        version: 6.7.0(@rjsf/utils@6.7.0(react@19.2.7))(react@19.2.7)
+        version: 6.8.0(@rjsf/utils@6.8.0(react@19.2.7))(react@19.2.7)
       '@rjsf/utils':
         specifier: 'catalog:'
-        version: 6.7.0(react@19.2.7)
+        version: 6.8.0(react@19.2.7)
       '@rjsf/validator-ajv8':
         specifier: 'catalog:'
         version: 6.7.0(@rjsf/utils@6.7.0(react@19.2.7))
@@ -529,7 +529,7 @@ importers:
     devDependencies:
       '@rjsf/mantine':
         specifier: 'catalog:'
-        version: 6.7.0(@mantine/core@9.4.2(@mantine/hooks@9.4.2(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/dates@9.4.2(@mantine/core@9.4.2(@mantine/hooks@9.4.2(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.2(react@19.2.7))(dayjs@1.11.21)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.2(react@19.2.7))(@rjsf/core@6.7.0(@rjsf/utils@6.7.0(react@19.2.7))(react@19.2.7))(@rjsf/utils@6.7.0(react@19.2.7))(react@19.2.7)
+        version: 6.8.0(@mantine/core@9.4.2(@mantine/hooks@9.4.2(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/dates@9.4.2(@mantine/core@9.4.2(@mantine/hooks@9.4.2(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.2(react@19.2.7))(dayjs@1.11.23)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.2(react@19.2.7))(@rjsf/core@6.8.0(@rjsf/utils@6.8.0(react@19.2.7))(react@19.2.7))(@rjsf/utils@6.8.0(react@19.2.7))(react@19.2.7)
       '@types/file-saver':
         specifier: 'catalog:'
         version: 2.0.7
@@ -2729,26 +2729,32 @@ packages:
       react-redux:
         optional: true
 
-  '@rjsf/core@6.7.0':
-    resolution: {integrity: sha512-TdiiRf9H6R7mYXyRq1TQHhTSdX9lpvYHsfn1obWksICbZEg4jBFBh7BuyrcHhzGos6976GsLO4TTYw11fQUbpQ==}
+  '@rjsf/core@6.8.0':
+    resolution: {integrity: sha512-HZ2e/l/QNcz8PTslBXyGWkiycMe3LgIfwgXo0qO3DPgyFKj4G+obJTKBq/W+DaIUmz1HicvH5WtOdXWWqK+gbA==}
     engines: {node: '>=20'}
     peerDependencies:
-      '@rjsf/utils': ^6.7.0
+      '@rjsf/utils': ^6.8.0
       react: '>=18'
 
-  '@rjsf/mantine@6.7.0':
-    resolution: {integrity: sha512-fuCXk7diEgnKMgXr8BOCHPyApQrCiombpn+qAcsy8+D0Bkp3+H6ww5o4mQ4EUOIfzD27OOx3Gfa3Y+4ScToo3A==}
+  '@rjsf/mantine@6.8.0':
+    resolution: {integrity: sha512-5nsfm8YLwu8jlC6a1QXvj9OdIwi0ZhpZ+HhB0D6r6lGfMPalXx2dFS0WMP6pzima77Zf/gygoHWBrPbDipg15w==}
     engines: {node: '>=20'}
     peerDependencies:
       '@mantine/core': '>=8'
       '@mantine/dates': '>=8'
       '@mantine/hooks': '>=8'
-      '@rjsf/core': ^6.7.0
-      '@rjsf/utils': ^6.7.0
+      '@rjsf/core': ^6.8.0
+      '@rjsf/utils': ^6.8.0
       react: '>=18'
 
   '@rjsf/utils@6.7.0':
     resolution: {integrity: sha512-jNnEL/rFYJR7TF9vPmV/oBs6CblbZ1emahGlFfBqvy60dpyog3luk1CPE3ss7H8/egBGES4XvIucKgvgEnxbaQ==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      react: '>=18'
+
+  '@rjsf/utils@6.8.0':
+    resolution: {integrity: sha512-gHcqPFSHdOz29tZiLlzDvD+Gfq21zVIFBufprSYTiHpUdcVNJEK6+V5aw++FtQncHdDWnTf2YCky/e1Bol2NEQ==}
     engines: {node: '>=20'}
     peerDependencies:
       react: '>=18'
@@ -3770,6 +3776,9 @@ packages:
   dayjs@1.11.21:
     resolution: {integrity: sha512-98IT+HOahAisibz/yjKbzuOBwYcjJ7BCLPzARyHiyEBmRz4fatF+KPJszEHXsGYjUG234aH/cOjW1wwTbKUZlA==}
 
+  dayjs@1.11.23:
+    resolution: {integrity: sha512-QDTCU0M0MxR3hQfnlDJfwekQiaanm1ubOD231u73WBckQ/fsamwRLiE2GBz6D3a/xF1NgfiDLJjXBa1hYOYTtQ==}
+
   debug@2.6.9:
     resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}
     peerDependencies:
@@ -4011,6 +4020,9 @@ packages:
 
   fast-uri@4.1.1:
     resolution: {integrity: sha512-YPOs1zD5TG2+EZt+r88LwF6mclA7TPkpwMP7ZN3TO2HiHS8TXvq7QA/17iJsV9dubcLo/f8eEYqMBruyQV21hQ==}
+
+  fast-uri@4.1.2:
+    resolution: {integrity: sha512-TyGmBcbDTZXcb2cj5MV89DrF42DKvb3y5DDUNh95iO+IMeAzMkVSxK1PZRrRIpc9yg8U2GhGdbofNa0LS/a4Bw==}
 
   fdir@6.5.0:
     resolution: {integrity: sha512-tIbYtZbucOs0BRGqPJkshJUYdL+SDH7dVM8gjy+ERp3WAUjLEFJE+02kanyHtwjWOnwrKYBiwAmM0p4kLJAnXg==}
@@ -6222,6 +6234,15 @@ snapshots:
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
 
+  '@mantine/dates@9.4.2(@mantine/core@9.4.2(@mantine/hooks@9.4.2(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.2(react@19.2.7))(dayjs@1.11.23)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+    dependencies:
+      '@mantine/core': 9.4.2(@mantine/hooks@9.4.2(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@mantine/hooks': 9.4.2(react@19.2.7)
+      clsx: 2.1.1
+      dayjs: 1.11.23
+      react: 19.2.7
+      react-dom: 19.2.7(react@19.2.7)
+
   '@mantine/dropzone@9.4.2(@mantine/core@9.4.2(@mantine/hooks@9.4.2(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.2(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
       '@mantine/core': 9.4.2(@mantine/hooks@9.4.2(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -6341,7 +6362,7 @@ snapshots:
   '@next/swc-win32-x64-msvc@16.2.10':
     optional: true
 
-  '@ocelescope/ocelot@0.6.0(3965e8aa252c7bf664b7a90ccd56d6a1)':
+  '@ocelescope/ocelot@0.6.0(e51658f818143ccd3baa17e2cc38e6b2)':
     dependencies:
       '@dagrejs/dagre': 3.0.0
       '@mantine/core': 9.4.2(@mantine/hooks@9.4.2(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -6352,7 +6373,7 @@ snapshots:
       '@tanstack/react-query': 5.90.21(react@19.2.7)
       '@xyflow/react': 12.11.2(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(immer@11.1.11)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       axios: 1.18.1(debug@4.4.3)
-      dayjs: 1.11.21
+      dayjs: 1.11.23
       elkjs: 0.11.1
       file-saver: 2.0.5
       html-to-image: 1.11.13
@@ -7399,9 +7420,9 @@ snapshots:
       react: 19.2.7
       react-redux: 9.3.0(@types/react@19.2.17)(react@19.2.7)(redux@5.0.1)
 
-  '@rjsf/core@6.7.0(@rjsf/utils@6.7.0(react@19.2.7))(react@19.2.7)':
+  '@rjsf/core@6.8.0(@rjsf/utils@6.8.0(react@19.2.7))(react@19.2.7)':
     dependencies:
-      '@rjsf/utils': 6.7.0(react@19.2.7)
+      '@rjsf/utils': 6.8.0(react@19.2.7)
       lodash: 4.18.1
       lodash-es: 4.18.1
       markdown-to-jsx: 9.8.2(react@19.2.7)
@@ -7412,14 +7433,14 @@ snapshots:
       - solid-js
       - vue
 
-  '@rjsf/mantine@6.7.0(@mantine/core@9.4.2(@mantine/hooks@9.4.2(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/dates@9.4.2(@mantine/core@9.4.2(@mantine/hooks@9.4.2(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.2(react@19.2.7))(dayjs@1.11.21)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.2(react@19.2.7))(@rjsf/core@6.7.0(@rjsf/utils@6.7.0(react@19.2.7))(react@19.2.7))(@rjsf/utils@6.7.0(react@19.2.7))(react@19.2.7)':
+  '@rjsf/mantine@6.8.0(@mantine/core@9.4.2(@mantine/hooks@9.4.2(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/dates@9.4.2(@mantine/core@9.4.2(@mantine/hooks@9.4.2(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.2(react@19.2.7))(dayjs@1.11.23)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.2(react@19.2.7))(@rjsf/core@6.8.0(@rjsf/utils@6.8.0(react@19.2.7))(react@19.2.7))(@rjsf/utils@6.8.0(react@19.2.7))(react@19.2.7)':
     dependencies:
       '@mantine/core': 9.4.2(@mantine/hooks@9.4.2(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@mantine/dates': 9.4.2(@mantine/core@9.4.2(@mantine/hooks@9.4.2(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.2(react@19.2.7))(dayjs@1.11.21)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@mantine/dates': 9.4.2(@mantine/core@9.4.2(@mantine/hooks@9.4.2(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.2(react@19.2.7))(dayjs@1.11.23)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@mantine/hooks': 9.4.2(react@19.2.7)
-      '@rjsf/core': 6.7.0(@rjsf/utils@6.7.0(react@19.2.7))(react@19.2.7)
-      '@rjsf/utils': 6.7.0(react@19.2.7)
-      dayjs: 1.11.21
+      '@rjsf/core': 6.8.0(@rjsf/utils@6.8.0(react@19.2.7))(react@19.2.7)
+      '@rjsf/utils': 6.8.0(react@19.2.7)
+      dayjs: 1.11.23
       react: 19.2.7
 
   '@rjsf/utils@6.7.0(react@19.2.7)':
@@ -7427,6 +7448,17 @@ snapshots:
       '@x0k/json-schema-merge': 1.0.3
       fast-equals: 6.0.2
       fast-uri: 4.1.1
+      jsonpointer: 5.0.1
+      lodash: 4.18.1
+      lodash-es: 4.18.1
+      react: 19.2.7
+      react-is: 18.3.1
+
+  '@rjsf/utils@6.8.0(react@19.2.7)':
+    dependencies:
+      '@x0k/json-schema-merge': 1.0.3
+      fast-equals: 6.0.2
+      fast-uri: 4.1.2
       jsonpointer: 5.0.1
       lodash: 4.18.1
       lodash-es: 4.18.1
@@ -8358,6 +8390,8 @@ snapshots:
 
   dayjs@1.11.21: {}
 
+  dayjs@1.11.23: {}
+
   debug@2.6.9:
     dependencies:
       ms: 2.0.0
@@ -8614,6 +8648,8 @@ snapshots:
   fast-uri@3.1.4: {}
 
   fast-uri@4.1.1: {}
+
+  fast-uri@4.1.2: {}
 
   fdir@6.5.0(picomatch@4.0.5):
     optionalDependencies:
