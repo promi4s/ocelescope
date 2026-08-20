@@ -31,3 +31,7 @@ def ident(name: str) -> str:
 def literal(value: str) -> str:
     """Render ``value`` as a SQL string literal, escaping embedded single quotes."""
     return "'" + value.replace("'", "''") + "'"
+
+
+def first_column_list(relation: duckdb.DuckDBPyRelation):
+    return [value[0] for value in relation.fetchall()]

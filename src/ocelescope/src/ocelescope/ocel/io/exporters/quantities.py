@@ -55,9 +55,16 @@ from ocelescope.ocel.io.exporters.common import (
 
 
 def has_quantities(con: duckdb.DuckDBPyConnection) -> bool:
-    """Whether any quantity-extension table is present in the DuckDB."""
+    """Whether any quantity-extension table holds a row.
+
+    Rows, not tables: every OCEL carries the three tables (see
+    :func:`~..schema.ensure_quantity_tables`), so their presence says nothing
+    about the log. A log without an extension must not grow one on the way out,
+    which is what asking for a row rather than a table keeps from happening.
+    """
     return any(
         table_exists(con, table)
+        and con.execute(f'SELECT 1 FROM "{table}" LIMIT 1').fetchone() is not None
         for table in (
             QUANTITIES_TABLE,
             QUANTITY_OPERATIONS_TABLE,
@@ -177,10 +184,7 @@ def xml_quantity_extension(con: duckdb.DuckDBPyConnection) -> etree.Element | No
     item_properties = etree.SubElement(root, XML_PROPERTIES)
     if table_exists(con, QUANTITY_ITEM_PROPERTIES_TABLE):
         property_columns = [c for c in _property_columns(con) if c != QEL_ITEM_TYPE]
-        # Declare each property's real OCEL type, as the object/event attribute
-        # declarations do -- writing them all as "string" loses a numeric property
-        # on re-import, since that attribute is the only type information the XML
-        # carries.
+
         property_type = {
             name: duckdb_type_to_ocel(dtype)
             for name, dtype in attribute_columns(
@@ -219,7 +223,7 @@ def item_properties_ddl(con: duckdb.DuckDBPyConnection) -> list[tuple[str, str]]
     file, which is the only way its declared types survive -- see
     :func:`~.sqlite._create_tables`.
     """
-    if not table_exists(con, QUANTITY_ITEM_PROPERTIES_TABLE):
+    if not has_quantities(con) or not table_exists(con, QUANTITY_ITEM_PROPERTIES_TABLE):
         return []
     type_column = SQL_KEYMAP[QEL_ITEM_TYPE]
     return [
@@ -233,8 +237,12 @@ def export_quantities_sqlite(con: duckdb.DuckDBPyConnection) -> None:
 
     Requires the target to already be attached as ``out``. Each copy is a single
     streamed ``CREATE TABLE ... AS SELECT`` renaming columns back to the OCEL 2.0
-    SQLite names.
+    SQLite names. A log whose extension is empty exports no extension tables at
+    all, matching what the JSON and XML exporters leave out.
     """
+    if not has_quantities(con):
+        return
+
     if table_exists(con, QUANTITIES_TABLE):
         con.execute(
             f'CREATE TABLE out."{SQL_QUANTITIES}" AS SELECT '
@@ -253,10 +261,6 @@ def export_quantities_sqlite(con: duckdb.DuckDBPyConnection) -> None:
         )
 
     if table_exists(con, QUANTITY_ITEM_PROPERTIES_TABLE):
-        # The table was created ahead of the ATTACH by :func:`item_properties_ddl`,
-        # so only fill it here -- letting DuckDB create it would discard the
-        # declared types (a BOOLEAN property would land as an integer and a time
-        # one as text, neither of which reads back as itself).
         type_column = SQL_KEYMAP[QEL_ITEM_TYPE]
         projection = ", ".join(
             f'"{column}" AS "{type_column}"' if column == QEL_ITEM_TYPE else f'"{column}"'

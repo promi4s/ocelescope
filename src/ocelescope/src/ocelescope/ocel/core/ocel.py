@@ -33,20 +33,13 @@ from ocelescope.ocel.managers.executions import ExecutionsManager
 from ocelescope.ocel.util.xes import create_ocel_from_xml, write_ocel_to_xes
 from ocelescope.util.sql import set_utc
 
-#: Name the destination database is attached under while :meth:`OCEL.to_duckdb` copies.
 _COPY_TARGET = "_copy_target"
 
-#: A table :meth:`OCEL.from_frames` accepts. DuckDB scans each of them directly.
 Frame = pd.DataFrame | pl.DataFrame | pl.LazyFrame
 
-#: PM4PY calls an O2O relation's source object ``ocel:oid`` and its target
-#: ``ocel:oid_2``; we call them ``ocel:oid_1`` / ``ocel:oid_2``. That one column is
-#: the only place the two namings disagree, so it is the only thing to translate --
-#: and it is translated here, at the PM4PY boundary, rather than by the O2O manager.
 _O2O_TO_PM4PY = {O2O_SOURCE_ID: OID_COL}
 _O2O_FROM_PM4PY = {OID_COL: O2O_SOURCE_ID}
 
-#: Extensions r4pm can read. It has no usable SQLite reader (see :meth:`OCEL.read`).
 _R4PM_SUFFIXES = {".jsonocel", ".json", ".xmlocel", ".xml"}
 
 
@@ -98,13 +91,17 @@ class OCEL:
         """
         Args:
             connection: An open DuckDB connection holding the flat OCEL tables,
-                with its ``TimeZone`` set to UTC. The OCEL takes ownership of it:
-                for an in-memory database, which DuckDB drops once its last
-                connection closes, that means the log lives exactly as long as
-                this instance.
+                with its ``TimeZone`` set to UTC. Any table it is missing is
+                created empty, so a bare connection makes a valid empty log. The
+                OCEL takes ownership of it: for an in-memory database, which
+                DuckDB drops once its last connection closes, that means the log
+                lives exactly as long as this instance.
             meta: Metadata for this OCEL instance.
         """
+        from ocelescope.ocel.io.schema import ensure_ocel_tables
+
         self._con = connection
+        ensure_ocel_tables(connection)
 
         self.extensions = ExtensionManager(self)
         self.objects = ObjectsManager(self)
