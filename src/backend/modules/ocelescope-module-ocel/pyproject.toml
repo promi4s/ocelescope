@@ -1,13 +1,13 @@
 [project]
 name = "ocelescope-module-ocel"
-version = "0.6.0"
+version = "0.7.0"
 description = "Ocelescope backend module exposing OCEL inspection routes"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
   "fastapi>=0.136.0",
-  "ocelescope>=0.6.0,<0.7.0",
-  "ocelescope-backend>=0.6.0,<0.7.0",
+  "ocelescope>=0.7.0,<0.8.0",
+  "ocelescope-backend>=0.7.0,<0.8.0",
   "packaging>=24.0",
   "pandas>=2.3.1",
   "polars>=1.40",

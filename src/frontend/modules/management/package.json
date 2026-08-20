@@ -1,7 +1,7 @@
 {
   "name": "@ocelescope/management",
   "type": "module",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "A tool for managing Resources and OCEL",
   "author": "G\u00f6rkem-Emre \u00d6zt\u00fcrk <goerkem.oeztuerk@rwth-aachen.de>",
   "license": "MIT",
