@@ -1,7 +1,7 @@
 {
   "name": "@ocelescope/api-client",
   "type": "module",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Core client + session/hooks layer used by Ocelescope API packages.",
   "author": "G\u00f6rkem-Emre \u00d6zt\u00fcrk <goerkem.oeztuerk@rwth-aachen.de>",
   "license": "MIT",
@@ -30,7 +30,6 @@
     "build": "tsdown",
     "dev": "tsdown --watch",
     "typecheck": "tsc --noEmit",
-    "release": "bumpp && pnpm publish",
     "prepublishOnly": "pnpm run build"
   },
   "peerDependencies": {
@@ -44,7 +43,6 @@
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "axios": "catalog:",
-    "bumpp": "catalog:",
     "tsdown": "catalog:",
     "typescript": "catalog:"
   }

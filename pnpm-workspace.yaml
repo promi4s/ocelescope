@@ -10,43 +10,42 @@ allowBuilds:
   sharp: true
 
 catalog:
-  '@biomejs/biome': 2.5.7
+  '@biomejs/biome': 2.5.9
   "@dagrejs/dagre": ^3.0.0
   "@floating-ui/react": ^0.27.18
   "@hpcc-js/wasm-graphviz": ^1.21.0
-  "@mantine/carousel": ^9.4.2
-  "@mantine/charts": ^9.4.2
-  "@mantine/core": ^9.4.2
-  "@mantine/dates": ^9.4.2
-  "@mantine/dropzone": ^9.4.2
-  "@mantine/hooks": ^9.4.2
-  "@mantine/notifications": ^9.4.2
+  "@mantine/carousel": ^9.5.1
+  "@mantine/charts": ^9.5.1
+  "@mantine/core": ^9.5.1
+  "@mantine/dates": ^9.5.1
+  "@mantine/dropzone": ^9.5.1
+  "@mantine/hooks": ^9.5.1
+  "@mantine/notifications": ^9.5.1
   "@marko19907/string-to-color": ^1.0.2
   "@monaco-editor/react": ^4.7.0
   '@ocelescope/ocelot': ^0.6.0
   '@r4pm/components': ^0.2.0
-  "@rjsf/core": ^6.7.0
-  "@rjsf/mantine": ^6.7.0
-  "@rjsf/utils": ^6.7.0
-  "@rjsf/validator-ajv8": ^6.7.0
+  "@rjsf/core": ^6.8.0
+  "@rjsf/mantine": ^6.8.0
+  "@rjsf/utils": ^6.8.0
+  "@rjsf/validator-ajv8": ^6.8.0
   "@tanstack/react-query": ^5.90.21
   "@tanstack/react-query-devtools": ^5.91.3
   "@tsconfig/strictest": ^2.0.8
   "@tsdown/css": ^0.22.14
   "@types/file-saver": ^2.0.7
-  "@types/node": ^26.1.1
+  "@types/node": ^26.2.0
   '@types/object-hash': ^3.0.6
   "@types/qs": ^6.15.1
-  "@types/react": ^19.2.17
-  "@types/react-dom": ^19.2.3
-  "@xyflow/react": ^12.11.2
+  "@types/react": ^19.2.18
+  "@types/react-dom": ^19.2.4
+  "@xyflow/react": ^12.11.3
   axios: ^1.18.1
-  bumpp: ^12.0.0
   clsx: ^2.1.1
   content-disposition-attachment: ^0.3.1
   cspell: ^10.0.1
   dayjs: ^1.11.19
-  elkjs: ^0.11.0
+  elkjs: ^0.12.0
   embla-carousel: ^8.6.0
   embla-carousel-react: ^8.6.0
   file-saver: ^2.0.5
@@ -54,18 +53,18 @@ catalog:
   jspdf: ^4.2.1
   lucide-react: ^1.0.0
   mantine-datatable: ^9.4.0
-  next: ^16.2.10
+  next: 16.3.0
   object-hash: ^3.0.0
-  orval: ^8.22.0
+  orval: ^8.24.0
   qs: ^6.15.3
-  react: ^19.2.7
-  react-dom: ^19.2.7
+  react: ^19.2.8
+  react-dom: ^19.2.8
   react-hook-form: ^7.71.2
   react-plotly.js: ^4.0.0
   react-zoom-pan-pinch: ^4.0.0
   recharts: ^3.2.1
   tsdown: ^0.22.14
-  typescript: ^5.9.3
+  typescript: ^6.0.3
   uniqolor: ^1.1.1
   zod: ^4.3.6
   zustand: ^5.0.11
@@ -79,21 +78,4 @@ ignoredBuiltDependencies:
   - sharp
 
 minimumReleaseAgeExclude:
-  - '@mantine/carousel@9.4.2'
-  - '@mantine/charts@9.4.2'
-  - '@mantine/core@9.4.2'
-  - '@mantine/dates@9.4.2'
-  - '@mantine/dropzone@9.4.2'
-  - '@mantine/hooks@9.4.2'
-  - '@mantine/notifications@9.4.2'
-  - '@mantine/store@9.4.2'
   - '@ocelescope/ocelot@0.5.0 || 0.6.0'
-  - '@biomejs/biome@2.5.5'
-  - '@biomejs/cli-darwin-arm64@2.5.5'
-  - '@biomejs/cli-darwin-x64@2.5.5'
-  - '@biomejs/cli-linux-arm64-musl@2.5.5'
-  - '@biomejs/cli-linux-arm64@2.5.5'
-  - '@biomejs/cli-linux-x64-musl@2.5.5'
-  - '@biomejs/cli-linux-x64@2.5.5'
-  - '@biomejs/cli-win32-arm64@2.5.5'
-  - '@biomejs/cli-win32-x64@2.5.5'

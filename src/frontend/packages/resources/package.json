@@ -1,7 +1,7 @@
 {
   "name": "@ocelescope/resources",
   "type": "module",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Ocelescope resources: helpers and UI components for rendering and exporting data.",
   "author": "G\u00f6rkem-Emre \u00d6zt\u00fcrk <goerkem.oeztuerk@rwth-aachen.de>",
   "license": "MIT",
@@ -37,7 +37,6 @@
     "build": "tsdown",
     "dev": "tsdown --watch",
     "typecheck": "tsc --noEmit",
-    "release": "bumpp && pnpm publish",
     "prepublishOnly": "pnpm run build"
   },
   "peerDependencies": {
@@ -63,7 +62,6 @@
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "bumpp": "catalog:",
     "tsdown": "catalog:",
     "typescript": "catalog:"
   },
