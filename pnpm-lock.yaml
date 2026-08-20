@@ -9,18 +9,6 @@ catalogs:
     '@biomejs/biome':
       specifier: 2.5.9
       version: 2.5.9
-    '@dagrejs/dagre':
-      specifier: ^3.0.0
-      version: 3.0.0
-    '@floating-ui/react':
-      specifier: ^0.27.18
-      version: 0.27.20
-    '@hpcc-js/wasm-graphviz':
-      specifier: ^1.21.0
-      version: 1.21.1
-    '@mantine/carousel':
-      specifier: ^9.5.1
-      version: 9.5.1
     '@mantine/charts':
       specifier: ^9.5.1
       version: 9.5.1
@@ -33,42 +21,18 @@ catalogs:
     '@mantine/dropzone':
       specifier: ^9.5.1
       version: 9.5.1
-    '@mantine/hooks':
-      specifier: ^9.5.1
-      version: 9.5.1
     '@mantine/notifications':
       specifier: ^9.5.1
       version: 9.5.1
-    '@marko19907/string-to-color':
-      specifier: ^1.0.2
-      version: 1.0.2
-    '@monaco-editor/react':
-      specifier: ^4.7.0
-      version: 4.7.0
     '@ocelescope/ocelot':
       specifier: ^0.6.0
       version: 0.6.0
     '@r4pm/components':
       specifier: ^0.2.0
       version: 0.2.0
-    '@rjsf/core':
-      specifier: ^6.8.0
-      version: 6.8.0
     '@rjsf/mantine':
       specifier: ^6.8.0
       version: 6.8.0
-    '@rjsf/utils':
-      specifier: ^6.8.0
-      version: 6.8.0
-    '@rjsf/validator-ajv8':
-      specifier: ^6.8.0
-      version: 6.8.0
-    '@tanstack/react-query':
-      specifier: ^5.90.21
-      version: 5.90.21
-    '@tanstack/react-query-devtools':
-      specifier: ^5.91.3
-      version: 5.91.3
     '@tsconfig/strictest':
       specifier: ^2.0.8
       version: 2.0.8
@@ -99,48 +63,21 @@ catalogs:
     axios:
       specifier: ^1.18.1
       version: 1.18.1
-    clsx:
-      specifier: ^2.1.1
-      version: 2.1.1
-    content-disposition-attachment:
-      specifier: ^0.3.1
-      version: 0.3.1
     cspell:
       specifier: ^10.0.1
       version: 10.0.1
-    dayjs:
-      specifier: ^1.11.19
-      version: 1.11.21
-    elkjs:
-      specifier: ^0.12.0
-      version: 0.12.0
-    embla-carousel:
-      specifier: ^8.6.0
-      version: 8.6.0
-    embla-carousel-react:
-      specifier: ^8.6.0
-      version: 8.6.0
-    file-saver:
-      specifier: ^2.0.5
-      version: 2.0.5
     html-to-image:
       specifier: 1.11.13
       version: 1.11.13
     jspdf:
       specifier: ^4.2.1
       version: 4.2.1
-    lucide-react:
-      specifier: ^1.0.0
-      version: 1.21.0
     mantine-datatable:
       specifier: ^9.4.0
       version: 9.4.0
     next:
       specifier: 16.3.0
       version: 16.3.0
-    object-hash:
-      specifier: ^3.0.0
-      version: 3.0.0
     orval:
       specifier: ^8.24.0
       version: 8.24.0
@@ -153,33 +90,12 @@ catalogs:
     react-dom:
       specifier: ^19.2.8
       version: 19.2.8
-    react-hook-form:
-      specifier: ^7.71.2
-      version: 7.71.2
-    react-plotly.js:
-      specifier: ^4.0.0
-      version: 4.0.0
-    react-zoom-pan-pinch:
-      specifier: ^4.0.0
-      version: 4.0.3
-    recharts:
-      specifier: ^3.2.1
-      version: 3.8.1
     tsdown:
       specifier: ^0.22.14
       version: 0.22.14
     typescript:
       specifier: ^6.0.3
       version: 6.0.3
-    uniqolor:
-      specifier: ^1.1.1
-      version: 1.1.1
-    zod:
-      specifier: ^4.3.6
-      version: 4.3.6
-    zustand:
-      specifier: ^5.0.11
-      version: 5.0.11
 
 importers:
 
