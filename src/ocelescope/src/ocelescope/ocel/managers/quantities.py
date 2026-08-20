@@ -1,447 +1,435 @@
 from typing import Any, Literal, cast
 
 import pandas as pd
+from duckdb import DuckDBPyRelation
 
 from ocelescope.ocel.constants.pm4py import ACTIVITY_COL, EID_COL, OID_COL, OTYPE_COL, TIMESTAMP_COL
 from ocelescope.ocel.constants.quantity import (
-    OQTY_COLUMNS,
     QEL_ITEM_TYPE,
     QEL_QUANTITY,
-    QOP_COLUMNS,
     QUANTITIES_TABLE,
     QUANTITY_ITEM_PROPERTIES_TABLE,
     QUANTITY_OPERATIONS_TABLE,
 )
-from ocelescope.ocel.constants.tables import EVENTS_TABLE, OBJECTS_TABLE
+from ocelescope.ocel.constants.tables import E2O_TABLE, EVENTS_TABLE, OBJECTS_TABLE
 from ocelescope.ocel.managers.base import BaseManager
-
-_QUANTITY_AS_NUMBER = f'TRY_CAST("{QEL_QUANTITY}" AS DOUBLE) AS "{QEL_QUANTITY}"'
-
-#: Keeps the rows a quantity table is read through: a zero quantity is no
-#: quantity at all. Null is kept, since SQL's ``NULL != 0`` is null rather than
-#: true -- which is what makes this the same rule as the pandas ``.ne(0)`` the
-#: frame-returning reads apply.
-_CLEAN = f'("{QEL_QUANTITY}" != 0 OR "{QEL_QUANTITY}" IS NULL)'
-
-
-def _quantity_projection(columns: list[str]) -> str:
-    """The stored columns, with the quantity forced to a number."""
-    return ", ".join(
-        _QUANTITY_AS_NUMBER if column == QEL_QUANTITY else f'"{column}"' for column in columns
-    )
+from ocelescope.util.sql import first_column_list, ident, literal
 
 
 class QuantityManager(BaseManager):
-    """Manage the **quantity extension** of an OCEL instance.
+    """The quantity extension of an OCEL: item levels carried by objects, changed by events.
 
-    This manager encapsulates:
-      - Reading/writing quantity-extension tables (initial quantities and quantity operations)
-      - Convenience views (wide/pivoted forms)
-      - Helpers to query involved item types, objects, and events
-      - Aggregations of quantity operations over time for a given object
-
-    Attributes:
-        oqty: DataFrame containing *initial quantities* per object and item type.
-        qop: DataFrame containing *quantity operations* per event, object, and item type.
+    Two tables back it. ``oqty`` holds what an object carries before any event
+    touches it, ``qop`` the change one event makes to one object's item type, and
+    ``properties`` describes the item types themselves. Everything else here reads
+    off those two -- who is involved in a quantity, and how an object's level
+    develops over time.
     """
 
     @property
-    def has_quantities(self) -> bool:
-        """Whether the log stores initial quantities at all.
-
-        Asks whether the table is *there*, which is not the same as whether it has
-        rows -- a caller writing SQL against it needs to know before it runs.
-        """
-        return self._has_table(QUANTITIES_TABLE)
-
-    @property
-    def has_operations(self) -> bool:
-        """Whether the log stores quantity operations at all."""
-        return self._has_table(QUANTITY_OPERATIONS_TABLE)
-
-    def _read(self, table: str, columns: list[str]) -> pd.DataFrame:
-        """Read a quantity table, or an empty frame when the OCEL carries no extension.
-
-        The quantity tables are the one part of an OCEL that is optional, so every
-        read has to cope with them not being there at all.
-        """
-        if not self._has_table(table):
-            return pd.DataFrame(columns=columns)
-        projection = ", ".join(f'"{c}"' for c in columns)
-        return self._relation(f'SELECT {projection} FROM "{table}"').df()
-
-    def _cleaned(self, frame: pd.DataFrame) -> pd.DataFrame:
-        """Drop zero-quantity rows, so every read sees a cleaned table."""
-        return frame.loc[frame[QEL_QUANTITY].ne(0)].reset_index(drop=True)
-
-    @property
     def oqty(self) -> pd.DataFrame:
-        """Initial quantities per object and item type."""
-        return self._cleaned(self._read(QUANTITIES_TABLE, OQTY_COLUMNS))
+        """Initial quantities per object and item type.
+
+        Returns:
+            DataFrame: One row per object and item type, with the quantity the
+            object carries before any event touches it.
+        """
+        return self._relation(f"""SELECT * FROM {QUANTITIES_TABLE}""").df()
 
     @oqty.setter
     def oqty(self, contents: Any) -> None:
-        self._replace(QUANTITIES_TABLE, contents, _quantity_projection(OQTY_COLUMNS))
+        """Store ``contents`` as the initial quantities, replacing what is there."""
+        self._replace(QUANTITIES_TABLE, contents)
 
     @property
     def qop(self) -> pd.DataFrame:
-        """Quantity operations per event, object and item type."""
-        return self._cleaned(self._read(QUANTITY_OPERATIONS_TABLE, QOP_COLUMNS))
+        """Quantity operations per event, object and item type.
+
+        Returns:
+            DataFrame: One row per event, object and item type, with the change
+            that event makes to that quantity.
+        """
+        return self._relation(f"""SELECT * FROM {QUANTITY_OPERATIONS_TABLE}""").df()
 
     @qop.setter
     def qop(self, contents: Any) -> None:
-        self._replace(QUANTITY_OPERATIONS_TABLE, contents, _quantity_projection(QOP_COLUMNS))
+        """Store ``contents`` as the quantity operations, replacing what is there."""
+        self._replace(
+            QUANTITY_OPERATIONS_TABLE,
+            contents,
+        )
 
     @property
     def properties(self) -> pd.DataFrame:
-        """One row of properties per item type.
+        """Properties per item type.
 
-        Its columns are user-defined, so unlike the other two this table is read
-        and stored as-is.
+        Returns:
+            DataFrame: One row per item type, with the properties declared for it.
         """
-        if not self._has_table(QUANTITY_ITEM_PROPERTIES_TABLE):
-            return pd.DataFrame(columns=[QEL_ITEM_TYPE])
         return self._relation(f'SELECT * FROM "{QUANTITY_ITEM_PROPERTIES_TABLE}"').df()
 
     @properties.setter
     def properties(self, contents: Any) -> None:
+        """Store ``contents`` as the item type properties, replacing what is there."""
         self._replace(QUANTITY_ITEM_PROPERTIES_TABLE, contents)
-
-    def is_populated(self) -> bool:
-        return any(not df.empty for df in [self.oqty, self.qop, self.properties])
-
-    @property
-    def _cleaned_oqty_mask(self):
-        return self.oqty[QEL_QUANTITY].ne(0)
-
-    @property
-    def _cleaned_qop_mask(self):
-        return self.qop[QEL_QUANTITY].ne(0)
 
     @property
     def wide_qop(self):
-        """Return quantity operations in a wide (pivoted) format.
-
-        The returned DataFrame has one row per (event id, object id), and one column
-        per item type containing the corresponding quantity operation value.
+        """Quantity operations in a wide (pivoted) format.
 
         Returns:
-            A wide/pivoted DataFrame of `qop` with columns:
-            - `EID_COL`, `OID_COL`
-            - one column per item type (from `QEL_ITEM_TYPE`)
+            DataFrame: One row per event and object, with ``ocel:eid``, ``ocel:oid``
+            and one column per item type. Missing operations count as 0.
         """
 
-        return (
-            self.qop.pivot_table(
-                index=[EID_COL, OID_COL],
-                columns=QEL_ITEM_TYPE,
-                values=QEL_QUANTITY,
-                fill_value=0,
-                aggfunc="first",
-            )
-            .reset_index()
-            .rename_axis(index=None, columns=None)
-        )
+        return self._relation(f"""
+            PIVOT {QUANTITY_OPERATIONS_TABLE} ON {ident(QEL_ITEM_TYPE)} USING coalesce(first({ident(QEL_QUANTITY)}), 0)
+        """).df()
 
     @property
     def wide_oqty(self):
-        """Return initial quantities in a wide (pivoted) format.
-
-        The returned DataFrame has one row per object id and one column per item type.
+        """Initial quantities in a wide (pivoted) format.
 
         Returns:
-            A wide/pivoted DataFrame of `oqty` indexed by `OID_COL`.
+            DataFrame: One row per object, with ``ocel:oid`` and one column per
+            item type. Missing quantities count as 0.
         """
 
-        return self.oqty.pivot_table(
-            index=[OID_COL],
-            columns=QEL_ITEM_TYPE,
-            values=QEL_QUANTITY,
-            aggfunc="first",
-            fill_value=0,
-        )
+        return self._relation(f"""
+            PIVOT {QUANTITIES_TABLE} ON {ident(QEL_ITEM_TYPE)} USING coalesce(first({ident(QEL_QUANTITY)}), 0)
+        """).df()
 
-    def _cleaned_union(self, column: str, *, operations_only: bool = False) -> str:
-        """SQL reading ``column`` from the quantity tables, zero quantities dropped.
+    def _distinct_values(self, field_name: str) -> DuckDBPyRelation:
+        """``field_name``'s distinct values across both quantity tables, sorted."""
+        field = ident(field_name)
 
-        The tables are optional, so the ones that are actually there are what gets
-        read -- and when neither is, the empty string says so, since a query over
-        no tables cannot be written.
-        """
-        tables = []
-        if self.has_quantities and not operations_only:
-            tables.append(QUANTITIES_TABLE)
-        if self.has_operations:
-            tables.append(QUANTITY_OPERATIONS_TABLE)
-        return " UNION ALL ".join(
-            f'SELECT "{column}" FROM "{table}" WHERE {_CLEAN}' for table in tables
-        )
-
-    def _distinct(self, column: str, *, operations_only: bool = False) -> list[str]:
-        """The distinct non-null values of ``column`` across the quantity tables.
-
-        Sorted: DuckDB computes a ``DISTINCT`` in parallel, so without an order
-        the same query hands its rows back in a different order each time it runs.
-        """
-        union = self._cleaned_union(column, operations_only=operations_only)
-        if not union:
-            return []
-        return self._column(
-            f'SELECT DISTINCT "{column}" FROM ({union}) WHERE "{column}" IS NOT NULL ORDER BY 1'
-        )
-
-    def _types_of(self, table: str, id_column: str, type_column: str, union: str) -> list[str]:
-        """The distinct ``type_column`` of the entities ``union`` names, sorted."""
-        if not union:
-            return []
-        return self._column(
-            f'SELECT DISTINCT "{type_column}" FROM "{table}" '
-            f'WHERE "{id_column}" IN '
-            f'(SELECT "{id_column}" FROM ({union}) WHERE "{id_column}" IS NOT NULL) '
-            f"ORDER BY 1"
-        )
+        return self._relation(f""" 
+            SELECT DISTINCT
+                {field}
+            FROM
+                {QUANTITIES_TABLE}
+            UNION
+                SELECT DISTINCT
+                    {field}
+                FROM
+                    {QUANTITY_OPERATIONS_TABLE}
+            ORDER BY
+                1
+        """)
 
     @property
     def item_types(self) -> list[str]:
-        """Return all item types present in initial quantities or quantity operations.
+        """Every item type appearing in ``oqty`` or ``qop``.
 
         Returns:
-            A list of unique item type identifiers (strings).
+            list[str]: Sorted list of unique item types.
         """
-        return self._distinct(QEL_ITEM_TYPE)
+
+        return first_column_list(self._distinct_values(QEL_ITEM_TYPE))
 
     @property
     def objects(self) -> list[str]:
-        """Return all object ids involved in quantities.
-
-        Includes:
-          - objects appearing in any quantity operation, and
-          - objects with any initial quantity row.
+        """Every object id appearing in ``oqty`` or ``qop``.
 
         Returns:
-            A list of unique object ids.
+            list[str]: Sorted list of unique object ids.
         """
-        return self._distinct(OID_COL)
+        return first_column_list(self._distinct_values(OID_COL))
 
     @property
     def object_types(self) -> list[str]:
-        """Return all object types involved in quantities.
-
+        """The types of the objects appearing in ``oqty`` or ``qop``.
 
         Returns:
-            A list of object types
+            list[str]: Sorted list of unique object type names.
         """
-        return self._types_of(OBJECTS_TABLE, OID_COL, OTYPE_COL, self._cleaned_union(OID_COL))
+        quantity_objects_table = "quantity_objects"
+        return first_column_list(
+            self._distinct_values(OID_COL).query(
+                quantity_objects_table,
+                f"""
+                    SELECT DISTINCT
+                        {ident(OTYPE_COL)}
+                    FROM
+                        {quantity_objects_table}
+                    JOIN {OBJECTS_TABLE} USING ({ident(OID_COL)})
+                    ORDER BY
+                        1
+                """,
+            )
+        )
+
+    def _get_it_objects(self, item_type: str):
+        """Objects with a non-zero ``item_type`` quantity, as a lazy relation."""
+        oid, it_col, quantity_col = ident(OID_COL), ident(QEL_ITEM_TYPE), ident(QEL_QUANTITY)
+        return self._relation(
+            f"""
+            SELECT DISTINCT {oid}
+            FROM (
+                SELECT {oid} FROM {QUANTITIES_TABLE}
+                WHERE {it_col} = ? AND {quantity_col} != 0
+                UNION ALL
+                SELECT {oid} FROM {QUANTITY_OPERATIONS_TABLE}
+                WHERE {it_col} = ? AND {quantity_col} != 0
+            )
+            ORDER BY 1
+        """,
+            [item_type, item_type],
+        )
 
     def get_it_objects(self, item_type: str):
-        """Return object ids involved for a given item type.
-
-        Includes object ids that:
-          - appear in a quantity operation for the given item type, or
-          - have an initial quantity row for the given item type.
+        """Object ids that carry or change ``item_type``, zero quantities aside.
 
         Args:
-            item_type: Item type to filter on.
+            item_type: The item type to filter on.
 
         Returns:
-            An array-like of unique object ids.
+            list[str]: Sorted list of unique object ids.
         """
 
-        oqty_ids = self.oqty.loc[
-            self.oqty[QEL_ITEM_TYPE].eq(item_type) & self._cleaned_oqty_mask, OID_COL
-        ]
-        qop_ids = self.qop.loc[
-            self.qop[QEL_ITEM_TYPE].eq(item_type) & self._cleaned_qop_mask, OID_COL
-        ]
-
-        return pd.concat([oqty_ids, qop_ids], ignore_index=True).dropna().unique()
+        return first_column_list(self._get_it_objects(item_type))
 
     def get_it_object_types(self, item_type: str) -> list[str]:
-        """Return object types involved for a given item type.
-
-        Object types are determined by looking up the involved object ids in the
-        OCEL objects table.
+        """The types of the objects that carry or change ``item_type``.
 
         Args:
-            item_type: Item type to filter on.
+            item_type: The item type to filter on.
 
         Returns:
-            A list of unique object type identifiers.
+            list[str]: List of unique object type names.
         """
-        return (
-            self._ocel.objects.df.loc[
-                self._ocel.objects.df[OID_COL].isin(self.get_it_objects(item_type)), OTYPE_COL
-            ]
-            .dropna()
-            .unique()
-        ).tolist()
+
+        item_objects_table = "item_objects_table"
+
+        return first_column_list(
+            self._get_it_objects(item_type).query(
+                item_objects_table,
+                f"""
+                SELECT DISTINCT
+                    {ident(OTYPE_COL)}
+                FROM
+                    {item_objects_table}
+                JOIN {OBJECTS_TABLE} USING ({ident(OID_COL)})
+            """,
+            )
+        )
 
     @property
     def events(self) -> list[str]:
-        """Return all event ids involved in quantity operations.
-
-        Only operations carry an event, so the initial quantities have no say here.
+        """Every event id appearing in ``qop`` -- initial quantities carry no event.
 
         Returns:
-            A list of unique event ids.
+            list[str]: List of unique event ids.
         """
-        return self._distinct(EID_COL, operations_only=True)
+        return first_column_list(
+            self._relation(f"""SELECT DISTINCT {ident(EID_COL)} FROM {QUANTITY_OPERATIONS_TABLE}""")
+        )
 
     @property
     def activities(self) -> list[str]:
-        """Return all activities involved in quantities.
-
+        """The activities of the events appearing in ``qop``.
 
         Returns:
-            A list of activities
+            list[str]: List of unique activity names.
         """
-        return self._types_of(
-            EVENTS_TABLE,
-            EID_COL,
-            ACTIVITY_COL,
-            self._cleaned_union(EID_COL, operations_only=True),
+        return first_column_list(
+            self._relation(f"""
+                SELECT DISTINCT
+                    {ident(ACTIVITY_COL)}
+                FROM
+                    {QUANTITY_OPERATIONS_TABLE}
+                JOIN {EVENTS_TABLE} USING ({ident(EID_COL)})
+            """)
         )
 
     def get_it_events(self, item_type: str):
-        """Return event ids involved in quantity operations for a given item type.
+        """Event ids with a quantity operation on ``item_type``.
 
         Args:
-            item_type: Item type to filter on.
+            item_type: The item type to filter on.
 
         Returns:
-            An array-like of unique event ids.
-
+            list[str]: List of unique event ids.
         """
-        return (
-            self.qop.loc[self.qop[QEL_ITEM_TYPE].eq(item_type) & self._cleaned_qop_mask, EID_COL]
-            .dropna()
-            .unique()
+        return first_column_list(
+            self._relation(
+                f"""
+                SELECT DISTINCT
+                    {ident(EID_COL)}
+                FROM
+                    {QUANTITY_OPERATIONS_TABLE}
+                WHERE
+                    {ident(QEL_ITEM_TYPE)} = ?
+           """,
+                [item_type],
+            )
+        )
+
+    def get_it_activities(self, item_type: str):
+        """The activities of the events with a quantity operation on ``item_type``.
+
+        Args:
+            item_type: The item type to filter on.
+
+        Returns:
+            list[str]: List of unique activity names.
+        """
+        return first_column_list(
+            self._relation(
+                f"""
+                SELECT DISTINCT
+                    {ident(ACTIVITY_COL)}
+                FROM
+                    {QUANTITY_OPERATIONS_TABLE}
+                JOIN {EVENTS_TABLE} USING({ident(EID_COL)})
+                WHERE
+                    {ident(QEL_ITEM_TYPE)} = ?
+           """,
+                [item_type],
+            )
         )
 
     def get_object_item_types(self, object_id: str):
-        """Return item types associated with a given object.
-
-        Includes item types that:
-          - appear in initial quantities for the object, or
-          - appear in any quantity operation for the object.
+        """Item types the object carries or changes, zero quantities aside.
 
         Args:
-            object_id: Object id to filter on.
+            object_id: The object to filter on.
 
         Returns:
-            An array-like of unique item type identifiers.
+            list[str]: List of unique item types.
         """
 
-        initial_item_types = self.oqty.loc[
-            self.oqty[OID_COL].eq(object_id) & self._cleaned_oqty_mask, QEL_ITEM_TYPE
-        ]
+        it_col, oid_col, quantity_col = ident(QEL_ITEM_TYPE), ident(OID_COL), ident(QEL_QUANTITY)
 
-        active_qty_operations = self.qop.loc[
-            self.qop[OID_COL].eq(object_id) & self._cleaned_qop_mask, QEL_ITEM_TYPE
-        ]
-
-        return pd.concat([initial_item_types, active_qty_operations]).dropna().unique()
+        return first_column_list(
+            self._relation(
+                f"""
+                SELECT DISTINCT {it_col} FROM (
+                    SELECT {it_col} FROM {QUANTITY_OPERATIONS_TABLE}
+                    WHERE {oid_col} = ? AND {quantity_col} != 0
+                    UNION ALL
+                    SELECT {it_col} FROM {QUANTITIES_TABLE}
+                    WHERE {oid_col} = ? AND {quantity_col} != 0
+                )   
+            """,
+                [object_id, object_id],
+            )
+        )
 
     def get_oqty_for_object(self, object_id: str) -> pd.Series:
-        """Return the initial quantities (oqty) for a specific object as a Series.
-
-        The returned Series is indexed by item type (`QEL_ITEM_TYPE`) and contains the
-        corresponding initial quantity values (`QEL_QUANTITY`) for the given object.
+        """The object's initial quantities.
 
         Args:
-            object_id: Object id to filter on.
+            object_id: The object to look up.
 
         Returns:
-            A pandas Series with index `QEL_ITEM_TYPE` and values `QEL_QUANTITY`
-            representing the initial quantities for the given object. If the underlying
-            data contains multiple rows for the same item type, the Series will have a
-            non-unique index (i.e., duplicate item-type entries).
+            Series: A pandas Series indexed by item type, containing the object's
+            initial quantities as values.
         """
 
-        return self.oqty.loc[
-            self.oqty[OID_COL].eq(object_id) & self._cleaned_oqty_mask,
-            [QEL_ITEM_TYPE, QEL_QUANTITY],
-        ].set_index(QEL_ITEM_TYPE)[QEL_QUANTITY]
+        item_type, quantity = ident(QEL_ITEM_TYPE), ident(QEL_QUANTITY)
 
-    # TODO: Check if using get_item_level_development would be more efficient
-    def get_object_item_level(
+        oqty = self._relation(
+            f"""
+            SELECT
+                {item_type}, first({quantity}) AS {quantity}
+            FROM
+                {QUANTITIES_TABLE}
+            WHERE
+                {ident(OID_COL)} = ?
+            GROUP BY ALL
+            ORDER BY 1
+        """,
+            [object_id],
+        ).to_df()
+
+        return cast(pd.Series, oqty.set_index(QEL_ITEM_TYPE)[QEL_QUANTITY])
+
+    def _item_level_development(
         self,
         object_id: str,
-        timestamp: str | None = None,
-        event_id: str | None = None,
+        item_types: list[str] | None = None,
+        include_events: Literal["log", "trace", "active"] = "trace",
         include_oqty: bool = True,
-        include_cutoff: bool = False,
-    ):
-        """Return item-level quantity for an object up to a cutoff.
+        pre_event: bool = False,
+    ) -> DuckDBPyRelation:
+        """An object's item levels over time, as a lazy relation.
 
-        Sums the object's quantity operations (qop) up to a cutoff timestamp and,
-        optionally, adds the object's initial quantities (oqty).
-
-        The cutoff is taken from `timestamp` and/or `event_id` (if both are provided,
-        the earlier timestamp is used). If `include_cutoff` is True the cutoff is
-        inclusive (<=); otherwise it is exclusive (<).
-
-        Args:
-            object_id: Object id to aggregate for.
-            timestamp: Optional cutoff timestamp (parsed via `pd.Timestamp`).
-            event_id: Optional event id whose timestamp can be used as a cutoff.
-            include_oqty: If True, add initial quantities (oqty) to the result.
-            include_cutoff: If True include rows at the cutoff timestamp (<=),
-                otherwise exclude them (<).
-
-        Returns:
-            A pandas Series with one entry per item type.
+        See :meth:`get_item_level_development`, which is this and nothing more.
         """
+        eid, oid = ident(EID_COL), ident(OID_COL)
+        activity, timestamp = ident(ACTIVITY_COL), ident(TIMESTAMP_COL)
+        item_type, quantity = ident(QEL_ITEM_TYPE), ident(QEL_QUANTITY)
 
-        wide_qop = self.wide_qop
+        with_oqty = include_oqty
 
-        wide_qop_with_timestamps = (
-            wide_qop.loc[wide_qop[OID_COL].eq(object_id)]
-            .merge(self._ocel.events.df[[EID_COL, TIMESTAMP_COL]], on=EID_COL)
-            .sort_values(by=TIMESTAMP_COL)
-            .set_index(EID_COL)
-        )
-
-        cutt_of = pd.Timestamp(timestamp) if timestamp is not None else None
-
-        if event_id:
-            event_timestamp: pd.Timestamp = cast(
-                pd.Timestamp,
-                self._ocel.events.df.loc[
-                    self._ocel.events.df[EID_COL].eq(event_id), TIMESTAMP_COL
-                ].iat[0],
+        return self._relation(f"""
+            WITH trace AS (
+                SELECT DISTINCT {eid}
+                FROM {E2O_TABLE}
+                WHERE {oid} = {literal(object_id)}
+            ),
+            event_table AS (
+                SELECT {eid}, {activity}, {timestamp}
+                FROM {EVENTS_TABLE}
+                {f"JOIN trace USING ({eid})" if include_events != "log" else ""}
+            ),
+            object_operations AS (
+                SELECT {eid}, {item_type}, {quantity}
+                FROM {QUANTITY_OPERATIONS_TABLE}
+                WHERE {oid} = {literal(object_id)} {
+            f"AND {quantity} != 0" if include_events == "active" else ""
+        }
+            ),
+            initial_quantities AS (
+                SELECT
+                    NULL AS {eid},
+                    NULL AS {activity},
+                    '-infinity'::TIMESTAMP AS {timestamp},
+                    {item_type},
+                    {quantity}
+                FROM {QUANTITIES_TABLE}
+                WHERE {oid} = {literal(object_id)} AND {quantity} != 0
+            ),
+            operations_per_event AS (
+                SELECT
+                    events.{eid},
+                    events.{activity},
+                    events.{timestamp},
+                    operations.{item_type},
+                    operations.{quantity}
+                FROM object_operations operations
+                {"JOIN" if include_events == "active" else "RIGHT JOIN"} event_table events USING ({
+            eid
+        })
+                {"UNION ALL SELECT * FROM initial_quantities" if with_oqty else ""}
             )
-
-            cutt_of = event_timestamp if cutt_of is None else min(event_timestamp, cutt_of)
-
-        if cutt_of:
-            wide_qop_with_timestamps = wide_qop_with_timestamps.loc[
-                wide_qop_with_timestamps[TIMESTAMP_COL].le(cutt_of)
-                if include_cutoff
-                else wide_qop_with_timestamps[TIMESTAMP_COL].lt(cutt_of)
-            ]
-
-        object_item_level = (
-            wide_qop_with_timestamps.drop(columns=[TIMESTAMP_COL, OID_COL], errors="ignore")
-            .agg(["sum"])
-            .iloc[0]
-        )
-
-        if include_oqty:
-            object_item_types = self.get_object_item_types(object_id)
-            initial_quantities = self.get_oqty_for_object(object_id=object_id).reindex(
-                object_item_types, fill_value=0
+            SELECT
+                {eid},
+                {activity},
+                {timestamp},
+                coalesce(
+                    sum(COLUMNS(* EXCLUDE ({eid}, {activity}, {timestamp}))) OVER (
+                        ORDER BY {timestamp}, {eid} 
+                        {
+            "ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING"
+            if pre_event
+            else "ROWS UNBOUNDED PRECEDING"
+        }
+                    ),
+                    0
+                )
+            FROM (
+                PIVOT operations_per_event
+                ON {item_type} {
+            f"IN ({', '.join(literal(it) for it in item_types)})" if item_types else ""
+        }
+                USING coalesce(first({quantity}), 0)
+                GROUP BY {eid}, {activity}, {timestamp}
             )
-
-            object_item_level[object_item_types] = object_item_level[object_item_types].add(
-                initial_quantities
-            )
-
-        return (
-            object_item_level.add(self.wide_oqty.loc[object_id].iloc[0], fill_value=0)
-            if include_oqty
-            else object_item_level
-        )
+            {f"QUALIFY {eid} IS NOT NULL" if with_oqty else ""}
+            ORDER BY {timestamp}, {eid}
+        """)
 
     def get_item_level_development(
         self,
@@ -451,144 +439,142 @@ class QuantityManager(BaseManager):
         include_oqty: bool = True,
         pre_event: bool = False,
     ) -> pd.DataFrame:
-        """Get item-level development for an object as a per-event DataFrame.
+        """How an object's item levels develop, one row per event.
 
-        The returned DataFrame is ordered by time and contains event metadata along
-        with one column per selected item type. Values represent the cumulative
-        development over the included events (cumulative sum of per-event quantity
-        changes). Optionally, the cumulative development can be offset by the
-        object's initial quantities (oqty) so that values represent absolute
-        quantities over time.
+        Rows are ordered by time and carry the event's id, activity and timestamp,
+        plus one column per item type holding a running sum of its operations.
 
         Args:
-            object_id: The object id to compute development for.
-            item_types: Optional list of item type names to include. If None, all
-                item types available for the given object are included.
-            include_events: Which events to include in the output:
-                "log" (all events), "trace" (events involving the object), or
-                "active" (only events where at least one selected item type changes).
-            include_oqty: If True, add the object's initial quantities (oqty) to the
-                cumulative development for each selected item type (i.e., return
-                absolute quantities rather than net change).
+            object_id: The object to follow.
+            item_types: Item types to report on; all the object has, by default.
+            include_events: Which events get a row -- ``"log"`` for every event,
+                ``"trace"`` for those involving the object, ``"active"`` for those
+                that actually change one of its quantities.
+            include_oqty: Start from the object's initial quantities, so the values
+                are absolute levels rather than net change.
+            pre_event: Report the level each event *found*, not the one it leaves.
 
         Returns:
-            A pandas DataFrame ordered by timestamp with columns
-            `[EID_COL, ACTIVITY_COL, TIMESTAMP_COL]` plus one column per selected item
-            type. If `include_oqty=True`, item-type columns contain absolute
-            quantities (initial oqty + cumulative changes); otherwise they contain
-            cumulative changes only.
+            DataFrame: One row per included event, ordered by timestamp, with
+            ``ocel:eid``, ``ocel:activity``, ``ocel:timestamp`` and one column per
+            reported item type.
+        """
+        return self._item_level_development(
+            object_id,
+            item_types=item_types,
+            include_events=include_events,
+            include_oqty=include_oqty,
+            pre_event=pre_event,
+        ).df()
+
+    def get_object_item_level(
+        self,
+        object_id: str,
+        timestamp: str | None = None,
+        event_id: str | None = None,
+        include_oqty: bool = True,
+        include_cutoff: bool = False,
+    ):
+        """The object's item levels, over the events up to a cutoff.
+
+        Args:
+            object_id: The object to follow.
+            timestamp: Cut off at this timestamp.
+            event_id: Cut off at this event's timestamp; ignored if ``timestamp``
+                is given. Without either, the whole log is included.
+            include_oqty: Start from the object's initial quantities.
+            include_cutoff: Keep the events at the cutoff itself, rather than
+                stopping short of them.
+
+        Returns:
+            DataFrame: The development rows up to the cutoff, one per event that
+            changes a quantity, shaped like
+            :meth:`get_item_level_development`'s.
         """
 
-        item_level_development = self.wide_qop
-
-        object_item_types = [
-            item_type
-            for item_type in self.get_object_item_types(object_id)
-            if item_type in item_level_development.columns
-            and (item_types is None or item_type in item_types)
-        ]
-
-        item_level_development = item_level_development.loc[
-            item_level_development[OID_COL].eq(object_id), [EID_COL, *object_item_types]
-        ]
-
-        events_df = self._ocel.events.df[[EID_COL, ACTIVITY_COL, TIMESTAMP_COL]]
-
-        if include_events != "log":
-            events_df = events_df.loc[
-                events_df[EID_COL].isin(self._ocel.e2o.get_events_of_object(object_id))
-            ]
-
-        item_level_development = pd.merge(
-            item_level_development,
-            events_df,
-            on=EID_COL,
-            how="left" if include_events == "active" else "right",
+        item_lvl_dev = self._item_level_development(
+            object_id, include_events="active", include_oqty=include_oqty
         )
-
-        item_level_development[object_item_types] = item_level_development[
-            object_item_types
-        ].fillna(0)
-
-        if include_events == "active":
-            item_level_development = item_level_development.loc[
-                ~item_level_development[object_item_types].eq(0).all(axis=1)
-            ]
-
-        item_level_development = item_level_development.sort_values(TIMESTAMP_COL, ascending=True)
-
-        if pre_event:
-            item_level_development = item_level_development.shift(1, fill_value=0)
-
-        item_level_development[object_item_types] = item_level_development[
-            object_item_types
-        ].cumsum()
-
-        if include_oqty:
-            initial_quantities = self.get_oqty_for_object(object_id=object_id).reindex(
-                object_item_types, fill_value=0
+        cutoff_expr = None
+        if timestamp is not None:
+            cutoff_expr = f"CAST({literal(timestamp)} AS TIMESTAMP)"
+        elif event_id is not None:
+            cutoff_expr = (
+                f"(SELECT {ident(TIMESTAMP_COL)} FROM {EVENTS_TABLE} "
+                f"WHERE {ident(EID_COL)} = {literal(event_id)})"
             )
 
-            item_level_development[object_item_types] = item_level_development[
-                object_item_types
-            ].add(initial_quantities)
-
-        return item_level_development.reset_index(drop=True)
-
-    def _get_it_entity_type_count(self, entity_type: Literal["events", "objects"]):
-        id_col = OID_COL if entity_type == "objects" else EID_COL
-        type_col = OTYPE_COL if entity_type == "objects" else ACTIVITY_COL
-
-        id_to_type_map = (
-            self._ocel.objects.type_by_id
-            if entity_type == "objects"
-            else self._ocel.events.activity_by_id
+        where = (
+            f"WHERE {ident(TIMESTAMP_COL)} {'<=' if include_cutoff else '<'} {cutoff_expr}"
+            if cutoff_expr
+            else ""
         )
 
-        it_entity_id_pairs = pd.concat(
-            [
-                self.qop.loc[self._cleaned_qop_mask, [id_col, QEL_ITEM_TYPE]],
-                *(
-                    [self.oqty.loc[self._cleaned_qop_mask, [id_col, QEL_ITEM_TYPE]]]
-                    if entity_type == "objects"
-                    else []
-                ),
-            ],
-            ignore_index=True,
-        ).drop_duplicates()
-
-        it_entity_id_pairs = pd.merge(it_entity_id_pairs, id_to_type_map, on=id_col)
-
-        return it_entity_id_pairs.groupby([QEL_ITEM_TYPE, type_col]).agg(count=(id_col, "nunique"))[
-            "count"
-        ]
+        return item_lvl_dev.query(
+            "item_lvl_dev",
+            f"""
+                SELECT * 
+                FROM item_lvl_dev
+                {where}
+            """,
+        ).df()
 
     @property
-    def it_object_type_count(self) -> pd.Series:
-        """Count involved object types per item type.
-
-        The returned Series is indexed by (item type, object type) and contains the
-        number of **distinct objects** that occur for each such pair. Object types are
-        derived by mapping object ids to their type via the OCEL objects table.
+    def it_object_type_count(self):
+        """Per item type and object type, how many distinct objects are involved.
 
         Returns:
-            pd.Series: A Series with a MultiIndex
-            ``(QEL_ITEM_TYPE, OTYPE_COL)``. Values are the number of unique objects
-            (``OID_COL``) for each (item type, object type) pair.
+            DataFrame: One row per item type and object type, with a ``count`` of
+            the distinct objects holding a non-zero quantity of it.
         """
-        return self._get_it_entity_type_count("objects")
+
+        otype, oid, eid = ident(OTYPE_COL), ident(OID_COL), ident(EID_COL)
+        itype, iqty = ident(QEL_ITEM_TYPE), ident(QEL_QUANTITY)
+
+        return self._relation(f"""
+            SELECT
+                {itype},
+                {otype},
+                count(DISTINCT {oid}) as count
+            FROM
+                (
+                    SELECT
+                        *
+                    FROM
+                        {QUANTITIES_TABLE}
+                    UNION
+                    (
+                        SELECT
+                            * EXCLUDE {eid}
+                        FROM
+                            {QUANTITY_OPERATIONS_TABLE}
+                    )
+                )
+            JOIN {OBJECTS_TABLE} USING ({oid})
+            WHERE {iqty} != 0
+            GROUP BY ALL
+        """).to_df()
 
     @property
-    def it_activity_count(self) -> pd.Series:
-        """Count involved activities per item type.
-
-        The returned Series is indexed by (item type, activity) and contains the
-        number of **distinct events** that occur for each such pair. Activities are
-        derived by mapping event ids to their activity via the OCEL events table.
+    def it_activity_count(self):
+        """Per item type and activity, how many distinct events are involved.
 
         Returns:
-            pd.Series: A Series with a MultiIndex
-            ``(QEL_ITEM_TYPE, ACTIVITY_COL)``. Values are the number of unique events
-            (``EID_COL``) for each (item type, activity) pair.
+            DataFrame: One row per item type and activity, with the number of
+            distinct events carrying a non-zero operation on it.
         """
-        return self._get_it_entity_type_count("events")
+        eid, act = ident(EID_COL), ident(ACTIVITY_COL)
+        itype, iqty = ident(QEL_ITEM_TYPE), ident(QEL_QUANTITY)
+
+        return self._relation(f"""
+            SELECT
+                {itype},
+                {act},
+                count(DISTINCT {eid})
+            FROM
+                {QUANTITY_OPERATIONS_TABLE}
+            JOIN events USING({eid})
+            WHERE
+                {iqty} != 0
+            GROUP BY ALL
+        """).to_df()

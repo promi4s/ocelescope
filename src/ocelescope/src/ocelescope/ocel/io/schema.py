@@ -33,11 +33,6 @@ from ocelescope.util.sql import ident
 
 SchemaDefinition = list[tuple[str, pa.DataType]]
 
-#: OCEL timestamps are stored zone-less, already normalized to UTC by
-#: :func:`~ocelescope.util.sql.utc_timestamp`. A zone-aware column would render
-#: differently depending on the reading session's ``TimeZone``, and would make an
-#: offset-less source value mean whatever zone the importing machine happened to
-#: be in.
 TIMESTAMP_TYPE = pa.timestamp("us")
 
 ATTRIBUTE_TYPE_TO_ARROW: dict[str, pa.DataType] = {
@@ -114,6 +109,15 @@ def ocel_table_schemas(
     }
 
 
+def _create_if_missing(con: duckdb.DuckDBPyConnection, table: str, schema: pa.Schema) -> None:
+    """Create ``table`` from ``schema``, empty, unless ``con`` already has it."""
+    if con.execute(
+        "SELECT 1 FROM information_schema.tables WHERE table_name = ?", [table]
+    ).fetchone():
+        return
+    con.from_arrow(schema.empty_table()).create(table)
+
+
 def ensure_quantity_tables(con: duckdb.DuckDBPyConnection) -> None:
     """Create any missing quantity-extension table on ``con``, empty.
 
@@ -132,11 +136,24 @@ def ensure_quantity_tables(con: duckdb.DuckDBPyConnection) -> None:
     }
 
     for table, schema in table_schemas.items():
-        if con.execute(
-            "SELECT 1 FROM information_schema.tables WHERE table_name = ?", [table]
-        ).fetchone():
-            continue
-        con.from_arrow(schema.empty_table()).create(table)
+        _create_if_missing(con, table, schema)
+
+
+def ensure_ocel_tables(con: duckdb.DuckDBPyConnection) -> None:
+    """Create any missing OCEL table on ``con``, empty, the quantity ones included.
+
+    The counterpart to :func:`create_ocel_tables` for a database that is not being
+    imported into. Every OCEL runs this on construction, so its managers can read
+    -- and write -- their own table without each first proving the log has one:
+    the eight tables are there from the start, however the database was built.
+
+    A table already present is left alone, its rows and its per-log attribute
+    columns with it, so this never discards anything and is safe to call on a log
+    that is already loaded.
+    """
+    for table, schema in ocel_table_schemas([], []).items():
+        _create_if_missing(con, table, schema)
+    ensure_quantity_tables(con)
 
 
 def create_ocel_tables(

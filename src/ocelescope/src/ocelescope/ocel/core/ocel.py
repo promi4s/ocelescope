@@ -91,13 +91,17 @@ class OCEL:
         """
         Args:
             connection: An open DuckDB connection holding the flat OCEL tables,
-                with its ``TimeZone`` set to UTC. The OCEL takes ownership of it:
-                for an in-memory database, which DuckDB drops once its last
-                connection closes, that means the log lives exactly as long as
-                this instance.
+                with its ``TimeZone`` set to UTC. Any table it is missing is
+                created empty, so a bare connection makes a valid empty log. The
+                OCEL takes ownership of it: for an in-memory database, which
+                DuckDB drops once its last connection closes, that means the log
+                lives exactly as long as this instance.
             meta: Metadata for this OCEL instance.
         """
+        from ocelescope.ocel.io.schema import ensure_ocel_tables
+
         self._con = connection
+        ensure_ocel_tables(connection)
 
         self.extensions = ExtensionManager(self)
         self.objects = ObjectsManager(self)
@@ -228,8 +232,6 @@ class OCEL:
             meta: Metadata for this OCEL instance.
             quantityExtension: Optional quantity-extension tables.
         """
-        from ocelescope.ocel.io.schema import ensure_quantity_tables
-
         connection = duckdb.connect(":memory:")
         try:
             set_utc(connection)
@@ -266,8 +268,6 @@ class OCEL:
                 ocel.quantities.oqty = oqty
                 ocel.quantities.qop = qop
                 ocel.quantities.properties = properties
-
-            ensure_quantity_tables(connection)
         except Exception:
             connection.close()
             raise

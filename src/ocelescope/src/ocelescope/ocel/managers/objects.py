@@ -97,14 +97,8 @@ class ObjectsManager(BaseManager):
         con = self._ocel.con
 
         with self._bound(contents) as incoming:
-            # a fresh database has no change table until something is stored
-            if not self._has_table(OBJECT_CHANGES_TABLE):
-                con.execute(
-                    f"CREATE TABLE {OBJECT_CHANGES_TABLE} "
-                    f"({oid} VARCHAR, {ts} TIMESTAMP, {field} VARCHAR)"
-                )
-
             stale = self.static_attribute_names
+
             if stale:
                 con.execute(
                     f"DELETE FROM {OBJECT_CHANGES_TABLE} WHERE {field} IN "

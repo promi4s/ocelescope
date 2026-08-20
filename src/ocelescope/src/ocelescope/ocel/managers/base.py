@@ -11,7 +11,6 @@ from ocelescope.util.sql import set_utc
 if TYPE_CHECKING:
     from ocelescope.ocel.core.ocel import OCEL
 
-#: View name a table's incoming contents are bound to while being written.
 _INCOMING = "_incoming_table"
 
 
@@ -20,15 +19,6 @@ class BaseManager:
 
     def __init__(self, ocel: "OCEL"):
         self._ocel = ocel
-
-    def _has_table(self, name: str) -> bool:
-        """Whether a table called ``name`` exists in the OCEL's database."""
-        return (
-            self._ocel.con.execute(
-                "SELECT 1 FROM information_schema.tables WHERE table_name = ?", [name]
-            ).fetchone()
-            is not None
-        )
 
     def _relation(self, sql: str, params: list[object] | None = None) -> duckdb.DuckDBPyRelation:
         """A lazy relation for ``sql``, on its own DuckDB cursor."""
