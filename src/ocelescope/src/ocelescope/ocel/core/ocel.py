@@ -33,20 +33,13 @@ from ocelescope.ocel.managers.executions import ExecutionsManager
 from ocelescope.ocel.util.xes import create_ocel_from_xml, write_ocel_to_xes
 from ocelescope.util.sql import set_utc
 
-#: Name the destination database is attached under while :meth:`OCEL.to_duckdb` copies.
 _COPY_TARGET = "_copy_target"
 
-#: A table :meth:`OCEL.from_frames` accepts. DuckDB scans each of them directly.
 Frame = pd.DataFrame | pl.DataFrame | pl.LazyFrame
 
-#: PM4PY calls an O2O relation's source object ``ocel:oid`` and its target
-#: ``ocel:oid_2``; we call them ``ocel:oid_1`` / ``ocel:oid_2``. That one column is
-#: the only place the two namings disagree, so it is the only thing to translate --
-#: and it is translated here, at the PM4PY boundary, rather than by the O2O manager.
 _O2O_TO_PM4PY = {O2O_SOURCE_ID: OID_COL}
 _O2O_FROM_PM4PY = {OID_COL: O2O_SOURCE_ID}
 
-#: Extensions r4pm can read. It has no usable SQLite reader (see :meth:`OCEL.read`).
 _R4PM_SUFFIXES = {".jsonocel", ".json", ".xmlocel", ".xml"}
 
 
@@ -235,6 +228,8 @@ class OCEL:
             meta: Metadata for this OCEL instance.
             quantityExtension: Optional quantity-extension tables.
         """
+        from ocelescope.ocel.io.schema import ensure_quantity_tables
+
         connection = duckdb.connect(":memory:")
         try:
             set_utc(connection)
@@ -271,6 +266,8 @@ class OCEL:
                 ocel.quantities.oqty = oqty
                 ocel.quantities.qop = qop
                 ocel.quantities.properties = properties
+
+            ensure_quantity_tables(connection)
         except Exception:
             connection.close()
             raise

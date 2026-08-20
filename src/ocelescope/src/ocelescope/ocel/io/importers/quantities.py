@@ -1,7 +1,7 @@
 """Stream the optional OCEL 2.0 quantity extension into the DuckDB output.
 
-When a log carries a quantity extension the importers add three more tables to
-the DuckDB database next to the five flat OCEL tables:
+Every OCEL database carries three quantity tables next to the five flat OCEL
+ones; these importers are what fills them when a log has an extension:
 
 * ``quantities``               -- initial quantity per (object, item type)
 * ``quantity_operations``      -- quantity change per (event, object, item type)
@@ -12,7 +12,9 @@ these helpers never materialise the whole log to reach it: JSON is read
 incrementally with ``ijson`` and only the extension sub-object is built, XML is
 sliced out by byte offset and parsed on its own, and the SQLite importer copies
 the extension tables straight across the already-attached source with streamed
-``INSERT ... SELECT`` statements. If a file has no extension, no tables are added.
+``INSERT ... SELECT`` statements. A file with no extension leaves the three
+tables in the empty form :func:`~..schema.ensure_quantity_tables` gave them --
+they are part of every OCEL, so a reader never has to ask whether they exist.
 """
 
 from __future__ import annotations
@@ -241,7 +243,6 @@ def import_quantities_xml(source: str | Path, target: DuckDBTarget) -> None:
     if fragment is None:
         return
 
-    # The sliced fragment's root element *is* the quantity extension.
     quantity_ext = etree.fromstring(fragment)
 
     operations_data: list[dict] = []
@@ -272,9 +273,7 @@ def import_quantities_xml(source: str | Path, target: DuckDBTarget) -> None:
             )
 
     item_property_data: list[dict] = []
-    # Each <property> declares its OCEL type; collect them so the assembled frame
-    # can be cast below. Without that every property stays the text it was parsed
-    # as, and a numeric one comes back as a string.
+
     property_type: dict[str, str] = {}
     property_tree = quantity_ext.find(XML_PROPERTIES)
     if property_tree is not None:
@@ -320,9 +319,12 @@ def import_quantities_sqlite(
     """Copy the quantity-extension tables from the attached SQLite source.
 
     Requires the source to already be attached as ``src`` (as the SQLite importer
-    does). Every copy is a single ``CREATE TABLE ... AS SELECT`` that DuckDB
-    streams internally, so nothing flows through Python. ``present`` is the set of
-    source table names, used to skip extension tables the file does not have.
+    does). Every copy is a single ``CREATE OR REPLACE TABLE ... AS SELECT`` that
+    DuckDB streams internally, so nothing flows through Python -- replacing,
+    because the empty tables are already there (see
+    :func:`~..schema.ensure_quantity_tables`). ``present`` is the set of source
+    table names, used to skip extension tables the file does not have, which then
+    keep their empty form.
 
     ``property_casts`` maps an item-property column to the DuckDB type to read it
     as, recovered from the file's declared types by the caller (which is the only
@@ -331,7 +333,7 @@ def import_quantities_sqlite(
     """
     if SQL_QUANTITIES in present:
         con.execute(
-            f'CREATE TABLE "{QUANTITIES_TABLE}" AS SELECT '
+            f'CREATE OR REPLACE TABLE "{QUANTITIES_TABLE}" AS SELECT '
             f'"{SQL_KEYMAP[OID_COL]}" AS "{OID_COL}", '
             f'"{SQL_KEYMAP[QEL_ITEM_TYPE]}" AS "{QEL_ITEM_TYPE}", '
             f'TRY_CAST("{SQL_KEYMAP[QEL_QUANTITY]}" AS DOUBLE) AS "{QEL_QUANTITY}" '
@@ -340,7 +342,7 @@ def import_quantities_sqlite(
 
     if SQL_OPERATIONS in present:
         con.execute(
-            f'CREATE TABLE "{QUANTITY_OPERATIONS_TABLE}" AS SELECT '
+            f'CREATE OR REPLACE TABLE "{QUANTITY_OPERATIONS_TABLE}" AS SELECT '
             f'"{SQL_KEYMAP[EID_COL]}" AS "{EID_COL}", '
             f'"{SQL_KEYMAP[OID_COL]}" AS "{OID_COL}", '
             f'"{SQL_KEYMAP[QEL_ITEM_TYPE]}" AS "{QEL_ITEM_TYPE}", '
@@ -349,11 +351,6 @@ def import_quantities_sqlite(
         )
 
     if SQL_ITEM_PROPERTIES in present:
-        # Item-property columns are user-defined, so keep them all and only rename
-        # the item-type column to the canonical name. ``property_casts`` carries
-        # their declared SQLite types, which the attached copy no longer shows
-        # (``sqlite_all_varchar`` reports every column as VARCHAR), so a numeric
-        # property has to be cast back here or it stays text.
         columns = [
             description[0]
             for description in con.execute(
@@ -373,6 +370,6 @@ def import_quantities_sqlite(
             for column in columns
         )
         con.execute(
-            f'CREATE TABLE "{QUANTITY_ITEM_PROPERTIES_TABLE}" AS '
+            f'CREATE OR REPLACE TABLE "{QUANTITY_ITEM_PROPERTIES_TABLE}" AS '
             f'SELECT {projection} FROM src."{SQL_ITEM_PROPERTIES}"'
         )

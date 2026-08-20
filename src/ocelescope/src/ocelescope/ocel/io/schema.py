@@ -22,6 +22,13 @@ from ocelescope.ocel.constants.pm4py import (
     OTYPE_COL,
     TIMESTAMP_COL,
 )
+from ocelescope.ocel.constants.quantity import (
+    QEL_ITEM_TYPE,
+    QEL_QUANTITY,
+    QUANTITIES_TABLE,
+    QUANTITY_ITEM_PROPERTIES_TABLE,
+    QUANTITY_OPERATIONS_TABLE,
+)
 from ocelescope.util.sql import ident
 
 SchemaDefinition = list[tuple[str, pa.DataType]]
@@ -52,11 +59,7 @@ EVENT_TABLE_BASE_SCHEMA: SchemaDefinition = [
     (TIMESTAMP_COL, TIMESTAMP_TYPE),
 ]
 
-#: ``ocel:field`` names the attribute a change row writes. It is stored rather
-#: than derived because the value itself is not enough to recover it: a change
-#: that clears an attribute leaves every column of its row NULL. Every importer
-#: fills it, and readers rely on it (see
-#: :attr:`~ocelescope.ocel.managers.objects.ObjectsManager.changes_table`).
+
 OBJECT_CHANGES_TABLE_SCHEMA: SchemaDefinition = [
     (OID_COL, pa.string()),
     (TIMESTAMP_COL, TIMESTAMP_TYPE),
@@ -73,6 +76,24 @@ E2O_TABLE_SCHEMA: SchemaDefinition = [
     (EID_COL, pa.string()),
     (E2O_QUALIFIER, pa.string()),
     (OID_COL, pa.string()),
+]
+
+QUANTITIES_TABLE_SCHEMA: SchemaDefinition = [
+    (OID_COL, pa.string()),
+    (QEL_ITEM_TYPE, pa.string()),
+    (QEL_QUANTITY, pa.float64()),
+]
+
+QUANTITY_OPERATIONS_TABLE_SCHEMA: SchemaDefinition = [
+    (EID_COL, pa.string()),
+    (OID_COL, pa.string()),
+    (QEL_ITEM_TYPE, pa.string()),
+    (QEL_QUANTITY, pa.float64()),
+]
+
+
+QUANTITY_ITEM_PROPERTIES_TABLE_SCHEMA: SchemaDefinition = [
+    (QEL_ITEM_TYPE, pa.string()),
 ]
 
 
@@ -93,6 +114,31 @@ def ocel_table_schemas(
     }
 
 
+def ensure_quantity_tables(con: duckdb.DuckDBPyConnection) -> None:
+    """Create any missing quantity-extension table on ``con``, empty.
+
+    Called for every OCEL, whether or not its log has an extension, so that the
+    three tables are as reliably there as the five flat ones: a reader can sum
+    ``quantity_operations`` without first proving it exists, and an importer that
+    does find an extension replaces these in place. A table that is already there
+    is left alone -- this never discards rows, so it is safe to call after the
+    extension has been read.
+    """
+
+    table_schemas = {
+        QUANTITIES_TABLE: pa.schema(QUANTITIES_TABLE_SCHEMA),
+        QUANTITY_OPERATIONS_TABLE: pa.schema(QUANTITY_OPERATIONS_TABLE_SCHEMA),
+        QUANTITY_ITEM_PROPERTIES_TABLE: pa.schema(QUANTITY_ITEM_PROPERTIES_TABLE_SCHEMA),
+    }
+
+    for table, schema in table_schemas.items():
+        if con.execute(
+            "SELECT 1 FROM information_schema.tables WHERE table_name = ?", [table]
+        ).fetchone():
+            continue
+        con.from_arrow(schema.empty_table()).create(table)
+
+
 def create_ocel_tables(
     con: duckdb.DuckDBPyConnection,
     object_columns: SchemaDefinition,
@@ -110,6 +156,7 @@ def create_ocel_tables(
     for table, schema in schemas.items():
         con.execute(f"DROP TABLE IF EXISTS {ident(table)}")
         con.from_arrow(schema.empty_table()).create(table)
+    ensure_quantity_tables(con)
     return schemas
 
 
