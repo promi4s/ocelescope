@@ -578,3 +578,107 @@ class QuantityManager(BaseManager):
                 {iqty} != 0
             GROUP BY ALL
         """).to_df()
+
+    def get_ilvl_table(
+        self, include_oqty: bool = True, pre_event: bool = False
+    ) -> DuckDBPyRelation:
+        """How every object's item levels develop, one row per event it takes part in.
+
+        The quantity operations are summed per object and item type in event order,
+        and the result is pivoted, so each item type becomes a column holding the
+        running level.
+
+        Args:
+            include_oqty: Seed each object and item type with the object's initial
+                quantity -- zero for the ones only quantity operations mention --
+                so the levels are absolute rather than net change.
+            pre_event: Report the level each event *found*, not the one it leaves.
+
+        Returns:
+            DuckDBPyRelation: One row per event and object, ordered by timestamp
+            and event id, with ``ocel:oid``, ``ocel:eid``, ``ocel:activity``,
+            ``ocel:timestamp`` and one column per item type.
+        """
+
+        oid, eid = ident(OID_COL), ident(EID_COL)
+        act, ts = ident(ACTIVITY_COL), ident(TIMESTAMP_COL)
+        itype, iqty = ident(QEL_ITEM_TYPE), ident(QEL_QUANTITY)
+
+        window = (
+            "ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING"
+            if pre_event
+            else "ROWS UNBOUNDED PRECEDING"
+        )
+
+        seed_union = "UNION BY NAME FROM initial_values" if include_oqty else ""
+        drop_seeds = f"QUALIFY {eid} IS NOT NULL" if include_oqty else ""
+
+        return self._relation(
+            f"""
+                WITH
+                initial_values as (
+                    SELECT
+                    {oid},
+                    {itype},
+                    coalesce(oqty.{iqty}, 0) as {iqty},
+                    '-infinity'::TIMESTAMP AS {ts},
+                    FROM
+                    {QUANTITIES_TABLE} oqty
+                    FULL OUTER JOIN (
+                        SELECT DISTINCT
+                        {oid},
+                        {itype}
+                        FROM
+                        {QUANTITY_OPERATIONS_TABLE}
+                    ) empty_oqty USING ({oid}, {itype})
+                ),
+                joined_qop as (
+                    SELECT
+                    oqty.*,
+                    ev.{act},
+                    ev.{ts}
+                    FROM
+                    {QUANTITY_OPERATIONS_TABLE} oqty
+                    JOIN {EVENTS_TABLE} ev USING ({eid})
+                ),
+                unpivoted_itlvl as (
+                    SELECT
+                    COLUMNS (* EXCLUDE {iqty}),
+                    sum({iqty}) OVER (
+                        PARTITION BY
+                        {oid},
+                        {itype}
+                        ORDER BY
+                        {ts},
+                        {eid}
+                        {window}
+                    ) as item_level
+                    FROM
+                    (
+                        SELECT
+                        *
+                        FROM
+                        joined_qop
+                        {seed_union}
+                    )
+                    {drop_seeds}
+                )
+                PIVOT unpivoted_itlvl ON {itype} USING (coalesce(first("item_level"), 0))
+                ORDER BY
+                {ts},
+                {eid}
+            """
+        )
+
+    def get_ilvl(self, include_oqty: bool = True, pre_event: bool = False):
+        """The item level development of the whole log, as a DataFrame.
+
+        Args:
+            include_oqty: Start from the objects' initial quantities, so the values
+                are absolute levels rather than net change.
+            pre_event: Report the level each event *found*, not the one it leaves.
+
+        Returns:
+            DataFrame: :meth:`get_ilvl_table`'s rows.
+        """
+        return self.get_ilvl_table(include_oqty=include_oqty, pre_event=pre_event).to_df()
