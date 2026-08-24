@@ -29,7 +29,6 @@ from ocelescope.ocel.constants.quantity import (
     QUANTITY_ITEM_PROPERTIES_TABLE,
     QUANTITY_OPERATIONS_TABLE,
 )
-from ocelescope.util.sql import ident
 
 SchemaDefinition = list[tuple[str, pa.DataType]]
 
@@ -42,6 +41,15 @@ ATTRIBUTE_TYPE_TO_ARROW: dict[str, pa.DataType] = {
     "float": pa.float64(),
     "boolean": pa.bool_(),
 }
+
+ATTRIBUTE_TYPE_TO_DUCKDB: dict[str, str] = {
+    "string": "VARCHAR",
+    "time": "TIMESTAMP",
+    "integer": "BIGINT",
+    "float": "DOUBLE",
+    "boolean": "BOOLEAN",
+}
+
 
 OBJECT_TABLE_BASE_SCHEMA: SchemaDefinition = [
     (OID_COL, pa.string()),
@@ -154,41 +162,3 @@ def ensure_ocel_tables(con: duckdb.DuckDBPyConnection) -> None:
     for table, schema in ocel_table_schemas([], []).items():
         _create_if_missing(con, table, schema)
     ensure_quantity_tables(con)
-
-
-def create_ocel_tables(
-    con: duckdb.DuckDBPyConnection,
-    object_columns: SchemaDefinition,
-    event_columns: SchemaDefinition,
-) -> dict[str, pa.Schema]:
-    """(Re)create the five empty OCEL tables on ``con`` and return their schemas.
-
-    This is the single source of truth for the output layout, shared by every
-    importer: :class:`OCELWriter` (JSON/XML) creates the tables here and then
-    buffers rows into them, while the SQLite importer creates them here and fills
-    them with bulk ``INSERT ... SELECT`` statements. The returned schema dict lets
-    callers that buffer rows build one column buffer per table.
-    """
-    schemas = ocel_table_schemas(object_columns, event_columns)
-    for table, schema in schemas.items():
-        con.execute(f"DROP TABLE IF EXISTS {ident(table)}")
-        con.from_arrow(schema.empty_table()).create(table)
-    ensure_quantity_tables(con)
-    return schemas
-
-
-def merge_columns(columns: SchemaDefinition) -> SchemaDefinition:
-    """Collapse duplicate attribute names into one column each.
-
-    A flat pm4py table has a single column per attribute name, so an attribute
-    declared under several object/event types must resolve to one Arrow type.
-    When the declared types disagree we fall back to ``string`` (the universal
-    supertype), which also lets any value cast cleanly on insert.
-    """
-    merged: dict[str, pa.DataType] = {}
-    for name, dtype in columns:
-        if name in merged and merged[name] != dtype:
-            merged[name] = pa.string()
-        else:
-            merged.setdefault(name, dtype)
-    return list(merged.items())

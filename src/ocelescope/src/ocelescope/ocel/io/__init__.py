@@ -20,18 +20,13 @@ see :meth:`ocelescope.OCEL.read_duckdb` and :meth:`ocelescope.OCEL.to_duckdb`.
 
 from pathlib import Path
 
+from ocelescope.ocel.io.connection import DuckDBTarget, connect_target
 from ocelescope.ocel.io.exporters import (
     export_ocel_json,
     export_ocel_sqlite,
     export_ocel_xml,
 )
-from ocelescope.ocel.io.connection import DuckDBTarget, connect_target
-from ocelescope.ocel.io.importers import (
-    OCELWriter,
-    import_ocel_json,
-    import_ocel_sqlite,
-    import_ocel_xml,
-)
+from ocelescope.ocel.io.r4pm import import_ocel_r4pm_streamed
 
 
 def convert_ocel_duckdb(source: str | Path, target: DuckDBTarget) -> None:
@@ -42,15 +37,7 @@ def convert_ocel_duckdb(source: str | Path, target: DuckDBTarget) -> None:
         target: Path of the DuckDB database to (re)create, or an open connection
             to write into (which the caller keeps owning).
     """
-    match Path(source).suffix:
-        case ".xmlocel" | ".xml":
-            import_ocel_xml(source, target)
-        case ".jsonocel" | ".json":
-            import_ocel_json(source, target)
-        case ".sqlite":
-            import_ocel_sqlite(source, target)
-        case suffix:
-            raise ValueError(f"Unsupported extension: {suffix}")
+    import_ocel_r4pm_streamed(source=source, target=target)
 
 
 def export_duckdb_ocel(source: DuckDBTarget, target: str | Path) -> None:
@@ -75,14 +62,10 @@ def export_duckdb_ocel(source: DuckDBTarget, target: str | Path) -> None:
 
 __all__ = [
     "DuckDBTarget",
-    "OCELWriter",
     "connect_target",
     "convert_ocel_duckdb",
     "export_duckdb_ocel",
     "export_ocel_json",
     "export_ocel_sqlite",
     "export_ocel_xml",
-    "import_ocel_json",
-    "import_ocel_sqlite",
-    "import_ocel_xml",
 ]
