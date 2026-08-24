@@ -324,8 +324,7 @@ class OCEL:
         Returns:
             OCEL: A fully constructed OCEL wrapper instance.
         """
-        from ocelescope.ocel.io import convert_ocel_duckdb
-        from ocelescope.ocel.io.importers.quantities import import_quantities
+        from ocelescope.ocel.io import import_ocel_r4pm_streamed, import_quantities
 
         path = Path(path)
 
@@ -351,7 +350,8 @@ class OCEL:
 
         connection = duckdb.connect(":memory:")
         try:
-            convert_ocel_duckdb(path, connection)
+            import_ocel_r4pm_streamed(path, connection)
+            import_quantities(path, connection)
             set_utc(connection)
         except Exception:
             connection.close()
@@ -474,14 +474,15 @@ class OCEL:
         Raises:
             ValueError: If the file extension is not supported.
         """
-        from ocelescope.ocel.io import export_duckdb_ocel
+        from ocelescope.ocel.io import export_ocel_r4pm_streamed, export_quantities
 
         path = Path(path)
 
         if path.suffix not in {".xmlocel", ".xml", ".jsonocel", ".json", ".sqlite"}:
             raise ValueError(f"Unsupported extension: {path.suffix}")
 
-        export_duckdb_ocel(self._con, path)
+        export_ocel_r4pm_streamed(self._con, path)
+        export_quantities(self._con, path)
         self.extensions.export_all(path)
 
     def write_xes(self, object_type: str, path: str | Path):

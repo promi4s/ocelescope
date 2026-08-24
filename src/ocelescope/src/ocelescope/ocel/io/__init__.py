@@ -18,38 +18,15 @@ itself is the OCEL's own business, since a database is what an OCEL already is -
 see :meth:`ocelescope.OCEL.read_duckdb` and :meth:`ocelescope.OCEL.to_duckdb`.
 """
 
-from pathlib import Path
-
 from ocelescope.ocel.io.connection import DuckDBTarget, connect_target
-from ocelescope.ocel.io.r4pm import export_ocel_r4pm_stream, import_ocel_r4pm_streamed
-
-
-def convert_ocel_duckdb(source: str | Path, target: DuckDBTarget) -> None:
-    """Read an OCEL file into a DuckDB database, dispatching on the file extension.
-
-    Args:
-        source: Path to an ``.jsonocel`` / ``.xmlocel`` / ``.sqlite`` OCEL 2.0 log.
-        target: Path of the DuckDB database to (re)create, or an open connection
-            to write into (which the caller keeps owning).
-    """
-    import_ocel_r4pm_streamed(source=source, target=target)
-
-
-def export_duckdb_ocel(source: DuckDBTarget, target: str | Path) -> None:
-    """Write a DuckDB OCEL database to a file, dispatching on the target extension.
-
-    Args:
-        source: Path to a DuckDB database produced by :func:`convert_ocel_duckdb`,
-            or an open connection to one (e.g. an :class:`ocelescope.OCEL`'s own,
-            which is what :meth:`ocelescope.OCEL.write` passes).
-        target: Output path with a ``.jsonocel`` / ``.xmlocel`` / ``.sqlite`` extension.
-    """
-    export_ocel_r4pm_stream(source, target)
-
+from ocelescope.ocel.io.quantities import export_quantities, import_quantities
+from ocelescope.ocel.io.r4pm import export_ocel_r4pm_streamed, import_ocel_r4pm_streamed
 
 __all__ = [
     "DuckDBTarget",
     "connect_target",
-    "convert_ocel_duckdb",
-    "export_duckdb_ocel",
+    "export_ocel_r4pm_streamed",
+    "import_ocel_r4pm_streamed",
+    "import_quantities",
+    "export_quantities",
 ]
