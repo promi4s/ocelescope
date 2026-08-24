@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from tempfile import NamedTemporaryFile
+from tempfile import NamedTemporaryFile, TemporaryDirectory
 from typing import Literal
 
 import duckdb
@@ -28,7 +28,7 @@ from ocelescope.ocel.constants.tables import (
 )
 from ocelescope.ocel.io.connection import DuckDBTarget, connect_target
 from ocelescope.ocel.io.schema import ATTRIBUTE_TYPE_TO_DUCKDB, ensure_ocel_tables
-from ocelescope.util.sql import ident, literal, set_utc, utc_timestamp
+from ocelescope.util.sql import ident, literal, utc_timestamp
 
 SRC = "r4pm"
 """Alias the source export is attached under, read-only."""
@@ -83,13 +83,19 @@ def _attribute_select(con: duckdb.DuckDBPyConnection, meta_table: MetaTable) -> 
 
 
 def import_ocel_r4pm_streamed(source: Path | str, target: DuckDBTarget) -> None:
-    """Build ``target`` from ``source``, replacing any file already there."""
+    """Build ``target`` from ``source``, replacing any tables already there.
+
+    Args:
+        source: Path to an OCEL 2.0 log in any format r4pm reads.
+        target: Path of the DuckDB database to write into, or an open connection
+            to one -- which is what :meth:`ocelescope.OCEL.read` hands over, and
+            what keeps an in-memory database alive past this call.
+    """
 
     with NamedTemporaryFile() as fp:
         r4pm.bindings.stream_ocel_to_duckdb(str(source), fp.name)
 
-        with duckdb.connect(str(target)) as con:
-            set_utc(con)
+        with connect_target(target) as con:
             con.execute(f"ATTACH {literal(str(fp.name))} AS {ident(SRC)} (READ_ONLY)")
 
             con.execute(f"""
@@ -146,8 +152,7 @@ def import_ocel_r4pm_streamed(source: Path | str, target: DuckDBTarget) -> None:
 
             con.execute(f"DETACH {ident(SRC)}")
 
-    with duckdb.connect(str(target)) as con:
-        ensure_ocel_tables(con)
+            ensure_ocel_tables(con)
 
 
 def with_attr_meta(table: Literal["objects", "events"]) -> str:
@@ -208,9 +213,11 @@ def export_ocel_r4pm_stream(source: DuckDBTarget, target: str | Path) -> None:
         target: Output path for the r4pm database, replaced if it is already there.
     """
 
-    with NamedTemporaryFile() as r4pm_file:
+    with TemporaryDirectory() as tmp:
+        r4pm_file = Path(tmp) / "ocel.duckdb"
+
         with connect_target(source) as con:
-            con.execute(f"ATTACH {literal(str(r4pm_file.name))} AS {ident(OUT)}")
+            con.execute(f"ATTACH {literal(str(r4pm_file))} AS {ident(OUT)}")
             try:
                 con.execute(f"""
                     CREATE TABLE {ident(OUT)}.objects AS
@@ -232,20 +239,24 @@ def export_ocel_r4pm_stream(source: DuckDBTarget, target: str | Path) -> None:
 
                 con.execute(f"""
                     CREATE TABLE {ident(OUT)}.o2o AS
-                    SELECT
+                    SELECT DISTINCT
                     {ident(O2O_SOURCE_ID)} AS source_id,
                     {ident(O2O_TARGET_ID)} AS target_id,
                     {ident(O2O_QUALIFIER)} AS qualifier
                     FROM {ident(O2O_TABLE)}
+                    WHERE {ident(O2O_SOURCE_ID)} IN (SELECT {ident(OID_COL)} FROM {ident(OBJECTS_TABLE)})
+                      AND {ident(O2O_TARGET_ID)} IN (SELECT {ident(OID_COL)} FROM {ident(OBJECTS_TABLE)})
                 """)
 
                 con.execute(f"""
                     CREATE TABLE {ident(OUT)}.e2o AS
-                    SELECT
+                    SELECT DISTINCT
                     {ident(EID_COL)} AS event_id,
                     {ident(OID_COL)} AS object_id,
                     {ident(E2O_QUALIFIER)} AS qualifier
                     FROM {ident(E2O_TABLE)}
+                    WHERE {ident(EID_COL)} IN (SELECT {ident(EID_COL)} FROM {ident(EVENTS_TABLE)})
+                      AND {ident(OID_COL)} IN (SELECT {ident(OID_COL)} FROM {ident(OBJECTS_TABLE)})
                 """)
 
                 con.execute(f"""
@@ -329,5 +340,5 @@ def export_ocel_r4pm_stream(source: DuckDBTarget, target: str | Path) -> None:
             finally:
                 con.execute(f"DETACH {ident(OUT)}")
 
-        ocel = r4pm.bindings.read_consolidated_ocel_from_duckdb(r4pm_file.name)
+        ocel = r4pm.bindings.read_consolidated_ocel_from_duckdb(str(r4pm_file))
         r4pm.export_item(ocel, str(target))

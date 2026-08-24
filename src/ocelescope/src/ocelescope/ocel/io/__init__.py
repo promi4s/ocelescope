@@ -21,12 +21,7 @@ see :meth:`ocelescope.OCEL.read_duckdb` and :meth:`ocelescope.OCEL.to_duckdb`.
 from pathlib import Path
 
 from ocelescope.ocel.io.connection import DuckDBTarget, connect_target
-from ocelescope.ocel.io.exporters import (
-    export_ocel_json,
-    export_ocel_sqlite,
-    export_ocel_xml,
-)
-from ocelescope.ocel.io.r4pm import import_ocel_r4pm_streamed
+from ocelescope.ocel.io.r4pm import export_ocel_r4pm_stream, import_ocel_r4pm_streamed
 
 
 def convert_ocel_duckdb(source: str | Path, target: DuckDBTarget) -> None:
@@ -49,15 +44,7 @@ def export_duckdb_ocel(source: DuckDBTarget, target: str | Path) -> None:
             which is what :meth:`ocelescope.OCEL.write` passes).
         target: Output path with a ``.jsonocel`` / ``.xmlocel`` / ``.sqlite`` extension.
     """
-    match Path(target).suffix:
-        case ".xmlocel" | ".xml":
-            export_ocel_xml(source, target)
-        case ".jsonocel" | ".json":
-            export_ocel_json(source, target)
-        case ".sqlite":
-            export_ocel_sqlite(source, target)
-        case suffix:
-            raise ValueError(f"Unsupported extension: {suffix}")
+    export_ocel_r4pm_stream(source, target)
 
 
 __all__ = [
@@ -65,7 +52,4 @@ __all__ = [
     "connect_target",
     "convert_ocel_duckdb",
     "export_duckdb_ocel",
-    "export_ocel_json",
-    "export_ocel_sqlite",
-    "export_ocel_xml",
 ]
