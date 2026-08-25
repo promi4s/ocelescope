@@ -66,21 +66,26 @@ class PluginTask(TaskBase, Generic[P]):
                 self.plugin_id, self.method_name
             )
 
-            ocel_args: dict[str, OCEL] = {
+            ocel_args: dict[str, OCEL | None] = {
                 key: self._copy_session_ocel(self.input["ocels"][key])
+                if key in self.input["ocels"]
+                else None
                 for key in method.input_ocels.keys()
             }
 
-            resource_args: dict[str, Resource] = {}
+            resource_args: dict[str, Resource | None] = {}
 
             # TODO: Find a better way to do this
             for key in method.input_resources.keys():
-                resource_instance = registry_manager.get_resource_instance(
-                    self.session.get_resource(self.input["resources"][key])
+                resource_instance = (
+                    registry_manager.get_resource_instance(
+                        self.session.get_resource(self.input["resources"][key])
+                    )
+                    if key in self.input["resources"]
+                    else None
                 )
 
-                if resource_instance:
-                    resource_args[key] = resource_instance
+                resource_args[key] = resource_instance
 
             kwargs = {
                 **ocel_args,
