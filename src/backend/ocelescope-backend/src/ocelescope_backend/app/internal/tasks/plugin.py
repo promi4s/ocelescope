@@ -33,8 +33,8 @@ P = ParamSpec("P")
 
 
 class PluginInput(TypedDict):
-    ocels: dict[str, str]
-    resources: dict[str, str]
+    ocels: dict[str, str | None]
+    resources: dict[str, str | None]
     input: dict[str, Any]
 
 
@@ -54,6 +54,23 @@ class PluginTask(TaskBase, Generic[P]):
         self.result: list[OCEL | Resource] | None = None
         self.session = session
 
+    @staticmethod
+    def _selected_id(
+        supplied: dict[str, str | None], key: str, is_optional: bool
+    ) -> str | None:
+        """The id picked for a declared input, or `None` when it may be left empty.
+
+        A cleared field arrives as `null` rather than as a missing key, so both count
+        as "not selected". A required input that is missing is reported by name, rather
+        than reaching the plugin as a `None` that fails somewhere in its body.
+        """
+        selected = supplied.get(key) or None
+
+        if selected is None and not is_optional:
+            raise ValueError(f"Missing required input: {key}")
+
+        return selected
+
     def _copy_session_ocel(self, ocel_id: str) -> OCEL:
         """An in-memory copy of a session OCEL, for the plugin to do as it likes with."""
         with self.session.get_ocel(ocel_id) as session_ocel:
@@ -66,21 +83,32 @@ class PluginTask(TaskBase, Generic[P]):
                 self.plugin_id, self.method_name
             )
 
-            ocel_args: dict[str, OCEL] = {
-                key: self._copy_session_ocel(self.input["ocels"][key])
-                for key in method.input_ocels.keys()
-            }
+            ocel_args: dict[str, OCEL | None] = {}
 
-            resource_args: dict[str, Resource] = {}
-
-            # TODO: Find a better way to do this
-            for key in method.input_resources.keys():
-                resource_instance = registry_manager.get_resource_instance(
-                    self.session.get_resource(self.input["resources"][key])
+            for key, annotation in method.input_ocels.items():
+                ocel_id = self._selected_id(
+                    self.input["ocels"], key, annotation.is_optional
                 )
 
-                if resource_instance:
-                    resource_args[key] = resource_instance
+                ocel_args[key] = (
+                    self._copy_session_ocel(ocel_id) if ocel_id is not None else None
+                )
+
+            resource_args: dict[str, Resource | None] = {}
+
+            # TODO: Find a better way to do this
+            for key, (_, annotation) in method.input_resources.items():
+                resource_id = self._selected_id(
+                    self.input["resources"], key, annotation.is_optional
+                )
+
+                resource_args[key] = (
+                    registry_manager.get_resource_instance(
+                        self.session.get_resource(resource_id)
+                    )
+                    if resource_id is not None
+                    else None
+                )
 
             kwargs = {
                 **ocel_args,
@@ -164,7 +192,9 @@ class PluginTask(TaskBase, Generic[P]):
         input: PluginInput,
     ) -> str:
         filters = {
-            ocel_id: session.get_filter(ocel_id) for ocel_id in input["ocels"].values()
+            ocel_id: session.get_filter(ocel_id)
+            for ocel_id in input["ocels"].values()
+            if ocel_id
         }
 
         key = cls._dedupe_key(plugin_id, method_name, input, filters)

@@ -27,6 +27,7 @@ export type OcelSelectProps = {
   description?: React.ReactNode;
   error?: React.ReactNode;
   placeholder?: string;
+  clearable?: boolean;
   required?: boolean;
   disabled?: boolean;
   w?: MantineStyleProps["w"];
@@ -36,6 +37,8 @@ export const OcelSelect: React.FC<OcelSelectProps> = ({
   extension,
   value,
   onChange,
+  clearable,
+  disabled,
   placeholder = "Select an OCEL",
   ...inputProps
 }) => {
@@ -52,6 +55,8 @@ export const OcelSelect: React.FC<OcelSelectProps> = ({
     [ocels, value],
   );
 
+  const showClearButton = clearable && !disabled && value != null;
+
   return (
     <Combobox
       store={combobox}
@@ -66,8 +71,15 @@ export const OcelSelect: React.FC<OcelSelectProps> = ({
           component="button"
           type="button"
           pointer
-          rightSection={<Combobox.Chevron />}
-          rightSectionPointerEvents="none"
+          disabled={disabled}
+          rightSection={
+            showClearButton ? (
+              <Combobox.ClearButton onClear={() => onChange?.(null)} />
+            ) : (
+              <Combobox.Chevron />
+            )
+          }
+          rightSectionPointerEvents={showClearButton ? "all" : "none"}
           onClick={() => combobox.toggleDropdown()}
         >
           {selected ? (

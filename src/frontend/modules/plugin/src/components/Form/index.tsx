@@ -19,6 +19,11 @@ export type PluginInputType = {
   input: any;
 };
 
+const compact = (record: Record<string, unknown> | undefined) =>
+  Object.fromEntries(
+    Object.entries(record ?? {}).filter(([, value]) => !!value),
+  ) as Record<string, string>;
+
 const PluginInput: React.FC<PluginInputProps> = ({
   pluginId,
   method,
@@ -47,8 +52,16 @@ const PluginInput: React.FC<PluginInputProps> = ({
 
   const onSubmit = useCallback(
     () =>
-      handleSubmit((data) =>
-        runPlugin({ data, methodName: method.name, pluginId }),
+      handleSubmit(({ input_ocels, input_resources, input }) =>
+        runPlugin({
+          data: {
+            input_ocels: compact(input_ocels),
+            input_resources: compact(input_resources),
+            input,
+          },
+          methodName: method.name,
+          pluginId,
+        }),
       )(),
     [handleSubmit, pluginId, method, runPlugin],
   );
@@ -56,16 +69,17 @@ const PluginInput: React.FC<PluginInputProps> = ({
   return (
     <Stack gap={"md"}>
       {Object.entries(method.input_ocels ?? {}).map(
-        ([name, { label, description, extension }]) => (
+        ([name, { label, description, extension, is_optional }]) => (
           <Controller
             key={name}
             control={control}
             name={`input_ocels.${name}`}
-            rules={{ required: "Please select a value" }}
+            rules={!is_optional ? { required: "Please select a value" } : {}}
             render={({ field, fieldState }) => (
               <OcelSelect
                 label={label}
-                required
+                clearable={is_optional}
+                required={!is_optional}
                 extension={extension ?? undefined}
                 description={description}
                 error={fieldState.error?.message}
@@ -77,16 +91,17 @@ const PluginInput: React.FC<PluginInputProps> = ({
         ),
       )}
       {Object.entries(method.input_resources ?? {}).map(
-        ([name, [resource_type, { label, description }]]) => (
+        ([name, [resource_type, { label, description, is_optional }]]) => (
           <Controller
             key={name}
             control={control}
             name={`input_resources.${name}`}
-            rules={{ required: "Please select a value" }}
+            rules={!is_optional ? { required: "Please select a value" } : {}}
             render={({ field, fieldState }) => (
               <ResourceSelect
+                clearable={is_optional}
                 label={label}
-                required
+                required={!is_optional}
                 type={resource_type}
                 description={description}
                 onChange={field.onChange}

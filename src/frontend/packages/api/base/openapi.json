@@ -1379,14 +1379,28 @@
         "properties": {
           "input_ocels": {
             "additionalProperties": {
-              "type": "string"
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
             },
             "type": "object",
             "title": "Input Ocels"
           },
           "input_resources": {
             "additionalProperties": {
-              "type": "string"
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
             },
             "type": "object",
             "title": "Input Resources"
@@ -2351,6 +2365,11 @@
             ],
             "title": "Description"
           },
+          "is_optional": {
+            "type": "boolean",
+            "title": "Is Optional",
+            "default": false
+          },
           "extension": {
             "anyOf": [
               {
@@ -2670,6 +2689,11 @@
               }
             ],
             "title": "Description"
+          },
+          "is_optional": {
+            "type": "boolean",
+            "title": "Is Optional",
+            "default": false
           }
         },
         "type": "object",
