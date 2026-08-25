@@ -56,16 +56,16 @@ const PluginInput: React.FC<PluginInputProps> = ({
   return (
     <Stack gap={"md"}>
       {Object.entries(method.input_ocels ?? {}).map(
-        ([name, { label, description, extension }]) => (
+        ([name, { label, description, extension, is_optional }]) => (
           <Controller
             key={name}
             control={control}
             name={`input_ocels.${name}`}
-            rules={{ required: "Please select a value" }}
+            rules={!is_optional ? { required: "Please select a value" } : {}}
             render={({ field, fieldState }) => (
               <OcelSelect
                 label={label}
-                required
+                required={!is_optional}
                 extension={extension ?? undefined}
                 description={description}
                 error={fieldState.error?.message}
@@ -77,16 +77,16 @@ const PluginInput: React.FC<PluginInputProps> = ({
         ),
       )}
       {Object.entries(method.input_resources ?? {}).map(
-        ([name, [resource_type, { label, description }]]) => (
+        ([name, [resource_type, { label, description, is_optional }]]) => (
           <Controller
             key={name}
             control={control}
             name={`input_resources.${name}`}
-            rules={{ required: "Please select a value" }}
+            rules={!is_optional ? { required: "Please select a value" } : {}}
             render={({ field, fieldState }) => (
               <ResourceSelect
                 label={label}
-                required
+                required={!is_optional}
                 type={resource_type}
                 description={description}
                 onChange={field.onChange}

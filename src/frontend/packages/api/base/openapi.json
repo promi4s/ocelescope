@@ -2351,6 +2351,11 @@
             ],
             "title": "Description"
           },
+          "is_optional": {
+            "type": "boolean",
+            "title": "Is Optional",
+            "default": false
+          },
           "extension": {
             "anyOf": [
               {
@@ -2670,6 +2675,11 @@
               }
             ],
             "title": "Description"
+          },
+          "is_optional": {
+            "type": "boolean",
+            "title": "Is Optional",
+            "default": false
           }
         },
         "type": "object",
