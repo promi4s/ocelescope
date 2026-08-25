@@ -1,9 +1,11 @@
 import { MultiSelect, Select } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import {
+  useE2oQualifier,
   useEventAttributes,
   useEventCounts,
   useEventIds,
+  useO2oQualifier,
   useObjectAttributes,
   useObjectCounts,
   useObjectIds,
@@ -93,6 +95,22 @@ const IdSelect =
     );
   };
 
+const QualifierSelect =
+  (useQualifier: typeof useE2oQualifier | typeof useO2oQualifier) =>
+  ({ ocelId, isMulti, value, ...props }: OcelSelectProps) => {
+    const { data: qualfier } = useQualifier(ocelId);
+
+    const SelectComponent = isMulti ? MultiSelect : Select;
+
+    return (
+      <SelectComponent
+        {...props}
+        value={value ?? (isMulti ? [] : null)}
+        data={qualfier}
+      />
+    );
+  };
+
 const OCEL_FIELDS: Record<string, ComponentType<OcelSelectProps>> = {
   event_type: TypeSelect(useEventCounts),
   object_type: TypeSelect(useObjectCounts),
@@ -100,6 +118,8 @@ const OCEL_FIELDS: Record<string, ComponentType<OcelSelectProps>> = {
   object_attribute: AttributeSelect(useObjectAttributes),
   event_id: IdSelect(useEventIds),
   object_id: IdSelect(useObjectIds),
+  e2o_qualifier: QualifierSelect(useE2oQualifier),
+  o2o_qualifier: QualifierSelect(useO2oQualifier),
 };
 
 export const OCELField = memo(

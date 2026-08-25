@@ -18,6 +18,8 @@ def OCEL_FIELD(
         "event_attribute",
         "object_attribute",
         "time_frame",
+        "e2o_qualifier",
+        "o2o_qualifier",
     ],
     ocel_id: str,
     default: Any = ...,
