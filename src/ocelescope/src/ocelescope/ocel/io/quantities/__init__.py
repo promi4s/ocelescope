@@ -26,6 +26,38 @@ def export_quantities(
 ) -> None:
     target = Path(target)
 
+    is_empty = source.sql("""
+        SELECT
+            oqty = 0
+            or qip = 0
+            or qop = 0 as is_empty
+        FROM
+        (
+            SELECT
+            (
+                SELECT
+                count(*)
+                FROM
+                quantities
+            ) AS oqty,
+            (
+                SELECT
+                count(*)
+                FROM
+                quantity_item_properties
+            ) as qip,
+            (
+                SELECT
+                count(*)
+                FROM
+                quantity_operations
+            ) as qop
+        )
+    """).fetchone()
+
+    if is_empty is None or is_empty[0]:
+        return
+
     match target.suffix:
         case ".json":
             export_quantities_json(source, target)
