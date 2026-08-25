@@ -98,7 +98,7 @@ const IdSelect =
 const QualifierSelect =
   (useQualifier: typeof useE2oQualifier | typeof useO2oQualifier) =>
   ({ ocelId, isMulti, value, ...props }: OcelSelectProps) => {
-    const { data: qualfier } = useQualifier(ocelId);
+    const { data: qualifier } = useQualifier(ocelId);
 
     const SelectComponent = isMulti ? MultiSelect : Select;
 
@@ -106,7 +106,7 @@ const QualifierSelect =
       <SelectComponent
         {...props}
         value={value ?? (isMulti ? [] : null)}
-        data={qualfier}
+        data={qualifier}
       />
     );
   };
