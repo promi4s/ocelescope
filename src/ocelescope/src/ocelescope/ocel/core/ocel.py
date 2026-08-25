@@ -22,6 +22,7 @@ from ocelescope.ocel.constants.pm4py import (
 )
 from ocelescope.ocel.extensions.manager import ExtensionManager
 from ocelescope.ocel.filter.base import BaseFilter
+from ocelescope.ocel.io import convert_ocel_duckdb, export_duckdb_ocel, import_quantities
 from ocelescope.ocel.managers import (
     E2OManager,
     EventsManager,
@@ -324,7 +325,6 @@ class OCEL:
         Returns:
             OCEL: A fully constructed OCEL wrapper instance.
         """
-        from ocelescope.ocel.io import import_ocel_r4pm_streamed, import_quantities
 
         path = Path(path)
 
@@ -350,8 +350,7 @@ class OCEL:
 
         connection = duckdb.connect(":memory:")
         try:
-            import_ocel_r4pm_streamed(path, connection)
-            import_quantities(path, connection)
+            convert_ocel_duckdb(path, connection)
             set_utc(connection)
         except Exception:
             connection.close()
@@ -474,15 +473,13 @@ class OCEL:
         Raises:
             ValueError: If the file extension is not supported.
         """
-        from ocelescope.ocel.io import export_ocel_r4pm_streamed, export_quantities
 
         path = Path(path)
 
         if path.suffix not in {".xmlocel", ".xml", ".jsonocel", ".json", ".sqlite"}:
             raise ValueError(f"Unsupported extension: {path.suffix}")
 
-        export_ocel_r4pm_streamed(self._con, path)
-        export_quantities(self._con, path)
+        export_duckdb_ocel(self._con, path)
         self.extensions.export_all(path)
 
     def write_xes(self, object_type: str, path: str | Path):

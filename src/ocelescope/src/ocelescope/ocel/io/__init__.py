@@ -18,9 +18,24 @@ itself is the OCEL's own business, since a database is what an OCEL already is -
 see :meth:`ocelescope.OCEL.read_duckdb` and :meth:`ocelescope.OCEL.to_duckdb`.
 """
 
+from pathlib import Path
+
+from duckdb import DuckDBPyConnection
+
 from ocelescope.ocel.io.connection import DuckDBTarget, connect_target
 from ocelescope.ocel.io.quantities import export_quantities, import_quantities
 from ocelescope.ocel.io.r4pm import export_ocel_r4pm_streamed, import_ocel_r4pm_streamed
+
+
+def export_duckdb_ocel(source: DuckDBPyConnection, target: str | Path):
+    export_ocel_r4pm_streamed(source, target)
+    export_quantities(source, target)
+
+
+def convert_ocel_duckdb(source: str | Path, target: DuckDBTarget):
+    import_ocel_r4pm_streamed(source, target)
+    import_quantities(source, target)
+
 
 __all__ = [
     "DuckDBTarget",
@@ -29,4 +44,6 @@ __all__ = [
     "import_ocel_r4pm_streamed",
     "import_quantities",
     "export_quantities",
+    "export_duckdb_ocel",
+    "convert_ocel_duckdb",
 ]
