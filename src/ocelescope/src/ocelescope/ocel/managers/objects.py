@@ -110,11 +110,26 @@ class ObjectsManager(BaseManager):
                 for name, dtype, *_ in con.execute(f"DESCRIBE {incoming}").fetchall()
                 if name not in (OID_COL, OTYPE_COL)
             ]
+            stored = {
+                name: dtype
+                for name, dtype, *_ in con.execute(f"DESCRIBE {OBJECT_CHANGES_TABLE}").fetchall()
+            }
             for name, dtype in columns:
-                con.execute(
-                    f"ALTER TABLE {OBJECT_CHANGES_TABLE} "
-                    f"ADD COLUMN IF NOT EXISTS {ident(name)} {dtype}"
-                )
+                if name not in stored:
+                    con.execute(
+                        f"ALTER TABLE {OBJECT_CHANGES_TABLE} ADD COLUMN {ident(name)} {dtype}"
+                    )
+
+                elif (
+                    stored[name] != dtype
+                    and not con.execute(
+                        f"SELECT count({ident(name)}) FROM {OBJECT_CHANGES_TABLE}"
+                    ).fetchall()[0][0]
+                ):
+                    con.execute(
+                        f"ALTER TABLE {OBJECT_CHANGES_TABLE} "
+                        f"ALTER COLUMN {ident(name)} TYPE {dtype}"
+                    )
                 con.execute(
                     f"INSERT INTO {OBJECT_CHANGES_TABLE} BY NAME "
                     f"SELECT {oid}, {EPOCH_SQL} AS {ts}, {literal(name)} AS {field}, {ident(name)} "
