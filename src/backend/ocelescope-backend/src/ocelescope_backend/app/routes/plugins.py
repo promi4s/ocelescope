@@ -5,7 +5,7 @@ from contextlib import ExitStack
 from datetime import datetime
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import Body
 from fastapi.exceptions import HTTPException
@@ -67,8 +67,8 @@ def get_plugin_method(plugin_id: str, method_name: str) -> PluginMethod | None:
 
 @plugin_router.post("/{plugin_id}/{method_name}", operation_id="runPlugin")
 def run_plugin(
-    input_ocels: dict[str, str],
-    input_resources: dict[str, str],
+    input_ocels: dict[str, str | None],
+    input_resources: dict[str, str | None],
     session: ApiSession,
     plugin_id: str,
     method_name: str,
@@ -202,8 +202,8 @@ def download_plugin_results(
     "/{plugin_id}/{method_name}/computed/{provider}", operation_id="getComputedValues"
 )
 def get_computed(
-    input_ocels: dict[str, Optional[str]],
-    input_resources: dict[str, Optional[str]],
+    input_ocels: dict[str, str | None],
+    input_resources: dict[str, str | None],
     input: dict[str, Any],
     session: ApiSession,
     plugin_id: str,
