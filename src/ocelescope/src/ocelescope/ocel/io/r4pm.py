@@ -198,7 +198,7 @@ def _r4pm_timestamp(expr: str) -> str:
     return f"{expr} AT TIME ZONE 'UTC'"
 
 
-def export_ocel_r4pm_stream(source: DuckDBTarget, target: str | Path) -> None:
+def export_ocel_r4pm_streamed(source: DuckDBTarget, target: str | Path) -> None:
     """Write the flat OCEL tables at ``source`` into an r4pm DuckDB log at ``target``.
 
     The inverse of :func:`import_ocel_r4pm_streamed`: it produces the seven tables
