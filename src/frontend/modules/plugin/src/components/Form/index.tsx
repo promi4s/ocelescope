@@ -65,6 +65,7 @@ const PluginInput: React.FC<PluginInputProps> = ({
             render={({ field, fieldState }) => (
               <OcelSelect
                 label={label}
+                clearable={is_optional}
                 required={!is_optional}
                 extension={extension ?? undefined}
                 description={description}
@@ -85,6 +86,7 @@ const PluginInput: React.FC<PluginInputProps> = ({
             rules={!is_optional ? { required: "Please select a value" } : {}}
             render={({ field, fieldState }) => (
               <ResourceSelect
+                clearable={is_optional}
                 label={label}
                 required={!is_optional}
                 type={resource_type}
