@@ -1,3 +1,4 @@
+from types import NoneType, UnionType
 from typing import (
     Annotated,
     Any,
@@ -23,6 +24,7 @@ from ocelescope.resource.resource import Resource
 class Annotation(BaseModel):
     label: str
     description: Optional[str] = None
+    is_optional: bool = False
 
 
 class OCELAnnotation(Annotation):
@@ -112,14 +114,40 @@ class PluginMethod(BaseModel):
         return self._input_model.model_json_schema() if self._input_model is not None else None
 
 
-def extract_info(typ) -> tuple[type, Optional[Annotation]]:
-    if get_origin(typ) is Annotated:
-        base_type, *annotations = get_args(typ)
-        annotation = next((a for a in annotations if isinstance(a, Annotation)), None)
-    else:
-        base_type = typ
-        annotation = None
-    return base_type, annotation
+def _unwrap_annotated(typ) -> tuple[Any, Optional[Annotation]]:
+    if get_origin(typ) is not Annotated:
+        return typ, None
+
+    base_type, *annotations = get_args(typ)
+    return base_type, next((a for a in annotations if isinstance(a, Annotation)), None)
+
+
+def _unwrap_optional(typ) -> tuple[Any, bool]:
+    """Strip the `None` from `T | None` / `Optional[T]`; other unions are rejected."""
+    if get_origin(typ) not in (Union, UnionType):
+        return typ, False
+
+    args = get_args(typ)
+    non_none = [arg for arg in args if arg is not NoneType]
+
+    if len(non_none) != 1 or len(non_none) == len(args):
+        raise TypeError(f"Unsupported union type: {typ}. Only `T | None` is supported.")
+
+    return non_none[0], True
+
+
+def extract_info(typ) -> tuple[type, Optional[Annotation], bool]:
+    """Peel `Annotated[...]` and `| None` off a hint.
+
+    Returns the base type, its `Annotation` (if any) and whether it was optional.
+    The annotation may sit on either side of the union, so both
+    `Annotated[OCEL | None, ...]` and `Annotated[OCEL, ...] | None` are accepted.
+    """
+    base_type, annotation = _unwrap_annotated(typ)
+    base_type, is_optional = _unwrap_optional(base_type)
+    base_type, inner_annotation = _unwrap_annotated(base_type)
+
+    return base_type, annotation if annotation is not None else inner_annotation, is_optional
 
 
 def plugin_method(
@@ -140,7 +168,7 @@ def plugin_method(
         method_hints = get_type_hints(func, include_extras=True)
 
         for arg_name, hint in method_hints.items():
-            base_type, annotation = extract_info(hint)
+            base_type, annotation, is_optional = extract_info(hint)
 
             if not isinstance(base_type, type) or arg_name == "return":
                 continue
@@ -148,19 +176,27 @@ def plugin_method(
             if issubclass(base_type, PluginInput):
                 plugin_method_meta._input_model = base_type
             elif issubclass(base_type, OCEL):
-                plugin_method_meta.input_ocels[arg_name] = (
+                ocel_annotation = (
                     OCELAnnotation(**annotation.model_dump())
                     if annotation is not None
                     else OCELAnnotation(label=arg_name)
                 )
+                ocel_annotation.is_optional = is_optional
+
+                plugin_method_meta.input_ocels[arg_name] = ocel_annotation
             elif issubclass(base_type, Resource):
                 plugin_method_meta._resource_types.add(base_type)
 
-                plugin_method_meta.input_resources[arg_name] = (
-                    base_type.get_type(),
+                resource_annotation = (
                     ResourceAnnotation(**annotation.model_dump())
                     if annotation is not None
-                    else ResourceAnnotation(label=arg_name),
+                    else ResourceAnnotation(label=arg_name)
+                )
+                resource_annotation.is_optional = is_optional
+
+                plugin_method_meta.input_resources[arg_name] = (
+                    base_type.get_type(),
+                    resource_annotation,
                 )
             else:
                 raise TypeError(
@@ -180,11 +216,11 @@ def plugin_method(
                 types_to_parse = [return_type]
 
             for typ in types_to_parse:
-                base_type, annotation = extract_info(typ)
+                base_type, annotation, _ = extract_info(typ)
 
                 if get_origin(base_type) is list:
                     inner_type = get_args(base_type)[0]
-                    base_type, annotation = extract_info(inner_type)
+                    base_type, annotation, _ = extract_info(inner_type)
                     is_list = True
                 else:
                     is_list = False
