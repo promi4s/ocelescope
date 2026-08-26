@@ -12,9 +12,9 @@ def import_quantities(source: str | Path, target: DuckDBTarget) -> None:
     source = Path(source)
 
     match source.suffix:
-        case ".json":
+        case ".json" | ".jsonocel":
             import_quantities_json(source, target)
-        case ".xml":
+        case ".xml" | ".xmlocel":
             import_quantities_xml(source, target)
         case ".sqlite":
             import_quantities_sqlite(source, target)
@@ -29,8 +29,8 @@ def export_quantities(
     is_empty = source.sql("""
         SELECT
             oqty = 0
-            or qip = 0
-            or qop = 0 as is_empty
+            and qip = 0
+            and qop = 0 as is_empty
         FROM
         (
             SELECT
@@ -59,9 +59,9 @@ def export_quantities(
         return
 
     match target.suffix:
-        case ".json":
+        case ".json" | ".jsonocel":
             export_quantities_json(source, target)
-        case ".xml":
+        case ".xml" | ".xmlocel":
             export_quantities_xml(source, target)
         case ".sqlite":
             export_quantities_sqlite(source, target)

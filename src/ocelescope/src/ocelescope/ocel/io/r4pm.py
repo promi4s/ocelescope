@@ -56,6 +56,13 @@ def _not_ignored(column: str) -> str:
     return f"{ident(column)} NOT IN ({', '.join(literal(name) for name in IGNORED_ATTRIBUTES)})"
 
 
+def _available(meta_table: MetaTable) -> str:
+    """The attribute names the table behind ``meta_table`` really has a column for."""
+    if meta_table == "object_attr_meta":
+        return f"SELECT DISTINCT name FROM {ident(SRC)}.object_attribute_changes"
+    return f"SELECT column_name AS name FROM (DESCRIBE {ident(SRC)}.events)"
+
+
 def _attribute_select(con: duckdb.DuckDBPyConnection, meta_table: MetaTable) -> str:
     """The attribute columns of one table, as ``TRY_CAST(...) AS name`` items.
 
@@ -75,10 +82,16 @@ def _attribute_select(con: duckdb.DuckDBPyConnection, meta_table: MetaTable) -> 
         ORDER BY attr_name
     """).fetchall()
 
+    # An attribute can be declared without ever being valued, and then it reaches
+    # the meta table but not the data: the PIVOT raises one column per name it
+    # sees, and r4pm's events table one per attribute it wrote. Selecting the
+    # declaration alone would fail to bind.
+    available = {name for (name,) in con.execute(_available(meta_table)).fetchall()}
+
     return ",".join(
         f"TRY_CAST({ident(name)} AS {ATTRIBUTE_TYPE_TO_DUCKDB[attr_type]}) AS {ident(name)}"
         for name, attr_type in attr_types
-        if attr_type in ATTRIBUTE_TYPE_TO_DUCKDB
+        if attr_type in ATTRIBUTE_TYPE_TO_DUCKDB and name in available
     )
 
 
@@ -159,9 +172,10 @@ def with_attr_meta(table: Literal["objects", "events"]) -> str:
     """A CTE naming every attribute column of one flat table with its OCEL type.
 
     r4pm stores an attribute's type as an OCEL type string, so the DuckDB column
-    types map back the way :func:`~ocelescope.ocel.io.exporters.common.duckdb_type_to_ocel`
-    maps them -- anything unrecognised falls back to ``string``. Object attributes
-    are read off ``object_changes``: ``objects`` carries only id and type.
+    types are mapped back to one -- anything unrecognised falls back to ``string``,
+    the inverse of :data:`~ocelescope.ocel.io.schema.ATTRIBUTE_TYPE_TO_DUCKDB`.
+    Object attributes are read off ``object_changes``: ``objects`` carries only id
+    and type.
     """
     flat_table = OBJECT_CHANGES_TABLE if table == "objects" else EVENTS_TABLE
     meta_columns = (
@@ -288,6 +302,7 @@ def export_ocel_r4pm_streamed(source: DuckDBTarget, target: str | Path) -> None:
                         {ident(OBJECT_CHANGED_FIELD)} = "name"
                     ) oc
                     JOIN attr_meta_map as amm on oc."name" = amm.attr_name
+                    ORDER BY oc.id, oc."name", oc."time"
                 """)
 
                 con.execute(f"""

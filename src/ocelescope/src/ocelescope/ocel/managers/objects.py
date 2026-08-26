@@ -86,12 +86,8 @@ class ObjectsManager(BaseManager):
         describe are the ones being replaced. Dynamic attributes are left alone,
         epoch rows included: those are a dynamic attribute's initial value, not
         the object's own column.
-
-        A value is only written where the object has no history of that attribute
-        at all. Tools that keep an attribute's first value in both tables (PM4PY
-        and r4pm do) would otherwise have it stored twice: once at its own time,
-        once more at the epoch, as a change that never happened.
         """
+
         oid, otype = ident(OID_COL), ident(OTYPE_COL)
         ts, field = ident(TIMESTAMP_COL), ident(OBJECT_CHANGED_FIELD)
         con = self._ocel.con
@@ -135,7 +131,8 @@ class ObjectsManager(BaseManager):
                     f"SELECT {oid}, {EPOCH_SQL} AS {ts}, {literal(name)} AS {field}, {ident(name)} "
                     f"FROM {incoming} i WHERE i.{ident(name)} IS NOT NULL "
                     f"AND NOT EXISTS (SELECT 1 FROM {OBJECT_CHANGES_TABLE} c "
-                    f"WHERE c.{oid} = i.{oid} AND c.{field} = {literal(name)})"
+                    f"WHERE c.{oid} = i.{oid} AND c.{field} = {literal(name)} "
+                    f"AND c.{ts} = {EPOCH_SQL})"
                 )
 
             con.execute(
@@ -252,9 +249,12 @@ class ObjectsManager(BaseManager):
             source = f"(SELECT {kept}{absent} FROM {incoming})"
 
             # the rows that name their field, which also settles the stored types
+            # -- save for the three the schema fixes, cast here so that contents
+            # arriving empty cannot leave an id column typed as a number
             con.execute(
                 f"CREATE OR REPLACE TABLE {OBJECT_CHANGES_TABLE} AS "
-                f"SELECT * REPLACE (coalesce({ts}, {EPOCH_SQL})::TIMESTAMP AS {ts}) "
+                f"SELECT * REPLACE (coalesce({ts}, {EPOCH_SQL})::TIMESTAMP AS {ts}, "
+                f"{oid}::VARCHAR AS {oid}, {field}::VARCHAR AS {field}) "
                 f"FROM {source} WHERE {field} IS NOT NULL"
             )
 

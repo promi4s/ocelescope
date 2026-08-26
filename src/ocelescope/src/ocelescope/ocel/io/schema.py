@@ -29,6 +29,13 @@ from ocelescope.ocel.constants.quantity import (
     QUANTITY_ITEM_PROPERTIES_TABLE,
     QUANTITY_OPERATIONS_TABLE,
 )
+from ocelescope.ocel.constants.tables import (
+    E2O_TABLE,
+    EVENTS_TABLE,
+    O2O_TABLE,
+    OBJECT_CHANGES_TABLE,
+    OBJECTS_TABLE,
+)
 
 SchemaDefinition = list[tuple[str, pa.DataType]]
 
@@ -100,6 +107,37 @@ QUANTITY_ITEM_PROPERTIES_TABLE_SCHEMA: SchemaDefinition = [
 ]
 
 
+def _duckdb_type(dtype: pa.DataType) -> str:
+    """``dtype`` as a DuckDB type name, which a cast can be written with."""
+    if dtype == TIMESTAMP_TYPE:
+        return "TIMESTAMP"
+    if dtype == pa.float64():
+        return "DOUBLE"
+    return "VARCHAR"
+
+
+FIXED_COLUMN_TYPES: dict[str, dict[str, str]] = {
+    table: {name: _duckdb_type(dtype) for name, dtype in definition}
+    for table, definition in {
+        OBJECTS_TABLE: OBJECT_TABLE_BASE_SCHEMA,
+        OBJECT_CHANGES_TABLE: OBJECT_CHANGES_TABLE_SCHEMA,
+        O2O_TABLE: O2O_TABLE_SCHEMA,
+        EVENTS_TABLE: EVENT_TABLE_BASE_SCHEMA,
+        E2O_TABLE: E2O_TABLE_SCHEMA,
+        QUANTITIES_TABLE: QUANTITIES_TABLE_SCHEMA,
+        QUANTITY_OPERATIONS_TABLE: QUANTITY_OPERATIONS_TABLE_SCHEMA,
+        QUANTITY_ITEM_PROPERTIES_TABLE: QUANTITY_ITEM_PROPERTIES_TABLE_SCHEMA,
+    }.items()
+}
+"""Each table's fixed columns, with the type the schema gives them.
+
+What a table is stored as is the schema's business, not the contents' -- a frame
+that arrives empty says nothing about its own types, and DuckDB reads a column of
+nothing as INTEGER. The per-log attribute columns are deliberately absent: their
+type is the log's to decide.
+"""
+
+
 def ocel_table_schemas(
     object_columns: SchemaDefinition, event_columns: SchemaDefinition
 ) -> dict[str, pa.Schema]:
@@ -109,11 +147,11 @@ def ocel_table_schemas(
     append to the fixed base columns of each table.
     """
     return {
-        "objects": pa.schema(OBJECT_TABLE_BASE_SCHEMA),
-        "object_changes": pa.schema(OBJECT_CHANGES_TABLE_SCHEMA + object_columns),
-        "o2o": pa.schema(O2O_TABLE_SCHEMA),
-        "events": pa.schema(EVENT_TABLE_BASE_SCHEMA + event_columns),
-        "e2o": pa.schema(E2O_TABLE_SCHEMA),
+        OBJECTS_TABLE: pa.schema(OBJECT_TABLE_BASE_SCHEMA),
+        OBJECT_CHANGES_TABLE: pa.schema(OBJECT_CHANGES_TABLE_SCHEMA + object_columns),
+        O2O_TABLE: pa.schema(O2O_TABLE_SCHEMA),
+        EVENTS_TABLE: pa.schema(EVENT_TABLE_BASE_SCHEMA + event_columns),
+        E2O_TABLE: pa.schema(E2O_TABLE_SCHEMA),
     }
 
 

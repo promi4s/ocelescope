@@ -83,7 +83,7 @@ def import_quantities_json(source: str | Path, target: DuckDBTarget) -> None:
 _WHITESPACE = b" \t\r\n"
 
 _DUMP_OPTS = orjson.OPT_NAIVE_UTC | orjson.OPT_UTC_Z
-"""Match :mod:`ocelescope.ocel.io.exporters.json`: timestamps as UTC with a ``Z``."""
+"""Write timestamps as UTC with a ``Z``, the way an OCEL 2.0 JSON log spells them."""
 
 
 def _fallback(value: object) -> float:
