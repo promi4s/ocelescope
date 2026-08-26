@@ -737,21 +737,7 @@
                     {
                       "type": "array",
                       "items": {
-                        "oneOf": [
-                          {
-                            "$ref": "#/components/schemas/OCELOutput"
-                          },
-                          {
-                            "$ref": "#/components/schemas/ResourceOutput"
-                          }
-                        ],
-                        "discriminator": {
-                          "propertyName": "type",
-                          "mapping": {
-                            "ocel": "#/components/schemas/OCELOutput",
-                            "resource": "#/components/schemas/ResourceOutput"
-                          }
-                        }
+                        "$ref": "#/components/schemas/PluginOutput"
                       }
                     },
                     {
@@ -818,7 +804,11 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Body_savePluginResults"
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ResultSelection"
+                },
+                "title": "Selection"
               }
             }
           }
@@ -1418,22 +1408,6 @@
           "input_resources"
         ],
         "title": "Body_runPlugin"
-      },
-      "Body_savePluginResults": {
-        "properties": {
-          "indices": {
-            "items": {
-              "type": "integer"
-            },
-            "type": "array",
-            "title": "Indices"
-          }
-        },
-        "type": "object",
-        "required": [
-          "indices"
-        ],
-        "title": "Body_savePluginResults"
       },
       "Body_upload": {
         "properties": {
@@ -2389,41 +2363,6 @@
         "title": "OCELAnnotation",
         "description": "UI annotation metadata for an `OCEL`-typed parameter or result.\n\nIn addition to the base `Annotation` fields, this annotation may specify an\nOCEL extension. To keep the annotation JSON-serializable and stable for\nfrontend consumption, the constructor accepts an `OCELExtension` class and\ncoerces it to its class name (a string).\n\nAttributes:\n    label: Human-readable label to display in the UI.\n    description: Optional longer text shown in the UI to explain the OCEL.\n    extension: Optional extension identifier. If constructed with an\n        `OCELExtension` class, it is coerced to that class' name."
       },
-      "OCELOutput": {
-        "properties": {
-          "result_index": {
-            "type": "integer",
-            "title": "Result Index"
-          },
-          "type": {
-            "type": "string",
-            "const": "ocel",
-            "title": "Type"
-          },
-          "activity_count": {
-            "additionalProperties": {
-              "type": "integer"
-            },
-            "type": "object",
-            "title": "Activity Count"
-          },
-          "object_count": {
-            "additionalProperties": {
-              "type": "integer"
-            },
-            "type": "object",
-            "title": "Object Count"
-          }
-        },
-        "type": "object",
-        "required": [
-          "result_index",
-          "type",
-          "activity_count",
-          "object_count"
-        ],
-        "title": "OCELOutput"
-      },
       "OCELResult": {
         "properties": {
           "type": {
@@ -2630,6 +2569,67 @@
         ],
         "title": "PluginMethod"
       },
+      "PluginOutput": {
+        "properties": {
+          "result_index": {
+            "type": "integer",
+            "title": "Result Index"
+          },
+          "default_name": {
+            "type": "string",
+            "title": "Default Name"
+          },
+          "type_label": {
+            "type": "string",
+            "title": "Type Label"
+          },
+          "visualization": {
+            "anyOf": [
+              {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/Graph"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Table"
+                  },
+                  {
+                    "$ref": "#/components/schemas/SVGVis"
+                  },
+                  {
+                    "$ref": "#/components/schemas/DotVis"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Plotly"
+                  }
+                ],
+                "discriminator": {
+                  "propertyName": "type",
+                  "mapping": {
+                    "dot": "#/components/schemas/DotVis",
+                    "graph": "#/components/schemas/Graph",
+                    "plotly": "#/components/schemas/Plotly",
+                    "svg": "#/components/schemas/SVGVis",
+                    "table": "#/components/schemas/Table"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Visualization"
+          }
+        },
+        "type": "object",
+        "required": [
+          "result_index",
+          "default_name",
+          "type_label",
+          "visualization"
+        ],
+        "title": "PluginOutput"
+      },
       "PluginSource": {
         "properties": {
           "task_id": {
@@ -2766,68 +2766,6 @@
         ],
         "title": "ResourceInfo"
       },
-      "ResourceOutput": {
-        "properties": {
-          "result_index": {
-            "type": "integer",
-            "title": "Result Index"
-          },
-          "type": {
-            "type": "string",
-            "const": "resource",
-            "title": "Type"
-          },
-          "resource_type": {
-            "type": "string",
-            "title": "Resource Type"
-          },
-          "visualization": {
-            "anyOf": [
-              {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/Graph"
-                  },
-                  {
-                    "$ref": "#/components/schemas/Table"
-                  },
-                  {
-                    "$ref": "#/components/schemas/SVGVis"
-                  },
-                  {
-                    "$ref": "#/components/schemas/DotVis"
-                  },
-                  {
-                    "$ref": "#/components/schemas/Plotly"
-                  }
-                ],
-                "discriminator": {
-                  "propertyName": "type",
-                  "mapping": {
-                    "dot": "#/components/schemas/DotVis",
-                    "graph": "#/components/schemas/Graph",
-                    "plotly": "#/components/schemas/Plotly",
-                    "svg": "#/components/schemas/SVGVis",
-                    "table": "#/components/schemas/Table"
-                  }
-                }
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Visualization"
-          }
-        },
-        "type": "object",
-        "required": [
-          "result_index",
-          "type",
-          "resource_type",
-          "visualization"
-        ],
-        "title": "ResourceOutput"
-      },
       "ResourceResult": {
         "properties": {
           "type": {
@@ -2862,6 +2800,31 @@
           "annotation"
         ],
         "title": "ResourceResult"
+      },
+      "ResultSelection": {
+        "properties": {
+          "index": {
+            "type": "integer",
+            "title": "Index"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "index",
+          "name"
+        ],
+        "title": "ResultSelection"
       },
       "SVGVis": {
         "properties": {

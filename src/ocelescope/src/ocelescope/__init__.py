@@ -6,10 +6,10 @@ from ocelescope.ocel import (
     E2OCountFilter,
     EventAttributeFilter,
     EventTypeFilter,
-    ObjectIdFilter,
     EventTypeFrequencyFilter,
     O2OCountFilter,
     ObjectAttributeFilter,
+    ObjectIdFilter,
     ObjectTypeFilter,
     ObjectTypeFrequencyFilter,
     OCELExtension,
@@ -19,6 +19,8 @@ from ocelescope.plugin import (
     CODE_FIELD,
     COMPUTED_SELECTION,
     OCEL_FIELD,
+    SLIDER_FIELD,
+    SQL_FIELD,
     OCELAnnotation,
     Plugin,
     PluginInput,
@@ -26,8 +28,6 @@ from ocelescope.plugin import (
     PluginMethod,
     PluginResult,
     ResourceAnnotation,
-    SLIDER_FIELD,
-    SQL_FIELD,
     plugin_method,
 )
 from ocelescope.resource import DirectlyFollowsGraph, PetriNet, Resource
@@ -46,6 +46,7 @@ from ocelescope.visualization import (
     GraphShapes,
     GraphvizLayoutConfig,
     LayoutConfig,
+    Plotly,
     SVGVis,
     Table,
     TableColumn,
@@ -111,4 +112,6 @@ __all__ = [
     "SVGVis",
     # Graphviz
     "DotVis",
+    # Plotly
+    "Plotly",
 ]

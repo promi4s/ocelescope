@@ -15,8 +15,8 @@ from pydantic import BaseModel
 from ocelescope import OCEL, PluginMethod, Resource
 from ocelescope_backend.app.dependencies import ApiPluginTask, ApiSession
 from ocelescope_backend.app.internal.config import config
-from ocelescope_backend.app.internal.model.plugin import (
-    PluginApi,
+from ocelescope_backend.app.internal.model.plugin import PluginApi
+from ocelescope_backend.app.internal.model.plugin_result import (
     PluginOutput,
     ResultSelection,
 )
