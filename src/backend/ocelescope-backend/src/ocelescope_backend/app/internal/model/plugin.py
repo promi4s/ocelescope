@@ -1,15 +1,16 @@
-from abc import ABC
-from typing import Annotated, Literal, Self, cast
+from typing import Self, cast
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from ocelescope import (
     OCEL,
     PluginMeta,
     PluginMethod,
-    Resource,
     Visualization,
 )
+from ocelescope_backend.app.internal.tasks.plugin import PluginTask
+from ocelescope_backend.app.internal.util.ocel_visualization import visualize_ocel
+from ocelescope_backend.app.internal.util.plugin_result import default_result_name
 
 
 class PluginApi(BaseModel):
@@ -18,38 +19,34 @@ class PluginApi(BaseModel):
     methods: list[PluginMethod]
 
 
-class PluginOutputBase(ABC, BaseModel):
+class PluginOutput(BaseModel):
     result_index: int
-
-
-class OCELOutput(PluginOutputBase):
-    type: Literal["ocel"]
-    activity_count: dict[str, int]
-    object_count: dict[str, int]
-
-    @classmethod
-    def from_ocel(cls, index: int, ocel: OCEL) -> Self:
-        return cls(
-            type="ocel",
-            result_index=index,
-            activity_count=ocel.events.activity_counts.to_dict(),
-            object_count=ocel.objects.counts.to_dict(),
-        )
-
-
-class ResourceOutput(PluginOutputBase):
-    type: Literal["resource"]
-    resource_type: str
+    default_name: str
+    type_label: str
     visualization: Visualization | None
 
     @classmethod
-    def from_resource(cls, index: int, resource: Resource):
-        return cls(
-            type="resource",
-            result_index=index,
-            resource_type=resource.label or resource.get_type(),
-            visualization=cast(Visualization, resource.visualize()),
-        )
+    def from_plugin_result(cls, task: PluginTask) -> list[Self]:
+        plugin_id, method_name = task.plugin_id, task.method_name
+
+        return [
+            cls(
+                result_index=index,
+                default_name=default_result_name(plugin_id, method_name, index),
+                type_label="OCEL",
+                visualization=visualize_ocel(result),
+            )
+            if isinstance(result, OCEL)
+            else cls(
+                result_index=index,
+                default_name=default_result_name(plugin_id, method_name, index),
+                type_label=result.get_type(),
+                visualization=cast(Visualization, result.visualize()),
+            )
+            for index, result in enumerate(task.result or [])
+        ]
 
 
-PluginOutput = Annotated[OCELOutput | ResourceOutput, Field(discriminator="type")]
+class ResultSelection(BaseModel):
+    index: int
+    name: str | None

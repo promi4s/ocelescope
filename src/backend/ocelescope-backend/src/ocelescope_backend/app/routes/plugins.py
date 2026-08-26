@@ -16,10 +16,9 @@ from ocelescope import OCEL, PluginMethod, Resource
 from ocelescope_backend.app.dependencies import ApiPluginTask, ApiSession
 from ocelescope_backend.app.internal.config import config
 from ocelescope_backend.app.internal.model.plugin import (
-    OCELOutput,
     PluginApi,
     PluginOutput,
-    ResourceOutput,
+    ResultSelection,
 )
 from ocelescope_backend.app.internal.model.resource import ResourceStore
 from ocelescope_backend.app.internal.model.response import TempFileResponse
@@ -91,12 +90,7 @@ def get_plugin_result(
     if plugin_task.result is None:
         return None
 
-    return [
-        OCELOutput.from_ocel(index, result)
-        if isinstance(result, OCEL)
-        else ResourceOutput.from_resource(index, result)
-        for index, result in enumerate(plugin_task.result)
-    ]
+    return PluginOutput.from_plugin_result(plugin_task)
 
 
 class SavedResults(BaseModel):
@@ -114,16 +108,19 @@ def save_plugin_results(
     plugin_id: str,
     method_name: str,
     task_id: str,
-    indices: list[int] = Body(embed=True),
+    selection: list[ResultSelection],
 ) -> SavedResults:
     """Save the selected results into the session as OCELs / resources."""
-    selected = select_results(plugin_task, indices)
+    selected = select_results(plugin_task, [result.index for result in selection])
+
     source = plugin_source(plugin_id, method_name, task_id)
 
     saved = SavedResults(ocel_ids=[], resource_ids=[])
 
     for index, entity in selected:
-        name = default_result_name(plugin_id, method_name, index)
+        name = next(result.name for result in selection) or default_result_name(
+            plugin_id=plugin_id, method_name=method_name, index=index
+        )
 
         if isinstance(entity, OCEL):
             saved.ocel_ids.append(session.add_ocel(entity, name))
