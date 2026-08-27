@@ -11,7 +11,6 @@ from ocelescope_backend.app.internal.config import config
 from ocelescope_backend.app.internal.model.plugin import PluginApi
 from ocelescope_backend.app.internal.model.resource import ResourceStore
 from ocelescope_backend.app.internal.registry.discovery import DiscoveryRegistry
-from ocelescope_backend.app.internal.registry.extension import ExtensionRegistry
 from ocelescope_backend.app.internal.registry.plugin import PluginRegistry
 from ocelescope_backend.app.internal.registry.resource import ResourceRegistry
 from ocelescope_backend.app.internal.util.dynamic_import import (
@@ -31,7 +30,6 @@ class RegistryManager:
     def __init__(self):
         self._plugin_registry = PluginRegistry()
         self._resource_registry = ResourceRegistry()
-        self._extension_registry = ExtensionRegistry()
         self._discovery_registry = DiscoveryRegistry()
         self._register_core_resources()
         self._discovery_registry.register(algorithms)
@@ -99,12 +97,6 @@ class RegistryManager:
 
         return hydrated_resource
 
-    def get_extension_descriptions(self):
-        return self._extension_registry.get_extension_description()
-
-    def get_loaded_extensions(self):
-        return self._extension_registry.get_loaded_extensions()
-
     def load_plugins(
         self, plugin_ids: list[str], ignore_errors: bool = True
     ) -> list[str]:
@@ -150,13 +142,6 @@ class RegistryManager:
                             print("plugin not found")
                             raise Exception()
 
-                        self._extension_registry.register(module)
-                        for method in plugin.method_map().values():
-                            for resource_type in method._resource_types:
-                                self._resource_registry.register_resource(
-                                    id, resource_type
-                                )
-
                         for info in self._discovery_registry.register(module):
                             self._resource_registry.register_resource(
                                 id, info.resource_type
@@ -179,7 +164,6 @@ class RegistryManager:
     def unload_plugins(self, plugin_ids: list[str]):
         for id in plugin_ids:
             self._plugin_registry.unload_module(id)
-            self._extension_registry.unload_module(id)
             self._resource_registry.unload_module(id)
             self._discovery_registry.unload_module(id)
 

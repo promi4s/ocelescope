@@ -23,7 +23,7 @@ from ocelescope.ocel.filter.base import BaseFilter, Keep
 from ocelescope.util.sql import ident
 
 if TYPE_CHECKING:
-    from ocelescope.ocel.core.ocel import OCEL
+    from ocelescope.ocel.core import OCEL
 
 
 def _all_ids(ocel: "OCEL", table: str, id_col: str) -> pl.LazyFrame:
@@ -50,7 +50,7 @@ def apply_filters(ocel: "OCEL", filters: Sequence[BaseFilter]) -> "OCEL":
     keeps what *all* of its filters keep. A filter that leaves a side ``None``
     constrains only the other one.
     """
-    from ocelescope.ocel.core.ocel import OCEL
+    from ocelescope.ocel.core import OCEL
 
     keeps: list[Keep] = [f.keep(ocel) for f in filters]
 

@@ -10,45 +10,17 @@
         "summary": "List uploaded and uploading OCELs",
         "description": "Returns metadata for all uploaded OCELs along with any OCEL files currently being imported.",
         "operationId": "getOcels",
-        "parameters": [
-          {
-            "name": "extension_name",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Extension Name"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/OcelMetadata"
                   },
+                  "type": "array",
                   "title": "Response Getocels"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -162,28 +134,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/modules/ocel/v1/extension/meta": {
-      "get": {
-        "summary": "Get Extension Meta",
-        "operationId": "getExtensionMeta",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": {
-                    "$ref": "#/components/schemas/OCELExtensionDescription"
-                  },
-                  "type": "object",
-                  "title": "Response Getextensionmeta"
                 }
               }
             }
@@ -2605,29 +2555,6 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
-      "OCELExtensionDescription": {
-        "properties": {
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "label": {
-            "type": "string",
-            "title": "Label"
-          },
-          "description": {
-            "type": "string",
-            "title": "Description"
-          }
-        },
-        "type": "object",
-        "required": [
-          "name",
-          "label",
-          "description"
-        ],
-        "title": "OCELExtensionDescription"
-      },
       "ObjectTypeVariants": {
         "properties": {
           "variants": {
@@ -2701,13 +2628,6 @@
             "type": "string",
             "title": "Created At"
           },
-          "extensions": {
-            "items": {
-              "$ref": "#/components/schemas/OCELExtensionDescription"
-            },
-            "type": "array",
-            "title": "Extensions"
-          },
           "filter_applied": {
             "anyOf": [
               {
@@ -2725,7 +2645,6 @@
           "id",
           "name",
           "created_at",
-          "extensions",
           "filter_applied"
         ],
         "title": "OcelMetadata"

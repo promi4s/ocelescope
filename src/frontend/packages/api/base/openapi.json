@@ -2343,17 +2343,6 @@
             "type": "boolean",
             "title": "Is Optional",
             "default": false
-          },
-          "extension": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Extension"
           }
         },
         "type": "object",

@@ -7,8 +7,6 @@ from pathlib import Path
 from typing import Any, Callable, Hashable, Sequence, Type, TypeVar, cast
 from uuid import uuid4
 
-from ocelescope.ocel.extensions.base_extension import OCELExtension
-
 from ocelescope import OCEL, BaseFilter
 from ocelescope_backend.app.internal.config import config
 from ocelescope_backend.app.internal.exceptions import NotFound
@@ -102,14 +100,12 @@ class Session:
         db_path: Path,
         name: str,
         created_at: str,
-        extensions: list[OCELExtension] | None = None,
     ) -> str:
         self.ocels[id] = SessionOCEL(
             id=id,
             db_path=db_path,
             name=name,
             created_at=created_at,
-            extensions=extensions,
         )
         sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
         return id
@@ -126,7 +122,6 @@ class Session:
             db_path,
             name,
             created_at=datetime.now().isoformat(),
-            extensions=ocel.extensions.all(),
         )
 
     def add_ocel_from_file(self, source_path: Path, name: str) -> str:
@@ -144,14 +139,6 @@ class Session:
             variant="r4pm" if source_path.stat().st_size <= threshold else "streamed",
         ) as ocel:
             return self.add_ocel(ocel, name=name)
-
-    def set_ocel_extensions(self, ocel_id: str, extensions: list[OCELExtension]):
-        """Attach in-memory extension instances to an already registered OCEL."""
-        if ocel_id not in self.ocels:
-            raise NotFound(f"OCEL with id {ocel_id} not found")
-
-        self.ocels[ocel_id].extensions = extensions
-        sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
 
     def get_ocel(self, ocel_id: str, use_original: bool = False) -> OCEL:
         if ocel_id not in self.ocels:

@@ -8,7 +8,6 @@ from tempfile import NamedTemporaryFile
 from typing import Literal
 from uuid import uuid4
 
-from ocelescope.ocel.extensions.manager import import_extensions
 from typing_extensions import TypedDict
 
 from ocelescope import OCEL
@@ -65,11 +64,6 @@ def _import_ocel(
             name=name,
         )
 
-        extensions = import_extensions(
-            read_path, registry_manager.get_loaded_extensions()
-        )
-        if extensions:
-            session.set_ocel_extensions(ocel_id, extensions)
     finally:
         read_path.unlink(missing_ok=True)
         file_path.unlink(missing_ok=True)

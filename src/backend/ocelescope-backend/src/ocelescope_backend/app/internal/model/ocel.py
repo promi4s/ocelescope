@@ -1,7 +1,6 @@
 from pathlib import Path
 from typing import Sequence
 
-from ocelescope.ocel.extensions.base_extension import OCELExtension
 from ocelescope.ocel.io import export_duckdb_ocel
 
 from ocelescope import OCEL, BaseFilter
@@ -23,13 +22,11 @@ class SessionOCEL:
         db_path: Path,
         name: str,
         created_at: str,
-        extensions: list[OCELExtension] | None = None,
     ):
         self.id = id
         self.db_path = db_path
         self.name = name
         self.created_at = created_at
-        self.extensions: list[OCELExtension] = extensions or []
         self._filters_by_source: dict[str, list[BaseFilter]] = {}
         self._filtered_db_path: Path | None = None
         self._filtered_generation = 0
@@ -67,8 +64,7 @@ class SessionOCEL:
         for, so this call itself loads nothing.
         """
         ocel = OCEL.read_duckdb(self._active_path(use_original))
-        if self.extensions:
-            ocel.extensions.set(self.extensions)
+
         return ocel
 
     def export(self, target_path: Path, use_original: bool = False) -> None:
@@ -81,9 +77,6 @@ class SessionOCEL:
         extension (``.json`` / ``.xml`` / ``.sqlite``).
         """
         export_duckdb_ocel(self._active_path(use_original), target_path)
-        for extension in self.extensions:
-            if target_path.suffix in getattr(extension, "supported_extensions", []):
-                extension.export_extension(target_path)
 
     def _drop_filtered(self) -> None:
         if self._filtered_db_path is not None:

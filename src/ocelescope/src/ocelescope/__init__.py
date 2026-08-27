@@ -12,7 +12,6 @@ from ocelescope.ocel import (
     ObjectIdFilter,
     ObjectTypeFilter,
     ObjectTypeFrequencyFilter,
-    OCELExtension,
     TimeFrameFilter,
 )
 from ocelescope.plugin import (
