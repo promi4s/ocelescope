@@ -69,7 +69,7 @@ export const OcelSelect: React.FC<OcelSelectProps> = ({
           component="button"
           type="button"
           pointer
-          disabled={disabled}
+          disabled={disabled || ocels.length === 0}
           rightSection={
             showClearButton ? (
               <Combobox.ClearButton onClear={() => onChange?.(null)} />

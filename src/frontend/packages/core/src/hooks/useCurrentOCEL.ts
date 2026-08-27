@@ -3,10 +3,14 @@ import { useEffect } from "react";
 import useCurrentOcelStore from "../store/currentOcelStore";
 
 export const useCurrentOcel = () => {
-  const { data: ocels = [] } = useGetOcels();
+  const { data: ocels = [], isSuccess } = useGetOcels();
   const { ocelId, setOcel, clearOcel } = useCurrentOcelStore();
 
   useEffect(() => {
+    if (!isSuccess) {
+      return;
+    }
+
     if (ocelId && !ocels?.some(({ id }) => id === ocelId)) {
       clearOcel();
     }
@@ -14,7 +18,7 @@ export const useCurrentOcel = () => {
     if (!ocelId && ocels[0]) {
       setOcel(ocels[0].id);
     }
-  }, [clearOcel, setOcel, ocels, ocelId]);
+  }, [clearOcel, setOcel, ocels, ocelId, isSuccess]);
 
   return { id: ocelId, setCurrentOcel: setOcel };
 };
