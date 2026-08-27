@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any, Iterator
 import duckdb
 import polars
 
+from ocelescope.ocel.io.schema import FIXED_COLUMN_TYPES
 from ocelescope.util.sql import set_utc
 
 if TYPE_CHECKING:
@@ -55,8 +56,22 @@ class BaseManager:
             con.unregister(_INCOMING)
 
     def _replace(self, table: str, contents: Any, projection: str = "*") -> None:
-        """Replace stored ``table`` with ``contents``, projected through ``projection``."""
+        """Replace stored ``table`` with ``contents``, projected through ``projection``.
+
+        The table's fixed columns are cast to the types the schema gives them,
+        whatever types ``contents`` carries. A frame that arrives empty carries
+        none worth keeping -- DuckDB reads a column of nothing as INTEGER, and an
+        id column stored that way refuses every later comparison against a real
+        one.
+        """
+        con = self._ocel.con
+        fixed = FIXED_COLUMN_TYPES.get(table, {})
+
         with self._bound(contents) as incoming:
-            self._ocel.con.execute(
-                f'CREATE OR REPLACE TABLE "{table}" AS SELECT {projection} FROM {incoming}'
+            source = f"(SELECT {projection} FROM {incoming})"
+            columns = {name for name, *_ in con.execute(f"DESCRIBE {source}").fetchall()}
+            pinned = ", ".join(
+                f'"{name}"::{dtype} AS "{name}"' for name, dtype in fixed.items() if name in columns
             )
+            replace = f" REPLACE ({pinned})" if pinned else ""
+            con.execute(f'CREATE OR REPLACE TABLE "{table}" AS SELECT *{replace} FROM {source}')

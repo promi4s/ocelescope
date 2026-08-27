@@ -22,6 +22,7 @@ from ocelescope.ocel.constants.pm4py import (
 )
 from ocelescope.ocel.extensions.manager import ExtensionManager
 from ocelescope.ocel.filter.base import BaseFilter
+from ocelescope.ocel.io import convert_ocel_duckdb, export_duckdb_ocel, import_quantities
 from ocelescope.ocel.managers import (
     E2OManager,
     EventsManager,
@@ -324,8 +325,6 @@ class OCEL:
         Returns:
             OCEL: A fully constructed OCEL wrapper instance.
         """
-        from ocelescope.ocel.io import convert_ocel_duckdb
-        from ocelescope.ocel.io.importers.quantities import import_quantities
 
         path = Path(path)
 
@@ -474,7 +473,6 @@ class OCEL:
         Raises:
             ValueError: If the file extension is not supported.
         """
-        from ocelescope.ocel.io import export_duckdb_ocel
 
         path = Path(path)
 
