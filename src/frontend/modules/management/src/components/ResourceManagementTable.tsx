@@ -128,11 +128,11 @@ const ResourceManagementTable: React.FC = () => {
 
   const entities: Entity[] = useMemo(() => {
     const ocelEntities = ocels.map<Entity>(
-      ({ name, created_at, id, extensions, filter_applied }) => ({
+      ({ name, created_at, id, filter_applied }) => ({
         id,
         name,
         type: "ocel" as const,
-        entityTypes: extensions.map(({ label }) => label),
+        entityTypes: [],
         createdAt: formatDateTime(created_at),
         downloadFormats: [".xml", ".json", ".sqlite"],
         isFiltered: !!filter_applied,

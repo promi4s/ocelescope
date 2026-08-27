@@ -20,7 +20,6 @@ const FilteredIndicator: React.FC = () => (
 );
 
 export type OcelSelectProps = {
-  extension?: string;
   value?: string | null;
   onChange?: (value: string | null) => void;
   label?: React.ReactNode;
@@ -34,7 +33,6 @@ export type OcelSelectProps = {
 };
 
 export const OcelSelect: React.FC<OcelSelectProps> = ({
-  extension,
   value,
   onChange,
   clearable,
@@ -42,7 +40,7 @@ export const OcelSelect: React.FC<OcelSelectProps> = ({
   placeholder = "Select an OCEL",
   ...inputProps
 }) => {
-  const { data } = useGetOcels(extension ? { extension_name: extension } : {});
+  const { data } = useGetOcels();
 
   const ocels = useMemo(() => data ?? [], [data]);
 
