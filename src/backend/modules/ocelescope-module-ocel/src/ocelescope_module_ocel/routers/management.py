@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 from fastapi import APIRouter, Query, Response
 from ocelescope_backend.app.dependencies import ApiSession
 from ocelescope_backend.app.internal.exceptions import NotFound
@@ -13,8 +11,6 @@ from ocelescope_backend.app.internal.ocel.default_ocel import (
     filter_default_ocels,
     get_default_ocel,
 )
-from ocelescope_backend.app.internal.registry import registry_manager
-from ocelescope_backend.app.internal.registry.extension import OCELExtensionDescription
 
 from ocelescope_module_ocel.models import OcelMetadata
 
@@ -32,14 +28,11 @@ router = APIRouter()
     operation_id="getOcels",
 )
 def get_ocels(
-    session: ApiSession, extension_name: Optional[str] = None
+    session: ApiSession,
 ) -> list[OcelMetadata]:
     return [
         OcelMetadata.from_handle(handle, filter_applied=handle.is_filtered)
         for handle in session.ocels.values()
-        if extension_name is None
-        or extension_name
-        in [extension.__class__.__name__ for extension in handle.extensions]
     ]
 
 
@@ -76,11 +69,6 @@ def import_default_ocel(
         session.add_ocel(ocel, name=default_ocel.name)
     response.status_code = 200
     return response
-
-
-@router.get("/extension/meta", operation_id="getExtensionMeta")
-def get_extension_meta() -> dict[str, OCELExtensionDescription]:
-    return registry_manager.get_extension_descriptions()
 
 
 @router.get(

@@ -10,7 +10,7 @@ from ocelescope.ocel.io.schema import FIXED_COLUMN_TYPES
 from ocelescope.util.sql import set_utc
 
 if TYPE_CHECKING:
-    from ocelescope.ocel.core.ocel import OCEL
+    from ocelescope.ocel.core import OCEL
 
 _INCOMING = "_incoming_table"
 

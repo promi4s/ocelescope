@@ -10,12 +10,11 @@ from typing import (
     get_args,
     get_origin,
     get_type_hints,
-    overload,
 )
 
 from pydantic import BaseModel, Field, PrivateAttr, computed_field
 
-from ocelescope import OCEL, OCELExtension
+from ocelescope import OCEL
 from ocelescope.plugin.input import PluginInput
 from ocelescope.resource.resource import Resource
 
@@ -43,23 +42,7 @@ class OCELAnnotation(Annotation):
 
     """
 
-    extension: Optional[str] = None
-
-    @overload
-    def __init__(
-        self, *, label: str, description: Optional[str] = ..., extension: None = ...
-    ) -> None: ...
-    @overload
-    def __init__(
-        self, *, label: str, description: Optional[str] = ..., extension: type[OCELExtension]
-    ) -> None: ...
-
-    def __init__(self, **data: Any) -> None:
-        ext = data.get("extension", None)
-        if isinstance(ext, type) and issubclass(ext, OCELExtension):
-            data["extension"] = ext.__name__  # coerce class → str
-
-        super().__init__(**data)
+    pass
 
 
 class ResourceAnnotation(Annotation):

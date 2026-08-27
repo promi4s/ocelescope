@@ -12,7 +12,6 @@ import type { PluginMethod, ResourceResult } from "@ocelescope/api-base";
 import {
   useDisableDiscoveryMethod,
   useEnableDiscoveryMethod,
-  useGetExtensionMeta,
   useGetPlugin,
   useGetResourceMeta,
   useListDiscoveryMethods,
@@ -29,14 +28,8 @@ const MethodCard: React.FC<{ pluginId: string; method: PluginMethod }> = ({
   const { query } = useRouter();
 
   const { data: resourceMeta = {} } = useGetResourceMeta();
-  const { data: extensionMeta = {} } = useGetExtensionMeta();
 
   const tags = useMemo(() => {
-    const extensions = Object.values(method.input_ocels ?? {}).map(
-      ({ extension }) =>
-        extension ? extensionMeta[extension]?.label : undefined,
-    );
-
     const inputResources = Object.values(method.input_resources ?? {}).map(
       ([resourceName]) => resourceMeta[resourceName]?.label ?? resourceName,
     );
@@ -48,10 +41,8 @@ const MethodCard: React.FC<{ pluginId: string; method: PluginMethod }> = ({
           resourceMeta[result.resource_type]?.label ?? result.resource_type,
       );
 
-    return Array.from(
-      new Set([...inputResources, ...resultNames, ...extensions]),
-    ).filter((tag) => !!tag) as string[];
-  }, [resourceMeta, extensionMeta, method]);
+    return Array.from(new Set([...inputResources, ...resultNames]));
+  }, [resourceMeta, method]);
 
   return (
     <GenericCard

@@ -8,7 +8,7 @@ import zipfile
 from pathlib import Path
 from types import ModuleType
 
-from ocelescope import OCELExtension, Plugin
+from ocelescope import Plugin
 
 ROOT = Path.cwd()
 SRC = ROOT / "src"
@@ -101,10 +101,6 @@ def module_has_plugin(module: ModuleType) -> str | None:
         if is_concrete_subclass(obj, Plugin):
             print(f"✅ Found Plugin: {obj.__name__} (from {module.__name__})")
             return obj.__name__
-    # Optional: show extensions discovered (not required to zip)
-    for obj in vars(module).values():
-        if is_concrete_subclass(obj, OCELExtension):
-            print(f"ℹ️  Found Extension: {obj.__name__} (from {module.__name__})")
 
 
 def zip_package(pkg_dir: Path, name: str | None) -> Path:

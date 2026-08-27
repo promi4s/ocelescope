@@ -69,7 +69,7 @@ const PluginInput: React.FC<PluginInputProps> = ({
   return (
     <Stack gap={"md"}>
       {Object.entries(method.input_ocels ?? {}).map(
-        ([name, { label, description, extension, is_optional }]) => (
+        ([name, { label, description, is_optional }]) => (
           <Controller
             key={name}
             control={control}
@@ -80,7 +80,6 @@ const PluginInput: React.FC<PluginInputProps> = ({
                 label={label}
                 clearable={is_optional}
                 required={!is_optional}
-                extension={extension ?? undefined}
                 description={description}
                 error={fieldState.error?.message}
                 onChange={field.onChange}

@@ -8,7 +8,7 @@ import polars as pl
 from pydantic import BaseModel
 
 if TYPE_CHECKING:
-    from ocelescope.ocel.core.ocel import OCEL
+    from ocelescope.ocel.core import OCEL
 
 
 def utc_bound(value: Optional[str]) -> Optional[datetime]:

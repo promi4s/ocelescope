@@ -20,7 +20,6 @@ from ocelescope.ocel.constants.pm4py import (
     OTYPE_COL,
     TIMESTAMP_COL,
 )
-from ocelescope.ocel.extensions.manager import ExtensionManager
 from ocelescope.ocel.filter.base import BaseFilter
 from ocelescope.ocel.io import convert_ocel_duckdb, export_duckdb_ocel, import_quantities
 from ocelescope.ocel.managers import (
@@ -104,7 +103,6 @@ class OCEL:
         self._con = connection
         ensure_ocel_tables(connection)
 
-        self.extensions = ExtensionManager(self)
         self.objects = ObjectsManager(self)
         self.events = EventsManager(self)
         self.quantities = QuantityManager(self)
@@ -480,7 +478,6 @@ class OCEL:
             raise ValueError(f"Unsupported extension: {path.suffix}")
 
         export_duckdb_ocel(self._con, path)
-        self.extensions.export_all(path)
 
     def write_xes(self, object_type: str, path: str | Path):
         """

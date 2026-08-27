@@ -23,7 +23,7 @@ from ocelescope.ocel.constants.tables import (
 from ocelescope.util.sql import ident, literal
 
 if TYPE_CHECKING:
-    from ocelescope.ocel.core.ocel import OCEL
+    from ocelescope.ocel.core import OCEL
 
 
 RENAME_MAP = {
@@ -43,7 +43,6 @@ DYNAMIC_PREFIX = "object:"
 
 
 def create_ocel_from_xml(path: str, fallback_object_name: str = "LogObject") -> "OCEL":
-    from ocelescope.ocel.core.ocel import OCEL
 
     log, _meta = r4pm.df.import_xes(path)
 
