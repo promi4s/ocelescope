@@ -59,6 +59,10 @@ class Resource(BaseModel, ABC):
         schema = json.dumps(cls.model_json_schema(), sort_keys=True)
         return hashlib.sha256(schema.encode()).hexdigest()
 
+    @classmethod
+    def get_label(cls) -> str:
+        return cls.label or cls.__name__
+
     @computed_field
     @property
     def _ocelescope_meta(self) -> ResourceMeta:
