@@ -50,7 +50,7 @@ class SessionOCEL:
             filtered = self.db_path.with_suffix(
                 f".filtered.{self._filtered_generation}.duckdb"
             )
-            with OCEL.read_duckdb(self.db_path) as origin:
+            with OCEL.read_duckdb(self.db_path, read_only=True) as origin:
                 with origin.filter(filters) as subset:
                     subset.to_duckdb(filtered)
             self._filtered_db_path = filtered
@@ -63,7 +63,7 @@ class SessionOCEL:
         writing to it. Its tables are read out of the file only as they are asked
         for, so this call itself loads nothing.
         """
-        ocel = OCEL.read_duckdb(self._active_path(use_original))
+        ocel = OCEL.read_duckdb(self._active_path(use_original), read_only=True)
 
         return ocel
 

@@ -359,9 +359,7 @@ class OCEL:
         )
 
     @staticmethod
-    def read_duckdb(
-        db_path: str | Path,
-    ) -> OCEL:
+    def read_duckdb(db_path: str | Path, read_only: bool = False) -> OCEL:
         """
         Open a flat DuckDB database (as written by :meth:`to_duckdb` or
         ``convert_ocel_duckdb``) as an :class:`OCEL`.
@@ -375,7 +373,7 @@ class OCEL:
             db_path: Path to a DuckDB database holding the flat OCEL tables.
             meta: Metadata for this OCEL instance.
         """
-        connection = duckdb.connect(str(db_path), read_only=True)
+        connection = duckdb.connect(str(db_path), read_only=read_only)
         try:
             set_utc(connection)
         except Exception:
