@@ -55,14 +55,14 @@ class Resource(BaseModel, ABC):
         return self
 
     @classmethod
-    def schema_hash(cls) -> str:
+    def get_schema_hash(cls) -> str:
         schema = json.dumps(cls.model_json_schema(), sort_keys=True)
         return hashlib.sha256(schema.encode()).hexdigest()
 
     @computed_field
     @property
     def _ocelescope_meta(self) -> ResourceMeta:
-        return ResourceMeta(schema_hash=self.schema_hash(), extra=self._meta)
+        return ResourceMeta(schema_hash=self.get_schema_hash(), extra=self._meta)
 
     def visualize(self) -> Visualization | None:
         """Produce a visualization for this resource.
