@@ -9,6 +9,18 @@ catalogs:
     '@biomejs/biome':
       specifier: 2.5.11
       version: 2.5.11
+    '@dagrejs/dagre':
+      specifier: ^3.0.0
+      version: 3.0.0
+    '@floating-ui/react':
+      specifier: ^0.27.18
+      version: 0.27.20
+    '@hpcc-js/wasm-graphviz':
+      specifier: ^1.21.0
+      version: 1.21.1
+    '@mantine/carousel':
+      specifier: ^9.5.1
+      version: 9.5.1
     '@mantine/charts':
       specifier: ^9.5.1
       version: 9.5.1
@@ -21,18 +33,42 @@ catalogs:
     '@mantine/dropzone':
       specifier: ^9.5.1
       version: 9.5.1
+    '@mantine/hooks':
+      specifier: ^9.5.1
+      version: 9.5.1
     '@mantine/notifications':
       specifier: ^9.5.1
       version: 9.5.1
+    '@marko19907/string-to-color':
+      specifier: ^1.0.2
+      version: 1.0.2
+    '@monaco-editor/react':
+      specifier: ^4.7.0
+      version: 4.7.0
     '@ocelescope/ocelot':
       specifier: ^0.6.0
       version: 0.6.0
     '@r4pm/components':
       specifier: ^0.2.0
       version: 0.2.0
+    '@rjsf/core':
+      specifier: ^6.8.0
+      version: 6.8.0
     '@rjsf/mantine':
       specifier: ^6.8.0
       version: 6.8.0
+    '@rjsf/utils':
+      specifier: ^6.8.0
+      version: 6.8.0
+    '@rjsf/validator-ajv8':
+      specifier: ^6.8.0
+      version: 6.8.0
+    '@tanstack/react-query':
+      specifier: ^5.90.21
+      version: 5.90.21
+    '@tanstack/react-query-devtools':
+      specifier: ^5.91.3
+      version: 5.91.3
     '@tsconfig/strictest':
       specifier: ^2.0.8
       version: 2.0.8
@@ -63,21 +99,48 @@ catalogs:
     axios:
       specifier: ^1.18.1
       version: 1.18.1
+    clsx:
+      specifier: ^2.1.1
+      version: 2.1.1
+    content-disposition-attachment:
+      specifier: ^0.3.1
+      version: 0.3.1
     cspell:
       specifier: ^10.0.1
       version: 10.1.1
+    dayjs:
+      specifier: ^1.11.19
+      version: 1.11.21
+    elkjs:
+      specifier: ^0.12.0
+      version: 0.12.0
+    embla-carousel:
+      specifier: ^8.6.0
+      version: 8.6.0
+    embla-carousel-react:
+      specifier: ^8.6.0
+      version: 8.6.0
+    file-saver:
+      specifier: ^2.0.5
+      version: 2.0.5
     html-to-image:
       specifier: 1.11.13
       version: 1.11.13
     jspdf:
       specifier: ^4.2.1
       version: 4.2.1
+    lucide-react:
+      specifier: ^1.0.0
+      version: 1.21.0
     mantine-datatable:
       specifier: ^9.4.0
       version: 9.4.0
     next:
       specifier: 16.3.2
       version: 16.3.2
+    object-hash:
+      specifier: ^3.0.0
+      version: 3.0.0
     orval:
       specifier: ^8.24.0
       version: 8.24.0
@@ -90,12 +153,33 @@ catalogs:
     react-dom:
       specifier: ^19.2.8
       version: 19.2.8
+    react-hook-form:
+      specifier: ^7.71.2
+      version: 7.71.2
+    react-plotly.js:
+      specifier: ^4.0.0
+      version: 4.0.0
+    react-zoom-pan-pinch:
+      specifier: ^4.0.0
+      version: 4.0.3
+    recharts:
+      specifier: ^3.2.1
+      version: 3.8.1
     tsdown:
       specifier: ^0.22.14
       version: 0.22.14
     typescript:
       specifier: ^6.0.3
       version: 6.0.3
+    uniqolor:
+      specifier: ^1.1.1
+      version: 1.1.1
+    zod:
+      specifier: ^4.3.6
+      version: 4.3.6
+    zustand:
+      specifier: ^5.0.11
+      version: 5.0.11
 
 importers:
 
@@ -233,7 +317,7 @@ importers:
         version: 1.21.0(react@19.2.8)
       next:
         specifier: 'catalog:'
-        version: 16.3.2(@babel/core@7.29.7)(@types/node@26.2.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        version: 16.3.2(@babel/core@7.29.7)(@types/node@26.4.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       react:
         specifier: 'catalog:'
         version: 19.2.8
@@ -267,7 +351,7 @@ importers:
         version: 19.2.5(@types/react@19.2.18)
       tsdown:
         specifier: 'catalog:'
-        version: 0.22.14(@tsdown/css@0.22.14)(oxc-resolver@11.21.3)(typescript@6.0.3)(unrun@0.2.32(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2))
+        version: 0.22.14(@tsdown/css@0.22.14)(oxc-resolver@11.21.3)(typescript@6.0.3)(unrun@0.2.32)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -315,7 +399,7 @@ importers:
         version: 9.4.0(@mantine/core@9.5.1(@mantine/hooks@9.5.1(react@19.2.8))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(@mantine/hooks@9.5.1(react@19.2.8))(clsx@2.1.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       next:
         specifier: 'catalog:'
-        version: 16.3.2(@babel/core@7.29.7)(@types/node@26.2.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        version: 16.3.2(@babel/core@7.29.7)(@types/node@26.4.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       object-hash:
         specifier: 'catalog:'
         version: 3.0.0
@@ -513,7 +597,7 @@ importers:
         version: 1.21.0(react@19.2.8)
       next:
         specifier: 'catalog:'
-        version: 16.3.2(@babel/core@7.29.7)(@types/node@26.2.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        version: 16.3.2(@babel/core@7.29.7)(@types/node@26.4.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       react:
         specifier: 'catalog:'
         version: 19.2.8
@@ -565,7 +649,7 @@ importers:
         version: link:../../packages/resources
       '@r4pm/components':
         specifier: 'catalog:'
-        version: 0.2.0(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(immer@11.1.11)(plotly.js@3.4.0(mapbox-gl@1.13.3))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        version: 0.2.0(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(plotly.js@3.4.0(mapbox-gl@1.13.3))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@tanstack/react-query':
         specifier: 'catalog:'
         version: 5.90.21(react@19.2.8)
@@ -743,7 +827,7 @@ importers:
         version: 9.4.0(@mantine/core@9.5.1(@mantine/hooks@9.5.1(react@19.2.8))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(@mantine/hooks@9.5.1(react@19.2.8))(clsx@2.1.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       next:
         specifier: 'catalog:'
-        version: 16.3.2(@babel/core@7.29.7)(@types/node@26.2.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        version: 16.3.2(@babel/core@7.29.7)(@types/node@26.4.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       react:
         specifier: 'catalog:'
         version: 19.2.8
@@ -828,7 +912,7 @@ importers:
         version: 9.4.0(@mantine/core@9.5.1(@mantine/hooks@9.5.1(react@19.2.8))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(@mantine/hooks@9.5.1(react@19.2.8))(clsx@2.1.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       next:
         specifier: 'catalog:'
-        version: 16.3.2(@babel/core@7.29.7)(@types/node@26.2.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        version: 16.3.2(@babel/core@7.29.7)(@types/node@26.4.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       react:
         specifier: 'catalog:'
         version: 19.2.8
@@ -3137,9 +3221,6 @@ packages:
   '@types/mapbox__vector-tile@1.3.4':
     resolution: {integrity: sha512-bpd8dRn9pr6xKvuEBQup8pwQfD4VUyqO/2deGjfpe6AwC8YRlyEipvefyRJUSiCJTZuCb8Pl1ciVV5ekqJ96Bg==}
 
-  '@types/node@26.2.0':
-    resolution: {integrity: sha512-5IviulTZeRNp2vAJ514cc/HUlY5nZ9fCbq9DMyC52BrhFZACo3nI0R7qBxhQmo/d27NFe96ur/b7Wwxklda+kg==}
-
   '@types/node@26.4.0':
     resolution: {integrity: sha512-faiGnoIrLH/V8cibOMEAZ8pMw6oXqSukl29ra4mN8GdaB2ZewzeaLj+INpV5N+Z1eKWzY+IzaIZH2EIR6YZRNQ==}
 
@@ -3181,19 +3262,6 @@ packages:
   '@x0k/json-schema-merge@1.0.3':
     resolution: {integrity: sha512-lerJC4sI9CNUQWdff3PnU1YJOqazD6TjMcvxZIPXUBjn4j1cUiXE0LvzhMnGYzKKr271TkvXJtH7gEwksrtn+w==}
 
-  '@xyflow/react@12.11.2':
-    resolution: {integrity: sha512-eLAlDWJfWnQEhJwGMjlWdAXO9eYllKpliUmPQlAmOLxz6mExXuzMVDUKLMquixgkrtmMFFtug3jGKmYYld12cA==}
-    peerDependencies:
-      '@types/react': '>=17'
-      '@types/react-dom': '>=17'
-      react: '>=17'
-      react-dom: '>=17'
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      '@types/react-dom':
-        optional: true
-
   '@xyflow/react@12.11.3':
     resolution: {integrity: sha512-G3jogHz2GWUtIOkhavUGno2YzY9u6fILIJBttfsBendb0/HWB90JG+sOTAvlIMEwyvq9zgy9V9ZQSwyQjR5QzQ==}
     peerDependencies:
@@ -3206,9 +3274,6 @@ packages:
         optional: true
       '@types/react-dom':
         optional: true
-
-  '@xyflow/system@0.0.79':
-    resolution: {integrity: sha512-czLyOh91NF0hIzbNzwi8I6GlqG23BHh2435OddfI6uiaLH3xdrdygO93gqgH1Bv9mhy8XPFQJOBn1FTq4LvEWA==}
 
   '@xyflow/system@0.0.80':
     resolution: {integrity: sha512-ywc3ZqG91brzWrH1WlwMdIX4goOfrpBy6AbLdVSaof/Xx9l138ijIKRExM6EkMro2F+OImGmSiA/WKcXvKVcfA==}
@@ -4748,10 +4813,6 @@ packages:
 
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
-
-  picomatch@4.0.5:
-    resolution: {integrity: sha512-RvwwcruNjI1ncT5xRakeyS9Lf8lcItv34KD+aif+VH9kduAyfYBipGh12274xtenIPZ119/R9BdTBa8gAwSh0A==}
-    engines: {node: '>=12'}
 
   picomatch@4.0.7:
     resolution: {integrity: sha512-qcJu88Q2IWqJsDD529JKMdwGm/dvInW4HvQnRwiH9JtihJvzGOscDtHE3x1pBKeUOTysQ8kVmLnJ2kJu7yhcGA==}
@@ -6315,11 +6376,6 @@ snapshots:
       react: 19.2.8
       react-dom: 19.2.8(react@19.2.8)
 
-  '@napi-rs/wasm-runtime@1.1.6':
-    dependencies:
-      '@tybys/wasm-util': 0.10.3
-    optional: true
-
   '@napi-rs/wasm-runtime@1.1.6(@emnapi/core@1.11.0)(@emnapi/runtime@1.11.0)':
     dependencies:
       '@emnapi/core': 1.11.0
@@ -6628,11 +6684,11 @@ snapshots:
     dependencies:
       quansync: 1.0.0
 
-  '@r4pm/components@0.2.0(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(immer@11.1.11)(plotly.js@3.4.0(mapbox-gl@1.13.3))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
+  '@r4pm/components@0.2.0(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(plotly.js@3.4.0(mapbox-gl@1.13.3))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:
       '@radix-ui/themes': 3.3.0(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@tanstack/react-virtual': 3.14.7(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      '@xyflow/react': 12.11.2(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(immer@11.1.11)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@xyflow/react': 12.11.3(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(immer@11.1.11)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       elkjs: 0.10.2
       html-to-image: 1.11.13
       react: 19.2.8
@@ -7532,14 +7588,6 @@ snapshots:
   '@rolldown/binding-openharmony-arm64@1.2.0':
     optional: true
 
-  '@rolldown/binding-wasm32-wasi@1.0.0-rc.9':
-    dependencies:
-      '@napi-rs/wasm-runtime': 1.1.6
-    transitivePeerDependencies:
-      - '@emnapi/core'
-      - '@emnapi/runtime'
-    optional: true
-
   '@rolldown/binding-wasm32-wasi@1.0.0-rc.9(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)':
     dependencies:
       '@napi-rs/wasm-runtime': 1.1.6(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)
@@ -7669,7 +7717,7 @@ snapshots:
       lightningcss: 1.33.0
       postcss-load-config: 6.0.1(jiti@2.7.0)(postcss@8.5.23)(yaml@2.9.0)
       rolldown: 1.2.0
-      tsdown: 0.22.14(@tsdown/css@0.22.14)(oxc-resolver@11.21.3)(typescript@6.0.3)(unrun@0.2.32(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2))
+      tsdown: 0.22.14(@tsdown/css@0.22.14)(oxc-resolver@11.21.3)(typescript@6.0.3)(unrun@0.2.32)
     optionalDependencies:
       postcss: 8.5.23
     transitivePeerDependencies:
@@ -7775,11 +7823,6 @@ snapshots:
       '@types/mapbox__point-geometry': 0.1.4
       '@types/pbf': 3.0.5
 
-  '@types/node@26.2.0':
-    dependencies:
-      undici-types: 8.3.0
-    optional: true
-
   '@types/node@26.4.0':
     dependencies:
       undici-types: 8.3.0
@@ -7818,19 +7861,6 @@ snapshots:
     dependencies:
       '@types/json-schema': 7.0.15
 
-  '@xyflow/react@12.11.2(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(immer@11.1.11)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
-    dependencies:
-      '@xyflow/system': 0.0.79
-      classcat: 5.0.5
-      react: 19.2.8
-      react-dom: 19.2.8(react@19.2.8)
-      zustand: 4.5.7(@types/react@19.2.18)(immer@11.1.11)(react@19.2.8)
-    optionalDependencies:
-      '@types/react': 19.2.18
-      '@types/react-dom': 19.2.5(@types/react@19.2.18)
-    transitivePeerDependencies:
-      - immer
-
   '@xyflow/react@12.11.3(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(immer@11.1.11)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:
       '@xyflow/system': 0.0.80
@@ -7843,18 +7873,6 @@ snapshots:
       '@types/react-dom': 19.2.5(@types/react@19.2.18)
     transitivePeerDependencies:
       - immer
-
-  '@xyflow/system@0.0.79':
-    dependencies:
-      '@types/d3-drag': 3.0.7
-      '@types/d3-interpolate': 3.0.4
-      '@types/d3-selection': 3.0.11
-      '@types/d3-transition': 3.0.9
-      '@types/d3-zoom': 3.0.8
-      d3-drag: 3.0.0
-      d3-interpolate: 3.0.1
-      d3-selection: 3.0.0
-      d3-zoom: 3.0.0
 
   '@xyflow/system@0.0.80':
     dependencies:
@@ -9267,31 +9285,6 @@ snapshots:
 
   next-tick@1.1.0: {}
 
-  next@16.3.2(@babel/core@7.29.7)(@types/node@26.2.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8):
-    dependencies:
-      '@next/env': 16.3.2
-      '@swc/helpers': 0.5.23
-      baseline-browser-mapping: 2.10.44
-      caniuse-lite: 1.0.30001806
-      postcss: 8.5.23
-      react: 19.2.8
-      react-dom: 19.2.8(react@19.2.8)
-      styled-jsx: 5.1.6(@babel/core@7.29.7)(react@19.2.8)
-    optionalDependencies:
-      '@next/swc-darwin-arm64': 16.3.2
-      '@next/swc-darwin-x64': 16.3.2
-      '@next/swc-linux-arm64-gnu': 16.3.2
-      '@next/swc-linux-arm64-musl': 16.3.2
-      '@next/swc-linux-x64-gnu': 16.3.2
-      '@next/swc-linux-x64-musl': 16.3.2
-      '@next/swc-win32-arm64-msvc': 16.3.2
-      '@next/swc-win32-x64-msvc': 16.3.2
-      sharp: 0.35.3(@types/node@26.2.0)
-    transitivePeerDependencies:
-      - '@babel/core'
-      - '@types/node'
-      - babel-plugin-macros
-
   next@16.3.2(@babel/core@7.29.7)(@types/node@26.4.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8):
     dependencies:
       '@next/env': 16.3.2
@@ -9450,8 +9443,6 @@ snapshots:
   pick-by-alias@1.2.0: {}
 
   picocolors@1.1.1: {}
-
-  picomatch@4.0.5: {}
 
   picomatch@4.0.7: {}
 
@@ -9869,31 +9860,6 @@ snapshots:
     transitivePeerDependencies:
       - oxc-resolver
 
-  rolldown@1.0.0-rc.9:
-    dependencies:
-      '@oxc-project/types': 0.115.0
-      '@rolldown/pluginutils': 1.0.0-rc.9
-    optionalDependencies:
-      '@rolldown/binding-android-arm64': 1.0.0-rc.9
-      '@rolldown/binding-darwin-arm64': 1.0.0-rc.9
-      '@rolldown/binding-darwin-x64': 1.0.0-rc.9
-      '@rolldown/binding-freebsd-x64': 1.0.0-rc.9
-      '@rolldown/binding-linux-arm-gnueabihf': 1.0.0-rc.9
-      '@rolldown/binding-linux-arm64-gnu': 1.0.0-rc.9
-      '@rolldown/binding-linux-arm64-musl': 1.0.0-rc.9
-      '@rolldown/binding-linux-ppc64-gnu': 1.0.0-rc.9
-      '@rolldown/binding-linux-s390x-gnu': 1.0.0-rc.9
-      '@rolldown/binding-linux-x64-gnu': 1.0.0-rc.9
-      '@rolldown/binding-linux-x64-musl': 1.0.0-rc.9
-      '@rolldown/binding-openharmony-arm64': 1.0.0-rc.9
-      '@rolldown/binding-wasm32-wasi': 1.0.0-rc.9
-      '@rolldown/binding-win32-arm64-msvc': 1.0.0-rc.9
-      '@rolldown/binding-win32-x64-msvc': 1.0.0-rc.9
-    transitivePeerDependencies:
-      - '@emnapi/core'
-      - '@emnapi/runtime'
-    optional: true
-
   rolldown@1.0.0-rc.9(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2):
     dependencies:
       '@oxc-project/types': 0.115.0
@@ -9958,40 +9924,6 @@ snapshots:
   semver@7.8.5: {}
 
   shallow-copy@0.0.1: {}
-
-  sharp@0.35.3(@types/node@26.2.0):
-    dependencies:
-      '@img/colour': 1.1.0
-      detect-libc: 2.1.2
-      semver: 7.8.5
-    optionalDependencies:
-      '@img/sharp-darwin-arm64': 0.35.3
-      '@img/sharp-darwin-x64': 0.35.3
-      '@img/sharp-freebsd-wasm32': 0.35.3
-      '@img/sharp-libvips-darwin-arm64': 1.3.2
-      '@img/sharp-libvips-darwin-x64': 1.3.2
-      '@img/sharp-libvips-linux-arm': 1.3.2
-      '@img/sharp-libvips-linux-arm64': 1.3.2
-      '@img/sharp-libvips-linux-ppc64': 1.3.2
-      '@img/sharp-libvips-linux-riscv64': 1.3.2
-      '@img/sharp-libvips-linux-s390x': 1.3.2
-      '@img/sharp-libvips-linux-x64': 1.3.2
-      '@img/sharp-libvips-linuxmusl-arm64': 1.3.2
-      '@img/sharp-libvips-linuxmusl-x64': 1.3.2
-      '@img/sharp-linux-arm': 0.35.3
-      '@img/sharp-linux-arm64': 0.35.3
-      '@img/sharp-linux-ppc64': 0.35.3
-      '@img/sharp-linux-riscv64': 0.35.3
-      '@img/sharp-linux-s390x': 0.35.3
-      '@img/sharp-linux-x64': 0.35.3
-      '@img/sharp-linuxmusl-arm64': 0.35.3
-      '@img/sharp-linuxmusl-x64': 0.35.3
-      '@img/sharp-webcontainers-wasm32': 0.35.3
-      '@img/sharp-win32-arm64': 0.35.3
-      '@img/sharp-win32-ia32': 0.35.3
-      '@img/sharp-win32-x64': 0.35.3
-      '@types/node': 26.2.0
-    optional: true
 
   sharp@0.35.3(@types/node@26.4.0):
     dependencies:
@@ -10192,7 +10124,7 @@ snapshots:
 
   tree-kill@1.2.2: {}
 
-  tsdown@0.22.14(@tsdown/css@0.22.14)(oxc-resolver@11.21.3)(typescript@6.0.3)(unrun@0.2.32(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)):
+  tsdown@0.22.14(@tsdown/css@0.22.14)(oxc-resolver@11.21.3)(typescript@6.0.3)(unrun@0.2.32):
     dependencies:
       ansis: 4.3.1
       cac: 7.0.0
@@ -10201,7 +10133,7 @@ snapshots:
       hookable: 6.1.1
       import-without-cache: 0.4.0
       obug: 2.1.4
-      picomatch: 4.0.5
+      picomatch: 4.0.7
       rolldown: 1.2.0
       rolldown-plugin-dts: 0.27.14(oxc-resolver@11.21.3)(rolldown@1.2.0)(typescript@6.0.3)
       tinyexec: 1.2.4
@@ -10213,33 +10145,6 @@ snapshots:
       '@tsdown/css': 0.22.14(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.22.14)(yaml@2.9.0)
       typescript: 6.0.3
       unrun: 0.2.32(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)
-    transitivePeerDependencies:
-      - '@typescript/native-preview'
-      - '@volar/typescript'
-      - oxc-resolver
-      - vue-tsc
-
-  tsdown@0.22.14(@tsdown/css@0.22.14)(oxc-resolver@11.21.3)(typescript@6.0.3)(unrun@0.2.32):
-    dependencies:
-      ansis: 4.3.1
-      cac: 7.0.0
-      defu: 6.1.7
-      empathic: 2.0.1
-      hookable: 6.1.1
-      import-without-cache: 0.4.0
-      obug: 2.1.4
-      picomatch: 4.0.5
-      rolldown: 1.2.0
-      rolldown-plugin-dts: 0.27.14(oxc-resolver@11.21.3)(rolldown@1.2.0)(typescript@6.0.3)
-      tinyexec: 1.2.4
-      tinyglobby: 0.2.17
-      tree-kill: 1.2.2
-      unconfig-core: 7.5.0
-      verkit: 0.3.2
-    optionalDependencies:
-      '@tsdown/css': 0.22.14(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.22.14)(yaml@2.9.0)
-      typescript: 6.0.3
-      unrun: 0.2.32
     transitivePeerDependencies:
       - '@typescript/native-preview'
       - '@volar/typescript'
@@ -10296,14 +10201,6 @@ snapshots:
   universalify@2.0.1: {}
 
   unquote@1.1.1: {}
-
-  unrun@0.2.32:
-    dependencies:
-      rolldown: 1.0.0-rc.9
-    transitivePeerDependencies:
-      - '@emnapi/core'
-      - '@emnapi/runtime'
-    optional: true
 
   unrun@0.2.32(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2):
     dependencies:
