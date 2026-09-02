@@ -1488,14 +1488,14 @@ requires-dist = [
 
 [[package]]
 name = "ocelescope-module-ocelot"
-version = "0.6.0"
+version = "0.6.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ocelescope-backend" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ba/10/2850b14e23dade7940ff062f91ae70c5d8452df5c478a22824a832671ccf/ocelescope_module_ocelot-0.6.0.tar.gz", hash = "sha256:009ca0e071fc80dfd99e0fa102d4749b000abf8919de96428f8fa699848ad6c1", size = 4870, upload-time = "2026-08-05T11:55:13.198Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a5/c8/1920d191e3107ed42ceb1802e75d702cd85a89c6f2ea8a2f9e08a9aa09b2/ocelescope_module_ocelot-0.6.1.tar.gz", hash = "sha256:e90cf6388830c12fbc511e9e6ae6f963dba67f3456365e05e4f0c31d461c1f20", size = 4872, upload-time = "2026-09-02T09:35:05.905Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/71/71/e767891490deef0fa0bc20e5ea9288d2889cea905a87d675476f7fc5aa29/ocelescope_module_ocelot-0.6.0-py3-none-any.whl", hash = "sha256:4c83ec346b16ea895bd81ca74cc55f8744a179e2bea8ebe6302b960e3dafa4df", size = 7034, upload-time = "2026-08-05T11:55:12.506Z" },
+    { url = "https://files.pythonhosted.org/packages/dd/1a/5d547fa8f0a9a7795624f5912f32aff87da75be54f31c3b9045ec7da0235/ocelescope_module_ocelot-0.6.1-py3-none-any.whl", hash = "sha256:f7f47f72658228230070d23f977c302aac033102a46478f46bf4502292ec0831", size = 7033, upload-time = "2026-09-02T09:35:05.143Z" },
 ]
 
 [[package]]
@@ -1530,7 +1530,7 @@ typecheck = [
 requires-dist = [
     { name = "ocelescope-module-filter", editable = "src/backend/modules/ocelescope-module-filter" },
     { name = "ocelescope-module-ocel", editable = "src/backend/modules/ocelescope-module-ocel" },
-    { name = "ocelescope-module-ocelot", specifier = ">=0.6.0,<0.7.0" },
+    { name = "ocelescope-module-ocelot", specifier = ">=0.6.1,<0.7.0" },
 ]
 
 [package.metadata.requires-dev]
