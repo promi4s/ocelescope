@@ -12,6 +12,8 @@ from ocelescope.visualization.visualization import Visualization
 class ResourceMeta(BaseModel):
     """Envelope emitted next to the payload of every dumped resource."""
 
+    META_KEY = "_ocelescope_meta"
+
     schema_hash: str
     extra: dict[str, Any] = Field(default_factory=dict)
 

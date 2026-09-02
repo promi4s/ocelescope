@@ -6,7 +6,6 @@ from pydantic import BaseModel, Field
 
 from ocelescope import Resource
 
-META_FIELD = "_ocelescope_meta"
 META_KEY = "ocelescope_meta"
 
 
@@ -30,15 +29,17 @@ class ResourceStore(ResourceBase):
         return ResourceInfo(**self.model_dump(include=set(ResourceInfo.model_fields)))
 
     def export(self) -> dict:
-        envelope = self.data.get(META_FIELD, {"schema_hash": self.schema_hash})
+        envelope = self.data.get(
+            ResourceMeta.META_KEY, {"schema_hash": self.schema_hash}
+        )
         meta = ResourceMeta(**envelope)
         meta.extra[META_KEY] = self.info.model_dump()
 
-        return {**self.data, META_FIELD: meta.model_dump()}
+        return {**self.data, ResourceMeta.META_KEY: meta.model_dump()}
 
     @classmethod
     def read_from_dict(cls, data: dict, name: str) -> Self:
-        meta = ResourceMeta(**data.get(META_FIELD, {}))
+        meta = ResourceMeta(**data.get(ResourceMeta.META_KEY, {}))
         info = meta.extra.get(META_KEY, {})
 
         return cls(
