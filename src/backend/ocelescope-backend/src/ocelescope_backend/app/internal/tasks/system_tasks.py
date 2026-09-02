@@ -250,7 +250,7 @@ def _import_resource(
 ) -> list[SystemNotification | InvalidationRequest]:
     try:
         data = orjson.loads(file_path.read_bytes())
-        resource = ResourceStore.read_from_dict(data=data, name=file_path.name)
+        resource = ResourceStore.read_from_dict(data=data, name=name)
     finally:
         file_path.unlink(missing_ok=True)
 
@@ -302,7 +302,7 @@ def _import_archived_data(
                 member_results = _import_resource(
                     session=session,
                     file_path=temp_path,
-                    name=Path(metadata["fileName"]).stem,
+                    name=Path(member_name).stem,
                 )
                 imported_resource = True
             elif suffix in {".xes", ".xes.gz"}:
