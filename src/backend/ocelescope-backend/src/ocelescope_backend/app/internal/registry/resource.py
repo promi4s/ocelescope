@@ -7,6 +7,8 @@ from ocelescope import Resource
 
 T = TypeVar("T", bound=Resource)
 
+META_FIELD = "_ocelescope_meta"
+
 
 class RegistryError(Exception):
     """Base class for every error raised by a registry."""
@@ -54,11 +56,7 @@ class ResourceRegistry:
 
     @staticmethod
     def get_resource_meta(data: dict) -> ResourceMeta | None:
-        return (
-            ResourceMeta(**data["_ocelescope_meta"])
-            if "_ocelescope_meta" in data
-            else None
-        )
+        return ResourceMeta(**data[META_FIELD]) if META_FIELD in data else None
 
     def hydrate(self, data: Any, source_id: str | None = None):
         if isinstance(data, dict):
@@ -72,10 +70,10 @@ class ResourceRegistry:
                 hydrated = {
                     k: self.hydrate(v, source_id)
                     for k, v in data.items()
-                    if k != "type"
+                    if k != META_FIELD
                 }
 
-                return ResourceClass(**hydrated)
+                return ResourceClass(**hydrated).with_meta(**meta.extra)
 
             return {k: self.hydrate(v, source_id) for k, v in data.items()}
         elif isinstance(data, list):
