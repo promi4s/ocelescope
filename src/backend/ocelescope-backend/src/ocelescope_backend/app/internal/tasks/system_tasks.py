@@ -246,8 +246,7 @@ def _archived_member_suffix(filename: str) -> str:
 
 
 def _import_resource(
-    session: Session,
-    file_path: Path,
+    session: Session, file_path: Path, name: str
 ) -> list[SystemNotification | InvalidationRequest]:
     try:
         data = orjson.loads(file_path.read_bytes())
@@ -300,7 +299,11 @@ def _import_archived_data(
                 "uploaded_at": metadata["uploaded_at"],
             }
             if suffix == ".ocelescope":
-                member_results = _import_resource(session, temp_path)
+                member_results = _import_resource(
+                    session=session,
+                    file_path=temp_path,
+                    name=Path(metadata["fileName"]).stem,
+                )
                 imported_resource = True
             elif suffix in {".xes", ".xes.gz"}:
                 member_results = _import_xes(session, temp_path, member_metadata)
@@ -360,4 +363,5 @@ def import_resource(
     file_path: Path,
     metadata: ImportMetadata,
 ):
-    return _import_resource(session, file_path)
+    name = Path(metadata["fileName"]).stem
+    return _import_resource(session=session, file_path=file_path, name=name)
