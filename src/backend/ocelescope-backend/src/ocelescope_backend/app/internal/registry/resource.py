@@ -44,15 +44,19 @@ class ResourceRegistry:
 
         entries = self.resources.get(schema_hash, {})
 
-        source_key = next(
-            (entry for entry in entries.keys() if not source_id or entry == source_id),
-            None,
+        resource_class = (
+            entries.get(source_id)
+            if source_id
+            else next(
+                iter(entries.values()),
+                None,
+            )
         )
 
-        if not source_key:
+        if not resource_class:
             raise ResourceNotRegistered(schema_hash=schema_hash, source_id=source_id)
 
-        return entries[source_key]
+        return resource_class
 
     @staticmethod
     def get_resource_meta(data: dict) -> ResourceMeta | None:
