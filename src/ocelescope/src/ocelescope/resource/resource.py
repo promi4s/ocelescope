@@ -1,8 +1,10 @@
 import hashlib
 import json
 from abc import ABC
+from pathlib import Path
 from typing import Any, ClassVar, Generic, Self, TypeVar
 
+import orjson
 from pydantic import BaseModel, Field, PrivateAttr, computed_field
 from pydantic_core import PydanticSerializationError, to_json
 
@@ -12,7 +14,7 @@ from ocelescope.visualization.visualization import Visualization
 class ResourceMeta(BaseModel):
     """Envelope emitted next to the payload of every dumped resource."""
 
-    META_KEY = "_ocelescope_meta"
+    META_KEY: ClassVar[str] = "_ocelescope_meta"
 
     schema_hash: str
     extra: dict[str, Any] = Field(default_factory=dict)
@@ -69,6 +71,29 @@ class Resource(BaseModel, ABC):
     @property
     def _ocelescope_meta(self) -> ResourceMeta:
         return ResourceMeta(schema_hash=self.get_schema_hash(), extra=self._meta)
+
+    def write(self, path: str | Path) -> Path:
+        path = Path(path)
+
+        if path.suffix != ".ocelescope":
+            path = path.with_name(path.name + ".ocelescope")
+
+        path.write_bytes(to_json(self))
+
+        return path
+
+    @classmethod
+    def read(cls, path: str | Path) -> Self:
+        data = orjson.loads(Path(path).read_bytes())
+
+        meta = ResourceMeta(**data.pop(ResourceMeta.META_KEY, {"schema_hash": ""}))
+
+        if meta.schema_hash != cls.get_schema_hash():
+            raise ValueError(
+                f"{Path(path).name} was written by a different version of {cls.__name__}"
+            )
+
+        return cls(**data).with_meta(**meta.extra)
 
     def visualize(self) -> Visualization | None:
         """Produce a visualization for this resource.
