@@ -262,7 +262,7 @@ const ResourceManagementTable: React.FC = () => {
                 textAlign: "right",
                 width: "0%",
                 //TODO: Maybe put this into its own component it is getting way to big
-                render: ({ type, resourceType, id, name, isUploading }) =>
+                render: ({ type, entityTypes, id, name, isUploading }) =>
                   isUploading ? (
                     <Loader size={20} />
                   ) : (
@@ -318,7 +318,7 @@ const ResourceManagementTable: React.FC = () => {
                               </Menu.Item>
                             </Menu.Sub.Dropdown>
                           </Menu.Sub>
-                        ) : resourceType === "PetriNet" ? (
+                        ) : entityTypes.includes("Petri Net") ? (
                           <Menu.Sub position="right-start">
                             <Menu.Sub.Target>
                               <Menu.Sub.Item
