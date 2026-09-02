@@ -46,8 +46,8 @@ catalogs:
       specifier: ^4.7.0
       version: 4.7.0
     '@ocelescope/ocelot':
-      specifier: ^0.6.0
-      version: 0.6.0
+      specifier: ^0.6.1
+      version: 0.6.1
     '@r4pm/components':
       specifier: ^0.2.0
       version: 0.2.0
@@ -238,7 +238,7 @@ importers:
         version: link:../modules/management
       '@ocelescope/ocelot':
         specifier: 'catalog:'
-        version: 0.6.0(3cd17373bf0b47f2bb738ec2929a81cc)
+        version: 0.6.1(3cd17373bf0b47f2bb738ec2929a81cc)
       '@ocelescope/plugin':
         specifier: workspace:^
         version: link:../modules/plugin
@@ -1884,8 +1884,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@ocelescope/ocelot@0.6.0':
-    resolution: {integrity: sha512-ExCfmAQRGDa1JaRnPdLCnI+J6J7Mw1DevtZEM7gqltTwTPwI/PmNtuEELdVfS/iS3fPTMbCdXdXmF2geo+ctXw==}
+  '@ocelescope/ocelot@0.6.1':
+    resolution: {integrity: sha512-FHycUNNM2lcdkeIGrArwQrncAj+wjteO48KmOpqii5ok48Y92sgX4+M45jrpPB5HbTjzd05qGg0OYAaH19Gc8w==}
     peerDependencies:
       '@dagrejs/dagre': ^3.0.0
       '@mantine/core': ^9.4.0
@@ -6416,7 +6416,7 @@ snapshots:
   '@next/swc-win32-x64-msvc@16.3.2':
     optional: true
 
-  '@ocelescope/ocelot@0.6.0(3cd17373bf0b47f2bb738ec2929a81cc)':
+  '@ocelescope/ocelot@0.6.1(3cd17373bf0b47f2bb738ec2929a81cc)':
     dependencies:
       '@dagrejs/dagre': 3.0.0
       '@mantine/core': 9.5.1(@mantine/hooks@9.5.1(react@19.2.8))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
