@@ -12,18 +12,18 @@ from ocelescope import (
 )
 from ocelescope_backend.app.dependencies import ApiSession
 from ocelescope_backend.app.internal.exceptions import NotFound
-from ocelescope_backend.app.internal.registry.registry_manager import registry_manager
-from ocelescope_backend.app.sse_manager import InvalidationRequest, sse_manager
 from ocelescope_backend.app.internal.model.discovery import (
     CreateDiscoveryTaskBody,
     DiscoveryMethodMeta,
     DiscoveryRequest,
     DiscoveryVariant,
 )
+from ocelescope_backend.app.internal.registry.registry_manager import registry_manager
 from ocelescope_backend.app.internal.tasks.discovery_task import (
     DiscoveryTask,
     DiscoveryTaskSummary,
 )
+from ocelescope_backend.app.sse_manager import InvalidationRequest, sse_manager
 
 _DISCOVERY_FILTER_TYPES: list[type[BaseFilter]] = [
     EventTypeFilter,
@@ -86,7 +86,7 @@ def create_discovery_task(
             ocel_id=ocel_id,
             method_id=info.method_id,
             name=info.name,
-            resource_type=info.resource_type.get_type(),
+            resource_type=info.resource_type.get_label(),
             parameters=parameters,
             filters=filter_pipeline,
         ),
@@ -148,7 +148,7 @@ def list_discovery_methods() -> list[DiscoveryMethodMeta]:
                     method_id=v.method_id,
                     resource_type=v.resource_type.label
                     if v.resource_type.label is not None
-                    else v.resource_type.get_type(),
+                    else v.resource_type.get_label(),
                     description=v.description,
                     input_schema=v.parameters_schema(),
                     plugin_id=v.plugin_id,

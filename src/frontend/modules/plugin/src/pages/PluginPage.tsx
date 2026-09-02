@@ -27,21 +27,30 @@ const MethodCard: React.FC<{ pluginId: string; method: PluginMethod }> = ({
 }) => {
   const { query } = useRouter();
 
-  const { data: resourceMeta = {} } = useGetResourceMeta();
+  const { data: resourceMeta } = useGetResourceMeta();
 
   const tags = useMemo(() => {
-    const inputResources = Object.values(method.input_resources ?? {}).map(
-      ([resourceName]) => resourceMeta[resourceName]?.label ?? resourceName,
+    const inputResources = Object.keys(method.input_resources ?? {}).map(
+      (schema_hash) => resourceMeta?.[schema_hash]?.label,
     );
+
+    const hasOcel =
+      !!method.input_ocels ||
+      method.results?.some(({ type }) => type === "ocel");
 
     const resultNames = (method.results ?? [])
       .filter((result): result is ResourceResult => result.type === "resource")
-      .map(
-        (result) =>
-          resourceMeta[result.resource_type]?.label ?? result.resource_type,
-      );
+      .map((result) => resourceMeta?.[result.schema_hash]?.label);
 
-    return Array.from(new Set([...inputResources, ...resultNames]));
+    return Array.from(
+      new Set(
+        [
+          ...inputResources,
+          ...resultNames,
+          ...(hasOcel ? ["OCEL"] : []),
+        ].filter((a) => !!a),
+      ),
+    ) as string[];
   }, [resourceMeta, method]);
 
   return (

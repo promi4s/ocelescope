@@ -127,11 +127,9 @@ class DiscoveryTask(TaskBase):
     def save_resource(self):
         if self.result is not None:
             return self.session.add_resource(
-                ResourceStore(
-                    type=self._actual_resource_type,
+                ResourceStore.from_resource(
+                    self.result,
                     name=self._build_resource_name(self._actual_resource_type),
-                    source=None,
-                    data=self.result.model_dump(),
                 )
             )
 

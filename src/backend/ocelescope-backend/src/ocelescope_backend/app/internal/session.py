@@ -12,6 +12,7 @@ from ocelescope_backend.app.internal.config import config
 from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.model.ocel import SessionOCEL
 from ocelescope_backend.app.internal.model.resource import ResourceApi, ResourceStore
+from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.tasks.base import TaskBase
 from ocelescope_backend.app.sse_manager import InvalidationRequest, sse_manager
 
@@ -209,9 +210,16 @@ class Session:
         sse_manager.send_safe(self.id, InvalidationRequest(routes=["resources"]))
 
     def list_resources(self) -> list[ResourceApi]:
+        resource_info = registry_manager.get_resource_info()
+
         return list(
-            ResourceApi(id=id, **resource.model_dump())
+            ResourceApi(
+                id=id,
+                resource_type_label=resource_info[resource.schema_hash]["label"],
+                **resource.model_dump(),
+            )
             for id, resource in self._resources.items()
+            if resource.schema_hash in resource_info
         )
 
     def rename_resource(self, id: str, new_name: str):

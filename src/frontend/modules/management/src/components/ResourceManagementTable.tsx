@@ -14,7 +14,6 @@ import {
   useDeleteOcel,
   useDeleteResource,
   useGetOcels,
-  useGetResourceMeta,
   useGetSystemTasks,
   useRenameOcel,
   useRenameResource,
@@ -78,8 +77,6 @@ const ResourceManagementTable: React.FC = () => {
   const { download: downloadResource } = useDownloadResource();
   const { download: downloadResourceAsPnml } = useDownloadResourceAsPnml();
 
-  const { data: resourceMeta = {} } = useGetResourceMeta();
-
   const { mutate: deleteResource } = useDeleteResource({
     mutation: { onSuccess: () => invalidate(["resources"]) },
   });
@@ -140,12 +137,12 @@ const ResourceManagementTable: React.FC = () => {
     );
 
     const resourceEntities = resources.map<Entity>(
-      ({ id, name, type, created_at }) => ({
+      ({ id, name, resource_type_label, schema_hash, created_at }) => ({
         id,
         name,
-        entityTypes: [resourceMeta[type]?.label ?? type],
+        entityTypes: [resource_type_label],
         type: "resource" as const,
-        resourceType: type,
+        resourceType: schema_hash,
         createdAt: formatDateTime(dayjs(created_at).toISOString()),
       }),
     );
@@ -160,7 +157,7 @@ const ResourceManagementTable: React.FC = () => {
     }));
 
     return [...ocelEntities, ...resourceEntities, ...taskEntity];
-  }, [ocels, resources, tasks, resourceMeta]);
+  }, [ocels, resources, tasks]);
 
   return (
     <>

@@ -27,7 +27,6 @@ from ocelescope_backend.app.internal.tasks.base import _call_with_known_params
 from ocelescope_backend.app.internal.tasks.plugin import PluginTask
 from ocelescope_backend.app.internal.util.plugin_result import (
     default_result_name,
-    plugin_source,
     select_results,
 )
 from ocelescope_backend.app.sse_manager import (
@@ -107,13 +106,10 @@ def save_plugin_results(
     plugin_task: ApiPluginTask,
     plugin_id: str,
     method_name: str,
-    task_id: str,
     selection: list[ResultSelection],
 ) -> SavedResults:
     """Save the selected results into the session as OCELs / resources."""
     selected = select_results(plugin_task, [result.index for result in selection])
-
-    source = plugin_source(plugin_id, method_name, task_id)
 
     saved = SavedResults(ocel_ids=[], resource_ids=[])
 
@@ -127,11 +123,8 @@ def save_plugin_results(
         else:
             saved.resource_ids.append(
                 session.add_resource(
-                    ResourceStore(
-                        name=name,
-                        type=entity.get_type(),
-                        source=source,
-                        data=entity.model_dump(mode="json"),
+                    ResourceStore.from_resource(
+                        name=name, source_id=plugin_id, resource=entity
                     )
                 )
             )
@@ -147,12 +140,10 @@ def download_plugin_results(
     plugin_task: ApiPluginTask,
     plugin_id: str,
     method_name: str,
-    task_id: str,
     indices: list[int] = Body(embed=True),
 ) -> TempFileResponse:
     """Bundle the selected results into a zip for download."""
     selected = select_results(plugin_task, indices)
-    source = plugin_source(plugin_id, method_name, task_id)
 
     archive_name = f"{plugin_id}_{method_name}_results"
     file_response = TempFileResponse(
@@ -181,15 +172,13 @@ def download_plugin_results(
                     entity.write(Path(ocel_file.name))
                     archive.write(ocel_file.name, arcname=_unique(name, ".json"))
             else:
-                store = ResourceStore(
-                    name=name,
-                    type=entity.get_type(),
-                    source=source,
-                    data=entity.model_dump(mode="json"),
-                )
+                resource_with_meta = ResourceStore.from_resource(
+                    resource=entity, name=name, source_id=plugin_id
+                ).export()
+
                 archive.writestr(
                     _unique(name, ".ocelescope"),
-                    json.dumps(store.model_dump(mode="json"), indent=2),
+                    json.dumps(resource_with_meta, indent=2),
                 )
 
     return file_response
@@ -228,7 +217,7 @@ def get_computed(
                 continue
 
             resource = registry_manager.get_resource_instance(
-                session.get_resource(resource_id), plugin_id=plugin_id
+                session.get_resource(resource_id).data, source_id=plugin_id
             )
 
             resource_args[key] = resource

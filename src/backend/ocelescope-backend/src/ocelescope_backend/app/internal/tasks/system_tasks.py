@@ -1,4 +1,3 @@
-import json
 import shutil
 import tempfile
 import traceback
@@ -8,6 +7,7 @@ from tempfile import NamedTemporaryFile
 from typing import Literal
 from uuid import uuid4
 
+import orjson
 from typing_extensions import TypedDict
 
 from ocelescope import OCEL
@@ -250,8 +250,8 @@ def _import_resource(
     file_path: Path,
 ) -> list[SystemNotification | InvalidationRequest]:
     try:
-        data = json.loads(file_path.read_text())
-        resource = ResourceStore(**data)
+        data = orjson.loads(file_path.read_bytes())
+        resource = ResourceStore.read_from_dict(data=data, name=file_path.name)
     finally:
         file_path.unlink(missing_ok=True)
 
