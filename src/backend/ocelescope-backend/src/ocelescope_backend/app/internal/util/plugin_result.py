@@ -1,7 +1,6 @@
 from fastapi.exceptions import HTTPException
 
 from ocelescope import OCEL, Resource
-from ocelescope_backend.app.internal.model.resource import PluginSource
 from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.tasks.plugin import PluginTask
 
@@ -36,19 +35,3 @@ def default_result_name(plugin_id: str, method_name: str, index: int) -> str:
     plugin = _safe_get_plugin(plugin_id)
     base = plugin.meta().name if plugin else plugin_id
     return f"{base}_{method_name}_{index}"
-
-
-def plugin_source(
-    plugin_id: str, method_name: str, task_id: str
-) -> PluginSource | None:
-    plugin = _safe_get_plugin(plugin_id)
-    if plugin is None:
-        return None
-
-    meta = plugin.meta()
-    return PluginSource(
-        task_id=task_id,
-        plugin_name=meta.name,
-        method_name=method_name,
-        version=meta.version,
-    )

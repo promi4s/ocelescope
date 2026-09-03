@@ -96,7 +96,7 @@ class DiscoveryRegistry:
             ):
                 raise TypeError(
                     f"Discovery method '{meta.name}' is already registered for resource "
-                    f"type '{meta.resource_type.get_type()}'."
+                    f"type '{meta.resource_type.get_label()}'."
                 )
 
         info = DiscoveryMethodInfo(

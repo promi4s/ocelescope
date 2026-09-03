@@ -989,7 +989,7 @@
         "operationId": "resources",
         "parameters": [
           {
-            "name": "resource_type",
+            "name": "schema_hash",
             "in": "query",
             "required": false,
             "schema": {
@@ -1001,7 +1001,7 @@
                   "type": "null"
                 }
               ],
-              "title": "Resource Type"
+              "title": "Schema Hash"
             }
           }
         ],
@@ -1017,43 +1017,6 @@
                   },
                   "title": "Response Resources"
                 }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "resources"
-        ],
-        "summary": "Upload Resource",
-        "operationId": "uploadResource",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "$ref": "#/components/schemas/Body_uploadResource"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
               }
             }
           },
@@ -1425,20 +1388,6 @@
           "files"
         ],
         "title": "Body_upload"
-      },
-      "Body_uploadResource": {
-        "properties": {
-          "file": {
-            "type": "string",
-            "contentMediaType": "application/octet-stream",
-            "title": "File"
-          }
-        },
-        "type": "object",
-        "required": [
-          "file"
-        ],
-        "title": "Body_uploadResource"
       },
       "CreateDiscoveryTaskBody": {
         "properties": {
@@ -2619,45 +2568,16 @@
         ],
         "title": "PluginOutput"
       },
-      "PluginSource": {
-        "properties": {
-          "task_id": {
-            "type": "string",
-            "title": "Task Id"
-          },
-          "plugin_name": {
-            "type": "string",
-            "title": "Plugin Name"
-          },
-          "method_name": {
-            "type": "string",
-            "title": "Method Name"
-          },
-          "version": {
-            "type": "string",
-            "title": "Version"
-          }
-        },
-        "type": "object",
-        "required": [
-          "task_id",
-          "plugin_name",
-          "method_name",
-          "version"
-        ],
-        "title": "PluginSource"
-      },
       "Resource": {
         "properties": {
-          "_ocelescope_resource_type": {
-            "type": "string",
-            "title": "Ocelescope Resource Type",
+          "_ocelescope_meta": {
+            "$ref": "#/components/schemas/ResourceMeta",
             "readOnly": true
           }
         },
         "type": "object",
         "required": [
-          "_ocelescope_resource_type"
+          "_ocelescope_meta"
         ],
         "title": "Resource",
         "description": "Abstract base class for resources.\n\nAttributes:\n    label: Optional human-readable label for this resource class.\n    description: Optional human-readable description for this resource class."
@@ -2694,39 +2614,44 @@
       },
       "ResourceApi": {
         "properties": {
-          "type": {
+          "name": {
             "type": "string",
-            "title": "Type"
+            "title": "Name"
           },
           "created_at": {
             "type": "string",
             "title": "Created At"
           },
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "source": {
+          "source_id": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/PluginSource"
+                "type": "string"
               },
               {
                 "type": "null"
               }
-            ]
+            ],
+            "title": "Source Id"
+          },
+          "schema_hash": {
+            "type": "string",
+            "title": "Schema Hash"
           },
           "id": {
             "type": "string",
             "title": "Id"
+          },
+          "resource_type_label": {
+            "type": "string",
+            "title": "Resource Type Label"
           }
         },
         "type": "object",
         "required": [
-          "type",
           "name",
-          "source",
-          "id"
+          "schema_hash",
+          "id",
+          "resource_type_label"
         ],
         "title": "ResourceApi"
       },
@@ -2755,6 +2680,25 @@
         ],
         "title": "ResourceInfo"
       },
+      "ResourceMeta": {
+        "properties": {
+          "schema_hash": {
+            "type": "string",
+            "title": "Schema Hash"
+          },
+          "extra": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Extra"
+          }
+        },
+        "type": "object",
+        "required": [
+          "schema_hash"
+        ],
+        "title": "ResourceMeta",
+        "description": "Envelope emitted next to the payload of every dumped resource."
+      },
       "ResourceResult": {
         "properties": {
           "type": {
@@ -2763,9 +2707,9 @@
             "title": "Type",
             "default": "resource"
           },
-          "resource_type": {
+          "schema_hash": {
             "type": "string",
-            "title": "Resource Type"
+            "title": "Schema Hash"
           },
           "is_list": {
             "type": "boolean",
@@ -2784,7 +2728,7 @@
         },
         "type": "object",
         "required": [
-          "resource_type",
+          "schema_hash",
           "is_list",
           "annotation"
         ],

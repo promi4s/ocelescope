@@ -29,7 +29,7 @@ class PluginOutput(BaseModel):
             else cls(
                 result_index=index,
                 default_name=default_result_name(plugin_id, method_name, index),
-                type_label=result.label or result.get_type(),
+                type_label=result.label or result.get_label(),
                 visualization=cast(Visualization, result.visualize()),
             )
             for index, result in enumerate(task.result or [])

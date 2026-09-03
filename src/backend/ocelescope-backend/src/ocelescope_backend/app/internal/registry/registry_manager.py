@@ -1,7 +1,7 @@
 import importlib.util
 import shutil
 import sys
-from typing import Any, Dict
+from typing import Dict
 
 from ocelescope.discovery import algorithms
 from typing_extensions import TypedDict
@@ -9,7 +9,6 @@ from typing_extensions import TypedDict
 from ocelescope import DirectlyFollowsGraph, PetriNet, Plugin, Resource
 from ocelescope_backend.app.internal.config import config
 from ocelescope_backend.app.internal.model.plugin import PluginApi
-from ocelescope_backend.app.internal.model.resource import ResourceStore
 from ocelescope_backend.app.internal.registry.discovery import DiscoveryRegistry
 from ocelescope_backend.app.internal.registry.plugin import PluginRegistry
 from ocelescope_backend.app.internal.registry.resource import ResourceRegistry
@@ -55,47 +54,10 @@ class RegistryManager:
             plugin_id=plugin_id, method_name=method_name
         )
 
-    def get_resource_class(
-        self, resource_type: str, plugin_id: str | None = None
-    ) -> type[Resource] | None:
-        return self._resource_registry.get_resource_class(
-            resource_type, plugin_id=plugin_id
-        )
-
-    def _hydrate(self, data: Any, plugin_id: str | None = None):
-        if isinstance(data, dict) and "_ocelescope_resource_type" in data:
-            ResourceClass = self._resource_registry.get_resource_class(
-                data["_ocelescope_resource_type"], plugin_id=plugin_id
-            )
-            if ResourceClass:
-                hydrated = {
-                    k: self._hydrate(v, plugin_id)
-                    for k, v in data.items()
-                    if k != "type"
-                }
-                return ResourceClass(**hydrated)
-        elif isinstance(data, dict):
-            return {k: self._hydrate(v, plugin_id) for k, v in data.items()}
-        elif isinstance(data, list):
-            return [self._hydrate(item, plugin_id) for item in data]
-        else:
-            return data
-
     def get_resource_instance(
-        self, resource: ResourceStore, plugin_id: str | None = None
-    ) -> Resource | None:
-        id = plugin_id
-        if resource.source and not plugin_id:
-            plugin = self._plugin_registry.get_plugin_by_name(
-                name=resource.source["plugin_name"], version=resource.source["version"]
-            )
-            id = plugin[0] if plugin else None
-
-        hydrated_resource = self._hydrate(resource.data, id)
-
-        assert isinstance(hydrated_resource, Resource)
-
-        return hydrated_resource
+        self, resource: dict, source_id: str | None = None
+    ) -> Resource:
+        return self._resource_registry.get_resource_instance(resource, source_id)
 
     def load_plugins(
         self, plugin_ids: list[str], ignore_errors: bool = True
@@ -142,6 +104,12 @@ class RegistryManager:
                             print("plugin not found")
                             raise Exception()
 
+                        for method in plugin.method_map().values():
+                            for resource_type in method._resource_types:
+                                self._resource_registry.register_resource(
+                                    id, resource_type
+                                )
+
                         for info in self._discovery_registry.register(module):
                             self._resource_registry.register_resource(
                                 id, info.resource_type
@@ -169,8 +137,11 @@ class RegistryManager:
 
     def get_resource_info(self) -> Dict[str, ResourceInfo]:
         return {
-            key: {"label": resource.label or key, "description": resource.description}
-            for key, resource in self._resource_registry.resources.items()
+            schema_hash: next(
+                ResourceInfo(label=r.get_label(), description=r.description)
+                for r in resource.values()
+            )
+            for schema_hash, resource in self._resource_registry.resources.items()
         }
 
 

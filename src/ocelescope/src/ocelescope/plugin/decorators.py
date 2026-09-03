@@ -67,7 +67,7 @@ class OCELResult(BaseModel):
 
 class ResourceResult(BaseModel):
     type: Literal["resource"] = "resource"
-    resource_type: str
+    schema_hash: str
     is_list: bool
     annotation: Optional[ResourceAnnotation]
 
@@ -178,7 +178,7 @@ def plugin_method(
                 resource_annotation.is_optional = is_optional
 
                 plugin_method_meta.input_resources[arg_name] = (
-                    base_type.get_type(),
+                    base_type.get_schema_hash(),
                     resource_annotation,
                 )
             else:
@@ -235,7 +235,7 @@ def plugin_method(
                             type="resource",
                             is_list=is_list,
                             annotation=annotation_obj,
-                            resource_type=base_type.get_type(),
+                            schema_hash=base_type.get_schema_hash(),
                         )
                     )
                 else:

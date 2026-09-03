@@ -104,7 +104,8 @@ class PluginTask(TaskBase, Generic[P]):
 
                 resource_args[key] = (
                     registry_manager.get_resource_instance(
-                        self.session.get_resource(resource_id)
+                        self.session.get_resource(resource_id).data,
+                        source_id=self.plugin_id,
                     )
                     if resource_id is not None
                     else None
