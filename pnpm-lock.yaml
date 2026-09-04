@@ -9,18 +9,6 @@ catalogs:
     '@biomejs/biome':
       specifier: 2.5.11
       version: 2.5.11
-    '@dagrejs/dagre':
-      specifier: ^3.0.0
-      version: 3.0.0
-    '@floating-ui/react':
-      specifier: ^0.27.18
-      version: 0.27.20
-    '@hpcc-js/wasm-graphviz':
-      specifier: ^1.21.0
-      version: 1.21.1
-    '@mantine/carousel':
-      specifier: ^9.5.1
-      version: 9.5.1
     '@mantine/charts':
       specifier: ^9.5.1
       version: 9.5.1
@@ -33,42 +21,18 @@ catalogs:
     '@mantine/dropzone':
       specifier: ^9.5.1
       version: 9.5.1
-    '@mantine/hooks':
-      specifier: ^9.5.1
-      version: 9.5.1
     '@mantine/notifications':
       specifier: ^9.5.1
       version: 9.5.1
-    '@marko19907/string-to-color':
-      specifier: ^1.0.2
-      version: 1.0.2
-    '@monaco-editor/react':
-      specifier: ^4.7.0
-      version: 4.7.0
     '@ocelescope/ocelot':
       specifier: ^0.6.1
       version: 0.6.1
     '@r4pm/components':
       specifier: ^0.2.0
       version: 0.2.0
-    '@rjsf/core':
-      specifier: ^6.8.0
-      version: 6.8.0
     '@rjsf/mantine':
       specifier: ^6.8.0
       version: 6.8.0
-    '@rjsf/utils':
-      specifier: ^6.8.0
-      version: 6.8.0
-    '@rjsf/validator-ajv8':
-      specifier: ^6.8.0
-      version: 6.8.0
-    '@tanstack/react-query':
-      specifier: ^5.90.21
-      version: 5.90.21
-    '@tanstack/react-query-devtools':
-      specifier: ^5.91.3
-      version: 5.91.3
     '@tsconfig/strictest':
       specifier: ^2.0.8
       version: 2.0.8
@@ -95,52 +59,25 @@ catalogs:
       version: 19.2.5
     '@xyflow/react':
       specifier: ^12.11.3
-      version: 12.11.3
+      version: 12.11.6
     axios:
       specifier: ^1.18.1
       version: 1.18.1
-    clsx:
-      specifier: ^2.1.1
-      version: 2.1.1
-    content-disposition-attachment:
-      specifier: ^0.3.1
-      version: 0.3.1
     cspell:
       specifier: ^10.0.1
       version: 10.1.1
-    dayjs:
-      specifier: ^1.11.19
-      version: 1.11.21
-    elkjs:
-      specifier: ^0.12.0
-      version: 0.12.0
-    embla-carousel:
-      specifier: ^8.6.0
-      version: 8.6.0
-    embla-carousel-react:
-      specifier: ^8.6.0
-      version: 8.6.0
-    file-saver:
-      specifier: ^2.0.5
-      version: 2.0.5
     html-to-image:
       specifier: 1.11.13
       version: 1.11.13
     jspdf:
       specifier: ^4.2.1
       version: 4.2.1
-    lucide-react:
-      specifier: ^1.0.0
-      version: 1.21.0
     mantine-datatable:
       specifier: ^9.4.0
       version: 9.4.0
     next:
       specifier: 16.3.2
       version: 16.3.2
-    object-hash:
-      specifier: ^3.0.0
-      version: 3.0.0
     orval:
       specifier: ^8.24.0
       version: 8.24.0
@@ -153,33 +90,12 @@ catalogs:
     react-dom:
       specifier: ^19.2.8
       version: 19.2.8
-    react-hook-form:
-      specifier: ^7.71.2
-      version: 7.71.2
-    react-plotly.js:
-      specifier: ^4.0.0
-      version: 4.0.0
-    react-zoom-pan-pinch:
-      specifier: ^4.0.0
-      version: 4.0.3
-    recharts:
-      specifier: ^3.2.1
-      version: 3.8.1
     tsdown:
       specifier: ^0.22.14
       version: 0.22.14
     typescript:
       specifier: ^6.0.3
       version: 6.0.3
-    uniqolor:
-      specifier: ^1.1.1
-      version: 1.1.1
-    zod:
-      specifier: ^4.3.6
-      version: 4.3.6
-    zustand:
-      specifier: ^5.0.11
-      version: 5.0.11
 
 importers:
 
@@ -238,7 +154,7 @@ importers:
         version: link:../modules/management
       '@ocelescope/ocelot':
         specifier: 'catalog:'
-        version: 0.6.1(3cd17373bf0b47f2bb738ec2929a81cc)
+        version: 0.6.1(e5416044144da7b1b76660cbd9950dfa)
       '@ocelescope/plugin':
         specifier: workspace:^
         version: link:../modules/plugin
@@ -247,7 +163,7 @@ importers:
         version: link:../modules/variants
       '@xyflow/react':
         specifier: 'catalog:'
-        version: 12.11.3(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(immer@11.1.11)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        version: 12.11.6(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(immer@11.1.11)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       mantine-datatable:
         specifier: 'catalog:'
         version: 9.4.0(@mantine/core@9.5.1(@mantine/hooks@9.5.1(react@19.2.8))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(@mantine/hooks@9.5.1(react@19.2.8))(clsx@2.1.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -3275,8 +3191,24 @@ packages:
       '@types/react-dom':
         optional: true
 
+  '@xyflow/react@12.11.6':
+    resolution: {integrity: sha512-9XsEJNHjatKYndszKTF/bsU7FOP9dJ6V/EQwzy3oMdtqgBuUq7BjKSwkEo+C7s4qHstHQfwwoHA3E8QfpPxZZQ==}
+    peerDependencies:
+      '@types/react': '>=17'
+      '@types/react-dom': '>=17'
+      react: '>=17'
+      react-dom: '>=17'
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
+
   '@xyflow/system@0.0.80':
     resolution: {integrity: sha512-ywc3ZqG91brzWrH1WlwMdIX4goOfrpBy6AbLdVSaof/Xx9l138ijIKRExM6EkMro2F+OImGmSiA/WKcXvKVcfA==}
+
+  '@xyflow/system@0.0.82':
+    resolution: {integrity: sha512-4DKnL3CGtCGLRSmgDqaajRVgeksMXq/Yw4wPfdMfm7JvdIiWHGzVYOfFUztiATwdBXZqUU6HhehwUdbV9G23PQ==}
 
   '@yuku-codegen/binding-android-arm64@0.8.5':
     resolution: {integrity: sha512-+oEBxK35kdbskhxozjZhI8N6qrMOfphpIkXnqBj6N2DC08rdkg10MUMRNKZLBNU6uNyoYiLcLyCE6aFV2sfMKw==}
@@ -6416,7 +6348,7 @@ snapshots:
   '@next/swc-win32-x64-msvc@16.3.2':
     optional: true
 
-  '@ocelescope/ocelot@0.6.1(3cd17373bf0b47f2bb738ec2929a81cc)':
+  '@ocelescope/ocelot@0.6.1(e5416044144da7b1b76660cbd9950dfa)':
     dependencies:
       '@dagrejs/dagre': 3.0.0
       '@mantine/core': 9.5.1(@mantine/hooks@9.5.1(react@19.2.8))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -6425,7 +6357,7 @@ snapshots:
       '@ocelescope/api-client': link:src/frontend/packages/api/client
       '@ocelescope/core': link:src/frontend/packages/core
       '@tanstack/react-query': 5.90.21(react@19.2.8)
-      '@xyflow/react': 12.11.3(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(immer@11.1.11)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@xyflow/react': 12.11.6(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(immer@11.1.11)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       axios: 1.18.1(debug@4.4.3)
       dayjs: 1.11.21
       elkjs: 0.11.1
@@ -6688,7 +6620,7 @@ snapshots:
     dependencies:
       '@radix-ui/themes': 3.3.0(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@tanstack/react-virtual': 3.14.7(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      '@xyflow/react': 12.11.3(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(immer@11.1.11)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@xyflow/react': 12.11.6(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(immer@11.1.11)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       elkjs: 0.10.2
       html-to-image: 1.11.13
       react: 19.2.8
@@ -7874,7 +7806,32 @@ snapshots:
     transitivePeerDependencies:
       - immer
 
+  '@xyflow/react@12.11.6(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(immer@11.1.11)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
+    dependencies:
+      '@xyflow/system': 0.0.82
+      classcat: 5.0.5
+      react: 19.2.8
+      react-dom: 19.2.8(react@19.2.8)
+      zustand: 4.5.7(@types/react@19.2.18)(immer@11.1.11)(react@19.2.8)
+    optionalDependencies:
+      '@types/react': 19.2.18
+      '@types/react-dom': 19.2.5(@types/react@19.2.18)
+    transitivePeerDependencies:
+      - immer
+
   '@xyflow/system@0.0.80':
+    dependencies:
+      '@types/d3-drag': 3.0.7
+      '@types/d3-interpolate': 3.0.4
+      '@types/d3-selection': 3.0.11
+      '@types/d3-transition': 3.0.9
+      '@types/d3-zoom': 3.0.8
+      d3-drag: 3.0.0
+      d3-interpolate: 3.0.1
+      d3-selection: 3.0.0
+      d3-zoom: 3.0.0
+
+  '@xyflow/system@0.0.82':
     dependencies:
       '@types/d3-drag': 3.0.7
       '@types/d3-interpolate': 3.0.4
