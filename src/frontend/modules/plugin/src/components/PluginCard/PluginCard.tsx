@@ -8,7 +8,7 @@ import { PluginUploadSection } from "../PluginUploadSection/PluginUploadSection"
 import { GenericCard } from "./GenericCard";
 
 export const PluginCard: React.FC<{ plugin: PluginApi }> = ({ plugin }) => {
-  const { description, label, version } = plugin.meta;
+  const { description, label, version } = plugin;
 
   const { mutate: deletePlugin } = useDeletePlugin();
 

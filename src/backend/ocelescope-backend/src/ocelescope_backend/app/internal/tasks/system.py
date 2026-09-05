@@ -16,7 +16,7 @@ from ocelescope_backend.app.internal.tasks.base import (
     TaskBase,
     TaskState,
     TaskSummary,
-    _call_with_known_params,
+    call_with_known_params,
     make_hashable,
 )
 from ocelescope_backend.app.sse_manager import (
@@ -62,7 +62,7 @@ class SystemTask(TaskBase, Generic[P]):
         self.state = TaskState.STARTED
         started_at = time.perf_counter()
         try:
-            self.result = _call_with_known_params(
+            self.result = call_with_known_params(
                 self.fn,
                 *self.args,
                 session=self.session,

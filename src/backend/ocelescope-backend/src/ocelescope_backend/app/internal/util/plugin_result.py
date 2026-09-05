@@ -33,5 +33,5 @@ def _safe_get_plugin(plugin_id: str):
 
 def default_result_name(plugin_id: str, method_name: str, index: int) -> str:
     plugin = _safe_get_plugin(plugin_id)
-    base = plugin.meta().name if plugin else plugin_id
+    base = plugin.get_name() if plugin else plugin_id
     return f"{base}_{method_name}_{index}"

@@ -1,6 +1,5 @@
 import { Button, Stack } from "@mantine/core";
-import type { PluginMethod } from "@ocelescope/api-base";
-import { useRunPlugin } from "@ocelescope/api-base";
+import { useRunPlugin, type MethodApi } from "@ocelescope/api-base";
 import { OcelSelect } from "@ocelescope/core";
 import { ResourceSelect } from "@ocelescope/resources";
 import { useCallback } from "react";
@@ -9,12 +8,11 @@ import PluginForm from "./PluginForm";
 
 type PluginInputProps = {
   pluginId: string;
-  method: PluginMethod;
+  method: MethodApi;
   onSuccess: (taskId: string) => void;
 };
 
 export type PluginInputType = {
-  input_ocels: { [key: string]: string };
   input_resources: { [key: string]: string };
   input: any;
 };
@@ -34,14 +32,8 @@ const PluginInput: React.FC<PluginInputProps> = ({
   });
 
   const defaultValue = {
-    input_ocels: Object.fromEntries(
-      Object.keys(method.input_ocels ?? {}).map((name) => [name, undefined]),
-    ),
     input_resources: Object.fromEntries(
-      Object.keys(method.input_resources ?? {}).map((name) => [
-        name,
-        undefined,
-      ]),
+      method.inputs.map(({ name }) => [name, undefined]),
     ),
     formData: {},
   };
@@ -52,10 +44,9 @@ const PluginInput: React.FC<PluginInputProps> = ({
 
   const onSubmit = useCallback(
     () =>
-      handleSubmit(({ input_ocels, input_resources, input }) =>
+      handleSubmit(({ input_resources, input }) =>
         runPlugin({
           data: {
-            input_ocels: compact(input_ocels),
             input_resources: compact(input_resources),
             input,
           },
@@ -68,56 +59,45 @@ const PluginInput: React.FC<PluginInputProps> = ({
 
   return (
     <Stack gap={"md"}>
-      {Object.entries(method.input_ocels ?? {}).map(
-        ([name, { label, description, is_optional }]) => (
-          <Controller
-            key={name}
-            control={control}
-            name={`input_ocels.${name}`}
-            rules={!is_optional ? { required: "Please select a value" } : {}}
-            render={({ field, fieldState }) => (
+      {method.inputs.map((io) => (
+        <Controller
+          key={io.name}
+          control={control}
+          name={`input_resources.${io.name}`}
+          rules={!io.is_optional ? { required: "Please select a value" } : {}}
+          render={({ field, fieldState }) =>
+            io.type === "ocel" ? (
               <OcelSelect
-                label={label}
-                clearable={is_optional}
-                required={!is_optional}
-                description={description}
+                label={io.label}
+                clearable={io.is_optional}
+                required={!io.is_optional}
+                description={io.description}
                 searchable
                 error={fieldState.error?.message}
                 onChange={field.onChange}
                 value={field.value}
               />
-            )}
-          />
-        ),
-      )}
-      {Object.entries(method.input_resources ?? {}).map(
-        ([name, [resource_type, { label, description, is_optional }]]) => (
-          <Controller
-            key={name}
-            control={control}
-            name={`input_resources.${name}`}
-            rules={!is_optional ? { required: "Please select a value" } : {}}
-            render={({ field, fieldState }) => (
+            ) : (
               <ResourceSelect
-                clearable={is_optional}
-                label={label}
-                required={!is_optional}
-                type={resource_type}
-                description={description}
+                clearable={io.is_optional}
+                label={io.label}
+                required={!io.is_optional}
+                type={io.schema_id}
+                description={io.description}
                 onChange={field.onChange}
                 error={fieldState.error?.message}
                 value={field.value}
                 searchable
               />
-            )}
-          />
-        ),
-      )}
-      {method.input_schema ? (
+            )
+          }
+        />
+      ))}
+      {method.configuration_schema ? (
         <PluginForm
           pluginId={pluginId}
           methodName={method.name}
-          schema={method.input_schema}
+          schema={method.configuration_schema}
           control={control}
           onSubmit={onSubmit}
         />

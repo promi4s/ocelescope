@@ -1,28 +1,29 @@
-from types import NoneType, UnionType
+from dataclasses import dataclass, field
+from types import MethodType, NoneType, UnionType
 from typing import (
+    TYPE_CHECKING,
     Annotated,
     Any,
     Callable,
     Literal,
-    Optional,
-    TypeAlias,
     Union,
     get_args,
     get_origin,
     get_type_hints,
 )
 
-from pydantic import BaseModel, Field, PrivateAttr, computed_field
-
 from ocelescope import OCEL
 from ocelescope.plugin.input import PluginInput
 from ocelescope.resource.resource import Resource
 
+if TYPE_CHECKING:
+    from ocelescope.plugin.plugin import Plugin
 
-# region Plugin Method
-class Annotation(BaseModel):
+
+@dataclass
+class Annotation:
     label: str
-    description: Optional[str] = None
+    description: str | None = None
     is_optional: bool = False
 
 
@@ -56,48 +57,10 @@ class ResourceAnnotation(Annotation):
         description: Optional longer text shown in the UI to explain the resource.
     """
 
-    annotation_resources: list[type[Resource]] | None = Field(exclude=True, default=None)
+    annotation_resources: list[type[Resource]] | None = None
 
 
-class OCELResult(BaseModel):
-    type: Literal["ocel"] = "ocel"
-    is_list: bool
-    annotation: Optional[OCELAnnotation]
-
-
-class ResourceResult(BaseModel):
-    type: Literal["resource"] = "resource"
-    schema_hash: str
-    is_list: bool
-    annotation: Optional[ResourceAnnotation]
-
-
-PluginResult: TypeAlias = Annotated[Union[OCELResult, ResourceResult], Field(discriminator="type")]
-
-
-PluginReturnItemType = Union[OCEL, Resource, list[OCEL], list[Resource]]
-PluginReturnType = Union[tuple[PluginReturnItemType], PluginReturnItemType]
-
-
-class PluginMethod(BaseModel):
-    name: str
-    label: Optional[str] = None
-    description: Optional[str] = None
-    input_ocels: dict[str, OCELAnnotation] = Field(default_factory=dict)
-    input_resources: dict[str, tuple[str, ResourceAnnotation]] = Field(default_factory=dict)
-
-    results: list[PluginResult] = Field(default_factory=list)
-
-    _input_model: Optional[type[PluginInput]] = PrivateAttr(default=None)
-    _method: Callable[..., PluginReturnType] = PrivateAttr()
-    _resource_types: set[type[Resource]] = PrivateAttr(default_factory=set)
-
-    @computed_field
-    def input_schema(self) -> dict[str, Any] | None:
-        return self._input_model.model_json_schema() if self._input_model is not None else None
-
-
-def _unwrap_annotated(typ) -> tuple[Any, Optional[Annotation]]:
+def _unwrap_annotated(typ) -> tuple[Any, Annotation | None]:
     if get_origin(typ) is not Annotated:
         return typ, None
 
@@ -119,7 +82,7 @@ def _unwrap_optional(typ) -> tuple[Any, bool]:
     return non_none[0], True
 
 
-def extract_info(typ) -> tuple[type, Optional[Annotation], bool]:
+def extract_info(typ) -> tuple[type, Annotation | None, bool]:
     """Peel `Annotated[...]` and `| None` off a hint.
 
     Returns the base type, its `Annotation` (if any) and whether it was optional.
@@ -130,12 +93,91 @@ def extract_info(typ) -> tuple[type, Optional[Annotation], bool]:
     base_type, is_optional = _unwrap_optional(base_type)
     base_type, inner_annotation = _unwrap_annotated(base_type)
 
-    return base_type, annotation if annotation is not None else inner_annotation, is_optional
+    return (
+        base_type,
+        annotation if annotation is not None else inner_annotation,
+        is_optional,
+    )
+
+
+class PluginIO:
+    def __init__(self, name: str, io_type: Any):
+        base_class, annotation, is_optional = extract_info(io_type)
+
+        self.is_list = False
+        if get_origin(base_class) is list:
+            base_class, _, _ = extract_info(get_args(base_class)[0])
+            self.is_list = True
+
+        if not isinstance(base_class, type) or not issubclass(base_class, (OCEL, Resource)):
+            target = f"parameter {name!r}" if name else "the return type"
+            raise TypeError(
+                f"Unsupported type for {target}: {io_type!r}. Plugin inputs and outputs must be "
+                f"`OCEL` or a `Resource` subclass, optionally wrapped in `list[...]`, `T | None` "
+                f"or `Annotated[...]`."
+            )
+
+        self.name = name
+        self.type: type[OCEL] | type[Resource] = base_class
+        self.is_optional = is_optional
+
+        is_annotation = isinstance(annotation, Annotation)
+
+        self.label = annotation.label if is_annotation else self.name
+        self.description = annotation.description if is_annotation else None
+
+        self.annotated_resources = (
+            annotation.annotation_resources if isinstance(annotation, ResourceAnnotation) else []
+        ) or []
+
+    @property
+    def resource_types(self):
+        return ([self.type] if issubclass(self.type, Resource) else []) + self.annotated_resources
+
+    @property
+    def io_type(self) -> Literal["ocel", "resource"]:
+        return "ocel" if issubclass(self.type, OCEL) else "resource"
+
+    def __repr__(self) -> str:
+        return str(
+            {
+                "name": self.name,
+                "type": self.type,
+                "label": self.label,
+                "description": self.description,
+                "is_optional": self.is_optional,
+                "is_list": self.is_list,
+            }
+        )
+
+
+PluginReturnItemType = Union[OCEL, Resource, list[OCEL], list[Resource]]
+PluginReturnType = Union[tuple[PluginReturnItemType], PluginReturnItemType]
+
+
+@dataclass
+class PluginMethod:
+    name: str
+    label: str
+    method: Callable[..., PluginReturnType]
+    description: str | None
+    inputs: list[PluginIO] = field(default_factory=list)
+    outputs: list[PluginIO] = field(default_factory=list)
+    configuration_input: type[PluginInput] | None = None
+
+    def bind(self, plugin: "Plugin") -> Callable[..., PluginReturnType]:
+        """Bind this method to a plugin instance.
+
+        `method` is captured while the class body is still executing, so it is a
+        plain function that still expects `self`. Binding it to `plugin` yields the
+        callable a plugin run actually needs.
+        """
+        return MethodType(self.method, plugin)
 
 
 def plugin_method(
-    label: Optional[str] = None,
-    description: Optional[str] = None,
+    label: str | None = None,
+    description: str | None = None,
 ):
     """Decorator that marks a plugin class method as an Ocelescope runnable function.
 
@@ -147,101 +189,34 @@ def plugin_method(
     """
 
     def decorator(func: Callable[..., PluginReturnType]):
-        plugin_method_meta = PluginMethod(name=func.__name__, label=label, description=description)  # ty: ignore[unresolved-attribute]
-        method_hints = get_type_hints(func, include_extras=True)
+        plugin_method_meta = PluginMethod(
+            name=func.__name__,  # ty: ignore[unresolved-attribute]
+            label=label or func.__name__,  # ty: ignore[unresolved-attribute]
+            description=description,
+            method=func,
+        )
 
-        for arg_name, hint in method_hints.items():
-            base_type, annotation, is_optional = extract_info(hint)
+        for key, value in get_type_hints(func, include_extras=True).items():
+            if key == "return":
+                return_origin = get_origin(value)
 
-            if not isinstance(base_type, type) or arg_name == "return":
-                continue
+                types_to_parse = []
 
-            if issubclass(base_type, PluginInput):
-                plugin_method_meta._input_model = base_type
-            elif issubclass(base_type, OCEL):
-                ocel_annotation = (
-                    OCELAnnotation(**annotation.model_dump())
-                    if annotation is not None
-                    else OCELAnnotation(label=arg_name)
-                )
-                ocel_annotation.is_optional = is_optional
-
-                plugin_method_meta.input_ocels[arg_name] = ocel_annotation
-            elif issubclass(base_type, Resource):
-                plugin_method_meta._resource_types.add(base_type)
-
-                resource_annotation = (
-                    ResourceAnnotation(**annotation.model_dump())
-                    if annotation is not None
-                    else ResourceAnnotation(label=arg_name)
-                )
-                resource_annotation.is_optional = is_optional
-
-                plugin_method_meta.input_resources[arg_name] = (
-                    base_type.get_schema_hash(),
-                    resource_annotation,
-                )
-            else:
-                raise TypeError(
-                    f"Argument {arg_name} must be either an OCEL, Resource or Input Schema"
-                )
-
-        return_type = method_hints.get("return", None)
-
-        if return_type is not None:
-            origin = get_origin(return_type)
-
-            types_to_parse = []
-
-            if origin is tuple:
-                types_to_parse = get_args(return_type)
-            else:
-                types_to_parse = [return_type]
-
-            for typ in types_to_parse:
-                base_type, annotation, _ = extract_info(typ)
-
-                if get_origin(base_type) is list:
-                    inner_type = get_args(base_type)[0]
-                    base_type, annotation, _ = extract_info(inner_type)
-                    is_list = True
+                if return_origin is tuple:
+                    types_to_parse = get_args(value)
                 else:
-                    is_list = False
+                    types_to_parse = [value]
 
-                # Now determine what kind of result it is
-                if issubclass(base_type, OCEL):
-                    plugin_method_meta.results.append(
-                        OCELResult(
-                            type="ocel",
-                            is_list=is_list,
-                            annotation=OCELAnnotation(**annotation.model_dump())
-                            if annotation is not None
-                            else None,
-                        )
-                    )
-                elif issubclass(base_type, Resource):
-                    plugin_method_meta._resource_types.add(base_type)
+                plugin_method_meta.outputs = [
+                    PluginIO("", return_item) for return_item in types_to_parse
+                ]
 
-                    annotation_obj = (
-                        annotation if isinstance(annotation, ResourceAnnotation) else None
-                    )
-                    if annotation_obj and annotation_obj.annotation_resources:
-                        plugin_method_meta._resource_types.update(
-                            annotation_obj.annotation_resources
-                        )
-
-                    plugin_method_meta.results.append(
-                        ResourceResult(
-                            type="resource",
-                            is_list=is_list,
-                            annotation=annotation_obj,
-                            schema_hash=base_type.get_schema_hash(),
-                        )
-                    )
-                else:
-                    raise TypeError(f"Unsupported return type: {base_type}")
-
-        plugin_method_meta._method = func
+            elif isinstance(base_type := extract_info(value)[0], type) and issubclass(
+                base_type, PluginInput
+            ):
+                plugin_method_meta.configuration_input = value
+            else:
+                plugin_method_meta.inputs += [PluginIO(name=key, io_type=value)]
 
         setattr(
             func,
@@ -252,6 +227,3 @@ def plugin_method(
         return func
 
     return decorator
-
-
-# endregion

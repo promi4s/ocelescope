@@ -27,7 +27,7 @@ export const usePluginForm = () => {
 export const useOcelId = (ocelRef: string) => {
   const { control } = usePluginForm();
 
-  return useWatch({ control, name: `input_ocels.${ocelRef}` });
+  return useWatch({ control, name: `input_resources.${ocelRef}` });
 };
 
 export const PluginFormProvider: React.FC<

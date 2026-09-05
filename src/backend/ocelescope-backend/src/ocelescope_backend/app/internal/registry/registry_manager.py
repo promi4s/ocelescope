@@ -1,7 +1,8 @@
 import importlib.util
 import shutil
 import sys
-from typing import Dict
+from contextlib import AbstractContextManager
+from typing import TYPE_CHECKING, Any, Dict
 
 from ocelescope.discovery import algorithms
 from typing_extensions import TypedDict
@@ -16,6 +17,9 @@ from ocelescope_backend.app.internal.util.dynamic_import import (
     import_wheel_dynamically,
     is_wheel_compatible,
 )
+
+if TYPE_CHECKING:
+    from ocelescope_backend.app.internal.session import Session
 
 
 class ResourceInfo(TypedDict):
@@ -52,6 +56,36 @@ class RegistryManager:
     def get_plugin_method(self, plugin_id: str, method_name: str):
         return self._plugin_registry.get_method(
             plugin_id=plugin_id, method_name=method_name
+        )
+
+    def get_plugin_method_kwargs(
+        self,
+        session: "Session",
+        plugin_id: str,
+        method_name: str,
+        input_resources: dict[str, str | None],
+    ) -> dict[str, Any]:
+
+        return self._plugin_registry.get_plugin_kwargs(
+            session=session,
+            plugin_id=plugin_id,
+            method_name=method_name,
+            input_resources=input_resources,
+        )
+
+    def get_computed_kwargs(
+        self,
+        session: "Session",
+        plugin_id: str,
+        method_name: str,
+        input_resources: dict[str, str | None],
+    ) -> AbstractContextManager[dict[str, Any]]:
+        """Kwargs for a computed-value provider; its OCELs live for the block."""
+        return self._plugin_registry.computed_kwargs(
+            session=session,
+            plugin_id=plugin_id,
+            method_name=method_name,
+            input_resources=input_resources,
         )
 
     def get_resource_instance(
@@ -100,11 +134,8 @@ class RegistryManager:
                     try:
                         plugin = self._plugin_registry.register(module)
 
-                        for method in plugin.method_map().values():
-                            for resource_type in method._resource_types:
-                                self._resource_registry.register_resource(
-                                    id, resource_type
-                                )
+                        for resource_type in plugin.get_resources():
+                            self._resource_registry.register_resource(id, resource_type)
 
                         for info in self._discovery_registry.register(module):
                             self._resource_registry.register_resource(
