@@ -100,10 +100,6 @@ class RegistryManager:
                     try:
                         plugin = self._plugin_registry.register(module)
 
-                        if not plugin:
-                            print("plugin not found")
-                            raise Exception()
-
                         for method in plugin.method_map().values():
                             for resource_type in method._resource_types:
                                 self._resource_registry.register_resource(
