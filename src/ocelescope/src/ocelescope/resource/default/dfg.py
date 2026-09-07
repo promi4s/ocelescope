@@ -121,7 +121,10 @@ class DirectlyFollowsGraph(Resource):
         """
         if threshold == 0 or not self.edges:
             return self
-        type_counts = {e.object_type: e.count for e in self.edges if e.source is None}
+        type_counts: dict[str, int] = {}
+        for edge in self.edges:
+            if edge.source is None:
+                type_counts[edge.object_type] = type_counts.get(edge.object_type, 0) + edge.count
         kept_edges = [
             e
             for e in self.edges
