@@ -38,6 +38,9 @@ const FilterForm = ({ ocelId, currentFilter, onSubmit }: FilterFormProps) => {
       value={currentTab}
       onChange={(newTab) => setCurrentTab(newTab as FilterKey)}
       keepMounted={false}
+      p={"xs"}
+      h={"100%"}
+      style={{ display: "flex", flexDirection: "column" }}
     >
       <Group>
         <Tabs.List flex={1}>
@@ -79,8 +82,15 @@ const FilterForm = ({ ocelId, currentFilter, onSubmit }: FilterFormProps) => {
 
       {Object.entries(FILTER_MAP).map(
         ([key, { ViewComponent, description }]) => (
-          <Tabs.Panel key={key} value={key} p={"md"}>
-            <Stack gap={"md"}>
+          <Tabs.Panel
+            key={key}
+            value={key}
+            p={"md"}
+            flex={1}
+            mih={0}
+            style={{ overflow: "auto" }}
+          >
+            <Stack gap={"md"} h={"100%"}>
               <Text size="sm" c="dimmed">
                 {description} Afterwards the log is cleaned up automatically:
                 relations whose source or target is missing are removed, events
