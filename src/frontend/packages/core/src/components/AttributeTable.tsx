@@ -125,6 +125,9 @@ const AttributesTable: React.FC<{
   ocelVersion?: OcelVersion;
   alwaysExpandable?: boolean;
   visibleAttributes?: string[];
+  height?: string | number;
+  className?: string;
+  style?: React.CSSProperties;
 }> = ({
   ocelId,
   entityType = "objects",
@@ -135,6 +138,9 @@ const AttributesTable: React.FC<{
   ocelVersion,
   alwaysExpandable = false,
   visibleAttributes,
+  height,
+  className,
+  style,
 }) => {
   const isEvent = entityType === "events";
 
@@ -309,7 +315,9 @@ const AttributesTable: React.FC<{
       recordsPerPage={PAGE_SIZE}
       onPageChange={setCurrentPage}
       noRecordsText="No attributes found"
-      height={500}
+      height={height}
+      className={className}
+      style={{ flex: 1, minHeight: 0, ...style }}
       rowExpansion={{
         allowMultiple: false,
         expandable: ({ record: { entity_type_names } }) =>
