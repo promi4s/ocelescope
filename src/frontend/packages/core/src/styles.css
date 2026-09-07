@@ -1,8 +1,8 @@
-/*
- * @ocelescope/core ships its own component styles only.
- *
- * The third-party global stylesheets core relies on (@mantine/core,
- * @mantine/dropzone, @mantine/notifications, mantine-datatable) are NOT
- * bundled here — the consuming app must import them itself, in order, BEFORE
- * this file. See the README for the exact import list.
- */
+@import "@mantine/core/styles.css";
+@import "@mantine/dates/styles.css";
+@import "@mantine/charts/styles.css";
+@import "@mantine/dropzone/styles.css";
+@import "@mantine/notifications/styles.css";
+@import "mantine-datatable/styles.css";
+@import "@xyflow/react/dist/style.css";
+@import "@r4pm/components/styles.css";

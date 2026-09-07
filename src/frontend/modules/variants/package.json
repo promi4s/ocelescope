@@ -41,8 +41,10 @@
     "dayjs": "catalog:",
     "lucide-react": "catalog:",
     "mantine-datatable": "catalog:",
+    "next": "catalog:",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "@r4pm/components": "catalog:"
   },
   "devDependencies": {
     "@tsdown/css": "catalog:",
@@ -52,7 +54,5 @@
     "tsdown": "catalog:",
     "typescript": "catalog:"
   },
-  "dependencies": {
-    "@r4pm/components": "catalog:"
-  }
+  "dependencies": {}
 }

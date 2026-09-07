@@ -1,5 +1,3 @@
-import "@r4pm/components/styles.css";
-
 import { Box, Button, LoadingOverlay, Tabs } from "@mantine/core";
 import { useObjectTypes, useObjectVariants } from "@ocelescope/api-base";
 import {
@@ -8,9 +6,14 @@ import {
   useDownloadVariantFlatLog,
 } from "@ocelescope/core";
 import type { TraceVariants } from "@r4pm/components";
-import { LogVariants, Theme } from "@r4pm/components";
 import { DownloadIcon } from "lucide-react";
+import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
+
+const LogVariants = dynamic(
+  () => import("@r4pm/components").then((m) => m.LogVariants),
+  { ssr: false },
+);
 
 const ObjectTypeVariants = ({
   ocelId,
@@ -114,7 +117,7 @@ const VariantsPage = () => {
   }
 
   return (
-    <Theme>
+    <>
       {otherObjectTypes.length > 0 ? (
         <Tabs defaultValue={firstObjectType} keepMounted={false}>
           <Tabs.List>
@@ -133,7 +136,7 @@ const VariantsPage = () => {
       ) : (
         <ObjectTypeVariants ocelId={id} objectType={firstObjectType} />
       )}
-    </Theme>
+    </>
   );
 };
 
