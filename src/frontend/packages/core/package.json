@@ -43,6 +43,7 @@
     "@ocelescope/resources": "workspace:^",
     "@tanstack/react-query": "catalog:",
     "@tanstack/react-query-devtools": "catalog:",
+    "@r4pm/components": "catalog:",
     "clsx": "catalog:",
     "content-disposition-attachment": "catalog:",
     "dayjs": "catalog:",
@@ -57,6 +58,8 @@
     "zustand": "catalog:"
   },
   "devDependencies": {
+    "@mantine/charts": "catalog:",
+    "@mantine/dates": "catalog:",
     "@mantine/notifications": "catalog:",
     "@tsdown/css": "catalog:",
     "@types/file-saver": "catalog:",
@@ -64,6 +67,7 @@
     "@types/qs": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "@xyflow/react": "catalog:",
     "qs": "catalog:",
     "tsdown": "catalog:",
     "typescript": "catalog:"

@@ -11,11 +11,6 @@
     "format": "biome format --write"
   },
   "dependencies": {
-    "@mantine/charts": "catalog:",
-    "@mantine/core": "catalog:",
-    "@mantine/dates": "catalog:",
-    "@mantine/dropzone": "catalog:",
-    "@mantine/notifications": "catalog:",
     "@ocelescope/api-base": "workspace:^",
     "@ocelescope/api-client": "workspace:^",
     "@ocelescope/core": "workspace:^",
@@ -26,8 +21,6 @@
     "@ocelescope/ocelot": "catalog:",
     "@ocelescope/plugin": "workspace:^",
     "@ocelescope/variants": "workspace:^",
-    "@xyflow/react": "catalog:",
-    "mantine-datatable": "catalog:",
     "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"
