@@ -106,6 +106,7 @@ const PluginInput: React.FC<PluginInputProps> = ({
                 onChange={field.onChange}
                 error={fieldState.error?.message}
                 value={field.value}
+                searchable
               />
             )}
           />
