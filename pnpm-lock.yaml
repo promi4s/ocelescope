@@ -49,8 +49,8 @@ catalogs:
       specifier: ^0.6.1
       version: 0.6.1
     '@r4pm/components':
-      specifier: ^0.2.0
-      version: 0.2.0
+      specifier: ^0.3.0
+      version: 0.3.2
     '@rjsf/core':
       specifier: ^6.8.0
       version: 6.8.0
@@ -649,7 +649,7 @@ importers:
         version: link:../../packages/resources
       '@r4pm/components':
         specifier: 'catalog:'
-        version: 0.2.0(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(plotly.js@3.4.0(mapbox-gl@1.13.3))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        version: 0.3.2(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(plotly.js@3.4.0(mapbox-gl@1.13.3))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@tanstack/react-query':
         specifier: 'catalog:'
         version: 5.90.21(react@19.2.8)
@@ -2084,8 +2084,8 @@ packages:
   '@quansync/fs@1.0.0':
     resolution: {integrity: sha512-4TJ3DFtlf1L5LDMaM6CanJ/0lckGNtJcMjQ1NAV6zDmA0tEHKZtxNKin8EgPaVX1YzljbxckyT2tJrpQKAtngQ==}
 
-  '@r4pm/components@0.2.0':
-    resolution: {integrity: sha512-XXXeR9Mj4IdLoBvdZUv9bltKkQN4P5aPETOATSqixNPa2/Rxcq55Hr7P6G36ZvZI27sMCj+5TiLKwbUtk03GSA==}
+  '@r4pm/components@0.3.2':
+    resolution: {integrity: sha512-2aEjDhAOSUKpvpvyVLShvby43pWNlXkL7ojkDgxGhxyKyjN9FoYX1gwDrTKam6Yx8pFJdUIIjx/xF6bm3cdkRQ==}
     peerDependencies:
       react: '>=18'
       react-dom: '>=18'
@@ -6684,7 +6684,7 @@ snapshots:
     dependencies:
       quansync: 1.0.0
 
-  '@r4pm/components@0.2.0(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(plotly.js@3.4.0(mapbox-gl@1.13.3))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
+  '@r4pm/components@0.3.2(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(plotly.js@3.4.0(mapbox-gl@1.13.3))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:
       '@radix-ui/themes': 3.3.0(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@tanstack/react-virtual': 3.14.7(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
