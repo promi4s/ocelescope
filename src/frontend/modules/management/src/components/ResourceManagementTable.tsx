@@ -2,13 +2,12 @@ import {
   ActionIcon,
   Badge,
   Group,
-  Loader,
-  Menu,
-  MenuItem,
+  MultiSelect,
   TextInput,
   Title,
   Tooltip,
 } from "@mantine/core";
+import { useDebouncedValue } from "@mantine/hooks";
 import { generateColor } from "@marko19907/string-to-color";
 import {
   useDeleteOcel,
@@ -28,35 +27,17 @@ import {
   useInvalidate,
 } from "@ocelescope/core";
 import { ResourceModal } from "@ocelescope/resources";
+import { CheckIcon, FilterIcon, SearchIcon, XIcon } from "lucide-react";
 import {
-  CheckIcon,
-  DownloadIcon,
-  EllipsisVerticalIcon,
-  EyeIcon,
-  FilterIcon,
-  PencilIcon,
-  TrashIcon,
-  XIcon,
-} from "lucide-react";
-import { DataTable } from "mantine-datatable";
+  DataTable,
+  type DataTableColumn,
+  type DataTableSortStatus,
+} from "mantine-datatable";
 import { useCallback, useMemo, useState } from "react";
+import type { Entity } from "../types";
 import dayjs, { formatDateTime } from "../util/dayjs";
+import EntityActionsMenu, { type OcelExtension } from "./EntityActionsMenu";
 import { XESExportWindow } from "./XESExportWindow";
-
-type Entity = {
-  type: "ocel" | "resource";
-  resourceType?: string;
-  entityTypes: string[];
-  id: string;
-  name: string;
-  createdAt: string;
-  downloadFormats?: string[];
-  isFiltered?: boolean;
-  isUploading?: boolean;
-};
-
-//TODO: sync with api
-const ocelExtensions = [".sqlite", ".xml", ".json"] as const;
 
 const ResourceManagementTable: React.FC = () => {
   const { data: ocels = [] } = useGetOcels();
@@ -123,41 +104,250 @@ const ResourceManagementTable: React.FC = () => {
 
   const [viewedResource, setViewedResource] = useState<string | undefined>();
 
-  const entities: Entity[] = useMemo(() => {
+  const [searchedName, setSearchedName] = useState<string | null>(null);
+  const [debouncedSearch] = useDebouncedValue(searchedName, 200);
+
+  const allEntityTypes = useMemo(
+    () => [
+      ...(ocels.length > 0 || tasks.length > 0 ? ["OCEL"] : []),
+      ...new Set(
+        resources.map(({ resource_type_label }) => resource_type_label),
+      ),
+    ],
+    [ocels, resources, tasks],
+  );
+
+  const [includedEntityTypes, setIncludedEntityTypes] = useState<string[]>([]);
+
+  const [sortStatus, setSortStatus] = useState<DataTableSortStatus<Entity>>({
+    columnAccessor: "createdAt",
+    direction: "desc",
+  });
+
+  const allEntities: Entity[] = useMemo(() => {
     const ocelEntities = ocels.map<Entity>(
       ({ name, created_at, id, filter_applied }) => ({
         id,
         name,
         type: "ocel" as const,
-        entityTypes: [],
-        createdAt: formatDateTime(created_at),
-        downloadFormats: [".xml", ".json", ".sqlite"],
+        entityTypeName: "OCEL",
+        createdAt: dayjs(created_at).toISOString(),
         isFiltered: !!filter_applied,
       }),
     );
 
     const resourceEntities = resources.map<Entity>(
-      ({ id, name, resource_type_label, schema_hash, created_at }) => ({
+      ({ id, name, resource_type_label, created_at }) => ({
         id,
         name,
-        entityTypes: [resource_type_label],
+        entityTypeName: resource_type_label,
         type: "resource" as const,
-        resourceType: schema_hash,
-        createdAt: formatDateTime(dayjs(created_at).toISOString()),
+        createdAt: dayjs(created_at).toISOString(),
       }),
     );
 
     const taskEntity = tasks.map<Entity>(({ id, metadata }) => ({
       id: id,
-      createdAt: metadata.uploaded_at as string,
+      createdAt: dayjs(metadata.uploaded_at as string).toISOString(),
       name: metadata.fileName as string,
-      entityTypes: [],
+      entityTypeName: "OCEL",
       type: "ocel",
       isUploading: true,
     }));
 
     return [...ocelEntities, ...resourceEntities, ...taskEntity];
   }, [ocels, resources, tasks]);
+
+  const entities: Entity[] = useMemo(() => {
+    const searchTerm = debouncedSearch?.trim().toLowerCase();
+    const includedTypes = new Set(includedEntityTypes);
+
+    const { columnAccessor, direction } = sortStatus;
+    const sign = direction === "desc" ? -1 : 1;
+    return allEntities
+      .filter(
+        ({ name, entityTypeName }) =>
+          (!searchTerm || name.trim().toLowerCase().includes(searchTerm)) &&
+          (includedTypes.size === 0 || includedTypes.has(entityTypeName)),
+      )
+      .sort(
+        (a, b) =>
+          sign *
+          String(a[columnAccessor as keyof Entity] ?? "").localeCompare(
+            String(b[columnAccessor as keyof Entity] ?? ""),
+            undefined,
+            { numeric: true, sensitivity: "base" },
+          ),
+      );
+  }, [allEntities, sortStatus, debouncedSearch, includedEntityTypes]);
+
+  const startRename = useCallback(
+    ({ id, name }: Entity) => setRenamedEntity({ id, value: name }),
+    [],
+  );
+  const downloadOcelAs = useCallback(
+    (id: string, extension: OcelExtension) =>
+      downloadOCEL(id, { ext: extension }),
+    [downloadOCEL],
+  );
+
+  const columns = useMemo<DataTableColumn<Entity>[]>(
+    () => [
+      {
+        accessor: "name",
+        sortable: true,
+        filter: (
+          <TextInput
+            placeholder="Search by name ..."
+            leftSection={<SearchIcon size={16} />}
+            rightSection={
+              <ActionIcon
+                size={"sm"}
+                variant="transparent"
+                c="dimmed"
+                onClick={() => setSearchedName(null)}
+              >
+                <XIcon size={14} />
+              </ActionIcon>
+            }
+            value={searchedName ?? ""}
+            onChange={(value) =>
+              setSearchedName(value.currentTarget.value ?? null)
+            }
+          />
+        ),
+        filtering: !!searchedName,
+        render: ({ id, type, name, isFiltered }) => (
+          <>
+            {renamedEntity?.id === id ? (
+              <Group>
+                <TextInput
+                  variant={"unstyled"}
+                  value={renamedEntity.value}
+                  style={{
+                    borderBottom: "1px solid #9ca3af",
+                  }}
+                  onChange={(e) => {
+                    setRenamedEntity({ id, value: e.target.value });
+                  }}
+                />
+                <Group gap={"xs"}>
+                  <ActionIcon
+                    color="green"
+                    m={0}
+                    onClick={() => {
+                      renameEntity(id, type, renamedEntity.value);
+                      setRenamedEntity(undefined);
+                    }}
+                  >
+                    <CheckIcon size={16} />
+                  </ActionIcon>
+                  <ActionIcon
+                    color="red"
+                    m={0}
+                    onClick={() => {
+                      setRenamedEntity(undefined);
+                    }}
+                  >
+                    <XIcon size={16} />
+                  </ActionIcon>
+                </Group>
+              </Group>
+            ) : (
+              <Group gap={6} wrap="nowrap">
+                {name}
+                {isFiltered && (
+                  <Tooltip label="This log has been filtered">
+                    <FilterIcon size={14} color="var(--mantine-color-blue-6)" />
+                  </Tooltip>
+                )}
+              </Group>
+            )}
+          </>
+        ),
+      },
+      {
+        accessor: "createdAt",
+        sortable: true,
+        render: ({ createdAt, isUploading }) =>
+          isUploading ? "uploading" : formatDateTime(createdAt),
+      },
+      {
+        accessor: "entityTypeName",
+        sortable: true,
+        title: "Type",
+        filter: (
+          <MultiSelect
+            placeholder="Filter by type ..."
+            data={allEntityTypes}
+            leftSection={<SearchIcon size={16} />}
+            value={includedEntityTypes}
+            onChange={setIncludedEntityTypes}
+            clearable
+            searchable
+            maw={300}
+            comboboxProps={{ withinPortal: false }}
+            renderOption={({ option, checked }) => (
+              <Group gap={"xs"} wrap="nowrap">
+                {checked && <CheckIcon size={14} />}
+                <Badge color={generateColor(option.value)}>
+                  {option.label}
+                </Badge>
+              </Group>
+            )}
+            renderPill={({ option, onRemove, disabled }) => (
+              <Badge
+                color={generateColor(String(option.value))}
+                style={{ cursor: disabled ? undefined : "pointer" }}
+                rightSection={!disabled && <XIcon size={12} />}
+                onMouseDown={(event) => {
+                  event.preventDefault();
+                  onRemove?.();
+                }}
+              >
+                {option.label}
+              </Badge>
+            )}
+          />
+        ),
+        filtering: includedEntityTypes.length > 0,
+        render: ({ entityTypeName }) => (
+          <Badge color={generateColor(entityTypeName)}>{entityTypeName}</Badge>
+        ),
+      },
+      {
+        accessor: "",
+        textAlign: "right",
+        width: "0%",
+        render: (entity) => (
+          <EntityActionsMenu
+            entity={entity}
+            onRename={startRename}
+            onInspect={setViewedResource}
+            onDownloadOcel={downloadOcelAs}
+            onExportAsXes={setExportOcelId}
+            onDownloadResource={downloadResource}
+            onDownloadResourceAsPnml={downloadResourceAsPnml}
+            onDelete={deleteEntity}
+          />
+        ),
+      },
+    ],
+    [
+      searchedName,
+      renamedEntity,
+      renameEntity,
+      allEntityTypes,
+      includedEntityTypes,
+      startRename,
+      downloadOcelAs,
+      downloadResource,
+      downloadResourceAsPnml,
+      deleteEntity,
+    ],
+  );
+
+  const hasEntities = allEntityTypes.length > 0;
 
   return (
     <>
@@ -172,194 +362,16 @@ const ResourceManagementTable: React.FC = () => {
         ocelId={exportOcelId}
         onClose={() => setExportOcelId(undefined)}
       />
-      {entities.length ? (
+      {hasEntities ? (
         <>
           <FullScreenUpload />
           <DataTable<Entity>
             withTableBorder
             borderRadius={"md"}
             idAccessor={"id"}
-            columns={[
-              {
-                accessor: "name",
-                render: ({ id, type, name, isFiltered }) => (
-                  <>
-                    {renamedEntity?.id === id ? (
-                      <Group>
-                        <TextInput
-                          variant={"unstyled"}
-                          value={renamedEntity.value}
-                          style={{
-                            borderBottom: "1px solid #9ca3af",
-                          }}
-                          onChange={(e) => {
-                            setRenamedEntity({ id, value: e.target.value });
-                          }}
-                        />
-                        <Group gap={"xs"}>
-                          <ActionIcon
-                            color="green"
-                            m={0}
-                            onClick={() => {
-                              renameEntity(id, type, renamedEntity.value);
-                              setRenamedEntity(undefined);
-                            }}
-                          >
-                            <CheckIcon size={16} />
-                          </ActionIcon>
-                          <ActionIcon
-                            color="red"
-                            m={0}
-                            onClick={() => {
-                              setRenamedEntity(undefined);
-                            }}
-                          >
-                            <XIcon size={16} />
-                          </ActionIcon>
-                        </Group>
-                      </Group>
-                    ) : (
-                      <Group gap={6} wrap="nowrap">
-                        {name}
-                        {isFiltered && (
-                          <Tooltip label="This log has been filtered">
-                            <FilterIcon
-                              size={14}
-                              color="var(--mantine-color-blue-6)"
-                            />
-                          </Tooltip>
-                        )}
-                      </Group>
-                    )}
-                  </>
-                ),
-              },
-              {
-                accessor: "createdAt",
-                render: ({ createdAt, isUploading }) =>
-                  isUploading ? "uploading" : formatDateTime(createdAt),
-              },
-              {
-                accessor: "entityTypes",
-                title: "Type",
-                render: ({ type, entityTypes }) => (
-                  <Group gap={"xs"}>
-                    {[...(type === "ocel" ? ["OCEL"] : []), ...entityTypes].map(
-                      (entityType) => (
-                        <Badge
-                          key={entityType}
-                          color={generateColor(entityType)}
-                        >
-                          {entityType}
-                        </Badge>
-                      ),
-                    )}
-                  </Group>
-                ),
-              },
-              {
-                accessor: "",
-                textAlign: "right",
-                width: "0%",
-                //TODO: Maybe put this into its own component it is getting way to big
-                render: ({ type, entityTypes, id, name, isUploading }) =>
-                  isUploading ? (
-                    <Loader size={20} />
-                  ) : (
-                    <Menu width={200} position="left-start">
-                      <Menu.Target>
-                        <ActionIcon
-                          variant="subtle"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <EllipsisVerticalIcon size={20} />
-                        </ActionIcon>
-                      </Menu.Target>
-                      <Menu.Dropdown onClick={(e) => e.stopPropagation()}>
-                        <Menu.Item
-                          leftSection={<PencilIcon size={16} />}
-                          onClick={() => setRenamedEntity({ id, value: name })}
-                        >
-                          Rename
-                        </Menu.Item>
-                        {type === "resource" && (
-                          <MenuItem
-                            leftSection={<EyeIcon size={16} />}
-                            onClick={() => setViewedResource(id)}
-                          >
-                            Inspect
-                          </MenuItem>
-                        )}
-                        {type === "ocel" ? (
-                          <Menu.Sub position="right-start">
-                            <Menu.Sub.Target>
-                              <Menu.Sub.Item
-                                leftSection={<DownloadIcon size={16} />}
-                              >
-                                Download
-                              </Menu.Sub.Item>
-                            </Menu.Sub.Target>
-                            <Menu.Sub.Dropdown>
-                              {ocelExtensions.map((extension) => (
-                                <Menu.Item
-                                  key={extension}
-                                  onClick={() =>
-                                    downloadOCEL(id, { ext: extension })
-                                  }
-                                >
-                                  {extension}
-                                </Menu.Item>
-                              ))}
-                              <Menu.Item
-                                key={".xes"}
-                                onClick={() => setExportOcelId(id)}
-                              >
-                                {".xes"}
-                              </Menu.Item>
-                            </Menu.Sub.Dropdown>
-                          </Menu.Sub>
-                        ) : entityTypes.includes("Petri Net") ? (
-                          <Menu.Sub position="right-start">
-                            <Menu.Sub.Target>
-                              <Menu.Sub.Item
-                                leftSection={<DownloadIcon size={16} />}
-                              >
-                                Download
-                              </Menu.Sub.Item>
-                            </Menu.Sub.Target>
-                            <Menu.Sub.Dropdown>
-                              <Menu.Item onClick={() => downloadResource(id)}>
-                                .ocelescope
-                              </Menu.Item>
-                              <Menu.Item
-                                onClick={() => downloadResourceAsPnml(id)}
-                              >
-                                .pnml
-                              </Menu.Item>
-                            </Menu.Sub.Dropdown>
-                          </Menu.Sub>
-                        ) : (
-                          <Menu.Item
-                            onClick={() => downloadResource(id)}
-                            leftSection={<DownloadIcon size={16} />}
-                          >
-                            Download
-                          </Menu.Item>
-                        )}
-                        <Menu.Divider />
-                        <Menu.Item
-                          leftSection={<TrashIcon size={16} color={"red"} />}
-                          color="red"
-                          fw="bold"
-                          onClick={() => deleteEntity(id, type)}
-                        >
-                          Delete
-                        </Menu.Item>
-                      </Menu.Dropdown>
-                    </Menu>
-                  ),
-              },
-            ]}
+            columns={columns}
+            sortStatus={sortStatus}
+            onSortStatusChange={setSortStatus}
             records={entities}
           />
         </>
