@@ -38,15 +38,14 @@ import {
   TrashIcon,
   XIcon,
 } from "lucide-react";
-import { DataTable } from "mantine-datatable";
+import { DataTable, type DataTableSortStatus } from "mantine-datatable";
 import { useCallback, useMemo, useState } from "react";
 import dayjs, { formatDateTime } from "../util/dayjs";
 import { XESExportWindow } from "./XESExportWindow";
 
 type Entity = {
   type: "ocel" | "resource";
-  resourceType?: string;
-  entityTypes: string[];
+  entityTypeName: string;
   id: string;
   name: string;
   createdAt: string;
@@ -123,13 +122,18 @@ const ResourceManagementTable: React.FC = () => {
 
   const [viewedResource, setViewedResource] = useState<string | undefined>();
 
+  const [sortStatus, setSortStatus] = useState<DataTableSortStatus<Entity>>({
+    columnAccessor: "createdAt",
+    direction: "desc",
+  });
+
   const entities: Entity[] = useMemo(() => {
     const ocelEntities = ocels.map<Entity>(
       ({ name, created_at, id, filter_applied }) => ({
         id,
         name,
         type: "ocel" as const,
-        entityTypes: [],
+        entityTypeName: "OCEL",
         createdAt: formatDateTime(created_at),
         downloadFormats: [".xml", ".json", ".sqlite"],
         isFiltered: !!filter_applied,
@@ -140,7 +144,7 @@ const ResourceManagementTable: React.FC = () => {
       ({ id, name, resource_type_label, schema_hash, created_at }) => ({
         id,
         name,
-        entityTypes: [resource_type_label],
+        entityTypeName: resource_type_label,
         type: "resource" as const,
         resourceType: schema_hash,
         createdAt: formatDateTime(dayjs(created_at).toISOString()),
@@ -149,15 +153,24 @@ const ResourceManagementTable: React.FC = () => {
 
     const taskEntity = tasks.map<Entity>(({ id, metadata }) => ({
       id: id,
-      createdAt: metadata.uploaded_at as string,
+      createdAt: formatDateTime(metadata.uploaded_at as string),
       name: metadata.fileName as string,
-      entityTypes: [],
+      entityTypeName: "OCEL",
       type: "ocel",
       isUploading: true,
     }));
 
-    return [...ocelEntities, ...resourceEntities, ...taskEntity];
-  }, [ocels, resources, tasks]);
+    const { columnAccessor, direction } = sortStatus;
+    const sign = direction === "desc" ? -1 : 1;
+
+    return [...ocelEntities, ...resourceEntities, ...taskEntity].sort(
+      (a, b) =>
+        sign *
+        String(a[columnAccessor as keyof Entity] ?? "").localeCompare(
+          String(b[columnAccessor as keyof Entity] ?? ""),
+        ),
+    );
+  }, [ocels, resources, tasks, sortStatus]);
 
   return (
     <>
@@ -182,6 +195,7 @@ const ResourceManagementTable: React.FC = () => {
             columns={[
               {
                 accessor: "name",
+                sortable: true,
                 render: ({ id, type, name, isFiltered }) => (
                   <>
                     {renamedEntity?.id === id ? (
@@ -236,25 +250,18 @@ const ResourceManagementTable: React.FC = () => {
               },
               {
                 accessor: "createdAt",
+                sortable: true,
                 render: ({ createdAt, isUploading }) =>
                   isUploading ? "uploading" : formatDateTime(createdAt),
               },
               {
-                accessor: "entityTypes",
+                accessor: "entityTypeName",
+                sortable: true,
                 title: "Type",
-                render: ({ type, entityTypes }) => (
-                  <Group gap={"xs"}>
-                    {[...(type === "ocel" ? ["OCEL"] : []), ...entityTypes].map(
-                      (entityType) => (
-                        <Badge
-                          key={entityType}
-                          color={generateColor(entityType)}
-                        >
-                          {entityType}
-                        </Badge>
-                      ),
-                    )}
-                  </Group>
+                render: ({ entityTypeName }) => (
+                  <Badge color={generateColor(entityTypeName)}>
+                    {entityTypeName}
+                  </Badge>
                 ),
               },
               {
@@ -262,7 +269,7 @@ const ResourceManagementTable: React.FC = () => {
                 textAlign: "right",
                 width: "0%",
                 //TODO: Maybe put this into its own component it is getting way to big
-                render: ({ type, entityTypes, id, name, isUploading }) =>
+                render: ({ type, entityTypeName, id, name, isUploading }) =>
                   isUploading ? (
                     <Loader size={20} />
                   ) : (
@@ -318,7 +325,7 @@ const ResourceManagementTable: React.FC = () => {
                               </Menu.Item>
                             </Menu.Sub.Dropdown>
                           </Menu.Sub>
-                        ) : entityTypes.includes("Petri Net") ? (
+                        ) : entityTypeName === "Petri Net" ? (
                           <Menu.Sub position="right-start">
                             <Menu.Sub.Target>
                               <Menu.Sub.Item
@@ -360,6 +367,8 @@ const ResourceManagementTable: React.FC = () => {
                   ),
               },
             ]}
+            sortStatus={sortStatus}
+            onSortStatusChange={setSortStatus}
             records={entities}
           />
         </>
