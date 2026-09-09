@@ -130,8 +130,8 @@ export const OCELField = memo(
     onChange,
     fieldPathId: { path },
   }: FieldProps) => {
-    const ocelRef = schema["x-ui-meta"]?.["ocel_id"];
-    const ocelFieldType = schema["x-ui-meta"]?.["field_type"];
+    const ocelRef = schema["x-ui-meta"]?.ocel_id;
+    const ocelFieldType = schema["x-ui-meta"]?.field_type;
 
     const ocelId = useOcelId(ocelRef);
     const isMulti = schema.type === "array";

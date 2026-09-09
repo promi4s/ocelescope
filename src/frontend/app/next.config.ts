@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
     "@mantine/charts",
     "recharts",
     "@r4pm/components",
+    "@ocelescope/core",
     "@ocelescope/resources",
     "@ocelescope/plugin",
     "@ocelescope/filter",
