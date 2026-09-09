@@ -719,6 +719,9 @@ importers:
       '@mantine/core':
         specifier: 'catalog:'
         version: 9.5.1(@mantine/hooks@9.5.1)(@types/react@19.2.18)(react-dom@19.2.8)(react@19.2.8)
+      '@mantine/hooks':
+        specifier: 'catalog:'
+        version: 9.5.1(react@19.2.8)
       '@marko19907/string-to-color':
         specifier: '*'
         version: 1.0.2

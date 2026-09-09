@@ -1,4 +1,15 @@
-import { Box, Button, LoadingOverlay, Tabs } from "@mantine/core";
+import {
+  ActionIcon,
+  Autocomplete,
+  Box,
+  Button,
+  Group,
+  LoadingOverlay,
+  Popover,
+  Scroller,
+  Tabs,
+} from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import { useObjectTypes, useObjectVariants } from "@ocelescope/api-base";
 import {
   defineModuleRoute,
@@ -6,9 +17,9 @@ import {
   useDownloadVariantFlatLog,
 } from "@ocelescope/core";
 import type { TraceVariants } from "@r4pm/components";
-import { DownloadIcon } from "lucide-react";
+import { DownloadIcon, SearchIcon } from "lucide-react";
 import dynamic from "next/dynamic";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const LogVariants = dynamic(
   () => import("@r4pm/components").then((m) => m.LogVariants),
@@ -66,7 +77,7 @@ const ObjectTypeVariants = ({
   };
 
   return (
-    <Box pos="relative" mih={200}>
+    <Box pos="relative" h="100%">
       <LoadingOverlay visible={isPending || !data || !variants} />
       {data && variants && (
         <>
@@ -107,34 +118,88 @@ const VariantsPage = () => {
     query: { enabled: !!id },
   });
 
-  if (!id || !objectTypes) {
-    return <LoadingOverlay visible />;
-  }
+  const [activeTab, setActiveTab] = useState<string | null>(null);
+  const [searchOpened, { close: closeSearch, toggle: toggleSearch }] =
+    useDisclosure(false);
 
-  const [firstObjectType, ...otherObjectTypes] = objectTypes;
-  if (!firstObjectType) {
-    return null;
+  useEffect(() => {
+    if (objectTypes && (!activeTab || !objectTypes?.includes(activeTab))) {
+      setActiveTab(objectTypes?.[0] ?? null);
+    }
+  }, [id, objectTypes, activeTab]);
+
+  if (!activeTab || !objectTypes || !id) {
+    return <LoadingOverlay visible />;
   }
 
   return (
     <>
-      {otherObjectTypes.length > 0 ? (
-        <Tabs defaultValue={firstObjectType} keepMounted={false}>
-          <Tabs.List>
-            {objectTypes.map((objectType) => (
-              <Tabs.Tab key={objectType} value={objectType}>
-                {objectType}
-              </Tabs.Tab>
-            ))}
-          </Tabs.List>
+      {objectTypes.length > 0 ? (
+        <Tabs
+          keepMounted={false}
+          h="100%"
+          style={{ display: "flex", flexDirection: "column" }}
+          value={activeTab}
+          onChange={setActiveTab}
+        >
+          <Group wrap="nowrap" gap="xs" style={{ flexShrink: 0 }}>
+            <Popover
+              width={300}
+              position="bottom-start"
+              withArrow
+              shadow="md"
+              opened={searchOpened}
+              onChange={closeSearch}
+              trapFocus
+              returnFocus
+            >
+              <Popover.Target>
+                <ActionIcon
+                  size={"md"}
+                  onClick={toggleSearch}
+                  aria-label="Search object types"
+                >
+                  <SearchIcon size={16} />
+                </ActionIcon>
+              </Popover.Target>
+              <Popover.Dropdown>
+                <Autocomplete
+                  data={objectTypes}
+                  aria-label="Object type"
+                  placeholder="Search object types"
+                  selectFirstOptionOnChange
+                  comboboxProps={{ withinPortal: false }}
+                  onOptionSubmit={(value) => {
+                    setActiveTab(value);
+                    closeSearch();
+                  }}
+                />
+              </Popover.Dropdown>
+            </Popover>
+            <Tabs.List flex={1} miw={0}>
+              <Scroller>
+                {objectTypes.map((objectType) => (
+                  <Tabs.Tab key={objectType} value={objectType}>
+                    {objectType}
+                  </Tabs.Tab>
+                ))}
+              </Scroller>
+            </Tabs.List>
+          </Group>
           {objectTypes.map((objectType) => (
-            <Tabs.Panel key={objectType} value={objectType} pt="md">
+            <Tabs.Panel
+              key={objectType}
+              value={objectType}
+              pt="md"
+              flex={1}
+              mih={0}
+            >
               <ObjectTypeVariants ocelId={id} objectType={objectType} />
             </Tabs.Panel>
           ))}
         </Tabs>
       ) : (
-        <ObjectTypeVariants ocelId={id} objectType={firstObjectType} />
+        <ObjectTypeVariants ocelId={id} objectType={activeTab} />
       )}
     </>
   );
