@@ -81,6 +81,7 @@ const PluginInput: React.FC<PluginInputProps> = ({
                 clearable={is_optional}
                 required={!is_optional}
                 description={description}
+                searchable
                 error={fieldState.error?.message}
                 onChange={field.onChange}
                 value={field.value}
