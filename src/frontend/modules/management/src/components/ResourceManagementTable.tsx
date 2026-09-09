@@ -35,6 +35,7 @@ import {
   EyeIcon,
   FilterIcon,
   PencilIcon,
+  SearchIcon,
   TrashIcon,
   XIcon,
 } from "lucide-react";
@@ -42,6 +43,7 @@ import { DataTable, type DataTableSortStatus } from "mantine-datatable";
 import { useCallback, useMemo, useState } from "react";
 import dayjs, { formatDateTime } from "../util/dayjs";
 import { XESExportWindow } from "./XESExportWindow";
+import { useDebouncedValue } from "@mantine/hooks";
 
 type Entity = {
   type: "ocel" | "resource";
@@ -122,6 +124,9 @@ const ResourceManagementTable: React.FC = () => {
 
   const [viewedResource, setViewedResource] = useState<string | undefined>();
 
+  const [searchedName, setSearchedName] = useState<string | null>(null);
+  const [debouncedSearch] = useDebouncedValue(searchedName, 200);
+
   const [sortStatus, setSortStatus] = useState<DataTableSortStatus<Entity>>({
     columnAccessor: "createdAt",
     direction: "desc",
@@ -162,15 +167,23 @@ const ResourceManagementTable: React.FC = () => {
 
     const { columnAccessor, direction } = sortStatus;
     const sign = direction === "desc" ? -1 : 1;
-
-    return [...ocelEntities, ...resourceEntities, ...taskEntity].sort(
-      (a, b) =>
-        sign *
-        String(a[columnAccessor as keyof Entity] ?? "").localeCompare(
-          String(b[columnAccessor as keyof Entity] ?? ""),
-        ),
-    );
-  }, [ocels, resources, tasks, sortStatus]);
+    return [...ocelEntities, ...resourceEntities, ...taskEntity]
+      .filter(
+        ({ name }) =>
+          !debouncedSearch ||
+          name
+            .trim()
+            .toLowerCase()
+            .includes(debouncedSearch.toLowerCase().trim()),
+      )
+      .sort(
+        (a, b) =>
+          sign *
+          String(a[columnAccessor as keyof Entity] ?? "").localeCompare(
+            String(b[columnAccessor as keyof Entity] ?? ""),
+          ),
+      );
+  }, [ocels, resources, tasks, sortStatus, debouncedSearch]);
 
   return (
     <>
@@ -196,6 +209,27 @@ const ResourceManagementTable: React.FC = () => {
               {
                 accessor: "name",
                 sortable: true,
+                filter: (
+                  <TextInput
+                    placeholder="Search by name ..."
+                    leftSection={<SearchIcon size={16} />}
+                    rightSection={
+                      <ActionIcon
+                        size={"sm"}
+                        variant="transparent"
+                        c="dimmed"
+                        onClick={() => setSearchedName(null)}
+                      >
+                        <XIcon size={14} />
+                      </ActionIcon>
+                    }
+                    value={searchedName ?? ""}
+                    onChange={(value) =>
+                      setSearchedName(value.currentTarget.value ?? null)
+                    }
+                  />
+                ),
+                filtering: !!searchedName,
                 render: ({ id, type, name, isFiltered }) => (
                   <>
                     {renamedEntity?.id === id ? (
