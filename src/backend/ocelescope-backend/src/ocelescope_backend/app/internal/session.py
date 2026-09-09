@@ -8,7 +8,6 @@ from typing import Any, Callable, Hashable, Sequence, Type, TypeVar, cast
 from uuid import uuid4
 
 from ocelescope import OCEL, BaseFilter
-from ocelescope_backend.app.internal.config import config
 from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.model.ocel import SessionOCEL
 from ocelescope_backend.app.internal.model.resource import ResourceApi, ResourceStore
@@ -126,19 +125,12 @@ class Session:
         )
 
     def add_ocel_from_file(self, source_path: Path, name: str) -> str:
-        """Register an OCEL file, picking the importer by how big the file is.
+        """Register an OCEL file, streamed entity by entity into its own DuckDB file.
 
-        Small logs go through r4pm, which parses the whole file at once and is the
-        faster of the two. Past ``OCEL_STREAM_THRESHOLD_MB`` that parse is what runs
-        the backend out of memory, so the log is instead streamed entity by entity
-        straight into its own DuckDB file -- never materialized as a whole.
+        The log is never materialized as a whole, so peak memory stays bounded by its
+        widest single entity however big the upload is.
         """
-        threshold = config.OCEL_STREAM_THRESHOLD_MB * 1024 * 1024
-
-        with OCEL.read(
-            source_path,
-            variant="r4pm" if source_path.stat().st_size <= threshold else "streamed",
-        ) as ocel:
+        with OCEL.read(source_path) as ocel:
             return self.add_ocel(ocel, name=name)
 
     def get_ocel(self, ocel_id: str, use_original: bool = False) -> OCEL:
