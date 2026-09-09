@@ -5,10 +5,12 @@ import {
   Loader,
   Menu,
   MenuItem,
+  MultiSelect,
   TextInput,
   Title,
   Tooltip,
 } from "@mantine/core";
+import { useDebouncedValue } from "@mantine/hooks";
 import { generateColor } from "@marko19907/string-to-color";
 import {
   useDeleteOcel,
@@ -43,7 +45,6 @@ import { DataTable, type DataTableSortStatus } from "mantine-datatable";
 import { useCallback, useMemo, useState } from "react";
 import dayjs, { formatDateTime } from "../util/dayjs";
 import { XESExportWindow } from "./XESExportWindow";
-import { useDebouncedValue } from "@mantine/hooks";
 
 type Entity = {
   type: "ocel" | "resource";
@@ -127,6 +128,18 @@ const ResourceManagementTable: React.FC = () => {
   const [searchedName, setSearchedName] = useState<string | null>(null);
   const [debouncedSearch] = useDebouncedValue(searchedName, 200);
 
+  const allEntityTypes = useMemo(
+    () => [
+      ...(ocels.length > 0 || tasks.length > 0 ? ["OCEL"] : []),
+      ...new Set(
+        resources.map(({ resource_type_label }) => resource_type_label),
+      ),
+    ],
+    [ocels, resources, tasks],
+  );
+
+  const [includedEntityTypes, setIncludedEntityTypes] = useState<string[]>([]);
+
   const [sortStatus, setSortStatus] = useState<DataTableSortStatus<Entity>>({
     columnAccessor: "createdAt",
     direction: "desc",
@@ -176,6 +189,11 @@ const ResourceManagementTable: React.FC = () => {
             .toLowerCase()
             .includes(debouncedSearch.toLowerCase().trim()),
       )
+      .filter(
+        ({ entityTypeName }) =>
+          includedEntityTypes.length === 0 ||
+          includedEntityTypes.includes(entityTypeName),
+      )
       .sort(
         (a, b) =>
           sign *
@@ -183,7 +201,14 @@ const ResourceManagementTable: React.FC = () => {
             String(b[columnAccessor as keyof Entity] ?? ""),
           ),
       );
-  }, [ocels, resources, tasks, sortStatus, debouncedSearch]);
+  }, [
+    ocels,
+    resources,
+    tasks,
+    sortStatus,
+    debouncedSearch,
+    includedEntityTypes,
+  ]);
 
   return (
     <>
@@ -198,7 +223,7 @@ const ResourceManagementTable: React.FC = () => {
         ocelId={exportOcelId}
         onClose={() => setExportOcelId(undefined)}
       />
-      {entities.length ? (
+      {allEntityTypes.length ? (
         <>
           <FullScreenUpload />
           <DataTable<Entity>
@@ -292,6 +317,41 @@ const ResourceManagementTable: React.FC = () => {
                 accessor: "entityTypeName",
                 sortable: true,
                 title: "Type",
+                filter: (
+                  <MultiSelect
+                    placeholder="Filter by type ..."
+                    data={allEntityTypes}
+                    leftSection={<SearchIcon size={16} />}
+                    value={includedEntityTypes}
+                    onChange={setIncludedEntityTypes}
+                    clearable
+                    searchable
+                    maw={300}
+                    comboboxProps={{ withinPortal: false }}
+                    renderOption={({ option, checked }) => (
+                      <Group gap={"xs"} wrap="nowrap">
+                        {checked && <CheckIcon size={14} />}
+                        <Badge color={generateColor(option.value)}>
+                          {option.label}
+                        </Badge>
+                      </Group>
+                    )}
+                    renderPill={({ option, onRemove, disabled }) => (
+                      <Badge
+                        color={generateColor(String(option.value))}
+                        style={{ cursor: disabled ? undefined : "pointer" }}
+                        rightSection={!disabled && <XIcon size={12} />}
+                        onMouseDown={(event) => {
+                          event.preventDefault();
+                          onRemove?.();
+                        }}
+                      >
+                        {option.label}
+                      </Badge>
+                    )}
+                  />
+                ),
+                filtering: includedEntityTypes.length > 0,
                 render: ({ entityTypeName }) => (
                   <Badge color={generateColor(entityTypeName)}>
                     {entityTypeName}
