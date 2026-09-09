@@ -35,11 +35,22 @@ async def upload(session: ApiSession, files: list[UploadFile] = File(...)) -> li
 
         task_method = None
         match file_path.suffix.lower():
-            case ".zip":
+            case ".zip" if [suffix.lower() for suffix in file_path.suffixes[-2:]] != [
+                ".ocel",
+                ".zip",
+            ]:
                 task_method = import_archive
             case ".ocelescope":
                 task_method = import_resource
-            case ".xml" | ".xmlocel" | ".json" | ".jsonocel" | ".sqlite":
+            case (
+                ".xml"
+                | ".xmlocel"
+                | ".json"
+                | ".jsonocel"
+                | ".sqlite"
+                | ".csv"
+                | ".zip"
+            ):
                 task_method = import_ocel_task
             case ".xes":
                 task_method = import_xes_task
