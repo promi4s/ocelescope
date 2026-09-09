@@ -188,7 +188,8 @@
     "**/dist/**",
     "**/*.svg",
     "**/*.min.js",
-    "**/api/base.ts"
+    "**/api/base.ts",
+    "src/frontend/packages/api/base/src/api/**"
   ],
   "ignoreRegExpList": ["\\{%[\\s\\S]*?%\\}", "\\{\\{[\\s\\S]*?\\}\\}"]
 }
