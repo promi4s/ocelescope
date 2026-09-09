@@ -3,14 +3,14 @@ import {
   Center,
   Group,
   Select,
+  type SelectProps,
   Tooltip,
   useMantineTheme,
-  type SelectProps,
 } from "@mantine/core";
 import { useGetOcels } from "@ocelescope/api-base";
-import { useCallback, useMemo, type ComponentProps } from "react";
-import { useCurrentOcel } from "../../hooks/useCurrentOCEL";
 import { CheckIcon, FilterIcon } from "lucide-react";
+import { type ComponentProps, useCallback, useMemo } from "react";
+import { useCurrentOcel } from "../../hooks/useCurrentOCEL";
 
 const iconProps = {
   color: "currentColor",
