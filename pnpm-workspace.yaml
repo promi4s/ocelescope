@@ -10,7 +10,7 @@ allowBuilds:
   sharp: true
 
 catalog:
-  '@biomejs/biome': 2.5.11
+  '@biomejs/biome': 2.5.12
   "@dagrejs/dagre": ^3.0.0
   "@floating-ui/react": ^0.27.18
   "@hpcc-js/wasm-graphviz": ^1.21.0
@@ -43,7 +43,7 @@ catalog:
   axios: ^1.18.1
   clsx: ^2.1.1
   content-disposition-attachment: ^0.3.1
-  cspell: ^10.0.1
+  cspell: ^10.3.0
   dayjs: ^1.11.19
   elkjs: ^0.12.0
   embla-carousel: ^8.6.0

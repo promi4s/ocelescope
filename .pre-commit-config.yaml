@@ -1,3 +1,6 @@
+default_install_hook_types: [pre-commit, pre-push]
+default_stages: [pre-commit]
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v2.3.0
@@ -6,9 +9,11 @@ repos:
         files: .*\.py$
         exclude: ^template/
       - id: end-of-file-fixer
+        stages: [pre-commit]
         files: .*\.py$
         exclude: ^template/
       - id: trailing-whitespace
+        stages: [pre-commit]
         files: .*\.py$
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.7
@@ -23,7 +28,7 @@ repos:
     rev: "v0.6.1"
     hooks:
       - id: biome-check
-        additional_dependencies: ["@biomejs/biome@2.5.0"]
+        additional_dependencies: ["@biomejs/biome@2.5.12"]
   - repo: local
     hooks:
       - id: generate-api
@@ -46,3 +51,18 @@ repos:
         pass_filenames: false
         types_or: [ts, tsx, javascript, jsx]
         exclude: ^template/
+      # Push-only: whole-repo passes that are too slow for every commit.
+      - id: check
+        name: Lint and format (autofix)
+        entry: pnpm run check
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-push]
+      - id: spellcheck
+        name: Spellcheck
+        entry: pnpm run spellcheck
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-push]
