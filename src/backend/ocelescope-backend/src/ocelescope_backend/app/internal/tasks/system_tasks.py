@@ -44,28 +44,17 @@ def _import_ocel(
 ) -> list[SystemNotification | InvalidationRequest]:
     original_name = Path(metadata["fileName"])
 
-    match original_name.suffix:
-        case ".xml":
-            desired_suffix = ".xmlocel"
-        case ".json":
-            desired_suffix = ".jsonocel"
-        case _:
-            desired_suffix = original_name.suffix
-
     name = original_name.stem
-    read_path = file_path
-    try:
-        if file_path.suffix != desired_suffix:
-            read_path = file_path.with_suffix(desired_suffix)
-            file_path.rename(read_path)
+    # "foo.ocel.zip" names the log "foo", not "foo.ocel".
+    if name.lower().endswith(".ocel"):
+        name = name[: -len(".ocel")]
 
+    try:
         ocel_id = session.add_ocel_from_file(
-            read_path,
+            file_path,
             name=name,
         )
-
     finally:
-        read_path.unlink(missing_ok=True)
         file_path.unlink(missing_ok=True)
 
     return [

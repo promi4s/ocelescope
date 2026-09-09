@@ -2163,7 +2163,9 @@
               "enum": [
                 ".xml",
                 ".json",
-                ".sqlite"
+                ".sqlite",
+                ".csv",
+                ".ocel.zip"
               ],
               "type": "string",
               "default": ".json",

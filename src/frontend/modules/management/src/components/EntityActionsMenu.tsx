@@ -1,4 +1,5 @@
 import { ActionIcon, Loader, Menu, MenuItem } from "@mantine/core";
+import { DownloadOCELExt } from "@ocelescope/api-base";
 import {
   DownloadIcon,
   EllipsisVerticalIcon,
@@ -9,10 +10,9 @@ import {
 import { memo } from "react";
 import type { Entity } from "../types";
 
-//TODO: sync with api
-const ocelExtensions = [".sqlite", ".xml", ".json"] as const;
+const ocelExtensions = Object.values(DownloadOCELExt);
 
-export type OcelExtension = (typeof ocelExtensions)[number];
+export type OcelExtension = DownloadOCELExt;
 
 type EntityActionsMenuProps = {
   entity: Entity;

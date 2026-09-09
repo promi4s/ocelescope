@@ -1,13 +1,14 @@
 from __future__ import annotations
 
+import warnings
+from collections.abc import Sequence
 from os import PathLike
 from pathlib import Path
-from typing import Literal, Sequence
+from typing import Literal
 
 import duckdb
 import pandas as pd
 import polars as pl
-import r4pm
 from pm4py.objects.ocel.obj import OCEL as PM4PYOCEL
 
 from ocelescope.ocel.constants.pm4py import (
@@ -21,7 +22,7 @@ from ocelescope.ocel.constants.pm4py import (
     TIMESTAMP_COL,
 )
 from ocelescope.ocel.filter.base import BaseFilter
-from ocelescope.ocel.io import convert_ocel_duckdb, export_duckdb_ocel, import_quantities
+from ocelescope.ocel.io import convert_ocel_duckdb, export_duckdb_ocel
 from ocelescope.ocel.managers import (
     E2OManager,
     EventsManager,
@@ -39,8 +40,6 @@ Frame = pd.DataFrame | pl.DataFrame | pl.LazyFrame
 
 _O2O_TO_PM4PY = {O2O_SOURCE_ID: OID_COL}
 _O2O_FROM_PM4PY = {OID_COL: O2O_SOURCE_ID}
-
-_R4PM_SUFFIXES = {".jsonocel", ".json", ".xmlocel", ".xml"}
 
 
 class OCEL:
@@ -293,60 +292,39 @@ class OCEL:
     @staticmethod
     def read(
         path: str | Path,
-        variant: Literal["r4pm", "streamed"] = "r4pm",
+        variant: Literal["r4pm", "streamed"] | None = None,
     ) -> OCEL:
         """
         Read an OCEL file (.jsonocel, .xmlocel, or .sqlite) from disk.
 
-        Either way the log ends up in an in-memory DuckDB database, which becomes
-        the returned OCEL's source of truth; the pandas tables are reshaped out of
-        it only as they are asked for. The format is detected from the extension.
+        The file is read entity by entity into an in-memory DuckDB database, which
+        becomes the returned OCEL's source of truth; the pandas tables are reshaped
+        out of it only as they are asked for. Peak memory therefore stays bounded by
+        the log's widest single entity rather than the whole log. The format is
+        detected from the extension.
 
         Args:
             path (str | Path):
                 Path to the OCEL file on disk.
-            meta (dict[str, Any], optional):
-                Additional metadata to attach to the OCELMeta container.
             variant:
-                Which reader to use.
-
-                ``"r4pm"`` parses the whole log with r4pm's Rust reader and hands
-                the finished tables over, which is fast but holds the log in
-                memory while it does so.
-
-                ``"streamed"`` reads the file entity by entity into the database,
-                so peak memory stays bounded by the log's widest single entity
-                rather than the whole log -- use it for logs too big to hold.
-
-                **``.sqlite`` logs are always streamed.**
+                Deprecated and ignored. Every log is now read streamed, so there is
+                no longer a reader to pick.
 
         Returns:
             OCEL: A fully constructed OCEL wrapper instance.
         """
+        if variant is not None:
+            warnings.warn(
+                "The 'variant' argument of OCEL.read is deprecated and ignored; "
+                "every log is now read streamed.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
 
         path = Path(path)
 
-        if variant == "r4pm" and path.suffix in _R4PM_SUFFIXES:
-            tables = r4pm.df.import_ocel(str(path))
-            o2o = tables.get("o2o")
-            object_changes = tables.get("object_changes")
-            ocel = OCEL.from_frames(
-                events=tables["events"],
-                objects=tables["objects"],
-                relations=tables["relations"],
-                o2o=o2o.rename(_O2O_FROM_PM4PY) if o2o is not None else None,
-                object_changes=object_changes.drop([OTYPE_COL], strict=False)
-                if object_changes is not None
-                else None,
-            )
-            try:
-                import_quantities(path, ocel.con)
-            except Exception:
-                ocel.close()
-                raise
-            return ocel
-
         connection = duckdb.connect(":memory:")
+
         try:
             convert_ocel_duckdb(path, connection)
             set_utc(connection)
