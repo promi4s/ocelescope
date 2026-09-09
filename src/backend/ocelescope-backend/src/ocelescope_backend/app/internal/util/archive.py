@@ -25,6 +25,7 @@ class ArchiveContents:
 
 _IGNORED_PATH_PARTS = {"__MACOSX"}
 _LOG_SUFFIXES = {
+    ".csv",
     ".json",
     ".jsonocel",
     ".sqlite",
@@ -32,6 +33,8 @@ _LOG_SUFFIXES = {
     ".xml",
     ".xmlocel",
 }
+# Formats whose last extension alone ('.zip', '.gz') says nothing about the file.
+_COMPOUND_LOG_SUFFIXES = (".ocel.zip", ".xes.gz")
 _RESOURCE_SUFFIX = ".ocelescope"
 
 
@@ -66,7 +69,10 @@ def _is_ignored(path: PurePosixPath) -> bool:
 
 def _is_supported_log(path: PurePosixPath) -> bool:
     lower_name = path.name.lower()
-    return lower_name.endswith(".xes.gz") or Path(lower_name).suffix in _LOG_SUFFIXES
+    return (
+        lower_name.endswith(_COMPOUND_LOG_SUFFIXES)
+        or Path(lower_name).suffix in _LOG_SUFFIXES
+    )
 
 
 def inspect_archive(
