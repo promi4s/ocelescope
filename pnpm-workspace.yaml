@@ -32,7 +32,7 @@ catalog:
   "@tanstack/react-query": ^5.90.21
   "@tanstack/react-query-devtools": ^5.91.3
   "@tsconfig/strictest": ^2.0.8
-  "@tsdown/css": ^0.22.14
+  "@tsdown/css": ^0.23.0
   "@types/file-saver": ^2.0.7
   "@types/node": ^26.2.0
   '@types/object-hash': ^3.0.6
