@@ -173,7 +173,8 @@
     "iqty",
     "itype",
     "ilvl",
-    "itlvl"
+    "itlvl",
+    "OCELIO"
   ],
   "ignorePaths": [
     "pnpm-lock.yaml",

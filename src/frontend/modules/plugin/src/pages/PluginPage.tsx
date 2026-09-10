@@ -8,12 +8,11 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-import type { PluginMethod, ResourceResult } from "@ocelescope/api-base";
 import {
+  type MethodApi,
   useDisableDiscoveryMethod,
   useEnableDiscoveryMethod,
   useGetPlugin,
-  useGetResourceMeta,
   useListDiscoveryMethods,
 } from "@ocelescope/api-base";
 import { useInvalidate } from "@ocelescope/core";
@@ -22,42 +21,23 @@ import { useMemo } from "react";
 import PluginBreadcrumbs from "../components/PluginBreadcrumbs/PluginBreadcrumbs";
 import { GenericCard } from "../components/PluginCard/GenericCard";
 
-const MethodCard: React.FC<{ pluginId: string; method: PluginMethod }> = ({
+const MethodCard: React.FC<{ pluginId: string; method: MethodApi }> = ({
   method,
 }) => {
   const { query } = useRouter();
 
-  const { data: resourceMeta } = useGetResourceMeta();
-
-  const tags = useMemo(() => {
-    const inputResources = Object.keys(method.input_resources ?? {}).map(
-      (schema_hash) => resourceMeta?.[schema_hash]?.label,
-    );
-
-    const hasOcel =
-      !!method.input_ocels ||
-      method.results?.some(({ type }) => type === "ocel");
-
-    const resultNames = (method.results ?? [])
-      .filter((result): result is ResourceResult => result.type === "resource")
-      .map((result) => resourceMeta?.[result.schema_hash]?.label);
-
-    return Array.from(
-      new Set(
-        [
-          ...inputResources,
-          ...resultNames,
-          ...(hasOcel ? ["OCEL"] : []),
-        ].filter((a) => !!a),
+  const tags = Array.from(
+    new Set(
+      [...method.inputs, ...method.outputs].map((io) =>
+        io.type === "ocel" ? "OCEL" : io.resource_label,
       ),
-    ) as string[];
-  }, [resourceMeta, method]);
+    ),
+  );
 
   return (
     <GenericCard
       title={method.label ?? method.name}
       description={method.description ?? ""}
-      tags={tags}
       link={{
         href: {
           query: {
@@ -67,6 +47,7 @@ const MethodCard: React.FC<{ pluginId: string; method: PluginMethod }> = ({
         },
         children: "Run Method",
       }}
+      tags={tags}
     />
   );
 };
@@ -98,8 +79,8 @@ const PluginPage: React.FC<{ pluginId: string }> = ({ pluginId }) => {
       <Stack>
         <Stack gap={0} align="center">
           <PluginBreadcrumbs />
-          <Title mt={"xs"}> {plugin?.meta.label}</Title>
-          <Text c="dimmed">{plugin?.meta.description}</Text>
+          <Title mt={"xs"}> {plugin?.label}</Title>
+          <Text c="dimmed">{plugin?.description}</Text>
         </Stack>
         <SimpleGrid
           cols={{ base: 1, sm: 2, lg: 4 }}

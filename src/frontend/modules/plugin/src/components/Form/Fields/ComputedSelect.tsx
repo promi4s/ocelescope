@@ -23,10 +23,9 @@ export const useSelectOptions = (provider: string) => {
   const serializedBody = useMemo(
     () =>
       JSON.stringify({
-        input: formValues.input,
-        input_ocels: compact(formValues.input_ocels),
+        configuration_input: formValues.input,
         input_resources: compact(formValues.input_resources),
-      }),
+      } satisfies BodyGetComputedValues),
     [formValues],
   );
   const [debouncedBody] = useDebouncedValue(serializedBody, 300);

@@ -1,21 +1,12 @@
-from abc import ABC
 import inspect
+from abc import ABC
 from typing import (
     ClassVar,
     Optional,
 )
 
-from pydantic import BaseModel
-
-
 from ocelescope.plugin.decorators import PluginMethod
-
-
-class PluginMeta(BaseModel):
-    name: str
-    version: str
-    label: str
-    description: Optional[str]
+from ocelescope.resource.resource import Resource
 
 
 class Plugin(ABC):
@@ -24,10 +15,8 @@ class Plugin(ABC):
     description: ClassVar[Optional[str]] = None
 
     @classmethod
-    def meta(cls):
-        return PluginMeta(
-            name=cls.__name__, version=cls.version, description=cls.description, label=cls.label
-        )
+    def get_name(cls):
+        return cls.__name__
 
     @classmethod
     def method_map(cls) -> dict[str, PluginMethod]:
@@ -41,3 +30,14 @@ class Plugin(ABC):
             method_map[method_meta.name] = method_meta
 
         return method_map
+
+    @classmethod
+    def get_resources(cls) -> list[type[Resource]]:
+        return list(
+            dict.fromkeys(
+                resource_type
+                for method_meta in cls.method_map().values()
+                for io_element in [*method_meta.inputs, *method_meta.outputs]
+                for resource_type in io_element.resource_types
+            )
+        )

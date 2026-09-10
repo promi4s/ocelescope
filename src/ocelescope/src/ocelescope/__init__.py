@@ -23,9 +23,7 @@ from ocelescope.plugin import (
     OCELAnnotation,
     Plugin,
     PluginInput,
-    PluginMeta,
     PluginMethod,
-    PluginResult,
     ResourceAnnotation,
     plugin_method,
 )
@@ -57,7 +55,6 @@ matplotlib.use("Agg")
 
 __all__ = [
     "OCEL",
-    "OCELExtension",
     "E2OCountFilter",
     "EventAttributeFilter",
     "EventTypeFilter",
@@ -75,16 +72,14 @@ __all__ = [
     "ResourceAnnotation",
     "OCELAnnotation",
     "Plugin",
-    "PluginMeta",
-    "PluginMethod",
     "COMPUTED_SELECTION",
     "OCEL_FIELD",
     "CODE_FIELD",
     "SLIDER_FIELD",
     "SQL_FIELD",
     "PluginInput",
-    "PluginResult",
     "plugin_method",
+    "PluginMethod",
     "BaseFilter",
     # Visualization
     # Util

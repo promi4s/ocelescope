@@ -1,5 +1,4 @@
 import traceback
-from copy import deepcopy
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -12,11 +11,12 @@ from typing_extensions import TypedDict
 
 from ocelescope import OCEL, BaseFilter, Resource
 from ocelescope_backend.app.internal.registry import registry_manager
+from ocelescope_backend.app.internal.registry.plugin import PluginNotFound
 from ocelescope_backend.app.internal.tasks.base import (
     TaskBase,
     TaskState,
     TaskSummary,
-    _call_with_known_params,
+    call_with_known_params,
 )
 from ocelescope_backend.app.internal.util.hashing import generate_tuple_hash
 from ocelescope_backend.app.sse_manager import (
@@ -33,8 +33,7 @@ P = ParamSpec("P")
 
 
 class PluginInput(TypedDict):
-    ocels: dict[str, str | None]
-    resources: dict[str, str | None]
+    input_resources: dict[str, str | None]
     input: dict[str, Any]
 
 
@@ -54,84 +53,41 @@ class PluginTask(TaskBase, Generic[P]):
         self.result: list[OCEL | Resource] | None = None
         self.session = session
 
-    @staticmethod
-    def _selected_id(
-        supplied: dict[str, str | None], key: str, is_optional: bool
-    ) -> str | None:
-        """The id picked for a declared input, or `None` when it may be left empty.
-
-        A cleared field arrives as `null` rather than as a missing key, so both count
-        as "not selected". A required input that is missing is reported by name, rather
-        than reaching the plugin as a `None` that fails somewhere in its body.
-        """
-        selected = supplied.get(key) or None
-
-        if selected is None and not is_optional:
-            raise ValueError(f"Missing required input: {key}")
-
-        return selected
-
-    def _copy_session_ocel(self, ocel_id: str) -> OCEL:
-        """An in-memory copy of a session OCEL, for the plugin to do as it likes with."""
-        with self.session.get_ocel(ocel_id) as session_ocel:
-            return deepcopy(session_ocel)
-
     def run(self):
         self.state = TaskState.STARTED
         try:
+            plugin = registry_manager.get_plugin(self.plugin_id)
+
+            if plugin is None:
+                raise PluginNotFound(self.plugin_id)
+
             method = registry_manager.get_plugin_method(
                 self.plugin_id, self.method_name
             )
 
-            ocel_args: dict[str, OCEL | None] = {}
+            kwargs = registry_manager.get_plugin_method_kwargs(
+                session=self.session,
+                plugin_id=self.plugin_id,
+                method_name=self.method_name,
+                input_resources=self.input["input_resources"],
+            )
 
-            for key, annotation in method.input_ocels.items():
-                ocel_id = self._selected_id(
-                    self.input["ocels"], key, annotation.is_optional
-                )
+            if method.configuration_input is not None:
+                kwargs["input"] = method.configuration_input(**self.input["input"])
 
-                ocel_args[key] = (
-                    self._copy_session_ocel(ocel_id) if ocel_id is not None else None
-                )
+            result = call_with_known_params(method.bind(plugin), **kwargs)
 
-            resource_args: dict[str, Resource | None] = {}
+            returned = result if isinstance(result, tuple) else (result,)
 
-            # TODO: Find a better way to do this
-            for key, (_, annotation) in method.input_resources.items():
-                resource_id = self._selected_id(
-                    self.input["resources"], key, annotation.is_optional
-                )
+            entities: list[OCEL | Resource] = []
 
-                resource_args[key] = (
-                    registry_manager.get_resource_instance(
-                        self.session.get_resource(resource_id).data,
-                        source_id=self.plugin_id,
-                    )
-                    if resource_id is not None
-                    else None
-                )
+            for item in returned:
+                if isinstance(item, list):
+                    entities.extend(item)
+                else:
+                    entities.append(item)
 
-            kwargs = {
-                **ocel_args,
-                **resource_args,
-            }
-
-            if method._input_model is not None:
-                kwargs["input"] = method._input_model(**self.input["input"])
-
-            result = _call_with_known_params(method._method, **kwargs)
-
-            self.result = []
-
-            if not isinstance(result, tuple):
-                result = (result,)
-
-            for item in result:
-                if not isinstance(item, list):
-                    item = [item]
-
-                for entity in item:
-                    self.result.append(entity)
+            self.result = entities
 
             if self.state != TaskState.CANCELLED:
                 self.state = TaskState.SUCCESS
@@ -192,10 +148,14 @@ class PluginTask(TaskBase, Generic[P]):
         method_name: str,
         input: PluginInput,
     ) -> str:
+        method = registry_manager.get_plugin_method(plugin_id, method_name)
+
+        ocel_fields = [input.name for input in method.inputs if input.io_type == "ocel"]
+
         filters = {
-            ocel_id: session.get_filter(ocel_id)
-            for ocel_id in input["ocels"].values()
-            if ocel_id
+            field_name: session.get_filter(input_id)
+            for field_name, input_id in input["input_resources"].items()
+            if input_id is not None and field_name in ocel_fields
         }
 
         key = cls._dedupe_key(plugin_id, method_name, input, filters)
