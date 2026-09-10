@@ -197,7 +197,7 @@ catalogs:
       version: 19.2.5
     '@xyflow/react':
       specifier: ^12.11.3
-      version: 12.11.3
+      version: 12.11.6
     axios:
       specifier: ^1.18.1
       version: 1.18.1
@@ -325,7 +325,7 @@ importers:
         version: link:../modules/management
       '@ocelescope/ocelot':
         specifier: 'catalog:'
-        version: 0.6.1(@dagrejs/dagre@3.0.0)(@mantine/core@9.5.1)(@mantine/hooks@9.5.1)(@ocelescope/api-base@src+frontend+packages+api+base)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@tanstack/react-query@5.90.21)(@xyflow/react@12.11.3)(axios@1.18.1)(dayjs@1.11.21)(elkjs@0.11.1)(file-saver@2.0.5)(html-to-image@1.11.13)(lucide-react@1.21.0)(mantine-datatable@9.4.0)(react-dom@19.2.8)(react@19.2.8)(recharts@3.8.1)
+        version: 0.6.1(@dagrejs/dagre@3.0.0)(@mantine/core@9.5.1)(@mantine/hooks@9.5.1)(@ocelescope/api-base@src+frontend+packages+api+base)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@tanstack/react-query@5.90.21)(@xyflow/react@12.11.6)(axios@1.18.1)(dayjs@1.11.21)(elkjs@0.11.1)(file-saver@2.0.5)(html-to-image@1.11.13)(lucide-react@1.21.0)(mantine-datatable@9.4.0)(react-dom@19.2.8)(react@19.2.8)(recharts@3.8.1)
       '@ocelescope/plugin':
         specifier: workspace:^
         version: link:../modules/plugin
@@ -963,7 +963,7 @@ importers:
         version: 19.2.5(@types/react@19.2.18)
       '@xyflow/react':
         specifier: 'catalog:'
-        version: 12.11.3(@types/react-dom@19.2.5)(@types/react@19.2.18)(immer@11.1.11)(react-dom@19.2.8)(react@19.2.8)
+        version: 12.11.6(@types/react-dom@19.2.5)(@types/react@19.2.18)(immer@11.1.11)(react-dom@19.2.8)(react@19.2.8)
       qs:
         specifier: 'catalog:'
         version: 6.15.3
@@ -990,7 +990,7 @@ importers:
         version: link:../api/base
       '@xyflow/react':
         specifier: 'catalog:'
-        version: 12.11.3(@types/react-dom@19.2.5)(@types/react@19.2.18)(immer@11.1.11)(react-dom@19.2.8)(react@19.2.8)
+        version: 12.11.6(@types/react-dom@19.2.5)(@types/react@19.2.18)(immer@11.1.11)(react-dom@19.2.8)(react@19.2.8)
       dayjs:
         specifier: 'catalog:'
         version: 1.11.21
@@ -3364,8 +3364,8 @@ packages:
   '@x0k/json-schema-merge@1.0.3':
     resolution: {integrity: sha512-lerJC4sI9CNUQWdff3PnU1YJOqazD6TjMcvxZIPXUBjn4j1cUiXE0LvzhMnGYzKKr271TkvXJtH7gEwksrtn+w==}
 
-  '@xyflow/react@12.11.3':
-    resolution: {integrity: sha512-G3jogHz2GWUtIOkhavUGno2YzY9u6fILIJBttfsBendb0/HWB90JG+sOTAvlIMEwyvq9zgy9V9ZQSwyQjR5QzQ==}
+  '@xyflow/react@12.11.6':
+    resolution: {integrity: sha512-9XsEJNHjatKYndszKTF/bsU7FOP9dJ6V/EQwzy3oMdtqgBuUq7BjKSwkEo+C7s4qHstHQfwwoHA3E8QfpPxZZQ==}
     peerDependencies:
       '@types/react': '>=17'
       '@types/react-dom': '>=17'
@@ -3377,8 +3377,8 @@ packages:
       '@types/react-dom':
         optional: true
 
-  '@xyflow/system@0.0.80':
-    resolution: {integrity: sha512-ywc3ZqG91brzWrH1WlwMdIX4goOfrpBy6AbLdVSaof/Xx9l138ijIKRExM6EkMro2F+OImGmSiA/WKcXvKVcfA==}
+  '@xyflow/system@0.0.82':
+    resolution: {integrity: sha512-4DKnL3CGtCGLRSmgDqaajRVgeksMXq/Yw4wPfdMfm7JvdIiWHGzVYOfFUztiATwdBXZqUU6HhehwUdbV9G23PQ==}
 
   '@yuku-codegen/binding-android-arm64@0.8.5':
     resolution: {integrity: sha512-+oEBxK35kdbskhxozjZhI8N6qrMOfphpIkXnqBj6N2DC08rdkg10MUMRNKZLBNU6uNyoYiLcLyCE6aFV2sfMKw==}
@@ -6518,7 +6518,7 @@ snapshots:
   '@next/swc-win32-x64-msvc@16.3.2':
     optional: true
 
-  '@ocelescope/ocelot@0.6.1(@dagrejs/dagre@3.0.0)(@mantine/core@9.5.1)(@mantine/hooks@9.5.1)(@ocelescope/api-base@src+frontend+packages+api+base)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@tanstack/react-query@5.90.21)(@xyflow/react@12.11.3)(axios@1.18.1)(dayjs@1.11.21)(elkjs@0.11.1)(file-saver@2.0.5)(html-to-image@1.11.13)(lucide-react@1.21.0)(mantine-datatable@9.4.0)(react-dom@19.2.8)(react@19.2.8)(recharts@3.8.1)':
+  '@ocelescope/ocelot@0.6.1(@dagrejs/dagre@3.0.0)(@mantine/core@9.5.1)(@mantine/hooks@9.5.1)(@ocelescope/api-base@src+frontend+packages+api+base)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@tanstack/react-query@5.90.21)(@xyflow/react@12.11.6)(axios@1.18.1)(dayjs@1.11.21)(elkjs@0.11.1)(file-saver@2.0.5)(html-to-image@1.11.13)(lucide-react@1.21.0)(mantine-datatable@9.4.0)(react-dom@19.2.8)(react@19.2.8)(recharts@3.8.1)':
     dependencies:
       '@dagrejs/dagre': 3.0.0
       '@mantine/core': 9.5.1(@mantine/hooks@9.5.1)(@types/react@19.2.18)(react-dom@19.2.8)(react@19.2.8)
@@ -6527,7 +6527,7 @@ snapshots:
       '@ocelescope/api-client': link:src/frontend/packages/api/client
       '@ocelescope/core': link:src/frontend/packages/core
       '@tanstack/react-query': 5.90.21(react@19.2.8)
-      '@xyflow/react': 12.11.3(@types/react-dom@19.2.5)(@types/react@19.2.18)(immer@11.1.11)(react-dom@19.2.8)(react@19.2.8)
+      '@xyflow/react': 12.11.6(@types/react-dom@19.2.5)(@types/react@19.2.18)(immer@11.1.11)(react-dom@19.2.8)(react@19.2.8)
       axios: 1.18.1(debug@4.4.3)
       dayjs: 1.11.21
       elkjs: 0.11.1
@@ -6790,7 +6790,7 @@ snapshots:
     dependencies:
       '@radix-ui/themes': 3.3.0(@types/react-dom@19.2.5)(@types/react@19.2.18)(react-dom@19.2.8)(react@19.2.8)
       '@tanstack/react-virtual': 3.14.7(react-dom@19.2.8)(react@19.2.8)
-      '@xyflow/react': 12.11.3(@types/react-dom@19.2.5)(@types/react@19.2.18)(immer@11.1.11)(react-dom@19.2.8)(react@19.2.8)
+      '@xyflow/react': 12.11.6(@types/react-dom@19.2.5)(@types/react@19.2.18)(immer@11.1.11)(react-dom@19.2.8)(react@19.2.8)
       elkjs: 0.10.2
       html-to-image: 1.11.13
       react: 19.2.8
@@ -7963,9 +7963,9 @@ snapshots:
     dependencies:
       '@types/json-schema': 7.0.15
 
-  '@xyflow/react@12.11.3(@types/react-dom@19.2.5)(@types/react@19.2.18)(immer@11.1.11)(react-dom@19.2.8)(react@19.2.8)':
+  '@xyflow/react@12.11.6(@types/react-dom@19.2.5)(@types/react@19.2.18)(immer@11.1.11)(react-dom@19.2.8)(react@19.2.8)':
     dependencies:
-      '@xyflow/system': 0.0.80
+      '@xyflow/system': 0.0.82
       classcat: 5.0.5
       react: 19.2.8
       react-dom: 19.2.8(react@19.2.8)
@@ -7976,7 +7976,7 @@ snapshots:
     transitivePeerDependencies:
       - immer
 
-  '@xyflow/system@0.0.80':
+  '@xyflow/system@0.0.82':
     dependencies:
       '@types/d3-drag': 3.0.7
       '@types/d3-interpolate': 3.0.4
