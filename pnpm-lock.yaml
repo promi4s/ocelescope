@@ -200,7 +200,7 @@ catalogs:
       version: 12.11.3
     axios:
       specifier: ^1.18.1
-      version: 1.18.1
+      version: 1.20.0
     clsx:
       specifier: ^2.1.1
       version: 2.1.1
@@ -325,7 +325,7 @@ importers:
         version: link:../modules/management
       '@ocelescope/ocelot':
         specifier: 'catalog:'
-        version: 0.6.1(@dagrejs/dagre@3.0.0)(@mantine/core@9.5.1)(@mantine/hooks@9.5.1)(@ocelescope/api-base@src+frontend+packages+api+base)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@tanstack/react-query@5.90.21)(@xyflow/react@12.11.3)(axios@1.18.1)(dayjs@1.11.21)(elkjs@0.11.1)(file-saver@2.0.5)(html-to-image@1.11.13)(lucide-react@1.21.0)(mantine-datatable@9.4.0)(react-dom@19.2.8)(react@19.2.8)(recharts@3.8.1)
+        version: 0.6.1(@dagrejs/dagre@3.0.0)(@mantine/core@9.5.1)(@mantine/hooks@9.5.1)(@ocelescope/api-base@src+frontend+packages+api+base)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@tanstack/react-query@5.90.21)(@xyflow/react@12.11.3)(axios@1.20.0)(dayjs@1.11.21)(elkjs@0.11.1)(file-saver@2.0.5)(html-to-image@1.11.13)(lucide-react@1.21.0)(mantine-datatable@9.4.0)(react-dom@19.2.8)(react@19.2.8)(recharts@3.8.1)
       '@ocelescope/plugin':
         specifier: workspace:^
         version: link:../modules/plugin
@@ -468,7 +468,7 @@ importers:
         version: 5.90.21(react@19.2.8)
       axios:
         specifier: 'catalog:'
-        version: 1.18.1(debug@4.4.3)
+        version: 1.20.0(debug@4.4.3)
       dayjs:
         specifier: 'catalog:'
         version: 1.11.21
@@ -788,7 +788,7 @@ importers:
         version: 5.90.21(react@19.2.8)
       axios:
         specifier: 'catalog:'
-        version: 1.18.1(debug@4.4.3)
+        version: 1.20.0(debug@4.4.3)
       react:
         specifier: 'catalog:'
         version: 19.2.8
@@ -838,7 +838,7 @@ importers:
         version: 19.2.18
       axios:
         specifier: 'catalog:'
-        version: 1.18.1(debug@4.4.3)
+        version: 1.20.0(debug@4.4.3)
       tsdown:
         specifier: 'catalog:'
         version: 0.22.14(@tsdown/css@0.22.14)(oxc-resolver@11.21.3)(typescript@6.0.3)(unrun@0.2.32)
@@ -3597,8 +3597,8 @@ packages:
     resolution: {integrity: sha512-0bDNnY/u6pPwHDMoF0FieU354oBi0a8rD9FcsLwzcGWbc8KS8KPIi7y+s13OlVY+gMWc/9xEMUgNE6Qm8ZllYQ==}
     engines: {node: '>=4'}
 
-  axios@1.18.1:
-    resolution: {integrity: sha512-3nTvFlvpn9Zu/RkHUqtc7/+al4UpRW5az71ap5zccp6e8RAYEzhMTecX8Dz1wWDYrPpUoB1HAQEGEAEvUr7S9g==}
+  axios@1.20.0:
+    resolution: {integrity: sha512-r8aOh8j9cGKpgQAqpzrUHnSIc6a59Y3Xf/cv8sy1DrHCkZHzQGEuoq1tARk6qSyDdtQGSDgpb9kFlruzPvrgwg==}
 
   balanced-match@4.0.4:
     resolution: {integrity: sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA==}
@@ -6518,7 +6518,7 @@ snapshots:
   '@next/swc-win32-x64-msvc@16.3.2':
     optional: true
 
-  '@ocelescope/ocelot@0.6.1(@dagrejs/dagre@3.0.0)(@mantine/core@9.5.1)(@mantine/hooks@9.5.1)(@ocelescope/api-base@src+frontend+packages+api+base)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@tanstack/react-query@5.90.21)(@xyflow/react@12.11.3)(axios@1.18.1)(dayjs@1.11.21)(elkjs@0.11.1)(file-saver@2.0.5)(html-to-image@1.11.13)(lucide-react@1.21.0)(mantine-datatable@9.4.0)(react-dom@19.2.8)(react@19.2.8)(recharts@3.8.1)':
+  '@ocelescope/ocelot@0.6.1(@dagrejs/dagre@3.0.0)(@mantine/core@9.5.1)(@mantine/hooks@9.5.1)(@ocelescope/api-base@src+frontend+packages+api+base)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@tanstack/react-query@5.90.21)(@xyflow/react@12.11.3)(axios@1.20.0)(dayjs@1.11.21)(elkjs@0.11.1)(file-saver@2.0.5)(html-to-image@1.11.13)(lucide-react@1.21.0)(mantine-datatable@9.4.0)(react-dom@19.2.8)(react@19.2.8)(recharts@3.8.1)':
     dependencies:
       '@dagrejs/dagre': 3.0.0
       '@mantine/core': 9.5.1(@mantine/hooks@9.5.1)(@types/react@19.2.18)(react-dom@19.2.8)(react@19.2.8)
@@ -6528,7 +6528,7 @@ snapshots:
       '@ocelescope/core': link:src/frontend/packages/core
       '@tanstack/react-query': 5.90.21(react@19.2.8)
       '@xyflow/react': 12.11.3(@types/react-dom@19.2.5)(@types/react@19.2.18)(immer@11.1.11)(react-dom@19.2.8)(react@19.2.8)
-      axios: 1.18.1(debug@4.4.3)
+      axios: 1.20.0(debug@4.4.3)
       dayjs: 1.11.21
       elkjs: 0.11.1
       file-saver: 2.0.5
@@ -8119,7 +8119,7 @@ snapshots:
 
   attr-accept@2.2.5: {}
 
-  axios@1.18.1(debug@4.4.3):
+  axios@1.20.0(debug@4.4.3):
     dependencies:
       follow-redirects: 1.16.0(debug@4.4.3)
       form-data: 4.0.6
