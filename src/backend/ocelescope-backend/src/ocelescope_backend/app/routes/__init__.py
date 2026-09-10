@@ -1,12 +1,10 @@
-from .session import session_router
-from .discovery import discovery_router
-from .tasks import tasks_router
 from .plugins import plugin_router
 from .resources import resource_router
+from .session import session_router
+from .tasks import tasks_router
 
 routes = [
     session_router,
-    discovery_router,
     tasks_router,
     plugin_router,
     resource_router,

@@ -1,7 +1,7 @@
 from contextlib import ExitStack, contextmanager
 from copy import deepcopy
 from types import ModuleType
-from typing import TYPE_CHECKING, Any, Iterator, Optional, TypedDict
+from typing import TYPE_CHECKING, Any, Iterator, Optional
 
 from ocelescope.plugin.decorators import PluginIO
 from ocelescope.resource.resource import ResourceMeta
@@ -54,12 +54,6 @@ class PluginAlreadyRegistered(RegistryError):
         super().__init__(
             f"Plugin {name!r} with version {version!r} is already registered"
         )
-
-
-class PluginInput(TypedDict):
-    input_ocels: dict[str, OCEL]
-    input_resources: dict[str, Resource]
-    input: dict[str, Any]
 
 
 class PluginRegistry:

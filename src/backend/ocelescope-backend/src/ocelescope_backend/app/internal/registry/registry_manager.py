@@ -4,13 +4,11 @@ import sys
 from contextlib import AbstractContextManager
 from typing import TYPE_CHECKING, Any, Dict
 
-from ocelescope.discovery import algorithms
 from typing_extensions import TypedDict
 
-from ocelescope import DirectlyFollowsGraph, PetriNet, Plugin, Resource
+from ocelescope import Plugin, Resource
 from ocelescope_backend.app.internal.config import config
 from ocelescope_backend.app.internal.model.plugin import PluginApi
-from ocelescope_backend.app.internal.registry.discovery import DiscoveryRegistry
 from ocelescope_backend.app.internal.registry.plugin import PluginRegistry
 from ocelescope_backend.app.internal.registry.resource import ResourceRegistry
 from ocelescope_backend.app.internal.util.dynamic_import import (
@@ -28,24 +26,9 @@ class ResourceInfo(TypedDict):
 
 
 class RegistryManager:
-    _CORE_RESOURCE_NAMESPACE = "__core__"
-
     def __init__(self):
         self._plugin_registry = PluginRegistry()
         self._resource_registry = ResourceRegistry()
-        self._discovery_registry = DiscoveryRegistry()
-        self._register_core_resources()
-        self._discovery_registry.register(algorithms)
-
-    @property
-    def discovery_registry(self) -> DiscoveryRegistry:
-        return self._discovery_registry
-
-    def _register_core_resources(self):
-        for resource_class in (PetriNet, DirectlyFollowsGraph):
-            self._resource_registry.register_resource(
-                self._CORE_RESOURCE_NAMESPACE, resource_class
-            )
 
     def list_plugins(self) -> list[PluginApi]:
         return self._plugin_registry.list_plugins()
@@ -137,11 +120,6 @@ class RegistryManager:
                         for resource_type in plugin.get_resources():
                             self._resource_registry.register_resource(id, resource_type)
 
-                        for info in self._discovery_registry.register(module):
-                            self._resource_registry.register_resource(
-                                id, info.resource_type
-                            )
-
                         loaded_plugins.append(id)
                     except Exception:
                         self.unload_plugins([id])
@@ -160,7 +138,6 @@ class RegistryManager:
         for id in plugin_ids:
             self._plugin_registry.unload_module(id)
             self._resource_registry.unload_module(id)
-            self._discovery_registry.unload_module(id)
 
     def get_resource_info(self) -> Dict[str, ResourceInfo]:
         return {
