@@ -11,11 +11,10 @@ from ocelescope.plugin.input import (
     SQL_FIELD,
     PluginInput,
 )
-from ocelescope.plugin.plugin import Plugin, PluginMeta, PluginMethod
+from ocelescope.plugin.plugin import Plugin, PluginMethod
 
 __all__ = [
     "PluginMethod",
-    "PluginMeta",
     "Plugin",
     "plugin_method",
     "OCELAnnotation",

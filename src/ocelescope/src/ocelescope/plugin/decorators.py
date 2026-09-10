@@ -24,7 +24,6 @@ if TYPE_CHECKING:
 class Annotation:
     label: str
     description: str | None = None
-    is_optional: bool = False
 
 
 @dataclass
@@ -54,6 +53,8 @@ class ResourceAnnotation(Annotation):
     Attributes:
         label: Human-readable label to display in the UI.
         description: Optional longer text shown in the UI to explain the resource.
+        annotation_resources: Further resource types this input accepts, registered
+            alongside the declared one.
     """
 
     annotation_resources: list[type[Resource]] | None = None
@@ -151,7 +152,7 @@ class PluginIO:
 
 
 PluginReturnItemType = Union[OCEL, Resource, list[OCEL], list[Resource]]
-PluginReturnType = Union[tuple[PluginReturnItemType], PluginReturnItemType]
+PluginReturnType = Union[tuple[PluginReturnItemType, ...], PluginReturnItemType]
 
 
 @dataclass

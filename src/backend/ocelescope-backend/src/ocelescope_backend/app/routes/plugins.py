@@ -14,6 +14,7 @@ from pydantic import BaseModel
 from ocelescope import OCEL
 from ocelescope_backend.app.dependencies import ApiPluginTask, ApiSession
 from ocelescope_backend.app.internal.config import config
+from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.model.plugin import MethodApi, PluginApi
 from ocelescope_backend.app.internal.model.plugin_result import (
     PluginOutput,
@@ -22,6 +23,7 @@ from ocelescope_backend.app.internal.model.plugin_result import (
 from ocelescope_backend.app.internal.model.resource import ResourceStore
 from ocelescope_backend.app.internal.model.response import TempFileResponse
 from ocelescope_backend.app.internal.registry import registry_manager
+from ocelescope_backend.app.internal.registry.resource import RegistryError
 from ocelescope_backend.app.internal.tasks.base import call_with_known_params
 from ocelescope_backend.app.internal.tasks.plugin import PluginTask
 from ocelescope_backend.app.internal.util.plugin_result import (
@@ -46,7 +48,7 @@ def get_plugin(plugin_id: str) -> PluginApi | None:
     plugin = registry_manager.get_plugin(plugin_id)
 
     if not plugin:
-        raise
+        raise NotFound(f"No plugin found for {plugin_id!r}")
 
     return PluginApi.from_plugin(plugin_id, plugin)
 
@@ -69,12 +71,15 @@ def run_plugin(
     method_name: str,
     input: dict[str, Any] = {},
 ) -> str:
-    return PluginTask.create_plugin_task(
-        session,
-        plugin_id=plugin_id,
-        method_name=method_name,
-        input={"input": input, "input_resources": input_resources},
-    )
+    try:
+        return PluginTask.create_plugin_task(
+            session,
+            plugin_id=plugin_id,
+            method_name=method_name,
+            input={"input": input, "input_resources": input_resources},
+        )
+    except RegistryError as error:
+        raise NotFound(str(error))
 
 
 @plugin_router.get(
@@ -192,12 +197,15 @@ def get_computed(
     provider: str,
     method_name: str,
 ) -> list[str]:
-    method = registry_manager.get_plugin_method(plugin_id, method_name)
+    try:
+        method = registry_manager.get_plugin_method(plugin_id, method_name)
+    except RegistryError as error:
+        raise NotFound(str(error))
 
     input_class = method.configuration_input
     fn = getattr(input_class, provider, None)
     if fn is None:
-        raise KeyError(f"{method_name}.{provider} not found")
+        raise NotFound(f"{method_name}.{provider} not found")
 
     try:
         with registry_manager.get_computed_kwargs(

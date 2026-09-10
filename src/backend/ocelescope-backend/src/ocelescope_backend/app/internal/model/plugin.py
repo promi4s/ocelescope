@@ -86,7 +86,7 @@ class PluginApi(BaseModel):
     def from_plugin(cls, id: str, plugin: Plugin) -> Self:
         return cls(
             id=id,
-            name=plugin.__class__.__name__,
+            name=plugin.get_name(),
             version=plugin.version,
             label=plugin.label,
             description=plugin.description,

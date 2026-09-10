@@ -1,5 +1,5 @@
 import { Button, Stack } from "@mantine/core";
-import { useRunPlugin, type MethodApi } from "@ocelescope/api-base";
+import { type MethodApi, useRunPlugin } from "@ocelescope/api-base";
 import { OcelSelect } from "@ocelescope/core";
 import { ResourceSelect } from "@ocelescope/resources";
 import { useCallback } from "react";

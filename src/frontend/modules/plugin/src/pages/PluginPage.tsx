@@ -1,5 +1,4 @@
 import {
-  Badge,
   Container,
   Divider,
   Group,
@@ -10,19 +9,17 @@ import {
   Title,
 } from "@mantine/core";
 import {
+  type MethodApi,
   useDisableDiscoveryMethod,
   useEnableDiscoveryMethod,
   useGetPlugin,
   useListDiscoveryMethods,
-  type MethodApi,
 } from "@ocelescope/api-base";
 import { useInvalidate } from "@ocelescope/core";
 import { useRouter } from "next/router";
 import { useMemo } from "react";
 import PluginBreadcrumbs from "../components/PluginBreadcrumbs/PluginBreadcrumbs";
 import { GenericCard } from "../components/PluginCard/GenericCard";
-import { generateColor } from "@marko19907/string-to-color";
-import { ArrowRightIcon } from "lucide-react";
 
 const MethodCard: React.FC<{ pluginId: string; method: MethodApi }> = ({
   method,
@@ -32,7 +29,7 @@ const MethodCard: React.FC<{ pluginId: string; method: MethodApi }> = ({
   const tags = Array.from(
     new Set(
       [...method.inputs, ...method.outputs].map((io) =>
-        io.type == "ocel" ? "OCEL" : io.resource_label,
+        io.type === "ocel" ? "OCEL" : io.resource_label,
       ),
     ),
   );

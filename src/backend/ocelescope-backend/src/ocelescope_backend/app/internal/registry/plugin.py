@@ -4,6 +4,7 @@ from types import ModuleType
 from typing import TYPE_CHECKING, Any, Iterator, Optional, TypedDict
 
 from ocelescope.plugin.decorators import PluginIO
+from ocelescope.resource.resource import ResourceMeta
 
 from ocelescope import OCEL, Plugin, PluginMethod, Resource
 from ocelescope_backend.app.internal.model.plugin import PluginApi
@@ -23,6 +24,20 @@ class PluginNotFound(RegistryError):
     def __init__(self, plugin_id: str):
         self.plugin_id = plugin_id
         super().__init__(f"No plugin found for {plugin_id!r}")
+
+
+class MethodNotFound(RegistryError):
+    """Raised when a plugin has no method under the requested name.
+
+    Attributes:
+        plugin_id: The registry id of the plugin that was looked in.
+        method_name: The method name that was looked for.
+    """
+
+    def __init__(self, plugin_id: str, method_name: str):
+        self.plugin_id = plugin_id
+        self.method_name = method_name
+        super().__init__(f"Plugin {plugin_id!r} has no method {method_name!r}")
 
 
 class PluginAlreadyRegistered(RegistryError):
@@ -86,7 +101,10 @@ class PluginRegistry:
         if plugin is None:
             raise PluginNotFound(plugin_id)
 
-        method = plugin.method_map()[method_name]
+        method = plugin.method_map().get(method_name)
+
+        if method is None:
+            raise MethodNotFound(plugin_id, method_name)
 
         return method
 
@@ -111,7 +129,9 @@ class PluginRegistry:
             with ocel:
                 return deepcopy(ocel)
 
-        return io.type(**session.get_resource(id).data)
+        data = session.get_resource(id).data
+
+        return io.type(**{k: v for k, v in data.items() if k != ResourceMeta.META_KEY})
 
     def get_plugin_kwargs(
         self,
@@ -119,17 +139,28 @@ class PluginRegistry:
         plugin_id: str,
         method_name: str,
         input_resources: dict[str, str | None],
+        require_inputs: bool = True,
         ocel_stack: ExitStack | None = None,
     ) -> dict[str, Any]:
 
         method = self.get_method(plugin_id, method_name)
 
         kwargs: dict[str, Any] = {
-            input.name: self._resolve_plugin_input(
-                session, input, input_resources, ocel_stack
+            io.name: self._resolve_plugin_input(
+                session, io, input_resources, ocel_stack
             )
-            for input in method.inputs
+            for io in method.inputs
         }
+
+        if require_inputs:
+            missing = [
+                io.name
+                for io in method.inputs
+                if not io.is_optional and kwargs[io.name] is None
+            ]
+
+            if missing:
+                raise ValueError(f"Missing required input: {', '.join(missing)}")
 
         return kwargs
 
@@ -145,7 +176,8 @@ class PluginRegistry:
 
         A provider only reads, so its OCELs are the session's own read-only view
         rather than a copy of the whole log -- they are closed when the block
-        exits and must not outlive it.
+        exits and must not outlive it. Inputs are not required to be filled in
+        yet either: the form the provider computes a field for is still open.
         """
         with ExitStack() as ocel_stack:
             yield self.get_plugin_kwargs(
@@ -153,6 +185,7 @@ class PluginRegistry:
                 plugin_id=plugin_id,
                 method_name=method_name,
                 input_resources=input_resources,
+                require_inputs=False,
                 ocel_stack=ocel_stack,
             )
 

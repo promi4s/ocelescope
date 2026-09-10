@@ -58,10 +58,12 @@ class PluginTask(TaskBase, Generic[P]):
         try:
             plugin = registry_manager.get_plugin(self.plugin_id)
 
-            method = plugin.method_map().get(self.method_name, None) if plugin else None
-
-            if plugin is None or method is None:
+            if plugin is None:
                 raise PluginNotFound(self.plugin_id)
+
+            method = registry_manager.get_plugin_method(
+                self.plugin_id, self.method_name
+            )
 
             kwargs = registry_manager.get_plugin_method_kwargs(
                 session=self.session,
@@ -73,23 +75,19 @@ class PluginTask(TaskBase, Generic[P]):
             if method.configuration_input is not None:
                 kwargs["input"] = method.configuration_input(**self.input["input"])
 
-            plugin = registry_manager.get_plugin(self.plugin_id)
-            if plugin is None:
-                raise PluginNotFound(self.plugin_id)
-
             result = call_with_known_params(method.bind(plugin), **kwargs)
 
-            self.result = []
+            returned = result if isinstance(result, tuple) else (result,)
 
-            if not isinstance(result, tuple):
-                result = (result,)
+            entities: list[OCEL | Resource] = []
 
-            for item in result:
-                if not isinstance(item, list):
-                    item = [item]
+            for item in returned:
+                if isinstance(item, list):
+                    entities.extend(item)
+                else:
+                    entities.append(item)
 
-                for entity in item:
-                    self.result.append(entity)
+            self.result = entities
 
             if self.state != TaskState.CANCELLED:
                 self.state = TaskState.SUCCESS

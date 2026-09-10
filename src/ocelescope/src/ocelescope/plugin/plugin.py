@@ -5,17 +5,8 @@ from typing import (
     Optional,
 )
 
-from pydantic import BaseModel
-
 from ocelescope.plugin.decorators import PluginMethod
 from ocelescope.resource.resource import Resource
-
-
-class PluginMeta(BaseModel):
-    name: str
-    version: str
-    label: str
-    description: Optional[str]
 
 
 class Plugin(ABC):
