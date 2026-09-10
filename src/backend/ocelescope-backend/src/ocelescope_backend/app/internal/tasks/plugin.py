@@ -1,6 +1,4 @@
-import re
 import traceback
-from copy import deepcopy
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -9,7 +7,6 @@ from typing import (
     ParamSpec,
 )
 
-from ocelescope.plugin.decorators import PluginIO
 from typing_extensions import TypedDict
 
 from ocelescope import OCEL, BaseFilter, Resource

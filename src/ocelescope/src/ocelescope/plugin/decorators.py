@@ -27,6 +27,7 @@ class Annotation:
     is_optional: bool = False
 
 
+@dataclass
 class OCELAnnotation(Annotation):
     """UI annotation metadata for an `OCEL`-typed parameter or result.
 
@@ -38,14 +39,12 @@ class OCELAnnotation(Annotation):
     Attributes:
         label: Human-readable label to display in the UI.
         description: Optional longer text shown in the UI to explain the OCEL.
-        extension: Optional extension identifier. If constructed with an
-            `OCELExtension` class, it is coerced to that class' name.
-
     """
 
     pass
 
 
+@dataclass
 class ResourceAnnotation(Annotation):
     """UI annotation metadata for a `Resource`-typed parameter or result.
 

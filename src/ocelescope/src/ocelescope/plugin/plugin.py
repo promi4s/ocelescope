@@ -1,6 +1,5 @@
 import inspect
 from abc import ABC
-from types import MethodType
 from typing import (
     ClassVar,
     Optional,
