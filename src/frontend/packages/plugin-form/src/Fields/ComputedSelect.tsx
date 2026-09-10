@@ -7,8 +7,7 @@ import {
 import type { FieldProps } from "@rjsf/utils";
 import { keepPreviousData } from "@tanstack/react-query";
 import { memo, useMemo } from "react";
-import { useWatch } from "react-hook-form";
-import { usePluginForm } from "../PluginFormContext";
+import { usePluginForm } from "../context";
 
 const compact = (record: Record<string, unknown> | undefined) =>
   Object.fromEntries(
@@ -16,17 +15,16 @@ const compact = (record: Record<string, unknown> | undefined) =>
   ) as Record<string, string>;
 
 export const useSelectOptions = (provider: string) => {
-  const { pluginId, methodName, control } = usePluginForm();
-
-  const formValues = useWatch({ control });
+  const { pluginId, methodName, inputResources, configuration } =
+    usePluginForm();
 
   const serializedBody = useMemo(
     () =>
       JSON.stringify({
-        configuration_input: formValues.input,
-        input_resources: compact(formValues.input_resources),
+        configuration_input: configuration,
+        input_resources: compact(inputResources),
       } satisfies BodyGetComputedValues),
-    [formValues],
+    [configuration, inputResources],
   );
   const [debouncedBody] = useDebouncedValue(serializedBody, 300);
 

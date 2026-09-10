@@ -646,30 +646,18 @@ importers:
       '@marko19907/string-to-color':
         specifier: 'catalog:'
         version: 1.0.2
-      '@monaco-editor/react':
-        specifier: 'catalog:'
-        version: 4.7.0(monaco-editor@0.56.0)(react-dom@19.2.8)(react@19.2.8)
       '@ocelescope/api-base':
         specifier: workspace:^
         version: link:../../packages/api/base
       '@ocelescope/core':
         specifier: workspace:^
         version: link:../../packages/core
+      '@ocelescope/plugin-form':
+        specifier: workspace:^
+        version: link:../../packages/plugin-form
       '@ocelescope/resources':
         specifier: workspace:^
         version: link:../../packages/resources
-      '@rjsf/core':
-        specifier: 'catalog:'
-        version: 6.8.0(@rjsf/utils@6.8.0)(react@19.2.8)
-      '@rjsf/utils':
-        specifier: 'catalog:'
-        version: 6.8.0(react@19.2.8)
-      '@rjsf/validator-ajv8':
-        specifier: 'catalog:'
-        version: 6.8.0(@rjsf/utils@6.8.0)
-      '@tanstack/react-query':
-        specifier: 'catalog:'
-        version: 5.90.21(react@19.2.8)
       embla-carousel:
         specifier: 'catalog:'
         version: 8.6.0
@@ -692,9 +680,6 @@ importers:
         specifier: 'catalog:'
         version: 7.71.2(react@19.2.8)
     devDependencies:
-      '@rjsf/mantine':
-        specifier: 'catalog:'
-        version: 6.8.0(@mantine/core@9.5.1)(@mantine/dates@9.5.1)(@mantine/hooks@9.5.1)(@rjsf/core@6.8.0)(@rjsf/utils@6.8.0)(react@19.2.8)
       '@types/file-saver':
         specifier: 'catalog:'
         version: 2.0.7
@@ -967,6 +952,61 @@ importers:
       qs:
         specifier: 'catalog:'
         version: 6.15.3
+      tsdown:
+        specifier: 'catalog:'
+        version: 0.22.14(@tsdown/css@0.22.14)(oxc-resolver@11.21.3)(typescript@6.0.3)(unrun@0.2.32)
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+
+  src/frontend/packages/plugin-form:
+    dependencies:
+      '@mantine/core':
+        specifier: 'catalog:'
+        version: 9.5.1(@mantine/hooks@9.5.1)(@types/react@19.2.18)(react-dom@19.2.8)(react@19.2.8)
+      '@mantine/hooks':
+        specifier: 'catalog:'
+        version: 9.5.1(react@19.2.8)
+      '@monaco-editor/react':
+        specifier: 'catalog:'
+        version: 4.7.0(monaco-editor@0.56.0)(react-dom@19.2.8)(react@19.2.8)
+      '@ocelescope/api-base':
+        specifier: workspace:^
+        version: link:../api/base
+      '@rjsf/core':
+        specifier: 'catalog:'
+        version: 6.8.0(@rjsf/utils@6.8.0)(react@19.2.8)
+      '@rjsf/mantine':
+        specifier: 'catalog:'
+        version: 6.8.0(@mantine/core@9.5.1)(@mantine/dates@9.5.1)(@mantine/hooks@9.5.1)(@rjsf/core@6.8.0)(@rjsf/utils@6.8.0)(react@19.2.8)
+      '@rjsf/utils':
+        specifier: 'catalog:'
+        version: 6.8.0(react@19.2.8)
+      '@rjsf/validator-ajv8':
+        specifier: 'catalog:'
+        version: 6.8.0(@rjsf/utils@6.8.0)
+      '@tanstack/react-query':
+        specifier: 'catalog:'
+        version: 5.90.21(react@19.2.8)
+      next:
+        specifier: 'catalog:'
+        version: 16.3.2(@babel/core@7.29.7)(@types/node@26.4.0)(react-dom@19.2.8)(react@19.2.8)
+      react:
+        specifier: 'catalog:'
+        version: 19.2.8
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.2.8(react@19.2.8)
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.4.0
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.2.18
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.2.5(@types/react@19.2.18)
       tsdown:
         specifier: 'catalog:'
         version: 0.22.14(@tsdown/css@0.22.14)(oxc-resolver@11.21.3)(typescript@6.0.3)(unrun@0.2.32)

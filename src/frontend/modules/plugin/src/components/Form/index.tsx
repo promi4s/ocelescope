@@ -1,10 +1,10 @@
 import { Button, Stack } from "@mantine/core";
 import { type MethodApi, useRunPlugin } from "@ocelescope/api-base";
 import { OcelSelect } from "@ocelescope/core";
+import { PluginForm } from "@ocelescope/plugin-form";
 import { ResourceSelect } from "@ocelescope/resources";
 import { useCallback } from "react";
-import { Controller, useForm } from "react-hook-form";
-import PluginForm from "./PluginForm";
+import { type Control, Controller, useForm, useWatch } from "react-hook-form";
 
 type PluginInputProps = {
   pluginId: string;
@@ -21,6 +21,42 @@ const compact = (record: Record<string, unknown> | undefined) =>
   Object.fromEntries(
     Object.entries(record ?? {}).filter(([, value]) => !!value),
   ) as Record<string, string>;
+
+type ConfigurationSectionProps = {
+  control: Control<PluginInputType>;
+  schema: { [key: string]: any };
+  pluginId: string;
+  methodName: string;
+  onSubmit: () => void;
+};
+
+const ConfigurationSection: React.FC<ConfigurationSectionProps> = ({
+  control,
+  schema,
+  pluginId,
+  methodName,
+  onSubmit,
+}) => {
+  const inputResources = useWatch({ control, name: "input_resources" });
+
+  return (
+    <Controller
+      control={control}
+      name="input"
+      render={({ field }) => (
+        <PluginForm
+          pluginId={pluginId}
+          methodName={methodName}
+          schema={schema}
+          inputResources={inputResources}
+          value={field.value}
+          onChange={field.onChange}
+          onSubmit={onSubmit}
+        />
+      )}
+    />
+  );
+};
 
 const PluginInput: React.FC<PluginInputProps> = ({
   pluginId,
@@ -94,11 +130,11 @@ const PluginInput: React.FC<PluginInputProps> = ({
         />
       ))}
       {method.configuration_schema ? (
-        <PluginForm
+        <ConfigurationSection
+          control={control}
           pluginId={pluginId}
           methodName={method.name}
           schema={method.configuration_schema}
-          control={control}
           onSubmit={onSubmit}
         />
       ) : (

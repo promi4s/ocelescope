@@ -12,10 +12,10 @@ import {
 } from "@ocelescope/api-base";
 import type { FieldProps } from "@rjsf/utils";
 import { type ComponentType, memo, useEffect, useMemo, useState } from "react";
-import { useOcelId } from "../PluginFormContext";
+import { usePluginForm } from "../context";
 
 type OcelSelectProps = {
-  ocelId: string;
+  ocelId: string | null;
   isMulti: boolean;
   value: any;
   onChange: (value: any) => void;
@@ -133,7 +133,8 @@ export const OCELField = memo(
     const ocelRef = schema["x-ui-meta"]?.ocel_id;
     const ocelFieldType = schema["x-ui-meta"]?.field_type;
 
-    const ocelId = useOcelId(ocelRef);
+    const { inputResources } = usePluginForm();
+    const ocelId = inputResources[ocelRef] ?? null;
     const isMulti = schema.type === "array";
 
     useEffect(() => {

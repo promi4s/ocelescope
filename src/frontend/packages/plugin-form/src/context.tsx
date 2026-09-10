@@ -1,11 +1,11 @@
 import { createContext, type ReactNode, useContext, useMemo } from "react";
-import { type Control, useWatch } from "react-hook-form";
-import type { PluginInputType } from ".";
+import type { PluginFormData, PluginInputResources } from "./types";
 
 type PluginFormContextValue = {
   pluginId: string;
   methodName: string;
-  control: Control<PluginInputType>;
+  inputResources: PluginInputResources;
+  configuration: PluginFormData;
 };
 
 const PluginFormContext = createContext<PluginFormContextValue | undefined>(
@@ -24,18 +24,12 @@ export const usePluginForm = () => {
   return context;
 };
 
-export const useOcelId = (ocelRef: string) => {
-  const { control } = usePluginForm();
-
-  return useWatch({ control, name: `input_resources.${ocelRef}` });
-};
-
 export const PluginFormProvider: React.FC<
   PluginFormContextValue & { children: ReactNode }
-> = ({ pluginId, methodName, control, children }) => {
+> = ({ pluginId, methodName, inputResources, configuration, children }) => {
   const value = useMemo(
-    () => ({ pluginId, methodName, control }),
-    [pluginId, methodName, control],
+    () => ({ pluginId, methodName, inputResources, configuration }),
+    [pluginId, methodName, inputResources, configuration],
   );
 
   return (

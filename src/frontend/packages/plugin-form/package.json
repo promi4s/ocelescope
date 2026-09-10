@@ -1,9 +1,9 @@
 {
-  "name": "@ocelescope/plugin",
+  "name": "@ocelescope/plugin-form",
   "type": "module",
   "version": "0.7.0",
-  "description": "A module for inspections of OCELs",
-  "author": "G\u00f6rkem-Emre \u00d6zt\u00fcrk <goerkem.oeztuerk@rwth-aachen.de>",
+  "description": "Renders a plugin method's configuration schema as a Mantine form, including Ocelescope's custom OCEL, computed, code and slider fields.",
+  "author": "Görkem-Emre Öztürk <goerkem.oeztuerk@rwth-aachen.de>",
   "license": "MIT",
   "homepage": "https://www.ocelescope.org",
   "repository": {
@@ -32,24 +32,20 @@
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
-    "@mantine/carousel": "catalog:",
     "@mantine/core": "catalog:",
     "@mantine/hooks": "catalog:",
-    "@marko19907/string-to-color": "catalog:",
+    "@monaco-editor/react": "catalog:",
     "@ocelescope/api-base": "workspace:^",
-    "@ocelescope/core": "workspace:^",
-    "@ocelescope/plugin-form": "workspace:^",
-    "@ocelescope/resources": "workspace:^",
-    "embla-carousel": "catalog:",
-    "embla-carousel-react": "catalog:",
-    "lucide-react": "catalog:",
+    "@rjsf/core": "catalog:",
+    "@rjsf/mantine": "catalog:",
+    "@rjsf/utils": "catalog:",
+    "@rjsf/validator-ajv8": "catalog:",
+    "@tanstack/react-query": "catalog:",
     "next": "catalog:",
     "react": "catalog:",
-    "react-dom": "catalog:",
-    "react-hook-form": "catalog:"
+    "react-dom": "catalog:"
   },
   "devDependencies": {
-    "@types/file-saver": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
