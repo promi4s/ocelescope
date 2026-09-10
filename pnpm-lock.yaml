@@ -182,7 +182,7 @@ catalogs:
       version: 2.0.7
     '@types/node':
       specifier: ^26.2.0
-      version: 26.4.0
+      version: 26.5.0
     '@types/object-hash':
       specifier: ^3.0.6
       version: 3.0.6
@@ -334,7 +334,7 @@ importers:
         version: link:../modules/variants
       next:
         specifier: 'catalog:'
-        version: 16.3.2(@babel/core@7.29.7)(@types/node@26.4.0)(react-dom@19.2.8)(react@19.2.8)
+        version: 16.3.2(@babel/core@7.29.7)(@types/node@26.5.0)(react-dom@19.2.8)(react@19.2.8)
       react:
         specifier: 'catalog:'
         version: 19.2.8
@@ -344,7 +344,7 @@ importers:
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
-        version: 26.4.0
+        version: 26.5.0
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.18
@@ -398,7 +398,7 @@ importers:
         version: 1.21.0(react@19.2.8)
       next:
         specifier: 'catalog:'
-        version: 16.3.2(@babel/core@7.29.7)(@types/node@26.4.0)(react-dom@19.2.8)(react@19.2.8)
+        version: 16.3.2(@babel/core@7.29.7)(@types/node@26.5.0)(react-dom@19.2.8)(react@19.2.8)
       react:
         specifier: 'catalog:'
         version: 19.2.8
@@ -423,7 +423,7 @@ importers:
         version: 2.0.7
       '@types/node':
         specifier: 'catalog:'
-        version: 26.4.0
+        version: 26.5.0
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.18
@@ -480,7 +480,7 @@ importers:
         version: 9.4.0(@mantine/core@9.5.1)(@mantine/hooks@9.5.1)(clsx@2.1.1)(react-dom@19.2.8)(react@19.2.8)
       next:
         specifier: 'catalog:'
-        version: 16.3.2(@babel/core@7.29.7)(@types/node@26.4.0)(react-dom@19.2.8)(react@19.2.8)
+        version: 16.3.2(@babel/core@7.29.7)(@types/node@26.5.0)(react-dom@19.2.8)(react@19.2.8)
       object-hash:
         specifier: 'catalog:'
         version: 3.0.0
@@ -505,7 +505,7 @@ importers:
         version: link:../../packages/api/config
       '@types/node':
         specifier: 'catalog:'
-        version: 26.4.0
+        version: 26.5.0
       '@types/object-hash':
         specifier: 'catalog:'
         version: 3.0.6
@@ -563,7 +563,7 @@ importers:
         version: 0.22.14(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.22.14)(yaml@2.9.0)
       '@types/node':
         specifier: 'catalog:'
-        version: 26.4.0
+        version: 26.5.0
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.18
@@ -618,7 +618,7 @@ importers:
         version: 0.22.14(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.22.14)(yaml@2.9.0)
       '@types/node':
         specifier: 'catalog:'
-        version: 26.4.0
+        version: 26.5.0
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.18
@@ -681,7 +681,7 @@ importers:
         version: 1.21.0(react@19.2.8)
       next:
         specifier: 'catalog:'
-        version: 16.3.2(@babel/core@7.29.7)(@types/node@26.4.0)(react-dom@19.2.8)(react@19.2.8)
+        version: 16.3.2(@babel/core@7.29.7)(@types/node@26.5.0)(react-dom@19.2.8)(react@19.2.8)
       react:
         specifier: 'catalog:'
         version: 19.2.8
@@ -700,7 +700,7 @@ importers:
         version: 2.0.7
       '@types/node':
         specifier: 'catalog:'
-        version: 26.4.0
+        version: 26.5.0
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.18
@@ -751,7 +751,7 @@ importers:
         version: 9.4.0(@mantine/core@9.5.1)(@mantine/hooks@9.5.1)(clsx@2.1.1)(react-dom@19.2.8)(react@19.2.8)
       next:
         specifier: 'catalog:'
-        version: 16.3.2(@babel/core@7.29.7)(@types/node@26.4.0)(react-dom@19.2.8)(react@19.2.8)
+        version: 16.3.2(@babel/core@7.29.7)(@types/node@26.5.0)(react-dom@19.2.8)(react@19.2.8)
       react:
         specifier: 'catalog:'
         version: 19.2.8
@@ -764,7 +764,7 @@ importers:
         version: 0.22.14(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.22.14)(yaml@2.9.0)
       '@types/node':
         specifier: 'catalog:'
-        version: 26.4.0
+        version: 26.5.0
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.18
@@ -801,7 +801,7 @@ importers:
         version: link:../config
       '@types/node':
         specifier: 'catalog:'
-        version: 26.4.0
+        version: 26.5.0
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.18
@@ -832,7 +832,7 @@ importers:
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
-        version: 26.4.0
+        version: 26.5.0
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.18
@@ -860,7 +860,7 @@ importers:
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
-        version: 26.4.0
+        version: 26.5.0
       tsdown:
         specifier: 'catalog:'
         version: 0.22.14(@tsdown/css@0.22.14)(oxc-resolver@11.21.3)(typescript@6.0.3)(unrun@0.2.32)
@@ -920,7 +920,7 @@ importers:
         version: 9.4.0(@mantine/core@9.5.1)(@mantine/hooks@9.5.1)(clsx@2.1.1)(react-dom@19.2.8)(react@19.2.8)
       next:
         specifier: 'catalog:'
-        version: 16.3.2(@babel/core@7.29.7)(@types/node@26.4.0)(react-dom@19.2.8)(react@19.2.8)
+        version: 16.3.2(@babel/core@7.29.7)(@types/node@26.5.0)(react-dom@19.2.8)(react@19.2.8)
       react:
         specifier: 'catalog:'
         version: 19.2.8
@@ -951,7 +951,7 @@ importers:
         version: 2.0.7
       '@types/node':
         specifier: 'catalog:'
-        version: 26.4.0
+        version: 26.5.0
       '@types/qs':
         specifier: 'catalog:'
         version: 6.15.1
@@ -1014,7 +1014,7 @@ importers:
         version: 9.4.0(@mantine/core@9.5.1)(@mantine/hooks@9.5.1)(clsx@2.1.1)(react-dom@19.2.8)(react@19.2.8)
       next:
         specifier: 'catalog:'
-        version: 16.3.2(@babel/core@7.29.7)(@types/node@26.4.0)(react-dom@19.2.8)(react@19.2.8)
+        version: 16.3.2(@babel/core@7.29.7)(@types/node@26.5.0)(react-dom@19.2.8)(react@19.2.8)
       react:
         specifier: 'catalog:'
         version: 19.2.8
@@ -1036,7 +1036,7 @@ importers:
         version: 2.0.7
       '@types/node':
         specifier: 'catalog:'
-        version: 26.4.0
+        version: 26.5.0
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.18
@@ -3323,8 +3323,8 @@ packages:
   '@types/mapbox__vector-tile@1.3.4':
     resolution: {integrity: sha512-bpd8dRn9pr6xKvuEBQup8pwQfD4VUyqO/2deGjfpe6AwC8YRlyEipvefyRJUSiCJTZuCb8Pl1ciVV5ekqJ96Bg==}
 
-  '@types/node@26.4.0':
-    resolution: {integrity: sha512-faiGnoIrLH/V8cibOMEAZ8pMw6oXqSukl29ra4mN8GdaB2ZewzeaLj+INpV5N+Z1eKWzY+IzaIZH2EIR6YZRNQ==}
+  '@types/node@26.5.0':
+    resolution: {integrity: sha512-dVSGpriSoCgz8WnDNTuSSuSv1PC/ALXihO4ulRZt7Md8k9mlbdin3lGOcDE8SnWOgf513ByWlXd7BK4azmyg/A==}
 
   '@types/object-hash@3.0.6':
     resolution: {integrity: sha512-fOBV8C1FIu2ELinoILQ+ApxcUKz4ngq+IWUYrxSGjXzzjUALijilampwkMgEtJ+h2njAW3pi853QpzNVCHB73w==}
@@ -5517,8 +5517,8 @@ packages:
   unconfig-core@7.5.0:
     resolution: {integrity: sha512-Su3FauozOGP44ZmKdHy2oE6LPjk51M/TRRjHv2HNCWiDvfvCoxC2lno6jevMA91MYAdCdwP05QnWdWpSbncX/w==}
 
-  undici-types@8.3.0:
-    resolution: {integrity: sha512-j375ScV60dom+YkPFIfTLcOiPxkN/buHz5GobjLhixFuANaNs3C9l4GmrWqejgXWJ7BbJcFYpTEUkS1Ge8bpZQ==}
+  undici-types@8.9.0:
+    resolution: {integrity: sha512-KTDyRTYX8sWmKXAikPHHSyc63CRPETMctyjKFupcC6OBLXT3xsN0e9aF7m+mIXutFWpUXuedtowG7iLOzp0kQg==}
 
   unicorn-magic@0.3.0:
     resolution: {integrity: sha512-+QBBXBCvifc56fsbuxZQ6Sic3wqqc3WWaqxs58gvJrcOuN83HGTCwz3oS5phzU9LthRNE9VrJCFCLUgHeeFnfA==}
@@ -7925,9 +7925,9 @@ snapshots:
       '@types/mapbox__point-geometry': 0.1.4
       '@types/pbf': 3.0.5
 
-  '@types/node@26.4.0':
+  '@types/node@26.5.0':
     dependencies:
-      undici-types: 8.3.0
+      undici-types: 8.9.0
 
   '@types/object-hash@3.0.6': {}
 
@@ -9388,7 +9388,7 @@ snapshots:
 
   next-tick@1.1.0: {}
 
-  next@16.3.2(@babel/core@7.29.7)(@types/node@26.4.0)(react-dom@19.2.8)(react@19.2.8):
+  next@16.3.2(@babel/core@7.29.7)(@types/node@26.5.0)(react-dom@19.2.8)(react@19.2.8):
     dependencies:
       '@next/env': 16.3.2
       '@swc/helpers': 0.5.23
@@ -9407,7 +9407,7 @@ snapshots:
       '@next/swc-linux-x64-musl': 16.3.2
       '@next/swc-win32-arm64-msvc': 16.3.2
       '@next/swc-win32-x64-msvc': 16.3.2
-      sharp: 0.35.3(@types/node@26.4.0)
+      sharp: 0.35.3(@types/node@26.5.0)
     transitivePeerDependencies:
       - '@babel/core'
       - '@types/node'
@@ -10030,7 +10030,7 @@ snapshots:
 
   shallow-copy@0.0.1: {}
 
-  sharp@0.35.3(@types/node@26.4.0):
+  sharp@0.35.3(@types/node@26.5.0):
     dependencies:
       '@img/colour': 1.1.0
       detect-libc: 2.1.2
@@ -10061,7 +10061,7 @@ snapshots:
       '@img/sharp-win32-arm64': 0.35.3
       '@img/sharp-win32-ia32': 0.35.3
       '@img/sharp-win32-x64': 0.35.3
-      '@types/node': 26.4.0
+      '@types/node': 26.5.0
     optional: true
 
   shebang-command@2.0.0:
@@ -10297,7 +10297,7 @@ snapshots:
       '@quansync/fs': 1.0.0
       quansync: 1.0.0
 
-  undici-types@8.3.0: {}
+  undici-types@8.9.0: {}
 
   unicorn-magic@0.3.0: {}
 
