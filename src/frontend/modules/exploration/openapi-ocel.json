@@ -10,45 +10,17 @@
         "summary": "List uploaded and uploading OCELs",
         "description": "Returns metadata for all uploaded OCELs along with any OCEL files currently being imported.",
         "operationId": "getOcels",
-        "parameters": [
-          {
-            "name": "extension_name",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Extension Name"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/OcelMetadata"
                   },
+                  "type": "array",
                   "title": "Response Getocels"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -139,7 +111,9 @@
                 }
               ],
               "description": "Dataset version (optional)",
-              "examples": ["1.0"],
+              "examples": [
+                "1.0"
+              ],
               "title": "Version"
             },
             "description": "Dataset version (optional)"
@@ -160,28 +134,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/modules/ocel/v1/extension/meta": {
-      "get": {
-        "summary": "Get Extension Meta",
-        "operationId": "getExtensionMeta",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": {
-                    "$ref": "#/components/schemas/OCELExtensionDescription"
-                  },
-                  "type": "object",
-                  "title": "Response Getextensionmeta"
                 }
               }
             }
@@ -360,7 +312,10 @@
             "in": "query",
             "required": false,
             "schema": {
-              "enum": ["events", "objects"],
+              "enum": [
+                "events",
+                "objects"
+              ],
               "type": "string",
               "default": "events",
               "title": "Entity Type"
@@ -421,7 +376,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -517,7 +475,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -617,7 +578,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -685,7 +649,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["events", "objects"],
+                  "enum": [
+                    "events",
+                    "objects"
+                  ],
                   "type": "string"
                 },
                 {
@@ -702,7 +669,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -770,7 +740,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -838,7 +811,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -942,7 +918,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1016,7 +995,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1080,7 +1062,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1148,7 +1133,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1252,7 +1240,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1348,7 +1339,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1410,7 +1404,10 @@
             "in": "query",
             "required": false,
             "schema": {
-              "enum": ["source", "target"],
+              "enum": [
+                "source",
+                "target"
+              ],
               "type": "string",
               "default": "source",
               "title": "Direction"
@@ -1534,7 +1531,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1553,6 +1553,77 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PaginatedResponse_list_RelationCountSummary__"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/modules/ocel/v1/{ocel_id}/relations/e2o/qualifiers": {
+      "get": {
+        "summary": "Get E2O Qualifier",
+        "operationId": "e2oQualifier",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "title": "Response E2Oqualifier"
                 }
               }
             }
@@ -1596,7 +1667,10 @@
             "in": "query",
             "required": false,
             "schema": {
-              "enum": ["source", "target"],
+              "enum": [
+                "source",
+                "target"
+              ],
               "type": "string",
               "default": "source",
               "title": "Direction"
@@ -1720,7 +1794,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1739,6 +1816,77 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PaginatedResponse_list_RelationCountSummary__"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/modules/ocel/v1/{ocel_id}/relations/o2o/qualifiers": {
+      "get": {
+        "summary": "Get O2O Qualifier",
+        "operationId": "o2oQualifier",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "title": "Response O2Oqualifier"
                 }
               }
             }
@@ -1782,7 +1930,10 @@
             "in": "query",
             "required": false,
             "schema": {
-              "enum": ["source", "target"],
+              "enum": [
+                "source",
+                "target"
+              ],
               "type": "string",
               "default": "source",
               "title": "Direction"
@@ -1795,7 +1946,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1861,7 +2015,10 @@
             "in": "query",
             "required": false,
             "schema": {
-              "enum": ["source", "target"],
+              "enum": [
+                "source",
+                "target"
+              ],
               "type": "string",
               "default": "source",
               "title": "Direction"
@@ -1874,7 +2031,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1942,7 +2102,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -1997,7 +2160,13 @@
             "in": "query",
             "required": false,
             "schema": {
-              "enum": [".xml", ".json", ".sqlite"],
+              "enum": [
+                ".xml",
+                ".json",
+                ".sqlite",
+                ".csv",
+                ".ocel.zip"
+              ],
               "type": "string",
               "default": ".json",
               "title": "Ext"
@@ -2010,7 +2179,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -2081,7 +2253,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -2166,7 +2341,10 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": ["original", "filtered"],
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
                   "type": "string"
                 },
                 {
@@ -2295,7 +2473,11 @@
           }
         },
         "type": "object",
-        "required": ["start_timestamp", "end_timestamp", "entity_count"],
+        "required": [
+          "start_timestamp",
+          "end_timestamp",
+          "entity_count"
+        ],
         "title": "Date_Distribution_Item"
       },
       "DefaultOCEL": {
@@ -2339,7 +2521,12 @@
           }
         },
         "type": "object",
-        "required": ["key", "name", "version", "file"],
+        "required": [
+          "key",
+          "name",
+          "version",
+          "file"
+        ],
         "title": "DefaultOCEL",
         "description": "Definition of a default OCEL on the server, for quick access. Supports pre-loading the OCEL on backend init."
       },
@@ -2362,7 +2549,11 @@
           }
         },
         "type": "object",
-        "required": ["start_time", "end_time", "date_distribution"],
+        "required": [
+          "start_time",
+          "end_time",
+          "date_distribution"
+        ],
         "title": "Entity_Time_Info"
       },
       "HTTPValidationError": {
@@ -2377,25 +2568,6 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
-      },
-      "OCELExtensionDescription": {
-        "properties": {
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "label": {
-            "type": "string",
-            "title": "Label"
-          },
-          "description": {
-            "type": "string",
-            "title": "Description"
-          }
-        },
-        "type": "object",
-        "required": ["name", "label", "description"],
-        "title": "OCELExtensionDescription"
       },
       "ObjectTypeVariants": {
         "properties": {
@@ -2416,7 +2588,11 @@
           }
         },
         "type": "object",
-        "required": ["variants", "case_count", "event_count"],
+        "required": [
+          "variants",
+          "case_count",
+          "event_count"
+        ],
         "title": "ObjectTypeVariants",
         "description": "All variants of a single object type together with the totals across them.\n\nAttributes:\n    variants: The distinct variants, sorted by frequency (descending).\n    case_count: Total number of cases (objects) of the object type.\n    event_count: Total number of events across all cases of the object type."
       },
@@ -2443,7 +2619,12 @@
           }
         },
         "type": "object",
-        "required": ["variant_id", "activities", "event_count", "case_count"],
+        "required": [
+          "variant_id",
+          "activities",
+          "event_count",
+          "case_count"
+        ],
         "title": "ObjectVariant",
         "description": "A single object variant: a distinct activity sequence objects of a type follow.\n\nAttributes:\n    variant_id: Identifier of the variant\n        (``<object_type>_<hash of the activity sequence>``). It depends only\n        on the sequence, so it stays the same across filtered views of a log.\n    activities: The ordered activity sequence that defines the variant.\n    event_count: Number of events in the variant (length of ``activities``).\n    case_count: Number of objects (cases) that follow this variant."
       },
@@ -2460,13 +2641,6 @@
           "created_at": {
             "type": "string",
             "title": "Created At"
-          },
-          "extensions": {
-            "items": {
-              "$ref": "#/components/schemas/OCELExtensionDescription"
-            },
-            "type": "array",
-            "title": "Extensions"
           },
           "filter_applied": {
             "anyOf": [
@@ -2485,7 +2659,6 @@
           "id",
           "name",
           "created_at",
-          "extensions",
           "filter_applied"
         ],
         "title": "OcelMetadata"
@@ -2659,7 +2832,11 @@
           }
         },
         "type": "object",
-        "required": ["source", "target", "qualifier"],
+        "required": [
+          "source",
+          "target",
+          "qualifier"
+        ],
         "title": "RelationCombination",
         "description": "A distinct (source, target, qualifier) combination of a relation.\n\nAttributes:\n    source: The source object or event type.\n    target: The target object or event type.\n    qualifier: The relation qualifier (empty string when none applies)."
       },
@@ -2813,12 +2990,23 @@
           }
         },
         "type": "object",
-        "required": ["loc", "msg", "type"],
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
         "title": "ValidationError"
       },
       "ValueType": {
         "type": "string",
-        "enum": ["empty", "string", "bool", "int", "float", "date"],
+        "enum": [
+          "empty",
+          "string",
+          "bool",
+          "int",
+          "float",
+          "date"
+        ],
         "title": "ValueType"
       }
     }

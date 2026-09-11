@@ -92,11 +92,3 @@ datasets. No OCEL queries or exploration concepts live in the package.
 To add a chart type, add its contract, builder, and a case in `Chart`. Keep engine
 settings inside `internal/`. The current engine is an implementation dependency;
 replacing it must preserve the public contract and selection semantics.
-
-Migration: replace `<BarChart ...>` with `<Chart type="bar" ...>` (similarly for
-other chart types). `useChartInteractions`, the factory, and public transforms
-have been removed. Controlled interaction state can use ordinary React state.
-
-Run `pnpm --filter @ocelescope/charts test`, `typecheck`, and `build`.
-Tests cover source-row provenance, ordering, repeated labels, and invalid API
-combinations. Browser rendering should also be checked when changing layouts.

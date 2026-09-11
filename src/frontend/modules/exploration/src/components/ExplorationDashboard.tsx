@@ -15,6 +15,8 @@ import {
 } from "@mantine/core";
 import { PlusIcon, ShapesIcon } from "lucide-react";
 import { useState } from "react";
+import { AnalysisCard } from "../analyses/AnalysisCard";
+import { AnalysisEditor } from "../analyses/AnalysisEditor";
 import {
   analysisDefinitions,
   findAnalysisDefinition,
@@ -36,7 +38,6 @@ export function ExplorationDashboard({ ocelId }: { ocelId: string }) {
   const activeDefinition = activeAnalysisId
     ? findAnalysisDefinition(activeAnalysisId)
     : undefined;
-  const ActiveEditor = activeDefinition?.Editor;
 
   const definitionCategories = Array.from(
     new Set(analysisDefinitions.map((definition) => definition.category)),
@@ -117,12 +118,9 @@ export function ExplorationDashboard({ ocelId }: { ocelId: string }) {
         ) : (
           <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="lg">
             {cards.map((card) => {
-              const definition = findAnalysisDefinition(card.spec.analysis);
-              if (!definition) return null;
-              const Card = definition.Card;
               return (
                 <Box key={card.id} h={420}>
-                  <Card
+                  <AnalysisCard
                     ocelId={ocelId}
                     card={card}
                     onEdit={() => {
@@ -157,7 +155,7 @@ export function ExplorationDashboard({ ocelId }: { ocelId: string }) {
         title={editingCard ? "Edit visualization" : "Add visualization"}
         padding="lg"
       >
-        {activeDefinition && ActiveEditor ? (
+        {activeDefinition ? (
           <Stack gap="lg">
             <div>
               <Title order={4}>{activeDefinition.label}</Title>
@@ -165,8 +163,9 @@ export function ExplorationDashboard({ ocelId }: { ocelId: string }) {
                 {activeDefinition.description}
               </Text>
             </div>
-            <ActiveEditor
+            <AnalysisEditor
               key={editingCard?.id ?? activeDefinition.id}
+              definition={activeDefinition}
               ocelId={ocelId}
               initial={editingCard?.spec}
               onCancel={closeDrawer}
@@ -175,10 +174,6 @@ export function ExplorationDashboard({ ocelId }: { ocelId: string }) {
           </Stack>
         ) : (
           <Stack gap="lg">
-            <Text size="sm" c="dimmed">
-              Start with the analytical question. Its configuration will only
-              offer attributes and visualizations compatible with the schema.
-            </Text>
             {definitionCategories.map(({ category, definitions }) => (
               <Stack key={category} gap="xs">
                 <Text size="xs" fw={700} tt="uppercase" c="dimmed">

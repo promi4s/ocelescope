@@ -1,8 +1,9 @@
-import type { ComponentType } from "react";
 import type {
   DashboardCardDefinition,
   VisualizationSpec,
 } from "../model/dashboard";
+import type { CardView } from "./cards";
+import type { AnalysisForm } from "./fields";
 
 export interface AnalysisEditorProps {
   ocelId: string;
@@ -24,6 +25,8 @@ export interface AnalysisDefinition {
   category: "Attributes" | "Relationships" | "Behavior" | "Time";
   label: string;
   description: string;
-  Editor: ComponentType<AnalysisEditorProps>;
-  Card: ComponentType<AnalysisCardProps>;
+  /** Declares the editor. One generic component renders it. */
+  form: AnalysisForm;
+  /** Declares the card. One generic component renders it. */
+  card: CardView;
 }

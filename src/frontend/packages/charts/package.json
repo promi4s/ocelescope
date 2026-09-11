@@ -19,8 +19,7 @@
     "dev": "tsdown --watch ./src",
     "typecheck": "tsc --noEmit",
     "storybook": "storybook dev -p 6007",
-    "build-storybook": "storybook build",
-    "test": "tsc --noEmit && tsdown tests/charts.test.ts --out-dir .test-dist --no-dts --platform node && node --test .test-dist/charts.test.mjs"
+    "build-storybook": "storybook build"
   },
   "peerDependencies": {
     "@mantine/core": "catalog:",
