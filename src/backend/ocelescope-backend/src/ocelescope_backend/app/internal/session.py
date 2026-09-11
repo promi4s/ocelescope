@@ -7,13 +7,11 @@ from pathlib import Path
 from typing import Any, Callable, Hashable, Sequence, Type, TypeVar, cast
 from uuid import uuid4
 
-from ocelescope.ocel.extensions.base_extension import OCELExtension
-from ocelescope.ocel.io import convert_ocel_duckdb
-
 from ocelescope import OCEL, BaseFilter
 from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.model.ocel import SessionOCEL
 from ocelescope_backend.app.internal.model.resource import ResourceApi, ResourceStore
+from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.tasks.base import TaskBase
 from ocelescope_backend.app.sse_manager import InvalidationRequest, sse_manager
 
@@ -102,14 +100,12 @@ class Session:
         db_path: Path,
         name: str,
         created_at: str,
-        extensions: list[OCELExtension] | None = None,
     ) -> str:
         self.ocels[id] = SessionOCEL(
             id=id,
             db_path=db_path,
             name=name,
             created_at=created_at,
-            extensions=extensions,
         )
         sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
         return id
@@ -126,24 +122,16 @@ class Session:
             db_path,
             name,
             created_at=datetime.now().isoformat(),
-            extensions=ocel.extensions.all(),
         )
 
-    def add_ocel_from_file(self, source_path: Path, name: str, created_at: str) -> str:
-        """Stream an OCEL file straight into a DuckDB file without materializing it."""
-        ocel_id = str(uuid4())
-        db_path = self._ocel_dir / f"{ocel_id}.duckdb"
-        convert_ocel_duckdb(source_path, db_path)
+    def add_ocel_from_file(self, source_path: Path, name: str) -> str:
+        """Register an OCEL file, streamed entity by entity into its own DuckDB file.
 
-        return self._register_ocel(ocel_id, db_path, name=name, created_at=created_at)
-
-    def set_ocel_extensions(self, ocel_id: str, extensions: list[OCELExtension]):
-        """Attach in-memory extension instances to an already registered OCEL."""
-        if ocel_id not in self.ocels:
-            raise NotFound(f"OCEL with id {ocel_id} not found")
-
-        self.ocels[ocel_id].extensions = extensions
-        sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
+        The log is never materialized as a whole, so peak memory stays bounded by its
+        widest single entity however big the upload is.
+        """
+        with OCEL.read(source_path) as ocel:
+            return self.add_ocel(ocel, name=name)
 
     def get_ocel(self, ocel_id: str, use_original: bool = False) -> OCEL:
         if ocel_id not in self.ocels:
@@ -214,9 +202,16 @@ class Session:
         sse_manager.send_safe(self.id, InvalidationRequest(routes=["resources"]))
 
     def list_resources(self) -> list[ResourceApi]:
+        resource_info = registry_manager.get_resource_info()
+
         return list(
-            ResourceApi(id=id, **resource.model_dump())
+            ResourceApi(
+                id=id,
+                resource_type_label=resource_info[resource.schema_hash]["label"],
+                **resource.model_dump(),
+            )
             for id, resource in self._resources.items()
+            if resource.schema_hash in resource_info
         )
 
     def rename_resource(self, id: str, new_name: str):

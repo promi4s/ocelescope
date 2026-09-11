@@ -6,24 +6,24 @@ from ocelescope.ocel import (
     E2OCountFilter,
     EventAttributeFilter,
     EventTypeFilter,
-    ObjectIdFilter,
     EventTypeFrequencyFilter,
     O2OCountFilter,
     ObjectAttributeFilter,
+    ObjectIdFilter,
     ObjectTypeFilter,
     ObjectTypeFrequencyFilter,
-    OCELExtension,
     TimeFrameFilter,
 )
 from ocelescope.plugin import (
+    CODE_FIELD,
     COMPUTED_SELECTION,
     OCEL_FIELD,
+    SLIDER_FIELD,
+    SQL_FIELD,
     OCELAnnotation,
     Plugin,
     PluginInput,
-    PluginMeta,
     PluginMethod,
-    PluginResult,
     ResourceAnnotation,
     plugin_method,
 )
@@ -43,6 +43,7 @@ from ocelescope.visualization import (
     GraphShapes,
     GraphvizLayoutConfig,
     LayoutConfig,
+    Plotly,
     SVGVis,
     Table,
     TableColumn,
@@ -54,7 +55,6 @@ matplotlib.use("Agg")
 
 __all__ = [
     "OCEL",
-    "OCELExtension",
     "E2OCountFilter",
     "EventAttributeFilter",
     "EventTypeFilter",
@@ -72,13 +72,14 @@ __all__ = [
     "ResourceAnnotation",
     "OCELAnnotation",
     "Plugin",
-    "PluginMeta",
-    "PluginMethod",
     "COMPUTED_SELECTION",
     "OCEL_FIELD",
+    "CODE_FIELD",
+    "SLIDER_FIELD",
+    "SQL_FIELD",
     "PluginInput",
-    "PluginResult",
     "plugin_method",
+    "PluginMethod",
     "BaseFilter",
     # Visualization
     # Util
@@ -105,4 +106,6 @@ __all__ = [
     "SVGVis",
     # Graphviz
     "DotVis",
+    # Plotly
+    "Plotly",
 ]

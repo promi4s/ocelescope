@@ -1,6 +1,6 @@
 [project]
 name = "ocelescope"
-version = "0.4.0"
+version = "0.7.0"
 description = "General tools for working with Object-Centric Event Logs and building Ocelescope plugins"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -14,13 +14,11 @@ classifiers = [
 ]
 
 dependencies = [
-  "cachetools>=6.1.0",
   "duckdb>=1.5.4",
   "graphviz>=0.21",
   "ijson>=3.5.0",
   "lxml>=6.1.1",
   "matplotlib>=3.10.9",
-  "numpy>=2.3.2",
   "orjson>=3.11.7",
   "pandas>=2.3.1",
   "plotly>=6.3.1",
@@ -28,7 +26,7 @@ dependencies = [
   "polars>=1.40.1",
   "pyarrow>=24.0.0",
   "pydantic>=2.11.7",
-  "r4pm[polars]>=0.6.0",
+  "r4pm-full[polars]>=0.6.2",
 ]
 
 [project.urls]
@@ -48,11 +46,12 @@ plugin = [
   "more-itertools>=11.1.0",
   "networkx>=3.5",
   "pulp>=3.3.2",
+  "numpy>=2.3.2",
   "scikit-learn>=1.9.0",
 ]
 
 [build-system]
-requires = ["uv_build>=0.11.20,<0.12.0"]
+requires = ["uv_build>=0.12.5,<0.13.0"]
 build-backend = "uv_build"
 
 [dependency-groups]

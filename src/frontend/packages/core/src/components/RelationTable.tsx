@@ -130,6 +130,9 @@ const RelationTable: React.FC<{
   hideTotal?: boolean;
   ocelVersion?: OcelVersion;
   visibleRelations?: { source: string; target: string }[];
+  height?: string | number;
+  className?: string;
+  style?: React.CSSProperties;
 }> = ({
   ocelId,
   relationType = "o2o",
@@ -140,6 +143,9 @@ const RelationTable: React.FC<{
   hideTotal = false,
   ocelVersion,
   visibleRelations,
+  height,
+  className,
+  style,
 }) => {
   const isE2O = relationType === "e2o";
   const isSource = direction === "source";
@@ -366,7 +372,9 @@ const RelationTable: React.FC<{
       recordsPerPage={PAGE_SIZE}
       onPageChange={setCurrentPage}
       noRecordsText="No relations found"
-      height={500}
+      height={height}
+      className={className}
+      style={{ flex: 1, minHeight: 0, ...style }}
       rowExpansion={{
         allowMultiple: false,
         expandable: ({ record }) => (record.qualifiers?.length ?? 0) > 1,

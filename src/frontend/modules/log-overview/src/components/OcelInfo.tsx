@@ -1,4 +1,4 @@
-import { Badge, LoadingOverlay, Stack, Table } from "@mantine/core";
+import { LoadingOverlay, Stack, Table } from "@mantine/core";
 import {
   useEventCounts,
   useGetOcel,
@@ -52,16 +52,6 @@ const OCELInfo: React.FC<{ ocelId: string }> = ({ ocelId }) => {
             {`${formatTime(timeInfo?.start_time)} - ${formatTime(timeInfo?.end_time)}`}
           </Table.Td>
         </Table.Tr>
-        {ocel.extensions.length > 0 && (
-          <Table.Tr>
-            <Table.Th>Extensions:</Table.Th>
-            <Table.Td>
-              {ocel.extensions.map(({ label }) => (
-                <Badge>{label}</Badge>
-              ))}
-            </Table.Td>
-          </Table.Tr>
-        )}
         {quantityInfo && quantityInfo.item_types.length > 0 && (
           <Table.Tr>
             <Table.Th>Quantities:</Table.Th>

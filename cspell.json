@@ -16,7 +16,6 @@
     "pnml",
     "Pnml",
     "pnpm",
-    "mkdocs",
     "uvicorn",
     "dotenv",
     "orval",
@@ -55,6 +54,12 @@
     "yaxes",
     "showgrid",
     "zeroline",
+    "textposition",
+    "cliponaxis",
+    "automargin",
+    "ticksuffix",
+    "showlegend",
+    "bargap",
     "hrect",
     "savefig",
     "getvalue",
@@ -161,7 +166,15 @@
     "ctes",
     "pydatetime",
     "RJEM",
-    "qddl"
+    "qddl",
+    "unpivoting",
+    "monaco",
+    "Monaco",
+    "iqty",
+    "itype",
+    "ilvl",
+    "itlvl",
+    "OCELIO"
   ],
   "ignorePaths": [
     "pnpm-lock.yaml",
@@ -176,8 +189,8 @@
     "**/dist/**",
     "**/*.svg",
     "**/*.min.js",
-    "docs/data/pluginEnviroment.txt",
-    "**/api/base.ts"
+    "**/api/base.ts",
+    "src/frontend/packages/api/base/src/api/**"
   ],
   "ignoreRegExpList": ["\\{%[\\s\\S]*?%\\}", "\\{\\{[\\s\\S]*?\\}\\}"]
 }

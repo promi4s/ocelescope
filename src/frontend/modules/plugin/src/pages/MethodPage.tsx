@@ -52,6 +52,7 @@ const MethodPage: React.FC<{ pluginId: string; methodName: string }> = ({
           <Box h="100%" pos="relative" style={{ overflow: "hidden" }}>
             {currentTask ? (
               <ResultSection
+                key={currentTask}
                 pluginId={pluginId}
                 methodName={methodName}
                 taskId={currentTask}

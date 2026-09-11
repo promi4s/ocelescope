@@ -27,14 +27,6 @@ for a complete setup.
 ```tsx
 // pages/_app.tsx
 
-// 1. Third-party global styles core relies on. Import these FIRST, in this
-//    order (@mantine/core must come before its extensions).
-import "@mantine/core/styles.css";
-import "@mantine/dropzone/styles.css";
-import "@mantine/notifications/styles.css";
-import "mantine-datatable/styles.css";
-
-// 2. core's own (scoped) styles — must come AFTER the above so its overrides win.
 import "@ocelescope/core/styles.css";
 
 import { OcelescopeApp } from "@ocelescope/core";
@@ -43,12 +35,13 @@ import config from "../ocelescope.config";
 export default OcelescopeApp(config);
 ```
 
-> **Styles.** `@ocelescope/core` ships only its own component styles in
-> `@ocelescope/core/styles.css`; it does **not** bundle its dependencies'
-> global CSS. Your app must import the Mantine / mantine-datatable stylesheets
-> above itself (and add those packages to its `dependencies`), in order, before
-> core's stylesheet. Each Ocelescope module documents any additional
-> stylesheets it needs.
+> **Styles.** `@ocelescope/core/styles.css` is the only stylesheet an app needs.
+> It inlines the third-party global CSS core and the Ocelescope modules rely on
+> (`@mantine/core` and its `dates` / `charts` / `dropzone` / `notifications`
+> extensions, `mantine-datatable`, `@xyflow/react`, `@r4pm/components`) ahead of
+> core's own component styles, in cascade order — so do not import those
+> stylesheets again. A module that ships its own stylesheet documents it; import
+> those after core's.
 
 ```tsx
 // pages/_document.tsx

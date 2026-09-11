@@ -5,12 +5,16 @@
   "dependencyDashboard": true,
   "prConcurrentLimit": 10,
   "prHourlyLimit": 2,
-  "ignorePaths": ["docs/**"],
   "commitMessagePrefix": ":arrow_up: ",
   "lockFileMaintenance": {
     "enabled": true
   },
   "packageRules": [
+    {
+      "description": "Action version and digest bumps are low-risk; majors are still held back by the rule below",
+      "matchManagers": ["github-actions"],
+      "automerge": true
+    },
     {
       "matchUpdateTypes": ["major"],
       "automerge": false
@@ -19,6 +23,16 @@
       "matchDepTypes": ["devDependencies"],
       "matchUpdateTypes": ["patch"],
       "automerge": true
+    },
+    {
+      "description": "next 16.3.1 ships a broken `output: standalone` bundle under pnpm (@swc/helpers esm/ is not traced); fixed in canary, so allow 16.3.2+",
+      "matchPackageNames": ["next"],
+      "allowedVersions": "<16.3.1 || >16.3.1"
+    },
+    {
+      "description": "TypeScript 7 has no stable compiler API yet (tsdown) and is outside typedoc's peer range",
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "<7"
     }
   ]
 }

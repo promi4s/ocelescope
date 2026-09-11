@@ -36,7 +36,7 @@ const PluginBreadcrumbs: React.FC = () => {
             query: { ...query, pluginId: plugin?.id, methodName: undefined },
           }}
         >
-          {plugin?.meta.label}
+          {plugin?.label}
         </Anchor>
       )}
       {pluginMethod && (

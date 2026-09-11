@@ -6,21 +6,22 @@ import {
   Center,
   Group,
   Loader,
+  Modal,
   MultiSelect,
   Splitter,
   Stack,
   Text,
+  TextInput,
   Tooltip,
 } from "@mantine/core";
 import { generateColor } from "@marko19907/string-to-color";
 import {
-  type OCELOutput,
-  type ResourceOutput,
+  type PluginOutput,
+  type ResultSelection,
   useDownloadPluginResults,
   usePluginResult,
   useSavePluginResults,
 } from "@ocelescope/api-base";
-import { BarList } from "@ocelescope/core";
 import { Visualization, type VisualizationsType } from "@ocelescope/resources";
 import {
   CheckIcon,
@@ -31,44 +32,78 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 
-type PluginOutput = OCELOutput | ResourceOutput;
-
-const ResourceView: React.FC<{
-  resource: ResourceOutput;
-}> = ({ resource }) => {
-  return (
-    <Visualization
-      visualization={resource.visualization as VisualizationsType}
-    />
-  );
-};
-
-export const OCELView: React.FC<{ ocel: OCELOutput }> = ({ ocel }) => {
-  return (
-    <Stack gap="md">
-      <BarList data={ocel.activity_count} labelHeader="Activity" />
-      <BarList data={ocel.object_count} labelHeader="Object type" />
-    </Stack>
-  );
-};
-
-const entityTypeOf = (output: PluginOutput) =>
-  output.type === "ocel" ? "ocel" : output.resource_type || "resource";
-
 const ResultLabel: React.FC<{
   label: string;
   entityType: string;
   bold?: boolean;
 }> = ({ label, entityType, bold }) => (
   <Group gap="xs" wrap="nowrap">
-    <Text fw={bold ? 600 : undefined} truncate>
+    <Text fw={bold ? 600 : undefined} truncate maw={120}>
       {label}
     </Text>
-    <Badge size="sm" color={generateColor(entityType)}>
+    <Badge
+      size="sm"
+      color={generateColor(entityType)}
+      style={{ flexShrink: 0 }}
+    >
       {entityType}
     </Badge>
   </Group>
 );
+
+const SaveModal = ({
+  opened,
+  onClose,
+  results,
+  onSave,
+}: {
+  opened: boolean;
+  onClose: () => void;
+  onSave: (results: ResultSelection[]) => void;
+  results: PluginOutput[];
+}) => {
+  const [names, setNames] = useState<Record<number, string>>({});
+
+  return (
+    <Modal opened={opened} onClose={onClose} title={"Save to Session"}>
+      <Stack>
+        <Stack gap={"xs"}>
+          {results.map(({ default_name, result_index, type_label }) => (
+            <Group key={result_index}>
+              <TextInput
+                placeholder={default_name}
+                value={names[result_index] ?? ""}
+                flex={1}
+                onChange={(newValue) =>
+                  setNames({
+                    ...names,
+                    [result_index]: newValue.currentTarget.value,
+                  })
+                }
+              />
+              <Badge size="sm" color={generateColor(type_label)}>
+                {type_label}
+              </Badge>
+            </Group>
+          ))}
+        </Stack>
+        <Button
+          onClick={() => {
+            onSave(
+              results.map(({ result_index }) => ({
+                index: result_index,
+                name: names[result_index] ?? null,
+              })),
+            );
+            onClose();
+          }}
+        >
+          Save to Session
+        </Button>
+      </Stack>
+    </Modal>
+  );
+};
 
 const ResultSection: React.FC<{
   pluginId: string;
@@ -92,6 +127,9 @@ const ResultSection: React.FC<{
   );
 
   const [selected, setSelected] = useState<number[]>([0]);
+
+  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+
   const [orientation, setOrientation] = useState<"vertical" | "horizontal">(
     "vertical",
   );
@@ -102,6 +140,7 @@ const ResultSection: React.FC<{
     isSuccess: isSaved,
     reset: resetSave,
   } = useSavePluginResults();
+
   const { mutate: downloadResults, isPending: isDownloading } =
     useDownloadPluginResults({
       request: { responseType: "blob" },
@@ -112,8 +151,8 @@ const ResultSection: React.FC<{
       (pluginSummary ?? []).map((output) => {
         return {
           value: output.result_index,
-          label: entityTypeOf(output),
-          entityType: output.type,
+          label: output.default_name,
+          entityType: output.type_label,
         };
       }),
     [pluginSummary],
@@ -159,12 +198,12 @@ const ResultSection: React.FC<{
     );
   };
 
-  const handleSaveToSession = () => {
+  const handleSaveToSession = (results: ResultSelection[]) => {
     saveResults({
       pluginId,
       methodName,
       taskId,
-      data: { indices: selected },
+      data: results,
     });
   };
 
@@ -188,13 +227,16 @@ const ResultSection: React.FC<{
             searchable
             clearable
             comboboxProps={{ withinPortal: true }}
-            renderOption={({ option }) => {
+            renderOption={({ option, checked }) => {
               const output = pluginSummary[Number(option.value)];
               return (
-                <ResultLabel
-                  label={option.label}
-                  entityType={output ? entityTypeOf(output) : option.label}
-                />
+                <Group align="center">
+                  {checked && <CheckIcon size={16} color="grey" />}
+                  <ResultLabel
+                    label={option.label}
+                    entityType={output?.type_label ?? ""}
+                  />
+                </Group>
               );
             }}
           />
@@ -248,7 +290,7 @@ const ResultSection: React.FC<{
             leftSection={
               isSaved ? <CheckIcon size={16} /> : <DatabaseIcon size={16} />
             }
-            onClick={handleSaveToSession}
+            onClick={() => setIsSaveModalOpen(true)}
             loading={isSaving}
             disabled={selected.length === 0}
           >
@@ -256,6 +298,15 @@ const ResultSection: React.FC<{
           </Button>
         </Group>
       </Group>
+
+      <SaveModal
+        opened={isSaveModalOpen}
+        onClose={() => setIsSaveModalOpen(false)}
+        results={pluginSummary.filter(({ result_index }) =>
+          selected.includes(result_index),
+        )}
+        onSave={handleSaveToSession}
+      />
 
       {selected.length === 0 ? (
         <Center style={{ flex: 1 }}>
@@ -271,18 +322,16 @@ const ResultSection: React.FC<{
         >
           {pluginSummary
             ?.filter(({ result_index }) => selected.includes(result_index))
-            .map((output, index) => (
+            .map((output) => (
               <Splitter.Pane
-                key={index}
+                key={output.result_index}
                 defaultSize={100 / selected.length}
                 min="15%"
               >
                 <Box h="100%" p="xs" pos="relative">
-                  {output.type === "ocel" ? (
-                    <OCELView ocel={output} />
-                  ) : (
-                    <ResourceView resource={output} />
-                  )}
+                  <Visualization
+                    visualization={output.visualization as VisualizationsType}
+                  />
                 </Box>
               </Splitter.Pane>
             ))}

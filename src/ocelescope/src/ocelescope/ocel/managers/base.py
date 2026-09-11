@@ -4,13 +4,14 @@ from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, Iterator
 
 import duckdb
+import polars
 
-from ocelescope.util.sql import ident, set_utc
+from ocelescope.ocel.io.schema import FIXED_COLUMN_TYPES
+from ocelescope.util.sql import set_utc
 
 if TYPE_CHECKING:
-    from ocelescope.ocel.core.ocel import OCEL
+    from ocelescope.ocel.core import OCEL
 
-#: View name a table's incoming contents are bound to while being written.
 _INCOMING = "_incoming_table"
 
 
@@ -19,15 +20,6 @@ class BaseManager:
 
     def __init__(self, ocel: "OCEL"):
         self._ocel = ocel
-
-    def _has_table(self, name: str) -> bool:
-        """Whether a table called ``name`` exists in the OCEL's database."""
-        return (
-            self._ocel.con.execute(
-                "SELECT 1 FROM information_schema.tables WHERE table_name = ?", [name]
-            ).fetchone()
-            is not None
-        )
 
     def _relation(self, sql: str, params: list[object] | None = None) -> duckdb.DuckDBPyRelation:
         """A lazy relation for ``sql``, on its own DuckDB cursor."""
@@ -43,20 +35,20 @@ class BaseManager:
         """
         return [row[0] for row in self._relation(sql, params).fetchall()]
 
-    def _attribute_names(self, table: str) -> list[str]:
-        """The attribute columns of a stored table: its columns minus the OCEL ones."""
-        return sorted(
-            name
-            for name, *_ in self._ocel.con.execute(f"DESCRIBE {ident(table)}").fetchall()
-            if not name.startswith("ocel:")
-        )
-
     @contextmanager
     def _bound(self, contents: Any) -> Iterator[str]:
-        """Bind ``contents`` to the OCEL's connection for one query, as a view."""
+        """Bind ``contents`` to the OCEL's connection for one query, as a view.
+
+        Anything still lazy is read out first. A relation or a LazyFrame taken off
+        a getter reads the very tables the caller is about to write, and a writer
+        that takes more than one statement would otherwise see it change under it:
+        the rows it means to store are gone by the time it stores them.
+        """
         con = self._ocel.con
         if isinstance(contents, duckdb.DuckDBPyRelation):
             contents = contents.to_arrow_table()
+        elif isinstance(contents, polars.LazyFrame):
+            contents = contents.collect()
         con.register(_INCOMING, contents)
         try:
             yield _INCOMING
@@ -64,8 +56,22 @@ class BaseManager:
             con.unregister(_INCOMING)
 
     def _replace(self, table: str, contents: Any, projection: str = "*") -> None:
-        """Replace stored ``table`` with ``contents``, projected through ``projection``."""
+        """Replace stored ``table`` with ``contents``, projected through ``projection``.
+
+        The table's fixed columns are cast to the types the schema gives them,
+        whatever types ``contents`` carries. A frame that arrives empty carries
+        none worth keeping -- DuckDB reads a column of nothing as INTEGER, and an
+        id column stored that way refuses every later comparison against a real
+        one.
+        """
+        con = self._ocel.con
+        fixed = FIXED_COLUMN_TYPES.get(table, {})
+
         with self._bound(contents) as incoming:
-            self._ocel.con.execute(
-                f'CREATE OR REPLACE TABLE "{table}" AS SELECT {projection} FROM {incoming}'
+            source = f"(SELECT {projection} FROM {incoming})"
+            columns = {name for name, *_ in con.execute(f"DESCRIBE {source}").fetchall()}
+            pinned = ", ".join(
+                f'"{name}"::{dtype} AS "{name}"' for name, dtype in fixed.items() if name in columns
             )
+            replace = f" REPLACE ({pinned})" if pinned else ""
+            con.execute(f'CREATE OR REPLACE TABLE "{table}" AS SELECT *{replace} FROM {source}')

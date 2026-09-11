@@ -1,1 +1,0 @@
-::: ocelescope.resource.default.dfg

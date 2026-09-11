@@ -15,7 +15,12 @@ const PlotlyViewer: React.FC<VisualizationProps<"plotly">> = ({
   return (
     <Plot
       data={data}
-      layout={{ ...layout }}
+      layout={{
+        ...layout,
+        autosize: true,
+        width: undefined,
+        height: undefined,
+      }}
       config={{
         responsive: true,
         displaylogo: false,

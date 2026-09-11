@@ -41,7 +41,7 @@ def make_hashable(obj):
 P = TypeVar("P")
 
 
-def _call_with_known_params(fn: Callable[..., P], *args, **kwargs) -> P:
+def call_with_known_params(fn: Callable[..., P], *args, **kwargs) -> P:
     sig = inspect.signature(fn)
     allowed = sig.parameters.keys()
     filtered = {k: v for k, v in kwargs.items() if k in allowed}

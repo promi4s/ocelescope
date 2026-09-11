@@ -41,6 +41,11 @@ def get_e2o(
     )
 
 
+@router.get("/{ocel_id}/relations/e2o/qualifiers", operation_id="e2oQualifier")
+def get_e2o_qualifier(ocel: ApiOcel) -> list[str]:
+    return ocel.e2o.qualifiers
+
+
 @router.get("/{ocel_id}/relations/o2o", operation_id="o2o")
 def get_o2o(
     ocel: ApiOcel,
@@ -65,6 +70,11 @@ def get_o2o(
         page=page,
         page_size=page_size,
     )
+
+
+@router.get("/{ocel_id}/relations/o2o/qualifiers", operation_id="o2oQualifier")
+def get_o2o_qualifier(ocel: ApiOcel) -> list[str]:
+    return ocel.o2o.qualifiers
 
 
 @router.get("/{ocel_id}/relations/e2o/combinations", operation_id="e2oCombinations")

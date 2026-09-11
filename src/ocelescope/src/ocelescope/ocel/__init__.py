@@ -1,23 +1,21 @@
 from ocelescope.ocel.core import OCEL
-from ocelescope.ocel.extensions.base_extension import OCELExtension
 from ocelescope.ocel.filter import (
     BaseFilter,
     E2OCountFilter,
     EventAttributeFilter,
-    EventTypeFrequencyFilter,
     EventTypeFilter,
-    ObjectIdFilter,
+    EventTypeFrequencyFilter,
     Keep,
     O2OCountFilter,
     ObjectAttributeFilter,
-    ObjectTypeFrequencyFilter,
+    ObjectIdFilter,
     ObjectTypeFilter,
+    ObjectTypeFrequencyFilter,
     TimeFrameFilter,
 )
 
 __all__ = [
     "OCEL",
-    "OCELExtension",
     "E2OCountFilter",
     "EventAttributeFilter",
     "EventTypeFrequencyFilter",

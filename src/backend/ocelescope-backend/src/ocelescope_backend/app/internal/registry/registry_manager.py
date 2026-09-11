@@ -1,7 +1,8 @@
 import importlib.util
 import shutil
 import sys
-from typing import Any, Dict
+from contextlib import AbstractContextManager
+from typing import TYPE_CHECKING, Any, Dict
 
 from ocelescope.discovery import algorithms
 from typing_extensions import TypedDict
@@ -9,15 +10,16 @@ from typing_extensions import TypedDict
 from ocelescope import DirectlyFollowsGraph, PetriNet, Plugin, Resource
 from ocelescope_backend.app.internal.config import config
 from ocelescope_backend.app.internal.model.plugin import PluginApi
-from ocelescope_backend.app.internal.model.resource import ResourceStore
 from ocelescope_backend.app.internal.registry.discovery import DiscoveryRegistry
-from ocelescope_backend.app.internal.registry.extension import ExtensionRegistry
 from ocelescope_backend.app.internal.registry.plugin import PluginRegistry
 from ocelescope_backend.app.internal.registry.resource import ResourceRegistry
 from ocelescope_backend.app.internal.util.dynamic_import import (
     import_wheel_dynamically,
     is_wheel_compatible,
 )
+
+if TYPE_CHECKING:
+    from ocelescope_backend.app.internal.session import Session
 
 
 class ResourceInfo(TypedDict):
@@ -31,7 +33,6 @@ class RegistryManager:
     def __init__(self):
         self._plugin_registry = PluginRegistry()
         self._resource_registry = ResourceRegistry()
-        self._extension_registry = ExtensionRegistry()
         self._discovery_registry = DiscoveryRegistry()
         self._register_core_resources()
         self._discovery_registry.register(algorithms)
@@ -57,53 +58,40 @@ class RegistryManager:
             plugin_id=plugin_id, method_name=method_name
         )
 
-    def get_resource_class(
-        self, resource_type: str, plugin_id: str | None = None
-    ) -> type[Resource] | None:
-        return self._resource_registry.get_resource_class(
-            resource_type, plugin_id=plugin_id
+    def get_plugin_method_kwargs(
+        self,
+        session: "Session",
+        plugin_id: str,
+        method_name: str,
+        input_resources: dict[str, str | None],
+    ) -> dict[str, Any]:
+
+        return self._plugin_registry.get_plugin_kwargs(
+            session=session,
+            plugin_id=plugin_id,
+            method_name=method_name,
+            input_resources=input_resources,
         )
 
-    def _hydrate(self, data: Any, plugin_id: str | None = None):
-        if isinstance(data, dict) and "_ocelescope_resource_type" in data:
-            ResourceClass = self._resource_registry.get_resource_class(
-                data["_ocelescope_resource_type"], plugin_id=plugin_id
-            )
-            if ResourceClass:
-                hydrated = {
-                    k: self._hydrate(v, plugin_id)
-                    for k, v in data.items()
-                    if k != "type"
-                }
-                return ResourceClass(**hydrated)
-        elif isinstance(data, dict):
-            return {k: self._hydrate(v, plugin_id) for k, v in data.items()}
-        elif isinstance(data, list):
-            return [self._hydrate(item, plugin_id) for item in data]
-        else:
-            return data
+    def get_computed_kwargs(
+        self,
+        session: "Session",
+        plugin_id: str,
+        method_name: str,
+        input_resources: dict[str, str | None],
+    ) -> AbstractContextManager[dict[str, Any]]:
+        """Kwargs for a computed-value provider; its OCELs live for the block."""
+        return self._plugin_registry.computed_kwargs(
+            session=session,
+            plugin_id=plugin_id,
+            method_name=method_name,
+            input_resources=input_resources,
+        )
 
     def get_resource_instance(
-        self, resource: ResourceStore, plugin_id: str | None = None
-    ) -> Resource | None:
-        id = plugin_id
-        if resource.source and not plugin_id:
-            plugin = self._plugin_registry.get_plugin_by_name(
-                name=resource.source["plugin_name"], version=resource.source["version"]
-            )
-            id = plugin[0] if plugin else None
-
-        hydrated_resource = self._hydrate(resource.data, id)
-
-        assert isinstance(hydrated_resource, Resource)
-
-        return hydrated_resource
-
-    def get_extension_descriptions(self):
-        return self._extension_registry.get_extension_description()
-
-    def get_loaded_extensions(self):
-        return self._extension_registry.get_loaded_extensions()
+        self, resource: dict, source_id: str | None = None
+    ) -> Resource:
+        return self._resource_registry.get_resource_instance(resource, source_id)
 
     def load_plugins(
         self, plugin_ids: list[str], ignore_errors: bool = True
@@ -146,16 +134,8 @@ class RegistryManager:
                     try:
                         plugin = self._plugin_registry.register(module)
 
-                        if not plugin:
-                            print("plugin not found")
-                            raise Exception()
-
-                        self._extension_registry.register(module)
-                        for method in plugin.method_map().values():
-                            for resource_type in method._resource_types:
-                                self._resource_registry.register_resource(
-                                    id, resource_type
-                                )
+                        for resource_type in plugin.get_resources():
+                            self._resource_registry.register_resource(id, resource_type)
 
                         for info in self._discovery_registry.register(module):
                             self._resource_registry.register_resource(
@@ -179,14 +159,16 @@ class RegistryManager:
     def unload_plugins(self, plugin_ids: list[str]):
         for id in plugin_ids:
             self._plugin_registry.unload_module(id)
-            self._extension_registry.unload_module(id)
             self._resource_registry.unload_module(id)
             self._discovery_registry.unload_module(id)
 
     def get_resource_info(self) -> Dict[str, ResourceInfo]:
         return {
-            key: {"label": resource.label or key, "description": resource.description}
-            for key, resource in self._resource_registry.resources.items()
+            schema_hash: next(
+                ResourceInfo(label=r.get_label(), description=r.description)
+                for r in resource.values()
+            )
+            for schema_hash, resource in self._resource_registry.resources.items()
         }
 
 

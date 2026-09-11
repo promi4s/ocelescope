@@ -1,101 +1,96 @@
 import {
-  Combobox,
+  Box,
+  Center,
   Group,
-  Input,
-  InputBase,
-  type MantineStyleProps,
-  Text,
+  Select,
+  type SelectProps,
   Tooltip,
-  useCombobox,
+  useMantineTheme,
 } from "@mantine/core";
 import { useGetOcels } from "@ocelescope/api-base";
-import { FilterIcon } from "lucide-react";
-import { useMemo } from "react";
+import { CheckIcon, FilterIcon } from "lucide-react";
+import { type ComponentProps, useCallback, useMemo } from "react";
 import { useCurrentOcel } from "../../hooks/useCurrentOCEL";
 
-const FilteredIndicator: React.FC = () => (
-  <Tooltip label="This log has been filtered">
-    <FilterIcon size={14} color="var(--mantine-color-blue-6)" />
-  </Tooltip>
-);
-
-export type OcelSelectProps = {
-  extension?: string;
-  value?: string | null;
-  onChange?: (value: string | null) => void;
-  label?: React.ReactNode;
-  description?: React.ReactNode;
-  error?: React.ReactNode;
-  placeholder?: string;
-  required?: boolean;
-  disabled?: boolean;
-  w?: MantineStyleProps["w"];
+const iconProps = {
+  color: "currentColor",
+  opacity: 0.6,
+  size: 18,
 };
 
-export const OcelSelect: React.FC<OcelSelectProps> = ({
-  extension,
+const OCELFilterIcon = ({ size }: { size: number }) => {
+  const theme = useMantineTheme();
+  return (
+    <Tooltip label="A filter is applied to this log">
+      <FilterIcon size={size} color={theme.colors.blue[8]} />
+    </Tooltip>
+  );
+};
+
+export const OcelSelect = ({
   value,
-  onChange,
-  placeholder = "Select an OCEL",
-  ...inputProps
-}) => {
-  const { data } = useGetOcels(extension ? { extension_name: extension } : {});
+  ...props
+}: Omit<ComponentProps<typeof Select<string>>, "data">) => {
+  const { data: ocels } = useGetOcels();
 
-  const ocels = useMemo(() => data ?? [], [data]);
+  const ocelIds = useMemo(
+    () =>
+      (ocels ?? []).map(({ id, name }) => ({
+        value: id,
+        label: name,
+      })),
+    [ocels],
+  );
 
-  const combobox = useCombobox({
-    onDropdownClose: () => combobox.resetSelectedOption(),
-  });
+  const filteredOcelIds = useMemo(
+    () =>
+      (ocels ?? [])
+        .filter(({ filter_applied }) => filter_applied)
+        .map(({ id }) => id),
+    [ocels],
+  );
 
-  const selected = useMemo(
-    () => ocels.find((ocel) => ocel.id === value),
-    [ocels, value],
+  const renderSelectOption: SelectProps["renderOption"] = useCallback(
+    ({ option, checked }) => (
+      <Group flex="1" gap="xs" wrap="nowrap" style={{ overflow: "hidden" }}>
+        {filteredOcelIds.includes(option.value) && (
+          <Center style={{ flexShrink: 0 }}>
+            <OCELFilterIcon size={14} />
+          </Center>
+        )}
+        <Box
+          flex="1"
+          style={{
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {option.label}
+        </Box>
+        {checked && (
+          <Center style={{ flexShrink: 0 }}>
+            <CheckIcon {...iconProps} />
+          </Center>
+        )}
+      </Group>
+    ),
+    [filteredOcelIds],
   );
 
   return (
-    <Combobox
-      store={combobox}
-      onOptionSubmit={(val) => {
-        onChange?.(val);
-        combobox.closeDropdown();
-      }}
-    >
-      <Combobox.Target>
-        <InputBase
-          {...inputProps}
-          component="button"
-          type="button"
-          pointer
-          rightSection={<Combobox.Chevron />}
-          rightSectionPointerEvents="none"
-          onClick={() => combobox.toggleDropdown()}
-        >
-          {selected ? (
-            <Group gap={6} wrap="nowrap" style={{ overflow: "hidden" }}>
-              <Text span size="sm" truncate>
-                {selected.name}
-              </Text>
-              {selected.filter_applied && <FilteredIndicator />}
-            </Group>
-          ) : (
-            <Input.Placeholder>{placeholder}</Input.Placeholder>
-          )}
-        </InputBase>
-      </Combobox.Target>
-
-      <Combobox.Dropdown>
-        <Combobox.Options>
-          {ocels.map((ocel) => (
-            <Combobox.Option value={ocel.id} key={ocel.id}>
-              <Group gap={6} wrap="nowrap">
-                {ocel.name}
-                {ocel.filter_applied && <FilteredIndicator />}
-              </Group>
-            </Combobox.Option>
-          ))}
-        </Combobox.Options>
-      </Combobox.Dropdown>
-    </Combobox>
+    <Select
+      leftSection={
+        value && filteredOcelIds.includes(value) ? (
+          <OCELFilterIcon size={14} />
+        ) : undefined
+      }
+      data={ocelIds}
+      value={value}
+      scrollAreaProps={{ styles: { content: { minWidth: 0 } } }}
+      {...props}
+      renderOption={renderSelectOption}
+    />
   );
 };
 

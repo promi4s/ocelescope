@@ -1,7 +1,6 @@
 from pathlib import Path
 from typing import Sequence
 
-from ocelescope.ocel.extensions.base_extension import OCELExtension
 from ocelescope.ocel.io import export_duckdb_ocel
 
 from ocelescope import OCEL, BaseFilter
@@ -23,15 +22,14 @@ class SessionOCEL:
         db_path: Path,
         name: str,
         created_at: str,
-        extensions: list[OCELExtension] | None = None,
     ):
         self.id = id
         self.db_path = db_path
         self.name = name
         self.created_at = created_at
-        self.extensions: list[OCELExtension] = extensions or []
         self._filters_by_source: dict[str, list[BaseFilter]] = {}
         self._filtered_db_path: Path | None = None
+        self._filtered_generation = 0
 
     def _all_filters(self) -> list[BaseFilter]:
         return [f for pipeline in self._filters_by_source.values() for f in pipeline]
@@ -42,13 +40,17 @@ class SessionOCEL:
         The filtered file is built by reading the origin, applying the pipeline and
         writing the result back out -- so the cost is paid here, when the pipeline
         changes, rather than on every read.
+
         """
         filters = self._all_filters()
         if use_original or not filters:
             return self.db_path
         if self._filtered_db_path is None:
-            filtered = self.db_path.with_suffix(".filtered.duckdb")
-            with OCEL.read_duckdb(self.db_path) as origin:
+            self._filtered_generation += 1
+            filtered = self.db_path.with_suffix(
+                f".filtered.{self._filtered_generation}.duckdb"
+            )
+            with OCEL.read_duckdb(self.db_path, read_only=True) as origin:
                 with origin.filter(filters) as subset:
                     subset.to_duckdb(filtered)
             self._filtered_db_path = filtered
@@ -61,9 +63,8 @@ class SessionOCEL:
         writing to it. Its tables are read out of the file only as they are asked
         for, so this call itself loads nothing.
         """
-        ocel = OCEL.read_duckdb(self._active_path(use_original))
-        if self.extensions:
-            ocel.extensions.set(self.extensions)
+        ocel = OCEL.read_duckdb(self._active_path(use_original), read_only=True)
+
         return ocel
 
     def export(self, target_path: Path, use_original: bool = False) -> None:
@@ -76,9 +77,6 @@ class SessionOCEL:
         extension (``.json`` / ``.xml`` / ``.sqlite``).
         """
         export_duckdb_ocel(self._active_path(use_original), target_path)
-        for extension in self.extensions:
-            if target_path.suffix in getattr(extension, "supported_extensions", []):
-                extension.export_extension(target_path)
 
     def _drop_filtered(self) -> None:
         if self._filtered_db_path is not None:

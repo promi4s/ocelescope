@@ -66,47 +66,49 @@ const TimeFrameSlider: React.FC<{
   endTime: string;
   onChange: (newTimeFrame: [string, string]) => void;
 }> = ({ timeInfo, startTime, endTime, onChange }) => {
-  const startIndex = useMemo(
-    () =>
-      timeInfo.date_distribution.findIndex(
-        ({ start_timestamp, end_timestamp }) =>
-          dayjs(startTime).isBetween(
-            start_timestamp,
-            end_timestamp,
-            null,
-            "[)",
-          ),
-      ),
-    [startTime, timeInfo.date_distribution],
-  );
+  const distribution = timeInfo.date_distribution;
+  const lastIndex = distribution.length - 1;
 
-  const endIndex = useMemo(
-    () =>
-      timeInfo.date_distribution.findLastIndex(
-        ({ start_timestamp, end_timestamp }) =>
-          dayjs(endTime).isBetween(start_timestamp, end_timestamp, null, "(]"),
-      ),
-    [endTime, timeInfo.date_distribution],
-  );
+  const startIndex = useMemo(() => {
+    const index = distribution.findIndex(({ end_timestamp }) =>
+      dayjs(startTime).isBefore(end_timestamp),
+    );
+
+    return index === -1 ? Math.max(lastIndex, 0) : index;
+  }, [startTime, distribution, lastIndex]);
+
+  const endIndex = useMemo(() => {
+    const index = distribution.findLastIndex(({ start_timestamp }) =>
+      dayjs(endTime).isAfter(start_timestamp),
+    );
+
+    return index === -1 ? 0 : index;
+  }, [endTime, distribution]);
+
+  if (lastIndex < 0) {
+    return null;
+  }
 
   return (
     <RangeSlider
       min={0}
-      max={timeInfo.date_distribution.length - 1}
+      max={lastIndex}
       minRange={0}
       value={[startIndex, endIndex]}
-      label={(value) =>
-        dayjs(timeInfo.date_distribution[value]!.start_timestamp).format(
-          "YYYY-MM-DD HH:mm",
-        )
-      }
+      label={(value) => {
+        const bucket = distribution[value];
+
+        return bucket
+          ? dayjs(bucket.start_timestamp).format("YYYY-MM-DD HH:mm")
+          : null;
+      }}
       onChange={([start, end]) => {
         onChange([
           //TODO: Find out why index shift is happening
           start === startIndex
             ? startTime
-            : timeInfo.date_distribution[start]!.start_timestamp,
-          timeInfo.date_distribution[end]!.end_timestamp,
+            : (distribution[start]?.start_timestamp ?? startTime),
+          distribution[end]?.end_timestamp ?? endTime,
         ]);
       }}
     />

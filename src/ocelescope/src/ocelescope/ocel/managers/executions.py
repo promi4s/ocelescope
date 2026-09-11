@@ -24,19 +24,8 @@ from ocelescope.ocel.constants.pm4py import (
 from ocelescope.ocel.managers.base import BaseManager
 from ocelescope.ocel.util.hash import hash_string_list
 
-#: Orders an object's events into its execution sequence.
-#:
-#: Events sharing a timestamp have no inherent order, yet the order decides the
-#: activity sequence and so the variant. Breaking the tie by ``ocel:activity``
-#: makes that choice canonical: an execution depends only on *which* activities
-#: happened *when*, so two objects with the same timed activities always land in
-#: the same variant -- never split apart by an incidental detail like the order
-#: their rows are stored in. ``ocel:eid`` then breaks the remaining tie (one
-#: object, one instant, the same activity twice), which cannot move an activity
-#: but does pin ``eid_list``.
 _EVENT_ORDER = f'e."{TIMESTAMP_COL}", e."{ACTIVITY_COL}", e."{EID_COL}"'
 
-#: An object joined to each of its events, the shape every execution is built from.
 _FROM_OBJECT_EVENTS = (
     f"FROM objects o "
     f'JOIN e2o r ON o."{OID_COL}" = r."{OID_COL}" '
@@ -119,17 +108,12 @@ class ExecutionsManager(BaseManager):
         )
         executions = self._relation(query, params).df().set_index(OID_COL)
 
-        # DuckDB hands a LIST column back as a numpy array, so the sequences are
-        # unpacked into plain lists.
         for column in (EXECUTION_ACT_LIST_COL, EXECUTION_EID_LIST_COL):
             if column in executions.columns:
                 executions[column] = executions[column].apply(list)
         if EXECUTION_TSTAMP_LIST_COL in executions.columns:
-            # A LIST loses its element type's time zone on the way out, leaving a
-            # naive datetime64 of the UTC reading. Restoring UTC keeps these
-            # timestamps comparable to every other one the OCEL hands out.
             executions[EXECUTION_TSTAMP_LIST_COL] = executions[EXECUTION_TSTAMP_LIST_COL].apply(
-                lambda times: [pd.Timestamp(time, tz="UTC") for time in times]
+                lambda times: [pd.Timestamp(time) for time in times]
             )
 
         executions[EXECUTION_VARIANT_ID_COL] = self._variant_ids(
@@ -185,8 +169,6 @@ class ExecutionsManager(BaseManager):
         params: list[object] = []
         where = self._type_filter([object_type], params)
 
-        # Group first, so only one row per variant is read and only one hash is
-        # computed per distinct sequence rather than one per object.
         query = (
             f"WITH executions AS ("
             f'SELECT o."{OID_COL}" AS oid, o."{OTYPE_COL}" AS otype, '

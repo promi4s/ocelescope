@@ -1,10 +1,10 @@
 {
   "name": "ocelescope-workspace",
   "private": "true",
-  "packageManager": "pnpm@11.15.1+sha512.81350b07e53c9538a02f1f2303b4290fa2d7be04e56e2a970c4cc4b417dc761de196edabd49d55c7dc9580db81007c44143e4e3d7e462b3000d23c255122d065",
+  "packageManager": "pnpm@12.3.4+sha512.961aa41fb077da3a04a441d9f8e15ebc0c96da8ef710b2eb67bf9ee7cb0610eabd48f1fd85f51cffe73846785fa0f87c56a3a872a1d893f8446741b5cce45457",
   "scripts": {
     "init:backend": "uv sync --all-packages",
-    "init:frontend": "pnpm i && pnpm run api:sync && pnpm run build:frontend",
+    "init:frontend": "pnpm i && pnpm run api:sync",
     "init": "pnpm run init:backend && pnpm run init:frontend",
     "build:frontend": "pnpm -r --filter \"!@ocelescope/app\" run build",
     "lint:frontend": "biome check .",
@@ -14,28 +14,27 @@
     "typecheck:backend": "uv run ty check ./src/",
     "typecheck": "pnpm run typecheck:backend && pnpm run typecheck:frontend",
     "format:frontend": "biome format --write ./src/frontend",
-    "format:backend": "uv run ruff format ./src/backend & uv run ruff format ./src/ocelescope",
+    "format:backend": "uv run ruff format ./src/",
     "format": "pnpm run format:frontend && pnpm run format:backend",
+    "check:frontend": "biome check --write .",
+    "check:backend": "uv run ruff check --fix ./src/ && uv run ruff format ./src/",
+    "check": "pnpm run check:backend && pnpm run check:frontend",
     "api:generate": "pnpm -r --if-present --parallel run generate:api",
     "api:sync": "pnpm --filter @ocelescope/api-config run build && pnpm run api:generate && pnpm run build:frontend",
-    "docs:dev": "uv sync --group docs && uv run mkdocs serve --livereload",
-    "docs:update": "uv run scripts/update_plugins.py && uv run --package ocelescope pip freeze >> docs/data/pluginEnviroment.txt",
     "dev:deps": "pnpm -r --parallel --filter \"!@ocelescope/app\" run dev",
     "dev:frontend": "pnpm -r --parallel --filter \"@ocelescope/app\" run dev",
     "dev:backend": "uv run ocelescope-backend serve --reload --reload-dir src/backend/ --env-file src/backend/.env",
     "dev:app": "pnpm run dev:backend & pnpm run dev:frontend",
     "docker:up": "docker compose -f docker-compose.yml up --build",
     "docker:down": "docker compose down",
-    "spellcheck": "cspell \"README.md\" \"CONTRIBUTING.md\" \"docs/**/*.md\" \".github/**/*.yml\" \"src/**/*.py\" \"src/**/*.ts\" \"src/**/*.tsx\" --no-progress --no-must-find-files",
-    "notebook": "uv run --with jupyterlab --with jupyter-ruff jupyter lab notebooks/"
+    "spellcheck": "cspell \"README.md\" \"CONTRIBUTING.md\" \".github/**/*.yml\" \"src/**/*.py\" \"src/**/*.ts\" \"src/**/*.tsx\" --no-progress --no-must-find-files",
+    "notebook": "uv run --with jupyterlab --with jupyter-ruff jupyter lab notebooks/",
+    "version:bump": "uv run scripts/bump_version.py"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.5",
+    "@biomejs/biome": "catalog:",
     "@tsconfig/strictest": "catalog:",
+    "cspell": "catalog:",
     "orval": "catalog:"
-  },
-  "dependencies": {
-    "orval": "catalog:",
-    "cspell": "catalog:"
   }
 }

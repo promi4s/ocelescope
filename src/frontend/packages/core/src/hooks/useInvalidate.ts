@@ -8,7 +8,7 @@ type InvalidationRouteName =
   | "discoveryMethods";
 
 const ROUTE_PATH: Record<InvalidationRouteName, string> = {
-  ocels: "ocels",
+  ocels: "modules/ocel/",
   resources: "resources",
   tasks: "tasks",
   plugins: "plugins",

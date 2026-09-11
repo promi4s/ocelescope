@@ -9,6 +9,7 @@ import polars
 from ocelescope.ocel.constants.pm4py import ACTIVITY_COL, EID_COL, TIMESTAMP_COL
 from ocelescope.ocel.constants.tables import EVENTS_TABLE
 from ocelescope.ocel.managers.base import BaseManager
+from ocelescope.util.sql import ident
 
 
 class EventsManager(BaseManager):
@@ -81,6 +82,18 @@ class EventsManager(BaseManager):
         self._replace(EVENTS_TABLE, contents)
 
     @property
+    def count(self) -> int:
+        """
+        Return the number of events in the log.
+
+        Returns:
+            int: The number of distinct events.
+        """
+        return self._relation(f'SELECT count(DISTINCT "{EID_COL}") FROM {EVENTS_TABLE}').fetchall()[
+            0
+        ][0]
+
+    @property
     def activities(self) -> list[str]:
         """
         Return all activity names present in the log.
@@ -126,10 +139,14 @@ class EventsManager(BaseManager):
         """
         Return the names of all event attributes.
 
+        Every event attribute has a column of its own on the events table, so the
+        attributes are its columns minus the OCEL ones.
+
         Returns:
             list[str]: A sorted list of event attribute names.
         """
-        return self._attribute_names(EVENTS_TABLE)
+        columns = self._ocel.con.execute(f"DESCRIBE {ident(EVENTS_TABLE)}").fetchall()
+        return sorted(name for name, *_ in columns if not name.startswith("ocel:"))
 
     def get_event_timestamp(self, event_id: str):
         """

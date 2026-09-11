@@ -1,8 +1,13 @@
 import { Input, MultiSelect, NumberInput, Select, Slider } from "@mantine/core";
-import type { FieldProps, FieldTemplateProps, WidgetProps } from "@rjsf/utils";
+import type {
+  DescriptionFieldProps,
+  FieldProps,
+  FieldTemplateProps,
+  WidgetProps,
+} from "@rjsf/utils";
 import validator from "@rjsf/validator-ajv8";
 import dynamic from "next/dynamic";
-import { memo, useMemo } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import type { DiscoverySchema } from "../types";
 
 const Form = dynamic(() => import("@rjsf/mantine").then((m) => m.Form), {
@@ -19,6 +24,17 @@ const MantineSliderWidget = ({
   const min = (schema.minimum ?? schema.exclusiveMinimum) as number;
   const max = (schema.maximum ?? schema.exclusiveMaximum) as number;
   const description = schema.description;
+  const formValue =
+    typeof value === "number" ? value : ((schema.default as number) ?? min);
+  const [sliderValue, setSliderValue] = useState(formValue);
+
+  useEffect(() => setSliderValue(formValue), [formValue]);
+
+  const handleChange = (nextValue: number) => {
+    setSliderValue(nextValue);
+    onChange(nextValue);
+  };
+
   return (
     <>
       <Input.Label required={required}>{label}</Input.Label>
@@ -30,24 +46,18 @@ const MantineSliderWidget = ({
         step={0.0001}
         decimalScale={4}
         hideControls
-        value={
-          typeof value === "number"
-            ? value
-            : ((schema.default as number) ?? min)
+        value={sliderValue}
+        onChange={(nextValue) =>
+          typeof nextValue === "number" && handleChange(nextValue)
         }
-        onChange={(v) => typeof v === "number" && onChange(v)}
       />
       <Slider
         min={min}
         max={max}
         step={0.0001}
         label={(v) => v.toFixed(4)}
-        value={
-          typeof value === "number"
-            ? value
-            : ((schema.default as number) ?? min)
-        }
-        onChange={onChange}
+        value={sliderValue}
+        onChange={handleChange}
       />
     </>
   );
@@ -71,7 +81,17 @@ const FieldTemplate = ({
   );
 };
 
-const TEMPLATES = { FieldTemplate };
+const DescriptionFieldTemplate = ({
+  id,
+  description,
+}: DescriptionFieldProps) =>
+  description ? (
+    <Input.Description id={id} mt={-8} mb={8}>
+      {description}
+    </Input.Description>
+  ) : null;
+
+const TEMPLATES = { DescriptionFieldTemplate, FieldTemplate };
 
 const UI_SCHEMA_BASE = {
   "ui:submitButtonOptions": { norender: true },

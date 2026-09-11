@@ -10,7 +10,7 @@
         "tags": [
           "session"
         ],
-        "summary": "Upload ocels, resources or tasks",
+        "summary": "Upload logs, plugins, or resources",
         "operationId": "upload",
         "requestBody": {
           "content": {
@@ -607,7 +607,7 @@
                 "schema": {
                   "anyOf": [
                     {
-                      "$ref": "#/components/schemas/PluginMethod"
+                      "$ref": "#/components/schemas/MethodApi"
                     },
                     {
                       "type": "null"
@@ -737,21 +737,7 @@
                     {
                       "type": "array",
                       "items": {
-                        "oneOf": [
-                          {
-                            "$ref": "#/components/schemas/OCELOutput"
-                          },
-                          {
-                            "$ref": "#/components/schemas/ResourceOutput"
-                          }
-                        ],
-                        "discriminator": {
-                          "propertyName": "type",
-                          "mapping": {
-                            "ocel": "#/components/schemas/OCELOutput",
-                            "resource": "#/components/schemas/ResourceOutput"
-                          }
-                        }
+                        "$ref": "#/components/schemas/PluginOutput"
                       }
                     },
                     {
@@ -818,7 +804,11 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Body_savePluginResults"
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ResultSelection"
+                },
+                "title": "Selection"
               }
             }
           }
@@ -999,7 +989,7 @@
         "operationId": "resources",
         "parameters": [
           {
-            "name": "resource_type",
+            "name": "schema_hash",
             "in": "query",
             "required": false,
             "schema": {
@@ -1011,7 +1001,7 @@
                   "type": "null"
                 }
               ],
-              "title": "Resource Type"
+              "title": "Schema Hash"
             }
           }
         ],
@@ -1027,43 +1017,6 @@
                   },
                   "title": "Response Resources"
                 }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "resources"
-        ],
-        "summary": "Upload Resource",
-        "operationId": "uploadResource",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "$ref": "#/components/schemas/Body_uploadResource"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
               }
             }
           },
@@ -1333,20 +1286,6 @@
       },
       "Body_getComputedValues": {
         "properties": {
-          "input_ocels": {
-            "additionalProperties": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ]
-            },
-            "type": "object",
-            "title": "Input Ocels"
-          },
           "input_resources": {
             "additionalProperties": {
               "anyOf": [
@@ -1361,32 +1300,31 @@
             "type": "object",
             "title": "Input Resources"
           },
-          "input": {
+          "configuration_input": {
             "additionalProperties": true,
             "type": "object",
-            "title": "Input"
+            "title": "Configuration Input"
           }
         },
         "type": "object",
         "required": [
-          "input_ocels",
           "input_resources",
-          "input"
+          "configuration_input"
         ],
         "title": "Body_getComputedValues"
       },
       "Body_runPlugin": {
         "properties": {
-          "input_ocels": {
-            "additionalProperties": {
-              "type": "string"
-            },
-            "type": "object",
-            "title": "Input Ocels"
-          },
           "input_resources": {
             "additionalProperties": {
-              "type": "string"
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
             },
             "type": "object",
             "title": "Input Resources"
@@ -1400,26 +1338,9 @@
         },
         "type": "object",
         "required": [
-          "input_ocels",
           "input_resources"
         ],
         "title": "Body_runPlugin"
-      },
-      "Body_savePluginResults": {
-        "properties": {
-          "indices": {
-            "items": {
-              "type": "integer"
-            },
-            "type": "array",
-            "title": "Indices"
-          }
-        },
-        "type": "object",
-        "required": [
-          "indices"
-        ],
-        "title": "Body_savePluginResults"
       },
       "Body_upload": {
         "properties": {
@@ -1437,20 +1358,6 @@
           "files"
         ],
         "title": "Body_upload"
-      },
-      "Body_uploadResource": {
-        "properties": {
-          "file": {
-            "type": "string",
-            "contentMediaType": "application/octet-stream",
-            "title": "File"
-          }
-        },
-        "type": "object",
-        "required": [
-          "file"
-        ],
-        "title": "Body_uploadResource"
       },
       "CreateDiscoveryTaskBody": {
         "properties": {
@@ -2285,6 +2192,91 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
+      "MethodApi": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "inputs": {
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/OCELIOApi"
+                },
+                {
+                  "$ref": "#/components/schemas/ResourceIOApi"
+                }
+              ],
+              "discriminator": {
+                "propertyName": "type",
+                "mapping": {
+                  "ocel": "#/components/schemas/OCELIOApi",
+                  "resource": "#/components/schemas/ResourceIOApi"
+                }
+              }
+            },
+            "type": "array",
+            "title": "Inputs"
+          },
+          "outputs": {
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/OCELIOApi"
+                },
+                {
+                  "$ref": "#/components/schemas/ResourceIOApi"
+                }
+              ],
+              "discriminator": {
+                "propertyName": "type",
+                "mapping": {
+                  "ocel": "#/components/schemas/OCELIOApi",
+                  "resource": "#/components/schemas/ResourceIOApi"
+                }
+              }
+            },
+            "type": "array",
+            "title": "Outputs"
+          },
+          "configuration_schema": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Configuration Schema"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "label",
+          "inputs",
+          "outputs"
+        ],
+        "title": "MethodApi"
+      },
       "NodeStyle": {
         "properties": {
           "double_border": {
@@ -2334,8 +2326,12 @@
         "title": "NodeStyle",
         "description": "Visual style options for a `GraphNode`.\n\nAttributes:\n    double_border: Renders a second border inside the node (e.g. final-marking places).\n    inner_symbol: Optional symbol rendered inside the node shape.\n    initial_tokens: Optional initial token count rendered inside a place node.\n    final_tokens: Optional final token count rendered inside a place node."
       },
-      "OCELAnnotation": {
+      "OCELIOApi": {
         "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
           "label": {
             "type": "string",
             "title": "Label"
@@ -2351,89 +2347,30 @@
             ],
             "title": "Description"
           },
-          "extension": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Extension"
-          }
-        },
-        "type": "object",
-        "required": [
-          "label"
-        ],
-        "title": "OCELAnnotation",
-        "description": "UI annotation metadata for an `OCEL`-typed parameter or result.\n\nIn addition to the base `Annotation` fields, this annotation may specify an\nOCEL extension. To keep the annotation JSON-serializable and stable for\nfrontend consumption, the constructor accepts an `OCELExtension` class and\ncoerces it to its class name (a string).\n\nAttributes:\n    label: Human-readable label to display in the UI.\n    description: Optional longer text shown in the UI to explain the OCEL.\n    extension: Optional extension identifier. If constructed with an\n        `OCELExtension` class, it is coerced to that class' name."
-      },
-      "OCELOutput": {
-        "properties": {
-          "result_index": {
-            "type": "integer",
-            "title": "Result Index"
-          },
-          "type": {
-            "type": "string",
-            "const": "ocel",
-            "title": "Type"
-          },
-          "activity_count": {
-            "additionalProperties": {
-              "type": "integer"
-            },
-            "type": "object",
-            "title": "Activity Count"
-          },
-          "object_count": {
-            "additionalProperties": {
-              "type": "integer"
-            },
-            "type": "object",
-            "title": "Object Count"
-          }
-        },
-        "type": "object",
-        "required": [
-          "result_index",
-          "type",
-          "activity_count",
-          "object_count"
-        ],
-        "title": "OCELOutput"
-      },
-      "OCELResult": {
-        "properties": {
-          "type": {
-            "type": "string",
-            "const": "ocel",
-            "title": "Type",
-            "default": "ocel"
+          "is_optional": {
+            "type": "boolean",
+            "title": "Is Optional"
           },
           "is_list": {
             "type": "boolean",
             "title": "Is List"
           },
-          "annotation": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/OCELAnnotation"
-              },
-              {
-                "type": "null"
-              }
-            ]
+          "type": {
+            "type": "string",
+            "const": "ocel",
+            "title": "Type"
           }
         },
         "type": "object",
         "required": [
+          "name",
+          "label",
+          "description",
+          "is_optional",
           "is_list",
-          "annotation"
+          "type"
         ],
-        "title": "OCELResult"
+        "title": "OCELIOApi"
       },
       "Plotly": {
         "properties": {
@@ -2463,12 +2400,32 @@
             "type": "string",
             "title": "Id"
           },
-          "meta": {
-            "$ref": "#/components/schemas/PluginMeta"
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
           },
           "methods": {
             "items": {
-              "$ref": "#/components/schemas/PluginMethod"
+              "$ref": "#/components/schemas/MethodApi"
             },
             "type": "array",
             "title": "Methods"
@@ -2477,285 +2434,26 @@
         "type": "object",
         "required": [
           "id",
-          "meta",
+          "name",
+          "version",
+          "label",
           "methods"
         ],
         "title": "PluginApi"
       },
-      "PluginMeta": {
-        "properties": {
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "version": {
-            "type": "string",
-            "title": "Version"
-          },
-          "label": {
-            "type": "string",
-            "title": "Label"
-          },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description"
-          }
-        },
-        "type": "object",
-        "required": [
-          "name",
-          "version",
-          "label",
-          "description"
-        ],
-        "title": "PluginMeta"
-      },
-      "PluginMethod": {
-        "properties": {
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "label": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Label"
-          },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description"
-          },
-          "input_ocels": {
-            "additionalProperties": {
-              "$ref": "#/components/schemas/OCELAnnotation"
-            },
-            "type": "object",
-            "title": "Input Ocels"
-          },
-          "input_resources": {
-            "additionalProperties": {
-              "prefixItems": [
-                {
-                  "type": "string"
-                },
-                {
-                  "$ref": "#/components/schemas/ResourceAnnotation"
-                }
-              ],
-              "type": "array",
-              "maxItems": 2,
-              "minItems": 2
-            },
-            "type": "object",
-            "title": "Input Resources"
-          },
-          "results": {
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/OCELResult"
-                },
-                {
-                  "$ref": "#/components/schemas/ResourceResult"
-                }
-              ],
-              "discriminator": {
-                "propertyName": "type",
-                "mapping": {
-                  "ocel": "#/components/schemas/OCELResult",
-                  "resource": "#/components/schemas/ResourceResult"
-                }
-              }
-            },
-            "type": "array",
-            "title": "Results"
-          },
-          "input_schema": {
-            "anyOf": [
-              {
-                "additionalProperties": true,
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Input Schema",
-            "readOnly": true
-          }
-        },
-        "type": "object",
-        "required": [
-          "name",
-          "input_schema"
-        ],
-        "title": "PluginMethod"
-      },
-      "PluginSource": {
-        "properties": {
-          "task_id": {
-            "type": "string",
-            "title": "Task Id"
-          },
-          "plugin_name": {
-            "type": "string",
-            "title": "Plugin Name"
-          },
-          "method_name": {
-            "type": "string",
-            "title": "Method Name"
-          },
-          "version": {
-            "type": "string",
-            "title": "Version"
-          }
-        },
-        "type": "object",
-        "required": [
-          "task_id",
-          "plugin_name",
-          "method_name",
-          "version"
-        ],
-        "title": "PluginSource"
-      },
-      "Resource": {
-        "properties": {
-          "_ocelescope_resource_type": {
-            "type": "string",
-            "title": "Ocelescope Resource Type",
-            "readOnly": true
-          }
-        },
-        "type": "object",
-        "required": [
-          "_ocelescope_resource_type"
-        ],
-        "title": "Resource",
-        "description": "Abstract base class for resources.\n\nAttributes:\n    label: Optional human-readable label for this resource class.\n    description: Optional human-readable description for this resource class."
-      },
-      "ResourceAnnotation": {
-        "properties": {
-          "label": {
-            "type": "string",
-            "title": "Label"
-          },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description"
-          }
-        },
-        "type": "object",
-        "required": [
-          "label"
-        ],
-        "title": "ResourceAnnotation",
-        "description": "UI annotation metadata for a `Resource`-typed parameter or result.\n\nThis annotation is used to provide frontend-facing text (label/description)\nfor resources.\n\nAttributes:\n    label: Human-readable label to display in the UI.\n    description: Optional longer text shown in the UI to explain the resource."
-      },
-      "ResourceApi": {
-        "properties": {
-          "type": {
-            "type": "string",
-            "title": "Type"
-          },
-          "created_at": {
-            "type": "string",
-            "title": "Created At"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "source": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/PluginSource"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "id": {
-            "type": "string",
-            "title": "Id"
-          }
-        },
-        "type": "object",
-        "required": [
-          "type",
-          "name",
-          "source",
-          "id"
-        ],
-        "title": "ResourceApi"
-      },
-      "ResourceInfo": {
-        "properties": {
-          "label": {
-            "type": "string",
-            "title": "Label"
-          },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description"
-          }
-        },
-        "type": "object",
-        "required": [
-          "label",
-          "description"
-        ],
-        "title": "ResourceInfo"
-      },
-      "ResourceOutput": {
+      "PluginOutput": {
         "properties": {
           "result_index": {
             "type": "integer",
             "title": "Result Index"
           },
-          "type": {
+          "default_name": {
             "type": "string",
-            "const": "resource",
-            "title": "Type"
+            "title": "Default Name"
           },
-          "resource_type": {
+          "type_label": {
             "type": "string",
-            "title": "Resource Type"
+            "title": "Type Label"
           },
           "visualization": {
             "anyOf": [
@@ -2798,46 +2496,160 @@
         "type": "object",
         "required": [
           "result_index",
-          "type",
-          "resource_type",
+          "default_name",
+          "type_label",
           "visualization"
         ],
-        "title": "ResourceOutput"
+        "title": "PluginOutput"
       },
-      "ResourceResult": {
+      "ResourceApi": {
         "properties": {
-          "type": {
+          "name": {
             "type": "string",
-            "const": "resource",
-            "title": "Type",
-            "default": "resource"
+            "title": "Name"
           },
-          "resource_type": {
+          "created_at": {
             "type": "string",
-            "title": "Resource Type"
+            "title": "Created At"
+          },
+          "source_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Id"
+          },
+          "schema_hash": {
+            "type": "string",
+            "title": "Schema Hash"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "resource_type_label": {
+            "type": "string",
+            "title": "Resource Type Label"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "schema_hash",
+          "id",
+          "resource_type_label"
+        ],
+        "title": "ResourceApi"
+      },
+      "ResourceIOApi": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "is_optional": {
+            "type": "boolean",
+            "title": "Is Optional"
           },
           "is_list": {
             "type": "boolean",
             "title": "Is List"
           },
-          "annotation": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/ResourceAnnotation"
-              },
-              {
-                "type": "null"
-              }
-            ]
+          "type": {
+            "type": "string",
+            "const": "resource",
+            "title": "Type"
+          },
+          "schema_id": {
+            "type": "string",
+            "title": "Schema Id"
+          },
+          "resource_label": {
+            "type": "string",
+            "title": "Resource Label"
           }
         },
         "type": "object",
         "required": [
-          "resource_type",
+          "name",
+          "label",
+          "description",
+          "is_optional",
           "is_list",
-          "annotation"
+          "type",
+          "schema_id",
+          "resource_label"
         ],
-        "title": "ResourceResult"
+        "title": "ResourceIOApi"
+      },
+      "ResourceInfo": {
+        "properties": {
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          }
+        },
+        "type": "object",
+        "required": [
+          "label",
+          "description"
+        ],
+        "title": "ResourceInfo"
+      },
+      "ResultSelection": {
+        "properties": {
+          "index": {
+            "type": "integer",
+            "title": "Index"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "index",
+          "name"
+        ],
+        "title": "ResultSelection"
       },
       "SVGVis": {
         "properties": {

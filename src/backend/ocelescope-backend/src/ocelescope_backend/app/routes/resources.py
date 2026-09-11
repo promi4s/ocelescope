@@ -3,14 +3,13 @@ from __future__ import annotations
 import json
 from typing import Optional, cast
 
-from fastapi.datastructures import UploadFile
 from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
 from pydantic.main import BaseModel
 
 from ocelescope import PetriNet, Visualization
 from ocelescope_backend.app.dependencies import ApiSession
-from ocelescope_backend.app.internal.model.resource import ResourceApi, ResourceStore
+from ocelescope_backend.app.internal.model.resource import ResourceApi
 from ocelescope_backend.app.internal.model.response import TempFileResponse
 from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.registry.registry_manager import ResourceInfo
@@ -20,12 +19,12 @@ resource_router = APIRouter(prefix="/resources", tags=["resources"])
 
 @resource_router.get(path="", operation_id="resources")
 def get_resources(
-    session: ApiSession, resource_type: Optional[str] = None
+    session: ApiSession, schema_hash: Optional[str] = None
 ) -> list[ResourceApi]:
     return [
         resource
         for resource in session.list_resources()
-        if resource_type is None or resource.type == resource_type
+        if schema_hash is None or resource.schema_hash == schema_hash
     ]
 
 
@@ -34,28 +33,12 @@ def get_resource_meta() -> dict[str, ResourceInfo]:
     return registry_manager.get_resource_info()
 
 
-@resource_router.post("", operation_id="uploadResource")
-async def upload_resource(file: UploadFile, session: ApiSession):
-    if file.content_type not in {"application/json", "application/octet-stream", None}:
-        raise HTTPException(status_code=400, detail="Only JSON files are supported.")
-
-    try:
-        contents = await file.read()
-        data = json.loads(contents)
-        resource = ResourceStore(**data)
-    except Exception:
-        raise HTTPException(status_code=400, detail="Invalid JSON file.")
-
-    session.add_resource(
-        resource,
-    )
-
-
 @resource_router.get(
     "/resource/{resource_id}/download", operation_id="downloadResource"
 )
 def download_resource(session: ApiSession, resource_id: str) -> TempFileResponse:
     resource = session.get_resource(id=resource_id)
+
     file_response = TempFileResponse(
         prefix=resource.name,
         suffix=".ocelescope",
@@ -63,7 +46,7 @@ def download_resource(session: ApiSession, resource_id: str) -> TempFileResponse
     )
 
     with open(file_response.tmp_path, "w", encoding="utf-8") as output_file:
-        json.dump(resource.model_dump(mode="json"), output_file, indent=2)
+        json.dump(resource.export(), output_file, indent=2)
 
     return file_response
 
@@ -77,7 +60,9 @@ def download_resource_as_pnml(
     import pm4py
 
     resource = session.get_resource(id=resource_id)
-    resource_instance = registry_manager.get_resource_instance(resource)
+    resource_instance = registry_manager.get_resource_instance(
+        resource.data, registry_manager._CORE_RESOURCE_NAMESPACE
+    )
 
     if not isinstance(resource_instance, PetriNet):
         raise HTTPException(status_code=400, detail="Resource is not a Petri net.")
@@ -103,11 +88,12 @@ class GetResourceResponse(BaseModel):
 def get_resource(session: ApiSession, resource_id: str) -> GetResourceResponse:
     resource = session.get_resource(resource_id)
 
-    resource_instance = registry_manager.get_resource_instance(resource)
+    resource_instance = registry_manager.get_resource_instance(resource.data)
 
     return GetResourceResponse(
         resource=ResourceApi(
             id=resource_id,
+            resource_type_label=resource_instance.get_label(),
             **resource.model_dump(),
         ),
         visualization=cast(Visualization, resource_instance.visualize())

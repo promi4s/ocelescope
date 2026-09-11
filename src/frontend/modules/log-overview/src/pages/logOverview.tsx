@@ -15,6 +15,8 @@ import {
 import { EntityBarList } from "../components/EntityBarList/EntityBarList";
 import OCELInfo from "../components/OcelInfo";
 
+const TABLE_HEIGHT = 500;
+
 const LogOverviewPage = () => {
   const { id } = useCurrentOcel();
   if (!id) {
@@ -47,10 +49,18 @@ const LogOverviewPage = () => {
                 <Tabs.Tab value="objects">Objects</Tabs.Tab>
               </Tabs.List>
               <Tabs.Panel value="events">
-                <AttributesTable ocelId={id} entityType="events" />
+                <AttributesTable
+                  ocelId={id}
+                  entityType="events"
+                  height={TABLE_HEIGHT}
+                />
               </Tabs.Panel>
               <Tabs.Panel value="objects">
-                <AttributesTable ocelId={id} entityType="objects" />
+                <AttributesTable
+                  ocelId={id}
+                  entityType="objects"
+                  height={TABLE_HEIGHT}
+                />
               </Tabs.Panel>
             </Tabs>
           </Stack>

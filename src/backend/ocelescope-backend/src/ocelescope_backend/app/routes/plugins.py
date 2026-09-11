@@ -4,30 +4,30 @@ import zipfile
 from datetime import datetime
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import Body
 from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
 from pydantic import BaseModel
 
-from ocelescope import OCEL, PluginMethod, Resource
+from ocelescope import OCEL
 from ocelescope_backend.app.dependencies import ApiPluginTask, ApiSession
 from ocelescope_backend.app.internal.config import config
-from ocelescope_backend.app.internal.model.plugin import (
-    OCELOutput,
-    PluginApi,
+from ocelescope_backend.app.internal.exceptions import NotFound
+from ocelescope_backend.app.internal.model.plugin import MethodApi, PluginApi
+from ocelescope_backend.app.internal.model.plugin_result import (
     PluginOutput,
-    ResourceOutput,
+    ResultSelection,
 )
 from ocelescope_backend.app.internal.model.resource import ResourceStore
 from ocelescope_backend.app.internal.model.response import TempFileResponse
 from ocelescope_backend.app.internal.registry import registry_manager
-from ocelescope_backend.app.internal.tasks.base import _call_with_known_params
+from ocelescope_backend.app.internal.registry.resource import RegistryError
+from ocelescope_backend.app.internal.tasks.base import call_with_known_params
 from ocelescope_backend.app.internal.tasks.plugin import PluginTask
 from ocelescope_backend.app.internal.util.plugin_result import (
     default_result_name,
-    plugin_source,
     select_results,
 )
 from ocelescope_backend.app.sse_manager import (
@@ -47,38 +47,39 @@ def get_plugins() -> list[PluginApi]:
 def get_plugin(plugin_id: str) -> PluginApi | None:
     plugin = registry_manager.get_plugin(plugin_id)
 
-    return (
-        PluginApi(
-            id=plugin_id, meta=plugin.meta(), methods=list(plugin.method_map().values())
-        )
-        if plugin
-        else None
-    )
+    if not plugin:
+        raise NotFound(f"No plugin found for {plugin_id!r}")
+
+    return PluginApi.from_plugin(plugin_id, plugin)
 
 
 @plugin_router.get("/{plugin_id}/{method_name}", operation_id="getPluginMethod")
-def get_plugin_method(plugin_id: str, method_name: str) -> PluginMethod | None:
+def get_plugin_method(plugin_id: str, method_name: str) -> MethodApi | None:
     try:
-        return registry_manager.get_plugin_method(plugin_id, method_name)
+        return MethodApi.from_method_meta(
+            registry_manager.get_plugin_method(plugin_id, method_name)
+        )
     except Exception:
         pass
 
 
 @plugin_router.post("/{plugin_id}/{method_name}", operation_id="runPlugin")
 def run_plugin(
-    input_ocels: dict[str, str],
-    input_resources: dict[str, str],
+    input_resources: dict[str, str | None],
     session: ApiSession,
     plugin_id: str,
     method_name: str,
     input: dict[str, Any] = {},
 ) -> str:
-    return PluginTask.create_plugin_task(
-        session,
-        plugin_id=plugin_id,
-        method_name=method_name,
-        input={"input": input, "ocels": input_ocels, "resources": input_resources},
-    )
+    try:
+        return PluginTask.create_plugin_task(
+            session,
+            plugin_id=plugin_id,
+            method_name=method_name,
+            input={"input": input, "input_resources": input_resources},
+        )
+    except RegistryError as error:
+        raise NotFound(str(error))
 
 
 @plugin_router.get(
@@ -90,12 +91,7 @@ def get_plugin_result(
     if plugin_task.result is None:
         return None
 
-    return [
-        OCELOutput.from_ocel(index, result)
-        if isinstance(result, OCEL)
-        else ResourceOutput.from_resource(index, result)
-        for index, result in enumerate(plugin_task.result)
-    ]
+    return PluginOutput.from_plugin_result(plugin_task)
 
 
 class SavedResults(BaseModel):
@@ -112,28 +108,25 @@ def save_plugin_results(
     plugin_task: ApiPluginTask,
     plugin_id: str,
     method_name: str,
-    task_id: str,
-    indices: list[int] = Body(embed=True),
+    selection: list[ResultSelection],
 ) -> SavedResults:
     """Save the selected results into the session as OCELs / resources."""
-    selected = select_results(plugin_task, indices)
-    source = plugin_source(plugin_id, method_name, task_id)
+    selected = select_results(plugin_task, [result.index for result in selection])
 
     saved = SavedResults(ocel_ids=[], resource_ids=[])
 
     for index, entity in selected:
-        name = default_result_name(plugin_id, method_name, index)
+        name = next(result.name for result in selection) or default_result_name(
+            plugin_id=plugin_id, method_name=method_name, index=index
+        )
 
         if isinstance(entity, OCEL):
             saved.ocel_ids.append(session.add_ocel(entity, name))
         else:
             saved.resource_ids.append(
                 session.add_resource(
-                    ResourceStore(
-                        name=name,
-                        type=entity.get_type(),
-                        source=source,
-                        data=entity.model_dump(mode="json"),
+                    ResourceStore.from_resource(
+                        name=name, source_id=plugin_id, resource=entity
                     )
                 )
             )
@@ -149,12 +142,10 @@ def download_plugin_results(
     plugin_task: ApiPluginTask,
     plugin_id: str,
     method_name: str,
-    task_id: str,
     indices: list[int] = Body(embed=True),
 ) -> TempFileResponse:
     """Bundle the selected results into a zip for download."""
     selected = select_results(plugin_task, indices)
-    source = plugin_source(plugin_id, method_name, task_id)
 
     archive_name = f"{plugin_id}_{method_name}_results"
     file_response = TempFileResponse(
@@ -183,15 +174,13 @@ def download_plugin_results(
                     entity.write(Path(ocel_file.name))
                     archive.write(ocel_file.name, arcname=_unique(name, ".json"))
             else:
-                store = ResourceStore(
-                    name=name,
-                    type=entity.get_type(),
-                    source=source,
-                    data=entity.model_dump(mode="json"),
-                )
+                resource_with_meta = ResourceStore.from_resource(
+                    resource=entity, name=name, source_id=plugin_id
+                ).export()
+
                 archive.writestr(
                     _unique(name, ".ocelescope"),
-                    json.dumps(store.model_dump(mode="json"), indent=2),
+                    json.dumps(resource_with_meta, indent=2),
                 )
 
     return file_response
@@ -201,43 +190,33 @@ def download_plugin_results(
     "/{plugin_id}/{method_name}/computed/{provider}", operation_id="getComputedValues"
 )
 def get_computed(
-    input_ocels: dict[str, Optional[str]],
-    input_resources: dict[str, Optional[str]],
-    input: dict[str, Any],
+    input_resources: dict[str, str | None],
+    configuration_input: dict[str, Any],
     session: ApiSession,
     plugin_id: str,
     provider: str,
     method_name: str,
 ) -> list[str]:
-    method = registry_manager.get_plugin_method(plugin_id, method_name)
+    try:
+        method = registry_manager.get_plugin_method(plugin_id, method_name)
+    except RegistryError as error:
+        raise NotFound(str(error))
 
-    input_class = method._input_model
+    input_class = method.configuration_input
     fn = getattr(input_class, provider, None)
     if fn is None:
-        raise KeyError(f"{method_name}.{provider} not found")
-
-    ocel_args: dict[str, OCEL] = {
-        key: session.get_ocel(ocel_id)
-        for key, ocel_id in input_ocels.items()
-        if ocel_id is not None
-    }
-
-    resource_args: dict[str, Resource | None] = {}
-
-    for key, resource_id in input_resources.items():
-        if not resource_id:
-            continue
-
-        resource = registry_manager.get_resource_instance(
-            session.get_resource(resource_id), plugin_id=plugin_id
-        )
-
-        resource_args[key] = resource
-
-    kwargs = {**ocel_args, **resource_args, "input": input}
+        raise NotFound(f"{method_name}.{provider} not found")
 
     try:
-        return _call_with_known_params(fn, **kwargs)
+        with registry_manager.get_computed_kwargs(
+            session=session,
+            plugin_id=plugin_id,
+            method_name=method_name,
+            input_resources=input_resources,
+        ) as kwargs:
+            kwargs["input"] = configuration_input
+
+            return call_with_known_params(fn, **kwargs)
     except Exception:
         return []
 

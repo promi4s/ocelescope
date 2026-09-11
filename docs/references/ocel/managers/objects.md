@@ -1,1 +1,0 @@
-::: ocelescope.ocel.managers.objects
