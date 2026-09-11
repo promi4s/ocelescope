@@ -1,27 +1,10 @@
 import type { EChartsOption } from "echarts";
+import type { ChartTheme, Primitive, TimelineChartProps } from "../types";
+import { toLabel } from "./data";
+import type { OptionBuilder } from "./engine";
+import { escapeHtml } from "./tooltip";
 
-export interface ObjectAttributeTimelinePoint {
-  label: string;
-  activity?: string;
-}
-
-export type ObjectAttributeTimelineValue = string | number | boolean | null;
-
-export interface ObjectAttributeTimelineConfig {
-  colors?: string[];
-}
-
-const DEFAULT_COLORS = [
-  "#228be6",
-  "#15aabf",
-  "#12b886",
-  "#82c91e",
-  "#fab005",
-  "#fd7e14",
-  "#fa5252",
-  "#be4bdb",
-  "#7950f2",
-];
+/** Independent value scales for columns sharing an ordered timeline. */
 
 // How many attributes get a real, labeled axis on each side before we stop drawing
 // axis lines/labels for the rest (their series and legend entry still work, they just
@@ -31,14 +14,14 @@ const MAX_LABELED_AXES_PER_SIDE = 3;
 const AXIS_OFFSET_STEP = 64;
 const BASE_MARGIN = 56;
 
-function formatValue(value: ObjectAttributeTimelineValue) {
-  if (value === null) return "—";
+function formatValue(value: Primitive) {
+  if (value == null) return "—";
   return String(value);
 }
 
-function isNumericLike(value: ObjectAttributeTimelineValue): boolean {
+function isNumericLike(value: Primitive): boolean {
   if (
-    value === null ||
+    value == null ||
     typeof value === "number" ||
     typeof value === "boolean"
   ) {
@@ -50,8 +33,8 @@ function isNumericLike(value: ObjectAttributeTimelineValue): boolean {
 // ECharts line series only accept numeric/null data points; booleans and
 // numeric-looking strings are coerced for plotting, the raw value is still what the
 // tooltip shows.
-function toPlotValue(value: ObjectAttributeTimelineValue): number | null {
-  if (value === null) return null;
+function toPlotValue(value: Primitive): number | null {
+  if (value == null) return null;
   if (typeof value === "boolean") return value ? 1 : 0;
   if (typeof value === "number") return value;
   const parsed = Number(value);
@@ -61,11 +44,9 @@ function toPlotValue(value: ObjectAttributeTimelineValue): number | null {
 // Attributes whose values aren't (all) numeric -- strings, dates -- get a category
 // y-axis instead, so their changes are still visible as a plotted line rather than a
 // blank/omitted series. Dates sort chronologically; everything else alphabetically.
-function buildCategoryAxis(values: ObjectAttributeTimelineValue[]) {
+function buildCategoryAxis(values: Primitive[]) {
   const distinct = Array.from(
-    new Set(
-      values.filter((value): value is string => typeof value === "string"),
-    ),
+    new Set(values.filter((value) => value != null).map(String)),
   );
   const allDates = distinct.every((value) => !Number.isNaN(Date.parse(value)));
   distinct.sort((a, b) =>
@@ -74,8 +55,8 @@ function buildCategoryAxis(values: ObjectAttributeTimelineValue[]) {
   const indexOf = new Map(distinct.map((value, index) => [value, index]));
   return {
     categories: distinct,
-    toIndex: (value: ObjectAttributeTimelineValue): number | null =>
-      typeof value === "string" ? (indexOf.get(value) ?? null) : null,
+    toIndex: (value: Primitive): number | null =>
+      value != null ? (indexOf.get(String(value)) ?? null) : null,
   };
 }
 
@@ -88,13 +69,17 @@ function buildCategoryAxis(values: ObjectAttributeTimelineValue[]) {
  * (series + tooltip + legend) but stop drawing a visible line/label to avoid
  * unbounded margin growth.
  */
-export function createObjectAttributeTimelineChartOption(
-  points: ObjectAttributeTimelinePoint[],
-  series: Record<string, ObjectAttributeTimelineValue[]>,
-  config: ObjectAttributeTimelineConfig = {},
+function timelineOptionValue(
+  props: TimelineChartProps,
+  theme: ChartTheme,
 ): EChartsOption {
+  const { rows, x, values } = props;
+  const points = rows.map((row) => ({ label: toLabel(row[x]) }));
+  const series = Object.fromEntries(
+    values.map((key) => [key, rows.map((row) => row[key])]),
+  );
   const attributes = Object.keys(series);
-  const colors = config.colors ?? DEFAULT_COLORS;
+  const colors = props.palette ?? theme.palette;
   const categories = points.map((point) => point.label);
 
   const axes = attributes.map((attribute) => {
@@ -130,13 +115,21 @@ export function createObjectAttributeTimelineChartOption(
   return {
     animationDuration: 250,
     color: colors,
+    textStyle: { fontFamily: theme.fontFamily, color: theme.text },
     legend: {
+      show: props.legend ?? true,
       type: "scroll",
       top: 0,
-      textStyle: { fontSize: 11 },
+      textStyle: { fontSize: 11, color: theme.text },
+      inactiveColor: theme.dimmed,
     },
     tooltip: {
+      show: props.tooltip !== false,
       trigger: "axis",
+      backgroundColor: theme.tooltipBackground,
+      borderColor: theme.tooltipBorder,
+      textStyle: { color: theme.text, fontFamily: theme.fontFamily },
+      confine: true,
       formatter: (raw: unknown) => {
         const items = raw as Array<{
           marker?: string;
@@ -147,13 +140,13 @@ export function createObjectAttributeTimelineChartOption(
         if (!first) return "";
         const point = points[first.dataIndex];
         const lines = [
-          point?.activity
-            ? `<strong>${point.activity}</strong>`
-            : "<strong>Attribute change</strong>",
+          `<strong>${escapeHtml(point?.label ?? "")}</strong>`,
           ...items.map(
             (item) =>
-              `${item.marker ?? ""}${item.seriesName ?? ""}: ${formatValue(
-                series[item.seriesName ?? ""]?.[item.dataIndex] ?? null,
+              `${item.marker ?? ""}${escapeHtml(item.seriesName ?? "")}: ${escapeHtml(
+                formatValue(
+                  series[item.seriesName ?? ""]?.[item.dataIndex] ?? null,
+                ),
               )}`,
           ),
         ];
@@ -175,7 +168,9 @@ export function createObjectAttributeTimelineChartOption(
         rotate: 35,
         overflow: "truncate",
         width: 90,
+        color: theme.dimmed,
       },
+      axisLine: { lineStyle: { color: theme.grid } },
     },
     yAxis: attributes.map((attribute, index) => {
       const axis = axes[index] ?? { kind: "numeric" as const };
@@ -198,7 +193,7 @@ export function createObjectAttributeTimelineChartOption(
         axisLine: { show: placement.labeled, lineStyle: { color } },
         axisTick: { show: placement.labeled },
         axisLabel: { show: placement.labeled, color },
-        splitLine: { show: index === 0, lineStyle: { color: "#e9ecef" } },
+        splitLine: { show: index === 0, lineStyle: { color: theme.grid } },
       };
     }),
     series: attributes.map((attribute, index) => {
@@ -219,3 +214,22 @@ export function createObjectAttributeTimelineChartOption(
     }),
   };
 }
+
+export const timelineOption: OptionBuilder<TimelineChartProps> = (
+  props,
+  theme,
+) => ({
+  option: timelineOptionValue(props, theme),
+  select: (params) => {
+    const row = props.rows[params.dataIndex ?? -1];
+    const series = props.values[params.seriesIndex ?? -1];
+    if (!row || !series) return undefined;
+    return {
+      row,
+      rows: [row],
+      category: toLabel(row[props.x]),
+      series,
+      value: row[series],
+    };
+  },
+});
