@@ -372,6 +372,9 @@ importers:
       '@ocelescope/core':
         specifier: workspace:^
         version: link:../../packages/core
+      '@ocelescope/plugin-form':
+        specifier: workspace:^
+        version: link:../../packages/plugin-form
       '@ocelescope/resources':
         specifier: workspace:^
         version: link:../../packages/resources
