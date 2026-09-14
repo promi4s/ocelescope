@@ -49,8 +49,8 @@ const ConfigurationSection: React.FC<ConfigurationSectionProps> = ({
           methodName={methodName}
           schema={schema}
           inputResources={inputResources}
-          value={field.value}
-          onChange={field.onChange}
+          formData={field.value}
+          onChange={({ formData }) => field.onChange(formData)}
           onSubmit={onSubmit}
         />
       )}

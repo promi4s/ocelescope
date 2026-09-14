@@ -1,19 +1,15 @@
 import validator from "@rjsf/validator-ajv8";
-import { useMemo } from "react";
+import { useMemo, type ComponentProps } from "react";
 import { PluginFormProvider } from "./context";
 import CustomSchemaField from "./Fields";
 import { Form } from "./MantineForm";
-import type { PluginFormData, PluginInputResources } from "./types";
+import type { PluginInputResources } from "./types";
 
 export type PluginFormProps = {
-  schema: { [key: string]: any };
-  value: PluginFormData;
-  onChange: (value: PluginFormData) => void;
-  onSubmit?: () => void;
   pluginId: string;
   methodName: string;
   inputResources?: PluginInputResources;
-};
+} & Omit<ComponentProps<typeof Form>, "validator">;
 
 const FIELDS = { SchemaField: CustomSchemaField };
 
@@ -21,12 +17,11 @@ const EMPTY_RESOURCES: PluginInputResources = {};
 
 const PluginForm: React.FC<PluginFormProps> = ({
   schema,
-  value,
-  onChange,
-  onSubmit,
   pluginId,
   methodName,
   inputResources = EMPTY_RESOURCES,
+  formData,
+  ...formProps
 }) => {
   const formSchema = useMemo(() => ({ ...schema, title: "" }), [schema]);
 
@@ -35,15 +30,13 @@ const PluginForm: React.FC<PluginFormProps> = ({
       pluginId={pluginId}
       methodName={methodName}
       inputResources={inputResources}
-      configuration={value}
+      configuration={formData}
     >
       <Form
         schema={formSchema}
-        formData={value}
         validator={validator}
         fields={FIELDS}
-        onChange={({ formData }) => onChange(formData)}
-        onSubmit={onSubmit}
+        {...formProps}
       />
     </PluginFormProvider>
   );
