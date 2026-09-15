@@ -9,6 +9,7 @@ import {
   Splitter,
   Stack,
   Text,
+  Tooltip,
 } from "@mantine/core";
 import { useEffect, useRef, useState } from "react";
 import type { UiSchema } from "@rjsf/utils";
@@ -130,13 +131,15 @@ const DiscoveryPage = () => {
         <ResultSection
           taskId={discoveryTask}
           extraActions={
-            <ActionIcon
-              size={"md"}
-              variant="outline"
-              onClick={() => splitterRef.current?.toggleCollapse(1)}
-            >
-              <Settings />
-            </ActionIcon>
+            <Tooltip label="Toogle settings">
+              <ActionIcon
+                size="input-sm"
+                variant="outline"
+                onClick={() => splitterRef.current?.toggleCollapse(1)}
+              >
+                <Settings />
+              </ActionIcon>
+            </Tooltip>
           }
         />
       </Splitter.Pane>

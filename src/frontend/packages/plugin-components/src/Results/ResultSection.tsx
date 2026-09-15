@@ -71,8 +71,9 @@ const ResultSection: React.FC<{
         px="sm"
         py="xs"
         wrap="nowrap"
+        gap={"xl"}
         style={{
-          borderBottom: "1px solid var(--mantine-color-default-border)",
+          borderBottom: "2px solid var(--mantine-color-default-border)",
         }}
       >
         <SelectionAction

@@ -10,7 +10,7 @@ const ResultLabel: React.FC<{
   bold?: boolean;
 }> = ({ label, entityType, bold }) => (
   <Group gap="xs" wrap="nowrap">
-    <Text fw={bold ? 600 : undefined} truncate maw={120}>
+    <Text fw={bold ? 600 : undefined} truncate>
       {label}
     </Text>
     <Badge
