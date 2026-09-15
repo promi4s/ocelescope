@@ -1,7 +1,7 @@
 import { Button, Stack } from "@mantine/core";
 import { type MethodApi, useRunPlugin } from "@ocelescope/api-base";
 import { OcelSelect } from "@ocelescope/core";
-import { PluginForm } from "@ocelescope/plugin-form";
+import { PluginForm } from "@ocelescope/plugin-components";
 import { ResourceSelect } from "@ocelescope/resources";
 import { useCallback } from "react";
 import { type Control, Controller, useForm, useWatch } from "react-hook-form";

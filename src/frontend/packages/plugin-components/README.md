@@ -1,4 +1,4 @@
-# @ocelescope/plugin-form
+# @ocelescope/plugin-components
 
 Renders a plugin method's **configuration schema** as a Mantine form.
 

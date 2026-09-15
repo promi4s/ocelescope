@@ -38,7 +38,7 @@
     "@marko19907/string-to-color": "catalog:",
     "@ocelescope/api-base": "workspace:^",
     "@ocelescope/core": "workspace:^",
-    "@ocelescope/plugin-form": "workspace:^",
+    "@ocelescope/plugin-components": "workspace:^",
     "@ocelescope/resources": "workspace:^",
     "embla-carousel": "catalog:",
     "embla-carousel-react": "catalog:",

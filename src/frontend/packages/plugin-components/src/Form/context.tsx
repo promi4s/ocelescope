@@ -1,5 +1,5 @@
 import { createContext, type ReactNode, useContext, useMemo } from "react";
-import type { PluginFormData, PluginInputResources } from "./types";
+import type { PluginFormData, PluginInputResources } from "../types";
 
 type PluginFormContextValue = {
   pluginId: string;

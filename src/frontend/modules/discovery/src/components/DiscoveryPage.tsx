@@ -1,10 +1,24 @@
 import { defineModuleRoute, useCurrentOcel } from "@ocelescope/core";
-import { PluginForm } from "@ocelescope/plugin-form";
+import { PluginForm } from "@ocelescope/plugin-components";
 import { useDiscoveryMethods } from "../hooks/useDiscoveryMethods";
-import { LoadingOverlay, Select, Stack, Text } from "@mantine/core";
-import { useEffect, useState } from "react";
+import Form from "@rjsf/core";
+import { Group, LoadingOverlay, Select, Stack, Text } from "@mantine/core";
+import { useEffect, useRef, useState } from "react";
+import type { UiSchema } from "@rjsf/utils";
+import { useDebouncedValue } from "@mantine/hooks";
+import { useRunPlugin } from "@ocelescope/api-base";
 
-const DiscoveryPage = () => {
+const uiSchema: UiSchema = {
+  "ui:submitButtonOptions": {
+    norender: true,
+  },
+};
+
+const DiscoverySideBar = ({
+  onSuccess,
+}: {
+  onSuccess: (discoveryTaskId: string) => void;
+}) => {
   const { discoveryGroups, discoveryMethods, isLoading } =
     useDiscoveryMethods();
 
@@ -14,11 +28,37 @@ const DiscoveryPage = () => {
     (typeof discoveryMethods)[number] | undefined
   >(undefined);
 
+  const { mutate } = useRunPlugin({
+    mutation: { onSuccess },
+  });
+
+  const [currentConfInput, setConfInput] = useState({});
+  const [debouncedInput] = useDebouncedValue(currentConfInput, 1000);
+
+  const ref = useRef<Form>(null);
+
   useEffect(() => {
     if (discoveryMethods.length > 1 && !currentMethod) {
       setCurrentMethod(discoveryMethods[0]);
     }
   }, [discoveryMethods]);
+
+  useEffect(() => {
+    if (
+      currentMethod &&
+      id &&
+      ref.current?.validate(debouncedInput).errors.length === 0
+    ) {
+      mutate({
+        methodName: currentMethod.name,
+        pluginId: currentMethod.pluginId,
+        data: {
+          input_resources: { [currentMethod.input.name]: id },
+          input: debouncedInput,
+        },
+      });
+    }
+  }, [ref, debouncedInput]);
 
   return (
     <Stack pos={"relative"}>
@@ -51,14 +91,29 @@ const DiscoveryPage = () => {
               pluginId={currentMethod?.pluginId}
               schema={currentMethod?.configuration_schema}
               inputResources={{ [currentMethod.input.name]: id }}
-              onChange={() => {}}
-              value={{}}
-              onSubmit={() => {}}
+              onChange={({ formData }) => setConfInput(formData)}
+              formData={currentConfInput}
+              ref={ref}
+              uiSchema={uiSchema}
             />
           )}
         </>
       )}
     </Stack>
+  );
+};
+
+const DiscoveryPage = () => {
+  const [discoveryTask, setDiscoveryTask] = useState<string | undefined>(
+    undefined,
+  );
+
+  return (
+    <Group>
+      <DiscoverySideBar
+        onSuccess={(discoveryTaskId) => setDiscoveryTask(discoveryTaskId)}
+      />
+    </Group>
   );
 };
 

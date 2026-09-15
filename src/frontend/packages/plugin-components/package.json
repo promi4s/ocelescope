@@ -1,5 +1,5 @@
 {
-  "name": "@ocelescope/plugin-form",
+  "name": "@ocelescope/plugin-components",
   "type": "module",
   "version": "0.7.0",
   "description": "Renders a plugin method's configuration schema as a Mantine form, including Ocelescope's custom OCEL, computed, code and slider fields.",
@@ -36,7 +36,10 @@
     "@mantine/hooks": "catalog:",
     "@monaco-editor/react": "catalog:",
     "@ocelescope/api-base": "workspace:^",
+    "@ocelescope/resources": "workspace:^",
     "@rjsf/core": "catalog:",
+    "lucide-react": "catalog:",
+    "@marko19907/string-to-color": "catalog:",
     "@rjsf/mantine": "catalog:",
     "@rjsf/utils": "catalog:",
     "@rjsf/validator-ajv8": "catalog:",

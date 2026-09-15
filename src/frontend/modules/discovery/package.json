@@ -37,7 +37,7 @@
     "@mantine/hooks": "catalog:",
     "@ocelescope/api-base": "workspace:^",
     "@ocelescope/core": "workspace:^",
-    "@ocelescope/plugin-form": "workspace:^",
+    "@ocelescope/plugin-components": "workspace:^",
     "@ocelescope/resources": "workspace:^",
     "@rjsf/core": "catalog:",
     "@rjsf/mantine": "catalog:",
