@@ -137,7 +137,7 @@ const DiscoveryPage = () => {
                 variant="outline"
                 onClick={() => splitterRef.current?.toggleCollapse(1)}
               >
-                <Settings />
+                <Settings size={20} />
               </ActionIcon>
             </Tooltip>
           }
