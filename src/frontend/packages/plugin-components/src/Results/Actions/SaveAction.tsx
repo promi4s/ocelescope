@@ -66,10 +66,12 @@ export const SaveAction = ({
   taskId,
   selected = [],
   summary,
+  disabled,
 }: {
   taskId?: string;
   selected?: number[];
   summary: PluginOutput[];
+  disabled?: boolean;
 }) => {
   const {
     mutate: saveResults,
@@ -87,29 +89,27 @@ export const SaveAction = ({
   };
 
   return (
-    taskId && (
-      <>
-        <Button
-          variant="light"
-          color={isSaved ? "green" : undefined}
-          leftSection={
-            isSaved ? <CheckIcon size={16} /> : <DatabaseIcon size={16} />
-          }
-          onClick={() => setIsSaveModalOpen(true)}
-          loading={isSaving}
-          disabled={selected.length === 0}
-        >
-          {isSaved ? "Saved" : "Save to session"}
-        </Button>
-        <SaveModal
-          opened={isSaveModalOpen}
-          onClose={() => setIsSaveModalOpen(false)}
-          results={summary.filter(({ result_index }) =>
-            selected.includes(result_index),
-          )}
-          onSave={handleSaveToSession}
-        />
-      </>
-    )
+    <>
+      <Button
+        variant="light"
+        color={isSaved ? "green" : undefined}
+        leftSection={
+          isSaved ? <CheckIcon size={16} /> : <DatabaseIcon size={16} />
+        }
+        onClick={() => setIsSaveModalOpen(true)}
+        loading={isSaving}
+        disabled={disabled || selected.length === 0}
+      >
+        {isSaved ? "Saved" : "Save to session"}
+      </Button>
+      <SaveModal
+        opened={isSaveModalOpen}
+        onClose={() => setIsSaveModalOpen(false)}
+        results={summary.filter(({ result_index }) =>
+          selected.includes(result_index),
+        )}
+        onSave={handleSaveToSession}
+      />
+    </>
   );
 };

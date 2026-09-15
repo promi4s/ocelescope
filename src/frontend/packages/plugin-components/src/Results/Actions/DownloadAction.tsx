@@ -6,9 +6,11 @@ import { useCallback } from "react";
 export const DownloadAction = ({
   taskId,
   selected = [],
+  disabled,
 }: {
   taskId?: string;
   selected?: number[];
+  disabled?: boolean;
 }) => {
   const { mutate: downloadResults, isPending: isDownloading } =
     useDownloadPluginResults({
@@ -32,17 +34,14 @@ export const DownloadAction = ({
   }, [taskId, selected]);
 
   return (
-    taskId &&
-    selected.length > 0 && (
-      <Button
-        variant="default"
-        leftSection={<DownloadIcon size={16} />}
-        onClick={handleDownload}
-        loading={isDownloading}
-        disabled={selected.length === 0}
-      >
-        Download
-      </Button>
-    )
+    <Button
+      variant="default"
+      leftSection={<DownloadIcon size={16} />}
+      onClick={handleDownload}
+      loading={isDownloading}
+      disabled={disabled || selected.length === 0}
+    >
+      Download
+    </Button>
   );
 };

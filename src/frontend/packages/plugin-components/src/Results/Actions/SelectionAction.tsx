@@ -27,8 +27,10 @@ export const SelectionAction = ({
   output,
   selectedOutputs,
   setSelectedOutputs,
+  isLoading,
 }: {
   output: PluginOutput[];
+  isLoading?: boolean;
   selectedOutputs: number[];
   setSelectedOutputs: (newSelection: number[]) => void;
 }) => {
@@ -44,7 +46,9 @@ export const SelectionAction = ({
     [output],
   );
 
-  return options.length > 1 ? (
+  return isLoading ? (
+    <Text>Loading</Text>
+  ) : options.length > 1 ? (
     <MultiSelect
       flex={1}
       data={options}

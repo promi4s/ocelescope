@@ -1,12 +1,20 @@
 import { defineModuleRoute, useCurrentOcel } from "@ocelescope/core";
-import { PluginForm } from "@ocelescope/plugin-components";
+import { PluginForm, ResultSection } from "@ocelescope/plugin-components";
 import { useDiscoveryMethods } from "../hooks/useDiscoveryMethods";
 import Form from "@rjsf/core";
-import { Group, LoadingOverlay, Select, Stack, Text } from "@mantine/core";
+import {
+  ActionIcon,
+  LoadingOverlay,
+  Select,
+  Splitter,
+  Stack,
+  Text,
+} from "@mantine/core";
 import { useEffect, useRef, useState } from "react";
 import type { UiSchema } from "@rjsf/utils";
-import { useDebouncedValue } from "@mantine/hooks";
+import { useDebouncedValue, type UseSplitterReturnValue } from "@mantine/hooks";
 import { useRunPlugin } from "@ocelescope/api-base";
+import { Settings } from "lucide-react";
 
 const uiSchema: UiSchema = {
   "ui:submitButtonOptions": {
@@ -61,7 +69,7 @@ const DiscoverySideBar = ({
   }, [ref, debouncedInput]);
 
   return (
-    <Stack pos={"relative"}>
+    <Stack pos={"relative"} maw={400} p={"md"}>
       <LoadingOverlay visible={isLoading} />
       <Select
         label="Discovery Method"
@@ -108,12 +116,36 @@ const DiscoveryPage = () => {
     undefined,
   );
 
+  const splitterRef = useRef<UseSplitterReturnValue>(null);
+
   return (
-    <Group>
-      <DiscoverySideBar
-        onSuccess={(discoveryTaskId) => setDiscoveryTask(discoveryTaskId)}
-      />
-    </Group>
+    <Splitter
+      splitterRef={splitterRef}
+      withHandle={false}
+      h={"100%"}
+      handleColor="var(--mantine-color-default-border)"
+      lineSize={2}
+    >
+      <Splitter.Pane defaultSize={70}>
+        <ResultSection
+          taskId={discoveryTask}
+          extraActions={
+            <ActionIcon
+              size={"md"}
+              variant="outline"
+              onClick={() => splitterRef.current?.toggleCollapse(1)}
+            >
+              <Settings />
+            </ActionIcon>
+          }
+        />
+      </Splitter.Pane>
+      <Splitter.Pane defaultSize={30} max={"400px"} min={"300px"} collapsible>
+        <DiscoverySideBar
+          onSuccess={(discoveryTaskId) => setDiscoveryTask(discoveryTaskId)}
+        />
+      </Splitter.Pane>
+    </Splitter>
   );
 };
 

@@ -15,7 +15,7 @@ import { useGetPluginMethod } from "@ocelescope/api-base";
 import { useState } from "react";
 import PluginInput from "../components/Form";
 import PluginBreadcrumbs from "../components/PluginBreadcrumbs/PluginBreadcrumbs";
-import ResultSection from "../components/ResultSection/ResultSection";
+import { ResultSection } from "@ocelescope/plugin-components";
 
 const COLLAPSED_SIZES: SplitterPaneSize[] = [0, 100];
 const SPLIT_SIZES: SplitterPaneSize[] = [75, 25];
@@ -51,12 +51,7 @@ const MethodPage: React.FC<{ pluginId: string; methodName: string }> = ({
         <Splitter.Pane defaultSize={0} min="20%" collapsible>
           <Box h="100%" pos="relative" style={{ overflow: "hidden" }}>
             {currentTask ? (
-              <ResultSection
-                key={currentTask}
-                pluginId={pluginId}
-                methodName={methodName}
-                taskId={currentTask}
-              />
+              <ResultSection taskId={currentTask} />
             ) : (
               <Center h="100%" p="md">
                 <Text c="dimmed" ta="center">
