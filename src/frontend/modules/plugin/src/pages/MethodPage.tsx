@@ -1,6 +1,4 @@
 import {
-  Box,
-  Center,
   Flex,
   Group,
   LoadingOverlay,
@@ -49,17 +47,7 @@ const MethodPage: React.FC<{ pluginId: string; methodName: string }> = ({
         style={{ flex: 1, minHeight: 0 }}
       >
         <Splitter.Pane defaultSize={0} min="20%" collapsible>
-          <Box h="100%" pos="relative" style={{ overflow: "hidden" }}>
-            {currentTask ? (
-              <ResultSection taskId={currentTask} />
-            ) : (
-              <Center h="100%" p="md">
-                <Text c="dimmed" ta="center">
-                  Run the method to see its results here.
-                </Text>
-              </Center>
-            )}
-          </Box>
+          <ResultSection taskId={currentTask} />
         </Splitter.Pane>
 
         <Splitter.Pane defaultSize={100} min="20%" collapsible>
