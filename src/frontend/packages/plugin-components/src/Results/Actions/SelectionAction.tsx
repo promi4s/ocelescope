@@ -1,4 +1,4 @@
-import { Badge, Group, MultiSelect, Text } from "@mantine/core";
+import { Badge, Group, Loader, MultiSelect, Text } from "@mantine/core";
 import { generateColor } from "@marko19907/string-to-color";
 import type { PluginOutput } from "@ocelescope/api-base";
 import { CheckIcon } from "lucide-react";
@@ -9,7 +9,7 @@ const ResultLabel: React.FC<{
   entityType: string;
   bold?: boolean;
 }> = ({ label, entityType, bold }) => (
-  <Group gap="xs" wrap="nowrap">
+  <Group gap="xs" wrap="nowrap" miw={0}>
     <Text fw={bold ? 600 : undefined} truncate>
       {label}
     </Text>
@@ -46,11 +46,20 @@ export const SelectionAction = ({
     [output],
   );
 
+  const entityTypeByValue = useMemo(
+    () => new Map(options.map(({ value, entityType }) => [value, entityType])),
+    [options],
+  );
+
   return isLoading ? (
-    <Text>Loading</Text>
+    <Group gap="xs" align="center" wrap="nowrap">
+      <Text>Loading</Text>
+      <Loader size={"xs"} />
+    </Group>
   ) : options.length > 1 ? (
     <MultiSelect
       flex={1}
+      miw={0}
       data={options}
       onChange={setSelectedOutputs}
       value={selectedOutputs}
@@ -58,11 +67,25 @@ export const SelectionAction = ({
       searchable
       clearable
       comboboxProps={{ withinPortal: true }}
+      styles={{
+        pillsList: {
+          flexWrap: "nowrap",
+          overflowX: "auto",
+          scrollbarWidth: "none",
+        },
+        pill: { flexShrink: 0 },
+        inputField: { minWidth: 80 },
+      }}
       renderOption={({ option, checked }) => {
         return (
-          <Group align="center">
-            {checked && <CheckIcon size={16} color="grey" />}
-            <ResultLabel label={option.label} entityType={option.label} />
+          <Group align="center" wrap="nowrap" gap="xs">
+            {checked && (
+              <CheckIcon size={16} color="grey" style={{ flexShrink: 0 }} />
+            )}
+            <ResultLabel
+              label={option.label}
+              entityType={entityTypeByValue.get(option.value) ?? ""}
+            />
           </Group>
         );
       }}
