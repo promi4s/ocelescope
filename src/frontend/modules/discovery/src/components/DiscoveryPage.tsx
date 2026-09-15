@@ -4,7 +4,9 @@ import { useDiscoveryMethods } from "../hooks/useDiscoveryMethods";
 import Form from "@rjsf/core";
 import {
   ActionIcon,
+  Box,
   LoadingOverlay,
+  ScrollArea,
   Select,
   Splitter,
   Stack,
@@ -70,8 +72,7 @@ const DiscoverySideBar = ({
   }, [ref, debouncedInput, currentMethod, id]);
 
   return (
-    <Stack pos={"relative"} maw={400} p={"md"}>
-      <LoadingOverlay visible={isLoading} />
+    <Stack maw={400} px={"md"} h={"100%"}>
       <Select
         label="Discovery Method"
         searchable
@@ -90,24 +91,25 @@ const DiscoverySideBar = ({
           }))}
         loading={isLoading}
       />
-      {currentMethod && (
-        <>
-          <Text c={"dimmed"}>{currentMethod.description}</Text>
-          {currentMethod.configuration_schema && (
+      {currentMethod && <Text c={"dimmed"}>{currentMethod.description}</Text>}
+      <Box pos={"relative"} flex={1} mih={0}>
+        <LoadingOverlay visible={isLoading} />
+        {currentMethod?.configuration_schema && (
+          <ScrollArea h={"100%"}>
             <PluginForm
               key={currentMethod.id}
-              methodName={currentMethod?.name}
-              pluginId={currentMethod?.pluginId}
-              schema={currentMethod?.configuration_schema}
+              methodName={currentMethod.name}
+              pluginId={currentMethod.pluginId}
+              schema={currentMethod.configuration_schema}
               inputResources={{ [currentMethod.input.name]: id }}
               onChange={({ formData }) => setConfInput(formData)}
               formData={currentConfInput}
               ref={ref}
               uiSchema={uiSchema}
             />
-          )}
-        </>
-      )}
+          </ScrollArea>
+        )}
+      </Box>
     </Stack>
   );
 };
