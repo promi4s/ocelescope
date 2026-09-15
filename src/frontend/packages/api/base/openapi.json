@@ -221,7 +221,7 @@
         }
       }
     },
-    "/plugins/{plugin_id}": {
+    "/plugins/plugin/{plugin_id}": {
       "get": {
         "tags": [
           "plugins"
@@ -309,7 +309,7 @@
         }
       }
     },
-    "/plugins/{plugin_id}/{method_name}": {
+    "/plugins/plugin/{plugin_id}/{method_name}": {
       "get": {
         "tags": [
           "plugins"
@@ -428,7 +428,7 @@
         }
       }
     },
-    "/plugins/{plugin_id}/{method_name}/result/{task_id}": {
+    "/plugins/task/{task_id}": {
       "get": {
         "tags": [
           "plugins"
@@ -436,24 +436,6 @@
         "summary": "Get Plugin Result",
         "operationId": "PluginResult",
         "parameters": [
-          {
-            "name": "plugin_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Plugin Id"
-            }
-          },
-          {
-            "name": "method_name",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Method Name"
-            }
-          },
           {
             "name": "task_id",
             "in": "path",
@@ -499,7 +481,7 @@
         }
       }
     },
-    "/plugins/{plugin_id}/{method_name}/result/{task_id}/save": {
+    "/plugins/task/{task_id}/save": {
       "post": {
         "tags": [
           "plugins"
@@ -508,24 +490,6 @@
         "description": "Save the selected results into the session as OCELs / resources.",
         "operationId": "savePluginResults",
         "parameters": [
-          {
-            "name": "plugin_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Plugin Id"
-            }
-          },
-          {
-            "name": "method_name",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Method Name"
-            }
-          },
           {
             "name": "task_id",
             "in": "path",
@@ -574,7 +538,7 @@
         }
       }
     },
-    "/plugins/{plugin_id}/{method_name}/result/{task_id}/download": {
+    "/plugins/task/{task_id}/download": {
       "post": {
         "tags": [
           "plugins"
@@ -583,24 +547,6 @@
         "description": "Bundle the selected results into a zip for download.",
         "operationId": "downloadPluginResults",
         "parameters": [
-          {
-            "name": "plugin_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Plugin Id"
-            }
-          },
-          {
-            "name": "method_name",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Method Name"
-            }
-          },
           {
             "name": "task_id",
             "in": "path",
@@ -643,7 +589,7 @@
         }
       }
     },
-    "/plugins/{plugin_id}/{method_name}/computed/{provider}": {
+    "/plugins/plugin/{plugin_id}/{method_name}/computed/{provider}": {
       "post": {
         "tags": [
           "plugins"

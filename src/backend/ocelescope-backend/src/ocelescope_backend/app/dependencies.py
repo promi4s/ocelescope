@@ -48,17 +48,10 @@ def get_ocel(
 ApiOcel = Annotated[OCEL, Depends(get_ocel)]
 
 
-def get_plugin_task(
-    session: ApiSession, plugin_id: str, method_name: str, task_id: str
-) -> PluginTask:
+def get_plugin_task(session: ApiSession, task_id: str) -> PluginTask:
     plugin_task = session.get_task(task_id)
 
-    if (
-        plugin_task is None
-        or not isinstance(plugin_task, PluginTask)
-        or plugin_task.plugin_id != plugin_id
-        or plugin_task.method_name != method_name
-    ):
+    if plugin_task is None or not isinstance(plugin_task, PluginTask):
         raise NotFound("Task could not be found")
 
     return plugin_task
