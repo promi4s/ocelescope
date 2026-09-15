@@ -39,6 +39,7 @@ export const DownloadAction = ({
       leftSection={<DownloadIcon size={16} />}
       onClick={handleDownload}
       loading={isDownloading}
+      {...{ autoComplete: "off" }}
       disabled={disabled || selected.length === 0}
     >
       Download

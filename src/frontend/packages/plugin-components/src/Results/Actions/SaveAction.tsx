@@ -98,6 +98,7 @@ export const SaveAction = ({
         }
         onClick={() => setIsSaveModalOpen(true)}
         loading={isSaving}
+        {...{ autoComplete: "off" }}
         disabled={disabled || selected.length === 0}
       >
         {isSaved ? "Saved" : "Save to session"}
