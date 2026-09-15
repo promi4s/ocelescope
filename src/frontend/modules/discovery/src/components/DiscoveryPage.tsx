@@ -67,7 +67,7 @@ const DiscoverySideBar = ({
         },
       });
     }
-  }, [ref, debouncedInput]);
+  }, [ref, debouncedInput, currentMethod, id]);
 
   return (
     <Stack pos={"relative"} maw={400} p={"md"}>
