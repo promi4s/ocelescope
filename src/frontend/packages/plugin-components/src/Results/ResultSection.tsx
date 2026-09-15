@@ -106,25 +106,19 @@ const SaveModal = ({
 };
 
 const ResultSection: React.FC<{
-  pluginId: string;
-  methodName: string;
-  taskId: string;
-}> = ({ pluginId, methodName, taskId }) => {
-  const { data: pluginSummary } = usePluginResult(
-    pluginId,
-    methodName,
-    taskId,
-    {
-      query: {
-        refetchInterval: ({ state }) => {
-          if (state.data == null) {
-            return 1000;
-          }
-          return false;
-        },
+  taskId?: string;
+}> = ({ taskId }) => {
+  const { data: pluginSummary } = usePluginResult(taskId ?? "", {
+    query: {
+      refetchInterval: ({ state }) => {
+        if (state.data == null) {
+          return 1000;
+        }
+        return false;
       },
+      enabled: !!taskId,
     },
-  );
+  });
 
   const [selected, setSelected] = useState<number[]>([0]);
 
@@ -184,13 +178,13 @@ const ResultSection: React.FC<{
 
   const handleDownload = () => {
     downloadResults(
-      { pluginId, methodName, taskId, data: { indices: selected } },
+      { taskId: taskId ?? "", data: { indices: selected } },
       {
         onSuccess: (data) => {
           const url = URL.createObjectURL(data as Blob);
           const anchor = document.createElement("a");
           anchor.href = url;
-          anchor.download = `${methodName}_results.zip`;
+          anchor.download = "results.zip";
           anchor.click();
           URL.revokeObjectURL(url);
         },
@@ -200,9 +194,7 @@ const ResultSection: React.FC<{
 
   const handleSaveToSession = (results: ResultSelection[]) => {
     saveResults({
-      pluginId,
-      methodName,
-      taskId,
+      taskId: taskId ?? "",
       data: results,
     });
   };
