@@ -8,7 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
-import type { BrushConfig, ChartViewport, ZoomConfig } from "../types";
+import type { ChartViewport, ZoomConfig } from "../types";
 import type { ChartEventMap } from "./engine";
 
 const EPSILON = 1e-9;
@@ -62,26 +62,28 @@ function composeHandler(
 interface UseEChartInteractionsOptions {
   chartRef: RefObject<EChartsReactCore | null>;
   zoom?: ZoomConfig;
-  brush?: BrushConfig;
   viewport?: ChartViewport | null;
   onViewportChange?: (viewport: ChartViewport | null) => void;
-  onSelection?: (selection: ChartViewport | null) => void;
   onEvents?: ChartEventMap;
 }
 
 export function useEChartInteractions({
   chartRef,
   zoom,
-  brush,
   viewport: controlledViewport,
   onViewportChange,
-  onSelection,
   onEvents,
 }: UseEChartInteractionsOptions) {
   const controlled = controlledViewport !== undefined;
   const [internalViewport, setInternalViewport] =
     useState<ChartViewport | null>(null);
-  const [hasSelection, setHasSelection] = useState(false);
+  // Which legend entries are hidden. ECharts keeps this on the instance, and
+  // every option rebuild is applied with `notMerge`, so without tracking it here
+  // a zoom (or any re-render) would silently show hidden series again.
+  const [legendSelected, setLegendSelected] = useState<Record<
+    string,
+    boolean
+  > | null>(null);
   const lastEmitted = useRef<ChartViewport | null>(controlledViewport ?? null);
   const viewport = controlled ? (controlledViewport ?? null) : internalViewport;
 
@@ -94,6 +96,18 @@ export function useEChartInteractions({
   const events = useMemo(() => {
     const result: ChartEventMap = { ...onEvents };
 
+    const trackLegend = (...args: unknown[]) => {
+      const { selected } = args[0] as { selected?: Record<string, boolean> };
+      if (selected) setLegendSelected({ ...selected });
+    };
+    for (const name of [
+      "legendselectchanged",
+      "legendselectall",
+      "legendinverseselect",
+    ]) {
+      composeHandler(result, name, trackLegend);
+    }
+
     if (zoom) {
       composeHandler(result, "datazoom", () => {
         const next = readViewport(chartRef);
@@ -104,38 +118,8 @@ export function useEChartInteractions({
       });
     }
 
-    if (brush) {
-      composeHandler(result, "brushEnd", (...args) => {
-        const parameters = args[0] as {
-          areas?: Array<{ coordRange?: [number, number] }>;
-        };
-        const range = parameters.areas?.[0]?.coordRange;
-        if (!range) {
-          setHasSelection(false);
-          onSelection?.(null);
-          return;
-        }
-        const selection = {
-          [brush.axis]: {
-            min: Math.min(...range),
-            max: Math.max(...range),
-          },
-        };
-        setHasSelection(true);
-        onSelection?.(selection);
-      });
-    }
-
     return result;
-  }, [
-    brush,
-    chartRef,
-    controlled,
-    onEvents,
-    onSelection,
-    onViewportChange,
-    zoom,
-  ]);
+  }, [chartRef, controlled, onEvents, onViewportChange, zoom]);
 
   const reset = useCallback(() => {
     const instance = chartRef.current?.getEchartsInstance();
@@ -145,25 +129,13 @@ export function useEChartInteractions({
       if (!controlled) setInternalViewport(null);
       onViewportChange?.(null);
     }
-    if (brush && hasSelection) {
-      instance?.dispatchAction({ type: "brush", areas: [] });
-      setHasSelection(false);
-      onSelection?.(null);
-    }
-  }, [
-    brush,
-    chartRef,
-    controlled,
-    hasSelection,
-    onSelection,
-    onViewportChange,
-    zoom,
-  ]);
+  }, [chartRef, controlled, onViewportChange, zoom]);
 
   return {
     events,
     viewport,
-    canReset: viewport != null || hasSelection,
+    legendSelected,
+    canReset: viewport != null,
     reset,
   };
 }
@@ -256,26 +228,19 @@ export function enhanceChartOption(
   option: EChartsOption,
   interaction: {
     zoom?: ZoomConfig;
-    brush?: BrushConfig;
     viewport: ChartViewport | null;
+    legendSelected?: Record<string, boolean> | null;
   },
 ): EChartsOption {
-  const { zoom, brush, viewport } = interaction;
+  const { zoom, viewport, legendSelected } = interaction;
+  const legend = option.legend;
   return {
     ...option,
+    ...(legendSelected && legend && !Array.isArray(legend)
+      ? { legend: { ...legend, selected: legendSelected } }
+      : {}),
     aria: option.aria ?? { enabled: true },
     grid: gridWithInteractionSpace(option.grid, zoom),
     ...(zoom ? { dataZoom: zoomOptions(zoom, viewport) } : {}),
-    ...(brush
-      ? {
-          brush: {
-            toolbox: [brush.axis === "y" ? "lineY" : "lineX", "clear"],
-            xAxisIndex: brush.axis === "x" ? 0 : undefined,
-            yAxisIndex: brush.axis === "y" ? 0 : undefined,
-            throttleType: "debounce",
-            throttleDelay: 100,
-          },
-        }
-      : {}),
   };
 }

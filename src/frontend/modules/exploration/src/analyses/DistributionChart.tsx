@@ -1,7 +1,13 @@
 import { Chart, type Row, useChartTheme } from "@ocelescope/charts";
 import { useMemo } from "react";
-import type { DistributionBucket } from "../api/exploration";
 import type { DistributionVisualization } from "../model/dashboard";
+
+/** One distribution row as the backend sends it. */
+export interface Bucket {
+  label: string;
+  count: number;
+  kind: "value" | "range" | "other" | "missing";
+}
 
 /**
  * Four analyses return the same bucket list, so they share one chart. Buckets
@@ -16,7 +22,7 @@ export function DistributionChart({
   empty,
   emptyMessage,
 }: {
-  buckets: DistributionBucket[];
+  buckets: Bucket[];
   visualization: DistributionVisualization;
   seriesName: string;
   loading: boolean;

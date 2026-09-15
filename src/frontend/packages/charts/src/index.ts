@@ -4,7 +4,6 @@ export { ChartCard } from "./ChartCard";
 export { useChartTheme } from "./internal/theme";
 export type {
   AxisSpec,
-  BrushConfig,
   ChartProps,
   ChartSelection,
   ChartViewport,

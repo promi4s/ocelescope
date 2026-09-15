@@ -172,42 +172,6 @@ def _type_filter(
 def _extremes(numeric: list[str]) -> str:
     """``min`` / ``max`` over the text values, ordered numerically where that is right.
 
-
-def _analytical_type(value_type: ValueType) -> AnalyticalType:
-    """Map a ValueType to the analytical type its values should be treated as.
-
-    A pure function of the column's stored type -- DuckDB already distinguishes INT
-    (BIGINT) from FLOAT (DOUBLE) at import time, so no value inspection is needed to
-    tell discrete from continuous.
-    """
-    return _VALUE_TYPE_TO_ANALYTICAL_TYPE[value_type]
-
-
-def _marshal(value: Any, value_type: ValueType) -> Any:
-    """Coerce a DuckDB min/max value into the model's ``str | int | float``."""
-    if value_type is ValueType.DATE and hasattr(value, "isoformat"):
-        return value.isoformat()
-    return value
-
-
-def _present(name: str, duckdb_type: str) -> str:
-    """The ``WHERE`` condition for an attribute having a value (non-null, non-empty)."""
-    condition = f"{ident(name)} IS NOT NULL"
-    if duckdb_type.upper() == "VARCHAR":
-        condition += f" AND {ident(name)} <> ''"
-    return condition
-
-
-def merged_event_table(
-    ocel: OCEL,
-    attribute_names: list[str] | None = None,
-    entity_names: list[str] | None = None,
-) -> duckdb.DuckDBPyRelation:
-    """One row per event: entity_id (ocel:eid), entity_type (ocel:activity), + attrs.
-
-    ``attribute_names`` = the attribute columns to include (``None`` = every event
-    attribute). ``entity_names`` optionally restricts to those activities (``None`` =
-    all; empty list = nothing).
     Text order is not value order for a number -- ``'10004' < '1023'`` -- so a numeric
     attribute is compared as a DOUBLE. Which attributes those are is decided by their
     stored type rather than by whether the values happen to parse, so a text attribute
@@ -219,6 +183,11 @@ def merged_event_table(
         f"ELSE {aggregate}(value) END"
         for aggregate in ("min", "max")
     )
+
+
+def _analytical_type(value_type: ValueType) -> AnalyticalType:
+    """Map a stored value type to the way its values should be analyzed."""
+    return _VALUE_TYPE_TO_ANALYTICAL_TYPE[value_type]
 
 
 def attribute_names(
@@ -256,37 +225,6 @@ def aggregate_attributes(
     """
     types = _attribute_types(ocel, entity_type)
     numeric = [n for n, t in types.items() if t in (ValueType.INT, ValueType.FLOAT)]
-
-    exprs: list[str] = []
-    for name in names:
-        present = _present(name, types[name])
-        exprs += [
-            f"min({ident(name)}) FILTER (WHERE {present})",
-            f"max({ident(name)}) FILTER (WHERE {present})",
-            f"count(DISTINCT {ident(name)}) FILTER (WHERE {present})",
-            f"array_agg(DISTINCT {ident(ENTITY_TYPE)}) FILTER (WHERE {present})",
-        ]
-    row = table.aggregate(", ".join(exprs)).fetchone()
-    assert row is not None  # an aggregate without GROUP BY always yields one row
-
-    attributes: list[AggregatedAttribute] = []
-    for i, name in enumerate(names):
-        minimum, maximum, distinct, entity_values = row[i * 4 : i * 4 + 4]
-        if minimum is None:  # no present values -> omit
-            continue
-        value_type = _value_type(types[name])
-        attributes.append(
-            AggregatedAttribute(
-                name=name,
-                type=value_type,
-                analytical_type=_analytical_type(value_type),
-                min=_marshal(minimum, value_type),
-                max=_marshal(maximum, value_type),
-                distinct_values=int(distinct or 0),
-                entity_type_names=sorted(
-                    v for v in (entity_values or []) if v is not None
-                ),
-            )
     rows = (
         long_table(ocel, entity_type, attribute_names, entity_names)
         .query(
@@ -302,6 +240,7 @@ def aggregate_attributes(
         AggregatedAttribute(
             name=name,
             type=types[name],
+            analytical_type=_analytical_type(types[name]),
             min=_marshal(minimum, types[name]),
             max=_marshal(maximum, types[name]),
             distinct_values=int(distinct or 0),
@@ -337,30 +276,12 @@ def typed_attributes(
         .fetchall()
     )
 
-    attributes: list[TypedAttribute] = []
-    for entity_type, *values in rows:
-        for i, name in enumerate(names):
-            minimum, maximum, distinct = values[i * 3 : i * 3 + 3]
-            if minimum is None:  # attribute absent for this entity type -> omit
-                continue
-            value_type = _value_type(types[name])
-            attributes.append(
-                TypedAttribute(
-                    name=name,
-                    entity_type=entity_type,
-                    type=value_type,
-                    analytical_type=_analytical_type(value_type),
-                    min=_marshal(minimum, value_type),
-                    max=_marshal(maximum, value_type),
-                    distinct_values=int(distinct or 0),
-                )
-            )
-    return attributes
     return [
         TypedAttribute(
             name=name,
             entity_type=entity,
             type=types[name],
+            analytical_type=_analytical_type(types[name]),
             min=_marshal(minimum, types[name]),
             max=_marshal(maximum, types[name]),
             distinct_values=int(distinct or 0),

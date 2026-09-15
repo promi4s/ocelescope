@@ -1,25 +1,23 @@
 import { defineConfig } from "@ocelescope/api-config";
 
-const asQuery = { query: { useQuery: true } } as const;
-
 export default defineConfig({
+  /**
+   * Models only. Every analysis is `POST /ocels/{id}/queries/{analysis}`, so
+   * the module calls them through one hook (`useAnalysisQuery`) instead of ten
+   * generated ones; excluding the operations keeps the request types without
+   * generating a client nobody imports.
+   */
   exploration: {
+    input: {
+      target: "./openapi.json",
+      filters: {
+        mode: "exclude",
+        tags: ["exploration"],
+        includeUnreferencedSchemas: true,
+      },
+    },
     output: {
       target: "./src/api/exploration.ts",
-      override: {
-        operations: {
-          queryEventAttributeDistribution: asQuery,
-          queryObjectAttributeDistribution: asQuery,
-          queryObjectCountsPerEvent: asQuery,
-          queryObjectTypeCombinations: asQuery,
-          queryActivityExecutionFrequency: asQuery,
-          queryObjectInvolvementDistribution: asQuery,
-          queryTimeBetweenActivities: asQuery,
-          queryObjectActivityExecutionDistribution: asQuery,
-          queryTotalObjectInvolvement: asQuery,
-          queryObjectAttributeTimeline: asQuery,
-        },
-      },
     },
   },
   ocel: {

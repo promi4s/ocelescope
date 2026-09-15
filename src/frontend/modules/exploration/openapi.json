@@ -5,27 +5,21 @@
     "version": "1.0"
   },
   "paths": {
-    "/modules/exploration/v1/ocels/{ocel_id}/queries/event-attribute-distribution": {
+    "/modules/exploration/v1/ocels/{ocel_id}/queries": {
       "post": {
         "tags": [
           "exploration"
         ],
-        "summary": "Query Event Attribute Distribution",
-        "operationId": "queryEventAttributeDistribution",
+        "summary": "Run Query",
+        "description": "Run the analysis named by the body's `analysis` field.",
+        "operationId": "runQuery",
         "parameters": [
           {
             "name": "ocel_id",
             "in": "path",
             "required": true,
             "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
+              "type": "string",
               "title": "Ocel Id"
             }
           },
@@ -56,7 +50,54 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/EventAttributeDistributionQuery"
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/EventAttributeDistribution"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ObjectAttributeDistribution"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ObjectInvolvementDistribution"
+                  },
+                  {
+                    "$ref": "#/components/schemas/TimeBetweenActivities"
+                  },
+                  {
+                    "$ref": "#/components/schemas/TotalObjectInvolvement"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ObjectCountsPerEvent"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ObjectTypeCombinations"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ActivityExecutionFrequency"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ObjectActivityExecutionDistribution"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ObjectAttributeTimeline"
+                  }
+                ],
+                "discriminator": {
+                  "propertyName": "analysis",
+                  "mapping": {
+                    "event-attribute-distribution": "#/components/schemas/EventAttributeDistribution",
+                    "object-attribute-distribution": "#/components/schemas/ObjectAttributeDistribution",
+                    "object-involvement-distribution": "#/components/schemas/ObjectInvolvementDistribution",
+                    "time-between-activities": "#/components/schemas/TimeBetweenActivities",
+                    "total-object-involvement": "#/components/schemas/TotalObjectInvolvement",
+                    "object-counts-per-event": "#/components/schemas/ObjectCountsPerEvent",
+                    "object-type-combinations": "#/components/schemas/ObjectTypeCombinations",
+                    "activity-execution-frequency": "#/components/schemas/ActivityExecutionFrequency",
+                    "object-activity-execution-distribution": "#/components/schemas/ObjectActivityExecutionDistribution",
+                    "object-attribute-timeline": "#/components/schemas/ObjectAttributeTimeline"
+                  }
+                },
+                "title": "Query"
               }
             }
           }
@@ -67,717 +108,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DistributionResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/modules/exploration/v1/ocels/{ocel_id}/queries/object-attribute-distribution": {
-      "post": {
-        "tags": [
-          "exploration"
-        ],
-        "summary": "Query Object Attribute Distribution",
-        "operationId": "queryObjectAttributeDistribution",
-        "parameters": [
-          {
-            "name": "ocel_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Ocel Id"
-            }
-          },
-          {
-            "name": "ocel_version",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "enum": [
-                    "original",
-                    "filtered"
-                  ],
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "default": "filtered",
-              "title": "Ocel Version"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ObjectAttributeDistributionQuery"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DistributionResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/modules/exploration/v1/ocels/{ocel_id}/queries/object-counts-per-event": {
-      "post": {
-        "tags": [
-          "exploration"
-        ],
-        "summary": "Query Object Counts Per Event",
-        "operationId": "queryObjectCountsPerEvent",
-        "parameters": [
-          {
-            "name": "ocel_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Ocel Id"
-            }
-          },
-          {
-            "name": "ocel_version",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "enum": [
-                    "original",
-                    "filtered"
-                  ],
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "default": "filtered",
-              "title": "Ocel Version"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ObjectCountsPerEventQuery"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ObjectCountsPerEventResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/modules/exploration/v1/ocels/{ocel_id}/queries/object-type-combinations": {
-      "post": {
-        "tags": [
-          "exploration"
-        ],
-        "summary": "Query Object Type Combinations",
-        "operationId": "queryObjectTypeCombinations",
-        "parameters": [
-          {
-            "name": "ocel_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Ocel Id"
-            }
-          },
-          {
-            "name": "ocel_version",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "enum": [
-                    "original",
-                    "filtered"
-                  ],
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "default": "filtered",
-              "title": "Ocel Version"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ObjectTypeCombinationsQuery"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ObjectTypeCombinationsResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/modules/exploration/v1/ocels/{ocel_id}/queries/activity-execution-frequency": {
-      "post": {
-        "tags": [
-          "exploration"
-        ],
-        "summary": "Query Activity Execution Frequency",
-        "operationId": "queryActivityExecutionFrequency",
-        "parameters": [
-          {
-            "name": "ocel_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Ocel Id"
-            }
-          },
-          {
-            "name": "ocel_version",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "enum": [
-                    "original",
-                    "filtered"
-                  ],
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "default": "filtered",
-              "title": "Ocel Version"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ActivityExecutionFrequencyQuery"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ActivityExecutionFrequencyResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/modules/exploration/v1/ocels/{ocel_id}/queries/object-involvement-distribution": {
-      "post": {
-        "tags": [
-          "exploration"
-        ],
-        "summary": "Query Object Involvement Distribution",
-        "operationId": "queryObjectInvolvementDistribution",
-        "parameters": [
-          {
-            "name": "ocel_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Ocel Id"
-            }
-          },
-          {
-            "name": "ocel_version",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "enum": [
-                    "original",
-                    "filtered"
-                  ],
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "default": "filtered",
-              "title": "Ocel Version"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ObjectInvolvementDistributionQuery"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DistributionResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/modules/exploration/v1/ocels/{ocel_id}/queries/time-between-activities": {
-      "post": {
-        "tags": [
-          "exploration"
-        ],
-        "summary": "Query Time Between Activities",
-        "operationId": "queryTimeBetweenActivities",
-        "parameters": [
-          {
-            "name": "ocel_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Ocel Id"
-            }
-          },
-          {
-            "name": "ocel_version",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "enum": [
-                    "original",
-                    "filtered"
-                  ],
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "default": "filtered",
-              "title": "Ocel Version"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/TimeBetweenActivitiesQuery"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TimeBetweenActivitiesResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/modules/exploration/v1/ocels/{ocel_id}/queries/object-activity-execution-distribution": {
-      "post": {
-        "tags": [
-          "exploration"
-        ],
-        "summary": "Query Object Activity Execution Distribution",
-        "operationId": "queryObjectActivityExecutionDistribution",
-        "parameters": [
-          {
-            "name": "ocel_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Ocel Id"
-            }
-          },
-          {
-            "name": "ocel_version",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "enum": [
-                    "original",
-                    "filtered"
-                  ],
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "default": "filtered",
-              "title": "Ocel Version"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ObjectActivityExecutionDistributionQuery"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ObjectActivityExecutionDistributionResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/modules/exploration/v1/ocels/{ocel_id}/queries/total-object-involvement": {
-      "post": {
-        "tags": [
-          "exploration"
-        ],
-        "summary": "Query Total Object Involvement",
-        "operationId": "queryTotalObjectInvolvement",
-        "parameters": [
-          {
-            "name": "ocel_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Ocel Id"
-            }
-          },
-          {
-            "name": "ocel_version",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "enum": [
-                    "original",
-                    "filtered"
-                  ],
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "default": "filtered",
-              "title": "Ocel Version"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TotalObjectInvolvementResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/modules/exploration/v1/ocels/{ocel_id}/queries/object-attribute-timeline": {
-      "post": {
-        "tags": [
-          "exploration"
-        ],
-        "summary": "Query Object Attribute Timeline",
-        "operationId": "queryObjectAttributeTimeline",
-        "parameters": [
-          {
-            "name": "ocel_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Ocel Id"
-            }
-          },
-          {
-            "name": "ocel_version",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "enum": [
-                    "original",
-                    "filtered"
-                  ],
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "default": "filtered",
-              "title": "Ocel Version"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ObjectAttributeTimelineQuery"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ObjectAttributeTimelineResponse"
+                  "$ref": "#/components/schemas/Result"
                 }
               }
             }
@@ -798,26 +129,13 @@
   },
   "components": {
     "schemas": {
-      "ActivityEventCount": {
+      "ActivityExecutionFrequency": {
         "properties": {
-          "activity": {
+          "analysis": {
             "type": "string",
-            "title": "Activity"
+            "const": "activity-execution-frequency",
+            "title": "Analysis"
           },
-          "event_count": {
-            "type": "integer",
-            "title": "Event Count"
-          }
-        },
-        "type": "object",
-        "required": [
-          "activity",
-          "event_count"
-        ],
-        "title": "ActivityEventCount"
-      },
-      "ActivityExecutionFrequencyQuery": {
-        "properties": {
           "object_type": {
             "type": "string",
             "title": "Object Type"
@@ -825,259 +143,13 @@
         },
         "type": "object",
         "required": [
+          "analysis",
           "object_type"
         ],
-        "title": "ActivityExecutionFrequencyQuery"
+        "title": "ActivityExecutionFrequency",
+        "description": "Objects of a type by how often they executed each activity, in bands."
       },
-      "ActivityExecutionFrequencyResponse": {
-        "properties": {
-          "rows": {
-            "items": {
-              "$ref": "#/components/schemas/ActivityExecutionFrequencyRow"
-            },
-            "type": "array",
-            "title": "Rows"
-          },
-          "object_activity_pair_count": {
-            "type": "integer",
-            "title": "Object Activity Pair Count"
-          },
-          "object_count": {
-            "type": "integer",
-            "title": "Object Count"
-          },
-          "maximum_execution_count": {
-            "type": "integer",
-            "title": "Maximum Execution Count"
-          }
-        },
-        "type": "object",
-        "required": [
-          "rows",
-          "object_activity_pair_count",
-          "object_count",
-          "maximum_execution_count"
-        ],
-        "title": "ActivityExecutionFrequencyResponse"
-      },
-      "ActivityExecutionFrequencyRow": {
-        "properties": {
-          "activity": {
-            "type": "string",
-            "title": "Activity"
-          },
-          "lower_bound": {
-            "type": "integer",
-            "title": "Lower Bound"
-          },
-          "upper_bound": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Upper Bound"
-          },
-          "label": {
-            "type": "string",
-            "title": "Label"
-          },
-          "object_count": {
-            "type": "integer",
-            "title": "Object Count"
-          }
-        },
-        "type": "object",
-        "required": [
-          "activity",
-          "lower_bound",
-          "upper_bound",
-          "label",
-          "object_count"
-        ],
-        "title": "ActivityExecutionFrequencyRow"
-      },
-      "CategoryGrouping": {
-        "properties": {
-          "kind": {
-            "type": "string",
-            "const": "categories",
-            "title": "Kind"
-          },
-          "limit": {
-            "type": "integer",
-            "maximum": 500.0,
-            "minimum": 1.0,
-            "title": "Limit",
-            "default": 50
-          }
-        },
-        "type": "object",
-        "required": [
-          "kind"
-        ],
-        "title": "CategoryGrouping"
-      },
-      "DistributionBucket": {
-        "properties": {
-          "key": {
-            "type": "string",
-            "title": "Key"
-          },
-          "label": {
-            "type": "string",
-            "title": "Label"
-          },
-          "count": {
-            "type": "integer",
-            "title": "Count"
-          },
-          "kind": {
-            "type": "string",
-            "enum": [
-              "value",
-              "range",
-              "missing",
-              "other"
-            ],
-            "title": "Kind"
-          },
-          "value": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "integer"
-              },
-              {
-                "type": "number"
-              },
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Value"
-          },
-          "lower": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Lower"
-          },
-          "upper": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Upper"
-          },
-          "inclusive_upper": {
-            "type": "boolean",
-            "title": "Inclusive Upper",
-            "default": false
-          }
-        },
-        "type": "object",
-        "required": [
-          "key",
-          "label",
-          "count",
-          "kind"
-        ],
-        "title": "DistributionBucket"
-      },
-      "DistributionResponse": {
-        "properties": {
-          "buckets": {
-            "items": {
-              "$ref": "#/components/schemas/DistributionBucket"
-            },
-            "type": "array",
-            "title": "Buckets"
-          },
-          "counts": {
-            "$ref": "#/components/schemas/QueryCounts"
-          },
-          "truncated": {
-            "type": "boolean",
-            "title": "Truncated"
-          }
-        },
-        "type": "object",
-        "required": [
-          "buckets",
-          "counts",
-          "truncated"
-        ],
-        "title": "DistributionResponse"
-      },
-      "EventAttributeDistributionQuery": {
-        "properties": {
-          "activity": {
-            "type": "string",
-            "title": "Activity"
-          },
-          "attribute": {
-            "type": "string",
-            "title": "Attribute"
-          },
-          "grouping": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/CategoryGrouping"
-              },
-              {
-                "$ref": "#/components/schemas/NumericBinGrouping"
-              }
-            ],
-            "title": "Grouping",
-            "discriminator": {
-              "propertyName": "kind",
-              "mapping": {
-                "bins": "#/components/schemas/NumericBinGrouping",
-                "categories": "#/components/schemas/CategoryGrouping"
-              }
-            }
-          }
-        },
-        "type": "object",
-        "required": [
-          "activity",
-          "attribute",
-          "grouping"
-        ],
-        "title": "EventAttributeDistributionQuery"
-      },
-      "HTTPValidationError": {
-        "properties": {
-          "detail": {
-            "items": {
-              "$ref": "#/components/schemas/ValidationError"
-            },
-            "type": "array",
-            "title": "Detail"
-          }
-        },
-        "type": "object",
-        "title": "HTTPValidationError"
-      },
-      "NumericBinGrouping": {
+      "Bins": {
         "properties": {
           "kind": {
             "type": "string",
@@ -1102,10 +174,93 @@
         "required": [
           "kind"
         ],
-        "title": "NumericBinGrouping"
+        "title": "Bins"
       },
-      "ObjectActivityExecutionDistributionQuery": {
+      "Categories": {
         "properties": {
+          "kind": {
+            "type": "string",
+            "const": "categories",
+            "title": "Kind"
+          },
+          "limit": {
+            "type": "integer",
+            "maximum": 500.0,
+            "minimum": 1.0,
+            "title": "Limit",
+            "default": 50
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind"
+        ],
+        "title": "Categories"
+      },
+      "EventAttributeDistribution": {
+        "properties": {
+          "analysis": {
+            "type": "string",
+            "const": "event-attribute-distribution",
+            "title": "Analysis"
+          },
+          "activity": {
+            "type": "string",
+            "title": "Activity"
+          },
+          "attribute": {
+            "type": "string",
+            "title": "Attribute"
+          },
+          "grouping": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Categories"
+              },
+              {
+                "$ref": "#/components/schemas/Bins"
+              }
+            ],
+            "title": "Grouping",
+            "discriminator": {
+              "propertyName": "kind",
+              "mapping": {
+                "bins": "#/components/schemas/Bins",
+                "categories": "#/components/schemas/Categories"
+              }
+            }
+          }
+        },
+        "type": "object",
+        "required": [
+          "analysis",
+          "activity",
+          "attribute",
+          "grouping"
+        ],
+        "title": "EventAttributeDistribution",
+        "description": "An event attribute's values, one per event of an activity."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ObjectActivityExecutionDistribution": {
+        "properties": {
+          "analysis": {
+            "type": "string",
+            "const": "object-activity-execution-distribution",
+            "title": "Analysis"
+          },
           "object_type": {
             "type": "string",
             "title": "Object Type"
@@ -1113,61 +268,19 @@
         },
         "type": "object",
         "required": [
+          "analysis",
           "object_type"
         ],
-        "title": "ObjectActivityExecutionDistributionQuery"
+        "title": "ObjectActivityExecutionDistribution",
+        "description": "Exact execution counts per object, for activities some object repeats."
       },
-      "ObjectActivityExecutionDistributionResponse": {
+      "ObjectAttributeDistribution": {
         "properties": {
-          "rows": {
-            "items": {
-              "$ref": "#/components/schemas/ObjectActivityExecutionDistributionRow"
-            },
-            "type": "array",
-            "title": "Rows"
-          },
-          "contributing_object_count": {
-            "type": "integer",
-            "title": "Contributing Object Count"
-          },
-          "activity_count": {
-            "type": "integer",
-            "title": "Activity Count"
-          }
-        },
-        "type": "object",
-        "required": [
-          "rows",
-          "contributing_object_count",
-          "activity_count"
-        ],
-        "title": "ObjectActivityExecutionDistributionResponse"
-      },
-      "ObjectActivityExecutionDistributionRow": {
-        "properties": {
-          "activity": {
+          "analysis": {
             "type": "string",
-            "title": "Activity"
+            "const": "object-attribute-distribution",
+            "title": "Analysis"
           },
-          "execution_count": {
-            "type": "integer",
-            "title": "Execution Count"
-          },
-          "object_count": {
-            "type": "integer",
-            "title": "Object Count"
-          }
-        },
-        "type": "object",
-        "required": [
-          "activity",
-          "execution_count",
-          "object_count"
-        ],
-        "title": "ObjectActivityExecutionDistributionRow"
-      },
-      "ObjectAttributeDistributionQuery": {
-        "properties": {
           "activity": {
             "type": "string",
             "title": "Activity"
@@ -1183,69 +296,40 @@
           "grouping": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/CategoryGrouping"
+                "$ref": "#/components/schemas/Categories"
               },
               {
-                "$ref": "#/components/schemas/NumericBinGrouping"
+                "$ref": "#/components/schemas/Bins"
               }
             ],
             "title": "Grouping",
             "discriminator": {
               "propertyName": "kind",
               "mapping": {
-                "bins": "#/components/schemas/NumericBinGrouping",
-                "categories": "#/components/schemas/CategoryGrouping"
+                "bins": "#/components/schemas/Bins",
+                "categories": "#/components/schemas/Categories"
               }
             }
           }
         },
         "type": "object",
         "required": [
+          "analysis",
           "activity",
           "object_type",
           "attribute",
           "grouping"
         ],
-        "title": "ObjectAttributeDistributionQuery"
+        "title": "ObjectAttributeDistribution",
+        "description": "An object attribute's value at each event of an activity, one per\nevent-object pair. A change at the event's own timestamp already applies."
       },
-      "ObjectAttributeTimelinePoint": {
+      "ObjectAttributeTimeline": {
         "properties": {
-          "timestamp": {
+          "analysis": {
             "type": "string",
-            "format": "date-time",
-            "title": "Timestamp"
+            "const": "object-attribute-timeline",
+            "title": "Analysis"
           },
-          "event_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Event Id"
-          },
-          "activity": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Activity"
-          }
-        },
-        "type": "object",
-        "required": [
-          "timestamp"
-        ],
-        "title": "ObjectAttributeTimelinePoint"
-      },
-      "ObjectAttributeTimelineQuery": {
-        "properties": {
           "object_id": {
             "type": "string",
             "title": "Object Id"
@@ -1267,88 +351,19 @@
         },
         "type": "object",
         "required": [
+          "analysis",
           "object_id"
         ],
-        "title": "ObjectAttributeTimelineQuery"
+        "title": "ObjectAttributeTimeline",
+        "description": "Every attribute change of an object and every event it takes part in,\nin time order, each with the attribute values in effect at that point."
       },
-      "ObjectAttributeTimelineResponse": {
+      "ObjectCountsPerEvent": {
         "properties": {
-          "object_type": {
+          "analysis": {
             "type": "string",
-            "title": "Object Type"
+            "const": "object-counts-per-event",
+            "title": "Analysis"
           },
-          "points": {
-            "items": {
-              "$ref": "#/components/schemas/ObjectAttributeTimelinePoint"
-            },
-            "type": "array",
-            "title": "Points"
-          },
-          "series": {
-            "additionalProperties": {
-              "items": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "integer"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "boolean"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
-              },
-              "type": "array"
-            },
-            "type": "object",
-            "title": "Series"
-          }
-        },
-        "type": "object",
-        "required": [
-          "object_type",
-          "points",
-          "series"
-        ],
-        "title": "ObjectAttributeTimelineResponse"
-      },
-      "ObjectCountPerEventRow": {
-        "properties": {
-          "activity": {
-            "type": "string",
-            "title": "Activity"
-          },
-          "object_type": {
-            "type": "string",
-            "title": "Object Type"
-          },
-          "object_count": {
-            "type": "integer",
-            "title": "Object Count"
-          },
-          "event_count": {
-            "type": "integer",
-            "title": "Event Count"
-          }
-        },
-        "type": "object",
-        "required": [
-          "activity",
-          "object_type",
-          "object_count",
-          "event_count"
-        ],
-        "title": "ObjectCountPerEventRow"
-      },
-      "ObjectCountsPerEventQuery": {
-        "properties": {
           "activities": {
             "items": {
               "type": "string"
@@ -1358,34 +373,19 @@
           }
         },
         "type": "object",
-        "title": "ObjectCountsPerEventQuery"
-      },
-      "ObjectCountsPerEventResponse": {
-        "properties": {
-          "rows": {
-            "items": {
-              "$ref": "#/components/schemas/ObjectCountPerEventRow"
-            },
-            "type": "array",
-            "title": "Rows"
-          },
-          "activity_event_counts": {
-            "items": {
-              "$ref": "#/components/schemas/ActivityEventCount"
-            },
-            "type": "array",
-            "title": "Activity Event Counts"
-          }
-        },
-        "type": "object",
         "required": [
-          "rows",
-          "activity_event_counts"
+          "analysis"
         ],
-        "title": "ObjectCountsPerEventResponse"
+        "title": "ObjectCountsPerEvent",
+        "description": "Events by how many distinct objects of each type they involve."
       },
-      "ObjectInvolvementDistributionQuery": {
+      "ObjectInvolvementDistribution": {
         "properties": {
+          "analysis": {
+            "type": "string",
+            "const": "object-involvement-distribution",
+            "title": "Analysis"
+          },
           "activity": {
             "type": "string",
             "title": "Activity"
@@ -1397,58 +397,39 @@
           "grouping": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/CategoryGrouping"
+                "$ref": "#/components/schemas/Categories"
               },
               {
-                "$ref": "#/components/schemas/NumericBinGrouping"
+                "$ref": "#/components/schemas/Bins"
               }
             ],
             "title": "Grouping",
             "discriminator": {
               "propertyName": "kind",
               "mapping": {
-                "bins": "#/components/schemas/NumericBinGrouping",
-                "categories": "#/components/schemas/CategoryGrouping"
+                "bins": "#/components/schemas/Bins",
+                "categories": "#/components/schemas/Categories"
               }
             }
           }
         },
         "type": "object",
         "required": [
+          "analysis",
           "activity",
           "object_type",
           "grouping"
         ],
-        "title": "ObjectInvolvementDistributionQuery"
+        "title": "ObjectInvolvementDistribution",
+        "description": "Distinct objects of a type per event of an activity, including zero."
       },
-      "ObjectTypeCombinationRow": {
+      "ObjectTypeCombinations": {
         "properties": {
-          "object_types": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Object Types"
-          },
-          "activity": {
+          "analysis": {
             "type": "string",
-            "title": "Activity"
+            "const": "object-type-combinations",
+            "title": "Analysis"
           },
-          "event_count": {
-            "type": "integer",
-            "title": "Event Count"
-          }
-        },
-        "type": "object",
-        "required": [
-          "object_types",
-          "activity",
-          "event_count"
-        ],
-        "title": "ObjectTypeCombinationRow"
-      },
-      "ObjectTypeCombinationsQuery": {
-        "properties": {
           "limit": {
             "type": "integer",
             "maximum": 50.0,
@@ -1465,74 +446,42 @@
           }
         },
         "type": "object",
-        "title": "ObjectTypeCombinationsQuery"
+        "required": [
+          "analysis"
+        ],
+        "title": "ObjectTypeCombinations",
+        "description": "The most frequent exact sets of object types per event, by activity."
       },
-      "ObjectTypeCombinationsResponse": {
+      "Result": {
         "properties": {
           "rows": {
             "items": {
-              "$ref": "#/components/schemas/ObjectTypeCombinationRow"
+              "additionalProperties": true,
+              "type": "object"
             },
             "type": "array",
             "title": "Rows"
           },
-          "total_event_count": {
-            "type": "integer",
-            "title": "Total Event Count"
-          },
-          "represented_event_count": {
-            "type": "integer",
-            "title": "Represented Event Count"
-          },
-          "total_combination_count": {
-            "type": "integer",
-            "title": "Total Combination Count"
-          },
-          "truncated": {
-            "type": "boolean",
-            "title": "Truncated"
+          "meta": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Meta"
           }
         },
         "type": "object",
         "required": [
-          "rows",
-          "total_event_count",
-          "represented_event_count",
-          "total_combination_count",
-          "truncated"
+          "rows"
         ],
-        "title": "ObjectTypeCombinationsResponse"
+        "title": "Result",
+        "description": "What every analysis returns: tidy rows, plus named population figures."
       },
-      "QueryCounts": {
+      "TimeBetweenActivities": {
         "properties": {
-          "total": {
-            "type": "integer",
-            "title": "Total"
+          "analysis": {
+            "type": "string",
+            "const": "time-between-activities",
+            "title": "Analysis"
           },
-          "present": {
-            "type": "integer",
-            "title": "Present"
-          },
-          "missing": {
-            "type": "integer",
-            "title": "Missing"
-          },
-          "represented": {
-            "type": "integer",
-            "title": "Represented"
-          }
-        },
-        "type": "object",
-        "required": [
-          "total",
-          "present",
-          "missing",
-          "represented"
-        ],
-        "title": "QueryCounts"
-      },
-      "TimeBetweenActivitiesQuery": {
-        "properties": {
           "source_activity": {
             "type": "string",
             "title": "Source Activity"
@@ -1571,102 +520,29 @@
         },
         "type": "object",
         "required": [
+          "analysis",
           "source_activity",
           "target_activity",
           "object_type",
           "unit"
         ],
-        "title": "TimeBetweenActivitiesQuery"
+        "title": "TimeBetweenActivities",
+        "description": "Durations from a source to a directly following target activity, once\neach object's trace is reduced to just those two activities."
       },
-      "TimeBetweenActivitiesResponse": {
+      "TotalObjectInvolvement": {
         "properties": {
-          "buckets": {
-            "items": {
-              "$ref": "#/components/schemas/DistributionBucket"
-            },
-            "type": "array",
-            "title": "Buckets"
-          },
-          "counts": {
-            "$ref": "#/components/schemas/QueryCounts"
-          },
-          "truncated": {
-            "type": "boolean",
-            "title": "Truncated"
-          },
-          "unit": {
+          "analysis": {
             "type": "string",
-            "enum": [
-              "seconds",
-              "minutes",
-              "hours",
-              "days"
-            ],
-            "title": "Unit"
-          },
-          "pair_count": {
-            "type": "integer",
-            "title": "Pair Count"
-          },
-          "contributing_object_count": {
-            "type": "integer",
-            "title": "Contributing Object Count"
+            "const": "total-object-involvement",
+            "title": "Analysis"
           }
         },
         "type": "object",
         "required": [
-          "buckets",
-          "counts",
-          "truncated",
-          "unit",
-          "pair_count",
-          "contributing_object_count"
+          "analysis"
         ],
-        "title": "TimeBetweenActivitiesResponse"
-      },
-      "TotalObjectInvolvementResponse": {
-        "properties": {
-          "rows": {
-            "items": {
-              "$ref": "#/components/schemas/TotalObjectInvolvementRow"
-            },
-            "type": "array",
-            "title": "Rows"
-          },
-          "event_count": {
-            "type": "integer",
-            "title": "Event Count"
-          }
-        },
-        "type": "object",
-        "required": [
-          "rows",
-          "event_count"
-        ],
-        "title": "TotalObjectInvolvementResponse"
-      },
-      "TotalObjectInvolvementRow": {
-        "properties": {
-          "activity": {
-            "type": "string",
-            "title": "Activity"
-          },
-          "object_count": {
-            "type": "integer",
-            "title": "Object Count"
-          },
-          "event_count": {
-            "type": "integer",
-            "title": "Event Count"
-          }
-        },
-        "type": "object",
-        "required": [
-          "activity",
-          "object_count",
-          "event_count"
-        ],
-        "title": "TotalObjectInvolvementRow"
+        "title": "TotalObjectInvolvement",
+        "description": "Events by how many distinct objects they involve, per activity.\nEvents without any object count as involving zero."
       },
       "ValidationError": {
         "properties": {

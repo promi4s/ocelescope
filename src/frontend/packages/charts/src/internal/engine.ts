@@ -7,7 +7,6 @@ import {
 } from "echarts/charts";
 import {
   AriaComponent,
-  BrushComponent,
   DatasetComponent,
   DataZoomComponent,
   GridComponent,
@@ -30,7 +29,6 @@ echarts.use([
   TooltipComponent,
   LegendComponent,
   DataZoomComponent,
-  BrushComponent,
   AriaComponent,
   LabelLayout,
   SVGRenderer,

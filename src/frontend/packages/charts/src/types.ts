@@ -121,11 +121,6 @@ export interface ZoomConfig {
   mouse?: boolean;
 }
 
-export interface BrushConfig {
-  /** Which axis the line brush selects across. */
-  axis: "x" | "y";
-}
-
 export type ChartExportFormat = "png" | "svg";
 
 export type SortDirection = "asc" | "desc" | "none";
@@ -219,6 +214,12 @@ export interface SunburstProps extends BaseChartProps {
   labelDepth?: number;
   /** Fold nodes contributing less than this share of their parent (0 to 1). */
   minShare?: number;
+  /**
+   * Segment order within each ring. Largest first by default; `"none"` keeps
+   * the order nodes first appear in `rows`, for rings with a natural order
+   * such as counts.
+   */
+  sort?: SortDirection;
 }
 
 export interface TimelineChartProps extends BaseChartProps {
@@ -230,10 +231,8 @@ export interface TimelineChartProps extends BaseChartProps {
 /** Axis interactions are available only on charts with Cartesian axes. */
 export interface AxisInteractions {
   zoom?: ZoomConfig;
-  brush?: BrushConfig;
   viewport?: ChartViewport | null;
   onViewportChange?: (viewport: ChartViewport | null) => void;
-  onSelection?: (selection: ChartViewport | null) => void;
 }
 
 /** Only settings applicable to the selected chart type are accepted. */

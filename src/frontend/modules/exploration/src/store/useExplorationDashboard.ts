@@ -39,7 +39,7 @@ function migrateCards(cards: DashboardCardDefinition[]) {
           ...spec,
           query: {
             ...spec.query,
-            grouping: { kind: "categories", limit: 500 },
+            grouping: { kind: "categories" as const, limit: 500 },
           },
           visualization: "bar",
         } as ObjectInvolvementDistributionSpec,

@@ -4,32 +4,27 @@ import { customFetch } from "../lib/fetcher";
 const BASE = "/api/external/modules/exploration/v1";
 
 /**
- * One hook for every analysis. Each endpoint is
- * `POST /ocels/{id}/queries/{analysis}` with the spec's query as the body, so
- * the analysis id is the only thing that varies — there is no reason for ten
- * generated hooks and ten card components that each call one of them.
+ * One endpoint serves every analysis: `POST /ocels/{id}/queries` with a body
+ * whose `analysis` field selects which one runs. The dashboard stores the query
+ * without that tag, so it is added here.
  *
- * Results always come from the *filtered* OCEL; the editor's choices come from
- * the original one.
+ * Results always come from the *filtered* OCEL; validity and the editor's
+ * choices come from the original one.
  */
 export function useAnalysisQuery<T>(
   ocelId: string,
   analysis: string,
-  query: unknown,
+  query: object | undefined,
 ) {
   return useQuery({
     queryKey: ["exploration", analysis, ocelId, query],
     queryFn: ({ signal }) =>
       customFetch<T>({
-        url: `${BASE}/ocels/${ocelId}/queries/${analysis}`,
+        url: `${BASE}/ocels/${ocelId}/queries`,
         method: "POST",
         params: { ocel_version: "filtered" },
-        ...(query === undefined
-          ? {}
-          : {
-              data: query,
-              headers: { "Content-Type": "application/json" },
-            }),
+        headers: { "Content-Type": "application/json" },
+        data: { ...query, analysis },
         signal,
       }),
   });

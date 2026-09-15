@@ -1,65 +1,68 @@
 import type {
-  ActivityExecutionFrequencyQuery,
-  EventAttributeDistributionQuery,
-  ObjectActivityExecutionDistributionQuery,
-  ObjectAttributeDistributionQuery,
-  ObjectAttributeTimelineQuery,
-  ObjectCountsPerEventQuery,
-  ObjectInvolvementDistributionQuery,
-  ObjectTypeCombinationsQuery,
-  TimeBetweenActivitiesQuery,
+  ActivityExecutionFrequency,
+  EventAttributeDistribution,
+  ObjectActivityExecutionDistribution,
+  ObjectAttributeDistribution,
+  ObjectAttributeTimeline,
+  ObjectCountsPerEvent,
+  ObjectInvolvementDistribution,
+  ObjectTypeCombinations,
+  TimeBetweenActivities,
 } from "../api/exploration";
+
+/** A query as the dashboard stores it: the `analysis` tag lives on the spec. */
+type Stored<Q> = Omit<Q, "analysis">;
 
 export type DistributionVisualization = "bar" | "donut" | "histogram";
 
 export interface EventAttributeDistributionSpec {
   analysis: "event-attribute-distribution";
-  query: EventAttributeDistributionQuery;
+  query: Stored<EventAttributeDistribution>;
   visualization: DistributionVisualization;
   title?: string;
 }
 
 export interface ActivityExecutionFrequencySpec {
   analysis: "activity-execution-frequency";
-  query: ActivityExecutionFrequencyQuery;
+  query: Stored<ActivityExecutionFrequency>;
   title?: string;
 }
 
 export interface ObjectAttributeDistributionSpec {
   analysis: "object-attribute-distribution";
-  query: ObjectAttributeDistributionQuery;
+  query: Stored<ObjectAttributeDistribution>;
   visualization: DistributionVisualization;
   title?: string;
 }
 
 export interface ObjectCountsPerEventSpec {
   analysis: "object-counts-per-event";
-  query: ObjectCountsPerEventQuery;
+  query: Stored<ObjectCountsPerEvent>;
   title?: string;
 }
 
 export interface ObjectInvolvementDistributionSpec {
   analysis: "object-involvement-distribution";
-  query: ObjectInvolvementDistributionQuery;
+  query: Stored<ObjectInvolvementDistribution>;
   visualization: "bar" | "histogram";
   title?: string;
 }
 
 export interface ObjectTypeCombinationsSpec {
   analysis: "object-type-combinations";
-  query: ObjectTypeCombinationsQuery;
+  query: Stored<ObjectTypeCombinations>;
   title?: string;
 }
 
 export interface TimeBetweenActivitiesSpec {
   analysis: "time-between-activities";
-  query: TimeBetweenActivitiesQuery;
+  query: Stored<TimeBetweenActivities>;
   title?: string;
 }
 
 export interface ObjectActivityExecutionDistributionSpec {
   analysis: "object-activity-execution-distribution";
-  query: ObjectActivityExecutionDistributionQuery;
+  query: Stored<ObjectActivityExecutionDistribution>;
   title?: string;
 }
 
@@ -70,7 +73,7 @@ export interface TotalObjectInvolvementSpec {
 
 export interface ObjectAttributeTimelineSpec {
   analysis: "object-attribute-timeline";
-  query: ObjectAttributeTimelineQuery;
+  query: Stored<ObjectAttributeTimeline>;
   title?: string;
 }
 

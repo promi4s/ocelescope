@@ -40,13 +40,7 @@ export const Chart = memo(function Chart(props: ChartProps) {
     emptyMessage = "No data",
   } = props;
   const empty = props.empty ?? props.rows.length === 0;
-  const {
-    zoom,
-    brush,
-    viewport,
-    onViewportChange,
-    onSelection,
-  }: AxisInteractions =
+  const { zoom, viewport, onViewportChange }: AxisInteractions =
     props.type === "pie" || props.type === "sunburst" ? {} : props;
   const chartRef = useRef<EChartsReactCore | null>(null);
   const slot = useContext(ChartSlotContext);
@@ -70,10 +64,8 @@ export const Chart = memo(function Chart(props: ChartProps) {
   const interactions = useEChartInteractions({
     chartRef,
     zoom,
-    brush,
     viewport,
     onViewportChange,
-    onSelection,
     onEvents: events,
   });
 
@@ -81,10 +73,10 @@ export const Chart = memo(function Chart(props: ChartProps) {
     () =>
       enhanceChartOption(option, {
         ...(zoom ? { zoom } : {}),
-        ...(brush ? { brush } : {}),
         viewport: interactions.viewport,
+        legendSelected: interactions.legendSelected,
       }),
-    [option, zoom, brush, interactions.viewport],
+    [option, zoom, interactions.viewport, interactions.legendSelected],
   );
 
   // Hand the instance to an enclosing ChartCard, if there is one.

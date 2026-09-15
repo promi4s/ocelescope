@@ -35,14 +35,13 @@ Rows are observations containing primitive values. API response adaptation belon
 in the feature module. Timeline rows contain one value per series column; the
 other charts use long rows and split series using a column's values.
 
-Bars and pies sort descending by default. Lines and scatter retain input order.
+Bars, pies and sunburst rings sort descending by default. Lines and scatter retain input order.
 `sort="none"` preserves order explicitly. Positive integer `topN` values fold
 the tail into “Other”; invalid or non-positive values leave all rows visible.
 
 Cartesian charts support `xAxis`, `yAxis`, `valueFormat`, and declarative tooltip
 settings. Cartesian and timeline charts support `zoom`, controlled `viewport`,
-`onViewportChange`, and `brush`/`onSelection`. Viewports use 0–100 percentages;
-brush selections use axis coordinates (indices on a categorical axis).
+and `onViewportChange`. Viewports use 0–100 percentages.
 
 Colours follow Mantine. Use `palette` for custom series colours and `itemColor`
 on bars or pies for individual marks. `useChartTheme` exposes resolved colours

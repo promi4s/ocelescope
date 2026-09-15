@@ -5,28 +5,18 @@
     "exactOptionalPropertyTypes": false,
     "target": "esnext",
     "jsx": "react-jsx",
-    "lib": [
-      "es2023",
-      "DOM"
-    ],
+    "lib": ["es2023", "DOM"],
     "moduleDetection": "force",
     "module": "preserve",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
-    "types": [
-      "node"
-    ],
+    "types": ["node"],
     "declaration": true,
     "emitDeclarationOnly": true,
     "verbatimModuleSyntax": true,
     "paths": {
-      "lucide-react": [
-        "./node_modules/lucide-react/dist/lucide-react.suffixed"
-      ]
+      "lucide-react": ["./node_modules/lucide-react/dist/lucide-react.suffixed"]
     }
   },
-  "include": [
-    "src",
-    "tests"
-  ]
+  "include": ["src", "tests"]
 }

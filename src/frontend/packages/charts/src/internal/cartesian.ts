@@ -162,10 +162,16 @@ export const cartesianOption = (
         ...(pivoted ? { name: names[seriesIndex] } : {}),
         ...(stack ? { stack: "total" } : {}),
         ...(mark === "bar"
-          ? {
-              barMaxWidth: barMaxWidth ?? 48,
-              ...(flush ? { barCategoryGap: "0%", barGap: "0%" } : {}),
-            }
+          ? flush
+            ? {
+                // A histogram's bars have to touch, so the default width cap
+                // must not apply: it would leave a gap whenever a category slot
+                // is wider than the cap. Only an explicit width is honoured.
+                barCategoryGap: "0%",
+                barGap: "0%",
+                ...(barMaxWidth != null ? { barMaxWidth } : {}),
+              }
+            : { barMaxWidth: barMaxWidth ?? 48 }
           : {}),
         ...(mark === "line" || mark === "area"
           ? {

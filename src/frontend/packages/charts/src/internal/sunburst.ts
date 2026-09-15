@@ -1,4 +1,10 @@
-import type { ChartTheme, Column, Row, SunburstProps } from "../types";
+import type {
+  ChartTheme,
+  Column,
+  Row,
+  SortDirection,
+  SunburstProps,
+} from "../types";
 import { toLabel, toNumber } from "./data";
 import type { BuiltChart, ClickParams, OptionBuilder } from "./engine";
 import { baseOption, defaultValueFormat } from "./theme";
@@ -66,32 +72,42 @@ interface SunburstDatum {
   label?: { show: boolean };
 }
 
+const ORDER: Record<SortDirection, ((a: Node, b: Node) => number) | null> = {
+  desc: (a, b) => b.value - a.value,
+  asc: (a, b) => a.value - b.value,
+  none: null, // folding preserves the order nodes first appear in the rows
+};
+
 const toData = (
   nodes: Node[],
   depth: number,
   labelDepth: number,
   minShare: number,
   parentTotal: number,
-): SunburstDatum[] =>
-  nodes
-    .filter((node) => parentTotal <= 0 || node.value / parentTotal >= minShare)
-    .sort((a, b) => b.value - a.value)
-    .map((node) => ({
-      name: node.name,
-      value: node.value,
-      ...(depth >= labelDepth ? { label: { show: false } } : {}),
-      ...(node.children.size > 0
-        ? {
-            children: toData(
-              [...node.children.values()],
-              depth + 1,
-              labelDepth,
-              minShare,
-              node.value,
-            ),
-          }
-        : {}),
-    }));
+  sort: SortDirection,
+): SunburstDatum[] => {
+  const kept = nodes.filter(
+    (node) => parentTotal <= 0 || node.value / parentTotal >= minShare,
+  );
+  const order = ORDER[sort];
+  return (order ? kept.sort(order) : kept).map((node) => ({
+    name: node.name,
+    value: node.value,
+    ...(depth >= labelDepth ? { label: { show: false } } : {}),
+    ...(node.children.size > 0
+      ? {
+          children: toData(
+            [...node.children.values()],
+            depth + 1,
+            labelDepth,
+            minShare,
+            node.value,
+            sort,
+          ),
+        }
+      : {}),
+  }));
+};
 
 export const sunburstOption: OptionBuilder<SunburstProps> = (
   props: SunburstProps,
@@ -104,6 +120,7 @@ export const sunburstOption: OptionBuilder<SunburstProps> = (
     nodeValue,
     labelDepth = 2,
     minShare = 0,
+    sort = "desc",
     palette,
     valueFormat = defaultValueFormat,
   } = props;
@@ -164,7 +181,7 @@ export const sunburstOption: OptionBuilder<SunburstProps> = (
         {
           type: "sunburst",
           radius: [0, "92%"],
-          data: toData(roots, 1, labelDepth, minShare, total),
+          data: toData(roots, 1, labelDepth, minShare, total, sort),
           itemStyle: { borderColor: theme.background, borderWidth: 1 },
           label: { color: theme.text, minAngle: 8 },
           emphasis: { focus: "ancestor" },

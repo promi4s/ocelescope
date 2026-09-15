@@ -2,20 +2,59 @@ import { Group, Stack, Text } from "@mantine/core";
 import { Chart, type Row } from "@ocelescope/charts";
 import type { ReactNode } from "react";
 
-import type {
-  ActivityEventCount,
-  ActivityExecutionFrequencyResponse,
-  DistributionResponse,
-  ObjectActivityExecutionDistributionResponse,
-  ObjectAttributeTimelineResponse,
-  ObjectCountPerEventRow,
-  ObjectCountsPerEventResponse,
-  ObjectTypeCombinationsResponse,
-  TimeBetweenActivitiesResponse,
-  TotalObjectInvolvementResponse,
-} from "../api/exploration";
 import type { VisualizationSpec } from "../model/dashboard";
-import { DistributionChart } from "./DistributionChart";
+import { type Bucket, DistributionChart } from "./DistributionChart";
+
+/*
+ * Every analysis answers with `{ rows, meta }` of generic records. These are
+ * the columns and figures each card reads from it.
+ */
+type Data<R, M> = { rows: R[]; meta: M };
+/** How the backend bins a histogram, in words. */
+const binning = (count?: number | null) =>
+  count
+    ? `grouped into ${count} equal intervals`
+    : "grouped into equal intervals sized by the Freedman–Diaconis rule, with far outliers counted in separate “<” and “>” bars";
+
+type DistributionMeta = { total: number; missing: number; truncated: boolean };
+type TimeBetweenData = Data<
+  Bucket,
+  DistributionMeta & { pair_count: number; contributing_object_count: number }
+>;
+type ExecutionFrequencyData = Data<
+  { activity: string; band: string; object_count: number },
+  {
+    object_count: number;
+    object_activity_pair_count: number;
+    maximum_execution_count: number;
+  }
+>;
+type TypeCombinationsData = Data<
+  { object_types: string[]; activity: string; event_count: number },
+  { total_event_count: number; total_combination_count: number }
+>;
+type CountsPerEventRow = {
+  activity: string;
+  object_type: string;
+  object_count: number;
+  event_count: number;
+};
+type CountsPerEventData = Data<
+  CountsPerEventRow,
+  { activity_event_counts: Record<string, number> }
+>;
+type ExecutionDistributionData = Data<
+  { activity: string; execution_count: number; object_count: number },
+  { object_count: number; activity_count: number }
+>;
+type TotalInvolvementData = Data<
+  { activity: string; object_count: number; event_count: number },
+  { event_count: number }
+>;
+type TimelineData = Data<
+  { activity: string | null; values: Record<string, unknown> },
+  { object_type: string; attributes: string[] }
+>;
 
 /**
  * What a card shows, per analysis. Everything a card used to repeat — the hook
@@ -86,26 +125,25 @@ const Pair = ({ left, right }: { left: ReactNode; right: ReactNode }) => (
   </Group>
 );
 
-/** The four bucket-shaped analyses differ only in wording. */
-const distributionCounts = (data: DistributionResponse) => data.counts;
+/** The four bucket-shaped analyses share one result shape; only wording differs. */
+type Distribution = Data<Bucket, DistributionMeta>;
 
-const distributionNote =
-  (population: string) => (data: DistributionResponse) => (
-    <Pair
-      left={`${distributionCounts(data).total.toLocaleString()} ${population}`}
-      right={`${distributionCounts(data).missing.toLocaleString()} missing`}
-    />
-  );
+const distributionNote = (population: string) => (data: Distribution) => (
+  <Pair
+    left={`${data.meta.total.toLocaleString()} ${population}`}
+    right={`${data.meta.missing.toLocaleString()} missing`}
+  />
+);
 
 const distributionChart =
   (seriesName: string) =>
   (
-    data: DistributionResponse | undefined,
+    data: Distribution | undefined,
     spec: { visualization: "bar" | "donut" | "histogram" },
     slot: ChartSlot,
   ) => (
     <DistributionChart
-      buckets={data?.buckets ?? []}
+      buckets={data?.rows ?? []}
       visualization={spec.visualization}
       seriesName={seriesName}
       {...slot}
@@ -116,7 +154,7 @@ const distributionChart =
 
 export const eventAttributeDistribution = defineCard<
   "event-attribute-distribution",
-  DistributionResponse
+  Distribution
 >("event-attribute-distribution", {
   title: (spec) => spec.title || `${spec.query.attribute} distribution`,
   subtitle: (spec) => `Activity · ${spec.query.activity}`,
@@ -127,7 +165,7 @@ export const eventAttributeDistribution = defineCard<
       question={`How is ${spec.query.attribute} distributed for events with activity “${spec.query.activity}”?`}
       determination={
         spec.query.grouping.kind === "bins"
-          ? `Numeric values are grouped into ${spec.query.grouping.count ?? "automatically determined"} intervals.`
+          ? `Numeric values are ${binning(spec.query.grouping.count)}.`
           : "Equal values are grouped together and counted."
       }
     >
@@ -137,14 +175,14 @@ export const eventAttributeDistribution = defineCard<
       </Text>
     </Question>
   ),
-  isEmpty: (data) => data.counts.total === 0,
+  isEmpty: (data) => data.meta.total === 0,
   note: distributionNote("events"),
   chart: distributionChart("Events"),
 });
 
 export const objectAttributeDistribution = defineCard<
   "object-attribute-distribution",
-  DistributionResponse
+  Distribution
 >("object-attribute-distribution", {
   title: (spec) => spec.title || `${spec.query.attribute} distribution`,
   subtitle: (spec) => `${spec.query.activity} · ${spec.query.object_type}`,
@@ -162,14 +200,14 @@ export const objectAttributeDistribution = defineCard<
       </Text>
     </Question>
   ),
-  isEmpty: (data) => data.counts.total === 0,
+  isEmpty: (data) => data.meta.total === 0,
   note: distributionNote("event–object pairs"),
   chart: distributionChart("Event–object pairs"),
 });
 
 export const objectInvolvementDistribution = defineCard<
   "object-involvement-distribution",
-  DistributionResponse
+  Distribution
 >("object-involvement-distribution", {
   title: (spec) => spec.title || "Object involvement distribution",
   subtitle: (spec) => `${spec.query.activity} · ${spec.query.object_type}`,
@@ -188,20 +226,20 @@ export const objectInvolvementDistribution = defineCard<
       </Text>
       <Text size="sm">
         {spec.visualization === "histogram"
-          ? `Counts are grouped into ${spec.query.grouping.kind === "bins" ? (spec.query.grouping.count ?? "automatically determined") : ""} numerical intervals.`
+          ? `Counts are ${binning(spec.query.grouping.kind === "bins" ? spec.query.grouping.count : null)}.`
           : "Each bar represents one exact involvement count."}{" "}
         Height is the number of events. The active filtered OCEL is used.
       </Text>
     </Stack>
   ),
-  isEmpty: (data) => data.counts.total === 0,
+  isEmpty: (data) => data.meta.total === 0,
   note: distributionNote("events"),
   chart: distributionChart("Events"),
 });
 
 export const timeBetweenActivities = defineCard<
   "time-between-activities",
-  TimeBetweenActivitiesResponse
+  TimeBetweenData
 >("time-between-activities", {
   title: (spec) => spec.title || "Time between activities",
   subtitle: (spec) =>
@@ -228,16 +266,16 @@ export const timeBetweenActivities = defineCard<
       </Text>
     </Stack>
   ),
-  isEmpty: (data) => data.counts.total === 0,
+  isEmpty: (data) => data.meta.total === 0,
   note: (data) => (
     <Pair
-      left={`${data.pair_count.toLocaleString()} matched pairs`}
-      right={`${data.contributing_object_count.toLocaleString()} contributing objects`}
+      left={`${data.meta.pair_count.toLocaleString()} matched pairs`}
+      right={`${data.meta.contributing_object_count.toLocaleString()} contributing objects`}
     />
   ),
   chart: (data, _spec, slot) => (
     <DistributionChart
-      buckets={data?.buckets ?? []}
+      buckets={data?.rows ?? []}
       visualization="histogram"
       seriesName="Activity pairs"
       {...slot}
@@ -247,7 +285,7 @@ export const timeBetweenActivities = defineCard<
 
 export const activityExecutionFrequency = defineCard<
   "activity-execution-frequency",
-  ActivityExecutionFrequencyResponse
+  ExecutionFrequencyData
 >("activity-execution-frequency", {
   title: (spec) => spec.title || "Activity execution frequency",
   subtitle: (spec) => `Object type · ${spec.query.object_type}`,
@@ -273,19 +311,19 @@ export const activityExecutionFrequency = defineCard<
   ),
   note: (data) => (
     <Pair
-      left={`${data.object_count.toLocaleString()} objects · ${data.object_activity_pair_count.toLocaleString()} object–activity pairs`}
-      right={`Maximum ${data.maximum_execution_count.toLocaleString()} executions`}
+      left={`${data.meta.object_count.toLocaleString()} objects · ${data.meta.object_activity_pair_count.toLocaleString()} object–activity pairs`}
+      right={`Maximum ${data.meta.maximum_execution_count.toLocaleString()} executions`}
     />
   ),
   chart: (data, _spec, slot) => {
     const rows: Row[] = (data?.rows ?? []).map((row) => ({
       activity: row.activity,
       executions:
-        row.label === "1"
+        row.band === "1"
           ? "Executed once"
-          : row.label === "2"
+          : row.band === "2"
             ? "Executed twice"
-            : `Executed ${row.label} times`,
+            : `Executed ${row.band} times`,
       objects: row.object_count,
     }));
     const activities = new Set(rows.map((row) => row.activity)).size;
@@ -311,7 +349,7 @@ export const activityExecutionFrequency = defineCard<
 
 export const objectTypeCombinations = defineCard<
   "object-type-combinations",
-  ObjectTypeCombinationsResponse
+  TypeCombinationsData
 >("object-type-combinations", {
   title: (spec) => spec.title || "Object-type combinations per event",
   subtitle: (spec) => {
@@ -346,8 +384,8 @@ export const objectTypeCombinations = defineCard<
   ),
   note: (data) => (
     <Pair
-      left={`${data.total_event_count.toLocaleString()} events shown`}
-      right={`${new Set(data.rows.map((row) => combinationLabel(row.object_types))).size} of ${data.total_combination_count.toLocaleString()} combinations`}
+      left={`${data.meta.total_event_count.toLocaleString()} events shown`}
+      right={`${new Set(data.rows.map((row) => combinationLabel(row.object_types))).size} of ${data.meta.total_combination_count.toLocaleString()} combinations`}
     />
   ),
   chart: (data, spec, slot) => {
@@ -377,7 +415,7 @@ export const objectTypeCombinations = defineCard<
           // One activity is compared against its own event total; several are
           // compared against the combination they share.
           showPercent: singleActivity
-            ? (data?.total_event_count ?? true)
+            ? (data?.meta.total_event_count ?? true)
             : true,
         }}
         {...(combinations > 8
@@ -390,7 +428,7 @@ export const objectTypeCombinations = defineCard<
 
 export const objectCountsPerEvent = defineCard<
   "object-counts-per-event",
-  ObjectCountsPerEventResponse
+  CountsPerEventData
 >("object-counts-per-event", {
   title: (spec) => spec.title || "Objects involved per event",
   subtitle: (spec) =>
@@ -420,8 +458,8 @@ export const objectCountsPerEvent = defineCard<
   ),
   note: (data) => (
     <Pair
-      left={`${data.activity_event_counts
-        .reduce((sum, item) => sum + item.event_count, 0)
+      left={`${Object.values(data.meta.activity_event_counts)
+        .reduce((sum, count) => sum + count, 0)
         .toLocaleString()} unique events`}
       right="Click a segment to focus"
     />
@@ -429,12 +467,10 @@ export const objectCountsPerEvent = defineCard<
   chart: (data, _spec, slot) => (
     <Chart
       type="sunburst"
-      rows={countsPerEventRows(
-        data?.rows ?? [],
-        data?.activity_event_counts ?? [],
-      )}
+      rows={countsPerEventRows(data)}
       {...slot}
       path={["activity", "object_type", "objects"]}
+      sort="none"
       value="events"
       nodeValue={["unique_events", null, null]}
     />
@@ -443,7 +479,7 @@ export const objectCountsPerEvent = defineCard<
 
 export const objectActivityExecutionDistribution = defineCard<
   "object-activity-execution-distribution",
-  ObjectActivityExecutionDistributionResponse
+  ExecutionDistributionData
 >("object-activity-execution-distribution", {
   title: (spec) => spec.title || "Object activity execution frequency",
   subtitle: (spec) => `Object type · ${spec.query.object_type}`,
@@ -465,8 +501,8 @@ export const objectActivityExecutionDistribution = defineCard<
   ),
   note: (data) => (
     <Pair
-      left={`${data.activity_count} activities`}
-      right={`${data.contributing_object_count.toLocaleString()} objects`}
+      left={`${data.meta.activity_count} activities`}
+      right={`${data.meta.object_count.toLocaleString()} objects`}
     />
   ),
   chart: (data, _spec, slot) => (
@@ -479,6 +515,7 @@ export const objectActivityExecutionDistribution = defineCard<
       }))}
       {...slot}
       path={["activity", "executions"]}
+      sort="none"
       value="objects"
     />
   ),
@@ -486,7 +523,7 @@ export const objectActivityExecutionDistribution = defineCard<
 
 export const totalObjectInvolvement = defineCard<
   "total-object-involvement",
-  TotalObjectInvolvementResponse
+  TotalInvolvementData
 >("total-object-involvement", {
   title: (spec) => spec.title || "Total objects involved in events",
   subtitle: () => "All object types",
@@ -511,7 +548,7 @@ export const totalObjectInvolvement = defineCard<
   ),
   note: (data) => (
     <Text size="xs" c="dimmed">
-      {data.event_count.toLocaleString()} unique events
+      {data.meta.event_count.toLocaleString()} unique events
     </Text>
   ),
   chart: (data, _spec, slot) => (
@@ -543,7 +580,7 @@ export const totalObjectInvolvement = defineCard<
 
 export const objectAttributeTimeline = defineCard<
   "object-attribute-timeline",
-  ObjectAttributeTimelineResponse
+  TimelineData
 >("object-attribute-timeline", {
   title: (spec) => spec.title || "Object attribute value development",
   subtitle: (spec) => `Object · ${spec.query.object_id}`,
@@ -565,12 +602,11 @@ export const objectAttributeTimeline = defineCard<
       </Text>
     </Stack>
   ),
-  isEmpty: (data) => data.points.length === 0,
+  isEmpty: (data) => data.rows.length === 0,
   note: (data) => (
     <Text size="xs" c="dimmed">
-      {data.object_type} · {Object.keys(data.series).length} attribute
-      {Object.keys(data.series).length === 1 ? "" : "s"} · {data.points.length}{" "}
-      points
+      {data.meta.object_type} · {data.meta.attributes.length} attribute
+      {data.meta.attributes.length === 1 ? "" : "s"} · {data.rows.length} points
     </Text>
   ),
   chart: (data, _spec, slot) => (
@@ -579,7 +615,7 @@ export const objectAttributeTimeline = defineCard<
       rows={timelineRows(data)}
       {...slot}
       x="point"
-      values={Object.keys(data?.series ?? {})}
+      values={data?.meta.attributes ?? []}
     />
   ),
 });
@@ -593,37 +629,33 @@ function combinationLabel(objectTypes: string[]): string {
 }
 
 /**
- * One row per (activity, object type, object count). `unique_events` carries
- * the activity's own event count, because object-type children overlap and
- * must not be summed into it.
+ * `unique_events` carries the activity's own event count, because object-type
+ * children overlap and must not be summed into it.
  */
-function countsPerEventRows(
-  rows: ObjectCountPerEventRow[],
-  activityEventCounts: ActivityEventCount[],
-): Row[] {
-  const uniqueEvents = new Map(
-    activityEventCounts.map((item) => [item.activity, item.event_count]),
-  );
-  return rows.map((row) => ({
+function countsPerEventRows(data: CountsPerEventData | undefined): Row[] {
+  if (!data) return [];
+  return data.rows.map((row) => ({
     activity: row.activity,
     object_type: row.object_type,
     objects: `${row.object_count} object${row.object_count === 1 ? "" : "s"}`,
     events: row.event_count,
-    unique_events: uniqueEvents.get(row.activity) ?? 0,
+    unique_events: data.meta.activity_event_counts[row.activity] ?? 0,
   }));
 }
 
-/** One row per observation, with a column per attribute. */
-function timelineRows(
-  data: ObjectAttributeTimelineResponse | undefined,
-): Row[] {
+/** Labels each point by its activity; booleans are plotted as 0 and 1. */
+function timelineRows(data: TimelineData | undefined): Row[] {
   if (!data) return [];
-  return data.points.map((point, index) => {
-    const row: Row = { point: point.activity ?? `#${index + 1}` };
-    for (const [attribute, values] of Object.entries(data.series)) {
-      const value = values[index];
+  return data.rows.map((source, index) => {
+    const row: Row = { point: source.activity ?? `#${index + 1}` };
+    for (const attribute of data.meta.attributes) {
+      const value = source.values[attribute];
       row[attribute] =
-        typeof value === "boolean" ? (value ? 1 : 0) : (value ?? null);
+        typeof value === "boolean"
+          ? Number(value)
+          : typeof value === "string" || typeof value === "number"
+            ? value
+            : null;
     }
     return row;
   });
