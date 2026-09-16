@@ -1,9 +1,9 @@
 import { Badge, Button, Group, Modal, Stack, TextInput } from "@mantine/core";
 import { generateColor } from "@marko19907/string-to-color";
 import {
-  useSavePluginResults,
   type PluginOutput,
   type ResultSelection,
+  useSavePluginResults,
 } from "@ocelescope/api-base";
 import { CheckIcon, DatabaseIcon } from "lucide-react";
 import { useState } from "react";

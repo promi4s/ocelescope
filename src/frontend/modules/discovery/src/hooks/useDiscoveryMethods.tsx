@@ -1,7 +1,7 @@
 import {
-  usePlugins,
   type OCELIOApi,
   type ResourceIOApi,
+  usePlugins,
 } from "@ocelescope/api-base";
 import { useMemo } from "react";
 

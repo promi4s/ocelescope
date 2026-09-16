@@ -19,9 +19,9 @@ import {
   useMemo,
   useState,
 } from "react";
-import { usePluginForm } from "../context";
-import { FrequencyPicker } from "../components/R4pmInputs";
 import type { OcelSelectProps } from "../../types";
+import { FrequencyPicker } from "../components/R4pmInputs";
+import { usePluginForm } from "../context";
 
 const AttributeSelect =
   (
@@ -184,7 +184,7 @@ const OCEL_FIELDS: Record<string, ComponentType<OcelSelectProps>> = {
   o2o_qualifier: QualifierSelect(useO2oQualifier),
 };
 
-//TODO: Sync this with backend and use better descriminators
+//TODO: Sync this with backend and use better discriminators
 export const OCELField = memo(
   ({
     schema,

@@ -8,13 +8,13 @@ import {
   Stack,
   Text,
 } from "@mantine/core";
+import { useToggle } from "@mantine/hooks";
 import { usePluginResult } from "@ocelescope/api-base";
 import { Visualization, type VisualizationsType } from "@ocelescope/resources";
 import { useEffect, useMemo, useState } from "react";
 import { DownloadAction } from "./Actions/DownloadAction";
+import { OrientationAction } from "./Actions/OrientationAction";
 import { SaveAction } from "./Actions/SaveAction";
-import { OrientationAction } from "./Actions/OrientationAcion";
-import { useToggle } from "@mantine/hooks";
 import { SelectionAction } from "./Actions/SelectionAction";
 
 const ResultSection: React.FC<{
@@ -40,7 +40,7 @@ const ResultSection: React.FC<{
 
   const [selected, setSelected] = useState<number[]>([]);
 
-  const [isHorizontal, toogleOrientation] = useToggle();
+  const [isHorizontal, toggleOrientation] = useToggle();
 
   const isLoading = !!taskId && !pluginSummary;
 
@@ -86,7 +86,7 @@ const ResultSection: React.FC<{
           {selected.length > 1 && (
             <OrientationAction
               isHorizontal={isHorizontal}
-              toggleOrientation={toogleOrientation}
+              toggleOrientation={toggleOrientation}
             />
           )}
           <DownloadAction

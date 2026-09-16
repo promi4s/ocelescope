@@ -1,7 +1,3 @@
-import { defineModuleRoute, useCurrentOcel } from "@ocelescope/core";
-import { PluginForm, ResultSection } from "@ocelescope/plugin-components";
-import { useDiscoveryMethods } from "../hooks/useDiscoveryMethods";
-import Form from "@rjsf/core";
 import {
   ActionIcon,
   Box,
@@ -13,11 +9,15 @@ import {
   Text,
   Tooltip,
 } from "@mantine/core";
-import { useEffect, useRef, useState } from "react";
-import type { UiSchema } from "@rjsf/utils";
-import { useDebouncedValue, type UseSplitterReturnValue } from "@mantine/hooks";
+import { type UseSplitterReturnValue, useDebouncedValue } from "@mantine/hooks";
 import { useRunPlugin } from "@ocelescope/api-base";
+import { defineModuleRoute, useCurrentOcel } from "@ocelescope/core";
+import { PluginForm, ResultSection } from "@ocelescope/plugin-components";
+import type Form from "@rjsf/core";
+import type { UiSchema } from "@rjsf/utils";
 import { Settings } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useDiscoveryMethods } from "../hooks/useDiscoveryMethods";
 
 const uiSchema: UiSchema = {
   "ui:submitButtonOptions": {
@@ -79,7 +79,7 @@ const DiscoverySideBar = ({
         searchable
         value={currentMethod?.id}
         onChange={(newMethod) =>
-          setCurrentMethod(discoveryMethods.find(({ id }) => id == newMethod))
+          setCurrentMethod(discoveryMethods.find(({ id }) => id === newMethod))
         }
         data={discoveryGroups
           .filter(({ methods }) => methods.length > 0)
@@ -134,7 +134,7 @@ const DiscoveryPage = () => {
         <ResultSection
           taskId={discoveryTask}
           extraActions={
-            <Tooltip label="Toogle settings">
+            <Tooltip label="Toggle settings">
               <ActionIcon
                 size="input-sm"
                 variant="outline"

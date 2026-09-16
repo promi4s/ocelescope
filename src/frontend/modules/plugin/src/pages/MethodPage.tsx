@@ -10,10 +10,10 @@ import {
 } from "@mantine/core";
 import type { SplitterPaneSize } from "@mantine/hooks";
 import { useGetPluginMethod } from "@ocelescope/api-base";
+import { ResultSection } from "@ocelescope/plugin-components";
 import { useState } from "react";
 import PluginInput from "../components/Form";
 import PluginBreadcrumbs from "../components/PluginBreadcrumbs/PluginBreadcrumbs";
-import { ResultSection } from "@ocelescope/plugin-components";
 
 const COLLAPSED_SIZES: SplitterPaneSize[] = [0, 100];
 const SPLIT_SIZES: SplitterPaneSize[] = [75, 25];
