@@ -6,7 +6,7 @@ import {
 import { useMemo } from "react";
 
 export const useDiscoveryMethods = () => {
-  const { data: plugins, isLoading } = usePlugins();
+  const { data: plugins, isLoading } = usePlugins({ include_base: true });
 
   const discoveryGroups = useMemo(() => {
     return (plugins ?? []).map(({ methods, ...plugin }) => ({

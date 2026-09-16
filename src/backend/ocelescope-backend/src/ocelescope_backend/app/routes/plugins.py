@@ -39,8 +39,12 @@ plugin_router = APIRouter(prefix="/plugins", tags=["plugins"])
 
 
 @plugin_router.get("", operation_id="plugins")
-def get_plugins() -> list[PluginApi]:
-    return registry_manager.list_plugins()
+def get_plugins(include_base: bool = False) -> list[PluginApi]:
+    return [
+        plugin
+        for plugin in registry_manager.list_plugins()
+        if include_base or plugin.id != registry_manager.BASE_PLUGIN_ID
+    ]
 
 
 @plugin_router.get("/plugin/{plugin_id}", operation_id="getPlugin")
