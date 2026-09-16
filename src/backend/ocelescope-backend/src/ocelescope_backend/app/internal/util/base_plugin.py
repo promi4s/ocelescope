@@ -19,12 +19,14 @@ class DiscoveryInput(PluginInput):
         ocel_id="ocel",
         theme="r4pm",
         title="Included object types",
+        default_frequency=0.5,
     )
     activities: list[str] = OCEL_FIELD(
         field_type="event_type",
         ocel_id="ocel",
         theme="r4pm",
         title="Included activities",
+        default_frequency=0.5,
     )
 
 
@@ -38,7 +40,12 @@ class BasePlugin(Plugin):
         description="Discover a object centric directly follows graph",
     )
     def discover_ocdfg(self, ocel: OCEL, input: DiscoveryInput) -> DirectlyFollowsGraph:
-        ocdfg = ocdfg_miner(ocel, frequency_threshold=input.threshold)
+        ocdfg = ocdfg_miner(
+            ocel,
+            frequency_threshold=input.threshold,
+            included_activities=input.activities,
+            included_object_types=input.object_types,
+        )
         return ocdfg
 
     @plugin_method(

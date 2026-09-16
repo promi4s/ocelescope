@@ -8,6 +8,7 @@ export type OcelSelectProps = {
   ocelId: string | null;
   isMulti: boolean;
   theme?: string;
+  defaultFrequency?: number;
   value: any;
   onChange: (value: any) => void;
   label?: string;
