@@ -96,7 +96,7 @@ const DiscoverySideBar = ({
       <Box pos={"relative"} flex={1} mih={0}>
         <LoadingOverlay visible={isLoading} />
         {currentMethod?.configuration_schema && (
-          <ScrollArea h={"100%"}>
+          <ScrollArea h={"100%"} offsetScrollbars>
             <PluginForm
               key={currentMethod.id}
               methodName={currentMethod.name}
