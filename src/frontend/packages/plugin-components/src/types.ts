@@ -3,3 +3,15 @@ export type PluginInputResources = {
 };
 
 export type PluginFormData = { [key: string]: any };
+
+export type OcelSelectProps = {
+  ocelId: string | null;
+  isMulti: boolean;
+  theme?: string;
+  value: any;
+  onChange: (value: any) => void;
+  label?: string;
+  description?: string;
+  required?: boolean;
+  disabled?: boolean;
+};

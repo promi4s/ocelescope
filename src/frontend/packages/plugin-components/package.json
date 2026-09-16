@@ -38,6 +38,7 @@
     "@ocelescope/api-base": "workspace:^",
     "@ocelescope/resources": "workspace:^",
     "@rjsf/core": "catalog:",
+    "@r4pm/components": "catalog:",
     "lucide-react": "catalog:",
     "@marko19907/string-to-color": "catalog:",
     "@rjsf/mantine": "catalog:",

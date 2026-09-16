@@ -13,17 +13,8 @@ import {
 import type { FieldProps } from "@rjsf/utils";
 import { type ComponentType, memo, useEffect, useMemo, useState } from "react";
 import { usePluginForm } from "../context";
-
-type OcelSelectProps = {
-  ocelId: string | null;
-  isMulti: boolean;
-  value: any;
-  onChange: (value: any) => void;
-  label?: string;
-  description?: string;
-  required?: boolean;
-  disabled?: boolean;
-};
+import { FrequencyPicker } from "../components/R4pmInputs";
+import type { OcelSelectProps } from "../../types";
 
 const AttributeSelect =
   (
@@ -54,8 +45,20 @@ const TypeSelect =
   (
     useCounts: typeof useEventCounts | typeof useObjectCounts,
   ): React.FC<OcelSelectProps> =>
-  ({ ocelId, isMulti, value, ...props }) => {
+  ({ ocelId, isMulti, value, theme, ...props }) => {
     const { data: counts } = useCounts(ocelId);
+
+    if (theme === "r4pm") {
+      return (
+        <FrequencyPicker
+          ocelId={ocelId}
+          value={value}
+          isMulti={isMulti}
+          {...props}
+          items={counts ?? {}}
+        />
+      );
+    }
 
     const types = useMemo(() => Object.keys(counts ?? {}), [counts]);
 
@@ -67,6 +70,7 @@ const TypeSelect =
         value={value ?? (isMulti ? [] : null)}
         data={types}
         clearable
+        searchable
       />
     );
   };
@@ -122,6 +126,7 @@ const OCEL_FIELDS: Record<string, ComponentType<OcelSelectProps>> = {
   o2o_qualifier: QualifierSelect(useO2oQualifier),
 };
 
+//TODO: Sync this with backend
 export const OCELField = memo(
   ({
     schema,
@@ -132,6 +137,7 @@ export const OCELField = memo(
   }: FieldProps) => {
     const ocelRef = schema["x-ui-meta"]?.ocel_id;
     const ocelFieldType = schema["x-ui-meta"]?.field_type;
+    const theme = schema["x-ui-meta"]?.theme;
 
     const { inputResources } = usePluginForm();
     const ocelId = inputResources[ocelRef] ?? null;
@@ -149,6 +155,7 @@ export const OCELField = memo(
           key={ocelId}
           ocelId={ocelId}
           isMulti={isMulti}
+          theme={theme}
           value={formData}
           onChange={(value) => onChange(value, path)}
           label={schema.title}

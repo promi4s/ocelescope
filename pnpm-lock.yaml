@@ -982,6 +982,9 @@ importers:
       '@ocelescope/resources':
         specifier: workspace:^
         version: link:../resources
+      '@r4pm/components':
+        specifier: 'catalog:'
+        version: 0.3.2(@types/react-dom@19.2.5)(@types/react@19.2.18)(immer@11.1.11)(plotly.js@3.4.0)(react-dom@19.2.8)(react@19.2.8)
       '@rjsf/core':
         specifier: 'catalog:'
         version: 6.8.0(@rjsf/utils@6.8.0)(react@19.2.8)
