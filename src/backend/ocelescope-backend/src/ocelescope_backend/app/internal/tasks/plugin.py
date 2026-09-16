@@ -98,22 +98,6 @@ class PluginTask(TaskBase, Generic[P]):
             if self.state != TaskState.CANCELLED:
                 self.state = TaskState.SUCCESS
 
-                sse_manager.send_safe(
-                    session_id=self.session.id,
-                    message=SystemNotification(
-                        type="notification",
-                        title="Plugin successfully run",
-                        message=f'Successfully run "{self.method_label}"',
-                        notification_type="info",
-                        link=PluginLink(
-                            type="plugin",
-                            method=self.method_name,
-                            id=self.plugin_id,
-                            task_id=self.id,
-                        ),
-                    ),
-                )
-
         except Exception as e:
             self.error = e
             self.state = TaskState.FAILURE
