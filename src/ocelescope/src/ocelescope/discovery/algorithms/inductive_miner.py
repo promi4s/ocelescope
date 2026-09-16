@@ -4,14 +4,9 @@ import pm4py
 from pydantic import Field
 
 from ocelescope import OCEL
-from ocelescope.discovery.decorator import discovery_method
 from ocelescope.resource.default.petri_net import PetriNet
 
 
-@discovery_method(
-    name="Inductive Miner (flattening)",
-    description="Discover an object-centric Petri net with the inductive miner.",
-)
 def inductive_miner(
     ocel: OCEL,
     noise_threshold: Annotated[
