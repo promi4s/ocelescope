@@ -30,9 +30,11 @@ const AttributeSelect =
   ({ ocelId, isMulti, value, onChange, ...props }) => {
     const { data: attributes } = useAttributes(ocelId);
 
+    const reset = useEffectEvent(() => onChange(isMulti ? [] : undefined));
+
     useEffect(() => {
-      onChange(isMulti ? [] : undefined);
-    }, [ocelId, isMulti, onChange]);
+      reset();
+    }, [ocelId, isMulti]);
 
     const names = useMemo(
       () => [...new Set((attributes ?? []).map(({ name }) => name))],
@@ -133,10 +135,6 @@ const IdSelect =
 
     const { data: ids } = useIds(ocelId, { search: debouncedSearch });
 
-    useEffect(() => {
-      onChange(isMulti ? [] : undefined);
-    }, [ocelId, isMulti, onChange]);
-
     const SelectComponent = isMulti ? MultiSelect : Select;
 
     return (
@@ -157,9 +155,11 @@ const QualifierSelect =
   ({ ocelId, isMulti, value, onChange, ...props }: OcelSelectProps) => {
     const { data: qualifier } = useQualifier(ocelId);
 
+    const reset = useEffectEvent(() => onChange(isMulti ? [] : undefined));
+
     useEffect(() => {
-      onChange(isMulti ? [] : undefined);
-    }, [ocelId, isMulti, onChange]);
+      reset();
+    }, [ocelId, isMulti]);
 
     const SelectComponent = isMulti ? MultiSelect : Select;
 
