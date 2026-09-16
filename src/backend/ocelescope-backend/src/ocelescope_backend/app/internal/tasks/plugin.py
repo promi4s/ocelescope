@@ -44,11 +44,17 @@ class PluginTaskSummary(TaskSummary):
 
 class PluginTask(TaskBase, Generic[P]):
     def __init__(
-        self, plugin_id: str, method_name: str, session: "Session", input: PluginInput
+        self,
+        plugin_id: str,
+        method_name: str,
+        method_label: str,
+        session: "Session",
+        input: PluginInput,
     ):
         super().__init__()
         self.plugin_id = plugin_id
         self.method_name = method_name
+        self.method_label = method_label
         self.input = input
         self.result: list[OCEL | Resource] | None = None
         self.session = session
@@ -97,7 +103,7 @@ class PluginTask(TaskBase, Generic[P]):
                     message=SystemNotification(
                         type="notification",
                         title="Plugin successfully run",
-                        message=f"Successfully run plugin {self.plugin_id} {self.method_name}",
+                        message=f'Successfully run "{self.method_label}"',
                         notification_type="info",
                         link=PluginLink(
                             type="plugin",
@@ -171,6 +177,7 @@ class PluginTask(TaskBase, Generic[P]):
             session=session,
             plugin_id=plugin_id,
             method_name=method_name,
+            method_label=method.label,
             input=input,
         )
         session.tasks[task.id] = task
