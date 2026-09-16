@@ -154,7 +154,7 @@ export function ChartCard({
 
   return (
     <ChartSlotContext.Provider value={slot}>
-      <Paper withBorder p={compact ? "xs" : "md"} radius="md" h="100%">
+      <Paper withBorder p={compact ? "xs" : "lg"} radius="md" h="100%" miw={0}>
         <Stack gap={compact ? "xs" : "sm"} h="100%">
           <Group
             justify="space-between"
@@ -163,7 +163,7 @@ export function ChartCard({
             gap="xs"
           >
             <Stack gap={2} miw={0}>
-              <Text fw={600} size={compact ? "sm" : "md"} lh={1.3} truncate>
+              <Text fw={600} size="sm" lh={1.4} lineClamp={2}>
                 {title}
               </Text>
               {subtitle && (
@@ -297,8 +297,18 @@ export function ChartCard({
             </Group>
           </Group>
 
+          <Divider />
           {!expanded && body(height)}
-          {note}
+          {note && (
+            <Box
+              pt="sm"
+              style={{
+                borderTop: "1px solid var(--mantine-color-default-border)",
+              }}
+            >
+              {note}
+            </Box>
+          )}
         </Stack>
       </Paper>
 

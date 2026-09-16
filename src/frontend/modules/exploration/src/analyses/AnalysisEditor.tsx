@@ -1,6 +1,7 @@
 import {
   Alert,
   Button,
+  Divider,
   Group,
   MultiSelect,
   NumberInput,
@@ -179,7 +180,8 @@ export function AnalysisEditor({
 
       {form.fields.map(render)}
 
-      <Group justify="flex-end" mt="sm">
+      <Divider mt="sm" />
+      <Group justify="space-between">
         <Button variant="default" onClick={onCancel}>
           Cancel
         </Button>
