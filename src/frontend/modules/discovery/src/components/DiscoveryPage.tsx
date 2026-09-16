@@ -58,7 +58,8 @@ const DiscoverySideBar = ({
     if (
       currentMethod &&
       id &&
-      ref.current?.validate(debouncedInput).errors.length === 0
+      (!currentMethod.configuration_schema ||
+        ref.current?.validate(debouncedInput).errors.length === 0)
     ) {
       mutate({
         methodName: currentMethod.name,
