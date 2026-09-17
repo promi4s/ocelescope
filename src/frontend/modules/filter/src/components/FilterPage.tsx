@@ -1,4 +1,4 @@
-import { LoadingOverlay } from "@mantine/core";
+import { Box, LoadingOverlay } from "@mantine/core";
 import {
   defineModuleRoute,
   useCurrentOcel,

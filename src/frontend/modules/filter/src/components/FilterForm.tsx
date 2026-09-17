@@ -2,6 +2,7 @@ import {
   ActionIcon,
   ActionIconGroup,
   Group,
+  Scroller,
   Stack,
   Tabs,
   Text,
@@ -38,19 +39,19 @@ const FilterForm = ({ ocelId, currentFilter, onSubmit }: FilterFormProps) => {
       value={currentTab}
       onChange={(newTab) => setCurrentTab(newTab as FilterKey)}
       keepMounted={false}
-      p={"xs"}
-      h={"100%"}
       style={{ display: "flex", flexDirection: "column" }}
+      h={"100%"}
     >
-      <Group>
-        <Tabs.List flex={1}>
-          {Object.entries(FILTER_MAP).map(([key, { title }]) => (
-            <Tabs.Tab key={key} value={key}>
-              {title}
-            </Tabs.Tab>
-          ))}
+      <Group py={"xs"} gap={0} wrap="nowrap">
+        <Tabs.List flex={1} miw={0}>
+          <Scroller>
+            {Object.entries(FILTER_MAP).map(([key, { title }]) => (
+              <Tabs.Tab key={key} value={key}>
+                {title}
+              </Tabs.Tab>
+            ))}
+          </Scroller>
         </Tabs.List>
-
         <ActionIconGroup>
           {formState.isDirty && (
             <>

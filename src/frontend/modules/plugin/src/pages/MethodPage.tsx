@@ -1,5 +1,4 @@
 import {
-  Flex,
   Group,
   LoadingOverlay,
   ScrollArea,
@@ -37,41 +36,38 @@ const MethodPage: React.FC<{ pluginId: string; methodName: string }> = ({
   };
 
   return (
-    <Flex direction="column" h="100%">
-      <Splitter
-        sizes={sizes}
-        onSizeChange={setSizes}
-        lineSize={4}
-        handleColor="var(--mantine-color-default-border)"
-        px="xs"
-        style={{ flex: 1, minHeight: 0 }}
-      >
-        <Splitter.Pane defaultSize={0} min="20%" collapsible>
-          <ResultSection taskId={currentTask} />
-        </Splitter.Pane>
+    <Splitter
+      sizes={sizes}
+      onSizeChange={setSizes}
+      lineSize={4}
+      handleColor="var(--mantine-color-default-border)"
+      h={"100%"}
+    >
+      <Splitter.Pane defaultSize={0} min="20%" collapsible>
+        <ResultSection taskId={currentTask} />
+      </Splitter.Pane>
 
-        <Splitter.Pane defaultSize={100} min="20%" collapsible>
-          <ScrollArea h="100%" type="auto">
-            <Stack gap="sm" p="md" maw={640} mx="auto" w="100%">
-              <Group justify="center">
-                <PluginBreadcrumbs />
-              </Group>
-              <Title ta="center">{pluginMethod.label ?? methodName}</Title>
-              {pluginMethod.description && (
-                <Text c="dimmed" ta="center">
-                  {pluginMethod.description}
-                </Text>
-              )}
-              <PluginInput
-                onSuccess={handleSuccess}
-                pluginId={pluginId}
-                method={pluginMethod}
-              />
-            </Stack>
-          </ScrollArea>
-        </Splitter.Pane>
-      </Splitter>
-    </Flex>
+      <Splitter.Pane defaultSize={100} min="20%" collapsible>
+        <ScrollArea h="100%" type="auto">
+          <Stack gap="sm" p="md" maw={640} mx="auto" w="100%">
+            <Group justify="center">
+              <PluginBreadcrumbs />
+            </Group>
+            <Title ta="center">{pluginMethod.label ?? methodName}</Title>
+            {pluginMethod.description && (
+              <Text c="dimmed" ta="center">
+                {pluginMethod.description}
+              </Text>
+            )}
+            <PluginInput
+              onSuccess={handleSuccess}
+              pluginId={pluginId}
+              method={pluginMethod}
+            />
+          </Stack>
+        </ScrollArea>
+      </Splitter.Pane>
+    </Splitter>
   );
 };
 

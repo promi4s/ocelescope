@@ -132,76 +132,68 @@ const VariantsPage = () => {
     return <LoadingOverlay visible />;
   }
 
-  return (
-    <>
-      {objectTypes.length > 0 ? (
-        <Tabs
-          keepMounted={false}
-          h="100%"
-          style={{ display: "flex", flexDirection: "column" }}
-          value={activeTab}
-          onChange={setActiveTab}
+  return objectTypes.length > 0 ? (
+    <Tabs
+      keepMounted={false}
+      h="100%"
+      style={{ display: "flex", flexDirection: "column" }}
+      value={activeTab}
+      onChange={setActiveTab}
+    >
+      <Group wrap="nowrap" gap="0" style={{ flexShrink: 0 }} pt={"xs"}>
+        <Popover
+          width={300}
+          position="bottom-start"
+          withArrow
+          shadow="md"
+          opened={searchOpened}
+          onChange={closeSearch}
+          trapFocus
+          returnFocus
         >
-          <Group wrap="nowrap" gap="xs" style={{ flexShrink: 0 }}>
-            <Popover
-              width={300}
-              position="bottom-start"
-              withArrow
-              shadow="md"
-              opened={searchOpened}
-              onChange={closeSearch}
-              trapFocus
-              returnFocus
+          <Popover.Target>
+            <ActionIcon
+              size={"lg"}
+              h={"100%"}
+              onClick={toggleSearch}
+              aria-label="Search object types"
+              bdrs={0}
             >
-              <Popover.Target>
-                <ActionIcon
-                  size={"md"}
-                  onClick={toggleSearch}
-                  aria-label="Search object types"
-                >
-                  <SearchIcon size={16} />
-                </ActionIcon>
-              </Popover.Target>
-              <Popover.Dropdown>
-                <Autocomplete
-                  data={objectTypes}
-                  aria-label="Object type"
-                  placeholder="Search object types"
-                  selectFirstOptionOnChange
-                  comboboxProps={{ withinPortal: false }}
-                  onOptionSubmit={(value) => {
-                    setActiveTab(value);
-                    closeSearch();
-                  }}
-                />
-              </Popover.Dropdown>
-            </Popover>
-            <Tabs.List flex={1} miw={0}>
-              <Scroller>
-                {objectTypes.map((objectType) => (
-                  <Tabs.Tab key={objectType} value={objectType}>
-                    {objectType}
-                  </Tabs.Tab>
-                ))}
-              </Scroller>
-            </Tabs.List>
-          </Group>
-          {objectTypes.map((objectType) => (
-            <Tabs.Panel
-              key={objectType}
-              value={objectType}
-              pt="md"
-              flex={1}
-              mih={0}
-            >
-              <ObjectTypeVariants ocelId={id} objectType={objectType} />
-            </Tabs.Panel>
-          ))}
-        </Tabs>
-      ) : (
-        <ObjectTypeVariants ocelId={id} objectType={activeTab} />
-      )}
-    </>
+              <SearchIcon size={16} />
+            </ActionIcon>
+          </Popover.Target>
+          <Popover.Dropdown>
+            <Autocomplete
+              data={objectTypes}
+              aria-label="Object type"
+              placeholder="Search object types"
+              selectFirstOptionOnChange
+              comboboxProps={{ withinPortal: false }}
+              onOptionSubmit={(value) => {
+                setActiveTab(value);
+                closeSearch();
+              }}
+            />
+          </Popover.Dropdown>
+        </Popover>
+        <Tabs.List flex={1} miw={0}>
+          <Scroller>
+            {objectTypes.map((objectType) => (
+              <Tabs.Tab key={objectType} value={objectType}>
+                {objectType}
+              </Tabs.Tab>
+            ))}
+          </Scroller>
+        </Tabs.List>
+      </Group>
+      {objectTypes.map((objectType) => (
+        <Tabs.Panel key={objectType} value={objectType} flex={1} mih={0}>
+          <ObjectTypeVariants ocelId={id} objectType={objectType} />
+        </Tabs.Panel>
+      ))}
+    </Tabs>
+  ) : (
+    <ObjectTypeVariants ocelId={id} objectType={activeTab} />
   );
 };
 
