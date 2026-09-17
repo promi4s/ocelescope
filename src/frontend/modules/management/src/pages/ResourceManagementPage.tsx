@@ -6,7 +6,7 @@ const ResourceManagementPage: React.FC<{ children?: React.ReactNode }> = ({
   children,
 }) => {
   return (
-    <Container h="100%">
+    <Container h="100%" p="md">
       <Stack gap={"sm"} h="100%">
         <ResourceManagementTable />
         {children}

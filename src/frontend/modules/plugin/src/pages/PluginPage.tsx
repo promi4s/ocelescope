@@ -39,7 +39,7 @@ const PluginPage: React.FC<{ pluginId: string }> = ({ pluginId }) => {
   const { data: plugin } = useGetPlugin(pluginId);
 
   return (
-    <Container fluid>
+    <Container fluid p="md">
       <Stack gap={0} align="center">
         <PluginBreadcrumbs />
         <Title mt={"xs"}> {plugin?.label}</Title>
