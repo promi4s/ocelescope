@@ -98,7 +98,6 @@ def ocdfg_miner(
             target=target,
             count=count,
             object_count=object_count,
-            annotation=f"{count} ({object_count})",
         )
         for object_type, source, target, count, object_count in ocel.sql(
             _dfg_query(
