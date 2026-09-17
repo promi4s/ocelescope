@@ -29,13 +29,13 @@ def _dfg_query(
 
     activity_filter = (
         f"WHERE {activity} IN ({','.join(literal(activity_name) for activity_name in included_activities)})"
-        if included_activities
+        if included_activities is not None
         else ""
     )
 
     object_type_filter = (
         f"WHERE {otype} IN ({','.join(literal(object_type) for object_type in included_object_types)})"
-        if included_object_types
+        if included_object_types is not None
         else ""
     )
 

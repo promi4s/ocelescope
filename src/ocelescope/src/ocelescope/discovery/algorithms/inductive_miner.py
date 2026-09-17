@@ -34,9 +34,9 @@ def _slim_pm4py_ocel(
     activity, timestamp = ident(ACTIVITY_COL), ident(TIMESTAMP_COL)
 
     conditions = []
-    if included_activities:
+    if included_activities is not None:
         conditions.append(f"e.{activity} IN ({','.join(map(literal, included_activities))})")
-    if included_object_types:
+    if included_object_types is not None:
         conditions.append(f"o.{otype} IN ({','.join(map(literal, included_object_types))})")
     where = f"WHERE {' AND '.join(conditions)}" if conditions else ""
 
