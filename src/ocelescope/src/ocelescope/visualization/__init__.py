@@ -7,6 +7,7 @@ from ocelescope.visualization.default.dfg import (
     DirectlyFollowsGraphViz,
     OCDirectlyFollowsGraphViz,
 )
+
 # TODO: Rename this layouting engine a class
 from ocelescope.visualization.default.dot import DotVis
 from ocelescope.visualization.default.graph import (
