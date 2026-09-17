@@ -10,7 +10,7 @@ allowBuilds:
   sharp: true
 
 catalog:
-  '@biomejs/biome': 2.5.12
+  '@biomejs/biome': 2.5.14
   "@dagrejs/dagre": ^3.0.0
   "@floating-ui/react": ^0.27.18
   "@hpcc-js/wasm-graphviz": ^1.21.0
@@ -33,21 +33,23 @@ catalog:
   "@tanstack/react-query": ^5.90.21
   "@tanstack/react-query-devtools": ^5.91.3
   "@tsconfig/strictest": ^2.0.8
-  "@tsdown/css": ^0.22.14
+  "@tsdown/css": ^0.23.0
   "@types/file-saver": ^2.0.7
-  "@types/node": ^26.2.0
+  "@types/node": ^26.6.1
   '@types/object-hash': ^3.0.6
   "@types/qs": ^6.15.1
-  "@types/react": ^19.2.18
-  "@types/react-dom": ^19.2.4
+  "@types/react": ^19.3.0
+  "@types/react-dom": ^19.3.0
   "@xyflow/react": ^12.11.3
-  axios: ^1.18.1
+  axios: ^1.20.0
   clsx: ^2.1.1
   content-disposition-attachment: ^0.3.1
   cspell: ^10.3.0
   dayjs: ^1.11.19
   echarts: ^6.1.0
   echarts-for-react: ^3.0.6
+  cspell: ^10.3.2
+  dayjs: ^1.11.23
   elkjs: ^0.12.0
   embla-carousel: ^8.6.0
   embla-carousel-react: ^8.6.0
@@ -58,20 +60,21 @@ catalog:
   mantine-datatable: ^9.4.0
   next: 16.3.2
   object-hash: ^3.0.0
-  orval: ^8.24.0
-  qs: ^6.15.3
-  react: ^19.2.8
-  react-dom: ^19.2.8
+  orval: ^8.33.0
+  qs: ^6.16.0
+  react: ^19.3.0
+  react-dom: ^19.3.0
   react-hook-form: ^7.71.2
   react-plotly.js: ^4.0.0
   react-zoom-pan-pinch: ^4.0.0
   recharts: ^3.2.1
   storybook: ^10.3.5
   tsdown: ^0.22.14
+  tsdown: ^0.23.0
   typescript: ^6.0.3
   uniqolor: ^1.1.1
-  zod: ^4.3.6
-  zustand: ^5.0.11
+  zod: ^4.6.5
+  zustand: ^5.0.15
 
 catalogMode: prefer
 

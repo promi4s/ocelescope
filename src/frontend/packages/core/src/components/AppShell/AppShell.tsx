@@ -36,7 +36,6 @@ export const AppShell: React.FC<{
         breakpoint: "sm",
         collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
       }}
-      padding="md"
     >
       <MantineAppShell.Header>
         <Group h="100%" px="md" justify="space-between">

@@ -39,11 +39,15 @@ plugin_router = APIRouter(prefix="/plugins", tags=["plugins"])
 
 
 @plugin_router.get("", operation_id="plugins")
-def get_plugins() -> list[PluginApi]:
-    return registry_manager.list_plugins()
+def get_plugins(include_base: bool = False) -> list[PluginApi]:
+    return [
+        plugin
+        for plugin in registry_manager.list_plugins()
+        if include_base or plugin.id != registry_manager.BASE_PLUGIN_ID
+    ]
 
 
-@plugin_router.get("/{plugin_id}", operation_id="getPlugin")
+@plugin_router.get("/plugin/{plugin_id}", operation_id="getPlugin")
 def get_plugin(plugin_id: str) -> PluginApi | None:
     plugin = registry_manager.get_plugin(plugin_id)
 
@@ -53,7 +57,7 @@ def get_plugin(plugin_id: str) -> PluginApi | None:
     return PluginApi.from_plugin(plugin_id, plugin)
 
 
-@plugin_router.get("/{plugin_id}/{method_name}", operation_id="getPluginMethod")
+@plugin_router.get("/plugin/{plugin_id}/{method_name}", operation_id="getPluginMethod")
 def get_plugin_method(plugin_id: str, method_name: str) -> MethodApi | None:
     try:
         return MethodApi.from_method_meta(
@@ -63,7 +67,7 @@ def get_plugin_method(plugin_id: str, method_name: str) -> MethodApi | None:
         pass
 
 
-@plugin_router.post("/{plugin_id}/{method_name}", operation_id="runPlugin")
+@plugin_router.post("/plugin/{plugin_id}/{method_name}", operation_id="runPlugin")
 def run_plugin(
     input_resources: dict[str, str | None],
     session: ApiSession,
@@ -82,9 +86,7 @@ def run_plugin(
         raise NotFound(str(error))
 
 
-@plugin_router.get(
-    "/{plugin_id}/{method_name}/result/{task_id}", operation_id="PluginResult"
-)
+@plugin_router.get("/task/{task_id}", operation_id="PluginResult")
 def get_plugin_result(
     plugin_task: ApiPluginTask,
 ) -> list[PluginOutput] | None:
@@ -100,14 +102,12 @@ class SavedResults(BaseModel):
 
 
 @plugin_router.post(
-    "/{plugin_id}/{method_name}/result/{task_id}/save",
+    "/task/{task_id}/save",
     operation_id="savePluginResults",
 )
 def save_plugin_results(
     session: ApiSession,
     plugin_task: ApiPluginTask,
-    plugin_id: str,
-    method_name: str,
     selection: list[ResultSelection],
 ) -> SavedResults:
     """Save the selected results into the session as OCELs / resources."""
@@ -115,9 +115,11 @@ def save_plugin_results(
 
     saved = SavedResults(ocel_ids=[], resource_ids=[])
 
-    for index, entity in selected:
-        name = next(result.name for result in selection) or default_result_name(
-            plugin_id=plugin_id, method_name=method_name, index=index
+    for result, (index, entity) in zip(selection, selected, strict=True):
+        name = result.name or default_result_name(
+            plugin_id=plugin_task.plugin_id,
+            method_name=plugin_task.method_name,
+            index=index,
         )
 
         if isinstance(entity, OCEL):
@@ -126,7 +128,7 @@ def save_plugin_results(
             saved.resource_ids.append(
                 session.add_resource(
                     ResourceStore.from_resource(
-                        name=name, source_id=plugin_id, resource=entity
+                        name=name, source_id=plugin_task.plugin_id, resource=entity
                     )
                 )
             )
@@ -135,17 +137,17 @@ def save_plugin_results(
 
 
 @plugin_router.post(
-    "/{plugin_id}/{method_name}/result/{task_id}/download",
+    "/task/{task_id}/download",
     operation_id="downloadPluginResults",
 )
 def download_plugin_results(
     plugin_task: ApiPluginTask,
-    plugin_id: str,
-    method_name: str,
     indices: list[int] = Body(embed=True),
 ) -> TempFileResponse:
     """Bundle the selected results into a zip for download."""
     selected = select_results(plugin_task, indices)
+    plugin_id = plugin_task.plugin_id
+    method_name = plugin_task.method_name
 
     archive_name = f"{plugin_id}_{method_name}_results"
     file_response = TempFileResponse(
@@ -187,7 +189,8 @@ def download_plugin_results(
 
 
 @plugin_router.post(
-    "/{plugin_id}/{method_name}/computed/{provider}", operation_id="getComputedValues"
+    "/plugin/{plugin_id}/{method_name}/computed/{provider}",
+    operation_id="getComputedValues",
 )
 def get_computed(
     input_resources: dict[str, str | None],
@@ -221,7 +224,7 @@ def get_computed(
         return []
 
 
-@plugin_router.delete("/{plugin_id}", operation_id="deletePlugin")
+@plugin_router.delete("/plugin/{plugin_id}", operation_id="deletePlugin")
 def delete_plugin(plugin_id: str, session: ApiSession):
     if not config.PLUGIN_DIR:
         raise HTTPException(status_code=404, detail="Plugin files not found")

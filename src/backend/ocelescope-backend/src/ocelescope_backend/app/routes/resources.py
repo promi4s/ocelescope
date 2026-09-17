@@ -61,7 +61,7 @@ def download_resource_as_pnml(
 
     resource = session.get_resource(id=resource_id)
     resource_instance = registry_manager.get_resource_instance(
-        resource.data, registry_manager._CORE_RESOURCE_NAMESPACE
+        resource.data, registry_manager.BASE_PLUGIN_ID
     )
 
     if not isinstance(resource_instance, PetriNet):

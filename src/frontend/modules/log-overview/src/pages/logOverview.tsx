@@ -23,7 +23,7 @@ const LogOverviewPage = () => {
     return <LoadingOverlay />;
   }
   return (
-    <Container key={id} fluid>
+    <Container key={id} fluid p="md">
       <Grid>
         <Grid.Col span={12}>
           <Stack>

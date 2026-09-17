@@ -1,6 +1,7 @@
 import { defineConfig } from "tsdown";
 export default defineConfig({
   platform: "neutral",
+  deps: { resolveDepSubpath: true },
   entry: ["src/styles.css", "src/index.ts"],
   css: {
     modules: {

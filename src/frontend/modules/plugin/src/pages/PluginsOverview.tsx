@@ -11,7 +11,7 @@ const PluginsOverview: React.FC = () => {
   const { data: plugins } = usePlugins();
 
   return (
-    <Stack gap="md">
+    <Stack gap="md" p="md">
       <div style={{ maxWidth: 720 }}>
         <Title order={2}>Plugin Overview</Title>
         <Text c="dimmed" size="sm" mt={4}>

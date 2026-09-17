@@ -8,6 +8,7 @@ class PluginInput(ABC, BaseModel):
     pass
 
 
+# TODO: Make Field functions for each field type
 def OCEL_FIELD(
     *,
     field_type: Literal[
@@ -22,7 +23,8 @@ def OCEL_FIELD(
         "o2o_qualifier",
     ],
     ocel_id: str,
-    default: Any = ...,
+    theme: Literal["standard", "r4pm"] = "standard",
+    default_frequency: float | None = None,
     title: Optional[str] = None,
     description: Optional[str] = None,
 ) -> Any:
@@ -40,10 +42,11 @@ def OCEL_FIELD(
         "type": "ocel",
         "field_type": field_type,
         "ocel_id": ocel_id,
+        "theme": theme,
+        "default_frequency": default_frequency,
     }
 
     return Field(
-        default=default,
         title=title,
         description=description,
         json_schema_extra={"x-ui-meta": extra},

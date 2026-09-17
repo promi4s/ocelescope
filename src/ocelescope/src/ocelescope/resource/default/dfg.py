@@ -1,8 +1,11 @@
+import math
 from typing import Any
 
+import networkx as nx
 from pydantic import Field
 
 from ocelescope.resource.resource import Annotated, Resource
+from ocelescope.visualization.default.dfg import DFG, OCDirectlyFollowsGraphViz
 from ocelescope.visualization.default.graph import (
     DIRECTED_ELK_GRAPH_LAYOUT,
     Graph,
@@ -45,13 +48,31 @@ class DFGEdge(Annotated):
             object-type-specific start node in the visualization.
         target: Target activity name. If ``None``, the edge ends at the
             object-type-specific end node in the visualization.
-        count: Frequency of this directly-follows relation.
+        count: How many times the directly-follows relation holds, counted as
+            object traversals. An object repeating the relation contributes
+            once per traversal.
+        object_count: Number of distinct objects of this type traversing the
+            relation. An object repeating the relation is counted once.
     """
 
     object_type: str
     source: str | None = None
     target: str | None = None
     count: int = 0
+    object_count: int = 0
+
+
+_START, _END = object(), object()
+
+
+def _rank(edge: DFGEdge) -> tuple[int, int]:
+    return edge.object_count, edge.count
+
+
+def _endpoints(edge: DFGEdge) -> tuple[object, object]:
+    source = _START if edge.source is None else edge.source
+    target = _END if edge.target is None else edge.target
+    return source, target
 
 
 class DirectlyFollowsGraph(Resource):
@@ -92,6 +113,14 @@ class DirectlyFollowsGraph(Resource):
         return result
 
     @property
+    def get_object_counts(self) -> dict[str, int]:
+        return {
+            start_edge.object_type: start_edge.object_count
+            for start_edge in self.edges
+            if start_edge.source is None
+        }
+
+    @property
     def activity_names(self) -> list[str]:
         """
         List all distinct activity names.
@@ -111,25 +140,52 @@ class DirectlyFollowsGraph(Resource):
         """
         return [object_type.name for object_type in self.object_types]
 
-    def filter_edges(self, threshold: float) -> "DirectlyFollowsGraph":
-        """Return a copy retaining only edges whose relative frequency >= threshold.
+    def filter_edges(self, fraction: float) -> "DirectlyFollowsGraph":
+        """Return a copy retaining only the most frequent edges of each object type.
 
-        Relative frequency is edge.count / object_type_count, where the object
-        type count is derived from the start edges (source=None).
+        For every object type, its edges (including start and end edges) are
+        ranked by ``object_count``, with ``count`` breaking ties, and the top
+        ``fraction`` (0-1) of them is kept, rounded up so that any non-zero
+        fraction keeps at least one edge per object type. Edges tied with the
+        last kept edge are kept as well.
+
+        To keep the graph connected, the remaining edges are then removed from
+        least to most frequent, skipping any edge whose removal would cut an
+        activity of the frequent edges off from the start or the end node.
+        Every kept edge thus lies on a start-to-end path.
+
         Activities and object types with no remaining edges are also pruned.
-        At threshold=0 the original graph is returned unchanged.
+        At fraction=1 the original graph is returned unchanged.
         """
-        if threshold == 0 or not self.edges:
+        if fraction >= 1 or not self.edges:
             return self
-        type_counts: dict[str, int] = {}
+
+        edges_by_type: dict[str, list[DFGEdge]] = {}
         for edge in self.edges:
-            if edge.source is None:
-                type_counts[edge.object_type] = type_counts.get(edge.object_type, 0) + edge.count
-        kept_edges = [
-            e
-            for e in self.edges
-            if (n := type_counts.get(e.object_type, 0)) > 0 and e.count / n >= threshold
-        ]
+            edges_by_type.setdefault(edge.object_type, []).append(edge)
+
+        kept_edges: list[DFGEdge] = []
+        for type_edges in edges_by_type.values():
+            keep = math.ceil(len(type_edges) * fraction)
+            if keep == 0:
+                continue
+            cutoff = sorted(map(_rank, type_edges), reverse=True)[keep - 1]
+            required = {node for e in type_edges if _rank(e) >= cutoff for node in _endpoints(e)}
+
+            graph = nx.DiGraph()
+            graph.add_nodes_from((_START, _END))
+            graph.add_edges_from(map(_endpoints, type_edges))
+            for edge in sorted(type_edges, key=_rank):
+                if _rank(edge) >= cutoff:
+                    break
+                graph.remove_edge(*_endpoints(edge))
+                reachable = nx.descendants(graph, _START) | {_START}
+                reaching = nx.ancestors(graph, _END) | {_END}
+                if not required <= reachable & reaching:
+                    graph.add_edge(*_endpoints(edge))
+
+            kept_edges.extend(e for e in type_edges if graph.has_edge(*_endpoints(e)))
+
         active_activities = {e.source for e in kept_edges if e.source} | {
             e.target for e in kept_edges if e.target
         }
@@ -143,36 +199,41 @@ class DirectlyFollowsGraph(Resource):
     @classmethod
     def from_pm4py(cls, ocdfg: Any) -> "DirectlyFollowsGraph":
         """Convert a pm4py OCDFG dict to a DirectlyFollowsGraph."""
-        edges = [
-            DFGEdge(
+
+        def edge(
+            object_type: str,
+            source: str | None,
+            target: str | None,
+            events: Any,
+            objects: Any,
+        ) -> DFGEdge:
+            count, object_count = len(events), len(objects)
+            return DFGEdge(
                 object_type=object_type,
                 source=source,
                 target=target,
-                count=len(events),
-                annotation=str(len(events)),
+                count=count,
+                object_count=object_count,
+                annotation=f"{count} ({object_count})",
             )
+
+        edge_objects = ocdfg["edges"]["unique_objects"]
+        edges = [
+            edge(object_type, source, target, events, edge_objects[object_type][(source, target)])
             for object_type, raw_edges in ocdfg["edges"]["event_couples"].items()
             for (source, target), events in raw_edges.items()
         ]
 
+        start_objects = ocdfg["start_activities"]["unique_objects"]
         start_edges = [
-            DFGEdge(
-                object_type=object_type,
-                target=activity,
-                count=len(events),
-                annotation=str(len(events)),
-            )
+            edge(object_type, None, activity, events, start_objects[object_type][activity])
             for object_type, activities in ocdfg["start_activities"]["events"].items()
             for activity, events in activities.items()
         ]
 
+        end_objects = ocdfg["end_activities"]["unique_objects"]
         end_edges = [
-            DFGEdge(
-                source=activity,
-                object_type=object_type,
-                count=len(events),
-                annotation=str(len(events)),
-            )
+            edge(object_type, activity, None, events, end_objects[object_type][activity])
             for object_type, activities in ocdfg["end_activities"]["events"].items()
             for activity, events in activities.items()
         ]
@@ -183,7 +244,40 @@ class DirectlyFollowsGraph(Resource):
             edges=edges + start_edges + end_edges,
         )
 
-    def visualize(self) -> Graph:
+    def _has_resource_annotations(self) -> bool:
+        return any(
+            isinstance(element.annotation, list) and element.annotation
+            for element in [*self.activities, *self.object_types, *self.edges]
+        )
+
+    def visualize(self) -> OCDirectlyFollowsGraphViz | Graph:
+        if self._has_resource_annotations():
+            return self._visualize_graph()
+        return self._visualize_ocdfg()
+
+    def _visualize_ocdfg(self) -> OCDirectlyFollowsGraphViz:
+        dfgs = {object_type.name: DFG() for object_type in self.object_types}
+
+        for edge in self.edges:
+            dfg = dfgs.setdefault(edge.object_type, DFG())
+            if edge.target is not None:
+                dfg.activities[edge.target] = dfg.activities.get(edge.target, 0) + edge.count
+
+            if edge.source is None and edge.target is not None:
+                dfg.start_activities[edge.target] = edge.count
+            elif edge.source is not None and edge.target is None:
+                dfg.end_activities[edge.source] = edge.count
+            elif edge.source is not None and edge.target is not None:
+                dfg.directly_follows_relations.append(((edge.source, edge.target), edge.count))
+
+        return OCDirectlyFollowsGraphViz(
+            object_type_to_dfg=dfgs,
+            object_counts={
+                object_type: sum(dfg.start_activities.values()) for object_type, dfg in dfgs.items()
+            },
+        )
+
+    def _visualize_graph(self) -> Graph:
         color_map = generate_color_map([ot.name for ot in self.object_types], "custom")
 
         start_object_types = {

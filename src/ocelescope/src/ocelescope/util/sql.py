@@ -33,5 +33,15 @@ def literal(value: str) -> str:
     return "'" + value.replace("'", "''") + "'"
 
 
+def in_list(expression: str, values: list[str]) -> str:
+    """Render ``expression IN (values)``; an empty list matches nothing (``FALSE``).
+
+    SQL has no empty ``IN ()``, so this is the form to use for a caller-supplied list.
+    """
+    if not values:
+        return "FALSE"
+    return f"{expression} IN ({','.join(map(literal, values))})"
+
+
 def first_column_list(relation: duckdb.DuckDBPyRelation):
     return [value[0] for value in relation.fetchall()]

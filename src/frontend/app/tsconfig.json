@@ -22,6 +22,9 @@
       "@ocelescope/management": ["../modules/management/src/index.ts"],
       "@ocelescope/filter": ["../modules/filter/src/index.ts"],
       "@ocelescope/plugin": ["../modules/plugin/src/index.ts"],
+      "@ocelescope/plugin-components": [
+        "../packages/plugin-components/src/index.ts"
+      ],
       "@ocelescope/log-overview": ["../modules/log-overview/src/index.ts"],
       "@ocelescope/variants": ["../modules/variants/src/index.ts"]
     }

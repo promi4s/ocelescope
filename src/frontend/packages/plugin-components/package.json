@@ -1,0 +1,59 @@
+{
+  "name": "@ocelescope/plugin-components",
+  "type": "module",
+  "version": "0.7.0",
+  "description": "Renders a plugin method's configuration schema as a Mantine form, including Ocelescope's custom OCEL, computed, code and slider fields.",
+  "author": "Görkem-Emre Öztürk <goerkem.oeztuerk@rwth-aachen.de>",
+  "license": "MIT",
+  "homepage": "https://www.ocelescope.org",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/promi4s/ocelescope.git"
+  },
+  "bugs": {
+    "url": "https://github.com/promi4s/ocelescope/issues"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@mantine/core": "catalog:",
+    "@mantine/hooks": "catalog:",
+    "@monaco-editor/react": "catalog:",
+    "@ocelescope/api-base": "workspace:^",
+    "@ocelescope/resources": "workspace:^",
+    "@rjsf/core": "catalog:",
+    "@r4pm/components": "catalog:",
+    "lucide-react": "catalog:",
+    "@marko19907/string-to-color": "catalog:",
+    "@rjsf/mantine": "catalog:",
+    "@rjsf/utils": "catalog:",
+    "@rjsf/validator-ajv8": "catalog:",
+    "@tanstack/react-query": "catalog:",
+    "next": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "tsdown": "catalog:",
+    "typescript": "catalog:"
+  }
+}
