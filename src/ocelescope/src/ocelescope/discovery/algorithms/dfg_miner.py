@@ -12,7 +12,7 @@ from ocelescope.ocel.constants.pm4py import (
 )
 from ocelescope.ocel.constants.tables import E2O_TABLE, EVENTS_TABLE, OBJECTS_TABLE
 from ocelescope.resource.default.dfg import DFGActivity, DFGEdge, DFGObject, DirectlyFollowsGraph
-from ocelescope.util.sql import ident, literal
+from ocelescope.util.sql import ident, in_list
 
 OBJECT_TYPE_COL = "object_type"
 SOURCE_COL = "source"
@@ -28,13 +28,11 @@ def _dfg_query(
     activity, timestamp = ident(ACTIVITY_COL), ident(TIMESTAMP_COL)
 
     activity_filter = (
-        f"WHERE {activity} IN ({','.join(literal(activity_name) for activity_name in included_activities)})"
-        if included_activities is not None
-        else ""
+        f"WHERE {in_list(activity, included_activities)}" if included_activities is not None else ""
     )
 
     object_type_filter = (
-        f"WHERE {otype} IN ({','.join(literal(object_type) for object_type in included_object_types)})"
+        f"WHERE {in_list(otype, included_object_types)}"
         if included_object_types is not None
         else ""
     )

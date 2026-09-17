@@ -15,7 +15,7 @@ from ocelescope.ocel.constants.pm4py import (
 )
 from ocelescope.ocel.constants.tables import E2O_TABLE, EVENTS_TABLE, OBJECTS_TABLE
 from ocelescope.resource.default.petri_net import PetriNet
-from ocelescope.util.sql import ident, literal
+from ocelescope.util.sql import ident, in_list
 
 
 def _slim_pm4py_ocel(
@@ -35,9 +35,9 @@ def _slim_pm4py_ocel(
 
     conditions = []
     if included_activities is not None:
-        conditions.append(f"e.{activity} IN ({','.join(map(literal, included_activities))})")
+        conditions.append(in_list(f"e.{activity}", included_activities))
     if included_object_types is not None:
-        conditions.append(f"o.{otype} IN ({','.join(map(literal, included_object_types))})")
+        conditions.append(in_list(f"o.{otype}", included_object_types))
     where = f"WHERE {' AND '.join(conditions)}" if conditions else ""
 
     relations = ocel.sql(
@@ -69,8 +69,13 @@ def inductive_miner(
     included_object_types: list[str] | None = None,
     included_activities: list[str] | None = None,
 ) -> PetriNet:
+    pm4py_ocel = _slim_pm4py_ocel(ocel, included_object_types, included_activities)
+    # pm4py cannot mine an empty log, e.g. when nothing is selected.
+    if pm4py_ocel.relations.empty:
+        return PetriNet()
+
     ocpn = pm4py.discover_oc_petri_net(
-        ocel=_slim_pm4py_ocel(ocel, included_object_types, included_activities),
+        ocel=pm4py_ocel,
         noise_threshold=noise_threshold,
         disable_fallthroughs=False,
         disable_strict_sequence_cut=False,
