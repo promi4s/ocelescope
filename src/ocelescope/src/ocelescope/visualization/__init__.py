@@ -19,13 +19,23 @@ from ocelescope.visualization.default.graph import (
     GraphvizLayoutConfig,
     LayoutConfig,
 )
+from ocelescope.visualization.default.petri_net import (
+    Arc,
+    OCArc,
+    OCPetriNetViz,
+    OCPlace,
+    PetriNetViz,
+    Place,
+    Transition,
+)
 from ocelescope.visualization.default.plotly import Plotly
 from ocelescope.visualization.default.svg import SVGVis
 from ocelescope.visualization.default.table import Table, TableColumn
 from ocelescope.visualization.util.color import generate_color_map
 
 Visualization: TypeAlias = Annotated[
-    Union[Graph, Table, SVGVis, DotVis, Plotly], Field(discriminator="type")
+    Union[Graph, Table, SVGVis, DotVis, Plotly, PetriNetViz, OCPetriNetViz],
+    Field(discriminator="type"),
 ]
 
 __all__ = [
@@ -55,4 +65,12 @@ __all__ = [
     "DotVis",
     # Plotly
     "Plotly",
+    # PetriNet
+    "Arc",
+    "OCArc",
+    "OCPetriNetViz",
+    "PetriNetViz",
+    "Place",
+    "OCPlace",
+    "Transition",
 ]
