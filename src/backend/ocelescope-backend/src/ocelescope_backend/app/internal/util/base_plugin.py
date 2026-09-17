@@ -15,9 +15,9 @@ from ocelescope import (
     plugin_method,
 )
 
-
-class DiscoveryInput(PluginInput):
-    paths: float = SLIDER_FIELD(
+Paths = Annotated[
+    float,
+    SLIDER_FIELD(
         min=0.01,
         max=1,
         step=0.01,
@@ -27,23 +27,41 @@ class DiscoveryInput(PluginInput):
             "How many of the less frequent paths to include. "
             "Lower values give a simpler model."
         ),
-    )
-    object_types: list[str] = OCEL_FIELD(
+    ),
+]
+ObjectTypes = Annotated[
+    list[str],
+    OCEL_FIELD(
         field_type="object_type",
         ocel_id="ocel",
         theme="r4pm",
         title="Included object types",
         description="Only these object types are used for discovery.",
         default_frequency=0.5,
-    )
-    activities: list[str] = OCEL_FIELD(
+    ),
+]
+Activities = Annotated[
+    list[str],
+    OCEL_FIELD(
         field_type="event_type",
         ocel_id="ocel",
         theme="r4pm",
         title="Included activities",
         description="Only events of these activities are used for discovery.",
         default_frequency=0.5,
-    )
+    ),
+]
+
+
+class DiscoveryPetriInput(PluginInput):
+    paths: Paths
+    object_types: ObjectTypes
+    activities: Activities
+
+
+class DiscoveryDFGInput(PluginInput):
+    paths: Paths
+    activities: Activities
 
 
 class BasePlugin(Plugin):
@@ -58,7 +76,7 @@ class BasePlugin(Plugin):
     def discover_ocdfg(
         self,
         ocel: Annotated[OCEL, OCELAnnotation(label="Event log")],
-        input: DiscoveryInput,
+        input: DiscoveryDFGInput,
     ) -> Annotated[
         DirectlyFollowsGraph, ResourceAnnotation(label="Directly-Follows Graph")
     ]:
@@ -66,7 +84,6 @@ class BasePlugin(Plugin):
             ocel,
             frequency_threshold=input.paths,
             included_activities=input.activities,
-            included_object_types=input.object_types,
         )
         return ocdfg
 
@@ -77,7 +94,7 @@ class BasePlugin(Plugin):
     def discover_ocpn(
         self,
         ocel: Annotated[OCEL, OCELAnnotation(label="Event log")],
-        input: DiscoveryInput,
+        input: DiscoveryPetriInput,
     ) -> Annotated[PetriNet, ResourceAnnotation(label="Petri Net")]:
         return inductive_miner(
             ocel,

@@ -67,7 +67,7 @@ export const FrequencyPicker = ({
         </Group>
       </UnstyledButton>
       <Collapse expanded={expanded}>
-        <Box py="xs" mah={300} style={{ overflow: "hidden" }}>
+        <Box py="xs" style={{ overflow: "hidden" }}>
           <R4PMFrequencyPicker
             value={selected}
             onChange={(next) =>
