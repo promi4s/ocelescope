@@ -1,65 +1,10 @@
-import { Box } from "@mantine/core";
-import type {
-  ObjectCentricPetriNet,
-  ObjectCentricPetriNetViewerProps,
-  PetriNet,
-  PetriNetViewerProps,
-} from "@r4pm/components";
-import dynamic from "next/dynamic";
-import { type ReactNode, useMemo } from "react";
+import type { ObjectCentricPetriNet, PetriNet } from "@r4pm/components";
+import { useMemo } from "react";
 import type { VisualizationProps } from "..";
+import { R4pmViewerContainer, r4pmViewer } from "./R4pm";
 
-const loadR4pm = async () => {
-  const [components, { wasmLayout }] = await Promise.all([
-    import("@r4pm/components"),
-    import("@r4pm/components/rust-layout/wasm"),
-  ]);
-  const viewerConfig = { layout: wasmLayout };
-  const { ViewerConfigProvider } = components;
-
-  const WithLayout = ({ children }: { children: ReactNode }) => (
-    <ViewerConfigProvider value={viewerConfig}>{children}</ViewerConfigProvider>
-  );
-
-  return { components, WithLayout };
-};
-
-const R4pmOcpn = dynamic(
-  async () => {
-    const {
-      components: { ObjectCentricPetriNetViewer },
-      WithLayout,
-    } = await loadR4pm();
-
-    return (props: ObjectCentricPetriNetViewerProps) => (
-      <WithLayout>
-        <ObjectCentricPetriNetViewer {...props} />
-      </WithLayout>
-    );
-  },
-  { ssr: false },
-);
-
-const R4pmPetriNet = dynamic(
-  async () => {
-    const {
-      components: { PetriNetViewer },
-      WithLayout,
-    } = await loadR4pm();
-
-    return (props: PetriNetViewerProps) => (
-      <WithLayout>
-        <PetriNetViewer {...props} />
-      </WithLayout>
-    );
-  },
-  { ssr: false },
-);
-
-const ExportFrame = dynamic(
-  () => import("@r4pm/components").then((c) => c.ViewerExportFrame),
-  { ssr: false },
-);
+const R4pmOcpn = r4pmViewer((c) => c.ObjectCentricPetriNetViewer);
+const R4pmPetriNet = r4pmViewer((c) => c.PetriNetViewer);
 
 const toR4pmPetriNet = (
   visualization:
@@ -75,20 +20,6 @@ const toR4pmPetriNet = (
   initial_marking: visualization.initial_marking ?? null,
   final_marking: visualization.final_marking ?? null,
 });
-
-const ViewerContainer = ({
-  filename,
-  children,
-}: {
-  filename: string;
-  children: ReactNode;
-}) => (
-  <Box h="100%" w="100%" pos="relative" style={{ overflow: "hidden" }}>
-    <ExportFrame filename={filename} style={{ height: "100%" }}>
-      {children}
-    </ExportFrame>
-  </Box>
-);
 
 export const OCPetriNetViewer = ({
   visualization,
@@ -118,9 +49,9 @@ export const OCPetriNetViewer = ({
   }, [visualization]);
 
   return (
-    <ViewerContainer filename="oc-petri-net">
+    <R4pmViewerContainer filename="oc-petri-net">
       <R4pmOcpn data={ocpnData} />
-    </ViewerContainer>
+    </R4pmViewerContainer>
   );
 };
 
@@ -133,8 +64,8 @@ export const PetriNetViewer = ({
   );
 
   return (
-    <ViewerContainer filename="petri-net">
+    <R4pmViewerContainer filename="petri-net">
       <R4pmPetriNet data={petriNet} />
-    </ViewerContainer>
+    </R4pmViewerContainer>
   );
 };

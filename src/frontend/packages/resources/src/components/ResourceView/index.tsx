@@ -7,6 +7,7 @@ import type {
   VisualizationsType,
   VisualizationsTypes,
 } from "../../types";
+import { DFGViewer, OCDFGViewer } from "./Viewers/DFG";
 import DotToSvgViewer from "./Viewers/Dot";
 import GraphViewer from "./Viewers/Graph";
 import { OCPetriNetViewer, PetriNetViewer } from "./Viewers/PetriNet";
@@ -36,6 +37,8 @@ const visualizationMap: {
   plotly: PlotlyViewer,
   r4pm_oc_petri_net: OCPetriNetViewer,
   r4pm_petri_net: PetriNetViewer,
+  r4pm_dfg: DFGViewer,
+  r4pm_ocdfg: OCDFGViewer,
 };
 
 export const Visualization = ({
