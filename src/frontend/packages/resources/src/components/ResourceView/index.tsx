@@ -33,6 +33,8 @@ const visualizationMap: {
   graph: GraphViewer,
   dot: DotToSvgViewer,
   plotly: PlotlyViewer,
+  r4pm_oc_petri_net: () => <></>,
+  r4pm_petri_net: () => <></>,
 };
 
 export const Visualization = ({

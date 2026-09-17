@@ -973,6 +973,35 @@
   },
   "components": {
     "schemas": {
+      "Arc": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "target": {
+            "type": "string",
+            "title": "Target"
+          },
+          "weight": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weight"
+          }
+        },
+        "type": "object",
+        "required": [
+          "source",
+          "target"
+        ],
+        "title": "Arc"
+      },
       "Body_downloadPluginResults": {
         "properties": {
           "indices": {
@@ -1181,6 +1210,12 @@
                   },
                   {
                     "$ref": "#/components/schemas/Plotly"
+                  },
+                  {
+                    "$ref": "#/components/schemas/PetriNetViz"
+                  },
+                  {
+                    "$ref": "#/components/schemas/OCPetriNetViz"
                   }
                 ],
                 "discriminator": {
@@ -1189,6 +1224,8 @@
                     "dot": "#/components/schemas/DotVis",
                     "graph": "#/components/schemas/Graph",
                     "plotly": "#/components/schemas/Plotly",
+                    "r4pm_oc_petri_net": "#/components/schemas/OCPetriNetViz",
+                    "r4pm_petri_net": "#/components/schemas/PetriNetViz",
                     "svg": "#/components/schemas/SVGVis",
                     "table": "#/components/schemas/Table"
                   }
@@ -1842,6 +1879,40 @@
         "title": "NodeStyle",
         "description": "Visual style options for a `GraphNode`.\n\nAttributes:\n    double_border: Renders a second border inside the node (e.g. final-marking places).\n    inner_symbol: Optional symbol rendered inside the node shape.\n    initial_tokens: Optional initial token count rendered inside a place node.\n    final_tokens: Optional final token count rendered inside a place node."
       },
+      "OCArc": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "target": {
+            "type": "string",
+            "title": "Target"
+          },
+          "weight": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weight"
+          },
+          "variable": {
+            "type": "boolean",
+            "title": "Variable",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "source",
+          "target"
+        ],
+        "title": "OCArc"
+      },
       "OCELIOApi": {
         "properties": {
           "name": {
@@ -1887,6 +1958,137 @@
           "type"
         ],
         "title": "OCELIOApi"
+      },
+      "OCPetriNetViz": {
+        "properties": {
+          "transitions": {
+            "items": {
+              "$ref": "#/components/schemas/Transition"
+            },
+            "type": "array",
+            "title": "Transitions"
+          },
+          "initial_marking": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Initial Marking"
+          },
+          "final_marking": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Final Marking"
+          },
+          "type": {
+            "type": "string",
+            "const": "r4pm_oc_petri_net",
+            "title": "Type",
+            "default": "r4pm_oc_petri_net"
+          },
+          "places": {
+            "items": {
+              "$ref": "#/components/schemas/OCPlace"
+            },
+            "type": "array",
+            "title": "Places"
+          },
+          "arcs": {
+            "items": {
+              "$ref": "#/components/schemas/OCArc"
+            },
+            "type": "array",
+            "title": "Arcs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "arcs"
+        ],
+        "title": "OCPetriNetViz"
+      },
+      "OCPlace": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "object_type": {
+            "type": "string",
+            "title": "Object Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "object_type"
+        ],
+        "title": "OCPlace"
+      },
+      "PetriNetViz": {
+        "properties": {
+          "transitions": {
+            "items": {
+              "$ref": "#/components/schemas/Transition"
+            },
+            "type": "array",
+            "title": "Transitions"
+          },
+          "initial_marking": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Initial Marking"
+          },
+          "final_marking": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Final Marking"
+          },
+          "type": {
+            "type": "string",
+            "const": "r4pm_petri_net",
+            "title": "Type",
+            "default": "r4pm_petri_net"
+          },
+          "places": {
+            "items": {
+              "$ref": "#/components/schemas/Place"
+            },
+            "type": "array",
+            "title": "Places"
+          },
+          "arcs": {
+            "items": {
+              "$ref": "#/components/schemas/Arc"
+            },
+            "type": "array",
+            "title": "Arcs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "arcs"
+        ],
+        "title": "PetriNetViz"
+      },
+      "Place": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "title": "Place"
       },
       "Plotly": {
         "properties": {
@@ -1989,6 +2191,12 @@
                   },
                   {
                     "$ref": "#/components/schemas/Plotly"
+                  },
+                  {
+                    "$ref": "#/components/schemas/PetriNetViz"
+                  },
+                  {
+                    "$ref": "#/components/schemas/OCPetriNetViz"
                   }
                 ],
                 "discriminator": {
@@ -1997,6 +2205,8 @@
                     "dot": "#/components/schemas/DotVis",
                     "graph": "#/components/schemas/Graph",
                     "plotly": "#/components/schemas/Plotly",
+                    "r4pm_oc_petri_net": "#/components/schemas/OCPetriNetViz",
+                    "r4pm_petri_net": "#/components/schemas/PetriNetViz",
                     "svg": "#/components/schemas/SVGVis",
                     "table": "#/components/schemas/Table"
                   }
@@ -2329,6 +2539,30 @@
           "CANCELLED"
         ],
         "title": "TaskState"
+      },
+      "Transition": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "title": "Transition"
       },
       "ValidationError": {
         "properties": {
