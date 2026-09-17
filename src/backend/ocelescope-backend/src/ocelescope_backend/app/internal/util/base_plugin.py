@@ -17,20 +17,23 @@ from ocelescope import (
 
 
 class DiscoveryInput(PluginInput):
-    threshold: float = SLIDER_FIELD(
+    paths: float = SLIDER_FIELD(
         min=0.01,
         max=1,
         step=0.01,
         default=0.5,
-        title="Threshold",
-        description="Higher values filter out more infrequent behavior.",
+        title="Paths",
+        description=(
+            "How many of the less frequent paths to include. "
+            "Lower values give a simpler model."
+        ),
     )
     object_types: list[str] = OCEL_FIELD(
         field_type="object_type",
         ocel_id="ocel",
         theme="r4pm",
         title="Included object types",
-        description="Object types considered during discovery.",
+        description="Only these object types are used for discovery.",
         default_frequency=0.5,
     )
     activities: list[str] = OCEL_FIELD(
@@ -38,7 +41,7 @@ class DiscoveryInput(PluginInput):
         ocel_id="ocel",
         theme="r4pm",
         title="Included activities",
-        description="Activities considered during discovery.",
+        description="Only events of these activities are used for discovery.",
         default_frequency=0.5,
     )
 
@@ -61,7 +64,7 @@ class BasePlugin(Plugin):
     ]:
         ocdfg = ocdfg_miner(
             ocel,
-            frequency_threshold=input.threshold,
+            frequency_threshold=input.paths,
             included_activities=input.activities,
             included_object_types=input.object_types,
         )
@@ -78,7 +81,8 @@ class BasePlugin(Plugin):
     ) -> Annotated[PetriNet, ResourceAnnotation(label="Petri Net")]:
         return inductive_miner(
             ocel,
-            noise_threshold=(1 - input.threshold),
+            # pm4py's noise threshold counts what to drop, the slider what to keep.
+            noise_threshold=1 - input.paths,
             included_activities=input.activities,
             included_object_types=input.object_types,
         )
