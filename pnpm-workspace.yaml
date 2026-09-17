@@ -63,7 +63,7 @@ catalog:
   react-plotly.js: ^4.0.0
   react-zoom-pan-pinch: ^4.0.0
   recharts: ^3.2.1
-  tsdown: ^0.22.14
+  tsdown: ^0.23.0
   typescript: ^6.0.3
   uniqolor: ^1.1.1
   zod: ^4.3.6
