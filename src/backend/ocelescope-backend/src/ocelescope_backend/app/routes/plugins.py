@@ -115,8 +115,8 @@ def save_plugin_results(
 
     saved = SavedResults(ocel_ids=[], resource_ids=[])
 
-    for index, entity in selected:
-        name = next(result.name for result in selection) or default_result_name(
+    for result, (index, entity) in zip(selection, selected, strict=True):
+        name = result.name or default_result_name(
             plugin_id=plugin_task.plugin_id,
             method_name=plugin_task.method_name,
             index=index,
