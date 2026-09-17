@@ -1,7 +1,7 @@
 from contextlib import ExitStack, contextmanager
 from copy import deepcopy
 from types import ModuleType
-from typing import TYPE_CHECKING, Any, Iterator, Optional, TypedDict
+from typing import TYPE_CHECKING, Any, Iterator, Optional
 
 from ocelescope.plugin.decorators import PluginIO
 from ocelescope.resource.resource import ResourceMeta
@@ -56,12 +56,6 @@ class PluginAlreadyRegistered(RegistryError):
         )
 
 
-class PluginInput(TypedDict):
-    input_ocels: dict[str, OCEL]
-    input_resources: dict[str, Resource]
-    input: dict[str, Any]
-
-
 class PluginRegistry:
     def __init__(self):
         self._registry: dict[str, Plugin] = {}
@@ -76,17 +70,21 @@ class PluginRegistry:
         if plugin is None:
             raise PluginNotFound(module.__name__)
 
+        return self.add_plugin(module.__name__, plugin)
+
+    def add_plugin(self, id: str, plugin_class: type[Plugin]) -> Plugin:
         if any(
-            plugin.get_name() == existing_plugin.get_name()
-            and plugin.version == existing_plugin.version
+            plugin_class.get_name() == existing_plugin.get_name()
+            and plugin_class.version == existing_plugin.version
             for existing_plugin in self._registry.values()
         ):
             raise PluginAlreadyRegistered(
-                name=plugin.get_name(), version=plugin.version
+                name=plugin_class.get_name(), version=plugin_class.version
             )
 
-        self._registry[module.__name__] = plugin()
-        return self._registry[module.__name__]
+        self._registry[id] = plugin_class()
+
+        return self._registry[id]
 
     def list_plugins(self) -> list[PluginApi]:
         return [

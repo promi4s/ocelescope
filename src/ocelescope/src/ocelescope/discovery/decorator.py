@@ -1,3 +1,4 @@
+import warnings
 from dataclasses import dataclass
 from typing import Any, Callable, get_type_hints
 
@@ -19,10 +20,19 @@ def discovery_method(
 ) -> Callable[[Callable[..., Resource]], Callable[..., Resource]]:
     """Mark a function as a discovery method.
 
+    Deprecated:
+        Expose discovery algorithms as `@plugin_method`s on a `Plugin` instead.
+
     Stamps `__discovery_meta__` on the function. The backend scans for this
     attribute at startup, derives the parameter schema from the function
     signature, and exposes the method through the discovery API.
     """
+    warnings.warn(
+        "@discovery_method is deprecated; expose discovery algorithms as "
+        "@plugin_method on a Plugin instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
     def decorator(func: Callable[..., Resource]) -> Callable[..., Resource]:
         hints = get_type_hints(func, include_extras=True)

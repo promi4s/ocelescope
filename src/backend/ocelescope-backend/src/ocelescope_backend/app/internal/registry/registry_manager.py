@@ -4,15 +4,17 @@ import sys
 from contextlib import AbstractContextManager
 from typing import TYPE_CHECKING, Any, Dict
 
-from ocelescope.discovery import algorithms
 from typing_extensions import TypedDict
 
-from ocelescope import DirectlyFollowsGraph, PetriNet, Plugin, Resource
+from ocelescope import Plugin, Resource
 from ocelescope_backend.app.internal.config import config
 from ocelescope_backend.app.internal.model.plugin import PluginApi
-from ocelescope_backend.app.internal.registry.discovery import DiscoveryRegistry
-from ocelescope_backend.app.internal.registry.plugin import PluginRegistry
+from ocelescope_backend.app.internal.registry.plugin import (
+    PluginNotFound,
+    PluginRegistry,
+)
 from ocelescope_backend.app.internal.registry.resource import ResourceRegistry
+from ocelescope_backend.app.internal.util.base_plugin import BasePlugin
 from ocelescope_backend.app.internal.util.dynamic_import import (
     import_wheel_dynamically,
     is_wheel_compatible,
@@ -28,24 +30,13 @@ class ResourceInfo(TypedDict):
 
 
 class RegistryManager:
-    _CORE_RESOURCE_NAMESPACE = "__core__"
+    BASE_PLUGIN_ID: str = "__BASE_PLUGIN_ID__"
 
     def __init__(self):
         self._plugin_registry = PluginRegistry()
         self._resource_registry = ResourceRegistry()
-        self._discovery_registry = DiscoveryRegistry()
-        self._register_core_resources()
-        self._discovery_registry.register(algorithms)
 
-    @property
-    def discovery_registry(self) -> DiscoveryRegistry:
-        return self._discovery_registry
-
-    def _register_core_resources(self):
-        for resource_class in (PetriNet, DirectlyFollowsGraph):
-            self._resource_registry.register_resource(
-                self._CORE_RESOURCE_NAMESPACE, resource_class
-            )
+        self.load_plugin(self.BASE_PLUGIN_ID, BasePlugin)
 
     def list_plugins(self) -> list[PluginApi]:
         return self._plugin_registry.list_plugins()
@@ -132,16 +123,20 @@ class RegistryManager:
                     sys.modules[id] = module
                     spec.loader.exec_module(module)
                     try:
-                        plugin = self._plugin_registry.register(module)
+                        plugin_class = next(
+                            (
+                                plugin
+                                for plugin in vars(module).values()
+                                if isinstance(plugin, type)
+                                and issubclass(plugin, Plugin)
+                            ),
+                            None,
+                        )
 
-                        for resource_type in plugin.get_resources():
-                            self._resource_registry.register_resource(id, resource_type)
+                        if plugin_class is None:
+                            raise PluginNotFound(module.__name__)
 
-                        for info in self._discovery_registry.register(module):
-                            self._resource_registry.register_resource(
-                                id, info.resource_type
-                            )
-
+                        self.load_plugin(id, plugin_class)
                         loaded_plugins.append(id)
                     except Exception:
                         self.unload_plugins([id])
@@ -156,11 +151,16 @@ class RegistryManager:
 
         return loaded_plugins
 
+    def load_plugin(self, id: str, plugin_class: type[Plugin]):
+        self._plugin_registry.add_plugin(id, plugin_class)
+
+        for resource_type in plugin_class.get_resources():
+            self._resource_registry.register_resource(id, resource_type)
+
     def unload_plugins(self, plugin_ids: list[str]):
         for id in plugin_ids:
             self._plugin_registry.unload_module(id)
             self._resource_registry.unload_module(id)
-            self._discovery_registry.unload_module(id)
 
     def get_resource_info(self) -> Dict[str, ResourceInfo]:
         return {

@@ -1,347 +1,191 @@
 import {
   ActionIcon,
   Box,
-  Center,
-  Drawer,
   LoadingOverlay,
+  ScrollArea,
+  Select,
+  Splitter,
+  Stack,
   Text,
   Tooltip,
 } from "@mantine/core";
-import { useLocalStorage } from "@mantine/hooks";
-import {
-  useCreateDiscoveryTask,
-  useDiscoveryTask,
-  useEventCounts,
-  useListDiscoveryFilters,
-  useListDiscoveryMethods,
-  useObjectCounts,
-  useSaveDiscovery,
-} from "@ocelescope/api-base";
+import { type UseSplitterReturnValue, useDebouncedValue } from "@mantine/hooks";
+import { useRunPlugin } from "@ocelescope/api-base";
 import { defineModuleRoute, useCurrentOcel } from "@ocelescope/core";
-import { Visualization, type VisualizationsType } from "@ocelescope/resources";
-import { BookmarkIcon, SettingsIcon } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import {
-  selectOcelFormState,
-  useDiscoveryStore,
-} from "../stores/discoveryStore";
-import type { DiscoverySchema } from "../types";
-import { getInitialFormData, normalizeFormData } from "../utils/discoveryState";
-import { DiscoverySettingsContent } from "./DiscoverySettingsContent";
+import { PluginForm, ResultSection } from "@ocelescope/plugin-components";
+import type Form from "@rjsf/core";
+import type { UiSchema } from "@rjsf/utils";
+import { Settings } from "lucide-react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { useDiscoveryMethods } from "../hooks/useDiscoveryMethods";
 
-const PANEL_OPEN_KEY = "ocelescope:discovery:panel-open";
+const uiSchema: UiSchema = {
+  "ui:submitButtonOptions": {
+    norender: true,
+  },
+};
 
-const DiscoveryPageContent = ({ ocelId }: { ocelId: string }) => {
-  const { selectedMethodId, formDataByMethod, filters, filtersInitialized } =
-    useDiscoveryStore(selectOcelFormState(ocelId));
-  const setSelectedMethodId = useDiscoveryStore((s) => s.setSelectedMethodId);
-  const setFormData = useDiscoveryStore((s) => s.setFormData);
-  const setFiltersInStore = useDiscoveryStore((s) => s.setFilters);
-  const initializeFilters = useDiscoveryStore((s) => s.initializeFilters);
+type DiscoveryMethod = ReturnType<
+  typeof useDiscoveryMethods
+>["discoveryMethods"][number];
 
-  const [taskId, setTaskId] = useState<string>();
-  const [savedTaskId, setSavedTaskId] = useState<string>();
-  const [submitError, setSubmitError] = useState<string>();
+const DiscoveryConfiguration = ({
+  method,
+  ocelId,
+  onSuccess,
+}: {
+  method: DiscoveryMethod;
+  ocelId: string;
+  onSuccess: (discoveryTaskId: string) => void;
+}) => {
+  const [input, setInput] = useState({});
+  const [debouncedInput] = useDebouncedValue(input, 1000);
 
-  const [panelOpen, setPanelOpen] = useLocalStorage<boolean>({
-    key: PANEL_OPEN_KEY,
-    defaultValue: true,
+  const ref = useRef<Form>(null);
+
+  const { mutate } = useRunPlugin({
+    mutation: { onSuccess },
   });
 
-  const {
-    data: rawMethods = [],
-    isLoading: isMethodsLoading,
-    error: methodsError,
-  } = useListDiscoveryMethods();
-
-  const methods = useMemo(
-    () =>
-      rawMethods
-        .map((m) => ({ ...m, variants: m.variants.filter((v) => v.enabled) }))
-        .filter((m) => m.variants.length),
-    [rawMethods],
-  );
-
-  const { data: availableFilters = [] } = useListDiscoveryFilters();
-
-  const { data: eventCounts = {} } = useEventCounts(ocelId, undefined, {
-    query: { enabled: true },
-  });
-  const { data: objectCounts = {} } = useObjectCounts(ocelId, undefined, {
-    query: { enabled: true },
-  });
-
-  // Initialize filter defaults on first visit for this OCEL
-  useEffect(() => {
-    if (filtersInitialized || availableFilters.length === 0) return;
-    initializeFilters(
-      ocelId,
-      availableFilters.map((f) => ({
-        name: f.name,
-        payload: getInitialFormData(f.json_schema as DiscoverySchema),
-      })),
-    );
-  }, [filtersInitialized, availableFilters, ocelId, initializeFilters]);
-
-  // Clear selection if the selected method was disabled/removed
-  useEffect(() => {
-    if (!selectedMethodId || isMethodsLoading) return;
-    const allVariantIds = methods.flatMap((m) =>
-      m.variants.map((v) => v.methodId),
-    );
-    if (!allVariantIds.includes(selectedMethodId)) {
-      setSelectedMethodId(ocelId, null);
+  const run = useEffectEvent((data: typeof debouncedInput) => {
+    if (
+      method.configuration_schema &&
+      ref.current?.validate(data).errors.length !== 0
+    ) {
+      return;
     }
-  }, [
-    methods,
-    selectedMethodId,
-    isMethodsLoading,
-    ocelId,
-    setSelectedMethodId,
-  ]);
 
-  // Auto-select first method only if nothing was restored
-  useEffect(() => {
-    if (selectedMethodId || methods.length === 0) return;
-    setSelectedMethodId(
-      ocelId,
-      methods
-        .flatMap((m) => m.variants)
-        .find((v) => v.resourceType === "DirectlyFollowsGraph")?.methodId ??
-        methods[0]?.variants[0]?.methodId ??
-        null,
-    );
-  }, [methods, selectedMethodId, ocelId, setSelectedMethodId]);
-
-  const selectedMethod = useMemo(
-    () =>
-      methods.find((m) =>
-        m.variants.some((v) => v.methodId === selectedMethodId),
-      ) ?? null,
-    [methods, selectedMethodId],
-  );
-
-  const selectedVariant = useMemo(
-    () =>
-      selectedMethod?.variants.find((v) => v.methodId === selectedMethodId) ??
-      null,
-    [selectedMethod, selectedMethodId],
-  );
-
-  const selectedSchema = (selectedVariant?.inputSchema ??
-    {}) as DiscoverySchema;
-
-  // Initialize form data defaults when a method is first selected
-  useEffect(() => {
-    if (!selectedMethodId || !selectedMethod) return;
-    if (formDataByMethod[selectedMethodId]) return;
-    setFormData(ocelId, selectedMethodId, getInitialFormData(selectedSchema));
-  }, [
-    selectedMethod,
-    selectedMethodId,
-    selectedSchema,
-    formDataByMethod,
-    ocelId,
-    setFormData,
-  ]);
-
-  const activeFormData = selectedMethodId
-    ? (formDataByMethod[selectedMethodId] ?? {})
-    : {};
-
-  const { mutate: runDiscovery, isPending: isSubmittingDiscovery } =
-    useCreateDiscoveryTask({
-      mutation: {
-        onSuccess: (newTaskId) => {
-          setSubmitError(undefined);
-          setTaskId(newTaskId);
-        },
-        onError: (error) => {
-          setSubmitError(
-            error instanceof Error ? error.message : "Discovery failed",
-          );
-        },
+    mutate({
+      methodName: method.name,
+      pluginId: method.pluginId,
+      data: {
+        input_resources: { [method.input.name]: ocelId },
+        input: data,
       },
     });
-
-  const { data: task, error: taskError } = useDiscoveryTask(taskId ?? "", {
-    query: {
-      enabled: !!taskId,
-      refetchInterval: ({ state }) => {
-        if (state.data?.state === "PENDING" || state.data?.state === "STARTED")
-          return 1000;
-        return false;
-      },
-    },
   });
-
-  const { mutate: saveDiscovery, isPending: isSaving } = useSaveDiscovery({
-    mutation: {
-      onSuccess: (_data, { taskId: savedId }) => setSavedTaskId(savedId),
-    },
-  });
-
-  const isSaved = !!taskId && savedTaskId === taskId;
-
-  const requestPayload = useMemo(
-    () => normalizeFormData(activeFormData),
-    [activeFormData],
-  );
-
-  const requestSignature = useMemo(
-    () =>
-      JSON.stringify({
-        selectedMethodId,
-        requestPayload,
-        ocelId,
-        filters: filters,
-      }),
-    [ocelId, requestPayload, selectedMethodId, filters],
-  );
 
   useEffect(() => {
-    if (!selectedMethodId) return;
-    const timeoutId = window.setTimeout(() => {
-      runDiscovery({
-        ocelId,
-        data: {
-          methodId: selectedMethodId,
-          parameters: requestPayload,
-          filters: filters,
-        },
-      });
-    }, 650);
-    return () => window.clearTimeout(timeoutId);
-  }, [
-    ocelId,
-    runDiscovery,
-    requestSignature,
-    requestPayload,
-    selectedMethodId,
-    filters,
-  ]);
-
-  const isDiscovering =
-    isSubmittingDiscovery ||
-    task?.state === "PENDING" ||
-    task?.state === "STARTED";
-
-  const errorMessage =
-    submitError ||
-    (methodsError instanceof Error ? methodsError.message : undefined) ||
-    (taskError instanceof Error ? taskError.message : undefined) ||
-    (task?.state === "FAILURE"
-      ? "The backend discovery task failed."
-      : undefined);
+    run(debouncedInput);
+  }, [debouncedInput]);
 
   return (
-    <Box pos="relative" h="100%" style={{ overflow: "hidden" }}>
-      {task?.state === "SUCCESS" ? (
-        <Box h="100%" p="sm">
-          <Visualization
-            visualization={task.visualization as VisualizationsType}
-            menuItems={[
-              {
-                icon: (
-                  <BookmarkIcon
-                    style={{
-                      width: 16,
-                      height: 16,
-                      maxWidth: "none",
-                      maxHeight: "none",
-                      stroke: isSaved
-                        ? "var(--mantine-color-green-6)"
-                        : "currentColor",
-                      fill: isSaved ? "var(--mantine-color-green-6)" : "none",
-                    }}
-                  />
-                ),
-                label: isSaved ? "Saved" : "Save",
-                onClick: () => {
-                  if (taskId && !isSaving && taskId !== savedTaskId)
-                    saveDiscovery({ taskId });
-                },
-              },
-            ]}
-          />
-        </Box>
-      ) : (
-        <Center h="100%">
-          <Text c="dimmed" ta="center">
-            {isDiscovering
-              ? "Discovering visualization..."
-              : "The discovery preview will appear here."}
-          </Text>
-        </Center>
-      )}
-
-      {!panelOpen && (
-        <Tooltip label="Open settings" position="left" withArrow>
-          <ActionIcon
-            variant="default"
-            size="lg"
-            radius="md"
-            onClick={() => setPanelOpen(true)}
-            style={{ position: "absolute", top: 12, right: 12, zIndex: 5 }}
-          >
-            <SettingsIcon size={16} />
-          </ActionIcon>
-        </Tooltip>
-      )}
-
-      <LoadingOverlay
-        visible={isMethodsLoading || isDiscovering}
-        zIndex={100}
-      />
-
-      <Drawer
-        opened={panelOpen}
-        onClose={() => setPanelOpen(false)}
-        position="right"
-        title="Discovery settings"
-        size={380}
-        withOverlay={false}
-        lockScroll={false}
-        trapFocus={false}
-        returnFocus={false}
-        withinPortal={false}
-        styles={{
-          root: { position: "absolute", inset: 0, pointerEvents: "none" },
-          inner: { position: "absolute", inset: 0, pointerEvents: "none" },
-          content: { height: "100%", pointerEvents: "auto" },
-        }}
-      >
-        <DiscoverySettingsContent
-          methods={methods}
-          selectedMethodId={selectedMethodId}
-          setSelectedMethodId={(id) => setSelectedMethodId(ocelId, id)}
-          selectedMethod={selectedMethod}
-          selectedSchema={selectedSchema}
-          activeFormData={activeFormData}
-          setActiveFormData={(data) =>
-            selectedMethodId && setFormData(ocelId, selectedMethodId, data)
-          }
-          eventCounts={eventCounts}
-          objectCounts={objectCounts}
-          errorMessage={errorMessage}
-          availableFilters={availableFilters}
-          filters={filters}
-          setFilters={(next) => setFiltersInStore(ocelId, next)}
+    method.configuration_schema && (
+      <ScrollArea h={"100%"} offsetScrollbars>
+        <PluginForm
+          methodName={method.name}
+          pluginId={method.pluginId}
+          schema={method.configuration_schema}
+          inputResources={{ [method.input.name]: ocelId }}
+          onChange={({ formData }) => setInput(formData)}
+          formData={input}
+          ref={ref}
+          uiSchema={uiSchema}
         />
-      </Drawer>
-    </Box>
+      </ScrollArea>
+    )
+  );
+};
+
+const DiscoverySideBar = ({
+  onSuccess,
+}: {
+  onSuccess: (discoveryTaskId: string) => void;
+}) => {
+  const { discoveryGroups, discoveryMethods, isLoading } =
+    useDiscoveryMethods();
+
+  const { id } = useCurrentOcel();
+
+  const [currentMethod, setCurrentMethod] = useState<
+    DiscoveryMethod | undefined
+  >(undefined);
+
+  useEffect(() => {
+    if (discoveryMethods.length > 0 && !currentMethod) {
+      setCurrentMethod(discoveryMethods[0]);
+    }
+  }, [discoveryMethods]);
+
+  return (
+    <Stack maw={400} px={"md"} h={"100%"}>
+      <Select
+        label="Discovery Method"
+        searchable
+        value={currentMethod?.id}
+        onChange={(newMethod) =>
+          setCurrentMethod(discoveryMethods.find(({ id }) => id === newMethod))
+        }
+        data={discoveryGroups
+          .filter(({ methods }) => methods.length > 0)
+          .map(({ label, methods }) => ({
+            group: label,
+            items: methods.map(({ label, id }) => ({
+              value: id,
+              label,
+            })),
+          }))}
+        loading={isLoading}
+      />
+      {currentMethod && <Text c={"dimmed"}>{currentMethod.description}</Text>}
+      <Box pos={"relative"} flex={1} mih={0}>
+        <LoadingOverlay visible={isLoading} />
+        {currentMethod && id && (
+          <DiscoveryConfiguration
+            key={`${currentMethod.id}:${id}`}
+            method={currentMethod}
+            ocelId={id}
+            onSuccess={onSuccess}
+          />
+        )}
+      </Box>
+    </Stack>
   );
 };
 
 const DiscoveryPage = () => {
-  const { id: ocelId } = useCurrentOcel();
-  if (!ocelId) return <LoadingOverlay visible />;
-  return <DiscoveryPageContent key={ocelId} ocelId={ocelId} />;
+  const [discoveryTask, setDiscoveryTask] = useState<string | undefined>(
+    undefined,
+  );
+
+  const splitterRef = useRef<UseSplitterReturnValue>(null);
+
+  return (
+    <Splitter
+      splitterRef={splitterRef}
+      withHandle={false}
+      h={"100%"}
+      handleColor="var(--mantine-color-default-border)"
+      lineSize={2}
+    >
+      <Splitter.Pane defaultSize={70}>
+        <ResultSection
+          taskId={discoveryTask}
+          extraActions={
+            <Tooltip label="Toggle settings">
+              <ActionIcon
+                size="input-sm"
+                variant="outline"
+                onClick={() => splitterRef.current?.toggleCollapse(1)}
+              >
+                <Settings size={20} />
+              </ActionIcon>
+            </Tooltip>
+          }
+        />
+      </Splitter.Pane>
+      <Splitter.Pane defaultSize={30} max={"400px"} min={"300px"} collapsible>
+        <DiscoverySideBar
+          onSuccess={(discoveryTaskId) => setDiscoveryTask(discoveryTaskId)}
+        />
+      </Splitter.Pane>
+    </Splitter>
+  );
 };
 
 export default defineModuleRoute({
-  component: DiscoveryPage,
   label: "Discovery",
   name: "discovery",
+  component: DiscoveryPage,
   requiresOcel: true,
 });

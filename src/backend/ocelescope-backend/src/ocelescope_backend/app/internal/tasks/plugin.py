@@ -21,8 +21,6 @@ from ocelescope_backend.app.internal.tasks.base import (
 from ocelescope_backend.app.internal.util.hashing import generate_tuple_hash
 from ocelescope_backend.app.sse_manager import (
     ErrorNotification,
-    PluginLink,
-    SystemNotification,
     sse_manager,
 )
 
@@ -44,11 +42,17 @@ class PluginTaskSummary(TaskSummary):
 
 class PluginTask(TaskBase, Generic[P]):
     def __init__(
-        self, plugin_id: str, method_name: str, session: "Session", input: PluginInput
+        self,
+        plugin_id: str,
+        method_name: str,
+        method_label: str,
+        session: "Session",
+        input: PluginInput,
     ):
         super().__init__()
         self.plugin_id = plugin_id
         self.method_name = method_name
+        self.method_label = method_label
         self.input = input
         self.result: list[OCEL | Resource] | None = None
         self.session = session
@@ -91,22 +95,6 @@ class PluginTask(TaskBase, Generic[P]):
 
             if self.state != TaskState.CANCELLED:
                 self.state = TaskState.SUCCESS
-
-                sse_manager.send_safe(
-                    session_id=self.session.id,
-                    message=SystemNotification(
-                        type="notification",
-                        title="Plugin successfully run",
-                        message=f"Successfully run plugin {self.plugin_id} {self.method_name}",
-                        notification_type="info",
-                        link=PluginLink(
-                            type="plugin",
-                            method=self.method_name,
-                            id=self.plugin_id,
-                            task_id=self.id,
-                        ),
-                    ),
-                )
 
         except Exception as e:
             self.error = e
@@ -171,6 +159,7 @@ class PluginTask(TaskBase, Generic[P]):
             session=session,
             plugin_id=plugin_id,
             method_name=method_name,
+            method_label=method.label,
             input=input,
         )
         session.tasks[task.id] = task
