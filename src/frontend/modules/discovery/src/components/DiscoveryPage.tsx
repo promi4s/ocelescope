@@ -16,13 +16,75 @@ import { PluginForm, ResultSection } from "@ocelescope/plugin-components";
 import type Form from "@rjsf/core";
 import type { UiSchema } from "@rjsf/utils";
 import { Settings } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { useDiscoveryMethods } from "../hooks/useDiscoveryMethods";
 
 const uiSchema: UiSchema = {
   "ui:submitButtonOptions": {
     norender: true,
   },
+};
+
+type DiscoveryMethod = ReturnType<
+  typeof useDiscoveryMethods
+>["discoveryMethods"][number];
+
+const DiscoveryConfiguration = ({
+  method,
+  ocelId,
+  onSuccess,
+}: {
+  method: DiscoveryMethod;
+  ocelId: string;
+  onSuccess: (discoveryTaskId: string) => void;
+}) => {
+  const [input, setInput] = useState({});
+  const [debouncedInput] = useDebouncedValue(input, 1000);
+
+  const ref = useRef<Form>(null);
+
+  const { mutate } = useRunPlugin({
+    mutation: { onSuccess },
+  });
+
+  const run = useEffectEvent((data: typeof debouncedInput) => {
+    if (
+      method.configuration_schema &&
+      ref.current?.validate(data).errors.length !== 0
+    ) {
+      return;
+    }
+
+    mutate({
+      methodName: method.name,
+      pluginId: method.pluginId,
+      data: {
+        input_resources: { [method.input.name]: ocelId },
+        input: data,
+      },
+    });
+  });
+
+  useEffect(() => {
+    run(debouncedInput);
+  }, [debouncedInput]);
+
+  return (
+    method.configuration_schema && (
+      <ScrollArea h={"100%"} offsetScrollbars>
+        <PluginForm
+          methodName={method.name}
+          pluginId={method.pluginId}
+          schema={method.configuration_schema}
+          inputResources={{ [method.input.name]: ocelId }}
+          onChange={({ formData }) => setInput(formData)}
+          formData={input}
+          ref={ref}
+          uiSchema={uiSchema}
+        />
+      </ScrollArea>
+    )
+  );
 };
 
 const DiscoverySideBar = ({
@@ -36,41 +98,14 @@ const DiscoverySideBar = ({
   const { id } = useCurrentOcel();
 
   const [currentMethod, setCurrentMethod] = useState<
-    (typeof discoveryMethods)[number] | undefined
+    DiscoveryMethod | undefined
   >(undefined);
 
-  const { mutate } = useRunPlugin({
-    mutation: { onSuccess },
-  });
-
-  const [currentConfInput, setConfInput] = useState({});
-  const [debouncedInput] = useDebouncedValue(currentConfInput, 1000);
-
-  const ref = useRef<Form>(null);
-
   useEffect(() => {
-    if (discoveryMethods.length > 1 && !currentMethod) {
+    if (discoveryMethods.length > 0 && !currentMethod) {
       setCurrentMethod(discoveryMethods[0]);
     }
   }, [discoveryMethods]);
-
-  useEffect(() => {
-    if (
-      currentMethod &&
-      id &&
-      (!currentMethod.configuration_schema ||
-        ref.current?.validate(debouncedInput).errors.length === 0)
-    ) {
-      mutate({
-        methodName: currentMethod.name,
-        pluginId: currentMethod.pluginId,
-        data: {
-          input_resources: { [currentMethod.input.name]: id },
-          input: debouncedInput,
-        },
-      });
-    }
-  }, [ref, debouncedInput, currentMethod, id]);
 
   return (
     <Stack maw={400} px={"md"} h={"100%"}>
@@ -95,20 +130,13 @@ const DiscoverySideBar = ({
       {currentMethod && <Text c={"dimmed"}>{currentMethod.description}</Text>}
       <Box pos={"relative"} flex={1} mih={0}>
         <LoadingOverlay visible={isLoading} />
-        {currentMethod?.configuration_schema && (
-          <ScrollArea h={"100%"} offsetScrollbars>
-            <PluginForm
-              key={currentMethod.id}
-              methodName={currentMethod.name}
-              pluginId={currentMethod.pluginId}
-              schema={currentMethod.configuration_schema}
-              inputResources={{ [currentMethod.input.name]: id }}
-              onChange={({ formData }) => setConfInput(formData)}
-              formData={currentConfInput}
-              ref={ref}
-              uiSchema={uiSchema}
-            />
-          </ScrollArea>
+        {currentMethod && id && (
+          <DiscoveryConfiguration
+            key={`${currentMethod.id}:${id}`}
+            method={currentMethod}
+            ocelId={id}
+            onSuccess={onSuccess}
+          />
         )}
       </Box>
     </Stack>
