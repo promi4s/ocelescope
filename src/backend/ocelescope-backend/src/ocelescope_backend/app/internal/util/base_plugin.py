@@ -18,7 +18,7 @@ from ocelescope import (
 
 class DiscoveryInput(PluginInput):
     threshold: float = SLIDER_FIELD(
-        min=0,
+        min=0.01,
         max=1,
         step=0.01,
         default=0.5,
