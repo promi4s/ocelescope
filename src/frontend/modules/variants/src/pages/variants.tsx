@@ -140,7 +140,7 @@ const VariantsPage = () => {
       value={activeTab}
       onChange={setActiveTab}
     >
-      <Group wrap="nowrap" gap="0" style={{ flexShrink: 0 }} pt={"xs"}>
+      <Group wrap="nowrap" gap="0" style={{ flexShrink: 0 }}>
         <Popover
           width={300}
           position="bottom-start"
