@@ -1093,6 +1093,121 @@
         ],
         "title": "Body_upload"
       },
+      "DFG": {
+        "properties": {
+          "activities": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Activities"
+          },
+          "directly_follows_relations": {
+            "items": {
+              "prefixItems": [
+                {
+                  "prefixItems": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ],
+                  "type": "array",
+                  "maxItems": 2,
+                  "minItems": 2
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "type": "array",
+              "maxItems": 2,
+              "minItems": 2
+            },
+            "type": "array",
+            "title": "Directly Follows Relations"
+          },
+          "start_activities": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Start Activities"
+          },
+          "end_activities": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "End Activities"
+          }
+        },
+        "type": "object",
+        "title": "DFG",
+        "description": "A directly-follows graph in the shape the r4pm viewers expect.\n\nAttributes:\n    activities: Occurrence count per activity.\n    directly_follows_relations: ``((source, target), count)`` pairs.\n    start_activities: Count per activity of how often it starts a trace.\n    end_activities: Count per activity of how often it ends a trace."
+      },
+      "DirectlyFollowsGraphViz": {
+        "properties": {
+          "activities": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Activities"
+          },
+          "directly_follows_relations": {
+            "items": {
+              "prefixItems": [
+                {
+                  "prefixItems": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ],
+                  "type": "array",
+                  "maxItems": 2,
+                  "minItems": 2
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "type": "array",
+              "maxItems": 2,
+              "minItems": 2
+            },
+            "type": "array",
+            "title": "Directly Follows Relations"
+          },
+          "start_activities": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Start Activities"
+          },
+          "end_activities": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "End Activities"
+          },
+          "type": {
+            "type": "string",
+            "const": "r4pm_dfg",
+            "title": "Type",
+            "default": "r4pm_dfg"
+          }
+        },
+        "type": "object",
+        "title": "DirectlyFollowsGraphViz"
+      },
       "DotVis": {
         "properties": {
           "type": {
@@ -1216,6 +1331,12 @@
                   },
                   {
                     "$ref": "#/components/schemas/OCPetriNetViz"
+                  },
+                  {
+                    "$ref": "#/components/schemas/DirectlyFollowsGraphViz"
+                  },
+                  {
+                    "$ref": "#/components/schemas/OCDirectlyFollowsGraphViz"
                   }
                 ],
                 "discriminator": {
@@ -1224,7 +1345,9 @@
                     "dot": "#/components/schemas/DotVis",
                     "graph": "#/components/schemas/Graph",
                     "plotly": "#/components/schemas/Plotly",
+                    "r4pm_dfg": "#/components/schemas/DirectlyFollowsGraphViz",
                     "r4pm_oc_petri_net": "#/components/schemas/OCPetriNetViz",
+                    "r4pm_ocdfg": "#/components/schemas/OCDirectlyFollowsGraphViz",
                     "r4pm_petri_net": "#/components/schemas/PetriNetViz",
                     "svg": "#/components/schemas/SVGVis",
                     "table": "#/components/schemas/Table"
@@ -1913,6 +2036,33 @@
         ],
         "title": "OCArc"
       },
+      "OCDirectlyFollowsGraphViz": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "r4pm_ocdfg",
+            "title": "Type",
+            "default": "r4pm_ocdfg"
+          },
+          "object_type_to_dfg": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/DFG"
+            },
+            "type": "object",
+            "title": "Object Type To Dfg"
+          },
+          "object_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Object Counts"
+          }
+        },
+        "type": "object",
+        "title": "OCDirectlyFollowsGraphViz",
+        "description": "An object-centric directly-follows graph: one DFG per object type.\n\nAttributes:\n    object_type_to_dfg: The directly-follows graph of each object type.\n    object_counts: Number of objects per object type."
+      },
       "OCELIOApi": {
         "properties": {
           "name": {
@@ -2197,6 +2347,12 @@
                   },
                   {
                     "$ref": "#/components/schemas/OCPetriNetViz"
+                  },
+                  {
+                    "$ref": "#/components/schemas/DirectlyFollowsGraphViz"
+                  },
+                  {
+                    "$ref": "#/components/schemas/OCDirectlyFollowsGraphViz"
                   }
                 ],
                 "discriminator": {
@@ -2205,7 +2361,9 @@
                     "dot": "#/components/schemas/DotVis",
                     "graph": "#/components/schemas/Graph",
                     "plotly": "#/components/schemas/Plotly",
+                    "r4pm_dfg": "#/components/schemas/DirectlyFollowsGraphViz",
                     "r4pm_oc_petri_net": "#/components/schemas/OCPetriNetViz",
+                    "r4pm_ocdfg": "#/components/schemas/OCDirectlyFollowsGraphViz",
                     "r4pm_petri_net": "#/components/schemas/PetriNetViz",
                     "svg": "#/components/schemas/SVGVis",
                     "table": "#/components/schemas/Table"

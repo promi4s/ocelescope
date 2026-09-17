@@ -2,6 +2,11 @@ from typing import Annotated, TypeAlias, Union
 
 from pydantic import Field
 
+from ocelescope.visualization.default.dfg import (
+    DFG,
+    DirectlyFollowsGraphViz,
+    OCDirectlyFollowsGraphViz,
+)
 # TODO: Rename this layouting engine a class
 from ocelescope.visualization.default.dot import DotVis
 from ocelescope.visualization.default.graph import (
@@ -34,7 +39,17 @@ from ocelescope.visualization.default.table import Table, TableColumn
 from ocelescope.visualization.util.color import generate_color_map
 
 Visualization: TypeAlias = Annotated[
-    Union[Graph, Table, SVGVis, DotVis, Plotly, PetriNetViz, OCPetriNetViz],
+    Union[
+        Graph,
+        Table,
+        SVGVis,
+        DotVis,
+        Plotly,
+        PetriNetViz,
+        OCPetriNetViz,
+        DirectlyFollowsGraphViz,
+        OCDirectlyFollowsGraphViz,
+    ],
     Field(discriminator="type"),
 ]
 
@@ -73,4 +88,8 @@ __all__ = [
     "Place",
     "OCPlace",
     "Transition",
+    # DFG
+    "DFG",
+    "DirectlyFollowsGraphViz",
+    "OCDirectlyFollowsGraphViz",
 ]

@@ -5,6 +5,7 @@ import networkx as nx
 from pydantic import Field
 
 from ocelescope.resource.resource import Annotated, Resource
+from ocelescope.visualization.default.dfg import DFG, OCDirectlyFollowsGraphViz
 from ocelescope.visualization.default.graph import (
     DIRECTED_ELK_GRAPH_LAYOUT,
     Graph,
@@ -243,7 +244,40 @@ class DirectlyFollowsGraph(Resource):
             edges=edges + start_edges + end_edges,
         )
 
-    def visualize(self) -> Graph:
+    def _has_resource_annotations(self) -> bool:
+        return any(
+            isinstance(element.annotation, list) and element.annotation
+            for element in [*self.activities, *self.object_types, *self.edges]
+        )
+
+    def visualize(self) -> OCDirectlyFollowsGraphViz | Graph:
+        if self._has_resource_annotations():
+            return self._visualize_graph()
+        return self._visualize_ocdfg()
+
+    def _visualize_ocdfg(self) -> OCDirectlyFollowsGraphViz:
+        dfgs = {object_type.name: DFG() for object_type in self.object_types}
+
+        for edge in self.edges:
+            dfg = dfgs.setdefault(edge.object_type, DFG())
+            if edge.target is not None:
+                dfg.activities[edge.target] = dfg.activities.get(edge.target, 0) + edge.count
+
+            if edge.source is None and edge.target is not None:
+                dfg.start_activities[edge.target] = edge.count
+            elif edge.source is not None and edge.target is None:
+                dfg.end_activities[edge.source] = edge.count
+            elif edge.source is not None and edge.target is not None:
+                dfg.directly_follows_relations.append(((edge.source, edge.target), edge.count))
+
+        return OCDirectlyFollowsGraphViz(
+            object_type_to_dfg=dfgs,
+            object_counts={
+                object_type: sum(dfg.start_activities.values()) for object_type, dfg in dfgs.items()
+            },
+        )
+
+    def _visualize_graph(self) -> Graph:
         color_map = generate_color_map([ot.name for ot in self.object_types], "custom")
 
         start_object_types = {
