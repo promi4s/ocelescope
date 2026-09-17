@@ -176,7 +176,8 @@
     "itlvl",
     "OCELIO",
     "bdrs",
-    "mult"
+    "mult",
+    "dfgs"
   ],
   "ignorePaths": [
     "pnpm-lock.yaml",
