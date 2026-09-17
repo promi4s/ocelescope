@@ -108,7 +108,7 @@ const DiscoverySideBar = ({
   }, [discoveryMethods]);
 
   return (
-    <Stack maw={400} px={"md"} h={"100%"}>
+    <Stack maw={400} px={"md"} pt={"xs"} h={"100%"}>
       <Select
         label="Discovery Method"
         searchable
