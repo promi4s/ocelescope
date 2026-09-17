@@ -44,6 +44,7 @@
     "@hpcc-js/wasm-graphviz": "catalog:",
     "@mantine/core": "catalog:",
     "@ocelescope/api-base": "workspace:^",
+    "@r4pm/components": "catalog:",
     "@xyflow/react": "catalog:",
     "dayjs": "catalog:",
     "elkjs": "catalog:",

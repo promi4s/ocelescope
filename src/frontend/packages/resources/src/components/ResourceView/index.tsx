@@ -9,6 +9,7 @@ import type {
 } from "../../types";
 import DotToSvgViewer from "./Viewers/Dot";
 import GraphViewer from "./Viewers/Graph";
+import { OCPetriNetViewer, PetriNetViewer } from "./Viewers/PetriNet";
 import PlotlyViewer from "./Viewers/Plotly";
 import SvgViewer from "./Viewers/SVG";
 import TableView from "./Viewers/Table";
@@ -33,8 +34,8 @@ const visualizationMap: {
   graph: GraphViewer,
   dot: DotToSvgViewer,
   plotly: PlotlyViewer,
-  r4pm_oc_petri_net: () => <></>,
-  r4pm_petri_net: () => <></>,
+  r4pm_oc_petri_net: OCPetriNetViewer,
+  r4pm_petri_net: PetriNetViewer,
 };
 
 export const Visualization = ({

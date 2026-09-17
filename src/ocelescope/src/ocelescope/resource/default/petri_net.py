@@ -19,6 +19,14 @@ from ocelescope.visualization.default.graph import (
     GraphNode,
     NodeStyle,
 )
+from ocelescope.visualization.default.petri_net import (
+    OCArc,
+    OCPetriNetViz,
+    OCPlace,
+)
+from ocelescope.visualization.default.petri_net import (
+    Transition as TransitionViz,
+)
 from ocelescope.visualization.util.color import generate_color_map
 
 
@@ -204,7 +212,35 @@ class PetriNet(Resource):
 
         return graph
 
-    def visualize(self) -> Graph:
+    def _has_annotations(self) -> bool:
+        return any(element.annotation for element in [*self.places, *self.transitions, *self.arcs])
+
+    def visualize(self) -> OCPetriNetViz | Graph:
+        if self._has_annotations():
+            return self._visualize_graph()
+        return self._visualize_petri_net()
+
+    def _visualize_petri_net(self) -> OCPetriNetViz:
+        return OCPetriNetViz(
+            places=[OCPlace(id=place.name, object_type=place.object_type) for place in self.places],
+            transitions=[
+                TransitionViz(id=transition.name, label=transition.label)
+                for transition in self.transitions
+            ],
+            arcs=[
+                OCArc(
+                    source=arc.source,
+                    target=arc.target,
+                    weight=arc.weight,
+                    variable=arc.type == ArcType.VARIABLE,
+                )
+                for arc in self.arcs
+            ],
+            initial_marking=dict(self.initial_marking),
+            final_marking=dict(self.final_marking),
+        )
+
+    def _visualize_graph(self) -> Graph:
         object_types = [place.object_type for place in self.places]
         color_map = generate_color_map(object_types, "custom")
         place_index = {place.name: place for place in self.places}
