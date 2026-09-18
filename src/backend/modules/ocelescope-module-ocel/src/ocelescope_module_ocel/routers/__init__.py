@@ -13,6 +13,7 @@ from ocelescope_module_ocel.routers import (
     management,
     objects,
     quantities,
+    query,
     relations,
 )
 
@@ -24,5 +25,6 @@ router.include_router(events.router)
 router.include_router(relations.router)
 router.include_router(quantities.router)
 router.include_router(export.router)
+router.include_router(query.router)
 
 __all__ = ["router"]

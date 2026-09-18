@@ -15,6 +15,11 @@ export default defineConfig({
     input: "./ocel.openapi.json",
     output: {
       target: "./src/api/ocel/index.ts",
+      override: {
+        operations: {
+          runSqlQuery: { query: { useQuery: true } },
+        },
+      },
     },
   },
 });

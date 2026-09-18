@@ -1,4 +1,5 @@
 from enum import StrEnum
+from typing import Literal
 
 from pydantic import BaseModel
 
@@ -10,6 +11,9 @@ class ValueType(StrEnum):
     INT = "int"
     FLOAT = "float"
     DATE = "date"
+
+
+AnalyticalType = Literal["categorical", "discrete", "continuous", "temporal", "unknown"]
 
 
 class Attribute(BaseModel):

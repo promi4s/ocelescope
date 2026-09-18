@@ -211,7 +211,6 @@ def aggregate_attributes(
     """
     types = _attribute_types(ocel, entity_type)
     numeric = [n for n, t in types.items() if t in (ValueType.INT, ValueType.FLOAT)]
-
     rows = (
         long_table(ocel, entity_type, attribute_names, entity_names)
         .query(
