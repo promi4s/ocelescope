@@ -1,16 +1,21 @@
 /** One analysis on the dashboard: its parameters, and the chart they produce. */
 import {
   ActionIcon,
+  Alert,
   Badge,
   Button,
+  Code,
   Divider,
   Group,
   HoverCard,
   Modal,
+  MultiSelect,
   Paper,
   ScrollArea,
+  Select,
   Stack,
   Text,
+  Textarea,
   ThemeIcon,
   Tooltip,
 } from "@mantine/core";
@@ -27,6 +32,7 @@ import {
   Settings2Icon,
   Trash2Icon,
 } from "lucide-react";
+import { useState } from "react";
 import {
   type Analysis,
   isConfigured,
@@ -198,14 +204,18 @@ export const AnalysisCard = ({
           <Divider />
           <ScrollArea.Autosize mah="62vh" type="auto" offsetScrollbars>
             <Stack gap="md" pr="xs">
-              {analysis.params.map((param) => (
-                <Control
-                  key={param.name}
-                  param={param}
-                  values={values}
-                  onChange={(value) => setParam(param, value)}
-                />
-              ))}
+              {analysis.view === "custom-chart" ? (
+                <CustomChartControls values={values} onChange={onChange} />
+              ) : (
+                analysis.params.map((param) => (
+                  <Control
+                    key={param.name}
+                    param={param}
+                    values={values}
+                    onChange={(value) => setParam(param, value)}
+                  />
+                ))
+              )}
             </Stack>
           </ScrollArea.Autosize>
           <Group justify="space-between">
@@ -236,7 +246,7 @@ const hasValue = (value: Values[string]) =>
 
 const summary = (analysis: Analysis, values: Values) =>
   analysis.params
-    .filter((param) => values[param.name] != null)
+    .filter((param) => param.kind !== "sql" && values[param.name] != null)
     .slice(0, 3)
     .map((param) => {
       const value = values[param.name];
@@ -253,6 +263,158 @@ const summary = (analysis: Analysis, values: Values) =>
         </Badge>
       );
     });
+
+const PLOT_TYPES = ["bar", "line", "area", "scatter", "pie"];
+
+const CustomChartControls = ({
+  values,
+  onChange,
+}: {
+  values: Values;
+  onChange: (values: Values) => void;
+}) => {
+  const appliedSql = String(values.sql ?? "");
+  const [draftSql, setDraftSql] = useState(appliedSql);
+  const query = useOcelQuery({
+    sql: appliedSql,
+    enabled: appliedSql.trim().length > 0,
+  });
+  const columns = (query.data?.columns ?? []).map((column) => ({
+    value: column.name,
+    label: `${column.name} · ${column.type.toLowerCase()}`,
+  }));
+  const y = Array.isArray(values.y)
+    ? values.y.map(String)
+    : values.y == null
+      ? []
+      : [String(values.y)];
+
+  const applyQuery = () => {
+    const sql = draftSql.trim();
+    if (sql === appliedSql) {
+      void query.refetch();
+      return;
+    }
+    onChange({
+      ...values,
+      sql,
+      x: undefined,
+      y: undefined,
+      series: undefined,
+    });
+  };
+
+  return (
+    <Stack gap="md">
+      <Stack gap={4}>
+        <Textarea
+          label="SQL query"
+          description={
+            <span>
+              Available tables: <Code>events</Code>, <Code>objects</Code>,{" "}
+              <Code>e2o</Code>, <Code>o2o</Code>, and{" "}
+              <Code>object_changes</Code>.
+            </span>
+          }
+          placeholder={
+            'SELECT "ocel:activity" AS activity, count(*) AS events\nFROM events\nGROUP BY 1'
+          }
+          autosize
+          minRows={6}
+          maxRows={14}
+          value={draftSql}
+          onChange={(event) => setDraftSql(event.currentTarget.value)}
+          styles={{ input: { fontFamily: "monospace", fontSize: 12 } }}
+        />
+        <Group justify="flex-end">
+          <Button
+            size="xs"
+            variant="light"
+            loading={query.isFetching}
+            disabled={draftSql.trim().length === 0}
+            onClick={applyQuery}
+          >
+            {columns.length > 0 ? "Reload columns" : "Load columns"}
+          </Button>
+        </Group>
+      </Stack>
+
+      {query.isError && (
+        <Alert color="red" title="The query could not be loaded">
+          {query.error instanceof Error
+            ? query.error.message
+            : "Check the SQL statement and try again."}
+        </Alert>
+      )}
+
+      {columns.length > 0 && (
+        <>
+          <Divider label="Plot" labelPosition="left" />
+          <Select
+            label="Plot type"
+            data={PLOT_TYPES}
+            value={String(values.plot_type ?? "bar")}
+            allowDeselect={false}
+            onChange={(plot_type) =>
+              onChange({ ...values, plot_type: plot_type ?? "bar" })
+            }
+          />
+          <Group grow align="flex-start">
+            <Select
+              label="X axis"
+              data={columns}
+              value={values.x == null ? null : String(values.x)}
+              onChange={(x) => onChange({ ...values, x: x ?? undefined })}
+            />
+            <MultiSelect
+              label="Y axis"
+              data={columns}
+              value={y}
+              searchable
+              onChange={(next) => onChange({ ...values, y: next })}
+            />
+          </Group>
+          <Select
+            label="Series (optional)"
+            description="Split rows into one trace per distinct value."
+            data={columns}
+            value={values.series == null ? null : String(values.series)}
+            clearable
+            searchable
+            onChange={(series) =>
+              onChange({ ...values, series: series ?? undefined })
+            }
+          />
+          {values.plot_type === "bar" && (
+            <Select
+              label="Bar mode"
+              data={["grouped", "stacked"]}
+              value={String(values.bar_mode ?? "grouped")}
+              allowDeselect={false}
+              onChange={(bar_mode) =>
+                onChange({ ...values, bar_mode: bar_mode ?? "grouped" })
+              }
+            />
+          )}
+          {values.plot_type === "line" && (
+            <Select
+              label="Y-axis mode"
+              data={[
+                { value: "shared", label: "Shared scale" },
+                { value: "independent", label: "One scale per line" },
+              ]}
+              value={String(values.axis_mode ?? "shared")}
+              allowDeselect={false}
+              onChange={(axis_mode) =>
+                onChange({ ...values, axis_mode: axis_mode ?? "shared" })
+              }
+            />
+          )}
+        </>
+      )}
+    </Stack>
+  );
+};
 
 /**
  * How one object's attributes changed. Every attribute keeps its own scale,

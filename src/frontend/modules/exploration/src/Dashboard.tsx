@@ -19,6 +19,7 @@ import {
 } from "@mantine/core";
 import {
   Clock3Icon,
+  Code2Icon,
   GitBranchIcon,
   PlusIcon,
   SearchIcon,
@@ -95,6 +96,7 @@ const categoryStyle = {
   Relationships: { color: "blue", icon: GitBranchIcon },
   Attributes: { color: "teal", icon: SlidersHorizontalIcon },
   Time: { color: "orange", icon: Clock3Icon },
+  Custom: { color: "cyan", icon: Code2Icon },
 } as const;
 
 const AnalysisCatalog = ({

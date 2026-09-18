@@ -5,7 +5,14 @@
  * an object - is one of core's pickers, so choosing here reads the same
  * endpoints and looks the same as on every other page. The rest is Mantine.
  */
-import { NumberInput, Select, Stack, Text } from "@mantine/core";
+import {
+  NumberInput,
+  Select,
+  Stack,
+  Text,
+  Textarea,
+  TextInput,
+} from "@mantine/core";
 import {
   useEventAttributes,
   useObjectAttributes,
@@ -112,6 +119,31 @@ export const Control = ({
     );
   }
 
+  if (param.kind === "text" || param.kind === "column") {
+    return (
+      <TextInput
+        label={param.label}
+        value={value == null ? "" : String(value)}
+        onChange={(event) => onChange(event.currentTarget.value || undefined)}
+      />
+    );
+  }
+
+  if (param.kind === "sql") {
+    return (
+      <Textarea
+        label={param.label}
+        autosize
+        minRows={6}
+        value={value == null ? "" : String(value)}
+        onChange={(event) => onChange(event.currentTarget.value || undefined)}
+        styles={{ input: { fontFamily: "monospace", fontSize: 12 } }}
+      />
+    );
+  }
+
+  if (param.kind === "columns") return null;
+
   const chosen = { value: value == null ? null : String(value), onChange };
 
   if (param.kind === "object") {
@@ -144,9 +176,11 @@ export const Control = ({
     );
   }
 
-  return param.kind === "activity" ? (
-    <ActivityPicker label={param.label} {...chosen} />
-  ) : (
-    <ObjectTypePicker label={param.label} {...chosen} />
-  );
+  if (param.kind === "activity") {
+    return <ActivityPicker label={param.label} {...chosen} />;
+  }
+  if (param.kind === "objectType") {
+    return <ObjectTypePicker label={param.label} {...chosen} />;
+  }
+  return null;
 };

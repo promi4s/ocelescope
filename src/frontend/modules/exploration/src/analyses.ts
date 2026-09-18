@@ -25,6 +25,10 @@ export interface Param {
     | "eventAttribute"
     | "objectAttribute"
     | "choice"
+    | "text"
+    | "sql"
+    | "column"
+    | "columns"
     | "number";
   /** Options for `choice`, first one being the default. */
   options?: readonly string[];
@@ -38,7 +42,7 @@ export interface Param {
 export interface Analysis {
   id: string;
   label: string;
-  category: "Behaviour" | "Relationships" | "Attributes" | "Time";
+  category: "Behaviour" | "Relationships" | "Attributes" | "Time" | "Custom";
   /** The question the chart answers, shown under its title. */
   question: string;
   /** Plain-language provenance shown in the card's information popover. */
@@ -47,7 +51,7 @@ export interface Analysis {
   sql: (values: Values, numeric: Numeric) => string;
   chart: (values: Values) => ChartOptions;
   /** Drawn by r4pm's attribute-change viewer rather than by a chart. */
-  view?: "attribute-changes";
+  view?: "attribute-changes" | "custom-chart";
 }
 
 /** Whether an attribute holds numbers, which decides bins versus value counts. */
@@ -161,6 +165,63 @@ const DISTRIBUTION_CHART = {
 } as const satisfies ChartOptions;
 
 export const analyses: readonly Analysis[] = [
+  {
+    id: "custom-sql-chart",
+    label: "Custom SQL chart",
+    category: "Custom",
+    question:
+      "Run your own SQL query and choose exactly how its result is plotted.",
+    method:
+      "The query runs read-only against the current OCEL's DuckDB tables. Its returned columns are mapped directly to the selected axes and optional series grouping.",
+    params: [
+      { name: "sql", label: "SQL query", kind: "sql" },
+      {
+        name: "plot_type",
+        label: "Plot type",
+        kind: "choice",
+        options: ["bar", "line", "area", "scatter", "pie"],
+        default: "bar",
+      },
+      { name: "x", label: "X axis", kind: "column" },
+      { name: "y", label: "Y axis", kind: "columns" },
+      {
+        name: "series",
+        label: "Series (optional)",
+        kind: "column",
+        required: false,
+      },
+      {
+        name: "bar_mode",
+        label: "Bar mode",
+        kind: "choice",
+        options: ["grouped", "stacked"],
+        default: "grouped",
+        required: false,
+      },
+      {
+        name: "axis_mode",
+        label: "Line axes",
+        kind: "choice",
+        options: ["shared", "independent"],
+        default: "shared",
+        required: false,
+      },
+    ],
+    sql: ({ sql }) => String(sql ?? ""),
+    chart: ({ plot_type, x, y, series, bar_mode, axis_mode }) => ({
+      type: (["bar", "line", "area", "scatter", "pie"].includes(
+        String(plot_type),
+      )
+        ? String(plot_type)
+        : "bar") as ChartOptions["type"],
+      x: String(x ?? ""),
+      y: Array.isArray(y) ? y.map(String) : String(y ?? ""),
+      ...(series && { series: String(series) }),
+      stacked: bar_mode === "stacked",
+      yAxes: axis_mode === "independent" ? "independent" : "shared",
+    }),
+    view: "custom-chart",
+  },
   {
     id: "total-object-involvement",
     label: "Total objects per event",
