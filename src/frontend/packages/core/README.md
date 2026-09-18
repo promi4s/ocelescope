@@ -98,6 +98,60 @@ export default defineModule({
 });
 ```
 
+### Charts
+
+`OcelChart` runs DuckDB SQL against the selected OCEL and draws the result. The
+query is usually the whole configuration: the first non-numeric column goes
+across, the numeric ones go up.
+
+```tsx
+import { OcelChart } from "@ocelescope/core";
+
+export const EventsByActivity = () => (
+  <OcelChart
+    title="Events per activity"
+    colorScope="activity"
+    sql={`SELECT "ocel:activity" AS activity, count(*) AS events
+          FROM events GROUP BY 1 ORDER BY 2 DESC`}
+  />
+);
+```
+
+Bar, line, area, scatter and pie; `series` unfolds a column into one series per
+value, `stacked` and `horizontal` change the shape, `types` offers the reader a
+switch between chart types, and `x`/`y` override the columns when the defaults
+guess wrong. Only a single `SELECT` runs, over the OCEL's stored tables
+(`events`, `objects`, `e2o`, `o2o`, `object_changes`); bind values through
+`parameters` rather than building SQL by hand. `SqlChart` is the same chart for
+a result you already have.
+
+Line charts can share a scale or overlay an independent scale per line. The
+second form is useful for measures with different units or very different
+ranges:
+
+```tsx
+<OcelChart
+  type="line"
+  x="time"
+  y="value"
+  series="measure"
+  yAxes="independent"
+  sql={measurements}
+/>
+```
+
+Charts are r4pm viewers. Colours come from the ambient `ViewerConfig` when a
+`colorScope` is given, so a category keeps the colour the graph viewers give it;
+clicks report a `ViewerTarget` to `onSelect`; and a chart inside a
+`<ViewerExportFrame>` exports with everything else in the frame:
+
+```tsx
+<ViewerExportFrame filename="activities">
+  <OcelChart title="Events per activity" sql={events} />
+  <OcelChart title="Objects per type" sql={objects} series="type" stacked />
+</ViewerExportFrame>
+```
+
 ## About
 
 Part of [Ocelescope](https://github.com/promi4s/ocelescope), a framework for

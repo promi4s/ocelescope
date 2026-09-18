@@ -34,7 +34,7 @@ from ocelescope.util.sql import ident, literal
 
 from ocelescope import OCEL
 from ocelescope_module_ocel.models import AggregatedAttribute, TypedAttribute
-from ocelescope_module_ocel.models.attributes import AnalyticalType, ValueType
+from ocelescope_module_ocel.models.attributes import ValueType
 
 EntityType = Literal["events", "objects"]
 
@@ -45,15 +45,6 @@ _DUCKDB_TO_VALUE_TYPE = {
     "DOUBLE": ValueType.FLOAT,
     "BOOLEAN": ValueType.BOOL,
     "DATE": ValueType.DATE,
-}
-
-_VALUE_TYPE_TO_ANALYTICAL_TYPE: dict[ValueType, AnalyticalType] = {
-    ValueType.EMPTY: "unknown",
-    ValueType.STRING: "categorical",
-    ValueType.BOOL: "categorical",
-    ValueType.INT: "discrete",
-    ValueType.FLOAT: "continuous",
-    ValueType.DATE: "temporal",
 }
 
 
@@ -185,11 +176,6 @@ def _extremes(numeric: list[str]) -> str:
     )
 
 
-def _analytical_type(value_type: ValueType) -> AnalyticalType:
-    """Map a stored value type to the way its values should be analyzed."""
-    return _VALUE_TYPE_TO_ANALYTICAL_TYPE[value_type]
-
-
 def attribute_names(
     ocel: OCEL,
     entity_type: EntityType,
@@ -240,7 +226,6 @@ def aggregate_attributes(
         AggregatedAttribute(
             name=name,
             type=types[name],
-            analytical_type=_analytical_type(types[name]),
             min=_marshal(minimum, types[name]),
             max=_marshal(maximum, types[name]),
             distinct_values=int(distinct or 0),
@@ -281,7 +266,6 @@ def typed_attributes(
             name=name,
             entity_type=entity,
             type=types[name],
-            analytical_type=_analytical_type(types[name]),
             min=_marshal(minimum, types[name]),
             max=_marshal(maximum, types[name]),
             distinct_values=int(distinct or 0),

@@ -22,7 +22,6 @@ class Attribute(BaseModel):
     max: str | int | float
     distinct_values: int
     type: ValueType
-    analytical_type: AnalyticalType
 
 
 class AggregatedAttribute(Attribute):

@@ -2377,6 +2377,83 @@
           }
         }
       }
+    },
+    "/modules/ocel/v1/{ocel_id}/query": {
+      "post": {
+        "summary": "Run SQL against an OCEL",
+        "operationId": "runSqlQuery",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "original",
+                    "filtered"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SqlQueryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SqlQueryResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2886,6 +2963,81 @@
         ],
         "title": "RelationCountSummary",
         "description": "Summary statistics for relationship multiplicities in O2O or E2O relations.\n\nFor each (source type, target type[, qualifier]) combination, captures how many\nrelated items occur per source instance.\n\nAttributes:\n    qualifier: The relation qualifier (empty string when none applies).\n    qualifiers: The qualifiers aggregated under a (source, target) pair. For\n        aggregated rows (``with_qualifier=False``) this lists every qualifier;\n        for per-qualifier rows it is the single-element list ``[qualifier]``.\n    source: The source object or event type.\n    target: The target object or event type.\n    min_count: The minimum number of related items for any source instance.\n    max_count: The maximum number of related items for any source instance.\n    sum: The total number of relation occurrences across all instances."
+      },
+      "SqlColumn": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "type"
+        ],
+        "title": "SqlColumn"
+      },
+      "SqlQueryRequest": {
+        "properties": {
+          "sql": {
+            "type": "string",
+            "title": "Sql"
+          },
+          "parameters": {
+            "items": {},
+            "type": "array",
+            "title": "Parameters"
+          },
+          "max_rows": {
+            "type": "integer",
+            "maximum": 100000.0,
+            "minimum": 1.0,
+            "title": "Max Rows",
+            "default": 5000
+          }
+        },
+        "type": "object",
+        "required": [
+          "sql"
+        ],
+        "title": "SqlQueryRequest",
+        "description": "A DuckDB query and the values bound to its ``?`` placeholders."
+      },
+      "SqlQueryResult": {
+        "properties": {
+          "columns": {
+            "items": {
+              "$ref": "#/components/schemas/SqlColumn"
+            },
+            "type": "array",
+            "title": "Columns"
+          },
+          "rows": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Rows"
+          },
+          "truncated": {
+            "type": "boolean",
+            "title": "Truncated",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "columns",
+          "rows"
+        ],
+        "title": "SqlQueryResult",
+        "description": "Tidy rows plus the schema DuckDB reported for them."
       },
       "TypedAttribute": {
         "properties": {

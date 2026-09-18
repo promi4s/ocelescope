@@ -44,8 +44,6 @@ catalog:
   axios: ^1.20.0
   clsx: ^2.1.1
   content-disposition-attachment: ^0.3.1
-  cspell: ^10.3.0
-  dayjs: ^1.11.19
   echarts: ^6.1.0
   echarts-for-react: ^3.0.6
   cspell: ^10.3.2
@@ -69,7 +67,6 @@ catalog:
   react-zoom-pan-pinch: ^4.0.0
   recharts: ^3.2.1
   storybook: ^10.3.5
-  tsdown: ^0.22.14
   tsdown: ^0.23.0
   typescript: ^6.0.3
   uniqolor: ^1.1.1
