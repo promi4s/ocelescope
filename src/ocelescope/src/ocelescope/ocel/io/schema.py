@@ -155,7 +155,9 @@ def ocel_table_schemas(
     }
 
 
-def _create_if_missing(con: duckdb.DuckDBPyConnection, table: str, schema: pa.Schema) -> None:
+def _create_if_missing(
+    con: duckdb.DuckDBPyConnection, table: str, schema: pa.Schema
+) -> None:
     """Create ``table`` from ``schema``, empty, unless ``con`` already has it."""
     if con.execute(
         "SELECT 1 FROM information_schema.tables WHERE table_name = ?", [table]
@@ -178,7 +180,9 @@ def ensure_quantity_tables(con: duckdb.DuckDBPyConnection) -> None:
     table_schemas = {
         QUANTITIES_TABLE: pa.schema(QUANTITIES_TABLE_SCHEMA),
         QUANTITY_OPERATIONS_TABLE: pa.schema(QUANTITY_OPERATIONS_TABLE_SCHEMA),
-        QUANTITY_ITEM_PROPERTIES_TABLE: pa.schema(QUANTITY_ITEM_PROPERTIES_TABLE_SCHEMA),
+        QUANTITY_ITEM_PROPERTIES_TABLE: pa.schema(
+            QUANTITY_ITEM_PROPERTIES_TABLE_SCHEMA
+        ),
     }
 
     for table, schema in table_schemas.items():

@@ -11,7 +11,12 @@ from ocelescope.ocel.constants.pm4py import (
     TIMESTAMP_COL,
 )
 from ocelescope.ocel.constants.tables import E2O_TABLE, EVENTS_TABLE, OBJECTS_TABLE
-from ocelescope.resource.default.dfg import DFGActivity, DFGEdge, DFGObject, DirectlyFollowsGraph
+from ocelescope.resource.default.dfg import (
+    DFGActivity,
+    DFGEdge,
+    DFGObject,
+    DirectlyFollowsGraph,
+)
 from ocelescope.util.sql import ident, in_list
 
 OBJECT_TYPE_COL = "object_type"
@@ -22,13 +27,16 @@ OBJECT_COUNT_COL = "object_count"
 
 
 def _dfg_query(
-    included_object_types: list[str] | None = None, included_activities: list[str] | None = None
+    included_object_types: list[str] | None = None,
+    included_activities: list[str] | None = None,
 ) -> str:
     eid, oid, otype = ident(EID_COL), ident(OID_COL), ident(OTYPE_COL)
     activity, timestamp = ident(ACTIVITY_COL), ident(TIMESTAMP_COL)
 
     activity_filter = (
-        f"WHERE {in_list(activity, included_activities)}" if included_activities is not None else ""
+        f"WHERE {in_list(activity, included_activities)}"
+        if included_activities is not None
+        else ""
     )
 
     object_type_filter = (
@@ -101,12 +109,15 @@ def ocdfg_miner(
         )
         for object_type, source, target, count, object_count in ocel.sql(
             _dfg_query(
-                included_activities=included_activities, included_object_types=included_object_types
+                included_activities=included_activities,
+                included_object_types=included_object_types,
             )
         ).fetchall()
     ]
 
-    activities = sorted({name for edge in edges for name in (edge.source, edge.target) if name})
+    activities = sorted(
+        {name for edge in edges for name in (edge.source, edge.target) if name}
+    )
     object_types = sorted({edge.object_type for edge in edges})
     dfg = DirectlyFollowsGraph(
         activities=[DFGActivity(name=name) for name in activities],

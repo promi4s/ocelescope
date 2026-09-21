@@ -1,4 +1,4 @@
-from typing import Annotated, TypeAlias, Union
+from typing import Annotated, TypeAlias
 
 from pydantic import Field
 
@@ -53,42 +53,34 @@ Visualization: TypeAlias = Annotated[
 ]
 
 __all__ = [
-    # Util
-    "Visualization",
-    "generate_color_map",
-    # Graph
-    "Graph",
-    "GraphNode",
-    "GraphEdge",
-    "EdgeArrow",
-    "LayoutConfig",
-    "ElkLayoutConfig",
-    "GraphvizLayoutConfig",
-    "GraphShapes",
+    "DFG",
     "DIRECTED_ELK_GRAPH_LAYOUT",
     "DIRECTED_GRAPH_LAYOUT",
     "FORCE_GRAPH_LAYOUT",
     "ORDERED_TREE_LAYOUT",
     "RADIAL_GRAPH_LAYOUT",
-    # Table
-    "Table",
-    "TableColumn",
-    # SVG
-    "SVGVis",
-    # Graphviz
-    "DotVis",
-    # Plotly
-    "Plotly",
-    # PetriNet
     "Arc",
+    "DirectlyFollowsGraphViz",
+    "DotVis",
+    "EdgeArrow",
+    "ElkLayoutConfig",
+    "Graph",
+    "GraphEdge",
+    "GraphNode",
+    "GraphShapes",
+    "GraphvizLayoutConfig",
+    "LayoutConfig",
     "OCArc",
+    "OCDirectlyFollowsGraphViz",
     "OCPetriNetViz",
+    "OCPlace",
     "PetriNetViz",
     "Place",
-    "OCPlace",
+    "Plotly",
+    "SVGVis",
+    "Table",
+    "TableColumn",
     "Transition",
-    # DFG
-    "DFG",
-    "DirectlyFollowsGraphViz",
-    "OCDirectlyFollowsGraphViz",
+    "Visualization",
+    "generate_color_map",
 ]

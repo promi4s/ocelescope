@@ -52,7 +52,9 @@ def discovery_method(
 
 def _extract_resource_type(func_name: str, annotation: Any) -> type[Resource]:
     if annotation is None:
-        raise TypeError(f"@discovery_method on '{func_name}': missing return type annotation")
+        raise TypeError(
+            f"@discovery_method on '{func_name}': missing return type annotation"
+        )
 
     if isinstance(annotation, type) and issubclass(annotation, Resource):
         return annotation

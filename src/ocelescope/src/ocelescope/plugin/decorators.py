@@ -107,7 +107,9 @@ class PluginIO:
             base_class, _, _ = extract_info(get_args(base_class)[0])
             self.is_list = True
 
-        if not isinstance(base_class, type) or not issubclass(base_class, (OCEL, Resource)):
+        if not isinstance(base_class, type) or not issubclass(
+            base_class, (OCEL, Resource)
+        ):
             target = f"parameter {name!r}" if name else "the return type"
             raise TypeError(
                 f"Unsupported type for {target}: {io_type!r}. Plugin inputs and outputs must be "
@@ -125,12 +127,16 @@ class PluginIO:
         self.description = annotation.description if is_annotation else None
 
         self.annotated_resources = (
-            annotation.annotation_resources if isinstance(annotation, ResourceAnnotation) else []
+            annotation.annotation_resources
+            if isinstance(annotation, ResourceAnnotation)
+            else []
         ) or []
 
     @property
     def resource_types(self):
-        return ([self.type] if issubclass(self.type, Resource) else []) + self.annotated_resources
+        return (
+            [self.type] if issubclass(self.type, Resource) else []
+        ) + self.annotated_resources
 
     @property
     def io_type(self) -> Literal["ocel", "resource"]:
@@ -149,8 +155,8 @@ class PluginIO:
         )
 
 
-PluginReturnItemType = Union[OCEL, Resource, list[OCEL], list[Resource]]
-PluginReturnType = Union[tuple[PluginReturnItemType, ...], PluginReturnItemType]
+PluginReturnItemType = OCEL | Resource | list[OCEL] | list[Resource]
+PluginReturnType = tuple[PluginReturnItemType, ...] | PluginReturnItemType
 
 
 @dataclass

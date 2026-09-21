@@ -31,7 +31,8 @@ def find_absolute_imports(package_dir: Path):
             match node:
                 # Case 1: import mypkg...
                 case ast.Import(names=names) if any(
-                    alias.name == package_name or alias.name.startswith(package_name + ".")
+                    alias.name == package_name
+                    or alias.name.startswith(package_name + ".")
                     for alias in names
                 ):
                     absolute_imports.append(
@@ -90,7 +91,9 @@ def load_package(pkg_dir: Path) -> ModuleType | None:
         spec.loader.exec_module(module)  # type: ignore[arg-type]
         return module
     except Exception:
-        print(f"❌ Failed to import {pkg_dir} as {module_name}:\n{traceback.format_exc()}")
+        print(
+            f"❌ Failed to import {pkg_dir} as {module_name}:\n{traceback.format_exc()}"
+        )
         sys.modules.pop(module_name, None)
         return None
 

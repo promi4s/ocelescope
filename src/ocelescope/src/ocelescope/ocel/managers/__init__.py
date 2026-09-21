@@ -4,4 +4,10 @@ from ocelescope.ocel.managers.o2o import O2OManager
 from ocelescope.ocel.managers.objects import ObjectsManager
 from ocelescope.ocel.managers.quantities import QuantityManager
 
-__all__ = ["E2OManager", "EventsManager", "O2OManager", "ObjectsManager", "QuantityManager"]
+__all__ = [
+    "E2OManager",
+    "EventsManager",
+    "O2OManager",
+    "ObjectsManager",
+    "QuantityManager",
+]

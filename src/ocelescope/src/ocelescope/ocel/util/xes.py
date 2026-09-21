@@ -43,12 +43,15 @@ DYNAMIC_PREFIX = "object:"
 
 
 def create_ocel_from_xml(path: str, fallback_object_name: str = "LogObject") -> "OCEL":
+    from ocelescope.ocel.core import OCEL  # avoid circular import
 
     log, _meta = r4pm.df.import_xes(path)
 
     log = log.rename({**RENAME_MAP}, strict=False)
 
-    global_cols = [col.removeprefix("case:") for col in log.columns if col.startswith("case:")]
+    global_cols = [
+        col.removeprefix("case:") for col in log.columns if col.startswith("case:")
+    ]
 
     event_cols = [
         col
@@ -84,13 +87,13 @@ def create_ocel_from_xml(path: str, fallback_object_name: str = "LogObject") -> 
         .rename({f"case:{col}": col for col in global_cols})
     )
 
-    event_table = log.select(event_cols + [EID_COL, ACTIVITY_COL, TIMESTAMP_COL]).unique(
-        subset=[EID_COL]
-    )
+    event_table = log.select(
+        event_cols + [EID_COL, ACTIVITY_COL, TIMESTAMP_COL]
+    ).unique(subset=[EID_COL])
 
-    e2o_table = log.select([EID_COL, OTYPE_COL, ACTIVITY_COL, OID_COL, TIMESTAMP_COL]).with_columns(
-        pl.lit(None, dtype=pl.String).alias(E2O_QUALIFIER)
-    )
+    e2o_table = log.select(
+        [EID_COL, OTYPE_COL, ACTIVITY_COL, OID_COL, TIMESTAMP_COL]
+    ).with_columns(pl.lit(None, dtype=pl.String).alias(E2O_QUALIFIER))
 
     return OCEL.from_frames(
         events=event_table,
@@ -108,7 +111,11 @@ def write_ocel_to_xes(ocel: "OCEL", object_type: str, path: str | Path) -> None:
         path: Where to write the file.
     """
     oid, otype, ts = ident(OID_COL), ident(OTYPE_COL), ident(TIMESTAMP_COL)
-    eid, activity, field = ident(EID_COL), ident(ACTIVITY_COL), ident(OBJECT_CHANGED_FIELD)
+    eid, activity, field = (
+        ident(EID_COL),
+        ident(ACTIVITY_COL),
+        ident(OBJECT_CHANGED_FIELD),
+    )
 
     kinds = ocel.sql(
         f"SELECT {field}, max({ts}) = {EPOCH_SQL} AS is_static "
@@ -144,7 +151,9 @@ def write_ocel_to_xes(ocel: "OCEL", object_type: str, path: str | Path) -> None:
         *(f"s.{ident(name)} AS {ident(f'{DYNAMIC_PREFIX}{name}')}" for name in dynamic),
     ]
 
-    flattened = ocel.objects.attribute_states(object_types=[object_type], attributes=dynamic).query(
+    flattened = ocel.objects.attribute_states(
+        object_types=[object_type], attributes=dynamic
+    ).query(
         "attribute_states",
         f"WITH object_ids AS "
         f"(SELECT {oid} FROM {OBJECTS_TABLE} WHERE {otype} = {literal(object_type)}), "

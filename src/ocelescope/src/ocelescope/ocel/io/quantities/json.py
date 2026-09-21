@@ -17,7 +17,11 @@ from ocelescope.ocel.constants.quantity import (
     QUANTITY_OPERATIONS_TABLE,
 )
 from ocelescope.ocel.io.connection import DuckDBTarget, connect_target
-from ocelescope.ocel.io.quantities.util import fetch_dicts, inverse_keymap, write_quantity_frames
+from ocelescope.ocel.io.quantities.util import (
+    fetch_dicts,
+    inverse_keymap,
+    write_quantity_frames,
+)
 from ocelescope.util.sql import ident
 
 JSON_QUANTITY_EXTENSION = "quantityExtension"
@@ -59,7 +63,11 @@ def import_quantities_json(source: str | Path, target: DuckDBTarget) -> None:
     rename = inverse_keymap(JSON_KEYMAP)
     oqty = pd.DataFrame.from_records(
         oqty_records,
-        columns=[JSON_KEYMAP[OID_COL], JSON_KEYMAP[QEL_ITEM_TYPE], JSON_KEYMAP[QEL_QUANTITY]],
+        columns=[
+            JSON_KEYMAP[OID_COL],
+            JSON_KEYMAP[QEL_ITEM_TYPE],
+            JSON_KEYMAP[QEL_QUANTITY],
+        ],
     ).rename(columns=rename)
     qop = pd.DataFrame.from_records(
         qop_records,

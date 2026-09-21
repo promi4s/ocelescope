@@ -95,7 +95,10 @@ def _tables(source: Path) -> set[str]:
     """The names of the tables the SQLite file holds."""
     with sqlite3.connect(f"file:{source}?mode=ro", uri=True) as con:
         return {
-            row[0] for row in con.execute("SELECT name FROM sqlite_master WHERE type = 'table'")
+            row[0]
+            for row in con.execute(
+                "SELECT name FROM sqlite_master WHERE type = 'table'"
+            )
         }
 
 
@@ -110,7 +113,9 @@ def _property_casts(source: Path) -> dict[str, str]:
 
     casts = {}
     for _, name, declared, *_ in columns:
-        ocel_type = _SQLITE_TO_OCEL.get((declared or "").upper().split("(")[0].strip(), "string")
+        ocel_type = _SQLITE_TO_OCEL.get(
+            (declared or "").upper().split("(")[0].strip(), "string"
+        )
         casts[name] = ATTRIBUTE_TYPE_TO_DUCKDB[ocel_type]
     return casts
 
@@ -132,7 +137,9 @@ def import_quantities_sqlite(source: str | Path, target: DuckDBTarget) -> None:
 
     with connect_target(target) as con:
         con.execute("INSTALL sqlite; LOAD sqlite;")
-        con.execute(f"ATTACH {literal(str(source))} AS {ident(LOG)} (TYPE sqlite, READ_ONLY)")
+        con.execute(
+            f"ATTACH {literal(str(source))} AS {ident(LOG)} (TYPE sqlite, READ_ONLY)"
+        )
         try:
             if SQL_QUANTITIES in present:
                 con.execute(f"""
@@ -203,7 +210,9 @@ def _create_item_properties(target: Path, ddl: list[tuple[str, str]]) -> None:
         con.execute(f'CREATE TABLE "{SQL_ITEM_PROPERTIES}" ({columns})')
 
 
-def export_quantities_sqlite(con: duckdb.DuckDBPyConnection, target: str | Path) -> None:
+def export_quantities_sqlite(
+    con: duckdb.DuckDBPyConnection, target: str | Path
+) -> None:
     """Add the quantity-extension tables to the SQLite log at ``target``.
 
     The log is written by r4pm, which knows nothing of the extension, so the three
@@ -249,7 +258,9 @@ def export_quantities_sqlite(con: duckdb.DuckDBPyConnection, target: str | Path)
             names = [name for name, _ in _item_properties_ddl(con)]
             columns = ", ".join(ident(name) for name in names)
             projection = ", ".join(
-                f"{ident(QEL_ITEM_TYPE)}" if name == SQL_KEYMAP[QEL_ITEM_TYPE] else ident(name)
+                f"{ident(QEL_ITEM_TYPE)}"
+                if name == SQL_KEYMAP[QEL_ITEM_TYPE]
+                else ident(name)
                 for name in names
             )
             con.execute(f"""

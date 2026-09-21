@@ -27,7 +27,9 @@ class ElkLayoutConfig(BaseModel):
     options: dict[str, str | int | float | bool] | None = None
 
 
-LayoutConfig = Annotated[GraphvizLayoutConfig | ElkLayoutConfig, Field(discriminator="type")]
+LayoutConfig = Annotated[
+    GraphvizLayoutConfig | ElkLayoutConfig, Field(discriminator="type")
+]
 
 
 DIRECTED_GRAPH_LAYOUT = GraphvizLayoutConfig(

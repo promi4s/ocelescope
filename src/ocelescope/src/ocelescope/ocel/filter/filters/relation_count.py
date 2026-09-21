@@ -121,7 +121,8 @@ class O2OCountFilter(BaseFilter, RelationCountFilterConfig):
 
     def keep(self, ocel) -> Keep:
         matched = ocel.o2o.typed_pl.filter(
-            (pl.col(O2O_SOURCE_TYPE) == self.source) & (pl.col(O2O_TARGET_TYPE) == self.target)
+            (pl.col(O2O_SOURCE_TYPE) == self.source)
+            & (pl.col(O2O_TARGET_TYPE) == self.target)
         )
         if self.qualifier is not None:
             matched = matched.filter(pl.col(O2O_QUALIFIER) == self.qualifier)

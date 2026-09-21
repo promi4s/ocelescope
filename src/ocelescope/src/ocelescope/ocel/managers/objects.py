@@ -55,7 +55,9 @@ class ObjectsManager(BaseManager):
 
         names = self.static_attribute_names
         if not names:
-            return self._relation(f"SELECT * FROM {OBJECTS_TABLE} ORDER BY {otype}, {oid}")
+            return self._relation(
+                f"SELECT * FROM {OBJECTS_TABLE} ORDER BY {otype}, {oid}"
+            )
 
         field = ident(OBJECT_CHANGED_FIELD)
         wanted = ", ".join(literal(name) for name in names)
@@ -109,7 +111,9 @@ class ObjectsManager(BaseManager):
             ]
             stored = {
                 name: dtype
-                for name, dtype, *_ in con.execute(f"DESCRIBE {OBJECT_CHANGES_TABLE}").fetchall()
+                for name, dtype, *_ in con.execute(
+                    f"DESCRIBE {OBJECT_CHANGES_TABLE}"
+                ).fetchall()
             }
             for name, dtype in columns:
                 if name not in stored:
@@ -234,7 +238,9 @@ class ObjectsManager(BaseManager):
         with self._bound(contents) as incoming:
             dropped = [OTYPE_COL, OBJECT_CHANGE_CUMCOUNT]
             meta = [OID_COL, TIMESTAMP_COL, OBJECT_CHANGED_FIELD, *dropped]
-            columns = [name for name, *_ in con.execute(f"DESCRIBE {incoming}").fetchall()]
+            columns = [
+                name for name, *_ in con.execute(f"DESCRIBE {incoming}").fetchall()
+            ]
             names = [name for name in columns if name not in meta]
 
             kept = f"COLUMNS(c -> c NOT IN ({', '.join(literal(name) for name in dropped)}))"
@@ -308,7 +314,9 @@ class ObjectsManager(BaseManager):
         Returns:
             list[str]: Sorted list of unique object type names.
         """
-        return self._column(f'SELECT DISTINCT "{OTYPE_COL}" FROM {OBJECTS_TABLE} ORDER BY 1')
+        return self._column(
+            f'SELECT DISTINCT "{OTYPE_COL}" FROM {OBJECTS_TABLE} ORDER BY 1'
+        )
 
     @property
     def count(self) -> int:
@@ -344,7 +352,9 @@ class ObjectsManager(BaseManager):
         Returns:
             Series: A pandas Series indexed by object ID, containing object types as values.
         """
-        mapping = self._relation(f'SELECT "{OID_COL}", "{OTYPE_COL}" FROM {OBJECTS_TABLE}').df()
+        mapping = self._relation(
+            f'SELECT "{OID_COL}", "{OTYPE_COL}" FROM {OBJECTS_TABLE}'
+        ).df()
         return cast(pd.Series, mapping.set_index(OID_COL)[OTYPE_COL])
 
     def has_types(self, types: Iterable[str]) -> bool:
@@ -478,7 +488,11 @@ class ObjectsManager(BaseManager):
         meta = f"{oid}, {otype}, {ts}"
         columns = "".join(f", c.{ident(name)}" for name in names)
         collapse = f", any_value(COLUMNS(* EXCLUDE ({meta})))" if names else ""
-        fill = f", last_value(COLUMNS(* EXCLUDE ({meta})) IGNORE NULLS) OVER w" if names else ""
+        fill = (
+            f", last_value(COLUMNS(* EXCLUDE ({meta})) IGNORE NULLS) OVER w"
+            if names
+            else ""
+        )
 
         return self._relation(
             # the objects table, cut down to the wanted types

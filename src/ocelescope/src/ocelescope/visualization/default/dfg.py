@@ -16,7 +16,9 @@ class DFG(BaseModel):
     """
 
     activities: dict[str, int] = Field(default_factory=dict)
-    directly_follows_relations: list[tuple[tuple[str, str], int]] = Field(default_factory=list)
+    directly_follows_relations: list[tuple[tuple[str, str], int]] = Field(
+        default_factory=list
+    )
     start_activities: dict[str, int] = Field(default_factory=dict)
     end_activities: dict[str, int] = Field(default_factory=dict)
 

@@ -27,7 +27,9 @@ def _write_table(con: duckdb.DuckDBPyConnection, name: str, df: pd.DataFrame) ->
     con.execute(f"DROP TABLE IF EXISTS {ident(name)}")
     con.register("_quantity_source", df)
     try:
-        con.execute(f"CREATE TABLE {ident(name)} AS SELECT *{replace} FROM _quantity_source")
+        con.execute(
+            f"CREATE TABLE {ident(name)} AS SELECT *{replace} FROM _quantity_source"
+        )
     finally:
         con.unregister("_quantity_source")
 

@@ -24,9 +24,14 @@ def collapse_object_changes(con: duckdb.DuckDBPyConnection) -> None:
     oid, ts = ident(OID_COL), ident(TIMESTAMP_COL)
     field = ident(OBJECT_CHANGED_FIELD)
 
-    columns = [row[0] for row in con.execute(f"DESCRIBE {ident(OBJECT_CHANGES_TABLE)}").fetchall()]
+    columns = [
+        row[0]
+        for row in con.execute(f"DESCRIBE {ident(OBJECT_CHANGES_TABLE)}").fetchall()
+    ]
     attributes = [
-        name for name in columns if name not in (OID_COL, TIMESTAMP_COL, OBJECT_CHANGED_FIELD)
+        name
+        for name in columns
+        if name not in (OID_COL, TIMESTAMP_COL, OBJECT_CHANGED_FIELD)
     ]
     values = f", max(COLUMNS(* EXCLUDE ({oid}, {ts}, {field})))" if attributes else ""
 

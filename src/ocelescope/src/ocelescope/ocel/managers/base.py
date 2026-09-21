@@ -22,7 +22,9 @@ class BaseManager:
     def __init__(self, ocel: OCEL):
         self._ocel = ocel
 
-    def _relation(self, sql: str, params: list[object] | None = None) -> duckdb.DuckDBPyRelation:
+    def _relation(
+        self, sql: str, params: list[object] | None = None
+    ) -> duckdb.DuckDBPyRelation:
         """A lazy relation for ``sql``, on its own DuckDB cursor."""
         cursor = self._ocel.con.cursor()
         set_utc(cursor)
@@ -70,9 +72,15 @@ class BaseManager:
 
         with self._bound(contents) as incoming:
             source = f"(SELECT {projection} FROM {incoming})"
-            columns = {name for name, *_ in con.execute(f"DESCRIBE {source}").fetchall()}
+            columns = {
+                name for name, *_ in con.execute(f"DESCRIBE {source}").fetchall()
+            }
             pinned = ", ".join(
-                f'"{name}"::{dtype} AS "{name}"' for name, dtype in fixed.items() if name in columns
+                f'"{name}"::{dtype} AS "{name}"'
+                for name, dtype in fixed.items()
+                if name in columns
             )
             replace = f" REPLACE ({pinned})" if pinned else ""
-            con.execute(f'CREATE OR REPLACE TABLE "{table}" AS SELECT *{replace} FROM {source}')
+            con.execute(
+                f'CREATE OR REPLACE TABLE "{table}" AS SELECT *{replace} FROM {source}'
+            )

@@ -8,7 +8,9 @@ from ocelescope.ocel.constants.pm4py import ACTIVITY_COL, EID_COL, OID_COL, OTYP
 from ocelescope.ocel.filter.base import BaseFilter, Keep
 
 
-def _cumulative_qualifying(counts: pl.LazyFrame, column: str, threshold: float) -> pl.LazyFrame:
+def _cumulative_qualifying(
+    counts: pl.LazyFrame, column: str, threshold: float
+) -> pl.LazyFrame:
     """The types whose cumulative frequency (most common first) is <= ``threshold``.
 
     A step function: type k qualifies once the threshold reaches the cumulative
@@ -18,7 +20,9 @@ def _cumulative_qualifying(counts: pl.LazyFrame, column: str, threshold: float) 
         counts.group_by(column)
         .len(name="count")
         .sort("count", descending=True)
-        .with_columns((pl.col("count").cum_sum() / pl.col("count").sum()).alias("cumulative"))
+        .with_columns(
+            (pl.col("count").cum_sum() / pl.col("count").sum()).alias("cumulative")
+        )
         .filter(pl.col("cumulative") <= threshold)
         .select(column)
     )
@@ -33,7 +37,9 @@ def _frequent(
     DuckDB cursor and cannot be read twice in one query.
     """
     qualifying = _cumulative_qualifying(entities(), type_column, threshold)
-    is_frequent = pl.col(type_column).is_in(qualifying.select(type_column).collect().to_series())
+    is_frequent = pl.col(type_column).is_in(
+        qualifying.select(type_column).collect().to_series()
+    )
     return ~is_frequent if mode == "exclude" else is_frequent
 
 
@@ -46,7 +52,9 @@ class EventTypeFrequencyFilter(BaseFilter):
     def keep(self, ocel) -> Keep:
         return Keep(
             events=ocel.events.pl.filter(
-                _frequent(lambda: ocel.events.pl, ACTIVITY_COL, self.threshold, self.mode)
+                _frequent(
+                    lambda: ocel.events.pl, ACTIVITY_COL, self.threshold, self.mode
+                )
             ).select(EID_COL)
         )
 

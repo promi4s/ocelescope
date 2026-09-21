@@ -36,7 +36,9 @@ def _all_ids(ocel: OCEL, table: str, id_col: str) -> pl.LazyFrame:
     return ocel.sql(f"SELECT {ident(id_col)} FROM {ident(table)}").pl(lazy=True)
 
 
-def _intersect(frames: list[pl.LazyFrame], all_ids: pl.LazyFrame, id_col: str) -> pl.LazyFrame:
+def _intersect(
+    frames: list[pl.LazyFrame], all_ids: pl.LazyFrame, id_col: str
+) -> pl.LazyFrame:
     """Ids kept by *every* frame (inner joins); ``all_ids`` when no frame constrains."""
     if not frames:
         return all_ids
