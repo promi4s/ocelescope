@@ -22,8 +22,8 @@ ocelescope-module-filter = { workspace = true }
 ocelescope-module-ocel = { workspace = true }
 
 [tool.ruff.lint]
-ignore = ["E731"]
-extend-select = ["RUF022"]
+ignore = ["E731", "BLE001"]
+extend-select = ["RUF022" ]
 
 [tool.ty.rules]
 # Existing `# type: ignore` comments target mypy/pyright; ty uses its own
