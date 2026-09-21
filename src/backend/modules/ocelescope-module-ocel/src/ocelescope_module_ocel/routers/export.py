@@ -7,7 +7,7 @@ is pm4py-only, so those do pull the tables they need into memory.
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Annotated, Literal
 
@@ -45,7 +45,7 @@ def download_ocel(
         raise NotFound("OCEL not found")
 
     name = session.ocels[ocel_id].name
-    tmp_file_prefix = datetime.now().strftime("%Y%m%d-%H%M%S") + "-" + name
+    tmp_file_prefix = datetime.now(tz=UTC).strftime("%Y%m%d-%H%M%S") + "-" + name
     file_response = TempFileResponse(
         prefix=tmp_file_prefix, suffix=ext, filename=name + ext
     )
@@ -65,7 +65,7 @@ def download_flat_log(
     ocel: ApiOcel, ocel_id: str, session: ApiSession, object_type_name: str
 ) -> TempFileResponse:
     name = session.ocels[ocel_id].name
-    tmp_file_prefix = f"{datetime.now().strftime('%Y%m%d-%H%M%S')}-{name}"
+    tmp_file_prefix = f"{datetime.now(tz=UTC).strftime('%Y%m%d-%H%M%S')}-{name}"
     file_response = TempFileResponse(
         prefix=tmp_file_prefix, suffix=".xes", filename=f"{name}_{object_type_name}.xes"
     )
@@ -98,7 +98,7 @@ def download_variant_flat_log(
     if not object_ids:
         raise NotFound("No objects were found for the given variants")
 
-    tmp_file_prefix = datetime.now().strftime("%Y%m%d-%H%M%S") + "-" + name
+    tmp_file_prefix = datetime.now(tz=UTC).strftime("%Y%m%d-%H%M%S") + "-" + name
     file_response = TempFileResponse(
         prefix=tmp_file_prefix, suffix=".xes", filename=f"{name}_{object_type}.xes"
     )

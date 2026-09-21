@@ -22,7 +22,7 @@ ocelescope-module-filter = { workspace = true }
 ocelescope-module-ocel = { workspace = true }
 
 [tool.ruff.lint]
-ignore = ["E731", "BLE001"]
+ignore = ["E731", "BLE001", "S110"]
 extend-select = ["RUF022" ]
 
 [tool.ty.rules]

@@ -50,9 +50,11 @@ class SessionOCEL:
             filtered = self.db_path.with_suffix(
                 f".filtered.{self._filtered_generation}.duckdb"
             )
-            with OCEL.read_duckdb(self.db_path, read_only=True) as origin:
-                with origin.filter(filters) as subset:
-                    subset.to_duckdb(filtered)
+            with (
+                OCEL.read_duckdb(self.db_path, read_only=True) as origin,
+                origin.filter(filters) as subset,
+            ):
+                subset.to_duckdb(filtered)
             self._filtered_db_path = filtered
         return self._filtered_db_path
 

@@ -7,7 +7,7 @@ class IgnoreOptionsRequestsFilter(logging.Filter):
     def filter(self, record):
         if record.args is None:
             return True
-        ip, method, route, _, code = record.args
+        _ip, method, _route, _, _code = record.args
         return method != "OPTIONS"
 
 

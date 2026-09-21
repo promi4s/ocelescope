@@ -47,7 +47,7 @@ def get_aggr_attributes(
 )
 def get_object_attributes(
     ocel: ApiOcel,
-    attribute_names: Annotated[list[str], Query()] = [],
+    attribute_names: Annotated[list[str], Query(default_factory=list)],
     names: Annotated[list[str] | None, Query()] = None,
 ) -> list[TypedAttribute]:
     return attribute_util.typed_attributes(
@@ -62,7 +62,7 @@ def get_object_attributes(
 )
 def get_event_attributes(
     ocel: ApiOcel,
-    attribute_names: Annotated[list[str], Query()] = [],
+    attribute_names: Annotated[list[str], Query(default_factory=list)],
     names: Annotated[list[str] | None, Query()] = None,
 ) -> list[TypedAttribute]:
     return attribute_util.typed_attributes(

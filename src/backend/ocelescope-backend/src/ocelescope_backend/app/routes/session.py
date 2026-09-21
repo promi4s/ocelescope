@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
+from typing import Annotated
 
 from fastapi import File, Request, UploadFile
 from fastapi.responses import JSONResponse, Response
@@ -25,7 +26,9 @@ session_router = APIRouter(prefix="/session", tags=["session"])
 @session_router.post(
     "/upload", summary="Upload logs, plugins, or resources", operation_id="upload"
 )
-async def upload(session: ApiSession, files: list[UploadFile] = File(...)) -> list[str]:
+async def upload(
+    session: ApiSession, files: Annotated[list[UploadFile], File()]
+) -> list[str]:
     tasks = []
     for file in files:
         if file.filename is None:
@@ -80,7 +83,7 @@ async def upload(session: ApiSession, files: list[UploadFile] = File(...)) -> li
                 file_path=tmp_path,
                 metadata={
                     "fileName": file_path.name,
-                    "uploaded_at": datetime.now().isoformat(),
+                    "uploaded_at": datetime.now(UTC).isoformat(),
                 },
             )
         )

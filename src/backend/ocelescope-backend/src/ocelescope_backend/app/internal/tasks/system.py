@@ -42,8 +42,8 @@ class SystemTask(TaskBase, Generic[P]):
         kwargs: dict[str, Any],
         fn: Callable[P, list[SSEMessage]],
         name: str,
-        metadata: dict[str, Any] = {},
         session: "Session",
+        metadata: dict[str, Any] | None = None,
     ):
         super().__init__()
         self.args = args
@@ -53,7 +53,7 @@ class SystemTask(TaskBase, Generic[P]):
         self.session = session
         self.error: BaseException | None = None
         self.result: Sequence[SSEMessage] = []
-        self.metadata = metadata
+        self.metadata = metadata or {}
 
     def run(self):
         self.state = TaskState.STARTED
@@ -124,7 +124,7 @@ class SystemTask(TaskBase, Generic[P]):
         task_name: str,
         run_once: bool = False,
         dedupe: bool = False,
-        metadata: dict[str, Any] = {},
+        metadata: dict[str, Any] | None = None,
     ) -> str:
         key = cls._dedupe_key(task_name, args, kwargs, run_once=run_once)
 
@@ -160,7 +160,10 @@ def system_task(
 
         @functools.wraps(fn)
         def wrapper(
-            *args: Any, session: "Session", metadata: dict[str, Any] = {}, **kwargs: Any
+            *args: Any,
+            session: "Session",
+            metadata: dict[str, Any] | None = None,
+            **kwargs: Any,
         ) -> str:
             return SystemTask.create_system_task(
                 fn=fn,
