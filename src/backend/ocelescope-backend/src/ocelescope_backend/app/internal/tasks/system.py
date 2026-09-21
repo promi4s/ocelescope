@@ -1,15 +1,12 @@
 import functools
 import time
 import traceback
+from collections.abc import Callable, Hashable, Sequence
 from typing import (
     TYPE_CHECKING,
     Any,
-    Callable,
     Generic,
-    Hashable,
-    Optional,
     ParamSpec,
-    Sequence,
 )
 
 from ocelescope_backend.app.internal.tasks.base import (
@@ -54,7 +51,7 @@ class SystemTask(TaskBase, Generic[P]):
         self.fn = fn
         self.name = name
         self.session = session
-        self.error: Optional[BaseException] = None
+        self.error: BaseException | None = None
         self.result: Sequence[SSEMessage] = []
         self.metadata = metadata
 
@@ -156,7 +153,7 @@ class SystemTask(TaskBase, Generic[P]):
 
 
 def system_task(
-    name: Optional[str] = None, dedupe: bool = False, run_once: bool = False
+    name: str | None = None, dedupe: bool = False, run_once: bool = False
 ) -> Callable[[Callable[P, Sequence[SSEMessage]]], Callable[P, str]]:
     def decorator(fn: Callable[P, Sequence[SSEMessage]]) -> Callable[P, str]:
         task_name = name or fn.__name__  # ty: ignore[unresolved-attribute]

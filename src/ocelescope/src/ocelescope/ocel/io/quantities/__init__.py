@@ -66,4 +66,4 @@ def export_quantities(
                 export_quantities_sqlite(src, target)
 
 
-__all__ = ["import_quantities", "export_quantities"]
+__all__ = ["export_quantities", "import_quantities"]

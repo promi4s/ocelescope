@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from typing import Optional, cast
+from typing import cast
 
 from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
@@ -19,7 +19,7 @@ resource_router = APIRouter(prefix="/resources", tags=["resources"])
 
 @resource_router.get(path="", operation_id="resources")
 def get_resources(
-    session: ApiSession, schema_hash: Optional[str] = None
+    session: ApiSession, schema_hash: str | None = None
 ) -> list[ResourceApi]:
     return [
         resource

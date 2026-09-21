@@ -31,8 +31,8 @@ ocel = OCEL.read("order-management.sqlite")
 # Structured access to the log via managers (each exposes a pandas DataFrame):
 print(ocel.events.df.head())
 print(ocel.objects.df.head())
-print(ocel.e2o.df.head())   # event-to-object relations
-print(ocel.o2o.df.head())   # object-to-object relations
+print(ocel.e2o.df.head())  # event-to-object relations
+print(ocel.o2o.df.head())  # object-to-object relations
 ```
 
 ### Filtering

@@ -83,7 +83,6 @@ __all__ = [
     "BaseFilter",
     # Visualization
     # Util
-    "Visualization",
     "generate_color_map",
     # Graph
     "Graph",

@@ -166,7 +166,7 @@ def _import_plugin_archive(
                 plugin_candidate.is_dir()
                 and (plugin_candidate / "__init__.py").exists()
             ):
-                plugin_id = f"plugin_{str(uuid4())}"
+                plugin_id = f"plugin_{uuid4()!s}"
                 shutil.move(plugin_candidate, config.PLUGIN_DIR / plugin_id)
                 added_plugin_ids.append(plugin_id)
     results: list[SystemNotification | ErrorNotification | InvalidationRequest] = []

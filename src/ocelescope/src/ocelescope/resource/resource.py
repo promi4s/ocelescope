@@ -105,8 +105,6 @@ class Resource(BaseModel, ABC):
             Optional[Visualization]: A visualization object or ``None``.
         """
 
-        ...
-
 
 T = TypeVar("T", bound=Resource)
 

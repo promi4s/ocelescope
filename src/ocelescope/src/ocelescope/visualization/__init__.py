@@ -40,17 +40,15 @@ from ocelescope.visualization.default.table import Table, TableColumn
 from ocelescope.visualization.util.color import generate_color_map
 
 Visualization: TypeAlias = Annotated[
-    Union[
-        Graph,
-        Table,
-        SVGVis,
-        DotVis,
-        Plotly,
-        PetriNetViz,
-        OCPetriNetViz,
-        DirectlyFollowsGraphViz,
-        OCDirectlyFollowsGraphViz,
-    ],
+    Graph
+    | Table
+    | SVGVis
+    | DotVis
+    | Plotly
+    | PetriNetViz
+    | OCPetriNetViz
+    | DirectlyFollowsGraphViz
+    | OCDirectlyFollowsGraphViz,
     Field(discriminator="type"),
 ]
 

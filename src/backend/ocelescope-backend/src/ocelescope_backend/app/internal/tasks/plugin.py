@@ -1,9 +1,9 @@
 import traceback
+from collections.abc import Hashable
 from typing import (
     TYPE_CHECKING,
     Any,
     Generic,
-    Hashable,
     ParamSpec,
 )
 

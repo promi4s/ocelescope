@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import json
 import tempfile
+from collections.abc import Callable, Hashable, Sequence
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Callable, Hashable, Sequence, Type, TypeVar, cast
+from typing import Any, TypeVar, cast
 from uuid import uuid4
 
 from ocelescope import OCEL, BaseFilter
@@ -61,7 +62,7 @@ class Session:
     def get_task(self, task_id: str):
         return self._tasks.get(task_id, None)
 
-    def list_tasks(self, task_type: Type[S], filter: Callable[[S], bool]):
+    def list_tasks(self, task_type: type[S], filter: Callable[[S], bool]):
         return [
             task.summarize()
             for task in self._tasks.values()

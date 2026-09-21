@@ -1,10 +1,10 @@
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from types import MethodType, NoneType, UnionType
 from typing import (
     TYPE_CHECKING,
     Annotated,
     Any,
-    Callable,
     Literal,
     Union,
     get_args,
@@ -39,8 +39,6 @@ class OCELAnnotation(Annotation):
         label: Human-readable label to display in the UI.
         description: Optional longer text shown in the UI to explain the OCEL.
     """
-
-    pass
 
 
 @dataclass
@@ -118,7 +116,7 @@ class PluginIO:
             )
 
         self.name = name
-        self.type: type[OCEL] | type[Resource] = base_class
+        self.type: type[OCEL | Resource] = base_class
         self.is_optional = is_optional
 
         is_annotation = isinstance(annotation, Annotation)
@@ -218,11 +216,7 @@ def plugin_method(
             else:
                 plugin_method_meta.inputs += [PluginIO(name=key, io_type=value)]
 
-        setattr(
-            func,
-            "__meta__",
-            plugin_method_meta,
-        )
+        func.__meta__ = plugin_method_meta
 
         return func
 

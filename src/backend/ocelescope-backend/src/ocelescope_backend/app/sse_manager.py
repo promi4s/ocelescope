@@ -1,5 +1,5 @@
 import asyncio
-from typing import Annotated, Literal, Optional, Union
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field
 
@@ -22,7 +22,7 @@ class PluginLink(BaseModel):
 
 
 SystemLink = Annotated[
-    Union[OcelLink, PluginLink, ResourceLink], Field(discriminator="type")
+    OcelLink | PluginLink | ResourceLink, Field(discriminator="type")
 ]
 
 
@@ -31,7 +31,7 @@ class SystemNotification(BaseModel):
     title: str
     message: str
     notification_type: Literal["warning", "info", "error"]
-    link: Optional[SystemLink] = None
+    link: SystemLink | None = None
 
 
 class ErrorNotification(BaseModel):
@@ -47,7 +47,7 @@ class InvalidationRequest(BaseModel):
 
 
 SSEMessage = Annotated[
-    Union[SystemNotification, InvalidationRequest, ErrorNotification],
+    SystemNotification | InvalidationRequest | ErrorNotification,
     Field(discriminator="type"),
 ]
 

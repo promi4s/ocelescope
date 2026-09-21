@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Iterator
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, Iterator
+from typing import TYPE_CHECKING, Any
 
 import duckdb
 import polars
@@ -18,7 +19,7 @@ _INCOMING = "_incoming_table"
 class BaseManager:
     """Base class for all managers, holding their shared access to the database."""
 
-    def __init__(self, ocel: "OCEL"):
+    def __init__(self, ocel: OCEL):
         self._ocel = ocel
 
     def _relation(self, sql: str, params: list[object] | None = None) -> duckdb.DuckDBPyRelation:

@@ -14,15 +14,15 @@ from ocelescope.plugin.input import (
 from ocelescope.plugin.plugin import Plugin, PluginMethod
 
 __all__ = [
-    "PluginMethod",
-    "Plugin",
-    "plugin_method",
-    "OCELAnnotation",
-    "ResourceAnnotation",
-    "PluginInput",
-    "OCEL_FIELD",
-    "COMPUTED_SELECTION",
     "CODE_FIELD",
+    "COMPUTED_SELECTION",
+    "OCEL_FIELD",
     "SLIDER_FIELD",
     "SQL_FIELD",
+    "OCELAnnotation",
+    "Plugin",
+    "PluginInput",
+    "PluginMethod",
+    "ResourceAnnotation",
+    "plugin_method",
 ]

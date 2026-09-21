@@ -1,6 +1,5 @@
-from ocelescope.resource.resource import Resource
-from ocelescope.resource.default.petri_net import PetriNet
 from ocelescope.resource.default.dfg import DirectlyFollowsGraph
+from ocelescope.resource.default.petri_net import PetriNet
+from ocelescope.resource.resource import Resource
 
-
-__all__ = ["Resource", "PetriNet", "DirectlyFollowsGraph"]
+__all__ = ["DirectlyFollowsGraph", "PetriNet", "Resource"]

@@ -1,6 +1,6 @@
 from collections import defaultdict
 from enum import Enum
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
 import networkx as nx
@@ -57,7 +57,7 @@ class Transition(Annotated):
     """
 
     name: str
-    label: Optional[str] = None
+    label: str | None = None
 
 
 class ArcType(str, Enum):

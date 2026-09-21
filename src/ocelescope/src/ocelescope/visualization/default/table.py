@@ -1,4 +1,4 @@
-from typing import Any, List, Literal, Optional
+from typing import Any, Literal
 
 from pydantic import BaseModel
 
@@ -19,7 +19,7 @@ class TableColumn(BaseModel):
     """
 
     id: str
-    label: Optional[str] = None
+    label: str | None = None
     data_type: TableDataType = "string"
     sortable: bool = True
     visible: bool = True
@@ -37,5 +37,5 @@ class Table(Visualization):
     """
 
     type: Literal["table"] = "table"
-    columns: List[TableColumn]
-    rows: List[dict[str, Any]]
+    columns: list[TableColumn]
+    rows: list[dict[str, Any]]

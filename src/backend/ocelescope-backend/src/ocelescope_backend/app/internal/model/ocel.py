@@ -1,5 +1,5 @@
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Sequence
 
 from ocelescope.ocel.io import export_duckdb_ocel
 

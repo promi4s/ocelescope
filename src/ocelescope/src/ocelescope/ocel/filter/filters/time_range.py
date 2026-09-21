@@ -1,4 +1,4 @@
-from typing import Literal, Optional
+from typing import Literal
 
 import polars as pl
 
@@ -9,7 +9,7 @@ from ocelescope.ocel.filter.base import BaseFilter, Keep, utc_bound
 class TimeFrameFilter(BaseFilter):
     """Keep the events within a time range. Either end may be left open."""
 
-    time_range: tuple[Optional[str], Optional[str]]
+    time_range: tuple[str | None, str | None]
     mode: Literal["exclude", "include"] = "include"
 
     def keep(self, ocel) -> Keep:
