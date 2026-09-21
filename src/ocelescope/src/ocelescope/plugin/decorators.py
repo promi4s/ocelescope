@@ -222,7 +222,7 @@ def plugin_method(
             else:
                 plugin_method_meta.inputs += [PluginIO(name=key, io_type=value)]
 
-        func.__meta__ = plugin_method_meta
+        setattr(func, "__meta__", plugin_method_meta)  # noqa: B010
 
         return func
 

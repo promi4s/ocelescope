@@ -15,14 +15,22 @@ repos:
       - id: trailing-whitespace
         stages: [pre-commit]
         files: .*\.py$
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.7
+  # ruff runs through uv so it uses the version pinned in uv.lock, the same one CI uses.
+  - repo: local
     hooks:
       - id: ruff
+        name: ruff
+        entry: uv run ruff check --force-exclude
+        language: system
         types_or: [python, pyi]
+        require_serial: true
         exclude: ^template/
       - id: ruff-format
+        name: ruff format
+        entry: uv run ruff format --force-exclude
+        language: system
         types_or: [python, pyi]
+        require_serial: true
         exclude: ^template/
   - repo: https://github.com/biomejs/pre-commit
     rev: "v0.6.1"
