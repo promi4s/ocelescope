@@ -205,8 +205,8 @@ catalogs:
       specifier: ^4.7.0
       version: 4.7.0
     '@ocelescope/ocelot':
-      specifier: ^0.6.1
-      version: 0.6.1
+      specifier: ^0.8.0
+      version: 0.8.0
     '@r4pm/components':
       specifier: ^0.3.2
       version: 0.3.2
@@ -382,7 +382,7 @@ importers:
         version: link:../modules/management
       '@ocelescope/ocelot':
         specifier: 'catalog:'
-        version: 0.6.1(@dagrejs/dagre@3.1.1)(@mantine/core@9.6.1)(@mantine/hooks@9.6.1)(@ocelescope/api-base@src+frontend+packages+api+base)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@tanstack/react-query@5.103.1)(@xyflow/react@12.11.6)(axios@1.20.0)(dayjs@1.11.23)(elkjs@0.11.1)(file-saver@2.0.5)(html-to-image@1.11.13)(lucide-react@1.46.0)(mantine-datatable@9.4.0)(react-dom@19.3.0)(react@19.3.0)(recharts@3.10.1)
+        version: 0.8.0(@dagrejs/dagre@3.1.1)(@mantine/core@9.6.1)(@mantine/hooks@9.6.1)(@ocelescope/api-base@src+frontend+packages+api+base)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@tanstack/react-query@5.103.1)(@xyflow/react@12.11.6)(axios@1.20.0)(dayjs@1.11.23)(elkjs@0.12.0)(file-saver@2.0.5)(html-to-image@1.11.13)(lucide-react@1.46.0)(mantine-datatable@9.4.0)(react-dom@19.3.0)(react@19.3.0)(recharts@3.10.1)
       '@ocelescope/plugin':
         specifier: workspace:^
         version: link:../modules/plugin
@@ -2044,26 +2044,26 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@ocelescope/ocelot@0.6.1':
-    resolution: {integrity: sha512-FHycUNNM2lcdkeIGrArwQrncAj+wjteO48KmOpqii5ok48Y92sgX4+M45jrpPB5HbTjzd05qGg0OYAaH19Gc8w==}
+  '@ocelescope/ocelot@0.8.0':
+    resolution: {integrity: sha512-thZZnXH+jUYIS9OQfwsEG095iDrYHHCXYy18vDfGmckhtLThf+xjJwP91lx1LPHXH38z1NUVc4ncWTdxIPlHbA==}
     peerDependencies:
       '@dagrejs/dagre': ^3.0.0
-      '@mantine/core': ^9.4.0
-      '@mantine/hooks': ^9.4.0
-      '@ocelescope/api-base': ^0.6.0
-      '@ocelescope/api-client': ^0.6.0
-      '@ocelescope/core': ^0.6.0
+      '@mantine/core': ^9.5.1
+      '@mantine/hooks': ^9.5.1
+      '@ocelescope/api-base': ^0.8.0
+      '@ocelescope/api-client': ^0.8.0
+      '@ocelescope/core': ^0.8.0
       '@tanstack/react-query': ^5.90.21
-      '@xyflow/react': ^12.10.1
-      axios: ^1.18.0
-      dayjs: ^1.11.19
-      elkjs: ^0.11.0
+      '@xyflow/react': ^12.11.3
+      axios: ^1.20.0
+      dayjs: ^1.11.23
+      elkjs: ^0.12.0
       file-saver: ^2.0.5
       html-to-image: 1.11.13
       lucide-react: ^1.0.0
-      mantine-datatable: ^9.3.1
-      react: ^19.2.0
-      react-dom: ^19.2.0
+      mantine-datatable: ^9.4.0
+      react: ^19.3.0
+      react-dom: ^19.3.0
       recharts: ^3.2.1
 
   '@orval/angular@8.33.0':
@@ -3987,9 +3987,6 @@ packages:
 
   elkjs@0.10.2:
     resolution: {integrity: sha512-Yx3ORtbAFrXelYkAy2g0eYyVY8QG0XEmGdQXmy0eithKKjbWRfl3Xe884lfkszfBF6UKyIy4LwfcZ3AZc8oxFw==}
-
-  elkjs@0.11.1:
-    resolution: {integrity: sha512-zxxR9k+rx5ktMwT/FwyLdPCrq7xN6e4VGGHH8hA01vVYKjTFik7nHOxBnAYtrgYUB1RpAiLvA1/U2YraWxyKKg==}
 
   elkjs@0.12.0:
     resolution: {integrity: sha512-YZcKynxVxYoKIOEpywEPwCFdg+BTbxQRNf3pbwdDCvc8O3kQD8bmIwSxKU1eOTVc4Xo+VG9Te+575mlfvOrhEQ==}
@@ -6222,7 +6219,7 @@ snapshots:
   '@next/swc-win32-x64-msvc@16.3.2':
     optional: true
 
-  '@ocelescope/ocelot@0.6.1(@dagrejs/dagre@3.1.1)(@mantine/core@9.6.1)(@mantine/hooks@9.6.1)(@ocelescope/api-base@src+frontend+packages+api+base)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@tanstack/react-query@5.103.1)(@xyflow/react@12.11.6)(axios@1.20.0)(dayjs@1.11.23)(elkjs@0.11.1)(file-saver@2.0.5)(html-to-image@1.11.13)(lucide-react@1.46.0)(mantine-datatable@9.4.0)(react-dom@19.3.0)(react@19.3.0)(recharts@3.10.1)':
+  '@ocelescope/ocelot@0.8.0(@dagrejs/dagre@3.1.1)(@mantine/core@9.6.1)(@mantine/hooks@9.6.1)(@ocelescope/api-base@src+frontend+packages+api+base)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@tanstack/react-query@5.103.1)(@xyflow/react@12.11.6)(axios@1.20.0)(dayjs@1.11.23)(elkjs@0.12.0)(file-saver@2.0.5)(html-to-image@1.11.13)(lucide-react@1.46.0)(mantine-datatable@9.4.0)(react-dom@19.3.0)(react@19.3.0)(recharts@3.10.1)':
     dependencies:
       '@dagrejs/dagre': 3.1.1
       '@mantine/core': 9.6.1(@mantine/hooks@9.6.1)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
@@ -6234,7 +6231,7 @@ snapshots:
       '@xyflow/react': 12.11.6(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.1.18)(react-dom@19.3.0)(react@19.3.0)
       axios: 1.20.0(debug@4.4.3)
       dayjs: 1.11.23
-      elkjs: 0.11.1
+      elkjs: 0.12.0
       file-saver: 2.0.5
       html-to-image: 1.11.13
       lucide-react: 1.46.0(react@19.3.0)
@@ -8201,8 +8198,6 @@ snapshots:
       strongly-connected-components: 1.0.1
 
   elkjs@0.10.2: {}
-
-  elkjs@0.11.1: {}
 
   elkjs@0.12.0: {}
 
