@@ -1,0 +1,27 @@
+{
+  "name": "@ocelescope/pnpm-plugin-catalog",
+  "type": "module",
+  "version": "0.8.0",
+  "description": "pnpm config dependency that provides the Ocelescope dependency catalog, keeping module workspaces in sync with Ocelescope releases.",
+  "author": "Görkem-Emre Öztürk <goerkem.oeztuerk@rwth-aachen.de>",
+  "license": "MIT",
+  "homepage": "https://www.ocelescope.org",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/promi4s/ocelescope.git"
+  },
+  "bugs": {
+    "url": "https://github.com/promi4s/ocelescope/issues"
+  },
+  "files": [
+    "pnpmfile.mjs",
+    "catalog.json"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "node scripts/generate-catalog.mjs",
+    "prepublishOnly": "pnpm run build"
+  }
+}
