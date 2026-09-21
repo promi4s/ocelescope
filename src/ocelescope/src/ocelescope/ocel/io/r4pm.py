@@ -41,7 +41,7 @@ OUT = "out"
 NO_ATTRIBUTE = "__r4pm_no_attribute"
 """Placeholder column that keeps an UNPIVOT legal on a table with no attributes."""
 
-IGNORED_ATTRIBUTES = ("@@cumcount",)
+IGNORED_ATTRIBUTES: tuple[str, ...] = ("@@cumcount",)
 """Attribute names r4pm keeps for its own bookkeeping, dropped on the way in.
 
 Neither their declarations nor their values reach the flat tables, so they also
