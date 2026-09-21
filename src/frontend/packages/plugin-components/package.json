@@ -1,7 +1,7 @@
 {
   "name": "@ocelescope/plugin-components",
   "type": "module",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Renders a plugin method's configuration schema as a Mantine form, including Ocelescope's custom OCEL, computed, code and slider fields.",
   "author": "Görkem-Emre Öztürk <goerkem.oeztuerk@rwth-aachen.de>",
   "license": "MIT",

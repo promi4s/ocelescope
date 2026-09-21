@@ -2499,17 +2499,6 @@
           "type": {
             "$ref": "#/components/schemas/ValueType"
           },
-          "analytical_type": {
-            "type": "string",
-            "enum": [
-              "categorical",
-              "discrete",
-              "continuous",
-              "temporal",
-              "unknown"
-            ],
-            "title": "Analytical Type"
-          },
           "entity_type_names": {
             "items": {
               "type": "string"
@@ -2525,7 +2514,6 @@
           "max",
           "distinct_values",
           "type",
-          "analytical_type",
           "entity_type_names"
         ],
         "title": "AggregatedAttribute",
@@ -3080,17 +3068,6 @@
           "type": {
             "$ref": "#/components/schemas/ValueType"
           },
-          "analytical_type": {
-            "type": "string",
-            "enum": [
-              "categorical",
-              "discrete",
-              "continuous",
-              "temporal",
-              "unknown"
-            ],
-            "title": "Analytical Type"
-          },
           "entity_type": {
             "type": "string",
             "title": "Entity Type"
@@ -3103,7 +3080,6 @@
           "max",
           "distinct_values",
           "type",
-          "analytical_type",
           "entity_type"
         ],
         "title": "TypedAttribute",
