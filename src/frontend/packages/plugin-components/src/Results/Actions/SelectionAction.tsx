@@ -9,7 +9,7 @@ const ResultLabel: React.FC<{
   entityType: string;
   bold?: boolean;
 }> = ({ label, entityType, bold }) => (
-  <Group gap="xs" wrap="nowrap" miw={0}>
+  <Group gap="xs" wrap="nowrap" miw={0} flex={1}>
     <Text fw={bold ? 600 : undefined} truncate>
       {label}
     </Text>

@@ -1,6 +1,6 @@
 import { ActionIcon, Splitter, Tooltip } from "@mantine/core";
 import { type UseSplitterReturnValue } from "@mantine/hooks";
-import { ResultSection } from "@ocelescope/plugin-components";
+import ResultSection from "../src/Results/ResultSection";
 import { Settings } from "lucide-react";
 import { useEffect, useRef, type PropsWithChildren } from "react";
 
@@ -8,12 +8,14 @@ type PluginDashboardProps = {
   pluginTaskId?: string;
   withHandle?: boolean;
   collapseOnNoTask?: boolean;
+  showInitialVisualization?: boolean;
 };
 
 export const PluginDashboard = ({
   pluginTaskId,
   withHandle = true,
   collapseOnNoTask = true,
+  showInitialVisualization,
   children,
 }: PropsWithChildren<PluginDashboardProps>) => {
   const splitterRef = useRef<UseSplitterReturnValue>(null);

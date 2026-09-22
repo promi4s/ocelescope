@@ -2,7 +2,6 @@ import {
   Box,
   Center,
   Group,
-  Loader,
   LoadingOverlay,
   Splitter,
   Stack,
@@ -16,15 +15,18 @@ import { DownloadAction } from "./Actions/DownloadAction";
 import { OrientationAction } from "./Actions/OrientationAction";
 import { SaveAction } from "./Actions/SaveAction";
 import { SelectionAction } from "./Actions/SelectionAction";
+import { ResultList } from "./ResultTable";
 
 const ResultSection: React.FC<{
   taskId?: string;
   extraActions?: React.ReactNode;
   noTaskIdInfo?: string;
+  showInitialVisualization?: boolean;
 }> = ({
   taskId,
   extraActions,
   noTaskIdInfo = "No Plugin was run to show a result",
+  showInitialVisualization = true,
 }) => {
   const { data: pluginSummary } = usePluginResult(taskId ?? "", {
     query: {
@@ -45,7 +47,12 @@ const ResultSection: React.FC<{
   const isLoading = !!taskId && !pluginSummary;
 
   useEffect(() => {
-    if (pluginSummary && pluginSummary.length > 0 && selected.length === 0) {
+    if (
+      pluginSummary &&
+      pluginSummary.length > 0 &&
+      selected.length === 0 &&
+      showInitialVisualization
+    ) {
       setSelected([0]);
     } else {
       const cleanedSelections = selected.filter(
@@ -71,73 +78,79 @@ const ResultSection: React.FC<{
         px="sm"
         py="xs"
         wrap="nowrap"
-        gap={"xl"}
         style={{
           borderBottom: "2px solid var(--mantine-color-default-border)",
         }}
+        gap={"xs"}
+        justify="end"
       >
-        <SelectionAction
-          output={pluginSummary ?? []}
-          selectedOutputs={selected}
-          isLoading={isLoading}
-          setSelectedOutputs={setSelected}
-        />
-        <Group gap="xs" ml="auto" wrap="nowrap">
-          {selected.length > 1 && (
-            <OrientationAction
-              isHorizontal={isHorizontal}
-              toggleOrientation={toggleOrientation}
+        {taskId && selected.length > 0 && (
+          <>
+            <SelectionAction
+              output={pluginSummary ?? []}
+              selectedOutputs={selected}
+              isLoading={isLoading}
+              setSelectedOutputs={setSelected}
             />
-          )}
-          <DownloadAction
-            taskId={taskId}
-            selected={selected}
-            disabled={isLoading}
-          />
-          <SaveAction
-            key={`${taskId}_${selected.join(",")}`}
-            taskId={taskId}
-            selected={selected}
-            disabled={isLoading}
-            summary={pluginSummary ?? []}
-          />
-          {extraActions}
-        </Group>
+            {selected.length > 1 && (
+              <OrientationAction
+                isHorizontal={isHorizontal}
+                toggleOrientation={toggleOrientation}
+              />
+            )}
+            <DownloadAction
+              taskId={taskId}
+              selected={selected}
+              disabled={isLoading}
+            />
+            <SaveAction
+              taskId={taskId}
+              selected={(pluginSummary ?? []).filter(({ result_index }) =>
+                selected.includes(result_index),
+              )}
+              disabled={isLoading}
+            />
+          </>
+        )}
+        {extraActions}
       </Group>
 
       <Box flex={1} mih={0} pos={"relative"}>
         <LoadingOverlay visible={isLoading} zIndex={1} />
-        {selectedResources.length > 0 ? (
-          <Splitter
-            key={`${isHorizontal}:${selected.join(",")}`}
-            orientation={isHorizontal ? "horizontal" : "vertical"}
-            lineSize={4}
-            handleColor="var(--mantine-color-default-border)"
-            h="100%"
-          >
-            {selectedResources.map((output) => (
-              <Splitter.Pane
-                key={output.result_index}
-                defaultSize={100 / selected.length}
-                min="15%"
-              >
-                <Box h="100%" pos="relative">
-                  <Visualization
-                    visualization={output.visualization as VisualizationsType}
-                  />
-                </Box>
-              </Splitter.Pane>
-            ))}
-          </Splitter>
-        ) : (
-          <Center h={"100%"}>
-            {isLoading ? (
-              <Loader />
-            ) : (
-              <Text c="dimmed">
-                {!taskId ? noTaskIdInfo : "Please select a result to show"}
-              </Text>
-            )}
+        {taskId &&
+          !isLoading &&
+          (selectedResources.length > 0 ? (
+            <Splitter
+              key={`${isHorizontal}:${selected.join(",")}`}
+              orientation={isHorizontal ? "horizontal" : "vertical"}
+              lineSize={4}
+              handleColor="var(--mantine-color-default-border)"
+              h="100%"
+            >
+              {selectedResources.map((output) => (
+                <Splitter.Pane
+                  key={output.result_index}
+                  defaultSize={100 / selected.length}
+                  min="15%"
+                >
+                  <Box h="100%" pos="relative">
+                    <Visualization
+                      visualization={output.visualization as VisualizationsType}
+                    />
+                  </Box>
+                </Splitter.Pane>
+              ))}
+            </Splitter>
+          ) : (
+            <ResultList
+              taskId={taskId}
+              outputs={pluginSummary ?? []}
+              onView={(result_indicies) => setSelected(result_indicies)}
+            />
+          ))}
+        {!taskId && (
+          <Center h="100%">
+            <Text c="dimmed">{noTaskIdInfo}</Text>
           </Center>
         )}
       </Box>
