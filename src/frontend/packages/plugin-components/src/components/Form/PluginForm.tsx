@@ -1,7 +1,7 @@
 import type RJSFForm from "@rjsf/core";
 import validator from "@rjsf/validator-ajv8";
 import { type ComponentProps, type Ref, useMemo } from "react";
-import type { PluginInputResources } from "../types";
+import type { PluginInputResources } from "../../types";
 import { PluginFormProvider } from "./context";
 import CustomSchemaField from "./Fields";
 import { Form } from "./MantineForm";

@@ -1,15 +1,11 @@
 import {
-  useSavePluginResults,
   type ResultSelection,
+  useSavePluginResults,
 } from "@ocelescope/api-base";
 import { useCallback, useMemo, useState } from "react";
 
-type useSaveToSessionProps = {
-  taskId: string;
-};
-
-const useSaveToSession = ({ taskId }: useSaveToSessionProps) => {
-  const { mutate: saveResults, isPending: isSaving } = useSavePluginResults();
+export const useSaveOutputs = ({ taskId }: { taskId: string }) => {
+  const { mutate: saveOutputs, isPending: isSaving } = useSavePluginResults();
 
   const [saved, setSaved] = useState<{ taskId: string; indices: number[] }>({
     taskId,
@@ -21,13 +17,10 @@ const useSaveToSession = ({ taskId }: useSaveToSessionProps) => {
     [saved, taskId],
   );
 
-  const handleSaveToSession = useCallback(
-    (results: ResultSelection[]) =>
-      saveResults(
-        {
-          taskId: taskId ?? "",
-          data: results,
-        },
+  const handleSave = useCallback(
+    (selections: ResultSelection[]) =>
+      saveOutputs(
+        { taskId, data: selections },
         {
           onSuccess: () =>
             setSaved((prev) => {
@@ -37,21 +30,22 @@ const useSaveToSession = ({ taskId }: useSaveToSessionProps) => {
                 indices: [
                   ...new Set([
                     ...indices,
-                    ...results.map(({ index }) => index),
+                    ...selections.map(({ index }) => index),
                   ]),
                 ],
               };
             }),
         },
       ),
-    [saveResults, taskId],
+    [saveOutputs, taskId],
   );
 
-  const isSaved = (resultIndex: number[]) =>
-    resultIndex.length > 0 &&
-    resultIndex.every((index) => savedIndices.includes(index));
+  const isSaved = useCallback(
+    (indices: number[]) =>
+      indices.length > 0 &&
+      indices.every((index) => savedIndices.includes(index)),
+    [savedIndices],
+  );
 
-  return { handleSaveToSession, savedIndices, isSaved, isSaving };
+  return { handleSave, savedIndices, isSaved, isSaving };
 };
-
-export default useSaveToSession;

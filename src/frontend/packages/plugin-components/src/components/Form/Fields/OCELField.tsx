@@ -19,7 +19,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import type { OcelSelectProps } from "../../types";
+import type { OcelSelectProps } from "../../../types";
 import { FrequencyPicker } from "../components/R4pmInputs";
 import { usePluginForm } from "../context";
 

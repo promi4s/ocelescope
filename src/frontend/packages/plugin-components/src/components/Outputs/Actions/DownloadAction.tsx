@@ -1,25 +1,25 @@
 import { Button } from "@mantine/core";
 import { DownloadIcon } from "lucide-react";
-import { useDownload } from "../../hooks/useDownload";
+import { useDownloadOutputs } from "../../../hooks/useDownloadOutputs";
 
 export const DownloadAction = ({
   taskId,
-  selected = [],
+  outputIndices = [],
   disabled,
 }: {
   taskId: string;
-  selected?: number[];
+  outputIndices?: number[];
   disabled?: boolean;
 }) => {
-  const { handleDownload, isDownloading } = useDownload({ taskId });
+  const { handleDownload, isDownloading } = useDownloadOutputs({ taskId });
   return (
     <Button
       variant="default"
       leftSection={<DownloadIcon size={16} />}
-      onClick={() => handleDownload(selected)}
+      onClick={() => handleDownload(outputIndices)}
       loading={isDownloading}
       {...{ autoComplete: "off" }}
-      disabled={disabled || selected.length === 0}
+      disabled={disabled || outputIndices.length === 0}
     >
       Download
     </Button>

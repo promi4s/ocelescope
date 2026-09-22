@@ -25,7 +25,7 @@ const MethodPage: React.FC<{ pluginId: string; methodName: string }> = ({
   }
 
   return (
-    <PluginDashboard pluginTaskId={currentTask}>
+    <PluginDashboard taskId={currentTask}>
       <ScrollArea h="100%" type="auto">
         <Stack gap="sm" p="md" maw={640} mx="auto" w="100%">
           <Group justify="center">

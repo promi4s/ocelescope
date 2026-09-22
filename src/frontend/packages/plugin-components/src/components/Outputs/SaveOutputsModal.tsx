@@ -1,18 +1,18 @@
 import { Badge, Button, Group, Modal, Stack, TextInput } from "@mantine/core";
 import { generateColor } from "@marko19907/string-to-color";
-import { type PluginOutput, type ResultSelection } from "@ocelescope/api-base";
+import type { PluginOutput, ResultSelection } from "@ocelescope/api-base";
 import { useState } from "react";
 
-export const SaveModal = ({
+export const SaveOutputsModal = ({
   opened,
   onClose,
-  results,
+  outputs,
   onSave,
 }: {
   opened: boolean;
   onClose: () => void;
-  onSave: (results: ResultSelection[]) => void;
-  results: PluginOutput[];
+  onSave: (selections: ResultSelection[]) => void;
+  outputs: PluginOutput[];
 }) => {
   const [names, setNames] = useState<Record<number, string>>({});
 
@@ -20,16 +20,16 @@ export const SaveModal = ({
     <Modal opened={opened} onClose={onClose} title={"Save to Session"}>
       <Stack>
         <Stack gap={"xs"}>
-          {results.map(({ default_name, result_index, type_label }) => (
+          {outputs.map(({ default_name, result_index, type_label }) => (
             <Group key={result_index}>
               <TextInput
                 placeholder={default_name}
                 value={names[result_index] ?? ""}
                 flex={1}
-                onChange={(newValue) =>
+                onChange={(event) =>
                   setNames({
                     ...names,
-                    [result_index]: newValue.currentTarget.value,
+                    [result_index]: event.currentTarget.value,
                   })
                 }
               />
@@ -42,9 +42,9 @@ export const SaveModal = ({
         <Button
           onClick={() => {
             onSave(
-              results.map(({ result_index }) => ({
+              outputs.map(({ result_index }) => ({
                 index: result_index,
-                name: names[result_index] ?? null,
+                name: names[result_index] || null,
               })),
             );
             onClose();

@@ -146,7 +146,7 @@ const DiscoveryPage = () => {
 
   return (
     <PluginDashboard
-      pluginTaskId={discoveryTask}
+      taskId={discoveryTask}
       withHandle={false}
       collapseOnNoTask={false}
     >

@@ -10,25 +10,28 @@ import {
 import { useToggle } from "@mantine/hooks";
 import { usePluginResult } from "@ocelescope/api-base";
 import { Visualization, type VisualizationsType } from "@ocelescope/resources";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { DownloadAction } from "./Actions/DownloadAction";
 import { OrientationAction } from "./Actions/OrientationAction";
 import { SaveAction } from "./Actions/SaveAction";
 import { SelectionAction } from "./Actions/SelectionAction";
-import { ResultList } from "./ResultTable";
+import { OutputList } from "./OutputList";
 
-const ResultSection: React.FC<{
+export type OutputSectionProps = {
   taskId?: string;
   extraActions?: React.ReactNode;
   noTaskIdInfo?: string;
-  showInitialVisualization?: boolean;
-}> = ({
+  /** Show the first output's visualization once the task finishes instead of the output list. */
+  autoShowFirstOutput?: boolean;
+};
+
+const OutputSection: React.FC<OutputSectionProps> = ({
   taskId,
   extraActions,
-  noTaskIdInfo = "No Plugin was run to show a result",
-  showInitialVisualization = true,
+  noTaskIdInfo = "Run a plugin method to see its outputs",
+  autoShowFirstOutput = true,
 }) => {
-  const { data: pluginSummary } = usePluginResult(taskId ?? "", {
+  const { data: outputs } = usePluginResult(taskId ?? "", {
     query: {
       refetchInterval: ({ state }) => {
         if (state.data == null) {
@@ -40,36 +43,26 @@ const ResultSection: React.FC<{
     },
   });
 
-  const [selected, setSelected] = useState<number[]>([]);
+  const [shownIndices, setShownIndices] = useState<number[]>([]);
+  const [initializedTaskId, setInitializedTaskId] = useState<string>();
+
+  if (outputs && taskId !== initializedTaskId) {
+    setInitializedTaskId(taskId);
+    setShownIndices(
+      autoShowFirstOutput && outputs[0] ? [outputs[0].result_index] : [],
+    );
+  }
 
   const [isHorizontal, toggleOrientation] = useToggle();
 
-  const isLoading = !!taskId && !pluginSummary;
+  const isLoading = !!taskId && !outputs;
 
-  useEffect(() => {
-    if (
-      pluginSummary &&
-      pluginSummary.length > 0 &&
-      selected.length === 0 &&
-      showInitialVisualization
-    ) {
-      setSelected([0]);
-    } else {
-      const cleanedSelections = selected.filter(
-        (index) => index < (pluginSummary ?? []).length,
-      );
-      if (cleanedSelections.length < selected.length) {
-        setSelected(cleanedSelections);
-      }
-    }
-  }, [pluginSummary, selected]);
-
-  const selectedResources = useMemo(
+  const shownOutputs = useMemo(
     () =>
-      (pluginSummary ?? []).filter(({ result_index }) =>
-        selected.includes(result_index),
+      (outputs ?? []).filter(({ result_index }) =>
+        shownIndices.includes(result_index),
       ),
-    [taskId, selected, pluginSummary],
+    [outputs, shownIndices],
   );
 
   return (
@@ -84,32 +77,21 @@ const ResultSection: React.FC<{
         gap={"xs"}
         justify="end"
       >
-        {taskId && selected.length > 0 && (
+        {taskId && shownOutputs.length > 0 && (
           <>
             <SelectionAction
-              output={pluginSummary ?? []}
-              selectedOutputs={selected}
-              isLoading={isLoading}
-              setSelectedOutputs={setSelected}
+              outputs={outputs ?? []}
+              value={shownIndices}
+              onChange={setShownIndices}
             />
-            {selected.length > 1 && (
+            {shownOutputs.length > 1 && (
               <OrientationAction
                 isHorizontal={isHorizontal}
                 toggleOrientation={toggleOrientation}
               />
             )}
-            <DownloadAction
-              taskId={taskId}
-              selected={selected}
-              disabled={isLoading}
-            />
-            <SaveAction
-              taskId={taskId}
-              selected={(pluginSummary ?? []).filter(({ result_index }) =>
-                selected.includes(result_index),
-              )}
-              disabled={isLoading}
-            />
+            <DownloadAction taskId={taskId} outputIndices={shownIndices} />
+            <SaveAction taskId={taskId} outputs={shownOutputs} />
           </>
         )}
         {extraActions}
@@ -118,19 +100,19 @@ const ResultSection: React.FC<{
       <Box flex={1} mih={0} pos={"relative"}>
         <LoadingOverlay visible={isLoading} zIndex={1} />
         {taskId &&
-          !isLoading &&
-          (selectedResources.length > 0 ? (
+          outputs &&
+          (shownOutputs.length > 0 ? (
             <Splitter
-              key={`${isHorizontal}:${selected.join(",")}`}
+              key={`${isHorizontal}:${shownIndices.join(",")}`}
               orientation={isHorizontal ? "horizontal" : "vertical"}
               lineSize={4}
               handleColor="var(--mantine-color-default-border)"
               h="100%"
             >
-              {selectedResources.map((output) => (
+              {shownOutputs.map((output) => (
                 <Splitter.Pane
                   key={output.result_index}
-                  defaultSize={100 / selected.length}
+                  defaultSize={100 / shownOutputs.length}
                   min="15%"
                 >
                   <Box h="100%" pos="relative">
@@ -142,10 +124,11 @@ const ResultSection: React.FC<{
               ))}
             </Splitter>
           ) : (
-            <ResultList
+            <OutputList
+              key={taskId}
               taskId={taskId}
-              outputs={pluginSummary ?? []}
-              onView={(result_indicies) => setSelected(result_indicies)}
+              outputs={outputs}
+              onView={setShownIndices}
             />
           ))}
         {!taskId && (
@@ -158,4 +141,4 @@ const ResultSection: React.FC<{
   );
 };
 
-export default ResultSection;
+export default OutputSection;

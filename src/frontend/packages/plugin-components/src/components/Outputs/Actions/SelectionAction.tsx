@@ -1,69 +1,56 @@
-import { Badge, Group, Loader, MultiSelect, Text } from "@mantine/core";
+import { Badge, Group, MultiSelect, Text } from "@mantine/core";
 import { generateColor } from "@marko19907/string-to-color";
 import type { PluginOutput } from "@ocelescope/api-base";
 import { CheckIcon } from "lucide-react";
 import { useMemo } from "react";
 
-const ResultLabel: React.FC<{
+const OutputLabel: React.FC<{
   label: string;
-  entityType: string;
+  typeLabel: string;
   bold?: boolean;
-}> = ({ label, entityType, bold }) => (
+}> = ({ label, typeLabel, bold }) => (
   <Group gap="xs" wrap="nowrap" miw={0} flex={1}>
     <Text fw={bold ? 600 : undefined} truncate>
       {label}
     </Text>
-    <Badge
-      size="sm"
-      color={generateColor(entityType)}
-      style={{ flexShrink: 0 }}
-    >
-      {entityType}
+    <Badge size="sm" color={generateColor(typeLabel)} style={{ flexShrink: 0 }}>
+      {typeLabel}
     </Badge>
   </Group>
 );
 
 export const SelectionAction = ({
-  output,
-  selectedOutputs,
-  setSelectedOutputs,
-  isLoading,
+  outputs,
+  value,
+  onChange,
 }: {
-  output: PluginOutput[];
-  isLoading?: boolean;
-  selectedOutputs: number[];
-  setSelectedOutputs: (newSelection: number[]) => void;
+  outputs: PluginOutput[];
+  value: number[];
+  onChange: (outputIndices: number[]) => void;
 }) => {
   const options = useMemo(
     () =>
-      (output ?? []).map((output) => {
-        return {
-          value: output.result_index,
-          label: output.default_name,
-          entityType: output.type_label,
-        };
-      }),
-    [output],
+      outputs.map(({ result_index, default_name, type_label }) => ({
+        value: result_index,
+        label: default_name,
+        typeLabel: type_label,
+      })),
+    [outputs],
   );
 
-  const entityTypeByValue = useMemo(
-    () => new Map(options.map(({ value, entityType }) => [value, entityType])),
+  const typeLabelByValue = useMemo(
+    () => new Map(options.map(({ value, typeLabel }) => [value, typeLabel])),
     [options],
   );
 
-  return isLoading ? (
-    <Group gap="xs" align="center" wrap="nowrap">
-      <Text>Loading</Text>
-      <Loader size={"xs"} />
-    </Group>
-  ) : options.length > 1 ? (
+  return options.length > 1 ? (
     <MultiSelect
       flex={1}
       miw={0}
       data={options}
-      onChange={setSelectedOutputs}
-      value={selectedOutputs}
-      placeholder="Select results to display"
+      onChange={onChange}
+      value={value}
+      placeholder="Select outputs to display"
       searchable
       clearable
       comboboxProps={{ withinPortal: true }}
@@ -82,9 +69,9 @@ export const SelectionAction = ({
             {checked && (
               <CheckIcon size={16} color="grey" style={{ flexShrink: 0 }} />
             )}
-            <ResultLabel
+            <OutputLabel
               label={option.label}
-              entityType={entityTypeByValue.get(option.value) ?? ""}
+              typeLabel={typeLabelByValue.get(option.value) ?? ""}
             />
           </Group>
         );
@@ -92,9 +79,9 @@ export const SelectionAction = ({
     />
   ) : (
     options[0] && (
-      <ResultLabel
+      <OutputLabel
         label={options[0].label}
-        entityType={options[0].entityType}
+        typeLabel={options[0].typeLabel}
         bold
       />
     )

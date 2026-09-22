@@ -1,32 +1,34 @@
 import { ActionIcon, Splitter, Tooltip } from "@mantine/core";
-import { type UseSplitterReturnValue } from "@mantine/hooks";
-import ResultSection from "../src/Results/ResultSection";
+import type { UseSplitterReturnValue } from "@mantine/hooks";
 import { Settings } from "lucide-react";
-import { useEffect, useRef, type PropsWithChildren } from "react";
+import { type PropsWithChildren, useEffect, useRef } from "react";
+import OutputSection, {
+  type OutputSectionProps,
+} from "./Outputs/OutputSection";
 
 type PluginDashboardProps = {
-  pluginTaskId?: string;
+  taskId?: string;
   withHandle?: boolean;
   collapseOnNoTask?: boolean;
-  showInitialVisualization?: boolean;
+  autoShowFirstOutput?: OutputSectionProps["autoShowFirstOutput"];
 };
 
 export const PluginDashboard = ({
-  pluginTaskId,
+  taskId,
   withHandle = true,
   collapseOnNoTask = true,
-  showInitialVisualization,
+  autoShowFirstOutput,
   children,
 }: PropsWithChildren<PluginDashboardProps>) => {
   const splitterRef = useRef<UseSplitterReturnValue>(null);
 
-  const isCollapsed = !pluginTaskId && collapseOnNoTask;
+  const isCollapsed = !taskId && collapseOnNoTask;
 
   useEffect(() => {
-    if (pluginTaskId && splitterRef.current?.sizes[0] === 0) {
+    if (taskId && splitterRef.current?.sizes[0] === 0) {
       splitterRef.current.setSizes([70, 30]);
     }
-  }, [pluginTaskId]);
+  }, [taskId]);
 
   return (
     <Splitter
@@ -37,8 +39,9 @@ export const PluginDashboard = ({
       lineSize={2}
     >
       <Splitter.Pane defaultSize={isCollapsed ? 0 : 70}>
-        <ResultSection
-          taskId={pluginTaskId}
+        <OutputSection
+          taskId={taskId}
+          autoShowFirstOutput={autoShowFirstOutput}
           extraActions={
             <Tooltip label="Toggle settings">
               <ActionIcon
