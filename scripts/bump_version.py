@@ -44,7 +44,7 @@ for path in pyprojects:
         f'version = "{new}"',
         path.read_text(),
         count=1,
-        flags=re.M,
+        flags=re.MULTILINE,
     )
     path.write_text(dep_re.sub(rf'"\1\2>={new},<{major}.{minor + 1}.0"', text))
 

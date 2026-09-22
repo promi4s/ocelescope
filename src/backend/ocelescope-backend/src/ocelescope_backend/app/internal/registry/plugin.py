@@ -1,7 +1,8 @@
+from collections.abc import Iterator
 from contextlib import ExitStack, contextmanager
 from copy import deepcopy
 from types import ModuleType
-from typing import TYPE_CHECKING, Any, Iterator, Optional
+from typing import TYPE_CHECKING, Any
 
 from ocelescope.plugin.decorators import PluginIO
 from ocelescope.resource.resource import ResourceMeta
@@ -61,7 +62,7 @@ class PluginRegistry:
         self._registry: dict[str, Plugin] = {}
 
     def register(self, module: ModuleType) -> Plugin:
-        plugin: Optional[type[Plugin]] = None
+        plugin: type[Plugin] | None = None
         for var in vars(module).values():
             if isinstance(var, type) and issubclass(var, Plugin):
                 plugin = var
@@ -91,7 +92,7 @@ class PluginRegistry:
             PluginApi.from_plugin(id, plugin) for id, plugin in self._registry.items()
         ]
 
-    def get_plugin(self, id: str) -> Optional[Plugin]:
+    def get_plugin(self, id: str) -> Plugin | None:
         return self._registry.get(id)
 
     def get_method(self, plugin_id: str, method_name: str) -> PluginMethod:

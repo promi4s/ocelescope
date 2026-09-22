@@ -62,7 +62,9 @@ def _cast_properties(df: pd.DataFrame, property_type: dict[str, str]) -> pd.Data
                 .astype("boolean")
             )
         elif arrow_type == TIMESTAMP_TYPE:
-            df[column] = pd.to_datetime(df[column], errors="coerce", utc=True).dt.tz_localize(None)
+            df[column] = pd.to_datetime(
+                df[column], errors="coerce", utc=True
+            ).dt.tz_localize(None)
         elif arrow_type == pa.int64():
             df[column] = pd.to_numeric(df[column], errors="coerce").astype("Int64")
         else:
@@ -82,7 +84,10 @@ def _xml_extension_fragment(source: Path) -> bytes | None:
 
     open_marker = f"<{XML_QUANTITY_EXTENSION}".encode()
     close_marker = f"</{XML_QUANTITY_EXTENSION}>".encode()
-    with open(source, "rb") as f, mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as mm:
+    with (
+        open(source, "rb") as f,
+        mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as mm,
+    ):
         start = mm.find(open_marker)
         if start == -1:
             return None
@@ -155,7 +160,9 @@ def import_quantities_xml(source: str | Path, target: DuckDBTarget) -> None:
         return
 
     oqty = pd.DataFrame(quantities_data, columns=[OID_COL, QEL_ITEM_TYPE, QEL_QUANTITY])
-    qop = pd.DataFrame(operations_data, columns=[EID_COL, OID_COL, QEL_ITEM_TYPE, QEL_QUANTITY])
+    qop = pd.DataFrame(
+        operations_data, columns=[EID_COL, OID_COL, QEL_ITEM_TYPE, QEL_QUANTITY]
+    )
     item_properties = (
         pd.DataFrame(item_property_data)
         if item_property_data
@@ -219,9 +226,14 @@ def xml_quantity_extension(con: duckdb.DuckDBPyConnection):
         operation = etree.SubElement(
             operations,
             XML_OPERATION,
-            {XML_EVENT_ID: _xml_text(row[EID_COL]), XML_OBJECT_ID: _xml_text(row[OID_COL])},
+            {
+                XML_EVENT_ID: _xml_text(row[EID_COL]),
+                XML_OBJECT_ID: _xml_text(row[OID_COL]),
+            },
         )
-        item = etree.SubElement(operation, XML_ITEM, {XML_ITEM_TYPE: _xml_text(row[QEL_ITEM_TYPE])})
+        item = etree.SubElement(
+            operation, XML_ITEM, {XML_ITEM_TYPE: _xml_text(row[QEL_ITEM_TYPE])}
+        )
         item.text = _xml_text(row[QEL_QUANTITY])
 
     quantities = etree.SubElement(root, XML_QUANTITIES)

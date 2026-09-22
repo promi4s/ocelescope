@@ -10,9 +10,9 @@ as the caller needs it (see :meth:`ocelescope.OCEL.read`).
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Iterator
 
 import duckdb
 

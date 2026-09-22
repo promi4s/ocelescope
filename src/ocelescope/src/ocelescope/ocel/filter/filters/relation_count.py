@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Callable, Literal, Optional
+from collections.abc import Callable
+from typing import Literal
 
 import polars as pl
 from pydantic import BaseModel
@@ -27,11 +28,11 @@ _COUNT = "__n"
 class RelationCountFilterConfig(BaseModel):
     source: str
     target: str
-    range: tuple[Optional[int], Optional[int]]
-    qualifier: Optional[str] = None
+    range: tuple[int | None, int | None]
+    qualifier: str | None = None
 
 
-def _in_range(count: pl.Expr, low: Optional[int], high: Optional[int]) -> pl.Expr:
+def _in_range(count: pl.Expr, low: int | None, high: int | None) -> pl.Expr:
     predicate = pl.lit(True)
     if low is not None:
         predicate = predicate & (count >= low)
@@ -45,7 +46,7 @@ def _keep_counted(
     counts: pl.LazyFrame,
     matched: pl.Expr,
     id_col: str,
-    count_range: tuple[Optional[int], Optional[int]],
+    count_range: tuple[int | None, int | None],
 ) -> pl.LazyFrame:
     """Ids of the counted type whose count is in range, plus every other entity.
 
@@ -120,7 +121,8 @@ class O2OCountFilter(BaseFilter, RelationCountFilterConfig):
 
     def keep(self, ocel) -> Keep:
         matched = ocel.o2o.typed_pl.filter(
-            (pl.col(O2O_SOURCE_TYPE) == self.source) & (pl.col(O2O_TARGET_TYPE) == self.target)
+            (pl.col(O2O_SOURCE_TYPE) == self.source)
+            & (pl.col(O2O_TARGET_TYPE) == self.target)
         )
         if self.qualifier is not None:
             matched = matched.filter(pl.col(O2O_QUALIFIER) == self.qualifier)

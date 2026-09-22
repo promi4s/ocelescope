@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import cast
+from typing import Annotated, cast
 
 from fastapi import Query
 from fastapi.routing import APIRouter
@@ -18,8 +18,8 @@ tasks_router = APIRouter(prefix="/tasks", tags=["tasks"])
 )
 def get_system_tasks(
     session: ApiSession,
-    task_names: list[str] | None = Query(default=None),
-    task_ids: list[str] | None = Query(default=None),
+    task_names: Annotated[list[str] | None, Query()] = None,
+    task_ids: Annotated[list[str] | None, Query()] = None,
     only_running: bool = True,
 ) -> list[SystemTaskSummary]:
     def filter_tasks(task: SystemTask):

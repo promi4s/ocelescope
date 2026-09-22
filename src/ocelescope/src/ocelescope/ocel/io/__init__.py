@@ -38,10 +38,10 @@ def convert_ocel_duckdb(source: str | Path, target: DuckDBTarget):
 __all__ = [
     "DuckDBTarget",
     "connect_target",
+    "convert_ocel_duckdb",
+    "export_duckdb_ocel",
     "export_ocel_r4pm_streamed",
+    "export_quantities",
     "import_ocel_r4pm_streamed",
     "import_quantities",
-    "export_quantities",
-    "export_duckdb_ocel",
-    "convert_ocel_duckdb",
 ]

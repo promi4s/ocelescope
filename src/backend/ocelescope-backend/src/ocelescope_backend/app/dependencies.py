@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Annotated, Iterator, Literal
+from collections.abc import Iterator
+from typing import Annotated, Literal
 
 from fastapi import Depends, HTTPException, Request
 
@@ -23,7 +24,7 @@ ApiSession = Annotated[Session, Depends(get_session)]
 def get_ocel(
     session: ApiSession,
     ocel_id: str | None = None,
-    ocel_version: Literal["original", "filtered"] | None = "filtered",
+    ocel_version: Literal["original", "filtered"] = "filtered",
 ) -> Iterator[OCEL]:
     """The request's OCEL, opened read-only over the session's DuckDB file.
 
@@ -34,9 +35,7 @@ def get_ocel(
     if not ocel_id:
         raise HTTPException(status_code=500, detail="Ocel id is required")
     try:
-        ocel = session.get_ocel(
-            ocel_id, use_original=False if ocel_version != "original" else True
-        )
+        ocel = session.get_ocel(ocel_id, use_original=ocel_version == "original")
     except NotFound:
         raise HTTPException(status_code=404, detail="OCEL not found")
     try:

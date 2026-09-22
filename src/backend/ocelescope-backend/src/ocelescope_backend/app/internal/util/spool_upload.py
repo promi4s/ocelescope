@@ -1,6 +1,5 @@
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Optional
 
 from fastapi import UploadFile
 
@@ -10,8 +9,8 @@ _CHUNK_SIZE = 1024 * 1024
 async def spool_upload_to_tempfile(
     upload: UploadFile,
     *,
-    suffix: Optional[str] = None,
-    prefix: Optional[str] = "upload-",
+    suffix: str | None = None,
+    prefix: str | None = "upload-",
 ) -> Path:
     """
     Stream an UploadFile to a temporary file using a bounded amount of memory.

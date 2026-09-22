@@ -2,7 +2,7 @@ import importlib.util
 import shutil
 import sys
 from contextlib import AbstractContextManager
-from typing import TYPE_CHECKING, Any, Dict
+from typing import TYPE_CHECKING, Any
 
 from typing_extensions import TypedDict
 
@@ -162,7 +162,7 @@ class RegistryManager:
             self._plugin_registry.unload_module(id)
             self._resource_registry.unload_module(id)
 
-    def get_resource_info(self) -> Dict[str, ResourceInfo]:
+    def get_resource_info(self) -> dict[str, ResourceInfo]:
         return {
             schema_hash: next(
                 ResourceInfo(label=r.get_label(), description=r.description)

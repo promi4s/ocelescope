@@ -1,6 +1,9 @@
 from ocelescope.ocel.filter.base import BaseFilter, Keep
 from ocelescope.ocel.filter.engine import apply_filters
-from ocelescope.ocel.filter.filters.attribute import EventAttributeFilter, ObjectAttributeFilter
+from ocelescope.ocel.filter.filters.attribute import (
+    EventAttributeFilter,
+    ObjectAttributeFilter,
+)
 from ocelescope.ocel.filter.filters.entity_type import (
     EventTypeFilter,
     ObjectIdFilter,

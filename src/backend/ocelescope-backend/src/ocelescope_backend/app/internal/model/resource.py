@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any, Self
 
 from ocelescope.resource.resource import ResourceMeta
@@ -13,7 +13,7 @@ class ResourceInfo(BaseModel):
     """Ocelescope-owned metadata, carried in the resource envelope's ``extra``."""
 
     name: str
-    created_at: str = Field(default_factory=lambda: str(datetime.now()))
+    created_at: str = Field(default_factory=lambda: datetime.now(tz=UTC).isoformat())
     source_id: str | None = None
 
 

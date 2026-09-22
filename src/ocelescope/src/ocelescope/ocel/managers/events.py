@@ -38,7 +38,9 @@ class EventsManager(BaseManager):
         Returns:
             DuckDBPyRelation: A lazy relation over all events.
         """
-        return self._relation(f'SELECT * FROM {EVENTS_TABLE} ORDER BY "{TIMESTAMP_COL}"')
+        return self._relation(
+            f'SELECT * FROM {EVENTS_TABLE} ORDER BY "{TIMESTAMP_COL}"'
+        )
 
     @table.setter
     def table(self, contents: Any) -> None:
@@ -89,9 +91,9 @@ class EventsManager(BaseManager):
         Returns:
             int: The number of distinct events.
         """
-        return self._relation(f'SELECT count(DISTINCT "{EID_COL}") FROM {EVENTS_TABLE}').fetchall()[
-            0
-        ][0]
+        return self._relation(
+            f'SELECT count(DISTINCT "{EID_COL}") FROM {EVENTS_TABLE}'
+        ).fetchall()[0][0]
 
     @property
     def activities(self) -> list[str]:
@@ -101,7 +103,9 @@ class EventsManager(BaseManager):
         Returns:
             list[str]: A sorted list of unique activity names.
         """
-        return self._column(f'SELECT DISTINCT "{ACTIVITY_COL}" FROM {EVENTS_TABLE} ORDER BY 1')
+        return self._column(
+            f'SELECT DISTINCT "{ACTIVITY_COL}" FROM {EVENTS_TABLE} ORDER BY 1'
+        )
 
     @property
     def activity_counts(self) -> pd.Series:
@@ -154,7 +158,8 @@ class EventsManager(BaseManager):
         """
         return str(
             self._relation(
-                f'SELECT "{TIMESTAMP_COL}" FROM {EVENTS_TABLE} WHERE "{EID_COL}" = ?', [event_id]
+                f'SELECT "{TIMESTAMP_COL}" FROM {EVENTS_TABLE} WHERE "{EID_COL}" = ?',
+                [event_id],
             )
             .df()[TIMESTAMP_COL]
             .iloc[0]

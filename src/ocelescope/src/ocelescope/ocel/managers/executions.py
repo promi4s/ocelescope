@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Iterable, cast
+from collections.abc import Iterable
+from typing import cast
 
 import pandas as pd
 
@@ -51,7 +52,9 @@ class ExecutionsManager(BaseManager):
     sequence without any of them being read into Python.
     """
 
-    def _type_filter(self, object_types: Iterable[str] | None, params: list[object]) -> str:
+    def _type_filter(
+        self, object_types: Iterable[str] | None, params: list[object]
+    ) -> str:
         """WHERE clause restricting to ``object_types``; None = all, empty = nothing."""
         if object_types is None:
             return ""
@@ -112,9 +115,9 @@ class ExecutionsManager(BaseManager):
             if column in executions.columns:
                 executions[column] = executions[column].apply(list)
         if EXECUTION_TSTAMP_LIST_COL in executions.columns:
-            executions[EXECUTION_TSTAMP_LIST_COL] = executions[EXECUTION_TSTAMP_LIST_COL].apply(
-                lambda times: [pd.Timestamp(time) for time in times]
-            )
+            executions[EXECUTION_TSTAMP_LIST_COL] = executions[
+                EXECUTION_TSTAMP_LIST_COL
+            ].apply(lambda times: [pd.Timestamp(time) for time in times])
 
         executions[EXECUTION_VARIANT_ID_COL] = self._variant_ids(
             cast(pd.Series, executions[EXECUTION_OTYPE_COL]),
@@ -122,7 +125,9 @@ class ExecutionsManager(BaseManager):
         )
         return executions
 
-    def get_object_variants(self, object_types: list[str] | None = None) -> pd.DataFrame:
+    def get_object_variants(
+        self, object_types: list[str] | None = None
+    ) -> pd.DataFrame:
         """
         Return the distinct executions, with how many objects follow each.
 
@@ -164,7 +169,9 @@ class ExecutionsManager(BaseManager):
             ],
         )
 
-    def get_variant_object_ids(self, object_type: str, variant_ids: list[str]) -> list[str]:
+    def get_variant_object_ids(
+        self, object_type: str, variant_ids: list[str]
+    ) -> list[str]:
         """Return the ids of the objects of ``object_type`` that follow any of ``variant_ids``."""
         params: list[object] = []
         where = self._type_filter([object_type], params)

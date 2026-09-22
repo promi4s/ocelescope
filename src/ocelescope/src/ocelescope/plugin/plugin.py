@@ -2,7 +2,6 @@ import inspect
 from abc import ABC
 from typing import (
     ClassVar,
-    Optional,
 )
 
 from ocelescope.plugin.decorators import PluginMethod
@@ -12,7 +11,7 @@ from ocelescope.resource.resource import Resource
 class Plugin(ABC):
     version: ClassVar[str]
     label: ClassVar[str]
-    description: ClassVar[Optional[str]] = None
+    description: ClassVar[str | None] = None
 
     @classmethod
     def get_name(cls):

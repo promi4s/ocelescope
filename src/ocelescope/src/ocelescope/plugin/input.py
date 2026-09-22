@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -25,8 +25,8 @@ def OCEL_FIELD(
     ocel_id: str,
     theme: Literal["standard", "r4pm"] = "standard",
     default_frequency: float | None = None,
-    title: Optional[str] = None,
-    description: Optional[str] = None,
+    title: str | None = None,
+    description: str | None = None,
 ) -> Any:
     """Create a Pydantic `Field` with Ocelescope UI metadata for OCEL-based inputs.
 
@@ -57,10 +57,10 @@ def SLIDER_FIELD(
     *,
     min: float,
     max: float,
-    step: Optional[float] = None,
-    marks: Optional[list[float]] = None,
-    title: Optional[str] = None,
-    description: Optional[str] = None,
+    step: float | None = None,
+    marks: list[float] | None = None,
+    title: str | None = None,
+    description: str | None = None,
     default: Any = ...,
 ) -> Any:
     """Create a Pydantic `Field` rendered as a slider.
@@ -102,8 +102,8 @@ def SLIDER_FIELD(
 def CODE_FIELD(
     *,
     language: str,
-    title: Optional[str] = None,
-    description: Optional[str] = None,
+    title: str | None = None,
+    description: str | None = None,
     default: Any = ...,
 ) -> Any:
     """Create a Pydantic `Field` rendered as a code editor.
@@ -129,8 +129,8 @@ def CODE_FIELD(
 
 def SQL_FIELD(
     *,
-    title: Optional[str] = None,
-    description: Optional[str] = None,
+    title: str | None = None,
+    description: str | None = None,
     default: Any = ...,
 ) -> Any:
     """Create a Pydantic `Field` rendered as a SQL editor.
@@ -152,8 +152,8 @@ def SQL_FIELD(
 
 def COMPUTED_SELECTION(
     *,
-    title: Optional[str] = None,
-    description: Optional[str] = None,
+    title: str | None = None,
+    description: str | None = None,
     provider: str,
     depends_on: list[str] | None = None,
     default: Any = ...,

@@ -1,6 +1,6 @@
 from collections import defaultdict
 from enum import Enum
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
 import networkx as nx
@@ -57,7 +57,7 @@ class Transition(Annotated):
     """
 
     name: str
-    label: Optional[str] = None
+    label: str | None = None
 
 
 class ArcType(str, Enum):
@@ -213,7 +213,10 @@ class PetriNet(Resource):
         return graph
 
     def _has_annotations(self) -> bool:
-        return any(element.annotation for element in [*self.places, *self.transitions, *self.arcs])
+        return any(
+            element.annotation
+            for element in [*self.places, *self.transitions, *self.arcs]
+        )
 
     def visualize(self) -> OCPetriNetViz | Graph:
         if self._has_annotations():
@@ -222,7 +225,10 @@ class PetriNet(Resource):
 
     def _visualize_petri_net(self) -> OCPetriNetViz:
         return OCPetriNetViz(
-            places=[OCPlace(id=place.name, object_type=place.object_type) for place in self.places],
+            places=[
+                OCPlace(id=place.name, object_type=place.object_type)
+                for place in self.places
+            ],
             transitions=[
                 TransitionViz(id=transition.name, label=transition.label)
                 for transition in self.transitions
@@ -357,19 +363,27 @@ class PetriNet(Resource):
                 else original_name
             )
             transition_name_map[original_name] = transition_name
-            pnet.add_transition(Transition(name=transition_name, label=transition.label))
+            pnet.add_transition(
+                Transition(name=transition_name, label=transition.label)
+            )
 
         for arc in ocpn.arcs:
             pnet.add_arc(
                 Arc(
-                    source=transition_name_map.get(str(arc.source.name), str(arc.source.name)),
-                    target=transition_name_map.get(str(arc.target.name), str(arc.target.name)),
+                    source=transition_name_map.get(
+                        str(arc.source.name), str(arc.source.name)
+                    ),
+                    target=transition_name_map.get(
+                        str(arc.target.name), str(arc.target.name)
+                    ),
                     type=ArcType.VARIABLE if arc.is_variable else ArcType.NORMAL,
                 )
             )
 
-        pnet.initial_marking = Marking({place.name: 1 for place in ocpn.initial_marking.keys()})
-        pnet.final_marking = Marking({place.name: 1 for place in ocpn.final_marking.keys()})
+        pnet.initial_marking = Marking(
+            {place.name: 1 for place in ocpn.initial_marking}
+        )
+        pnet.final_marking = Marking({place.name: 1 for place in ocpn.final_marking})
 
         return pnet
 

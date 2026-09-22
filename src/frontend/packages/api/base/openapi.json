@@ -1064,10 +1064,16 @@
             "title": "Input Resources"
           },
           "input": {
-            "additionalProperties": true,
-            "type": "object",
-            "title": "Input",
-            "default": {}
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Input"
           }
         },
         "type": "object",

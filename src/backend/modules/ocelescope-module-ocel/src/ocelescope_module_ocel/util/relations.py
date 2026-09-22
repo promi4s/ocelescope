@@ -23,7 +23,6 @@ from ocelescope.util.sql import ident
 from ocelescope_backend.app.internal.model.base import PaginatedResponse
 
 from ocelescope import OCEL
-
 from ocelescope_module_ocel.models import RelationCombination, RelationCountSummary
 
 QUALIFIER = "ocel:qualifier"

@@ -1,4 +1,4 @@
-from typing import Annotated, Literal, Union
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field
 
@@ -27,7 +27,9 @@ class ElkLayoutConfig(BaseModel):
     options: dict[str, str | int | float | bool] | None = None
 
 
-LayoutConfig = Annotated[Union[GraphvizLayoutConfig, ElkLayoutConfig], Field(discriminator="type")]
+LayoutConfig = Annotated[
+    GraphvizLayoutConfig | ElkLayoutConfig, Field(discriminator="type")
+]
 
 
 DIRECTED_GRAPH_LAYOUT = GraphvizLayoutConfig(

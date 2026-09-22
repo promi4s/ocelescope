@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import json
 import tempfile
-from datetime import datetime
+from collections.abc import Callable, Hashable, Sequence
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Callable, Hashable, Sequence, Type, TypeVar, cast
+from typing import Any, ClassVar, Self, TypeVar, cast
 from uuid import uuid4
 
 from ocelescope import OCEL, BaseFilter
@@ -20,7 +21,7 @@ T = TypeVar("T")
 
 
 class Session:
-    sessions = {}
+    sessions: ClassVar[dict[str, Self]] = {}
 
     def __init__(
         self,
@@ -61,7 +62,7 @@ class Session:
     def get_task(self, task_id: str):
         return self._tasks.get(task_id, None)
 
-    def list_tasks(self, task_type: Type[S], filter: Callable[[S], bool]):
+    def list_tasks(self, task_type: type[S], filter: Callable[[S], bool]):
         return [
             task.summarize()
             for task in self._tasks.values()
@@ -121,7 +122,7 @@ class Session:
             ocel_id,
             db_path,
             name,
-            created_at=datetime.now().isoformat(),
+            created_at=datetime.now(tz=UTC).isoformat(),
         )
 
     def add_ocel_from_file(self, source_path: Path, name: str) -> str:
@@ -204,7 +205,7 @@ class Session:
     def list_resources(self) -> list[ResourceApi]:
         resource_info = registry_manager.get_resource_info()
 
-        return list(
+        return [
             ResourceApi(
                 id=id,
                 resource_type_label=resource_info[resource.schema_hash]["label"],
@@ -212,7 +213,7 @@ class Session:
             )
             for id, resource in self._resources.items()
             if resource.schema_hash in resource_info
-        )
+        ]
 
     def rename_resource(self, id: str, new_name: str):
         if id not in self._resources:

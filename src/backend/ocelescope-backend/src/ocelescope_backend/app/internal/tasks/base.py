@@ -2,14 +2,12 @@ import inspect
 import threading
 import uuid
 from abc import ABC
+from collections.abc import Callable
 from datetime import datetime
 from enum import Enum
-from typing import TYPE_CHECKING, Callable, TypeVar
+from typing import TypeVar
 
 from pydantic.main import BaseModel
-
-if TYPE_CHECKING:
-    pass
 
 
 class TaskState(str, Enum):
@@ -51,7 +49,6 @@ def call_with_known_params(fn: Callable[..., P], *args, **kwargs) -> P:
 class TaskSummary(BaseModel, ABC):
     id: str
     state: TaskState
-    pass
 
 
 class TaskBase:

@@ -12,8 +12,9 @@ valid OCEL rather than merely a smaller one.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from functools import reduce
-from typing import TYPE_CHECKING, Sequence
+from typing import TYPE_CHECKING
 
 import polars as pl
 
@@ -26,7 +27,7 @@ if TYPE_CHECKING:
     from ocelescope.ocel.core import OCEL
 
 
-def _all_ids(ocel: "OCEL", table: str, id_col: str) -> pl.LazyFrame:
+def _all_ids(ocel: OCEL, table: str, id_col: str) -> pl.LazyFrame:
     """Every id ``table`` holds -- what a side no filter constrains keeps.
 
     Read as the bare column rather than off the manager: the objects table is
@@ -35,7 +36,9 @@ def _all_ids(ocel: "OCEL", table: str, id_col: str) -> pl.LazyFrame:
     return ocel.sql(f"SELECT {ident(id_col)} FROM {ident(table)}").pl(lazy=True)
 
 
-def _intersect(frames: list[pl.LazyFrame], all_ids: pl.LazyFrame, id_col: str) -> pl.LazyFrame:
+def _intersect(
+    frames: list[pl.LazyFrame], all_ids: pl.LazyFrame, id_col: str
+) -> pl.LazyFrame:
     """Ids kept by *every* frame (inner joins); ``all_ids`` when no frame constrains."""
     if not frames:
         return all_ids
@@ -43,7 +46,7 @@ def _intersect(frames: list[pl.LazyFrame], all_ids: pl.LazyFrame, id_col: str) -
     return reduce(lambda left, right: left.join(right, on=id_col, how="inner"), unique)
 
 
-def apply_filters(ocel: "OCEL", filters: Sequence[BaseFilter]) -> "OCEL":
+def apply_filters(ocel: OCEL, filters: Sequence[BaseFilter]) -> OCEL:
     """Return a new :class:`OCEL` holding the subset ``filters`` agree on.
 
     Each filter names the ids it keeps and the sets are intersected, so a pipeline

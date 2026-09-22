@@ -3,7 +3,13 @@ from typing import Any, Literal, cast
 import pandas as pd
 from duckdb import DuckDBPyRelation
 
-from ocelescope.ocel.constants.pm4py import ACTIVITY_COL, EID_COL, OID_COL, OTYPE_COL, TIMESTAMP_COL
+from ocelescope.ocel.constants.pm4py import (
+    ACTIVITY_COL,
+    EID_COL,
+    OID_COL,
+    OTYPE_COL,
+    TIMESTAMP_COL,
+)
 from ocelescope.ocel.constants.quantity import (
     QEL_ITEM_TYPE,
     QEL_QUANTITY,
@@ -161,7 +167,11 @@ class QuantityManager(BaseManager):
 
     def _get_it_objects(self, item_type: str):
         """Objects with a non-zero ``item_type`` quantity, as a lazy relation."""
-        oid, it_col, quantity_col = ident(OID_COL), ident(QEL_ITEM_TYPE), ident(QEL_QUANTITY)
+        oid, it_col, quantity_col = (
+            ident(OID_COL),
+            ident(QEL_ITEM_TYPE),
+            ident(QEL_QUANTITY),
+        )
         return self._relation(
             f"""
             SELECT DISTINCT {oid}
@@ -222,7 +232,9 @@ class QuantityManager(BaseManager):
             list[str]: List of unique event ids.
         """
         return first_column_list(
-            self._relation(f"""SELECT DISTINCT {ident(EID_COL)} FROM {QUANTITY_OPERATIONS_TABLE}""")
+            self._relation(
+                f"""SELECT DISTINCT {ident(EID_COL)} FROM {QUANTITY_OPERATIONS_TABLE}"""
+            )
         )
 
     @property
@@ -299,7 +311,11 @@ class QuantityManager(BaseManager):
             list[str]: List of unique item types.
         """
 
-        it_col, oid_col, quantity_col = ident(QEL_ITEM_TYPE), ident(OID_COL), ident(QEL_QUANTITY)
+        it_col, oid_col, quantity_col = (
+            ident(QEL_ITEM_TYPE),
+            ident(OID_COL),
+            ident(QEL_QUANTITY),
+        )
 
         return first_column_list(
             self._relation(
@@ -399,9 +415,9 @@ class QuantityManager(BaseManager):
                     operations.{item_type},
                     operations.{quantity}
                 FROM object_operations operations
-                {"JOIN" if include_events == "active" else "RIGHT JOIN"} event_table events USING ({
-            eid
-        })
+                {
+            "JOIN" if include_events == "active" else "RIGHT JOIN"
+        } event_table events USING ({eid})
                 {"UNION ALL SELECT * FROM initial_quantities" if with_oqty else ""}
             )
             SELECT
@@ -681,4 +697,6 @@ class QuantityManager(BaseManager):
         Returns:
             DataFrame: :meth:`get_ilvl_table`'s rows.
         """
-        return self.get_ilvl_table(include_oqty=include_oqty, pre_event=pre_event).to_df()
+        return self.get_ilvl_table(
+            include_oqty=include_oqty, pre_event=pre_event
+        ).to_df()

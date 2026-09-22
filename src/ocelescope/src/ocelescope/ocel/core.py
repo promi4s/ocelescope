@@ -4,7 +4,7 @@ import warnings
 from collections.abc import Sequence
 from os import PathLike
 from pathlib import Path
-from typing import Literal
+from typing import Literal, Self
 
 import duckdb
 import pandas as pd
@@ -117,7 +117,9 @@ class OCEL:
         """The DuckDB connection backing this OCEL."""
         return self._con
 
-    def sql(self, query: str, params: list[object] | None = None) -> duckdb.DuckDBPyRelation:
+    def sql(
+        self, query: str, params: list[object] | None = None
+    ) -> duckdb.DuckDBPyRelation:
         """Run a read query over the stored tables, returning a lazy relation.
 
         The escape hatch for reads the managers cannot express -- multi-table joins,
@@ -169,7 +171,9 @@ class OCEL:
             f'AND "{OID_COL}" NOT IN (SELECT "{O2O_SOURCE_ID}" FROM o2o) '
             f'AND "{OID_COL}" NOT IN (SELECT "{O2O_TARGET_ID}" FROM o2o)'
         )
-        con.execute(f'DELETE FROM events WHERE "{EID_COL}" NOT IN (SELECT "{EID_COL}" FROM e2o)')
+        con.execute(
+            f'DELETE FROM events WHERE "{EID_COL}" NOT IN (SELECT "{EID_COL}" FROM e2o)'
+        )
         con.execute(
             f'DELETE FROM object_changes WHERE "{OID_COL}" NOT IN (SELECT "{OID_COL}" FROM objects)'
         )
@@ -178,7 +182,7 @@ class OCEL:
         """Close the underlying connection, dropping an in-memory database."""
         self._con.close()
 
-    def __enter__(self) -> OCEL:
+    def __enter__(self) -> Self:
         return self
 
     def __exit__(self, *_exc) -> None:

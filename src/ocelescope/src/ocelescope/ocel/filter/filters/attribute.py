@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Optional, Union
-
 import polars as pl
 
 from ocelescope.ocel.constants.pm4py import (
@@ -37,12 +35,12 @@ class _AttributeFilter(BaseFilter):
     so each subclass only has to say where one entity's value is read from.
     """
 
-    target_type: Optional[str] = None
+    target_type: str | None = None
     attribute: str
-    time_range: Optional[tuple[Optional[str], Optional[str]]] = None
-    number_range: Optional[tuple[Optional[float], Optional[float]]] = None
-    values: Optional[list[Union[str, int, float]]] = None
-    regex: Optional[str] = None
+    time_range: tuple[str | None, str | None] | None = None
+    number_range: tuple[float | None, float | None] | None = None
+    values: list[str | int | float] | None = None
+    regex: str | None = None
 
     def _match(self, params: list[object]) -> str:
         """The condition on ``value``, appending its binds to ``params``.

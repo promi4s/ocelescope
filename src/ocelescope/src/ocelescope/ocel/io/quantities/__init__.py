@@ -1,9 +1,18 @@
 from pathlib import Path
 
 from ocelescope.ocel.io.connection import DuckDBTarget, connect_target
-from ocelescope.ocel.io.quantities.json import export_quantities_json, import_quantities_json
-from ocelescope.ocel.io.quantities.sqlite import export_quantities_sqlite, import_quantities_sqlite
-from ocelescope.ocel.io.quantities.xml import export_quantities_xml, import_quantities_xml
+from ocelescope.ocel.io.quantities.json import (
+    export_quantities_json,
+    import_quantities_json,
+)
+from ocelescope.ocel.io.quantities.sqlite import (
+    export_quantities_sqlite,
+    import_quantities_sqlite,
+)
+from ocelescope.ocel.io.quantities.xml import (
+    export_quantities_xml,
+    import_quantities_xml,
+)
 
 
 def import_quantities(source: str | Path, target: DuckDBTarget) -> None:
@@ -66,4 +75,4 @@ def export_quantities(
                 export_quantities_sqlite(src, target)
 
 
-__all__ = ["import_quantities", "export_quantities"]
+__all__ = ["export_quantities", "import_quantities"]

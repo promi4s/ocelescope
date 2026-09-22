@@ -1,10 +1,10 @@
 import json
 import shutil
 import zipfile
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Any
+from typing import Annotated, Any
 
 from fastapi import Body
 from fastapi.exceptions import HTTPException
@@ -73,14 +73,14 @@ def run_plugin(
     session: ApiSession,
     plugin_id: str,
     method_name: str,
-    input: dict[str, Any] = {},
+    input: dict[str, Any] | None = None,
 ) -> str:
     try:
         return PluginTask.create_plugin_task(
             session,
             plugin_id=plugin_id,
             method_name=method_name,
-            input={"input": input, "input_resources": input_resources},
+            input={"input": input or {}, "input_resources": input_resources},
         )
     except RegistryError as error:
         raise NotFound(str(error))
@@ -142,7 +142,7 @@ def save_plugin_results(
 )
 def download_plugin_results(
     plugin_task: ApiPluginTask,
-    indices: list[int] = Body(embed=True),
+    indices: Annotated[list[int], Body(embed=True)],
 ) -> TempFileResponse:
     """Bundle the selected results into a zip for download."""
     selected = select_results(plugin_task, indices)
@@ -151,7 +151,7 @@ def download_plugin_results(
 
     archive_name = f"{plugin_id}_{method_name}_results"
     file_response = TempFileResponse(
-        prefix=datetime.now().strftime("%Y%m%d-%H%M%S") + "-",
+        prefix=datetime.now(tz=UTC).strftime("%Y%m%d-%H%M%S") + "-",
         suffix=".zip",
         filename=f"{archive_name}.zip",
     )

@@ -56,11 +56,3 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = ["pyarrow-stubs>=20.0.0.20260625"]
-
-[tool.black]
-line-length = 100
-
-[tool.ruff]
-line-length = 100
-fix = true
-lint.ignore = ["E731", "E501"]

@@ -105,7 +105,9 @@ class E2OManager(BaseManager):
 
     def _store(self, contents: Any) -> None:
         """Store ``contents`` as the E2O relations, dropping the derived columns."""
-        projection = ", ".join(f'"{c}"' for c in (E2O_EVENT_ID, E2O_QUALIFIER, E2O_OBJECT_ID))
+        projection = ", ".join(
+            f'"{c}"' for c in (E2O_EVENT_ID, E2O_QUALIFIER, E2O_OBJECT_ID)
+        )
         self._replace(E2O_TABLE, contents, projection)
 
     @property

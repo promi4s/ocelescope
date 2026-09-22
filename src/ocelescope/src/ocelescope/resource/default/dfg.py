@@ -109,7 +109,9 @@ class DirectlyFollowsGraph(Resource):
         """
         result: dict[str, dict[tuple[str | None, str | None], int]] = {}
         for edge in self.edges:
-            result.setdefault(edge.object_type, {})[(edge.source, edge.target)] = edge.count
+            result.setdefault(edge.object_type, {})[(edge.source, edge.target)] = (
+                edge.count
+            )
         return result
 
     @property
@@ -170,7 +172,9 @@ class DirectlyFollowsGraph(Resource):
             if keep == 0:
                 continue
             cutoff = sorted(map(_rank, type_edges), reverse=True)[keep - 1]
-            required = {node for e in type_edges if _rank(e) >= cutoff for node in _endpoints(e)}
+            required = {
+                node for e in type_edges if _rank(e) >= cutoff for node in _endpoints(e)
+            }
 
             graph = nx.DiGraph()
             graph.add_nodes_from((_START, _END))
@@ -192,7 +196,9 @@ class DirectlyFollowsGraph(Resource):
         active_object_types = {e.object_type for e in kept_edges}
         return DirectlyFollowsGraph(
             activities=[a for a in self.activities if a.name in active_activities],
-            object_types=[ot for ot in self.object_types if ot.name in active_object_types],
+            object_types=[
+                ot for ot in self.object_types if ot.name in active_object_types
+            ],
             edges=kept_edges,
         )
 
@@ -219,21 +225,35 @@ class DirectlyFollowsGraph(Resource):
 
         edge_objects = ocdfg["edges"]["unique_objects"]
         edges = [
-            edge(object_type, source, target, events, edge_objects[object_type][(source, target)])
+            edge(
+                object_type,
+                source,
+                target,
+                events,
+                edge_objects[object_type][(source, target)],
+            )
             for object_type, raw_edges in ocdfg["edges"]["event_couples"].items()
             for (source, target), events in raw_edges.items()
         ]
 
         start_objects = ocdfg["start_activities"]["unique_objects"]
         start_edges = [
-            edge(object_type, None, activity, events, start_objects[object_type][activity])
+            edge(
+                object_type,
+                None,
+                activity,
+                events,
+                start_objects[object_type][activity],
+            )
             for object_type, activities in ocdfg["start_activities"]["events"].items()
             for activity, events in activities.items()
         ]
 
         end_objects = ocdfg["end_activities"]["unique_objects"]
         end_edges = [
-            edge(object_type, activity, None, events, end_objects[object_type][activity])
+            edge(
+                object_type, activity, None, events, end_objects[object_type][activity]
+            )
             for object_type, activities in ocdfg["end_activities"]["events"].items()
             for activity, events in activities.items()
         ]
@@ -261,19 +281,24 @@ class DirectlyFollowsGraph(Resource):
         for edge in self.edges:
             dfg = dfgs.setdefault(edge.object_type, DFG())
             if edge.target is not None:
-                dfg.activities[edge.target] = dfg.activities.get(edge.target, 0) + edge.count
+                dfg.activities[edge.target] = (
+                    dfg.activities.get(edge.target, 0) + edge.count
+                )
 
             if edge.source is None and edge.target is not None:
                 dfg.start_activities[edge.target] = edge.count
             elif edge.source is not None and edge.target is None:
                 dfg.end_activities[edge.source] = edge.count
             elif edge.source is not None and edge.target is not None:
-                dfg.directly_follows_relations.append(((edge.source, edge.target), edge.count))
+                dfg.directly_follows_relations.append(
+                    ((edge.source, edge.target), edge.count)
+                )
 
         return OCDirectlyFollowsGraphViz(
             object_type_to_dfg=dfgs,
             object_counts={
-                object_type: sum(dfg.start_activities.values()) for object_type, dfg in dfgs.items()
+                object_type: sum(dfg.start_activities.values())
+                for object_type, dfg in dfgs.items()
             },
         )
 

@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from datetime import datetime, timezone
-from typing import TYPE_CHECKING, NamedTuple, Optional
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING, NamedTuple
 
 import polars as pl
 from pydantic import BaseModel
@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from ocelescope.ocel.core import OCEL
 
 
-def utc_bound(value: Optional[str]) -> Optional[datetime]:
+def utc_bound(value: str | None) -> datetime | None:
     """An ISO bound as the zone-less UTC timestamps are stored as -- an offset is
     converted, not dropped. Polars will not compare a zone-aware literal against a
     zone-less column at all, so the zone has to go before the comparison is built."""
@@ -20,7 +20,7 @@ def utc_bound(value: Optional[str]) -> Optional[datetime]:
     parsed = datetime.fromisoformat(value)
     if parsed.tzinfo is None:
         return parsed
-    return parsed.astimezone(timezone.utc).replace(tzinfo=None)
+    return parsed.astimezone(UTC).replace(tzinfo=None)
 
 
 class Keep(NamedTuple):
@@ -39,6 +39,6 @@ class BaseFilter(BaseModel, ABC):
     """A valid subset of an OCEL, expressed as the event/object ids to keep."""
 
     @abstractmethod
-    def keep(self, ocel: "OCEL") -> Keep:
+    def keep(self, ocel: OCEL) -> Keep:
         """Return the event/object ids to keep as a :class:`Keep`."""
         ...

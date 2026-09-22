@@ -1,7 +1,8 @@
 from typing import Self
 
-from ocelescope import OCEL
 from pydantic import BaseModel
+
+from ocelescope import OCEL
 
 
 class QuantityInfo(BaseModel):

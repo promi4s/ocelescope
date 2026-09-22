@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Annotated, Literal, TypeAlias, Union
+from typing import Annotated, Literal, TypeAlias
 
 from ocelescope.ocel.filter import (
     E2OCountFilter as _E2OCountFilter,
@@ -76,14 +76,12 @@ class O2OCountFilter(_O2OCountFilter):
 
 
 NativeFilter: TypeAlias = Annotated[
-    Union[
-        TimeFrameFilter,
-        ActivityFilter,
-        ObjectTypeFilter,
-        EventAttributeFilter,
-        ObjectAttributeFilter,
-        E2OCountFilter,
-        O2OCountFilter,
-    ],
+    TimeFrameFilter
+    | ActivityFilter
+    | ObjectTypeFilter
+    | EventAttributeFilter
+    | ObjectAttributeFilter
+    | E2OCountFilter
+    | O2OCountFilter,
     Field(discriminator="type"),
 ]
