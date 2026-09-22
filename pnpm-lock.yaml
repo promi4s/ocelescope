@@ -239,7 +239,7 @@ catalogs:
       version: 2.0.7
     '@types/node':
       specifier: ^26.6.1
-      version: 26.6.1
+      version: 26.6.2
     '@types/object-hash':
       specifier: ^3.0.6
       version: 3.0.6
@@ -391,7 +391,7 @@ importers:
         version: link:../modules/variants
       next:
         specifier: 'catalog:'
-        version: 16.3.2(@types/node@26.6.1)(react-dom@19.3.0)(react@19.3.0)
+        version: 16.3.2(@types/node@26.6.2)(react-dom@19.3.0)(react@19.3.0)
       react:
         specifier: 'catalog:'
         version: 19.3.0
@@ -401,7 +401,7 @@ importers:
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
-        version: 26.6.1
+        version: 26.6.2
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
@@ -458,7 +458,7 @@ importers:
         version: 1.46.0(react@19.3.0)
       next:
         specifier: 'catalog:'
-        version: 16.3.2(@types/node@26.6.1)(react-dom@19.3.0)(react@19.3.0)
+        version: 16.3.2(@types/node@26.6.2)(react-dom@19.3.0)(react@19.3.0)
       react:
         specifier: 'catalog:'
         version: 19.3.0
@@ -483,7 +483,7 @@ importers:
         version: 2.0.7
       '@types/node':
         specifier: 'catalog:'
-        version: 26.6.1
+        version: 26.6.2
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
@@ -519,14 +519,14 @@ importers:
         version: 1.46.0(react@19.3.0)
       next:
         specifier: 'catalog:'
-        version: 16.3.2(@types/node@26.6.1)(react-dom@19.3.0)(react@19.3.0)
+        version: 16.3.2(@types/node@26.6.2)(react-dom@19.3.0)(react@19.3.0)
       react:
         specifier: 'catalog:'
         version: 19.3.0
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
-        version: 26.6.1
+        version: 26.6.2
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
@@ -580,7 +580,7 @@ importers:
         version: 9.4.0(@mantine/core@9.6.1)(@mantine/hooks@9.6.1)(clsx@2.1.1)(react-dom@19.3.0)(react@19.3.0)
       next:
         specifier: 'catalog:'
-        version: 16.3.2(@types/node@26.6.1)(react-dom@19.3.0)(react@19.3.0)
+        version: 16.3.2(@types/node@26.6.2)(react-dom@19.3.0)(react@19.3.0)
       object-hash:
         specifier: 'catalog:'
         version: 3.0.0
@@ -605,7 +605,7 @@ importers:
         version: link:../../packages/api/config
       '@types/node':
         specifier: 'catalog:'
-        version: 26.6.1
+        version: 26.6.2
       '@types/object-hash':
         specifier: 'catalog:'
         version: 3.0.6
@@ -663,7 +663,7 @@ importers:
         version: 0.23.0(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.23.0)(yaml@2.9.1)
       '@types/node':
         specifier: 'catalog:'
-        version: 26.6.1
+        version: 26.6.2
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
@@ -718,7 +718,7 @@ importers:
         version: 0.23.0(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.23.0)(yaml@2.9.1)
       '@types/node':
         specifier: 'catalog:'
-        version: 26.6.1
+        version: 26.6.2
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
@@ -769,7 +769,7 @@ importers:
         version: 1.46.0(react@19.3.0)
       next:
         specifier: 'catalog:'
-        version: 16.3.2(@types/node@26.6.1)(react-dom@19.3.0)(react@19.3.0)
+        version: 16.3.2(@types/node@26.6.2)(react-dom@19.3.0)(react@19.3.0)
       react:
         specifier: 'catalog:'
         version: 19.3.0
@@ -785,7 +785,7 @@ importers:
         version: 2.0.7
       '@types/node':
         specifier: 'catalog:'
-        version: 26.6.1
+        version: 26.6.2
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
@@ -836,7 +836,7 @@ importers:
         version: 9.4.0(@mantine/core@9.6.1)(@mantine/hooks@9.6.1)(clsx@2.1.1)(react-dom@19.3.0)(react@19.3.0)
       next:
         specifier: 'catalog:'
-        version: 16.3.2(@types/node@26.6.1)(react-dom@19.3.0)(react@19.3.0)
+        version: 16.3.2(@types/node@26.6.2)(react-dom@19.3.0)(react@19.3.0)
       react:
         specifier: 'catalog:'
         version: 19.3.0
@@ -849,7 +849,7 @@ importers:
         version: 0.23.0(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.23.0)(yaml@2.9.1)
       '@types/node':
         specifier: 'catalog:'
-        version: 26.6.1
+        version: 26.6.2
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
@@ -886,7 +886,7 @@ importers:
         version: link:../config
       '@types/node':
         specifier: 'catalog:'
-        version: 26.6.1
+        version: 26.6.2
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
@@ -917,7 +917,7 @@ importers:
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
-        version: 26.6.1
+        version: 26.6.2
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
@@ -945,7 +945,7 @@ importers:
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
-        version: 26.6.1
+        version: 26.6.2
       tsdown:
         specifier: 'catalog:'
         version: 0.23.0(@tsdown/css@0.23.0)(typescript@6.0.3)
@@ -1005,7 +1005,7 @@ importers:
         version: 9.4.0(@mantine/core@9.6.1)(@mantine/hooks@9.6.1)(clsx@2.1.1)(react-dom@19.3.0)(react@19.3.0)
       next:
         specifier: 'catalog:'
-        version: 16.3.2(@types/node@26.6.1)(react-dom@19.3.0)(react@19.3.0)
+        version: 16.3.2(@types/node@26.6.2)(react-dom@19.3.0)(react@19.3.0)
       react:
         specifier: 'catalog:'
         version: 19.3.0
@@ -1036,7 +1036,7 @@ importers:
         version: 2.0.7
       '@types/node':
         specifier: 'catalog:'
-        version: 26.6.1
+        version: 26.6.2
       '@types/qs':
         specifier: 'catalog:'
         version: 6.15.1
@@ -1102,7 +1102,7 @@ importers:
         version: 1.46.0(react@19.3.0)
       next:
         specifier: 'catalog:'
-        version: 16.3.2(@types/node@26.6.1)(react-dom@19.3.0)(react@19.3.0)
+        version: 16.3.2(@types/node@26.6.2)(react-dom@19.3.0)(react@19.3.0)
       react:
         specifier: 'catalog:'
         version: 19.3.0
@@ -1112,7 +1112,7 @@ importers:
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
-        version: 26.6.1
+        version: 26.6.2
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
@@ -1171,7 +1171,7 @@ importers:
         version: 9.4.0(@mantine/core@9.6.1)(@mantine/hooks@9.6.1)(clsx@2.1.1)(react-dom@19.3.0)(react@19.3.0)
       next:
         specifier: 'catalog:'
-        version: 16.3.2(@types/node@26.6.1)(react-dom@19.3.0)(react@19.3.0)
+        version: 16.3.2(@types/node@26.6.2)(react-dom@19.3.0)(react@19.3.0)
       react:
         specifier: 'catalog:'
         version: 19.3.0
@@ -1193,7 +1193,7 @@ importers:
         version: 2.0.7
       '@types/node':
         specifier: 'catalog:'
-        version: 26.6.1
+        version: 26.6.2
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
@@ -3288,8 +3288,8 @@ packages:
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
-  '@types/node@26.6.1':
-    resolution: {integrity: sha512-VqGJBMCtdhqkBUCcBLvywI0NJ+KLuVzgNnlBUNFOQjqVxzo2lxLUNg1DSey8+u2u6ktswSAxg+s68QLzWHNOuA==}
+  '@types/node@26.6.2':
+    resolution: {integrity: sha512-X1P21scMv4zGKLYqjdGjaKa7COa0RKVYYZZN/NfvLQ1JegxFhdhpZG/Lyn8AXx6CDUavKAd11v6BvfpkDByK8g==}
 
   '@types/object-hash@3.0.6':
     resolution: {integrity: sha512-fOBV8C1FIu2ELinoILQ+ApxcUKz4ngq+IWUYrxSGjXzzjUALijilampwkMgEtJ+h2njAW3pi853QpzNVCHB73w==}
@@ -7552,7 +7552,7 @@ snapshots:
 
   '@types/json-schema@7.0.15': {}
 
-  '@types/node@26.6.1':
+  '@types/node@26.6.2':
     dependencies:
       undici-types: 8.9.0
 
@@ -8892,7 +8892,7 @@ snapshots:
 
   next-tick@1.1.0: {}
 
-  next@16.3.2(@types/node@26.6.1)(react-dom@19.3.0)(react@19.3.0):
+  next@16.3.2(@types/node@26.6.2)(react-dom@19.3.0)(react@19.3.0):
     dependencies:
       '@next/env': 16.3.2
       '@swc/helpers': 0.5.23
@@ -8911,7 +8911,7 @@ snapshots:
       '@next/swc-linux-x64-musl': 16.3.2
       '@next/swc-win32-arm64-msvc': 16.3.2
       '@next/swc-win32-x64-msvc': 16.3.2
-      sharp: 0.35.4(@types/node@26.6.1)
+      sharp: 0.35.4(@types/node@26.6.2)
     transitivePeerDependencies:
       - '@babel/core'
       - '@types/node'
@@ -9488,7 +9488,7 @@ snapshots:
 
   shallow-copy@0.0.1: {}
 
-  sharp@0.35.4(@types/node@26.6.1):
+  sharp@0.35.4(@types/node@26.6.2):
     dependencies:
       '@img/colour': 1.1.0
       detect-libc: 2.1.2
@@ -9519,7 +9519,7 @@ snapshots:
       '@img/sharp-win32-arm64': 0.35.4
       '@img/sharp-win32-ia32': 0.35.4
       '@img/sharp-win32-x64': 0.35.4
-      '@types/node': 26.6.1
+      '@types/node': 26.6.2
     optional: true
 
   shebang-command@2.0.0:
