@@ -2,20 +2,15 @@ import {
   Group,
   LoadingOverlay,
   ScrollArea,
-  Splitter,
   Stack,
   Text,
   Title,
 } from "@mantine/core";
-import type { SplitterPaneSize } from "@mantine/hooks";
 import { useGetPluginMethod } from "@ocelescope/api-base";
-import { ResultSection } from "@ocelescope/plugin-components";
+import { PluginDashboard } from "@ocelescope/plugin-components";
 import { useState } from "react";
 import PluginInput from "../components/Form";
 import PluginBreadcrumbs from "../components/PluginBreadcrumbs/PluginBreadcrumbs";
-
-const COLLAPSED_SIZES: SplitterPaneSize[] = [0, 100];
-const SPLIT_SIZES: SplitterPaneSize[] = [75, 25];
 
 const MethodPage: React.FC<{ pluginId: string; methodName: string }> = ({
   pluginId,
@@ -24,50 +19,32 @@ const MethodPage: React.FC<{ pluginId: string; methodName: string }> = ({
   const { data: pluginMethod } = useGetPluginMethod(pluginId, methodName);
 
   const [currentTask, setCurrentTask] = useState<string>();
-  const [sizes, setSizes] = useState<SplitterPaneSize[]>(COLLAPSED_SIZES);
 
   if (!pluginMethod) {
     return <LoadingOverlay visible={true} />;
   }
 
-  const handleSuccess = (taskId: string) => {
-    setCurrentTask(taskId);
-    setSizes((prev) => (prev[0] === 0 ? SPLIT_SIZES : prev));
-  };
-
   return (
-    <Splitter
-      sizes={sizes}
-      onSizeChange={setSizes}
-      lineSize={4}
-      handleColor="var(--mantine-color-default-border)"
-      h={"100%"}
-    >
-      <Splitter.Pane defaultSize={0} min="20%" collapsible>
-        <ResultSection taskId={currentTask} />
-      </Splitter.Pane>
-
-      <Splitter.Pane defaultSize={100} min="20%" collapsible>
-        <ScrollArea h="100%" type="auto">
-          <Stack gap="sm" p="md" maw={640} mx="auto" w="100%">
-            <Group justify="center">
-              <PluginBreadcrumbs />
-            </Group>
-            <Title ta="center">{pluginMethod.label ?? methodName}</Title>
-            {pluginMethod.description && (
-              <Text c="dimmed" ta="center">
-                {pluginMethod.description}
-              </Text>
-            )}
-            <PluginInput
-              onSuccess={handleSuccess}
-              pluginId={pluginId}
-              method={pluginMethod}
-            />
-          </Stack>
-        </ScrollArea>
-      </Splitter.Pane>
-    </Splitter>
+    <PluginDashboard pluginTaskId={currentTask}>
+      <ScrollArea h="100%" type="auto">
+        <Stack gap="sm" p="md" maw={640} mx="auto" w="100%">
+          <Group justify="center">
+            <PluginBreadcrumbs />
+          </Group>
+          <Title ta="center">{pluginMethod.label ?? methodName}</Title>
+          {pluginMethod.description && (
+            <Text c="dimmed" ta="center">
+              {pluginMethod.description}
+            </Text>
+          )}
+          <PluginInput
+            onSuccess={setCurrentTask}
+            pluginId={pluginId}
+            method={pluginMethod}
+          />
+        </Stack>
+      </ScrollArea>
+    </PluginDashboard>
   );
 };
 
