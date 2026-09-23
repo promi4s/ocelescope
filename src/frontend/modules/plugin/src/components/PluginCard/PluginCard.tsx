@@ -2,21 +2,16 @@ import {
   ActionIcon,
   Anchor,
   Badge,
-  Box,
   Card,
   Divider,
   Group,
   Menu,
   Modal,
-  OverflowList,
   Stack,
   Text,
   ThemeIcon,
-  Tooltip,
   UnstyledButton,
 } from "@mantine/core";
-import { useHover } from "@mantine/hooks";
-import { generateColor } from "@marko19907/string-to-color";
 import type { PluginApi } from "@ocelescope/api-base";
 import { useDeletePlugin } from "@ocelescope/api-base";
 import { FullScreenUpload, getModuleRoute } from "@ocelescope/core";
@@ -28,16 +23,21 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import {
+  INTERACTIVE_LAYER,
+  LinkCard,
+  LinkCardDescription,
+  LinkCardTitle,
+  ResourceTypeOverflowList,
+} from "../LinkCard/LinkCard";
 import { PluginUploadSection } from "../PluginUploadSection/PluginUploadSection";
 
 export const PLUGIN_CARD_HEIGHT = 330;
 const MAX_METHOD_LINKS = 3;
-const INTERACTIVE_LAYER = { position: "relative", zIndex: 1 } as const;
 
 export const PluginCard: React.FC<{ plugin: PluginApi }> = ({ plugin }) => {
   const { id, description, label, version, methods } = plugin;
   const { mutate: deletePlugin } = useDeletePlugin();
-  const { hovered, ref } = useHover<HTMLDivElement>();
 
   const resourceTypes = Array.from(
     new Set(
@@ -59,42 +59,10 @@ export const PluginCard: React.FC<{ plugin: PluginApi }> = ({ plugin }) => {
   const hiddenCount = methods.length - visibleMethods.length;
 
   return (
-    <Card
-      ref={ref}
-      withBorder
-      shadow={hovered ? "md" : "xs"}
-      radius="md"
-      padding="md"
-      h={PLUGIN_CARD_HEIGHT}
-      style={{
-        transition: "box-shadow 150ms ease, border-color 150ms ease",
-        ...(hovered && { borderColor: "var(--mantine-primary-color-filled)" }),
-      }}
-    >
-      <Box
-        component={Link}
-        href={pluginHref}
-        aria-hidden
-        tabIndex={-1}
-        pos="absolute"
-        inset={0}
-      />
+    <LinkCard href={pluginHref} height={PLUGIN_CARD_HEIGHT}>
       <Group justify="space-between" align="start" wrap="nowrap" gap="sm">
         <Stack gap={0} miw={0}>
-          <Anchor
-            component={Link}
-            href={pluginHref}
-            fw={600}
-            title={`Open ${label}`}
-            style={INTERACTIVE_LAYER}
-          >
-            <Group gap={4} wrap="nowrap">
-              <Text inherit truncate="end">
-                {label}
-              </Text>
-              <ChevronRightIcon size={16} style={{ flexShrink: 0 }} />
-            </Group>
-          </Anchor>
+          <LinkCardTitle href={pluginHref} label={label} />
           <Text size="xs" c="dimmed">
             v{version}
           </Text>
@@ -122,15 +90,7 @@ export const PluginCard: React.FC<{ plugin: PluginApi }> = ({ plugin }) => {
         </Menu>
       </Group>
 
-      <Text
-        size="sm"
-        c="dimmed"
-        mt="sm"
-        lineClamp={2}
-        h="calc(2em * var(--mantine-line-height-sm))"
-      >
-        {description || "No description provided."}
-      </Text>
+      <LinkCardDescription description={description} />
 
       <Divider
         my="sm"
@@ -200,57 +160,12 @@ export const PluginCard: React.FC<{ plugin: PluginApi }> = ({ plugin }) => {
           <Text size="xs" c="dimmed">
             Works with
           </Text>
-          <OverflowList
-            gap={6}
-            h={20}
-            data={resourceTypes}
-            renderItem={(resourceType) => (
-              <ResourceTypeBadge
-                key={resourceType}
-                resourceType={resourceType}
-              />
-            )}
-            renderOverflow={(hiddenTypes) => (
-              <Tooltip
-                withArrow
-                label={
-                  <Stack gap={4}>
-                    {hiddenTypes.map((resourceType) => (
-                      <ResourceTypeBadge
-                        key={resourceType}
-                        resourceType={resourceType}
-                      />
-                    ))}
-                  </Stack>
-                }
-              >
-                <Badge
-                  size="sm"
-                  variant="default"
-                  style={{ ...INTERACTIVE_LAYER, flexShrink: 0 }}
-                >
-                  +{hiddenTypes.length}
-                </Badge>
-              </Tooltip>
-            )}
-          />
+          <ResourceTypeOverflowList resourceTypes={resourceTypes} />
         </Stack>
       )}
-    </Card>
+    </LinkCard>
   );
 };
-
-const ResourceTypeBadge: React.FC<{ resourceType: string }> = ({
-  resourceType,
-}) => (
-  <Badge
-    size="sm"
-    color={generateColor(resourceType)}
-    style={{ flexShrink: 0 }}
-  >
-    {resourceType}
-  </Badge>
-);
 
 export const UploadPluginCard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
