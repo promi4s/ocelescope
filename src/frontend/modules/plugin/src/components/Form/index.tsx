@@ -1,9 +1,10 @@
-import { Button, Stack } from "@mantine/core";
+import { ActionIcon, Button, Group, Stack, Tooltip } from "@mantine/core";
 import { type MethodApi, useRunPlugin } from "@ocelescope/api-base";
 import { OcelSelect } from "@ocelescope/core";
 import { PluginForm } from "@ocelescope/plugin-components";
 import { ResourceSelect } from "@ocelescope/resources";
 import type Form from "@rjsf/core";
+import { EyeClosedIcon, EyeIcon } from "lucide-react";
 import { useCallback, useRef } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 
@@ -11,6 +12,8 @@ type PluginInputProps = {
   pluginId: string;
   method: MethodApi;
   onSuccess: (taskId: string) => void;
+  autoShowFirstOutput: boolean;
+  setAutoShowFirstOutput: (value: boolean) => void;
 };
 
 export type PluginInputType = {
@@ -27,6 +30,8 @@ const PluginInput: React.FC<PluginInputProps> = ({
   pluginId,
   method,
   onSuccess,
+  autoShowFirstOutput,
+  setAutoShowFirstOutput,
 }) => {
   const { mutate: runPlugin } = useRunPlugin({
     mutation: { onSuccess },
@@ -117,7 +122,33 @@ const PluginInput: React.FC<PluginInputProps> = ({
           )}
         />
       )}
-      <Button onClick={onSubmit}>Submit</Button>
+      <Group gap="xs" wrap="nowrap">
+        <Button flex={1} onClick={onSubmit}>
+          Submit
+        </Button>
+        <Tooltip
+          label={
+            autoShowFirstOutput
+              ? "Opening first output after run"
+              : "Hide outputs after run"
+          }
+          withArrow
+        >
+          <ActionIcon
+            onClick={() => setAutoShowFirstOutput(!autoShowFirstOutput)}
+            size="input-sm"
+            variant={autoShowFirstOutput ? "light" : "default"}
+            aria-label="Open first output after run"
+            aria-pressed={autoShowFirstOutput}
+          >
+            {autoShowFirstOutput ? (
+              <EyeIcon size={18} />
+            ) : (
+              <EyeClosedIcon size={18} />
+            )}
+          </ActionIcon>
+        </Tooltip>
+      </Group>
     </Stack>
   );
 };

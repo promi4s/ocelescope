@@ -21,12 +21,17 @@ const MethodPage: React.FC<{ pluginId: string; methodName: string }> = ({
 
   const [currentTask, setCurrentTask] = useState<string>();
 
+  const [autoShowFirstOutput, setAutoShowFirstOutput] = useState(true);
+
   if (!pluginMethod) {
     return <LoadingOverlay visible={true} />;
   }
 
   return (
-    <PluginDashboard taskId={currentTask} autoShowFirstOutput={false}>
+    <PluginDashboard
+      taskId={currentTask}
+      autoShowFirstOutput={autoShowFirstOutput}
+    >
       <ScrollArea h="100%" type="auto">
         <Stack gap="sm" p="md" maw={640} mx="auto" w="100%">
           <Group justify="center">
@@ -46,6 +51,8 @@ const MethodPage: React.FC<{ pluginId: string; methodName: string }> = ({
             onSuccess={setCurrentTask}
             pluginId={pluginId}
             method={pluginMethod}
+            autoShowFirstOutput={autoShowFirstOutput}
+            setAutoShowFirstOutput={setAutoShowFirstOutput}
           />
         </Stack>
       </ScrollArea>
