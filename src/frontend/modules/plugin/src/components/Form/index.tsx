@@ -3,8 +3,9 @@ import { type MethodApi, useRunPlugin } from "@ocelescope/api-base";
 import { OcelSelect } from "@ocelescope/core";
 import { PluginForm } from "@ocelescope/plugin-components";
 import { ResourceSelect } from "@ocelescope/resources";
-import { useCallback } from "react";
-import { type Control, Controller, useForm, useWatch } from "react-hook-form";
+import type Form from "@rjsf/core";
+import { useCallback, useRef } from "react";
+import { Controller, useForm, useWatch } from "react-hook-form";
 
 type PluginInputProps = {
   pluginId: string;
@@ -21,42 +22,6 @@ const compact = (record: Record<string, unknown> | undefined) =>
   Object.fromEntries(
     Object.entries(record ?? {}).filter(([, value]) => !!value),
   ) as Record<string, string>;
-
-type ConfigurationSectionProps = {
-  control: Control<PluginInputType>;
-  schema: { [key: string]: any };
-  pluginId: string;
-  methodName: string;
-  onSubmit: () => void;
-};
-
-const ConfigurationSection: React.FC<ConfigurationSectionProps> = ({
-  control,
-  schema,
-  pluginId,
-  methodName,
-  onSubmit,
-}) => {
-  const inputResources = useWatch({ control, name: "input_resources" });
-
-  return (
-    <Controller
-      control={control}
-      name="input"
-      render={({ field }) => (
-        <PluginForm
-          pluginId={pluginId}
-          methodName={methodName}
-          schema={schema}
-          inputResources={inputResources}
-          formData={field.value}
-          onChange={({ formData }) => field.onChange(formData)}
-          onSubmit={onSubmit}
-        />
-      )}
-    />
-  );
-};
 
 const PluginInput: React.FC<PluginInputProps> = ({
   pluginId,
@@ -78,8 +43,10 @@ const PluginInput: React.FC<PluginInputProps> = ({
     defaultValues: defaultValue,
   });
 
-  const onSubmit = useCallback(
-    () =>
+  const ref = useRef<Form>(null);
+
+  const onSubmit = useCallback(() => {
+    if (!method.configuration_schema || ref.current?.validateForm()) {
       handleSubmit(({ input_resources, input }) =>
         runPlugin({
           data: {
@@ -89,9 +56,11 @@ const PluginInput: React.FC<PluginInputProps> = ({
           methodName: method.name,
           pluginId,
         }),
-      )(),
-    [handleSubmit, pluginId, method, runPlugin],
-  );
+      )();
+    }
+  }, [handleSubmit, pluginId, method, runPlugin]);
+
+  const inputResources = useWatch({ control, name: "input_resources" });
 
   return (
     <Stack gap={"md"}>
@@ -129,17 +98,26 @@ const PluginInput: React.FC<PluginInputProps> = ({
           }
         />
       ))}
-      {method.configuration_schema ? (
-        <ConfigurationSection
+      {method.configuration_schema && (
+        <Controller
           control={control}
-          pluginId={pluginId}
-          methodName={method.name}
-          schema={method.configuration_schema}
-          onSubmit={onSubmit}
+          name="input"
+          render={({ field }) => (
+            <PluginForm
+              ref={ref}
+              pluginId={pluginId}
+              methodName={method.name}
+              schema={method.configuration_schema as { [key: string]: any }}
+              inputResources={inputResources}
+              formData={field.value}
+              onChange={({ formData }) => field.onChange(formData)}
+              uiSchema={{ "ui:submitButtonOptions": { norender: true } }}
+              onSubmit={onSubmit}
+            />
+          )}
         />
-      ) : (
-        <Button onClick={onSubmit}>Submit</Button>
       )}
+      <Button onClick={onSubmit}>Submit</Button>
     </Stack>
   );
 };
