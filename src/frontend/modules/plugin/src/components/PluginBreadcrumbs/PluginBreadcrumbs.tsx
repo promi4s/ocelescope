@@ -20,9 +20,20 @@ const PluginBreadcrumbs: React.FC = () => {
   );
 
   return (
-    <Breadcrumbs>
+    <Breadcrumbs
+      styles={{
+        root: {
+          display: "grid",
+          gridAutoFlow: "column",
+          gridAutoColumns: "minmax(0, max-content)",
+        },
+        breadcrumb: { minWidth: 0, lineHeight: "var(--mantine-line-height)" },
+      }}
+    >
       <Anchor
         component={Link}
+        truncate
+        title="Plugins"
         href={{
           query: { ...query, pluginId: undefined, methodName: undefined },
         }}
@@ -32,6 +43,8 @@ const PluginBreadcrumbs: React.FC = () => {
       {plugin && (
         <Anchor
           component={Link}
+          truncate
+          title={plugin.label}
           href={{
             query: { ...query, pluginId: plugin?.id, methodName: undefined },
           }}
@@ -42,6 +55,8 @@ const PluginBreadcrumbs: React.FC = () => {
       {pluginMethod && (
         <Anchor
           component={Link}
+          truncate
+          title={pluginMethod.label ?? pluginMethod.name}
           href={{
             query: {
               ...query,
