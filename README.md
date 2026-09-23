@@ -37,7 +37,6 @@ To set up the project for the first time, run:
 
 ```sh
 pnpm run init
-pnpm run api:sync
 ```
 
 This will:
@@ -45,6 +44,9 @@ This will:
 - install backend dependencies (via `uv`)
 - install frontend dependencies (via `pnpm`)
 - generate and build the frontend API client
+- install the git hooks (via `pre-commit`)
+
+To update dependencies later (e.g. after pulling), run `pnpm run sync`.
 
 ---
 

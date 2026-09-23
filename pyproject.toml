@@ -35,7 +35,10 @@ redundant-cast = "ignore"
 [dependency-groups]
 dev = [{ include-group = "lint" }, { include-group = "typecheck" }]
 
-lint = ["ruff>=0.15.7"]
+lint = [
+    "pre-commit>=4.6.2",
+    "ruff>=0.15.7",
+]
 
 typecheck = ["lxml-stubs>=0.5.1", "ty>=0.0.51"]
 
