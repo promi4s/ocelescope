@@ -11,8 +11,8 @@ const PluginsOverview: React.FC = () => {
   const { data: plugins } = usePlugins();
 
   return (
-    <Stack gap="md" p="md">
-      <div style={{ maxWidth: 720 }}>
+    <Stack gap="xs" p="md" h={"100%"}>
+      <Stack gap={0}>
         <Title order={2}>Plugin Overview</Title>
         <Text c="dimmed" size="sm" mt={4}>
           Upload plugins to extend Ocelescope with custom process mining
@@ -42,8 +42,7 @@ const PluginsOverview: React.FC = () => {
           </Anchor>{" "}
           you've built.
         </Text>
-      </div>
-
+      </Stack>
       {plugins && plugins.length === 0 ? (
         <PluginUploadSection />
       ) : (
