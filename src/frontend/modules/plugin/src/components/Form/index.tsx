@@ -1,15 +1,26 @@
-import { Button, Stack } from "@mantine/core";
+import {
+  ActionIcon,
+  Button,
+  Group,
+  ScrollArea,
+  Stack,
+  Tooltip,
+} from "@mantine/core";
 import { type MethodApi, useRunPlugin } from "@ocelescope/api-base";
 import { OcelSelect } from "@ocelescope/core";
 import { PluginForm } from "@ocelescope/plugin-components";
 import { ResourceSelect } from "@ocelescope/resources";
-import { useCallback } from "react";
-import { type Control, Controller, useForm, useWatch } from "react-hook-form";
+import type Form from "@rjsf/core";
+import { EyeClosedIcon, EyeIcon } from "lucide-react";
+import { useCallback, useRef } from "react";
+import { Controller, useForm, useWatch } from "react-hook-form";
 
 type PluginInputProps = {
   pluginId: string;
   method: MethodApi;
   onSuccess: (taskId: string) => void;
+  autoShowFirstOutput: boolean;
+  setAutoShowFirstOutput: (value: boolean) => void;
 };
 
 export type PluginInputType = {
@@ -22,46 +33,12 @@ const compact = (record: Record<string, unknown> | undefined) =>
     Object.entries(record ?? {}).filter(([, value]) => !!value),
   ) as Record<string, string>;
 
-type ConfigurationSectionProps = {
-  control: Control<PluginInputType>;
-  schema: { [key: string]: any };
-  pluginId: string;
-  methodName: string;
-  onSubmit: () => void;
-};
-
-const ConfigurationSection: React.FC<ConfigurationSectionProps> = ({
-  control,
-  schema,
-  pluginId,
-  methodName,
-  onSubmit,
-}) => {
-  const inputResources = useWatch({ control, name: "input_resources" });
-
-  return (
-    <Controller
-      control={control}
-      name="input"
-      render={({ field }) => (
-        <PluginForm
-          pluginId={pluginId}
-          methodName={methodName}
-          schema={schema}
-          inputResources={inputResources}
-          formData={field.value}
-          onChange={({ formData }) => field.onChange(formData)}
-          onSubmit={onSubmit}
-        />
-      )}
-    />
-  );
-};
-
 const PluginInput: React.FC<PluginInputProps> = ({
   pluginId,
   method,
   onSuccess,
+  autoShowFirstOutput,
+  setAutoShowFirstOutput,
 }) => {
   const { mutate: runPlugin } = useRunPlugin({
     mutation: { onSuccess },
@@ -78,8 +55,10 @@ const PluginInput: React.FC<PluginInputProps> = ({
     defaultValues: defaultValue,
   });
 
-  const onSubmit = useCallback(
-    () =>
+  const ref = useRef<Form>(null);
+
+  const onSubmit = useCallback(() => {
+    if (!method.configuration_schema || ref.current?.validateForm()) {
       handleSubmit(({ input_resources, input }) =>
         runPlugin({
           data: {
@@ -89,57 +68,100 @@ const PluginInput: React.FC<PluginInputProps> = ({
           methodName: method.name,
           pluginId,
         }),
-      )(),
-    [handleSubmit, pluginId, method, runPlugin],
-  );
+      )();
+    }
+  }, [handleSubmit, pluginId, method, runPlugin]);
+
+  const inputResources = useWatch({ control, name: "input_resources" });
 
   return (
-    <Stack gap={"md"}>
-      {method.inputs.map((io) => (
-        <Controller
-          key={io.name}
-          control={control}
-          name={`input_resources.${io.name}`}
-          rules={!io.is_optional ? { required: "Please select a value" } : {}}
-          render={({ field, fieldState }) =>
-            io.type === "ocel" ? (
-              <OcelSelect
-                label={io.label}
-                clearable={io.is_optional}
-                required={!io.is_optional}
-                description={io.description}
-                searchable
-                error={fieldState.error?.message}
-                onChange={field.onChange}
-                value={field.value}
-              />
-            ) : (
-              <ResourceSelect
-                clearable={io.is_optional}
-                label={io.label}
-                required={!io.is_optional}
-                type={io.schema_id}
-                description={io.description}
-                onChange={field.onChange}
-                error={fieldState.error?.message}
-                value={field.value}
-                searchable
-              />
-            )
+    <Stack gap={0} flex={1} mih={0}>
+      <ScrollArea flex={1} mih={0} type="auto">
+        <Stack gap="md" px="md" pb="md" maw={640} mx="auto" w="100%">
+          {method.inputs.map((io) => (
+            <Controller
+              key={io.name}
+              control={control}
+              name={`input_resources.${io.name}`}
+              rules={
+                !io.is_optional ? { required: "Please select a value" } : {}
+              }
+              render={({ field, fieldState }) =>
+                io.type === "ocel" ? (
+                  <OcelSelect
+                    label={io.label}
+                    clearable={io.is_optional}
+                    required={!io.is_optional}
+                    description={io.description}
+                    searchable
+                    error={fieldState.error?.message}
+                    onChange={field.onChange}
+                    value={field.value}
+                  />
+                ) : (
+                  <ResourceSelect
+                    clearable={io.is_optional}
+                    label={io.label}
+                    required={!io.is_optional}
+                    type={io.schema_id}
+                    description={io.description}
+                    onChange={field.onChange}
+                    error={fieldState.error?.message}
+                    value={field.value}
+                    searchable
+                  />
+                )
+              }
+            />
+          ))}
+          {method.configuration_schema && (
+            <Controller
+              control={control}
+              name="input"
+              render={({ field }) => (
+                <PluginForm
+                  ref={ref}
+                  pluginId={pluginId}
+                  methodName={method.name}
+                  schema={method.configuration_schema as { [key: string]: any }}
+                  inputResources={inputResources}
+                  formData={field.value}
+                  onChange={({ formData }) => field.onChange(formData)}
+                  uiSchema={{ "ui:submitButtonOptions": { norender: true } }}
+                  onSubmit={onSubmit}
+                />
+              )}
+            />
+          )}
+        </Stack>
+      </ScrollArea>
+      <Group gap="xs" wrap="nowrap" p="md" maw={640} mx="auto" w="100%">
+        <Button flex={1} onClick={onSubmit}>
+          Submit
+        </Button>
+        <Tooltip
+          label={
+            autoShowFirstOutput
+              ? "Opening first output after run"
+              : "Hide outputs after run"
           }
-        />
-      ))}
-      {method.configuration_schema ? (
-        <ConfigurationSection
-          control={control}
-          pluginId={pluginId}
-          methodName={method.name}
-          schema={method.configuration_schema}
-          onSubmit={onSubmit}
-        />
-      ) : (
-        <Button onClick={onSubmit}>Submit</Button>
-      )}
+          withArrow
+        >
+          <ActionIcon
+            onClick={() => setAutoShowFirstOutput(!autoShowFirstOutput)}
+            size="input-sm"
+            variant={autoShowFirstOutput ? "light" : "default"}
+            aria-label="Open first output after run"
+            aria-pressed={autoShowFirstOutput}
+          >
+            {autoShowFirstOutput ? (
+              <EyeIcon size={18} />
+            ) : (
+              <EyeClosedIcon size={18} />
+            )}
+          </ActionIcon>
+        </Tooltip>
+      </Group>
     </Stack>
   );
 };

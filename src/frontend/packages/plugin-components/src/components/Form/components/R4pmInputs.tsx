@@ -9,7 +9,7 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { ChevronDownIcon } from "lucide-react";
 import dynamic from "next/dynamic";
-import type { OcelSelectProps } from "../../types";
+import type { OcelSelectProps } from "../../../types";
 
 const R4PMFrequencyPicker = dynamic(
   () => import("@r4pm/components").then((m) => m.FrequencyPicker),

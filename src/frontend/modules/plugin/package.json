@@ -41,6 +41,7 @@
     "@ocelescope/plugin-components": "workspace:^",
     "@ocelescope/resources": "workspace:^",
     "embla-carousel": "catalog:",
+    "@rjsf/core": "catalog:",
     "embla-carousel-react": "catalog:",
     "lucide-react": "catalog:",
     "next": "catalog:",
