@@ -2,6 +2,7 @@ import {
   Group,
   LoadingOverlay,
   ScrollArea,
+  Spoiler,
   Stack,
   Text,
   Title,
@@ -31,11 +32,15 @@ const MethodPage: React.FC<{ pluginId: string; methodName: string }> = ({
           <Group justify="center">
             <PluginBreadcrumbs />
           </Group>
-          <Title ta="center">{pluginMethod.label ?? methodName}</Title>
+          <Title ta="center" order={2}>
+            {pluginMethod.label ?? methodName}
+          </Title>
           {pluginMethod.description && (
-            <Text c="dimmed" ta="center">
-              {pluginMethod.description}
-            </Text>
+            <Spoiler maxHeight={120} showLabel="Show more" hideLabel="Hide">
+              <Text c="dimmed" ta="center">
+                {pluginMethod.description}
+              </Text>
+            </Spoiler>
           )}
           <PluginInput
             onSuccess={setCurrentTask}
