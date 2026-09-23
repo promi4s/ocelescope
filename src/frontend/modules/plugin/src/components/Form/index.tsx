@@ -1,4 +1,11 @@
-import { ActionIcon, Button, Group, Stack, Tooltip } from "@mantine/core";
+import {
+  ActionIcon,
+  Button,
+  Group,
+  ScrollArea,
+  Stack,
+  Tooltip,
+} from "@mantine/core";
 import { type MethodApi, useRunPlugin } from "@ocelescope/api-base";
 import { OcelSelect } from "@ocelescope/core";
 import { PluginForm } from "@ocelescope/plugin-components";
@@ -68,61 +75,67 @@ const PluginInput: React.FC<PluginInputProps> = ({
   const inputResources = useWatch({ control, name: "input_resources" });
 
   return (
-    <Stack gap={"md"}>
-      {method.inputs.map((io) => (
-        <Controller
-          key={io.name}
-          control={control}
-          name={`input_resources.${io.name}`}
-          rules={!io.is_optional ? { required: "Please select a value" } : {}}
-          render={({ field, fieldState }) =>
-            io.type === "ocel" ? (
-              <OcelSelect
-                label={io.label}
-                clearable={io.is_optional}
-                required={!io.is_optional}
-                description={io.description}
-                searchable
-                error={fieldState.error?.message}
-                onChange={field.onChange}
-                value={field.value}
-              />
-            ) : (
-              <ResourceSelect
-                clearable={io.is_optional}
-                label={io.label}
-                required={!io.is_optional}
-                type={io.schema_id}
-                description={io.description}
-                onChange={field.onChange}
-                error={fieldState.error?.message}
-                value={field.value}
-                searchable
-              />
-            )
-          }
-        />
-      ))}
-      {method.configuration_schema && (
-        <Controller
-          control={control}
-          name="input"
-          render={({ field }) => (
-            <PluginForm
-              ref={ref}
-              pluginId={pluginId}
-              methodName={method.name}
-              schema={method.configuration_schema as { [key: string]: any }}
-              inputResources={inputResources}
-              formData={field.value}
-              onChange={({ formData }) => field.onChange(formData)}
-              uiSchema={{ "ui:submitButtonOptions": { norender: true } }}
-              onSubmit={onSubmit}
+    <Stack gap={0} flex={1} mih={0}>
+      <ScrollArea flex={1} mih={0} type="auto">
+        <Stack gap="md" px="md" pb="md" maw={640} mx="auto" w="100%">
+          {method.inputs.map((io) => (
+            <Controller
+              key={io.name}
+              control={control}
+              name={`input_resources.${io.name}`}
+              rules={
+                !io.is_optional ? { required: "Please select a value" } : {}
+              }
+              render={({ field, fieldState }) =>
+                io.type === "ocel" ? (
+                  <OcelSelect
+                    label={io.label}
+                    clearable={io.is_optional}
+                    required={!io.is_optional}
+                    description={io.description}
+                    searchable
+                    error={fieldState.error?.message}
+                    onChange={field.onChange}
+                    value={field.value}
+                  />
+                ) : (
+                  <ResourceSelect
+                    clearable={io.is_optional}
+                    label={io.label}
+                    required={!io.is_optional}
+                    type={io.schema_id}
+                    description={io.description}
+                    onChange={field.onChange}
+                    error={fieldState.error?.message}
+                    value={field.value}
+                    searchable
+                  />
+                )
+              }
+            />
+          ))}
+          {method.configuration_schema && (
+            <Controller
+              control={control}
+              name="input"
+              render={({ field }) => (
+                <PluginForm
+                  ref={ref}
+                  pluginId={pluginId}
+                  methodName={method.name}
+                  schema={method.configuration_schema as { [key: string]: any }}
+                  inputResources={inputResources}
+                  formData={field.value}
+                  onChange={({ formData }) => field.onChange(formData)}
+                  uiSchema={{ "ui:submitButtonOptions": { norender: true } }}
+                  onSubmit={onSubmit}
+                />
+              )}
             />
           )}
-        />
-      )}
-      <Group gap="xs" wrap="nowrap">
+        </Stack>
+      </ScrollArea>
+      <Group gap="xs" wrap="nowrap" p="md" maw={640} mx="auto" w="100%">
         <Button flex={1} onClick={onSubmit}>
           Submit
         </Button>

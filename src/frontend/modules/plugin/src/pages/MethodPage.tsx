@@ -1,7 +1,6 @@
 import {
   Group,
   LoadingOverlay,
-  ScrollArea,
   Spoiler,
   Stack,
   Text,
@@ -32,7 +31,7 @@ const MethodPage: React.FC<{ pluginId: string; methodName: string }> = ({
       taskId={currentTask}
       autoShowFirstOutput={autoShowFirstOutput}
     >
-      <ScrollArea h="100%" type="auto">
+      <Stack h="100%" gap={0}>
         <Stack gap="sm" p="md" maw={640} mx="auto" w="100%">
           <Group justify="center">
             <PluginBreadcrumbs />
@@ -47,15 +46,15 @@ const MethodPage: React.FC<{ pluginId: string; methodName: string }> = ({
               </Text>
             </Spoiler>
           )}
-          <PluginInput
-            onSuccess={setCurrentTask}
-            pluginId={pluginId}
-            method={pluginMethod}
-            autoShowFirstOutput={autoShowFirstOutput}
-            setAutoShowFirstOutput={setAutoShowFirstOutput}
-          />
         </Stack>
-      </ScrollArea>
+        <PluginInput
+          onSuccess={setCurrentTask}
+          pluginId={pluginId}
+          method={pluginMethod}
+          autoShowFirstOutput={autoShowFirstOutput}
+          setAutoShowFirstOutput={setAutoShowFirstOutput}
+        />
+      </Stack>
     </PluginDashboard>
   );
 };
