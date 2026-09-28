@@ -5,7 +5,7 @@ from typing import ClassVar
 from fastapi import FastAPI
 from packaging.version import Version
 
-from ocelescope import BaseFilter
+from ocelescope import BaseFilter, Resource
 
 
 @dataclass(frozen=True)
@@ -16,6 +16,7 @@ class ModuleMeta:
 
 class Module(ABC):
     meta: ClassVar[ModuleMeta]
+    resources: ClassVar[list[type[Resource]]] = []
 
     @classmethod
     @abstractmethod
