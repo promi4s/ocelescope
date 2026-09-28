@@ -1,9 +1,8 @@
-"""Names used by the quantity extension: our own, and each file format's.
+"""Names used by the quantity extension once it is *in* an OCEL.
 
-The first group is how a quantity extension looks once it is *in* an OCEL -- the
-column names its tables carry and the tables it is stored in. The rest is how the
-OCEL 2.0 formats spell the same things on disk, which the importers and exporters
-translate to and from.
+The column names its tables carry and the tables it is stored in. Files use the
+same names; how the deprecated file formats spelled them lives with their readers
+in :mod:`ocelescope.ocel.io.extras.quantities`.
 """
 
 from ocelescope.ocel.constants.pm4py import EID_COL, OID_COL

@@ -191,7 +191,8 @@
     "OCELIO",
     "bdrs",
     "mult",
-    "dfgs"
+    "dfgs",
+    "iterchildren"
   ],
   "ignorePaths": [
     "pnpm-lock.yaml",
