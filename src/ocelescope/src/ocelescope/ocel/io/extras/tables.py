@@ -1,8 +1,11 @@
-"""Which tables of an OCEL's DuckDB are extras, for the exporters of every format."""
+"""Table helpers the extras modules of every format share."""
 
 from __future__ import annotations
 
+from typing import Any
+
 import duckdb
+import pyarrow as pa
 
 from ocelescope.ocel.constants.tables import (
     E2O_TABLE,
@@ -45,3 +48,23 @@ def column_types(con: duckdb.DuckDBPyConnection, table: str) -> list[tuple[str, 
         (name, column_type)
         for name, column_type, *_ in con.execute(f"DESCRIBE {ident(table)}").fetchall()
     ]
+
+
+def rows_to_arrow(rows: list[dict[str, Any]], table: str) -> pa.Table:
+    """The rows as an Arrow table, with a column for every key of every row.
+
+    Unlike ``pa.Table.from_pylist``, which takes the columns from the first row
+    only, a key missing from some rows is NULL there -- the XML exporter leaves a
+    NULL attribute out. A key whose values have different kinds (``1`` and
+    ``"x"``) is not something the exporters write, so it raises.
+    """
+    keys = dict.fromkeys(key for row in rows for key in row)
+    columns = {}
+    for key in keys:
+        try:
+            columns[key] = pa.array([row.get(key) for row in rows])
+        except (pa.ArrowInvalid, pa.ArrowTypeError) as error:
+            raise ValueError(
+                f"column {key!r} of extra table {table!r} mixes values of different types"
+            ) from error
+    return pa.table(columns)

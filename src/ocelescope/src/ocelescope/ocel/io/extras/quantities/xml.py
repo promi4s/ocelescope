@@ -10,7 +10,6 @@ from collections.abc import Iterator
 from typing import Any, cast
 
 import duckdb
-import pyarrow as pa
 from lxml import etree
 
 from ocelescope.ocel.constants.pm4py import EID_COL, OID_COL
@@ -21,6 +20,7 @@ from ocelescope.ocel.constants.quantity import (
     QUANTITY_ITEM_PROPERTIES_TABLE,
     QUANTITY_OPERATIONS_TABLE,
 )
+from ocelescope.ocel.io.extras.tables import rows_to_arrow
 from ocelescope.ocel.io.schema import ATTRIBUTE_TYPE_TO_DUCKDB
 from ocelescope.util.sql import ident
 
@@ -63,7 +63,7 @@ def _write(
     created: set[str],
 ) -> None:
     """Write records into a quantity table, replacing it with the first batch."""
-    arrow_batch = pa.Table.from_pylist(records)
+    arrow_batch = rows_to_arrow(records, table_name)
     select_list = ", ".join(
         f"{casts[column]} AS {ident(column)}" if column in casts else ident(column)
         for column in arrow_batch.column_names

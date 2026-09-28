@@ -30,6 +30,7 @@ from ocelescope.ocel.io.extras.sqlite import export_extras_sqlite, import_extras
 from ocelescope.ocel.io.extras.tables import tables_to_export
 from ocelescope.ocel.io.extras.xml import export_extras_xml, import_extras_xml
 from ocelescope.ocel.io.r4pm import export_ocel_r4pm_streamed, import_ocel_r4pm_streamed
+from ocelescope.ocel.io.schema import ensure_quantity_tables
 
 
 def export_duckdb_ocel(source: DuckDBTarget, target: str | Path):
@@ -54,6 +55,10 @@ def convert_ocel_duckdb(source: str | Path, target: DuckDBTarget):
             import_extras_json(source, target)
         case ".xml" | ".xmlocel":
             import_extras_xml(source, target)
+    # after the extras, so a log's own quantity tables are not in their way; the
+    # database then holds all eight tables, and can be opened read-only as an OCEL
+    with connect_target(target) as con:
+        ensure_quantity_tables(con)
 
 
 __all__ = [

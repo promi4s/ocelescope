@@ -1,4 +1,4 @@
-"""Copy the non-OCEL sections of an XML OCEL log into DuckDB, and back.
+"""Copy the extra tables of an XML OCEL log into DuckDB, and back.
 
 An extra table is a ``<table name="...">`` child of ``<log>``. Its ``<columns>``
 declaration lists the columns in order, with their exact names and OCEL types, and
@@ -6,9 +6,9 @@ each ``<row .../>`` carries its values as positional attributes ``c0``, ``c1``, 
 -- so any table or column name works, ``ocel:oid`` included, which would not be a
 valid attribute name itself. A row without an attribute has NULL there.
 
-Sections of any other name are read the older way: the element name is the table
-name and each attribute a column. Sections are found by scanning bytes and only
-their own bytes are parsed, so the OCEL body is never parsed here.
+Sections are found by scanning bytes and only their own bytes are parsed, so the
+OCEL body is never parsed here; a log with neither a ``<table>`` nor a legacy
+section is not even scanned. Any other element under ``<log>`` is ignored.
 
 The deprecated ``<quantity-extension>`` section is read into the quantity tables
 instead, with a :class:`DeprecationWarning`.
@@ -25,7 +25,6 @@ from typing import Any, cast
 from xml.sax.saxutils import quoteattr
 
 import duckdb
-import pyarrow as pa
 from lxml import etree
 
 from ocelescope.ocel.io.connection import DuckDBTarget, connect_target
@@ -34,15 +33,10 @@ from ocelescope.ocel.io.extras.quantities.xml import (
     read_legacy_xml_quantities,
 )
 from ocelescope.ocel.io.extras.tables import column_types as table_column_types
+from ocelescope.ocel.io.extras.tables import rows_to_arrow
 from ocelescope.ocel.io.schema import ATTRIBUTE_TYPE_TO_DUCKDB, duckdb_to_attribute_type
 from ocelescope.util.sql import ident
 
-SKIPPED_SECTIONS = {
-    "object-types",
-    "event-types",
-    "objects",
-    "events",
-}
 TABLE_TAG = "table"
 ROW_TAG = "row"
 BATCH_SIZE = 50_000
@@ -69,17 +63,31 @@ def find_element_end(file_bytes: mmap.mmap, tag_name: bytes, content_start: int)
             return search_from
 
 
-def find_top_level_sections(path: Path) -> list[tuple[str, int, int]]:
-    """(table name, start, end) byte range of every child of <log>, jumping over each section's content.
+def _may_have_extras(file_bytes: mmap.mmap) -> bool:
+    """Whether a ``<table`` or ``<quantity-extension`` tag occurs anywhere at all.
 
-    For a ``<table name="...">`` section the table name is its ``name`` attribute,
-    for any other section its element name.
+    Two byte searches instead of a scan of every section; in XML a raw ``<``
+    only ever opens a tag, so neither can hide inside a value.
     """
-    sections = []
+    return (
+        file_bytes.find(b"<" + TABLE_TAG.encode()) >= 0
+        or file_bytes.find(b"<" + XML_QUANTITY_EXTENSION.encode()) >= 0
+    )
+
+
+def find_extra_sections(path: Path) -> list[tuple[str, str, int, int]]:
+    """``(element, table name, start, end)`` of every ``<table>`` and legacy section under <log>.
+
+    The table name of a ``<table>`` is its ``name`` attribute. Every other child of
+    ``<log>`` is jumped over without being parsed.
+    """
+    sections: list[tuple[str, str, int, int]] = []
     with (
         path.open("rb") as file,
         mmap.mmap(file.fileno(), 0, access=mmap.ACCESS_READ) as file_bytes,
     ):
+        if not _may_have_extras(file_bytes):
+            return sections
         position = file_bytes.find(b">", file_bytes.find(b"<log")) + 1
         while True:
             tag_start = file_bytes.find(b"<", position)
@@ -103,33 +111,23 @@ def find_top_level_sections(path: Path) -> list[tuple[str, int, int]]:
                 opening_tag = file_bytes[tag_start : tag_end + 1]
                 if not is_self_closing:
                     opening_tag += b"</" + element_name + b">"
-                section_name = str(etree.fromstring(opening_tag).get("name"))
-            else:
-                section_name = element_name.decode()
-            sections.append((section_name, tag_start, position))
-
-
-def _is_table(path: Path, section_start: int) -> bool:
-    """Whether the section at ``section_start`` is a ``<table name="...">``."""
-    with path.open("rb") as file:
-        file.seek(section_start)
-        head = file.read(len(TABLE_TAG) + 2)
-    return (
-        head[1 : len(TABLE_TAG) + 1] == TABLE_TAG.encode() and head[-1:] in b" \t\r\n/>"
-    )
+                table_name = str(etree.fromstring(opening_tag).get("name"))
+                sections.append((TABLE_TAG, table_name, tag_start, position))
+            elif element_name == XML_QUANTITY_EXTENSION.encode():
+                sections.append((XML_QUANTITY_EXTENSION, "", tag_start, position))
 
 
 def read_column_types(
-    path: Path, section_start: int, section_end: int
-) -> dict[str, str] | None:
-    """{column name: OCEL type}, in declared order, from the section's <columns>; None if it has none."""
+    path: Path, table_name: str, section_start: int, section_end: int
+) -> dict[str, str]:
+    """{column name: OCEL type}, in declared order, from the ``<table>``'s <columns>."""
     with (
         path.open("rb") as file,
         mmap.mmap(file.fileno(), 0, access=mmap.ACCESS_READ) as file_bytes,
     ):
         columns_start = file_bytes.find(b"<columns", section_start, section_end)
         if columns_start < 0:
-            return None
+            raise ValueError(f"<table name={table_name!r}> has no <columns>")
         columns_end = file_bytes.find(b"</columns>", columns_start, section_end) + len(
             b"</columns>"
         )
@@ -179,104 +177,74 @@ def iter_rows(
         parser.close()
 
 
-def row_to_dict(row_element: etree._Element) -> dict[str, Any]:
-    """Attributes become columns. Text goes into "value", child elements into "<child>" / "<child>.<attr>"."""
-    record: dict[str, Any] = {
-        str(attribute_name): attribute_value
-        for attribute_name, attribute_value in row_element.attrib.items()
-    }
-    if row_element.text and row_element.text.strip():
-        record["value"] = row_element.text
-    for child_element in row_element:
-        child_tag = str(child_element.tag)
-        for attribute_name, attribute_value in child_element.attrib.items():
-            record[f"{child_tag}.{attribute_name}"] = attribute_value
-        if child_element.text and child_element.text.strip():
-            record[child_tag] = child_element.text
-    return record
-
-
 def insert_batch(
     connection: duckdb.DuckDBPyConnection,
     table_name: str,
     records: list[dict[str, Any]],
-    column_types: dict[str, str] | None,
+    column_types: dict[str, str],
 ):
-    """Inserts the records, cast to the declared column types. Without a declaration everything stays VARCHAR."""
-    arrow_batch = pa.Table.from_pylist(records)
-    if column_types is None:
-        connection.execute(
-            f"CREATE TABLE IF NOT EXISTS {ident(table_name)} AS SELECT * FROM arrow_batch LIMIT 0"
-        )
-        select_list = "*"
-    else:
-        select_list = ", ".join(
-            f"{_cast(column_name, ocel_type)} AS {ident(column_name)}"
-            for column_name, ocel_type in column_types.items()
-            if column_name in arrow_batch.column_names
-        )
+    """Inserts the records, cast to the declared column types."""
+    arrow_batch = rows_to_arrow(records, table_name)
+    select_list = ", ".join(
+        f"{_cast(column_name, ocel_type)} AS {ident(column_name)}"
+        for column_name, ocel_type in column_types.items()
+        if column_name in arrow_batch.column_names
+    )
     connection.execute(
         f"INSERT INTO {ident(table_name)} BY NAME SELECT {select_list} FROM arrow_batch"
     )
     records.clear()
 
 
-def import_extras_xml(path: str | Path, target: DuckDBTarget) -> None:
-    """Loads every top-level section not in SKIPPED_SECTIONS into its own table.
+def _read_table(
+    connection: duckdb.DuckDBPyConnection,
+    path: Path,
+    table_name: str,
+    section_start: int,
+    section_end: int,
+) -> None:
+    """Create ``table_name`` from its declaration and fill it from the rows."""
+    column_types = read_column_types(path, table_name, section_start, section_end)
+    column_definitions = ", ".join(
+        f"{ident(column_name)} {_duckdb_type(ocel_type)}"
+        for column_name, ocel_type in column_types.items()
+    )
+    connection.execute(f"CREATE TABLE {ident(table_name)} ({column_definitions})")
 
-    Column types come from the section's <columns> declaration; sections without one are
-    loaded as VARCHAR. A deprecated ``<quantity-extension>`` section is read into the
-    quantity tables, with a :class:`DeprecationWarning`.
+    positional = {f"c{index}": name for index, name in enumerate(column_types)}
+    pending_records: list[dict[str, Any]] = []
+    for row_element in iter_rows(path, section_start, section_end):
+        pending_records.append(
+            {positional[str(key)]: value for key, value in row_element.attrib.items()}
+        )
+        if len(pending_records) >= BATCH_SIZE:
+            insert_batch(connection, table_name, pending_records, column_types)
+    if pending_records:
+        insert_batch(connection, table_name, pending_records, column_types)
+
+
+def import_extras_xml(path: str | Path, target: DuckDBTarget) -> None:
+    """Loads every ``<table name="...">`` of the XML log at ``path`` into a table of that name.
+
+    A deprecated ``<quantity-extension>`` section is read into the quantity tables,
+    with a :class:`DeprecationWarning`.
     """
     path = Path(path)
+    sections = find_extra_sections(path)
+    if not sections:
+        return
     legacy_filled: set[str] = set()
     with connect_target(target) as connection:
-        for section_name, section_start, section_end in find_top_level_sections(path):
-            if section_name in SKIPPED_SECTIONS:
+        for element, table_name, section_start, section_end in sections:
+            if element == TABLE_TAG:
+                _read_table(connection, path, table_name, section_start, section_end)
                 continue
-            if section_name == XML_QUANTITY_EXTENSION:
-                with (
-                    path.open("rb") as file,
-                    mmap.mmap(file.fileno(), 0, access=mmap.ACCESS_READ) as file_bytes,
-                ):
-                    fragment = file_bytes[section_start:section_end]
-                legacy_filled |= read_legacy_xml_quantities(fragment, connection)
-                continue
-
-            column_types = read_column_types(path, section_start, section_end)
-            positional: dict[str, str] = {}
-            if _is_table(path, section_start):
-                if column_types is None:
-                    raise ValueError(f"<table name={section_name!r}> has no <columns>")
-                positional = {
-                    f"c{index}": name for index, name in enumerate(column_types)
-                }
-            if column_types is not None:
-                column_definitions = ", ".join(
-                    f"{ident(column_name)} {_duckdb_type(ocel_type)}"
-                    for column_name, ocel_type in column_types.items()
-                )
-                connection.execute(
-                    f"CREATE TABLE {ident(section_name)} ({column_definitions})"
-                )
-
-            pending_records: list[dict[str, Any]] = []
-            for row_element in iter_rows(path, section_start, section_end):
-                if positional:
-                    pending_records.append(
-                        {
-                            positional[str(key)]: value
-                            for key, value in row_element.attrib.items()
-                        }
-                    )
-                else:
-                    pending_records.append(row_to_dict(row_element))
-                if len(pending_records) >= BATCH_SIZE:
-                    insert_batch(
-                        connection, section_name, pending_records, column_types
-                    )
-            if pending_records:
-                insert_batch(connection, section_name, pending_records, column_types)
+            with (
+                path.open("rb") as file,
+                mmap.mmap(file.fileno(), 0, access=mmap.ACCESS_READ) as file_bytes,
+            ):
+                fragment = file_bytes[section_start:section_end]
+            legacy_filled |= read_legacy_xml_quantities(fragment, connection)
 
     if legacy_filled:
         warnings.warn(

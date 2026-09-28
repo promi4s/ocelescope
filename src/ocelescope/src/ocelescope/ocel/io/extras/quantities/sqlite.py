@@ -22,6 +22,7 @@ from ocelescope.ocel.constants.quantity import (
     QUANTITY_OPERATIONS_TABLE,
 )
 from ocelescope.ocel.io.connection import DuckDBTarget, connect_target
+from ocelescope.ocel.io.extras.quantities.util import quantity_as_double
 from ocelescope.util.sql import ident
 
 #: Names of the deprecated quantity-extension tables in an OCEL 2.0 SQLite log.
@@ -111,14 +112,4 @@ def quantities_from_extras(target: DuckDBTarget) -> None:
                     f"ALTER TABLE {ident(table)} "
                     f"RENAME COLUMN {ident(SQL_KEYMAP[column])} TO {ident(column)}"
                 )
-            column_types = dict(
-                con.execute(
-                    f"SELECT column_name, column_type FROM (DESCRIBE {ident(table)})"
-                ).fetchall()
-            )
-            # a quantity is a number whatever the file declared it as
-            if column_types.get(QEL_QUANTITY, "DOUBLE") != "DOUBLE":
-                con.execute(
-                    f"ALTER TABLE {ident(table)} ALTER {ident(QEL_QUANTITY)} "
-                    f"TYPE DOUBLE USING TRY_CAST({ident(QEL_QUANTITY)} AS DOUBLE)"
-                )
+            quantity_as_double(con, table)

@@ -27,32 +27,19 @@ import duckdb
 import ijson
 import pyarrow as pa
 
-from ocelescope.ocel.constants.quantity import (
-    QEL_QUANTITY,
-    QUANTITIES_TABLE,
-    QUANTITY_ITEM_PROPERTIES_TABLE,
-    QUANTITY_OPERATIONS_TABLE,
-)
 from ocelescope.ocel.io.connection import DuckDBTarget, connect_target
 from ocelescope.ocel.io.extras.quantities.json import (
     JSON_KEYMAP,
-    JSON_OPERATIONS,
-    JSON_PROPERTIES,
-    JSON_QUANTITIES,
     JSON_QUANTITY_EXTENSION,
+    JSON_TABLES,
 )
+from ocelescope.ocel.io.extras.quantities.util import quantity_as_double
+from ocelescope.ocel.io.extras.tables import rows_to_arrow
 from ocelescope.util.sql import ident, literal
 
 SKIPPED_KEYS = {"objects", "events", "eventTypes", "objectTypes"}
 OCEL_NESTED = ("attributes", "relationships")
 BATCH_SIZE = 50_000
-
-LEGACY_TABLES = {
-    JSON_OPERATIONS: QUANTITY_OPERATIONS_TABLE,
-    JSON_QUANTITIES: QUANTITIES_TABLE,
-    JSON_PROPERTIES: QUANTITY_ITEM_PROPERTIES_TABLE,
-}
-"""A list of the deprecated ``quantityExtension`` object -> the quantity table it fills."""
 
 
 def may_have_extra_lists(path: Path, chunk_size: int = 1 << 24) -> bool:
@@ -77,36 +64,81 @@ def may_have_extra_lists(path: Path, chunk_size: int = 1 << 24) -> bool:
     return total - known > len(SKIPPED_KEYS) - len(top)
 
 
+_BATCH_VIEW = "_extras_batch"
+"""Name a batch is registered under while it is written."""
+
+
+def _column_types(con: duckdb.DuckDBPyConnection, relation: str) -> dict[str, str]:
+    return {
+        name: column_type
+        for name, column_type, *_ in con.execute(f"DESCRIBE {relation}").fetchall()
+    }
+
+
 def insert_batch(
     con: duckdb.DuckDBPyConnection,
     table: str,
     rows: list[dict[str, Any]],
     created: set[str],
+    null_columns: dict[str, set[str]],
     legacy: bool,
 ):
     """Insert ``rows`` into ``table``, creating it with the first batch.
 
+    A column that is NULL throughout a batch does not decide its type -- the
+    exporter writes ``null`` explicitly, so a sparse column can start with a whole
+    batch of them. It is added once a later batch has values, and one that never
+    has any is recorded in ``null_columns`` for :func:`_add_null_columns`. A column
+    whose type changes from one batch to the next raises.
+
     A legacy quantity table replaces one of the same name, and its JSON column
     names are renamed to ours on the way in.
     """
-    batch = pa.Table.from_pylist(rows)
-    select = "*"
+    batch = rows_to_arrow(rows, table)
     if legacy:
-        renames = ", ".join(
-            f"{ident(json_name)} AS {ident(our_name)}"
-            for our_name, json_name in JSON_KEYMAP.items()
-            if json_name in batch.column_names
-        )
-        if renames:
-            select = f"* RENAME ({renames})"
+        rename = {json_name: our_name for our_name, json_name in JSON_KEYMAP.items()}
+        batch = batch.rename_columns([rename.get(c, c) for c in batch.column_names])
 
-    if table in created:
-        con.execute(f"INSERT INTO {ident(table)} BY NAME SELECT {select} FROM batch")
-    else:
-        create = "CREATE OR REPLACE TABLE" if legacy else "CREATE TABLE"
-        con.execute(f"{create} {ident(table)} AS SELECT {select} FROM batch")
-        created.add(table)
+    all_null = [f.name for f in batch.schema if pa.types.is_null(f.type)]
+    null_columns.setdefault(table, set()).update(all_null)
+    batch = batch.drop_columns(all_null)
+    if batch.num_columns == 0:
+        # only NULLs: keep the rows, with one column as text to carry them
+        batch = pa.table({all_null[0]: pa.nulls(len(rows), pa.string())})
+
+    con.register(_BATCH_VIEW, batch)
+    try:
+        if table not in created:
+            create = "CREATE OR REPLACE TABLE" if legacy else "CREATE TABLE"
+            con.execute(f"{create} {ident(table)} AS SELECT * FROM {_BATCH_VIEW}")
+            created.add(table)
+        else:
+            existing = _column_types(con, ident(table))
+            for column, incoming in _column_types(con, _BATCH_VIEW).items():
+                if column not in existing:
+                    con.execute(
+                        f"ALTER TABLE {ident(table)} ADD COLUMN {ident(column)} {incoming}"
+                    )
+                elif incoming != existing[column]:
+                    raise ValueError(
+                        f"column {column!r} of extra table {table!r} changes type "
+                        f"from {existing[column]} to {incoming}"
+                    )
+            con.execute(
+                f"INSERT INTO {ident(table)} BY NAME SELECT * FROM {_BATCH_VIEW}"
+            )
+    finally:
+        con.unregister(_BATCH_VIEW)
     rows.clear()
+
+
+def _add_null_columns(
+    con: duckdb.DuckDBPyConnection, table: str, null_columns: dict[str, set[str]]
+) -> None:
+    """Add the columns of ``table`` that never held a value, as VARCHAR."""
+    existing = _column_types(con, ident(table))
+    for column in sorted(null_columns.pop(table, set()) - set(existing)):
+        con.execute(f"ALTER TABLE {ident(table)} ADD COLUMN {ident(column)} VARCHAR")
 
 
 def load_lists(path: Path, con: duckdb.DuckDBPyConnection) -> set[str]:
@@ -116,6 +148,7 @@ def load_lists(path: Path, con: duckdb.DuckDBPyConnection) -> set[str]:
     the legacy quantity tables that were filled.
     """
     created: set[str] = set()
+    null_columns: dict[str, set[str]] = {}
     legacy_filled: set[str] = set()
     table: str = ""
     table_depth = 1
@@ -139,9 +172,9 @@ def load_lists(path: Path, con: duckdb.DuckDBPyConnection) -> set[str]:
                 skipping = value in SKIPPED_KEYS or in_container
                 continue
             if in_container and depth == 2 and event == "map_key":
-                legacy = value in LEGACY_TABLES
+                legacy = value in JSON_TABLES
                 table, table_depth, skipping = (
-                    LEGACY_TABLES.get(value, ""),
+                    JSON_TABLES.get(value, ""),
                     2,
                     not legacy,
                 )
@@ -154,10 +187,12 @@ def load_lists(path: Path, con: duckdb.DuckDBPyConnection) -> set[str]:
             elif depth == table_depth + 1 and event == "end_map":
                 rows.append(row)
                 if len(rows) >= BATCH_SIZE:
-                    insert_batch(con, table, rows, created, legacy)
+                    insert_batch(con, table, rows, created, null_columns, legacy)
             elif depth == table_depth and event == "end_array":
                 if rows:
-                    insert_batch(con, table, rows, created, legacy)
+                    insert_batch(con, table, rows, created, null_columns, legacy)
+                if table in created:
+                    _add_null_columns(con, table, null_columns)
                     if legacy:
                         legacy_filled.add(table)
             elif event == "map_key":
@@ -165,21 +200,6 @@ def load_lists(path: Path, con: duckdb.DuckDBPyConnection) -> set[str]:
             elif depth == table_depth + 2:
                 row[key] = value
     return legacy_filled
-
-
-def _quantities_as_double(con: duckdb.DuckDBPyConnection, tables: set[str]) -> None:
-    """A quantity is a number, whatever the file stored it as (``"1.0"`` included)."""
-    for table in tables & {QUANTITIES_TABLE, QUANTITY_OPERATIONS_TABLE}:
-        column_types = dict(
-            con.execute(
-                f"SELECT column_name, column_type FROM (DESCRIBE {ident(table)})"
-            ).fetchall()
-        )
-        if column_types.get(QEL_QUANTITY, "DOUBLE") != "DOUBLE":
-            con.execute(
-                f"ALTER TABLE {ident(table)} ALTER {ident(QEL_QUANTITY)} "
-                f"TYPE DOUBLE USING TRY_CAST({ident(QEL_QUANTITY)} AS DOUBLE)"
-            )
 
 
 def import_extras_json(path: str | Path, target: DuckDBTarget) -> None:
@@ -195,7 +215,8 @@ def import_extras_json(path: str | Path, target: DuckDBTarget) -> None:
         legacy_filled = load_lists(path, con)
         if not legacy_filled:
             return
-        _quantities_as_double(con, legacy_filled)
+        for table in legacy_filled:
+            quantity_as_double(con, table)
     warnings.warn(
         f"The JSON {JSON_QUANTITY_EXTENSION!r} object is deprecated. Its lists were "
         f"read into {', '.join(repr(table) for table in sorted(legacy_filled))}.",
