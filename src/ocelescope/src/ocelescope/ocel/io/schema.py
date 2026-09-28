@@ -41,14 +41,6 @@ SchemaDefinition = list[tuple[str, pa.DataType]]
 
 TIMESTAMP_TYPE = pa.timestamp("us")
 
-ATTRIBUTE_TYPE_TO_ARROW: dict[str, pa.DataType] = {
-    "string": pa.string(),
-    "time": TIMESTAMP_TYPE,
-    "integer": pa.int64(),
-    "float": pa.float64(),
-    "boolean": pa.bool_(),
-}
-
 ATTRIBUTE_TYPE_TO_DUCKDB: dict[str, str] = {
     "string": "VARCHAR",
     "time": "TIMESTAMP",
@@ -56,6 +48,23 @@ ATTRIBUTE_TYPE_TO_DUCKDB: dict[str, str] = {
     "float": "DOUBLE",
     "boolean": "BOOLEAN",
 }
+
+
+def duckdb_to_attribute_type(duckdb_type: str) -> str:
+    """The OCEL attribute type a DuckDB column type is written as.
+
+    The inverse of :data:`ATTRIBUTE_TYPE_TO_DUCKDB`; anything else is a string.
+    """
+    t = duckdb_type.upper()
+    if "BOOL" in t:
+        return "boolean"
+    if "TIMESTAMP" in t or "DATE" in t or t == "TIME":
+        return "time"
+    if "INT" in t:  # TINYINT/SMALLINT/INTEGER/BIGINT/HUGEINT/UINTEGER...
+        return "integer"
+    if any(kind in t for kind in ("DOUBLE", "FLOAT", "DECIMAL", "REAL", "NUMERIC")):
+        return "float"
+    return "string"
 
 
 OBJECT_TABLE_BASE_SCHEMA: SchemaDefinition = [
@@ -189,6 +198,17 @@ def ensure_quantity_tables(con: duckdb.DuckDBPyConnection) -> None:
         _create_if_missing(con, table, schema)
 
 
+def ensure_flat_tables(con: duckdb.DuckDBPyConnection) -> None:
+    """Create any missing one of the five flat OCEL tables on ``con``, empty.
+
+    The quantity tables are left out: an import leaves them to the extras, which
+    create them from the log, and :func:`ensure_ocel_tables` adds whichever the log
+    did not have once the OCEL is built.
+    """
+    for table, schema in ocel_table_schemas([], []).items():
+        _create_if_missing(con, table, schema)
+
+
 def ensure_ocel_tables(con: duckdb.DuckDBPyConnection) -> None:
     """Create any missing OCEL table on ``con``, empty, the quantity ones included.
 
@@ -201,6 +221,5 @@ def ensure_ocel_tables(con: duckdb.DuckDBPyConnection) -> None:
     columns with it, so this never discards anything and is safe to call on a log
     that is already loaded.
     """
-    for table, schema in ocel_table_schemas([], []).items():
-        _create_if_missing(con, table, schema)
+    ensure_flat_tables(con)
     ensure_quantity_tables(con)

@@ -27,7 +27,7 @@ from ocelescope.ocel.constants.tables import (
     OBJECTS_TABLE,
 )
 from ocelescope.ocel.io.connection import DuckDBTarget, connect_target
-from ocelescope.ocel.io.schema import ATTRIBUTE_TYPE_TO_DUCKDB, ensure_ocel_tables
+from ocelescope.ocel.io.schema import ATTRIBUTE_TYPE_TO_DUCKDB, ensure_flat_tables
 from ocelescope.util.sql import ident, literal, utc_timestamp
 
 SRC = "r4pm"
@@ -165,7 +165,7 @@ def import_ocel_r4pm_streamed(source: Path | str, target: DuckDBTarget) -> None:
 
             con.execute(f"DETACH {ident(SRC)}")
 
-            ensure_ocel_tables(con)
+            ensure_flat_tables(con)
 
 
 def with_attr_meta(table: Literal["objects", "events"]) -> str:

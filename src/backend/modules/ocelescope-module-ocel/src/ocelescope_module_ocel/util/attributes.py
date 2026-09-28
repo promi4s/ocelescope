@@ -8,7 +8,7 @@ summary is one ``GROUP BY`` over it however many attributes the log has:
 
 The reported :class:`ValueType` is the attribute's stored DuckDB column type -- the
 importer only ever assigns a small fixed set (see
-``ocelescope.ocel.io.schema.ATTRIBUTE_TYPE_TO_ARROW``), so no value-based inference is
+``ocelescope.ocel.io.schema.ATTRIBUTE_TYPE_TO_DUCKDB``), so no value-based inference is
 needed. Unpivoting has to render every value as text to fit them in one column, so the
 types are read from the stored columns before that and the extremes are cast back after.
 """
