@@ -19,8 +19,8 @@ import {
   ValueType,
 } from "@ocelescope/api-base";
 import {
-  ActivityPicker,
   EventAttributePicker,
+  EventTypePicker,
   ObjectAttributePicker,
   ObjectPicker,
   ObjectTypePicker,
@@ -93,7 +93,7 @@ export const Control = ({
     const selected = Array.isArray(value) ? value.map(String) : [];
     return (
       <Stack gap={4}>
-        <ActivityPicker
+        <EventTypePicker
           label={param.label}
           multiple
           value={selected}
@@ -156,7 +156,9 @@ export const Control = ({
     return (
       <EventAttributePicker
         label={param.label}
-        activity={values.activity == null ? undefined : String(values.activity)}
+        eventType={
+          values.activity == null ? undefined : String(values.activity)
+        }
         disabled={values.activity == null}
         {...chosen}
       />
@@ -177,7 +179,7 @@ export const Control = ({
   }
 
   if (param.kind === "activity") {
-    return <ActivityPicker label={param.label} {...chosen} />;
+    return <EventTypePicker label={param.label} {...chosen} />;
   }
   if (param.kind === "objectType") {
     return <ObjectTypePicker label={param.label} {...chosen} />;

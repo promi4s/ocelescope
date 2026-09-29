@@ -32,29 +32,7 @@ export { createModulesPage } from "./components/ModulePage";
 export { OcelescopeApp } from "./components/OcelescopeApp";
 export { OcelescopeDocument } from "./components/OcelescopeDocument";
 export { OcelSelect } from "./components/OcelSelect/OcelSelect";
-export {
-  ActivityPicker,
-  type ActivityPickerProps,
-  EventAttributePicker,
-  type EventAttributePickerProps,
-  EventPicker,
-  type EventPickerProps,
-  IdPicker,
-  type IdPickerProps,
-  type MultiPicker,
-  type NameItem,
-  NamePicker,
-  type NamePickerProps,
-  ObjectAttributePicker,
-  type ObjectAttributePickerProps,
-  ObjectPicker,
-  type ObjectPickerProps,
-  ObjectTypePicker,
-  type ObjectTypePickerProps,
-  type OcelSource,
-  type Selection,
-  type SinglePicker,
-} from "./components/pickers";
+export * from "./components/Pickers";
 export { default as RelationTable } from "./components/RelationTable";
 export { UploadModal } from "./components/UploadModal/UploadModal";
 export { UploadSection } from "./components/UploadSection/UploadSection";
