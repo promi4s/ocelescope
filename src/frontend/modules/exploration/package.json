@@ -4,6 +4,10 @@
   "version": "0.9.0",
   "description": "Interactive analytical dashboards for OCEL data",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/promi4s/ocelescope.git"
+  },
   "exports": {
     ".": "./dist/index.js",
     "./package.json": "./package.json"
