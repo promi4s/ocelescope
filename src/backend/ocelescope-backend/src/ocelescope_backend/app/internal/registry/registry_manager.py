@@ -157,6 +157,10 @@ class RegistryManager:
         for resource_type in plugin_class.get_resources():
             self._resource_registry.register_resource(id, resource_type)
 
+    def load_module(self, id: str, resources: list[type[Resource]]):
+        for resource_type in resources:
+            self._resource_registry.register_resource(id, resource_type)
+
     def unload_plugins(self, plugin_ids: list[str]):
         for id in plugin_ids:
             self._plugin_registry.unload_module(id)

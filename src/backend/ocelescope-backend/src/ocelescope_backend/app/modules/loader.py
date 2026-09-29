@@ -5,6 +5,7 @@ from fastapi import FastAPI
 
 from ocelescope_backend.app.internal.docs import init_custom_docs
 from ocelescope_backend.app.internal.logger import logger
+from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.modules.base import Module
 
 ENTRYPOINT_GROUP = "ocelescope_backend.modules"
@@ -12,6 +13,10 @@ ENTRYPOINT_GROUP = "ocelescope_backend.modules"
 
 def get_module_path(module: type[Module]):
     return f"/modules/{module.meta.key}/v{module.meta.version.major}"
+
+
+def get_module_source_id(module: type[Module]):
+    return f"module:{module.meta.key}:v{module.meta.version.major}"
 
 
 def discover_modules() -> list[type[Module]]:
@@ -44,6 +49,10 @@ def mount_modules(app: FastAPI) -> list[type[Module]]:
                 f"Duplicated Module detected key: {meta.key} version: v{meta.version.major}"
             )
             continue
+
+        registry_manager.load_module(
+            get_module_source_id(module_cls), module_cls.resources
+        )
 
         sub_app = module_cls.create_app()
 
