@@ -67,7 +67,15 @@ export const FrequencyPicker = ({
         </Group>
       </UnstyledButton>
       <Collapse expanded={expanded}>
-        <Box py="xs" style={{ overflow: "hidden" }}>
+        <Box
+          py="xs"
+          style={{ overflow: "hidden" }}
+          onClickCapture={(event) => {
+            if ((event.target as HTMLElement).closest("button:not([type])")) {
+              event.preventDefault();
+            }
+          }}
+        >
           <R4PMFrequencyPicker
             value={selected}
             onChange={(next) =>
