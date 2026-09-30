@@ -32,28 +32,6 @@
       "get": {
         "summary": "Get default OCEL metadata",
         "operationId": "getDefaultOcel",
-        "parameters": [
-          {
-            "name": "only_latest_versions",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "boolean",
-              "default": true,
-              "title": "Only Latest Versions"
-            }
-          },
-          {
-            "name": "only_preloaded",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "boolean",
-              "default": false,
-              "title": "Only Preloaded"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -65,16 +43,6 @@
                     "$ref": "#/components/schemas/DefaultOCEL"
                   },
                   "title": "Response Getdefaultocel"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -92,7 +60,6 @@
             "schema": {
               "type": "string",
               "description": "Default OCEL key",
-              "examples": [],
               "title": "Key"
             },
             "description": "Default OCEL key"
@@ -2417,16 +2384,6 @@
               }
             ],
             "title": "Url"
-          },
-          "preload": {
-            "type": "boolean",
-            "title": "Preload",
-            "default": false
-          },
-          "hide": {
-            "type": "boolean",
-            "title": "Hide",
-            "default": false
           }
         },
         "type": "object",
@@ -2436,8 +2393,7 @@
           "version",
           "file"
         ],
-        "title": "DefaultOCEL",
-        "description": "Definition of a default OCEL on the server, for quick access. Supports pre-loading the OCEL on backend init."
+        "title": "DefaultOCEL"
       },
       "Entity_Time_Info": {
         "properties": {

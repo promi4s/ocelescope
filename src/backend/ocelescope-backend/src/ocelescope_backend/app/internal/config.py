@@ -25,10 +25,6 @@ class OceanConfig(BaseSettings):
         description="When set to True, passes details of internal errors via the API. Always set to False in production environment.",
     )
 
-    DATA_DIR: DirectoryPath | None = Field(
-        default=None,
-        description="Path to the data directory, relative to `main.py`",
-    )
     PLUGIN_DIR: DirectoryPath | None = Field(
         default=None,
         description="Path to the directory, where plugins are stored",
