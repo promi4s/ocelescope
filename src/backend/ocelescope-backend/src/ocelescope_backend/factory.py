@@ -10,7 +10,6 @@ from fastapi.sse import EventSourceResponse
 
 from ocelescope_backend.app.internal.config import config
 from ocelescope_backend.app.internal.docs import init_custom_docs
-from ocelescope_backend.app.internal.ocel.default_ocel import load_default_ocels
 from ocelescope_backend.app.internal.registrar import (
     register_initial_plugins,
 )
@@ -24,7 +23,6 @@ from ocelescope_backend.version import __version__
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    load_default_ocels()
     sse_manager.set_loop(asyncio.get_running_loop())
     yield
 

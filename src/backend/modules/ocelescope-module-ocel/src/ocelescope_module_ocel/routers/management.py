@@ -3,16 +3,14 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Query, Response
+from ocelescope.ocel.io.connection import connect_target
 from ocelescope_backend.app.dependencies import ApiSession
 from ocelescope_backend.app.internal.exceptions import NotFound
-from ocelescope_backend.app.internal.ocel.default_ocel import (
-    DEFAULT_OCEL_KEYS,
-    DefaultOCEL,
-    filter_default_ocels,
-    get_default_ocel,
-)
 
+from ocelescope import OCEL
+from ocelescope_module_ocel.config import DefaultOCELs
 from ocelescope_module_ocel.models import OcelMetadata
+from ocelescope_module_ocel.models.default_ocel import DefaultOCEL
 
 router = APIRouter()
 
@@ -39,36 +37,38 @@ def get_ocels(
 @router.get(
     "/default", summary="Get default OCEL metadata", operation_id="getDefaultOcel"
 )
-def default_ocels(
-    only_latest_versions: bool = True,
-    only_preloaded: bool = False,
-) -> list[DefaultOCEL]:
-    return filter_default_ocels(
-        exclude_hidden=True,
-        only_latest_versions=only_latest_versions,
-        only_preloaded=only_preloaded,
-    )
+def default_ocels(default_config: DefaultOCELs) -> list[DefaultOCEL]:
+    return default_config.event_logs if default_config else []
 
 
 @router.post(
     "/default", summary="Import default OCEL", operation_id="importDefaultOcel"
 )
 def import_default_ocel(
-    response: Response,
     session: ApiSession,
-    key: str = Query(description="Default OCEL key", examples=DEFAULT_OCEL_KEYS),
+    default_config: DefaultOCELs,
+    key: str = Query(
+        description="Default OCEL key",
+    ),
     version: str | None = Query(
         default=None, description="Dataset version (optional)", examples=["1.0"]
     ),
 ) -> Response:
-    default_ocel = get_default_ocel(key=key, version=version)
-    if default_ocel is None:
-        raise NotFound("The given default OCEL was not found")
+    if not default_config:
+        raise NotFound("No default OCELs configured")
 
-    with default_ocel.get_ocel_copy(use_abbreviations=False) as ocel:
-        session.add_ocel(ocel, name=default_ocel.name)
-    response.status_code = 200
-    return response
+    event_log = default_config.get_event_log(key=key, version=version)
+    if not event_log:
+        raise NotFound("Default OCEL not found")
+
+    event_log_path = default_config.event_log_directory / event_log.file
+    if not event_log_path.exists():
+        raise NotFound("Default OCEL file not found")
+
+    with connect_target(event_log_path) as conn:
+        session.add_ocel(OCEL.from_duckdb(conn), event_log.name)
+
+    return Response(status_code=200)
 
 
 @router.get(
