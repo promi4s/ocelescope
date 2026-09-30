@@ -45,7 +45,7 @@ package = true
 plugin = [
   "more-itertools>=11.1.0",
   "networkx>=3.5",
-  "pulp>=3.3.2,<4",
+  "pulp>=4,<5",
   "numpy>=2.3.2",
   "scikit-learn>=1.9.0",
 ]
