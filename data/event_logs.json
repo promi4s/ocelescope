@@ -2,118 +2,32 @@
   "base_path": "event_logs",
   "event_logs": [
     {
-      "key": "pallet-logistics",
-      "name": "Logistics Example",
-      "version": "0.9",
-      "file": "pallet-logistics-v0.9.sqlite",
-      "preload": false
-    },
-    {
-      "key": "containerLogistics",
+      "key": "container-logistics",
       "name": "Container Logistics",
-      "version": "1",
-      "file": "ContainerLogistics-v1.sqlite",
-      "url": "https://zenodo.org/record/8289900",
-      "preload": false,
-      "abbr_map": {
-        "Vehicle": "Vcl",
-        "Truck": "Trk",
-        "Container": "Ctr",
-        "Transport Document": "TD",
-        "Handling Unit": "HU",
-        "Customer Order": "CO",
-        "Forklift": "FL",
-        "Register": "Reg",
-        "Reschedule": "Reschedule",
-        "Drive": "Drv",
-        "Terminal": "Trmnl",
-        "Loading Bay": "LoadBay"
-      }
+      "version": "3",
+      "file": "container_logistics.db",
+      "url": "https://doi.org/10.5281/zenodo.18373888"
     },
     {
-      "key": "orderManagementWithDistances",
-      "name": "Order Management (with distances)",
-      "version": "1",
-      "file": "order-management-v1-with-distances.sqlite",
-      "url": "https://zenodo.org/record/8337464",
-      "preload": false
-    },
-    {
-      "key": "orderManagementWithDistances",
-      "name": "Order Management (with distances, OCEAn units)",
-      "version": "1.2",
-      "file": "order-management-v1.2-with-distances-ocean-units.sqlite",
-      "url": "https://zenodo.org/record/8337464",
-      "preload": true
-    },
-    {
-      "key": "orderManagement",
+      "key": "order-management",
       "name": "Order Management",
-      "version": "1",
-      "file": "order-management-v1.sqlite",
-      "url": "https://zenodo.org/record/8337464",
-      "preload": false,
-      "hide": true
+      "version": "3",
+      "file": "order-management.db",
+      "url": "https://doi.org/10.5281/zenodo.18373906"
     },
     {
       "key": "p2p",
-      "name": "Purchase-to-Pay (P2P)",
+      "name": "Procure-To-Payment",
       "version": "1",
-      "file": "ocel2-p2p-1.0.sqlite",
-      "url": "https://zenodo.org/record/8412920",
-      "preload": false,
-      "abbr_map": {
-        "goods receipt": "goods rcpt.",
-        "invoice receipt": "invoice rcpt.",
-        "material": "material",
-        "payment": "payment",
-        "purchase_order": "purch. order",
-        "purchase_requisition": "purch. req.",
-        "quotation": "quotation",
-        "Approve Purchase Order": "Apprv. purch. order",
-        "Approve Purchase Requisition": "Apprv. purch. req.",
-        "Create Goods Receipt": "Create goods rcpt.",
-        "Create Invoice Receipt": "Create inv. rcpt.",
-        "Create Purchase Order": "Create purch. order",
-        "Create Purchase Requisition": "Create purch. req.",
-        "Create Request for Quotation": "Create req. for quot.",
-        "Delegate Purchase Requisition Approval": "Delegate purch. req. apprv.",
-        "Execute Payment": "Exec. Payment",
-        "Perform Two-Way Match": "Two-Way Match",
-        "invoice_receipt_pm": "ir_pm",
-        "Purchase Order of Quotation": "po_q",
-        "Invoice Receipt of Goods Receipt": "ir_gr",
-        "Materials of Goods Receipt": "m_gr",
-        "Good Receipts of Purchase Order": "po_gr",
-        "order_pm": "po_pm",
-        "goods_receipt_pm": "gr_pm",
-        "Quotation of PR": "pr_q",
-        "assigned_materials of PR": "pr_assigned_m",
-        "Materials of Purchase Order": "po_m",
-        "Materials of Quotation": "q_m",
-        "Invoice Receipts of Purchase Order": "po_ir"
-      }
+      "file": "p2p.db",
+      "url": "https://doi.org/10.5281/zenodo.8412920"
     },
     {
       "key": "hinge",
       "name": "Hinge Production",
       "version": "1",
-      "file": "socel_hinge.sqlite",
-      "preload": false
-    },
-    {
-      "key": "hinge",
-      "name": "Hinge Production (fixed number format)",
-      "version": "1.1",
-      "file": "socel_hinge_v1.1_num.sqlite",
-      "preload": false
-    },
-    {
-      "key": "hinge",
-      "name": "Hinge Production (with OCEAn units)",
-      "version": "1.3.1",
-      "file": "socel_hinge_v1.2_ocean-units.sqlite",
-      "preload": true
+      "file": "hinge.db",
+      "url": "https://doi.org/10.5281/zenodo.13638681"
     }
   ]
 }
