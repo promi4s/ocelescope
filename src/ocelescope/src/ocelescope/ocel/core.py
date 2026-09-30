@@ -454,9 +454,6 @@ class OCEL:
 
         path = Path(path)
 
-        if path.suffix not in {".xmlocel", ".xml", ".jsonocel", ".json", ".sqlite"}:
-            raise ValueError(f"Unsupported extension: {path.suffix}")
-
         export_duckdb_ocel(self._con, path)
 
     def write_xes(self, object_type: str, path: str | Path):
