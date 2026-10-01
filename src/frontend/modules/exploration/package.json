@@ -1,7 +1,7 @@
 {
   "name": "@ocelescope/exploration",
   "type": "module",
-  "version": "0.9.1",
+  "version": "0.10.0",
   "description": "Interactive analytical dashboards for OCEL data",
   "license": "MIT",
   "repository": {
