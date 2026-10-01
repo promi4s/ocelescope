@@ -192,7 +192,8 @@
     "bdrs",
     "mult",
     "dfgs",
-    "iterchildren"
+    "iterchildren",
+    "levelprefix"
   ],
   "ignorePaths": [
     "pnpm-lock.yaml",

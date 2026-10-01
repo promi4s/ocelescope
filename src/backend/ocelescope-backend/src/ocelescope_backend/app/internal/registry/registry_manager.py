@@ -38,6 +38,10 @@ class RegistryManager:
 
         self.load_plugin(self.BASE_PLUGIN_ID, BasePlugin)
 
+    @property
+    def resource_registry(self) -> ResourceRegistry:
+        return self._resource_registry
+
     def list_plugins(self) -> list[PluginApi]:
         return self._plugin_registry.list_plugins()
 
@@ -155,10 +159,6 @@ class RegistryManager:
         self._plugin_registry.add_plugin(id, plugin_class)
 
         for resource_type in plugin_class.get_resources():
-            self._resource_registry.register_resource(id, resource_type)
-
-    def load_module(self, id: str, resources: list[type[Resource]]):
-        for resource_type in resources:
             self._resource_registry.register_resource(id, resource_type)
 
     def unload_plugins(self, plugin_ids: list[str]):

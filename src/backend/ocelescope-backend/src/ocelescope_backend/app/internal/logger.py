@@ -1,32 +1,45 @@
 import logging
+from copy import deepcopy
+from typing import Any
 
 import uvicorn.config
 
+LOGGER_NAME = "ocelescope"
+
+logger = logging.getLogger(LOGGER_NAME)
+
+
+def get_logger(name: str) -> logging.Logger:
+    return logger.getChild(name)
+
 
 class IgnoreOptionsRequestsFilter(logging.Filter):
-    def filter(self, record):
-        if record.args is None:
-            return True
-        _ip, method, _route, _, _code = record.args
-        return method != "OPTIONS"
+    """Drops uvicorn access log lines for CORS preflight requests."""
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        args = record.args
+        return not (isinstance(args, tuple) and len(args) > 1 and args[1] == "OPTIONS")
 
 
-ignore_options_request_filter = IgnoreOptionsRequestsFilter("ignore_options_requests")
+def build_log_config(level: str = "INFO") -> dict[str, Any]:
+    config = deepcopy(uvicorn.config.LOGGING_CONFIG)
+    config["disable_existing_loggers"] = False
 
+    config["filters"] = {"ignore_options": {"()": IgnoreOptionsRequestsFilter}}
+    config["handlers"]["access"]["filters"] = ["ignore_options"]
 
-LOGGER_CONFIG = uvicorn.config.LOGGING_CONFIG
-LOGGER_CONFIG["disable_existing_loggers"] = False
-
-# logger = logging.getLogger("ocean")
-
-# # Redirect own logger to uvicorn
-# uvicorn_logger = logging.getLogger("uvicorn")
-# for handler in uvicorn_logger.handlers:
-#     logger.addHandler(handler)
-
-access_logger = logging.getLogger("uvicorn.access")
-access_logger.addFilter(ignore_options_request_filter)
-
-logger = logging.getLogger("uvicorn.error")
-# logger.setLevel(logging.INFO)
-logger.setLevel(logging.DEBUG)
+    config["formatters"]["ocelescope"] = {
+        "()": "uvicorn.logging.DefaultFormatter",
+        "fmt": "%(levelprefix)s [%(name)s] %(message)s",
+    }
+    config["handlers"]["ocelescope"] = {
+        "formatter": "ocelescope",
+        "class": "logging.StreamHandler",
+        "stream": "ext://sys.stderr",
+    }
+    config["loggers"][LOGGER_NAME] = {
+        "handlers": ["ocelescope"],
+        "level": level,
+        "propagate": False,
+    }
+    return config
