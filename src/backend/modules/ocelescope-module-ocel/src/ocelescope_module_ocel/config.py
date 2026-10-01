@@ -14,7 +14,7 @@ This file contains a Config class defining all environment parameters, including
 
 
 class OCELModuleConfig(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env")
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     DATA_DIR: DirectoryPath | None = Field(
         default=None,
