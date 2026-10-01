@@ -8,10 +8,12 @@ from ocelescope_module_filter.routes import router
 class Filter(Module):
     meta = ModuleMeta(key="filter", version=Version("1.0"))
 
-    @classmethod
-    def create_app(cls) -> FastAPI:
+    def create_app(self) -> FastAPI:
         app = FastAPI(
-            title="Filter", version=str(cls.meta.version), docs_url=None, redoc_url=None
+            title="Filter",
+            version=str(self.meta.version),
+            docs_url=None,
+            redoc_url=None,
         )
 
         app.include_router(router)

@@ -41,6 +41,11 @@ class OceanConfig(BaseSettings):
         description="Maximum total expanded size accepted for an uploaded zip archive",
     )
 
+    LOG_LEVEL: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = Field(
+        default="INFO",
+        description="Minimum level of the backend's own log output",
+    )
+
     MODE: Literal["production", "development"] | None = Field(
         default="development", description="The mode in which the backend is running"
     )
