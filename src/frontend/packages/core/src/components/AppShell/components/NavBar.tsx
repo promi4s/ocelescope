@@ -9,15 +9,21 @@ import {
   Text,
   UnstyledButton,
 } from "@mantine/core";
-import { useGetOcels, useLogout } from "@ocelescope/api-base";
+import {
+  type OcelMetadata,
+  useGetOcels,
+  useLogout,
+} from "@ocelescope/api-base";
 import { useQueryClient } from "@tanstack/react-query";
 import { LogOutIcon, PackageIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Fragment, useMemo, useState } from "react";
+import { useCurrentOcel } from "../../../hooks/useCurrentOCEL";
 import useModulePath from "../../../hooks/useModulePath";
 import type { ModuleDefinition, OcelescopeConfig } from "../../../lib/config";
 import { getModuleRoute } from "../../../lib/getModuleRoute";
+import { canAccessRoute } from "../../../lib/routeAccess";
 import classes from "../AppShell.module.css";
 
 const LogoutButton: React.FC = () => {
@@ -73,19 +79,18 @@ const LogoutButton: React.FC = () => {
 const NavbarGroup = ({
   modules,
   modulePath,
-  isOcelAvailable,
+  ocel,
 }: {
   modules: ModuleDefinition[];
-  isOcelAvailable: boolean;
+  ocel: OcelMetadata | undefined;
   modulePath?: {
     moduleName?: string;
     routeName?: string;
   };
 }) => {
   return modules.map(({ label, name, icon: Icon = PackageIcon, routes }) => {
-    const isModuleDisabled =
-      !Object.values(routes).some(({ requiresOcel }) => !requiresOcel) &&
-      !isOcelAvailable;
+    const availableRoute = routes.find((route) => canAccessRoute(route, ocel));
+    const isModuleDisabled = !availableRoute;
 
     return (
       <NavLink
@@ -96,6 +101,7 @@ const NavbarGroup = ({
         component={Link}
         href={getModuleRoute({
           moduleName: name,
+          ...(availableRoute ? { routeName: availableRoute.name } : {}),
         })}
         disabled={isModuleDisabled}
         {...(isModuleDisabled ? { opened: false } : {})}
@@ -104,24 +110,22 @@ const NavbarGroup = ({
         }
       >
         {Object.keys(routes).length > 1 &&
-          Object.values(routes).map(
-            ({ label: routeLabel, name: routeName, requiresOcel }) => (
-              <NavLink
-                key={routeName}
-                label={routeLabel}
-                href={getModuleRoute({
-                  moduleName: name,
-                  routeName: routeName,
-                })}
-                disabled={!!requiresOcel && !isOcelAvailable}
-                component={Link}
-                active={
-                  name === modulePath?.moduleName &&
-                  routeName === modulePath.routeName
-                }
-              />
-            ),
-          )}
+          Object.values(routes).map((route) => (
+            <NavLink
+              key={route.name}
+              label={route.label}
+              href={getModuleRoute({
+                moduleName: name,
+                routeName: route.name,
+              })}
+              disabled={!canAccessRoute(route, ocel)}
+              component={Link}
+              active={
+                name === modulePath?.moduleName &&
+                route.name === modulePath.routeName
+              }
+            />
+          ))}
       </NavLink>
     );
   });
@@ -133,7 +137,8 @@ const NavBar: React.FC<{ config: OcelescopeConfig }> = ({ config }) => {
   const modulePath = useModulePath(config);
   const { data: ocels } = useGetOcels();
 
-  const isOcelAvailable = ocels?.length !== 0;
+  const { id } = useCurrentOcel();
+  const ocel = ocels?.find((log) => log.id === id);
 
   const moduleGroups = useMemo(() => {
     if (!navbarGroups) {
@@ -177,7 +182,7 @@ const NavBar: React.FC<{ config: OcelescopeConfig }> = ({ config }) => {
               )}
               <NavbarGroup
                 modules={modules}
-                isOcelAvailable={isOcelAvailable}
+                ocel={ocel}
                 modulePath={modulePath}
               />
             </Fragment>

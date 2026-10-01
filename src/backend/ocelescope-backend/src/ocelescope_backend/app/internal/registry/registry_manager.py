@@ -9,6 +9,7 @@ from typing_extensions import TypedDict
 from ocelescope import Plugin, Resource
 from ocelescope_backend.app.internal.config import config
 from ocelescope_backend.app.internal.model.plugin import PluginApi
+from ocelescope_backend.app.internal.registry.extension import ExtensionRegistry
 from ocelescope_backend.app.internal.registry.plugin import (
     PluginNotFound,
     PluginRegistry,
@@ -35,12 +36,17 @@ class RegistryManager:
     def __init__(self):
         self._plugin_registry = PluginRegistry()
         self._resource_registry = ResourceRegistry()
+        self._extension_registry = ExtensionRegistry()
 
         self.load_plugin(self.BASE_PLUGIN_ID, BasePlugin)
 
     @property
     def resource_registry(self) -> ResourceRegistry:
         return self._resource_registry
+
+    @property
+    def extension_registry(self) -> ExtensionRegistry:
+        return self._extension_registry
 
     def list_plugins(self) -> list[PluginApi]:
         return self._plugin_registry.list_plugins()

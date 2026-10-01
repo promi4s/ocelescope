@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from collections.abc import Iterator
-from typing import Annotated, Literal
+from collections.abc import Callable, Iterator
+from typing import Annotated, Literal, TypeVar
 
 from fastapi import Depends, HTTPException, Request
 
-from ocelescope import OCEL
+from ocelescope import OCEL, OCELExtension
 from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.session import Session
 from ocelescope_backend.app.internal.tasks.plugin import PluginTask
@@ -46,6 +46,27 @@ def get_ocel(
 
 ApiOcel = Annotated[OCEL, Depends(get_ocel)]
 
+
+E = TypeVar("E", bound=OCELExtension)
+
+
+def get_ocel_extension(extension: type[E]) -> Callable[..., E]:
+    """Use as Annotated[SOCEL, Depends(get_ocel_extension(SOCEL))].
+
+    Shares ApiOcel's request lifetime and original/filtered selection. Any error
+    from_ocel raises rejects the log as unsupported (HTTP 422).
+    """
+
+    def dependency(ocel: ApiOcel) -> E:
+        try:
+            return extension.from_ocel(ocel)
+        except Exception as error:
+            raise HTTPException(
+                status_code=422,
+                detail=f"OCEL does not support {extension.label}: {error}",
+            ) from error
+
+    return dependency
 
 def get_plugin_task(session: ApiSession, task_id: str) -> PluginTask:
     plugin_task = session.get_task(task_id)

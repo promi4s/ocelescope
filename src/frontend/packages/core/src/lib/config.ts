@@ -18,6 +18,7 @@ export type ModuleRouteDefinition = {
   name: string;
   label: string;
   requiresOcel?: boolean;
+  requiresExtensions?: readonly string[];
   component: React.ComponentType;
 };
 

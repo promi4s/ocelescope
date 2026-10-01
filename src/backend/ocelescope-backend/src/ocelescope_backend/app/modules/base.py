@@ -6,7 +6,7 @@ from typing import ClassVar
 from fastapi import FastAPI
 from packaging.version import Version
 
-from ocelescope import BaseFilter, Resource
+from ocelescope import BaseFilter, OCELExtension, Resource
 from ocelescope_backend.app.modules.context import ModuleContext, ModuleRegistry
 
 
@@ -19,6 +19,7 @@ class ModuleMeta:
 class Module(ABC):
     meta: ClassVar[ModuleMeta]
     resources: ClassVar[list[type[Resource]]] = []
+    extensions: ClassVar[list[type[OCELExtension]]] = []
 
     def __init__(self, context: ModuleContext) -> None:
         self.context = context

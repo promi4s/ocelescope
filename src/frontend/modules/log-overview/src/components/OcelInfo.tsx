@@ -6,6 +6,7 @@ import {
   useQuantityInfo,
   useTimeInfo,
 } from "@ocelescope/api-base";
+import { OcelTypeBadges } from "@ocelescope/core";
 import { useMemo } from "react";
 import { formatTime } from "../util/dayjs";
 
@@ -37,6 +38,12 @@ const OCELInfo: React.FC<{ ocelId: string }> = ({ ocelId }) => {
         <Table.Tr>
           <Table.Th w={160}>Name:</Table.Th>
           <Table.Td>{ocel.name}</Table.Td>
+        </Table.Tr>
+        <Table.Tr>
+          <Table.Th>Type:</Table.Th>
+          <Table.Td>
+            <OcelTypeBadges extensions={ocel.extensions} />
+          </Table.Td>
         </Table.Tr>
         <Table.Tr>
           <Table.Th>Events:</Table.Th>

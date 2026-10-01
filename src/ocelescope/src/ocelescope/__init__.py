@@ -12,6 +12,7 @@ from ocelescope.ocel import (
     ObjectIdFilter,
     ObjectTypeFilter,
     ObjectTypeFrequencyFilter,
+    OCELExtension,
     TimeFrameFilter,
 )
 from ocelescope.plugin import (
@@ -82,6 +83,7 @@ __all__ = [
     "LayoutConfig",
     "O2OCountFilter",
     "OCELAnnotation",
+    "OCELExtension",
     "ObjectAttributeFilter",
     "ObjectIdFilter",
     "ObjectTypeFilter",

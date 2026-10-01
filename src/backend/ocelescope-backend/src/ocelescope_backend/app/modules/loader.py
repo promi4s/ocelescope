@@ -25,7 +25,11 @@ def build_module(module_cls: type[Module]) -> Module:
     return module_cls(
         ModuleContext(
             logger=get_logger(f"modules.{module_cls.meta.key}"),
-            registry=ModuleRegistry(registry_manager.resource_registry, source_id),
+            registry=ModuleRegistry(
+                registry_manager.resource_registry,
+                registry_manager.extension_registry,
+                source_id,
+            ),
             source_id=source_id,
             mount_path=get_module_path(module_cls),
         )
@@ -64,7 +68,7 @@ def mount_modules(app: FastAPI) -> list[type[Module]]:
             continue
 
         module = build_module(module_cls)
-        module.registry.load(module_cls.resources)
+        module.registry.load(module_cls.resources, module_cls.extensions)
 
         sub_app = module.create_app()
 

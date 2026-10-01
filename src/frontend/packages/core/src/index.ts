@@ -32,6 +32,7 @@ export { createModulesPage } from "./components/ModulePage";
 export { OcelescopeApp } from "./components/OcelescopeApp";
 export { OcelescopeDocument } from "./components/OcelescopeDocument";
 export { OcelSelect } from "./components/OcelSelect/OcelSelect";
+export { OcelTypeBadges } from "./components/OcelSelect/OcelTypeBadges";
 export {
   ActivityPicker,
   type ActivityPickerProps,

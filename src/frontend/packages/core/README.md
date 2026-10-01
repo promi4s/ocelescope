@@ -98,6 +98,31 @@ export default defineModule({
 });
 ```
 
+### Extension requirements
+
+Routes can require registered OCEL extensions by their stable IDs:
+
+```tsx
+const spatialRoute = defineModuleRoute({
+  name: "spatial",
+  label: "Spatial analysis",
+  requiresExtensions: ["socel"],
+  component: SpatialView,
+});
+```
+
+Every requested extension must be available on the selected log. Requirements
+apply to navigation and direct page access, and automatically require a log.
+The backend module registers its classes with `extensions = [SOCEL]` and protects
+its endpoints with `get_ocel_extension(SOCEL)`.
+
+`OcelTypeBadges` renders the OCEL badge plus extension labels from the existing
+`useGetOcel` / `useGetOcels` metadata hooks:
+
+```tsx
+<OcelTypeBadges extensions={ocel.extensions} />
+```
+
 ### Charts
 
 `OcelChart` runs DuckDB SQL against the selected OCEL and draws the result. The

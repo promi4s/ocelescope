@@ -3,7 +3,7 @@ from pathlib import Path
 
 from ocelescope.ocel.io import export_duckdb_ocel
 
-from ocelescope import OCEL, BaseFilter
+from ocelescope import OCEL, BaseFilter, OCELExtension
 
 
 class SessionOCEL:
@@ -30,6 +30,7 @@ class SessionOCEL:
         self._filters_by_source: dict[str, list[BaseFilter]] = {}
         self._filtered_db_path: Path | None = None
         self._filtered_generation = 0
+        self.recognized_extensions: list[type[OCELExtension]] | None = None
 
     def _all_filters(self) -> list[BaseFilter]:
         return [f for pipeline in self._filters_by_source.values() for f in pipeline]
@@ -101,5 +102,9 @@ class SessionOCEL:
     def set_filters(self, module_source: str, pipeline: Sequence[BaseFilter]):
         self._filters_by_source[module_source] = list(pipeline)
         self._drop_filtered()
+        # Has to be done because currently filters don't propagate to extensions
+        # DuckDb does not have a cascade on delete which might leave references alive
+        # that break validation rules of the extension
+        self.recognized_extensions = None
         if self._all_filters():
             self._active_path(use_original=False)
