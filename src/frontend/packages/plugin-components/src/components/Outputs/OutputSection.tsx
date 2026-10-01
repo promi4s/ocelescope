@@ -1,4 +1,5 @@
 import {
+  Badge,
   Box,
   Center,
   Group,
@@ -8,8 +9,10 @@ import {
   Text,
 } from "@mantine/core";
 import { useToggle } from "@mantine/hooks";
+import { generateColor } from "@marko19907/string-to-color";
 import { usePluginResult } from "@ocelescope/api-base";
 import { Visualization, type VisualizationsType } from "@ocelescope/resources";
+import { EyeOffIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { DownloadAction } from "./Actions/DownloadAction";
 import { OrientationAction } from "./Actions/OrientationAction";
@@ -116,9 +119,35 @@ const OutputSection: React.FC<OutputSectionProps> = ({
                   min="15%"
                 >
                   <Box h="100%" pos="relative">
-                    <Visualization
-                      visualization={output.visualization as VisualizationsType}
-                    />
+                    {output.visualization ? (
+                      <Visualization
+                        visualization={
+                          output.visualization as VisualizationsType
+                        }
+                      />
+                    ) : (
+                      <Center h="100%" p="md">
+                        <Stack align="center" gap="xs">
+                          <EyeOffIcon
+                            size={64}
+                            strokeWidth={1.5}
+                            color="var(--mantine-color-dimmed)"
+                          />
+                          <Text fw={500}>No visualization available</Text>
+                          <Group gap={6} justify="center">
+                            <Badge
+                              size="sm"
+                              color={generateColor(output.type_label)}
+                            >
+                              {output.type_label}
+                            </Badge>
+                            <Text size="sm" c="dimmed">
+                              does not provide a visualization
+                            </Text>
+                          </Group>
+                        </Stack>
+                      </Center>
+                    )}
                   </Box>
                 </Splitter.Pane>
               ))}
