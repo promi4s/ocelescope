@@ -1,7 +1,7 @@
 {
   "name": "@ocelescope/pnpm-plugin-catalog",
   "type": "module",
-  "version": "0.9.1",
+  "version": "0.10.0",
   "description": "pnpm config dependency that provides the Ocelescope dependency catalog, keeping module workspaces in sync with Ocelescope releases.",
   "author": "Görkem-Emre Öztürk <goerkem.oeztuerk@rwth-aachen.de>",
   "license": "MIT",
