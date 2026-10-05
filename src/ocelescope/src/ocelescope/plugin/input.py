@@ -168,7 +168,7 @@ def COMPUTED_SELECTION(
         default: Default value, or `...` to make the field required.
 
     """
-    meta = {
+    meta: dict[str, Any] = {
         "type": "computed_select",
         "provider": provider,
         "dependsOn": depends_on or [],
