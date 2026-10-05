@@ -1,26 +1,27 @@
-import { Group, SegmentedControl, Text } from "@mantine/core";
-import type { SqlQueryResult } from "@ocelescope/api-base";
-import { EmptyState, useViewerConfig, useViewSetting } from "@r4pm/components";
-import type { ChartType, SqlChartProps } from ".";
+import { EmptyState, useViewSetting } from "@r4pm/components";
+import { Flex, SegmentedControl, Text } from "@r4pm/components/ui";
 import { AreaChart } from "./AreaChart";
 import { BarChart } from "./BarChart";
+import { HistogramChart } from "./HistogramChart";
 import { LineChart } from "./LineChart";
 import { PieChart } from "./PieChart";
 import { ScatterChart } from "./ScatterChart";
 import { SunburstChart } from "./SunburstChart";
+import type { ChartType, SqlChartProps, Table } from "./types";
 
 /**
  * A query's result, drawn.
  *
- * This is the r4pm viewer: it reads the result's own column types to decide
- * what goes across and what goes up, takes colours and selection from the
- * ambient `ViewerConfig`, and hands the rows to one of the charts.
+ * It reads the result's own column types to decide what goes across and what
+ * goes up, and hands the rows to one of the charts; colours and selection
+ * reach them from the ambient `ViewerConfig`, or from the props given here.
  */
 export const SqlChart = ({
   data,
   type: initialType = "bar",
   types = [],
   x,
+  xEnd,
   y,
   series,
   path,
@@ -30,9 +31,9 @@ export const SqlChart = ({
   colorScope,
   title,
   height = "100%",
-  ...config
+  colorOf,
+  onSelect,
 }: SqlChartProps) => {
-  const { colorOf, onSelect } = useViewerConfig(config);
   // Keyed by title so two charts under one ViewStateProvider keep their own
   // choice rather than switching together.
   const [type, setType] = useViewSetting<ChartType>(
@@ -46,11 +47,9 @@ export const SqlChart = ({
     x: category,
     y: measures,
     series,
-    ...(colorScope && {
-      colorOf: (name: string) => colorOf?.(colorScope, name) ?? "#888888",
-    }),
-    onSelect: (name: string, point: unknown) =>
-      onSelect?.({ scope: colorScope ?? category, key: name, data: point }),
+    colorScope,
+    colorOf,
+    onSelect,
   };
 
   return (
@@ -63,26 +62,29 @@ export const SqlChart = ({
       }}
     >
       {(title || types.length > 1) && (
-        <Group gap="xs" mb="xs" pr={48} justify="flex-start" wrap="wrap">
+        // Room on the right for an enclosing export frame's menu.
+        <Flex gap="2" mb="2" pr="8" align="center" wrap="wrap">
           {title && (
-            <Text size="sm" fw={600} truncate>
+            <Text size="2" weight="bold" truncate>
               {title}
             </Text>
           )}
           {types.length > 1 && (
-            <SegmentedControl
+            <SegmentedControl.Root
               data-export-ignore
-              size="xs"
-              radius="xl"
+              size="1"
+              radius="full"
               value={type}
-              onChange={(value) => setType(value as ChartType)}
-              data={types.map((option) => ({
-                value: option,
-                label: option[0]?.toUpperCase() + option.slice(1),
-              }))}
-            />
+              onValueChange={(value) => setType(value as ChartType)}
+            >
+              {types.map((option) => (
+                <SegmentedControl.Item key={option} value={option}>
+                  {option[0]?.toUpperCase() + option.slice(1)}
+                </SegmentedControl.Item>
+              ))}
+            </SegmentedControl.Root>
           )}
-        </Group>
+        </Flex>
       )}
       <div style={{ flex: 1, minHeight: 0 }}>
         {data.rows.length === 0 ? (
@@ -92,6 +94,8 @@ export const SqlChart = ({
           />
         ) : type === "bar" ? (
           <BarChart {...chart} stacked={stacked} horizontal={horizontal} />
+        ) : type === "histogram" && xEnd ? (
+          <HistogramChart {...chart} xEnd={xEnd} />
         ) : type === "line" ? (
           <LineChart {...chart} yAxes={yAxes} />
         ) : type === "area" ? (
@@ -112,7 +116,7 @@ const NUMERIC = /INT|DEC|DOUBLE|FLOAT|REAL|NUMERIC|HUGEINT/;
 
 /** What to draw: the first non-numeric column across, the numbers up. */
 const columns = (
-  result: SqlQueryResult,
+  result: Table,
   { x, y, series }: Pick<SqlChartProps, "x" | "y" | "series">,
 ) => {
   const numeric = (name: string) =>

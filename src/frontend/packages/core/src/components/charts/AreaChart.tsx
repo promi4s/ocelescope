@@ -1,11 +1,13 @@
 import { cartesian, traceCount } from "./internal/cartesian";
 import { axis, Plot } from "./internal/Plot";
+import { useChart } from "./internal/useChart";
 import { type CartesianChartProps, measureOf } from "./types";
 
 export type AreaChartProps = CartesianChartProps;
 
 /** A line with the ground beneath it filled in, for totals over time. */
-export const AreaChart = ({ xRange, ...props }: AreaChartProps) => {
+export const AreaChart = ({ xRange, ...given }: AreaChartProps) => {
+  const props = useChart(given);
   const measure = measureOf(props.y);
 
   return (

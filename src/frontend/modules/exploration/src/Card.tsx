@@ -21,11 +21,7 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { LineChart, OcelChart, useOcelQuery } from "@ocelescope/core";
-import {
-  AsyncBoundary,
-  colorForKey,
-  ViewerExportFrame,
-} from "@r4pm/components";
+import { AsyncBoundary, ViewerExportFrame } from "@r4pm/components";
 import {
   ChartNoAxesCombinedIcon,
   InfoIcon,
@@ -167,7 +163,7 @@ export const AnalysisCard = ({
               <OcelChart
                 height="100%"
                 sql={analysis.sql(values, numeric)}
-                {...analysis.chart(values)}
+                {...analysis.chart(values, numeric)}
               />
             )
           ) : (
@@ -426,9 +422,7 @@ const Changes = ({
             series="attribute"
             xRange={lifetime}
             yAxes="independent"
-            colorOf={(attribute) =>
-              colorForKey("attribute", attribute) ?? "#888888"
-            }
+            colorScope="attribute"
             step
           />
         );

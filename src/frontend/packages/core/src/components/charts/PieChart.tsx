@@ -1,5 +1,6 @@
 import { Plot } from "./internal/Plot";
 import { paint, toSeries } from "./internal/series";
+import { useChart } from "./internal/useChart";
 import type { ChartProps } from "./types";
 
 export interface PieChartProps extends ChartProps {
@@ -8,7 +9,8 @@ export interface PieChartProps extends ChartProps {
 }
 
 /** Shares of a whole, one slice per category. */
-export const PieChart = ({ hole = 0.5, ...props }: PieChartProps) => {
+export const PieChart = ({ hole = 0.5, ...given }: PieChartProps) => {
+  const props = useChart(given);
   // A pie draws one measure; further traces would sit on top of each other.
   const [slices] = toSeries(props);
   const colors = slices && paint(slices, props.colorOf, true);

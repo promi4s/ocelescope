@@ -9,6 +9,8 @@ export {
   type ChartOptions,
   type ChartProps,
   type ChartType,
+  HistogramChart,
+  type HistogramChartProps,
   LineChart,
   type LineChartProps,
   OcelChart,

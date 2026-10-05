@@ -1,5 +1,5 @@
 import { ThemedPlot } from "@r4pm/components/charts";
-import type { ChartProps } from "../types";
+import type { SelectName } from "./useChart";
 
 /** One Plotly trace. `react-plotly.js` types traces as `unknown`, so this
  * names what we put in one rather than pretending to type all of Plotly. */
@@ -23,7 +23,7 @@ export const Plot = ({
   legend?: boolean;
   /** Which of a clicked point's fields names it; a horizontal bar reads `y`. */
   readName?: (point: Click["points"][number]) => string;
-  onSelect?: ChartProps["onSelect"];
+  onSelect?: SelectName;
 }) => (
   <ThemedPlot
     data={traces}

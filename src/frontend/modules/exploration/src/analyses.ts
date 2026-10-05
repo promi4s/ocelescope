@@ -49,7 +49,7 @@ export interface Analysis {
   method: string;
   params: readonly Param[];
   sql: (values: Values, numeric: Numeric) => string;
-  chart: (values: Values) => ChartOptions;
+  chart: (values: Values, numeric: Numeric) => ChartOptions;
   /** Drawn by r4pm's attribute-change viewer rather than by a chart. */
   view?: "attribute-changes" | "custom-chart";
 }
@@ -113,15 +113,35 @@ const counts = (source: string, limit = 25) => `WITH raw AS (${source}),
   FROM raw WHERE value IS NULL GROUP BY ALL HAVING count(*) > 0
   ORDER BY rank`;
 
+/** The column a histogram's bins start in, named after what they measure so
+ * the axis reads it - kept clear of the two columns beside it. */
+const binColumn = (measure: unknown) => {
+  const name = String(measure ?? "value");
+  return name === "count" || name === "bin_end" ? `${name} ` : name;
+};
+
+/** How to draw what `histogram` returns. */
+const histogramChart = (measure: unknown): ChartOptions => ({
+  type: "histogram",
+  x: binColumn(measure),
+  xEnd: "bin_end",
+  y: "count",
+});
+
 /**
- * A histogram of `source`'s `value` column.
+ * A histogram of `source`'s `value` column: one row per bin, with its lower
+ * edge in a column named after `measure`, its upper edge in `bin_end`.
  *
  * Bin width is Freedman-Diaconis (2·IQR/∛n), with Sturges' rule where the
  * interquartile range is zero. Values beyond Tukey's outer fences are counted
- * in a `<` and a `>` bar instead of stretching the bins, which is what left a
- * long-tailed distribution as one tall bar and a row of empty ones.
+ * in two open-ended bins - no lower edge, or no upper one - instead of
+ * stretching the bins, which is what left a long-tailed distribution as one
+ * tall bar and a row of empty ones.
  */
-const histogram = (source: string) => `WITH raw AS (${source}),
+const histogram = (
+  source: string,
+  measure: unknown,
+) => `WITH raw AS (${source}),
   spread AS (
     SELECT quantile_cont(value, 0.25) AS q1, quantile_cont(value, 0.75) AS q3 FROM raw
   ),
@@ -146,23 +166,29 @@ const histogram = (source: string) => `WITH raw AS (${source}),
     SELECT lo + width * least(floor((value - lo) / nullif(width, 0)), bins - 1) AS start, width
     FROM raw, plan WHERE value BETWEEN lo AND hi
   )
-  SELECT format('{:.6g} – {:.6g}', start, start + width) AS bucket, count(*) AS count, start
+  SELECT start AS ${ident(binColumn(measure))}, start + width AS bin_end, count(*) AS count
   FROM binned GROUP BY ALL
   UNION ALL
-  SELECT format('< {:.6g}', lo), count(*), -1e308 FROM raw, plan WHERE value < lo GROUP BY ALL
+  SELECT NULL, lo, count(*) FROM raw, plan WHERE value < lo GROUP BY ALL
   UNION ALL
-  SELECT format('> {:.6g}', hi), count(*), 1e308 FROM raw, plan WHERE value > hi GROUP BY ALL
-  ORDER BY start`;
+  SELECT hi, NULL, count(*) FROM raw, plan WHERE value > hi GROUP BY ALL
+  ORDER BY 1 NULLS FIRST`;
 
 /** Value counts or a histogram, whichever the attribute deserves. */
-const distribution = (source: string, isNumeric: boolean) =>
-  isNumeric ? histogram(source) : counts(source);
+const distribution = (
+  source: string,
+  attribute: unknown,
+  isNumeric: boolean,
+) => (isNumeric ? histogram(source, attribute) : counts(source));
 
-const DISTRIBUTION_CHART = {
-  x: "bucket",
-  y: "count",
-  types: ["bar", "pie"],
-} as const satisfies ChartOptions;
+/** How to draw what `distribution` returns. */
+const distributionChart = (
+  attribute: unknown,
+  isNumeric: boolean,
+): ChartOptions =>
+  isNumeric
+    ? histogramChart(attribute)
+    : { x: "bucket", y: "count", types: ["bar", "pie"] };
 
 export const analyses: readonly Analysis[] = [
   {
@@ -428,9 +454,11 @@ export const analyses: readonly Analysis[] = [
       distribution(
         `SELECT ${ident(attribute)} AS value FROM events
        WHERE "ocel:activity" = ${lit(activity)}`,
+        attribute,
         numeric(String(attribute)),
       ),
-    chart: () => DISTRIBUTION_CHART,
+    chart: ({ attribute }, numeric) =>
+      distributionChart(attribute, numeric(String(attribute))),
   },
   {
     id: "object-attribute-distribution",
@@ -461,9 +489,11 @@ export const analyses: readonly Analysis[] = [
     )
     SELECT changes.value FROM pairs
     ASOF LEFT JOIN changes ON pairs.oid = changes.oid AND pairs.ts >= changes.ts`,
+        attribute,
         numeric(String(attribute)),
       ),
-    chart: () => DISTRIBUTION_CHART,
+    chart: ({ attribute }, numeric) =>
+      distributionChart(attribute, numeric(String(attribute))),
   },
   {
     id: "time-between-activities",
@@ -492,7 +522,8 @@ export const analyses: readonly Analysis[] = [
     // Each object's trace is reduced to the two activities, so "directly
     // followed" means with none of the two in between.
     sql: ({ source, target, object_type, unit }) =>
-      histogram(`WITH ${REL},
+      histogram(
+        `WITH ${REL},
     trace AS (
       SELECT oid, activity, ts,
              lead(activity) OVER w AS next_activity, lead(ts) OVER w AS next_ts
@@ -502,13 +533,10 @@ export const analyses: readonly Analysis[] = [
       WINDOW w AS (PARTITION BY oid ORDER BY ts, eid)
     )
     SELECT epoch(next_ts - ts) / ${SECONDS[String(unit)] ?? 3600} AS value
-    FROM trace WHERE activity = ${lit(source)} AND next_activity = ${lit(target)}`),
-    chart: ({ unit }) => ({
-      x: "bucket",
-      y: "count",
-      types: ["bar", "pie"],
-      title: `Time in ${unit ?? "hours"}`,
-    }),
+    FROM trace WHERE activity = ${lit(source)} AND next_activity = ${lit(target)}`,
+        unit,
+      ),
+    chart: ({ unit }) => histogramChart(unit),
   },
   {
     id: "object-attribute-timeline",

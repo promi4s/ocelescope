@@ -5,6 +5,7 @@ import {
   plotted,
   type Series,
 } from "../types";
+import type { ColorOfName } from "./useChart";
 
 /**
  * The rows as traces: one per value of the `series` column, or one per measure
@@ -43,7 +44,7 @@ export const toSeries = ({
  */
 export const paint = (
   series: Series,
-  colorOf: ChartProps["colorOf"],
+  colorOf: ColorOfName | undefined,
   alone: boolean,
 ) => {
   if (!colorOf) return undefined;

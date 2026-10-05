@@ -1,5 +1,6 @@
 import { cartesian, traceCount } from "./internal/cartesian";
 import { axis, Plot, type Trace } from "./internal/Plot";
+import { useChart } from "./internal/useChart";
 import { type CartesianChartProps, measureOf } from "./types";
 
 export interface BarChartProps extends CartesianChartProps {
@@ -14,8 +15,9 @@ export const BarChart = ({
   stacked = false,
   horizontal = false,
   xRange,
-  ...props
+  ...given
 }: BarChartProps) => {
+  const props = useChart(given);
   const measure = measureOf(props.y);
   const count = props.rows.length;
   const traces = cartesian(

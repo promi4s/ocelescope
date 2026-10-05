@@ -1,4 +1,5 @@
 import { Plot, type Trace } from "./internal/Plot";
+import { type ColorOfName, useChart } from "./internal/useChart";
 import { type ChartProps, label, measureOf, type Row } from "./types";
 
 export interface SunburstChartProps extends ChartProps {
@@ -7,7 +8,8 @@ export interface SunburstChartProps extends ChartProps {
 }
 
 /** A hierarchy as rings, each one a column of the path. */
-export const SunburstChart = ({ path, ...props }: SunburstChartProps) => {
+export const SunburstChart = ({ path, ...given }: SunburstChartProps) => {
+  const props = useChart(given);
   const rings = path ?? [props.x, props.series].filter(named);
 
   return (
@@ -32,7 +34,7 @@ const nest = (
   rows: readonly Row[],
   path: readonly string[],
   measure: string,
-  colorOf: ChartProps["colorOf"],
+  colorOf: ColorOfName | undefined,
 ): Trace => {
   const nodes = new Map<
     string,

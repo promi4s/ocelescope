@@ -1,12 +1,13 @@
-import type { SqlQueryResult } from "@ocelescope/api-base";
-import type { ViewerConfig, ViewerProps } from "@r4pm/components";
+import type { ViewerConfig } from "@r4pm/components";
 import dynamic from "next/dynamic";
 import type { AreaChartProps } from "./AreaChart";
 import type { BarChartProps } from "./BarChart";
+import type { HistogramChartProps } from "./HistogramChart";
 import type { LineChartProps } from "./LineChart";
 import type { PieChartProps } from "./PieChart";
 import type { ScatterChartProps } from "./ScatterChart";
 import type { SunburstChartProps } from "./SunburstChart";
+import type { ChartOptions, SqlChartProps } from "./types";
 
 /**
  * Charts of the current OCEL, written as SQL.
@@ -28,54 +29,30 @@ import type { SunburstChartProps } from "./SunburstChart";
  * `ViewerConfig`, the plot is a `ThemedPlot`, so it hovers, zooms and toggles
  * its legend like every other r4pm chart, and an enclosing
  * `<ViewerExportFrame>` exports it along with everything else in the frame.
+ *
+ * Everything in this folder except this file and `OcelChart` depends on r4pm
+ * and React alone, so it could live in r4pm as it stands. What stays here is
+ * what belongs to the host: running the query against the current OCEL, and
+ * keeping Plotly out of Next's server render.
  */
 
 export type { AreaChartProps } from "./AreaChart";
 export type { BarChartProps } from "./BarChart";
+export type { HistogramChartProps } from "./HistogramChart";
 export type { LineChartProps } from "./LineChart";
 export type { PieChartProps } from "./PieChart";
 export type { ScatterChartProps } from "./ScatterChart";
 export type { SunburstChartProps } from "./SunburstChart";
 export type {
   CartesianChartProps,
+  ChartOptions,
   ChartProps,
+  ChartType,
   Row,
   Series,
+  SqlChartProps,
+  Table,
 } from "./types";
-
-export type ChartType =
-  | "bar"
-  | "line"
-  | "area"
-  | "scatter"
-  | "pie"
-  | "sunburst";
-
-/** How a query's result is drawn, when the columns alone should not decide. */
-export interface ChartOptions {
-  type?: ChartType;
-  /** Types offered in the header switch. Fewer than two hides it. */
-  types?: ChartType[];
-  /** Category column. Defaults to the first non-numeric column. */
-  x?: string;
-  /** Measure column(s). Defaults to every numeric column. */
-  y?: string | string[];
-  /** Column unfolded into one series per distinct value. */
-  series?: string;
-  /** Sunburst rings, innermost first. Defaults to `[x, series]`. */
-  path?: string[];
-  stacked?: boolean;
-  horizontal?: boolean;
-  /** For line charts, overlay one y scale per line rather than sharing one. */
-  yAxes?: "shared" | "independent";
-  /** Colour through the host's resolver under this scope ("activity",
-   * "objectType"), so a category keeps the colour the graph viewers give it. */
-  colorScope?: string;
-  title?: string;
-  height?: number | string;
-}
-
-export type SqlChartProps = ViewerProps<SqlQueryResult> & ChartOptions;
 
 export interface OcelChartProps extends ChartOptions, ViewerConfig {
   /** DuckDB SQL over the OCEL's stored tables: `events`, `objects`, `e2o`,
@@ -97,6 +74,10 @@ const browserOnly = <Props,>(load: () => Promise<React.ComponentType<Props>>) =>
 
 export const BarChart = browserOnly<BarChartProps>(() =>
   import("./BarChart").then((module) => module.BarChart),
+);
+
+export const HistogramChart = browserOnly<HistogramChartProps>(() =>
+  import("./HistogramChart").then((module) => module.HistogramChart),
 );
 
 export const LineChart = browserOnly<LineChartProps>(() =>
