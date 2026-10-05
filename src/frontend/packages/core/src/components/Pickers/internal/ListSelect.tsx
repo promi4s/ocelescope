@@ -151,9 +151,10 @@ export const ListSelect = <T,>({
       gap="2"
       // r4pm's count line is noise when picking one value, and wrong when
       // the rows are only a page of a search.
-      className={
-        !model.multiple || total !== undefined ? classes.hideCount : undefined
-      }
+      className={[
+        !model.multiple || total !== undefined ? classes.hideCount : "",
+        model.multiple ? "" : classes.single,
+      ].join(" ")}
     >
       {onSearch && (
         <TextField.Root

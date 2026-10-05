@@ -186,7 +186,7 @@ export const analyses: readonly Analysis[] = [
       { name: "y", label: "Y axis", kind: "columns" },
       {
         name: "series",
-        label: "Series (optional)",
+        label: "Series",
         kind: "column",
         required: false,
       },
@@ -478,7 +478,7 @@ export const analyses: readonly Analysis[] = [
       { name: "target", label: "To", kind: "activity" },
       {
         name: "object_type",
-        label: "Object type (optional)",
+        label: "Object type",
         kind: "objectType",
         required: false,
       },
@@ -543,11 +543,27 @@ export const analyses: readonly Analysis[] = [
 export const findAnalysis = (id: string) =>
   analyses.find((analysis) => analysis.id === id);
 
-/** Whether every required parameter has a value. */
-export const isConfigured = (analysis: Analysis, values: Values) =>
-  analysis.params.every(
-    (param) => param.required === false || hasValue(values[param.name]),
-  );
+/**
+ * A card's values, with every parameter the reader has not set at its
+ * built-in value - so what a control shows is what the query runs with.
+ */
+export const resolve = (analysis: Analysis, values: Values): Values => {
+  const resolved: Values = {};
+  for (const param of analysis.params) {
+    const value =
+      values[param.name] ?? param.default ?? param.options?.[0] ?? undefined;
+    if (value != null) resolved[param.name] = value;
+  }
+  return resolved;
+};
 
-const hasValue = (value: Values[string]) =>
+export const hasValue = (value: Values[string]) =>
   value != null && (!Array.isArray(value) || value.length > 0);
+
+/** Whether every required parameter has a value. */
+export const isConfigured = (analysis: Analysis, values: Values) => {
+  const resolved = resolve(analysis, values);
+  return analysis.params.every(
+    (param) => param.required === false || hasValue(resolved[param.name]),
+  );
+};
