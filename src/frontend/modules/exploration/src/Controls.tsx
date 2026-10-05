@@ -6,12 +6,13 @@
  * endpoints and looks the same as on every other page. The rest is Mantine.
  */
 import {
+  Box,
+  Group,
+  Input,
   NumberInput,
-  Select,
+  SegmentedControl,
   Stack,
-  Text,
-  Textarea,
-  TextInput,
+  ThemeIcon,
 } from "@mantine/core";
 import {
   useEventAttributes,
@@ -26,7 +27,8 @@ import {
   ObjectTypePicker,
   useCurrentOcel,
 } from "@ocelescope/core";
-import type { Param, Values } from "./analyses";
+import { CheckIcon } from "lucide-react";
+import { type Analysis, hasValue, type Param, type Values } from "./analyses";
 
 /** The value types a chart bins; the rest it counts by value. */
 const BINNED: string[] = [ValueType.int, ValueType.float];
@@ -63,25 +65,108 @@ export const useNumeric = (values: Values) => {
     );
 };
 
-export const Control = ({
+/** Whether a parameter narrows another: its choices depend on the activity. */
+const followsActivity = (analysis: Analysis, param: Param) =>
+  param.kind === "eventAttribute" ||
+  (param.kind === "objectType" &&
+    param.required !== false &&
+    analysis.params.some((other) => other.name === "activity"));
+
+/**
+ * The parameters to clear when one changes, because what they offer depends
+ * on it: an attribute on its activity or object type, an object type on the
+ * activity it is narrowed to.
+ */
+export const dependents = (analysis: Analysis, changed: Param) => {
+  const stale = (param: Param) =>
+    (changed.name === "activity" && followsActivity(analysis, param)) ||
+    (changed.name === "object_type" && param.kind === "objectAttribute");
+  const names = analysis.params.filter(stale).map((param) => param.name);
+  // An object type cleared with its activity takes its attribute along.
+  return changed.name === "activity" && names.includes("object_type")
+    ? [
+        ...names,
+        ...analysis.params
+          .filter((param) => param.kind === "objectAttribute")
+          .map((param) => param.name),
+      ]
+    : names;
+};
+
+/**
+ * An analysis's parameters as numbered steps. A step shows a check once it
+ * has a value; the next one to fill is highlighted, and optional ones are
+ * dashed - so what is left to do is seen rather than read.
+ */
+export const Fields = ({
+  analysis,
+  values,
+  onChange,
+}: {
+  analysis: Analysis;
+  values: Values;
+  onChange: (param: Param, value: Values[string]) => void;
+}) => {
+  const next = analysis.params.find(
+    (param) => param.required !== false && !hasValue(values[param.name]),
+  );
+
+  return (
+    <Stack gap="md">
+      {analysis.params.map((param, index) => {
+        const done = hasValue(values[param.name]);
+        return (
+          <Group key={param.name} gap="sm" align="flex-start" wrap="nowrap">
+            <ThemeIcon
+              size={22}
+              radius="xl"
+              color={done ? "teal" : param === next ? "blue" : "gray"}
+              variant={done || param === next ? "filled" : "outline"}
+              style={{
+                fontSize: 11,
+                fontWeight: 600,
+                borderStyle: param.required === false ? "dashed" : undefined,
+              }}
+            >
+              {done ? <CheckIcon size={13} /> : index + 1}
+            </ThemeIcon>
+            <Box flex={1} miw={0}>
+              <Control
+                analysis={analysis}
+                param={param}
+                values={values}
+                onChange={(value) => onChange(param, value)}
+              />
+            </Box>
+          </Group>
+        );
+      })}
+    </Stack>
+  );
+};
+
+const Control = ({
+  analysis,
   param,
   values,
   onChange,
 }: {
+  analysis: Analysis;
   param: Param;
   values: Values;
   onChange: (value: Values[string]) => void;
 }) => {
   const value = values[param.name];
+  const activity =
+    typeof values.activity === "string" ? values.activity : undefined;
 
   if (param.kind === "number") {
     return (
       <NumberInput
-        size="xs"
         label={param.label}
         min={param.min}
         max={param.max}
-        value={Number(value ?? param.default ?? 0)}
+        value={Number(value ?? 0)}
         onChange={(next) =>
           onChange(typeof next === "number" ? next : undefined)
         }
@@ -89,62 +174,50 @@ export const Control = ({
     );
   }
 
-  if (param.kind === "activities") {
-    const selected = Array.isArray(value) ? value.map(String) : [];
-    return (
-      <Stack gap={4}>
-        <ActivityPicker
-          label={param.label}
-          multiple
-          value={selected}
-          onChange={onChange}
-        />
-        <Text size="xs" c="dimmed">
-          Leave empty to include all activities.
-        </Text>
-      </Stack>
-    );
-  }
-
+  // Few enough to show them all, so nothing has to be opened to see them.
   if (param.kind === "choice") {
     return (
-      <Select
-        size="xs"
-        label={param.label}
-        data={[...(param.options ?? [])]}
-        value={String(value ?? param.options?.[0] ?? "")}
-        onChange={(next) => onChange(next ?? undefined)}
-        allowDeselect={false}
-      />
+      <Input.Wrapper label={param.label}>
+        <SegmentedControl
+          fullWidth
+          data={[...(param.options ?? [])]}
+          value={String(value ?? "")}
+          onChange={onChange}
+        />
+      </Input.Wrapper>
     );
   }
 
-  if (param.kind === "text" || param.kind === "column") {
+  if (param.kind === "activities") {
     return (
-      <TextInput
+      <ActivityPicker
         label={param.label}
-        value={value == null ? "" : String(value)}
-        onChange={(event) => onChange(event.currentTarget.value || undefined)}
+        placeholder="All activities"
+        multiple
+        value={Array.isArray(value) ? value.map(String) : []}
+        onChange={onChange}
       />
     );
   }
-
-  if (param.kind === "sql") {
-    return (
-      <Textarea
-        label={param.label}
-        autosize
-        minRows={6}
-        value={value == null ? "" : String(value)}
-        onChange={(event) => onChange(event.currentTarget.value || undefined)}
-        styles={{ input: { fontFamily: "monospace", fontSize: 12 } }}
-      />
-    );
-  }
-
-  if (param.kind === "columns") return null;
 
   const chosen = { value: value == null ? null : String(value), onChange };
+
+  if (param.kind === "activity") {
+    return <ActivityPicker label={param.label} {...chosen} />;
+  }
+
+  if (param.kind === "objectType") {
+    const narrowed = followsActivity(analysis, param);
+    return (
+      <ObjectTypePicker
+        label={param.label}
+        activity={narrowed ? activity : undefined}
+        disabled={narrowed && activity === undefined}
+        {...(param.required === false && { placeholder: "All object types" })}
+        {...chosen}
+      />
+    );
+  }
 
   if (param.kind === "object") {
     return <ObjectPicker label={param.label} {...chosen} />;
@@ -156,8 +229,8 @@ export const Control = ({
     return (
       <EventAttributePicker
         label={param.label}
-        activity={values.activity == null ? undefined : String(values.activity)}
-        disabled={values.activity == null}
+        activity={activity}
+        disabled={activity === undefined}
         {...chosen}
       />
     );
@@ -176,11 +249,6 @@ export const Control = ({
     );
   }
 
-  if (param.kind === "activity") {
-    return <ActivityPicker label={param.label} {...chosen} />;
-  }
-  if (param.kind === "objectType") {
-    return <ObjectTypePicker label={param.label} {...chosen} />;
-  }
+  // The remaining kinds belong to the custom chart, which has its own form.
   return null;
 };

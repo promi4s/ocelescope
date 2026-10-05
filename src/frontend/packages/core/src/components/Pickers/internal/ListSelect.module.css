@@ -1,0 +1,12 @@
+/* Hides the "n of <rows> selected" line of r4pm's FrequencyPicker, which has
+   no option for it: the line just above the listbox. */
+.hideCount div:has(+ [role="listbox"]) {
+  display: none;
+}
+
+/* r4pm draws a checkbox on every row, also when only one can be picked. There
+   it becomes a radio button: the mark just before the row's label. */
+.single [role="option"] > span:has(+ :global(.truncate)) {
+  /* biome-ignore lint/complexity/noImportantStyles: r4pm sets it inline */
+  border-radius: 50% !important;
+}

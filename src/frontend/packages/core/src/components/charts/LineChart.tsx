@@ -1,5 +1,6 @@
 import { axis, Plot } from "./internal/Plot";
 import { paint, toSeries } from "./internal/series";
+import { useChart } from "./internal/useChart";
 import { type CartesianChartProps, measureOf } from "./types";
 
 export interface LineChartProps extends CartesianChartProps {
@@ -17,8 +18,9 @@ export const LineChart = ({
   step = false,
   yAxes = "shared",
   xRange,
-  ...props
+  ...given
 }: LineChartProps) => {
+  const props = useChart(given);
   const groups = toSeries(props);
   const independent = yAxes === "independent" && groups.length > 1;
   const colors = groups.map((group) => {

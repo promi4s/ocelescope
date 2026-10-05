@@ -1,11 +1,13 @@
 import { cartesian, traceCount } from "./internal/cartesian";
 import { axis, Plot } from "./internal/Plot";
+import { useChart } from "./internal/useChart";
 import { type CartesianChartProps, measureOf } from "./types";
 
 export type ScatterChartProps = CartesianChartProps;
 
 /** A point per row, for values that have no order to follow. */
-export const ScatterChart = ({ xRange, ...props }: ScatterChartProps) => {
+export const ScatterChart = ({ xRange, ...given }: ScatterChartProps) => {
+  const props = useChart(given);
   const measure = measureOf(props.y);
 
   return (

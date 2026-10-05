@@ -1,8 +1,21 @@
+import type { ViewerConfig, ViewerProps } from "@r4pm/components";
+
 /** One row of a tidy result: a value per column. */
 export type Row = Record<string, unknown>;
 
-/** What every chart is given: rows, and which columns to read them by. */
-export interface ChartProps {
+/** A tidy table: its rows, and the type its source reported per column. */
+export interface Table {
+  columns: readonly { name: string; type: string }[];
+  rows: readonly Row[];
+}
+
+/**
+ * What every chart is given: rows, and which columns to read them by.
+ *
+ * Colour and selection follow the r4pm viewer contract: `colorOf` and
+ * `onSelect` come from the ambient `ViewerConfig` unless given here.
+ */
+export interface ChartProps extends Pick<ViewerConfig, "colorOf" | "onSelect"> {
   rows: readonly Row[];
   /** Column whose values name the categories. */
   x: string;
@@ -10,10 +23,10 @@ export interface ChartProps {
   y: string | readonly string[];
   /** Column unfolded into one series per distinct value. */
   series?: string;
-  /** Colour for a name, e.g. the one the graph viewers give it. */
-  colorOf?: (name: string) => string;
-  /** A click on a mark, by the name that mark carries. */
-  onSelect?: (name: string, point: unknown) => void;
+  /** Scope the marks are coloured and selected under ("activity",
+   * "objectType"), so a name keeps the colour the other viewers give it.
+   * Without one the plot's own colours are used. */
+  colorScope?: string;
 }
 
 /** What the charts drawn against two axes take on top of the rest. */
@@ -23,6 +36,44 @@ export interface CartesianChartProps extends ChartProps {
    * the axis down to the millisecond around itself. */
   xRange?: readonly [unknown, unknown];
 }
+
+export type ChartType =
+  | "bar"
+  | "histogram"
+  | "line"
+  | "area"
+  | "scatter"
+  | "pie"
+  | "sunburst";
+
+/** How a table is drawn, when its columns alone should not decide. */
+export interface ChartOptions {
+  type?: ChartType;
+  /** Types offered in the header switch. Fewer than two hides it. */
+  types?: ChartType[];
+  /** Category column. Defaults to the first non-numeric column. For a
+   * histogram, the column holding each bin's lower edge. */
+  x?: string;
+  /** Histogram only: the column holding each bin's upper edge. */
+  xEnd?: string;
+  /** Measure column(s). Defaults to every numeric column. */
+  y?: string | string[];
+  /** Column unfolded into one series per distinct value. */
+  series?: string;
+  /** Sunburst rings, innermost first. Defaults to `[x, series]`. */
+  path?: string[];
+  stacked?: boolean;
+  horizontal?: boolean;
+  /** For line charts, overlay one y scale per line rather than sharing one. */
+  yAxes?: "shared" | "independent";
+  /** Colour through the host's resolver under this scope ("activity",
+   * "objectType"), so a category keeps the colour the graph viewers give it. */
+  colorScope?: string;
+  title?: string;
+  height?: number | string;
+}
+
+export type SqlChartProps = ViewerProps<Table> & ChartOptions;
 
 /** One trace's worth of rows: what it is called, and what it draws. */
 export interface Series {

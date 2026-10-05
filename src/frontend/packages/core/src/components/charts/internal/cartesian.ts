@@ -1,6 +1,6 @@
-import type { ChartProps } from "../types";
 import type { Trace } from "./Plot";
 import { paint, toSeries } from "./series";
+import type { Drawn } from "./useChart";
 
 /**
  * Traces for the charts drawn against two axes.
@@ -10,7 +10,7 @@ import { paint, toSeries } from "./series";
  * what makes it itself.
  */
 export const cartesian = (
-  { rows, x, y, series, colorOf }: ChartProps,
+  { rows, x, y, series, colorOf }: Drawn,
   mark: Trace,
   horizontal = false,
   colorByPoint = true,
@@ -36,4 +36,4 @@ export const cartesian = (
 };
 
 /** How many traces a chart will draw, which decides whether it needs a legend. */
-export const traceCount = (props: ChartProps) => toSeries(props).length;
+export const traceCount = (props: Drawn) => toSeries(props).length;

@@ -4,6 +4,7 @@ import {
   Alert,
   Badge,
   Button,
+  Center,
   Code,
   Divider,
   Group,
@@ -20,12 +21,7 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { LineChart, OcelChart, useOcelQuery } from "@ocelescope/core";
-import {
-  AsyncBoundary,
-  colorForKey,
-  EmptyState,
-  ViewerExportFrame,
-} from "@r4pm/components";
+import { AsyncBoundary, ViewerExportFrame } from "@r4pm/components";
 import {
   ChartNoAxesCombinedIcon,
   InfoIcon,
@@ -37,13 +33,14 @@ import {
   type Analysis,
   isConfigured,
   type Param,
+  resolve,
   type Values,
 } from "./analyses";
-import { Control, useNumeric } from "./Controls";
+import { dependents, Fields, useNumeric } from "./Controls";
 
 export const AnalysisCard = ({
   analysis,
-  values,
+  values: stored,
   onChange,
   onRemove,
   configurationOpened,
@@ -58,23 +55,13 @@ export const AnalysisCard = ({
   onConfigure: () => void;
   onCloseConfiguration: () => void;
 }) => {
+  const values = resolve(analysis, stored);
   const numeric = useNumeric(values);
   const configured = isConfigured(analysis, values);
   const setParam = (param: Param, value: Values[string]) => {
-    const next = { ...values, [param.name]: value };
-    // A previously selected attribute may not exist in the new parent scope.
-    if (param.name === "activity" && param.kind === "activity") {
-      const dependent = analysis.params.find(
-        (candidate) => candidate.kind === "eventAttribute",
-      );
-      if (dependent) next[dependent.name] = undefined;
-    }
-    if (param.name === "object_type") {
-      const dependent = analysis.params.find(
-        (candidate) => candidate.kind === "objectAttribute",
-      );
-      if (dependent) next[dependent.name] = undefined;
-    }
+    const next = { ...stored, [param.name]: value };
+    // What a dependent parameter held may not exist under the new choice.
+    for (const name of dependents(analysis, param)) next[name] = undefined;
     onChange(next);
   };
 
@@ -99,11 +86,6 @@ export const AnalysisCard = ({
                 <Badge variant="light" color="gray" size="xs">
                   {analysis.category}
                 </Badge>
-                {!configured && (
-                  <Badge variant="light" color="orange" size="xs">
-                    Configure first
-                  </Badge>
-                )}
               </Group>
               <Text c="dimmed" size="xs" lineClamp={2}>
                 {analysis.question}
@@ -181,14 +163,19 @@ export const AnalysisCard = ({
               <OcelChart
                 height="100%"
                 sql={analysis.sql(values, numeric)}
-                {...analysis.chart(values)}
+                {...analysis.chart(values, numeric)}
               />
             )
           ) : (
-            <EmptyState
-              title="Choose what to analyze"
-              description={`Configure ${unset(analysis, values)} to create this visualization.`}
-            />
+            <Center h="100%" data-export-ignore>
+              <Button
+                variant="light"
+                leftSection={<Settings2Icon size={16} />}
+                onClick={onConfigure}
+              >
+                Configure
+              </Button>
+            </Center>
           )}
         </ViewerExportFrame>
       </Paper>
@@ -196,53 +183,28 @@ export const AnalysisCard = ({
       <Modal
         opened={configurationOpened}
         onClose={onCloseConfiguration}
-        title={`Configure ${analysis.label}`}
+        title={analysis.label}
         size="lg"
         centered
       >
-        <Stack gap="md">
-          <Divider />
+        <Stack gap="lg">
           <ScrollArea.Autosize mah="62vh" type="auto" offsetScrollbars>
-            <Stack gap="md" pr="xs">
-              {analysis.view === "custom-chart" ? (
-                <CustomChartControls values={values} onChange={onChange} />
-              ) : (
-                analysis.params.map((param) => (
-                  <Control
-                    key={param.name}
-                    param={param}
-                    values={values}
-                    onChange={(value) => setParam(param, value)}
-                  />
-                ))
-              )}
-            </Stack>
+            {analysis.view === "custom-chart" ? (
+              <CustomChartControls values={values} onChange={onChange} />
+            ) : (
+              <Fields analysis={analysis} values={values} onChange={setParam} />
+            )}
           </ScrollArea.Autosize>
-          <Group justify="space-between">
-            <Text size="xs" c={configured ? "teal" : "dimmed"}>
-              {configured
-                ? "Ready—the visualization is updating with these choices."
-                : `Still needed: ${unset(analysis, values)}.`}
-            </Text>
-            <Button onClick={onCloseConfiguration}>Done</Button>
+          <Group justify="flex-end">
+            <Button disabled={!configured} onClick={onCloseConfiguration}>
+              Done
+            </Button>
           </Group>
         </Stack>
       </Modal>
     </>
   );
 };
-
-/** The parameters still without a value, in words. */
-const unset = (analysis: Analysis, values: Values) =>
-  analysis.params
-    .filter(
-      (param) => param.required !== false && !hasValue(values[param.name]),
-    )
-    .map((param) => param.label.toLowerCase())
-    .join(", ");
-
-const hasValue = (value: Values[string]) =>
-  value != null && (!Array.isArray(value) || value.length > 0);
 
 const summary = (analysis: Analysis, values: Values) =>
   analysis.params
@@ -375,8 +337,8 @@ const CustomChartControls = ({
             />
           </Group>
           <Select
-            label="Series (optional)"
-            description="Split rows into one trace per distinct value."
+            label="Series"
+            placeholder="None"
             data={columns}
             value={values.series == null ? null : String(values.series)}
             clearable
@@ -460,9 +422,7 @@ const Changes = ({
             series="attribute"
             xRange={lifetime}
             yAxes="independent"
-            colorOf={(attribute) =>
-              colorForKey("attribute", attribute) ?? "#888888"
-            }
+            colorScope="attribute"
             step
           />
         );

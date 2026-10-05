@@ -2,6 +2,7 @@
 import {
   Badge,
   Button,
+  Center,
   Container,
   Divider,
   Group,
@@ -27,19 +28,27 @@ import {
   SlidersHorizontalIcon,
 } from "lucide-react";
 import { useMemo, useState } from "react";
-import { type Analysis, analyses, findAnalysis, type Values } from "./analyses";
+import {
+  type Analysis,
+  analyses,
+  findAnalysis,
+  isConfigured,
+  type Values,
+} from "./analyses";
 import { AnalysisCard } from "./Card";
 import { useCards } from "./store";
 
 export const Dashboard = ({ ocelId }: { ocelId: string }) => {
-  const { cards, add, update, remove } = useCards(ocelId);
+  const { cards, loaded, add, update, remove } = useCards(ocelId);
   const [catalogOpen, setCatalogOpen] = useState(false);
   const [configure, setConfigure] = useState<string>();
 
   const addAnalysis = (analysis: string) => {
     const id = add(analysis);
     setCatalogOpen(false);
-    setConfigure(id);
+    // Only an analysis that still needs a choice opens its configuration.
+    const added = findAnalysis(analysis);
+    if (added && !isConfigured(added, {})) setConfigure(id);
   };
 
   return (
@@ -56,14 +65,28 @@ export const Dashboard = ({ ocelId }: { ocelId: string }) => {
               )}
             </Group>
           </Stack>
-          <Button
-            leftSection={<PlusIcon size={16} />}
-            onClick={() => setCatalogOpen(true)}
-          >
-            Add visualization
-          </Button>
+          {cards.length > 0 && (
+            <Button
+              leftSection={<PlusIcon size={16} />}
+              onClick={() => setCatalogOpen(true)}
+            >
+              Add visualization
+            </Button>
+          )}
         </Group>
 
+        {loaded && cards.length === 0 && (
+          <Center h="50vh">
+            <Button
+              size="lg"
+              variant="light"
+              leftSection={<PlusIcon size={18} />}
+              onClick={() => setCatalogOpen(true)}
+            >
+              Add visualization
+            </Button>
+          </Center>
+        )}
         <SimpleGrid cols={{ base: 1, xl: 2 }} spacing="md">
           {cards.map((card) => {
             const analysis = findAnalysis(card.analysis);
@@ -198,11 +221,6 @@ const CatalogItem = ({
           </Text>
           <Text c="dimmed" size="xs" lineClamp={3}>
             {analysis.question}
-          </Text>
-          <Text size="xs" c={analysis.params.length > 0 ? "dimmed" : "blue"}>
-            {analysis.params.length > 0
-              ? `${analysis.params.length} configuration ${analysis.params.length === 1 ? "choice" : "choices"}`
-              : "Ready to view"}
           </Text>
         </Stack>
       </Paper>
