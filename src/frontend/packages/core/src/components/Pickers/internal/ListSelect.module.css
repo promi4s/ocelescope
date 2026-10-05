@@ -1,0 +1,5 @@
+/* Hides the "n of <rows> selected" line of r4pm's FrequencyPicker, which has
+   no option for it: the line just above the listbox. */
+.hideCount div:has(+ [role="listbox"]) {
+  display: none;
+}

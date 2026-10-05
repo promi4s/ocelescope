@@ -38,6 +38,9 @@ export type OptionPickerProps<T> = PickerProps &
      * picker only reports what the reader types. */
     search?: string;
     onSearch?: (search: string) => void;
+    /** How many there are to pick from, when the options are only the page
+     * of them a search turned up. Defaults to the number of options. */
+    total?: number;
   };
 
 export const defaultIdOf = (value: unknown) =>

@@ -16,8 +16,13 @@ export const DropdownSelect = <T,>(
   const { model, label, placeholder, disabled, missing, loading } = props;
   const [open, setOpen] = useState(props.autoFocus ?? false);
 
-  const picked = model.picked.map(({ label }) => label).join(", ");
-  const [first] = model.picked;
+  // One picked value is named; more are counted against all there are.
+  const [first, ...more] = model.picked;
+  const total = props.total ?? model.options.length;
+  const picked =
+    more.length === 0
+      ? first?.label
+      : `${model.picked.length} of ${total.toLocaleString()} selected`;
 
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
@@ -33,7 +38,7 @@ export const DropdownSelect = <T,>(
           }}
         >
           <Flex gap="2" align="center" minWidth="0">
-            {model.picked.length === 1 && <Swatch color={first?.color} />}
+            {more.length === 0 && <Swatch color={first?.color} />}
             <Text truncate highContrast={!!picked && !missing}>
               {missing ?? (picked || placeholder || "Choose…")}
             </Text>
