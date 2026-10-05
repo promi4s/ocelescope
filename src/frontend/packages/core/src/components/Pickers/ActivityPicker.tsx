@@ -7,7 +7,7 @@ import type { OcelPickerProps } from "./types";
 
 export type ActivityPickerProps = OcelPickerProps<string>;
 
-/** The log's event types (activities), by how many events each has. */
+/** The log's activities, by how many events each has. */
 export const ActivityPicker = ({
   ocelId,
   ocelVersion = "filtered",
@@ -36,7 +36,7 @@ export const ActivityPicker = ({
       options={options}
       loading={isPending}
       error={error}
-      placeholder="Choose an event type…"
+      placeholder="Choose an activity…"
       emptyText="The log has no events"
       {...picker}
     />

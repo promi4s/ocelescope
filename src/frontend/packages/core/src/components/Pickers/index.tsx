@@ -12,7 +12,7 @@ import type { OptionPickerProps } from "./OptionPicker";
  * they all wrap around an endpoint; use it for choices from elsewhere.
  */
 
-export type { ActivityPickerProps as EventTypePickerProps } from "./ActivityPicker";
+export type { ActivityPickerProps } from "./ActivityPicker";
 export type { AttributePickerProps } from "./AttributePicker";
 export type { E2ORelationPickerProps } from "./E2ORelationPicker";
 export type { EventAttributePickerProps } from "./EventAttributePicker";
@@ -46,7 +46,7 @@ export const OptionPicker = clientOnly(() =>
   import("./OptionPicker").then((m) => m.OptionPicker),
 ) as <T>(props: OptionPickerProps<T>) => JSX.Element;
 
-export const EventTypePicker = clientOnly(() =>
+export const ActivityPicker = clientOnly(() =>
   import("./ActivityPicker").then((m) => m.ActivityPicker),
 );
 export const ObjectTypePicker = clientOnly(() =>

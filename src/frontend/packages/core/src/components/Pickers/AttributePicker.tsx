@@ -15,9 +15,9 @@ import { OptionPicker } from "./OptionPicker";
 import type { AttributeRef, OcelPickerProps } from "./types";
 
 export type AttributePickerProps = OcelPickerProps<AttributeRef> & {
-  /** The event type whose attributes, and whose related objects'
+  /** The activity whose attributes, and whose related objects'
    * attributes, are offered. */
-  eventType: string | undefined;
+  activity: string | undefined;
   /** Offer attributes of only these related object types. Default: all. */
   objectTypes?: readonly string[];
   /** Offer only object types every event relates to exactly one object of,
@@ -30,16 +30,16 @@ export type AttributePickerProps = OcelPickerProps<AttributeRef> & {
 const attributeId = (ref: AttributeRef) =>
   JSON.stringify(
     ref.target === "event"
-      ? ["event", ref.eventType, ref.name]
+      ? ["event", ref.activity, ref.name]
       : ["object", ref.objectType, ref.name],
   );
 
 /**
- * Attributes around an event type: those its events carry, and those of the
+ * Attributes around an activity: those its events carry, and those of the
  * object types its events relate to, grouped by where they come from.
  */
 export const AttributePicker = ({
-  eventType,
+  activity,
   objectTypes,
   onlyUniquelyRelated = false,
   valueTypes,
@@ -50,17 +50,17 @@ export const AttributePicker = ({
   const id = useOcelId(ocelId);
   const activityColor = useColorOf("activity");
   const objectTypeColor = useColorOf("objectType");
-  const enabled = id != null && eventType !== undefined;
+  const enabled = id != null && activity !== undefined;
 
   const events = useEventAttributes(
     id,
-    { ocel_version: ocelVersion, names: eventType ? [eventType] : [] },
+    { ocel_version: ocelVersion, names: activity ? [activity] : [] },
     { query: { enabled } },
   );
   const relations = useE2o(
     id,
     {
-      source_types: eventType ? [eventType] : [],
+      source_types: activity ? [activity] : [],
       ocel_version: ocelVersion,
       page_size: 1000,
     },
@@ -69,7 +69,7 @@ export const AttributePicker = ({
 
   const relatedTypes = useMemo(() => {
     const rows = (relations.data?.response ?? []).filter(
-      (row) => row.source === eventType,
+      (row) => row.source === activity,
     );
     // Unique: one qualifier, and exactly one object per event.
     const isUnique = (type: string) => {
@@ -84,7 +84,7 @@ export const AttributePicker = ({
     return [...new Set(rows.map((row) => row.target))]
       .filter((type) => !objectTypes || objectTypes.includes(type))
       .filter((type) => !onlyUniquelyRelated || isUnique(type));
-  }, [relations.data, eventType, objectTypes, onlyUniquelyRelated]);
+  }, [relations.data, activity, objectTypes, onlyUniquelyRelated]);
 
   const objects = useObjectAttributes(
     id,
@@ -93,15 +93,15 @@ export const AttributePicker = ({
   );
 
   const options = useMemo(() => {
-    if (eventType === undefined) return [];
+    if (activity === undefined) return [];
     return [
       ...attributeOptions(
         events.data,
         valueTypes,
-        (name): AttributeRef => ({ target: "event", eventType, name }),
+        (name): AttributeRef => ({ target: "event", activity, name }),
         {
-          label: eventType,
-          color: activityColor(eventType),
+          label: activity,
+          color: activityColor(activity),
           caption: "event attributes",
         },
       ),
@@ -119,7 +119,7 @@ export const AttributePicker = ({
       ),
     ];
   }, [
-    eventType,
+    activity,
     events.data,
     objects.data,
     relatedTypes,
@@ -139,9 +139,7 @@ export const AttributePicker = ({
         (relatedTypes.length > 0 && objects.isPending)
       }
       error={events.error ?? relations.error ?? objects.error}
-      missing={
-        eventType === undefined ? "Choose an event type first" : undefined
-      }
+      missing={activity === undefined ? "Choose an activity first" : undefined}
       placeholder="Choose an attribute…"
       emptyText="No attributes to choose from"
       {...attributeDefaults}

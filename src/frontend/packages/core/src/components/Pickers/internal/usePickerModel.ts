@@ -25,8 +25,6 @@ export interface PickerModel<T> {
   pickedIds: Set<string>;
   /** Replace the whole selection. */
   set: (values: T[]) => void;
-  /** Multi: add or take out one value. Single: pick it. */
-  toggle: (value: T) => void;
   remove: (id: string) => void;
 }
 
@@ -77,15 +75,6 @@ export const usePickerModel = <T>(
     picked,
     pickedIds,
     set,
-    toggle: (value) => {
-      if (!props.multiple) return set([value]);
-      const id = idOf(value);
-      set(
-        pickedIds.has(id)
-          ? picked.filter((entry) => entry.id !== id).map((p) => p.value)
-          : [...picked.map((entry) => entry.value), value],
-      );
-    },
     remove: (id) =>
       set(picked.filter((entry) => entry.id !== id).map((p) => p.value)),
   };

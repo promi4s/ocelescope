@@ -62,7 +62,7 @@ export interface Relation {
   qualifier: string;
 }
 
-/** An attribute of an event type's events, or of an object type's objects. */
+/** An attribute of an activity's events, or of an object type's objects. */
 export type AttributeRef =
-  | { target: "event"; eventType: string; name: string }
+  | { target: "event"; activity: string; name: string }
   | { target: "object"; objectType: string; name: string };

@@ -56,20 +56,13 @@ export const PickedBadges = ({
   picked,
   onRemove,
   disabled,
-  inline,
 }: {
   picked: readonly { id: string; label: string; color?: string }[];
   onRemove: (id: string) => void;
   disabled?: boolean;
-  /** Flow with the siblings, as inside a field, instead of a row of its own. */
-  inline?: boolean;
 }) =>
   picked.length === 0 ? null : (
-    <Flex
-      gap="1"
-      wrap="wrap"
-      style={inline ? { display: "contents" } : undefined}
-    >
+    <Flex gap="1" wrap="wrap">
       {picked.map(({ id, label, color }) => (
         <Badge
           key={id}
@@ -85,10 +78,7 @@ export const PickedBadges = ({
               tabIndex={0}
               aria-label={`Remove ${label}`}
               style={{ cursor: "pointer" }}
-              onClick={(event) => {
-                event.stopPropagation();
-                onRemove(id);
-              }}
+              onClick={() => onRemove(id)}
               onKeyDown={(event) => {
                 if (event.key === "Enter" || event.key === " ") {
                   event.preventDefault();
