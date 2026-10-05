@@ -48,7 +48,7 @@ const PluginInput: React.FC<PluginInputProps> = ({
     input_resources: Object.fromEntries(
       method.inputs.map(({ name }) => [name, undefined]),
     ),
-    formData: {},
+    input: {},
   };
 
   const { control, handleSubmit } = useForm<PluginInputType>({

@@ -38,6 +38,10 @@ class RegistryManager:
 
         self.load_plugin(self.BASE_PLUGIN_ID, BasePlugin)
 
+    @property
+    def resource_registry(self) -> ResourceRegistry:
+        return self._resource_registry
+
     def list_plugins(self) -> list[PluginApi]:
         return self._plugin_registry.list_plugins()
 

@@ -1,12 +1,12 @@
 [project]
 name = "ocelescope-workspace"
-version = "0.8.0"
+version = "0.10.1"
 description = "Workspace for ocelescope package"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-  "ocelescope-module-filter>=0.8.0,<0.9.0",
-  "ocelescope-module-ocel>=0.8.0,<0.9.0",
+  "ocelescope-module-filter>=0.10.1,<0.11.0",
+  "ocelescope-module-ocel>=0.10.1,<0.11.0",
   "ocelescope-module-ocelot>=0.8.0,<0.9.0",
 ]
 

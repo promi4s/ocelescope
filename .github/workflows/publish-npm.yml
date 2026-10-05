@@ -8,6 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      id-token: write
+    environment:
+      name: publish
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -39,8 +42,5 @@ jobs:
         run: pnpm run api:sync
 
       - name: Publish (skips versions already on npm)
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
-          pnpm -r publish --no-git-checks --access public --filter "!@ocelescope/ocelot"
+        run: pnpm -r publish --no-git-checks --access public --filter
+          "!@ocelescope/ocelot"

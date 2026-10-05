@@ -1,9 +1,13 @@
 {
   "name": "@ocelescope/exploration",
   "type": "module",
-  "version": "0.8.0",
+  "version": "0.10.1",
   "description": "Interactive analytical dashboards for OCEL data",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/promi4s/ocelescope.git"
+  },
   "exports": {
     ".": "./dist/index.js",
     "./package.json": "./package.json"

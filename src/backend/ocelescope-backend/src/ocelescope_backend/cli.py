@@ -4,8 +4,15 @@ from typing import Annotated
 import orjson
 import typer
 import uvicorn
+from dotenv import load_dotenv
 
-from ocelescope_backend.app.modules.loader import discover_modules, get_module_path
+from ocelescope_backend.app.internal.config import OceanConfig
+from ocelescope_backend.app.internal.logger import build_log_config
+from ocelescope_backend.app.modules.loader import (
+    build_module,
+    discover_modules,
+    get_module_path,
+)
 from ocelescope_backend.factory import create_app
 
 app = typer.Typer()
@@ -32,8 +39,14 @@ def serve(
     reload_dirs: Annotated[list[Path] | None, typer.Option("--reload-dir")] = None,
     env_file: Annotated[Path | None, typer.Option()] = None,
 ) -> None:
+    # uvicorn configures logging before it loads env_file, so resolve the level here
+    if env_file is not None:
+        load_dotenv(env_file)
+    log_level = OceanConfig().LOG_LEVEL
+
     uvicorn.run(
         "ocelescope_backend.main:app",
+        log_config=build_log_config(log_level),
         host=host,
         port=port,
         reload=reload,
@@ -64,7 +77,7 @@ def generate_base_api(
         if module_class is None:
             raise typer.BadParameter(f"Unknown module: {module}")
 
-        fastapi_app = module_class.create_app()
+        fastapi_app = build_module(module_class).create_app()
         prefix = get_module_path(module_class)
 
         openapi_schema = fastapi_app.openapi()

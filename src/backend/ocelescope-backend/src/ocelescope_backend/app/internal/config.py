@@ -1,7 +1,7 @@
 from typing import Literal
 
 from pydantic import DirectoryPath, Field
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 """
 This file contains a Config class defining all environment parameters, including types, default values and descriptions.
@@ -10,6 +10,8 @@ This file contains a Config class defining all environment parameters, including
 
 
 class OceanConfig(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
     FRONTEND_URL: str = Field(
         default="http://frontend:3000",
         description="The frontend URL, relevant for CORS settings",
@@ -25,10 +27,6 @@ class OceanConfig(BaseSettings):
         description="When set to True, passes details of internal errors via the API. Always set to False in production environment.",
     )
 
-    DATA_DIR: DirectoryPath | None = Field(
-        default=None,
-        description="Path to the data directory, relative to `main.py`",
-    )
     PLUGIN_DIR: DirectoryPath | None = Field(
         default=None,
         description="Path to the directory, where plugins are stored",
@@ -45,12 +43,14 @@ class OceanConfig(BaseSettings):
         description="Maximum total expanded size accepted for an uploaded zip archive",
     )
 
+    LOG_LEVEL: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = Field(
+        default="INFO",
+        description="Minimum level of the backend's own log output",
+    )
+
     MODE: Literal["production", "development"] | None = Field(
         default="development", description="The mode in which the backend is running"
     )
-
-    class Config:
-        env_file = ".env"
 
 
 config = OceanConfig()  # type: ignore

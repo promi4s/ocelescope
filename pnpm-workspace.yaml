@@ -10,7 +10,7 @@ allowBuilds:
   sharp: true
 
 catalog:
-  '@biomejs/biome': 2.5.14
+  '@biomejs/biome': 2.5.15
   "@dagrejs/dagre": ^3.0.0
   "@floating-ui/react": ^0.27.18
   "@hpcc-js/wasm-graphviz": ^1.21.0
@@ -56,7 +56,7 @@ catalog:
   jspdf: ^4.2.1
   lucide-react: ^1.0.0
   mantine-datatable: ^9.4.0
-  next: 16.3.5
+  next: 16.3.8
   object-hash: ^3.0.0
   orval: ^8.33.0
   qs: ^6.16.0
