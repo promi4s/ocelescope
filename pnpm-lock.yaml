@@ -292,6 +292,9 @@ catalogs:
     dayjs:
       specifier: ^1.11.23
       version: 1.11.23
+    echarts:
+      specifier: ^6.1.0
+      version: 6.1.0
     echarts-for-react:
       specifier: ^3.0.6
       version: 3.0.6
@@ -619,6 +622,9 @@ importers:
       '@ocelescope/api-config':
         specifier: workspace:^
         version: link:../../packages/api/config
+      '@r4pm/components':
+        specifier: 'catalog:'
+        version: 0.3.2(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.1.21)(plotly.js@4.1.1)(react-dom@19.3.0)(react@19.3.0)
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.4
@@ -631,6 +637,9 @@ importers:
       '@types/react-dom':
         specifier: 'catalog:'
         version: 19.3.0(@types/react@19.3.0)
+      echarts:
+        specifier: 'catalog:'
+        version: 6.1.0
       echarts-for-react:
         specifier: 'catalog:'
         version: 3.0.6(echarts@6.1.0)(react@19.3.0)
@@ -7604,8 +7613,7 @@ snapshots:
       - debug
       - supports-color
 
-  base64-arraybuffer@1.0.2:
-    optional: true
+  base64-arraybuffer@1.0.2: {}
 
   baseline-browser-mapping@2.11.27: {}
 
@@ -8838,8 +8846,7 @@ snapshots:
     dependencies:
       resolve-protobuf-schema: 2.1.0
 
-  performance-now@2.1.0:
-    optional: true
+  performance-now@2.1.0: {}
 
   pick-by-alias@1.2.0: {}
 
@@ -9013,7 +9020,6 @@ snapshots:
   raf@3.4.1:
     dependencies:
       performance-now: 2.1.0
-    optional: true
 
   react-dom@19.3.0(react@19.3.0):
     dependencies:

@@ -1,11 +1,68 @@
-import { Box, Grid, LoadingOverlay, RangeSlider } from "@mantine/core";
+import {
+  Box,
+  Grid,
+  LoadingOverlay,
+  RangeSlider,
+  useMantineTheme,
+} from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
 import type { EntityTimeInfo } from "@ocelescope/api-base";
 import { useTimeInfo } from "@ocelescope/api-base";
+import type { EChartsOption } from "echarts";
+import EChartsReact from "echarts-for-react";
 import { memo, useMemo } from "react";
 import { Controller, Watch } from "react-hook-form";
 import type { FilterView, FilterViewType } from "../../types/filter";
 import dayjs from "../../util/dayjs";
+
+const DATE_FORMAT = "YYYY-MM-DD HH:mm";
+
+const TimeGraph: React.FC<{
+  timeInfo: EntityTimeInfo;
+  startDate?: string;
+  endDate?: string;
+}> = memo(({ timeInfo, startDate, endDate }) => {
+  const theme = useMantineTheme();
+
+  const option: EChartsOption = useMemo(() => {
+    const buckets = timeInfo.date_distribution.map(
+      ({ start_timestamp, end_timestamp, entity_count }) => ({
+        label: `${dayjs(start_timestamp).format(DATE_FORMAT)} - ${dayjs(end_timestamp).format(DATE_FORMAT)}`,
+        count: Object.values(entity_count).reduce((acc, curr) => acc + curr, 0),
+        isInRange:
+          (!startDate || dayjs(end_timestamp).isAfter(dayjs(startDate))) &&
+          (!endDate || dayjs(start_timestamp).isBefore(dayjs(endDate))),
+      }),
+    );
+
+    return {
+      tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
+      grid: { left: 0, right: 0, top: 8, bottom: 0 },
+      xAxis: {
+        type: "category",
+        data: buckets.map(({ label }) => label),
+        show: false,
+      },
+      yAxis: { type: "value", show: false },
+      series: [
+        {
+          type: "bar",
+          name: "count",
+          barCategoryGap: 0,
+          data: buckets.map(({ count, isInRange }) => ({
+            value: count,
+            itemStyle: {
+              color: theme.colors.blue[6],
+              opacity: isInRange ? 1 : 0.25,
+            },
+          })),
+        },
+      ],
+    };
+  }, [timeInfo, startDate, endDate, theme]);
+
+  return <EChartsReact option={option} style={{ height: 300 }} />;
+});
 
 const TimeFrameSlider: React.FC<{
   timeInfo: EntityTimeInfo;
@@ -46,7 +103,7 @@ const TimeFrameSlider: React.FC<{
         const bucket = distribution[value];
 
         return bucket
-          ? dayjs(bucket.start_timestamp).format("YYYY-MM-DD HH:mm")
+          ? dayjs(bucket.start_timestamp).format(DATE_FORMAT)
           : null;
       }}
       onChange={([start, end]) => {
@@ -83,9 +140,13 @@ const TimeFrameFilterView: FilterView<"time_frame"> = memo(
                     "time_frame.0.time_range.1",
                   ] as const
                 }
-                render={() => {
-                  return <></>;
-                }}
+                render={([startTime, endTime]) => (
+                  <TimeGraph
+                    timeInfo={timeInfo}
+                    startDate={startTime ?? undefined}
+                    endDate={endTime ?? undefined}
+                  />
+                )}
               />
             </Grid.Col>
             <Controller

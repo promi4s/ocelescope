@@ -1,7 +1,30 @@
+import { InlineStyles, Stack } from "@mantine/core";
 import { useEventCounts, useObjectCounts } from "@ocelescope/api-base";
+import dynamic from "next/dynamic";
 import { Controller } from "react-hook-form";
 import type { FilterView, FilterViewType } from "../../types/filter";
-import { EntityTypeFilterInput } from "../inputs/EntityTypeFilter";
+
+const FrequencyPicker = dynamic(
+  () => import("@r4pm/components").then((module) => module.FrequencyPicker),
+  { ssr: false },
+);
+
+const PICKER_CLASS = "ocelescope-type-filter-picker";
+
+const FillHeightStyles = () => (
+  <>
+    <InlineStyles
+      deduplicate
+      selector={`.${PICKER_CLASS} > :last-child`}
+      styles={{ flex: 1, minHeight: 0 }}
+    />
+    <InlineStyles
+      deduplicate
+      selector={`.${PICKER_CLASS} [role="listbox"]`}
+      styles={{ flex: 1, minHeight: 0, maxHeight: "none !important" }}
+    />
+  </>
+);
 
 const EntityFilter: (
   entityType: "events" | "objects",
@@ -9,51 +32,64 @@ const EntityFilter: (
   (entityType) =>
   ({ ocelId, control }) => {
     const isEvents = entityType === "events";
-    const { data: entityCounts } = (
-      isEvents ? useEventCounts : useObjectCounts
-    )(ocelId, {
-      ocel_version: "original",
-    });
+    const { data: counts } = (isEvents ? useEventCounts : useObjectCounts)(
+      ocelId,
+      { ocel_version: "original" },
+    );
 
     return (
-      <form>
-        <Controller
-          name={isEvents ? `activity.${0}.mode` : `object_type.${0}.mode`}
-          control={control}
-          render={({ field: modeField }) => (
-            <Controller
-              name={
-                isEvents
-                  ? `activity.${0}.event_types`
-                  : `object_type.${0}.object_types`
-              }
-              control={control}
-              render={({ field }) => (
-                <EntityTypeFilterInput
-                  entityTypes={Object.entries(entityCounts ?? {}).map(
-                    ([activity, count]) => ({ key: activity, value: count }),
-                  )}
-                  selectedEntityTypes={field.value ?? []}
-                  mode={modeField.value ?? "exclude"}
-                  onModeChange={modeField.onChange}
-                  label={isEvents ? "Activities" : "Object Types"}
-                  onChange={field.onChange}
-                />
-              )}
-            />
-          )}
-        />
-      </form>
+      <Controller
+        name={isEvents ? `activity.${0}` : `object_type.${0}`}
+        control={control}
+        render={({ field }) => {
+          const filter = field.value;
+          const selected =
+            filter?.type === "activity"
+              ? filter.event_types
+              : filter?.type === "object_type"
+                ? filter.object_types
+                : [];
+
+          return (
+            <Stack gap={4} flex={1} mih={0} className={PICKER_CLASS}>
+              <FillHeightStyles />
+              <FrequencyPicker
+                items={counts ?? {}}
+                value={new Set(selected)}
+                onChange={(next) =>
+                  field.onChange(
+                    isEvents
+                      ? {
+                          type: "activity",
+                          event_types: [...next],
+                          mode: "include",
+                        }
+                      : {
+                          type: "object_type",
+                          object_types: [...next],
+                          mode: "include",
+                        },
+                  )
+                }
+                mode={"multi"}
+                scope={isEvents ? "activity" : "objectType"}
+                searchable
+                showCutoff
+              />
+            </Stack>
+          );
+        }}
+      />
     );
   };
 
 export const ActivityFilter: FilterViewType<"activity"> = {
   title: "Activity",
   description:
-    "Filters the event log by activity (the event type). In include mode only events of the selected activities are kept; in exclude mode the selected activities are dropped and everything else is kept. The bar chart shows how many events exist per activity to help you decide what to keep.",
+    "Filters the event log by activity (the event type). Only events of the selected activities are kept. The list shows how many events exist per activity to help you decide what to keep.",
   ViewComponent: EntityFilter("events"),
   generateDefault: () => [
-    { type: "activity", event_types: [], mode: "exclude" },
+    { type: "activity", event_types: [], mode: "include" },
   ],
   cleanUpFilters: (filter) => {
     if (!filter[0] || filter[0].event_types.length === 0) {
@@ -66,10 +102,10 @@ export const ActivityFilter: FilterViewType<"activity"> = {
 export const ObjectTypeFilter: FilterViewType<"object_type"> = {
   title: "Object Type",
   description:
-    "Filters the log by object type. In include mode only objects of the selected types are kept; in exclude mode the selected types are dropped and everything else is kept. The bar chart shows how many objects exist per type to help you decide what to keep.",
+    "Filters the log by object type. Only objects of the selected types are kept. The list shows how many objects exist per type to help you decide what to keep.",
   ViewComponent: EntityFilter("objects"),
   generateDefault: () => [
-    { type: "object_type", object_types: [], mode: "exclude" },
+    { type: "object_type", object_types: [], mode: "include" },
   ],
   cleanUpFilters: (filter) => {
     if (!filter[0] || filter[0].object_types.length === 0) {
