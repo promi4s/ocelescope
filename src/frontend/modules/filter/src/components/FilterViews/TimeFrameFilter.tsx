@@ -1,4 +1,3 @@
-import { BarChart } from "@mantine/charts";
 import { Box, Grid, LoadingOverlay, RangeSlider } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
 import type { EntityTimeInfo } from "@ocelescope/api-base";
@@ -7,58 +6,6 @@ import { memo, useMemo } from "react";
 import { Controller, Watch } from "react-hook-form";
 import type { FilterView, FilterViewType } from "../../types/filter";
 import dayjs from "../../util/dayjs";
-
-const TimeGraph: React.FC<{
-  timeInfo: EntityTimeInfo;
-  startDate?: string;
-  endDate?: string;
-}> = memo(({ timeInfo, startDate, endDate }) => {
-  const data = useMemo(() => {
-    const data = timeInfo.date_distribution.map(
-      ({ start_timestamp, end_timestamp, entity_count }) => {
-        const isInRange =
-          (!startDate || dayjs(end_timestamp).isAfter(dayjs(startDate))) &&
-          (!endDate || dayjs(start_timestamp).isBefore(dayjs(endDate)));
-
-        return {
-          date: `${dayjs(start_timestamp).format("YYYY-MM-DD HH:mm")}-${dayjs(end_timestamp).format("YYYY-MM-DD HH:mm")} `,
-          ...(isInRange
-            ? {
-                value: Object.values(entity_count).reduce(
-                  (acc, curr) => acc + curr,
-                  0,
-                ),
-              }
-            : {
-                disabledValue: Object.values(entity_count).reduce(
-                  (acc, curr) => acc + curr,
-                  0,
-                ),
-              }),
-        };
-      },
-    );
-
-    return data;
-  }, [timeInfo, startDate, endDate]);
-
-  return (
-    <BarChart
-      h={300}
-      w={"100%"}
-      data={data}
-      dataKey="date"
-      type="stacked"
-      series={[
-        { name: "value", color: "blue", label: "count" },
-        { name: "disabledValue", color: "red", label: "count" },
-      ]}
-      withYAxis={false}
-      withXAxis={false}
-      barChartProps={{ barCategoryGap: 0, barGap: 0 }}
-    />
-  );
-});
 
 const TimeFrameSlider: React.FC<{
   timeInfo: EntityTimeInfo;
@@ -136,14 +83,8 @@ const TimeFrameFilterView: FilterView<"time_frame"> = memo(
                     "time_frame.0.time_range.1",
                   ] as const
                 }
-                render={([startTime, endTime]) => {
-                  return (
-                    <TimeGraph
-                      timeInfo={timeInfo}
-                      startDate={startTime ?? undefined}
-                      endDate={endTime ?? undefined}
-                    />
-                  );
+                render={() => {
+                  return <></>;
                 }}
               />
             </Grid.Col>

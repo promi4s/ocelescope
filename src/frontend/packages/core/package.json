@@ -58,7 +58,6 @@
     "zustand": "catalog:"
   },
   "devDependencies": {
-    "@mantine/charts": "catalog:",
     "@mantine/dates": "catalog:",
     "@mantine/notifications": "catalog:",
     "@tsdown/css": "catalog:",

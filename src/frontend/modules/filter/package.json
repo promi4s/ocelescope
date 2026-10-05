@@ -34,7 +34,6 @@
   },
   "peerDependencies": {
     "@dagrejs/dagre": "catalog:",
-    "@mantine/charts": "catalog:",
     "@mantine/core": "catalog:",
     "@mantine/dates": "catalog:",
     "@mantine/hooks": "catalog:",
@@ -45,14 +44,14 @@
     "@tanstack/react-query": "catalog:",
     "axios": "catalog:",
     "dayjs": "catalog:",
+    "echarts-for-react": "catalog:",
     "lucide-react": "catalog:",
     "mantine-datatable": "catalog:",
     "next": "catalog:",
     "object-hash": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "react-hook-form": "catalog:",
-    "recharts": "catalog:"
+    "react-hook-form": "catalog:"
   },
   "devDependencies": {
     "@mantine/notifications": "catalog:",
@@ -61,6 +60,7 @@
     "@types/object-hash": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "echarts-for-react": "catalog:",
     "tsdown": "catalog:",
     "typescript": "catalog:"
   }

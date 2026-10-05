@@ -36,7 +36,6 @@ const EntityFilter: (
                   selectedEntityTypes={field.value ?? []}
                   mode={modeField.value ?? "exclude"}
                   onModeChange={modeField.onChange}
-                  showGraph
                   label={isEvents ? "Activities" : "Object Types"}
                   onChange={field.onChange}
                 />
