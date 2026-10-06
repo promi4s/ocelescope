@@ -1,8 +1,10 @@
+from functools import cache
 from importlib.metadata import entry_points
 from typing import Any
 
 from fastapi import FastAPI
 
+from ocelescope import OCEL
 from ocelescope_backend.app.internal.docs import init_custom_docs
 from ocelescope_backend.app.internal.logger import get_logger, logger
 from ocelescope_backend.app.internal.registry import registry_manager
@@ -47,6 +49,20 @@ def discover_modules() -> list[type[Module]]:
         modules.append(loaded)
 
     return modules
+
+
+@cache
+def known_extensions() -> list[type[OCEL]]:
+    """The OCEL extensions the installed modules know, one per name.
+
+    Read off the modules' ``extensions`` through their entry points.
+    """
+    by_name: dict[str, type[OCEL]] = {}
+    for module_cls in discover_modules():
+        for ocel_type in module_cls.extensions:
+            if ocel_type.extension is not None:
+                by_name.setdefault(ocel_type.extension.name, ocel_type)
+    return list(by_name.values())
 
 
 def mount_modules(app: FastAPI) -> list[type[Module]]:

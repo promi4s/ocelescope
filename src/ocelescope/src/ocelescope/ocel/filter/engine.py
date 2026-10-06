@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from functools import reduce
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypeVar
 
 import polars as pl
 
@@ -25,6 +25,8 @@ from ocelescope.util.sql import ident
 
 if TYPE_CHECKING:
     from ocelescope.ocel.core import OCEL
+
+T = TypeVar("T", bound="OCEL")
 
 
 def _all_ids(ocel: OCEL, table: str, id_col: str) -> pl.LazyFrame:
@@ -46,15 +48,13 @@ def _intersect(
     return reduce(lambda left, right: left.join(right, on=id_col, how="inner"), unique)
 
 
-def apply_filters(ocel: OCEL, filters: Sequence[BaseFilter]) -> OCEL:
+def apply_filters(ocel: T, filters: Sequence[BaseFilter]) -> T:
     """Return a new :class:`OCEL` holding the subset ``filters`` agree on.
 
     Each filter names the ids it keeps and the sets are intersected, so a pipeline
     keeps what *all* of its filters keep. A filter that leaves a side ``None``
     constrains only the other one.
     """
-    from ocelescope.ocel.core import OCEL
-
     keeps: list[Keep] = [f.keep(ocel) for f in filters]
 
     kept_events, kept_objects = pl.collect_all(
@@ -91,8 +91,7 @@ def apply_filters(ocel: OCEL, filters: Sequence[BaseFilter]) -> OCEL:
         clone.close()
         raise
 
-    filtered = OCEL(
-        clone,
-    )
+    # the class of the log it came from, so a filtered QEL is still a QEL
+    filtered = type(ocel)(clone)
     filtered.clean()
     return filtered

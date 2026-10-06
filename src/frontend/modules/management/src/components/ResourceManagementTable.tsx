@@ -20,6 +20,7 @@ import {
 } from "@ocelescope/api-base";
 import {
   FullScreenUpload,
+  OcelTypeBadges,
   UploadSection,
   useDownloadOCEL,
   useDownloadResource,
@@ -109,7 +110,13 @@ const ResourceManagementTable: React.FC = () => {
 
   const allEntityTypes = useMemo(
     () => [
-      ...(ocels.length > 0 || tasks.length > 0 ? ["OCEL"] : []),
+      ...new Set(
+        ocels.flatMap(({ extensions }) => [
+          "OCEL",
+          ...(extensions ?? []).map(({ label }) => label),
+        ]),
+      ),
+      ...(tasks.length > 0 && ocels.length === 0 ? ["OCEL"] : []),
       ...new Set(
         resources.map(({ resource_type_label }) => resource_type_label),
       ),
@@ -126,7 +133,12 @@ const ResourceManagementTable: React.FC = () => {
 
   const allEntities: Entity[] = useMemo(() => {
     const ocelEntities = ocels.map<Entity>(
-      ({ name, created_at, id, filter_applied }) => ({
+      ({ name, created_at, id, filter_applied, extensions }) => ({
+        extensions: extensions ?? [],
+        entityTypeNames: [
+          "OCEL",
+          ...(extensions ?? []).map(({ label }) => label),
+        ],
         id,
         name,
         type: "ocel" as const,
@@ -140,6 +152,7 @@ const ResourceManagementTable: React.FC = () => {
       ({ id, name, resource_type_label, created_at }) => ({
         id,
         name,
+        entityTypeNames: [resource_type_label],
         entityTypeName: resource_type_label,
         type: "resource" as const,
         createdAt: dayjs(created_at).toISOString(),
@@ -150,6 +163,7 @@ const ResourceManagementTable: React.FC = () => {
       id: id,
       createdAt: dayjs(metadata.uploaded_at as string).toISOString(),
       name: metadata.fileName as string,
+      entityTypeNames: ["OCEL"],
       entityTypeName: "OCEL",
       type: "ocel",
       isUploading: true,
@@ -166,9 +180,11 @@ const ResourceManagementTable: React.FC = () => {
     const sign = direction === "desc" ? -1 : 1;
     return allEntities
       .filter(
-        ({ name, entityTypeName }) =>
+        ({ name, entityTypeName, entityTypeNames }) =>
           (!searchTerm || name.trim().toLowerCase().includes(searchTerm)) &&
-          (includedTypes.size === 0 || includedTypes.has(entityTypeName)),
+          (includedTypes.size === 0 ||
+            entityTypeNames?.some((type) => includedTypes.has(type)) ||
+            includedTypes.has(entityTypeName)),
       )
       .sort(
         (a, b) =>
@@ -311,9 +327,14 @@ const ResourceManagementTable: React.FC = () => {
           />
         ),
         filtering: includedEntityTypes.length > 0,
-        render: ({ entityTypeName }) => (
-          <Badge color={generateColor(entityTypeName)}>{entityTypeName}</Badge>
-        ),
+        render: ({ entityTypeName, type, extensions }) =>
+          type === "ocel" ? (
+            <OcelTypeBadges extensions={extensions} />
+          ) : (
+            <Badge color={generateColor(entityTypeName)}>
+              {entityTypeName}
+            </Badge>
+          ),
       },
       {
         accessor: "",

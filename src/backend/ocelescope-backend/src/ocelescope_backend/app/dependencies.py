@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from collections.abc import Iterator
-from typing import Annotated, Literal
+from collections.abc import Callable, Iterator
+from typing import Annotated, Literal, TypeVar
 
 from fastapi import Depends, HTTPException, Request
 
@@ -45,6 +45,34 @@ def get_ocel(
 
 
 ApiOcel = Annotated[OCEL, Depends(get_ocel)]
+
+T = TypeVar("T", bound=OCEL)
+
+
+def ocel_as(ocel_type: type[T]) -> Callable[..., T]:
+    """The request's OCEL as an extension of it: ``ApiOcel`` for a subclass.
+
+    ::
+
+        ApiQEL = Annotated[QEL, Depends(ocel_as(QEL))]
+
+        @router.get("/{ocel_id}/items")
+        def items(qel: ApiQEL) -> list[str]:
+            return qel.quantities.item_types
+
+    Takes the same ``ocel_id`` and ``ocel_version`` as ``ApiOcel`` and shares its
+    connection. A log that is not of the format is answered with 422.
+    """
+
+    def dependency(ocel: ApiOcel) -> T:
+        if not ocel_type.matches(ocel):
+            label = ocel_type.extension.label if ocel_type.extension else "OCEL"
+            raise HTTPException(
+                status_code=422, detail=f"The OCEL is not a {label} log"
+            )
+        return ocel_type.from_ocel(ocel)
+
+    return dependency
 
 
 def get_plugin_task(session: ApiSession, task_id: str) -> PluginTask:

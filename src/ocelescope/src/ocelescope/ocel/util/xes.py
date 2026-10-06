@@ -42,7 +42,11 @@ XES_NAMES = {column: name for name, column in RENAME_MAP.items()}
 DYNAMIC_PREFIX = "object:"
 
 
-def create_ocel_from_xml(path: str, fallback_object_name: str = "LogObject") -> "OCEL":
+def create_ocel_from_xml(
+    path: str,
+    fallback_object_name: str = "LogObject",
+    ocel_class: "type[OCEL] | None" = None,
+) -> "OCEL":
     from ocelescope.ocel.core import OCEL  # avoid circular import
 
     log, _meta = r4pm.df.import_xes(path)
@@ -95,7 +99,7 @@ def create_ocel_from_xml(path: str, fallback_object_name: str = "LogObject") -> 
         [EID_COL, OTYPE_COL, ACTIVITY_COL, OID_COL, TIMESTAMP_COL]
     ).with_columns(pl.lit(None, dtype=pl.String).alias(E2O_QUALIFIER))
 
-    return OCEL.from_frames(
+    return (ocel_class or OCEL).from_frames(
         events=event_table,
         objects=object_table,
         relations=e2o_table,

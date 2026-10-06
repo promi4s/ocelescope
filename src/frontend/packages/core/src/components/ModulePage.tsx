@@ -1,4 +1,6 @@
+import { Center, Text } from "@mantine/core";
 import type { GetStaticPaths, GetStaticProps, NextPage } from "next";
+import { useOcelRequirement } from "../hooks/useOcelRequirement";
 import type { OcelescopeConfig } from "../lib/config";
 
 type ModulePageProps = {
@@ -50,9 +52,21 @@ export const createModulesPage = (config: OcelescopeConfig) => {
   const ModulePage: NextPage<ModulePageProps> = ({ moduleName, routeName }) => {
     const moduleConfig = modules.find(({ name }) => name === moduleName);
 
-    const RouteComponent = moduleConfig?.routes.find(
-      ({ name }) => name === routeName,
-    )?.component;
+    const route = moduleConfig?.routes.find(({ name }) => name === routeName);
+    const RouteComponent = route?.component;
+    const isRequirementMet = useOcelRequirement();
+
+    // a page for an OCEL extension is not shown a log of another kind
+    if (
+      Array.isArray(route?.requiresOcel) &&
+      !isRequirementMet(route.requiresOcel)
+    ) {
+      return (
+        <Center h="100%">
+          <Text c="dimmed">This page does not support the selected log.</Text>
+        </Center>
+      );
+    }
 
     return RouteComponent ? <RouteComponent /> : null;
   };

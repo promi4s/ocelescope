@@ -1,4 +1,5 @@
 from ocelescope.ocel.core import OCEL
+from ocelescope.ocel.extension import Extension
 from ocelescope.ocel.filter import (
     BaseFilter,
     E2OCountFilter,
@@ -13,14 +14,17 @@ from ocelescope.ocel.filter import (
     ObjectTypeFrequencyFilter,
     TimeFrameFilter,
 )
+from ocelescope.ocel.qel import QEL
 
 __all__ = [
     "OCEL",
+    "QEL",
     "BaseFilter",
     "E2OCountFilter",
     "EventAttributeFilter",
     "EventTypeFilter",
     "EventTypeFrequencyFilter",
+    "Extension",
     "Keep",
     "O2OCountFilter",
     "ObjectAttributeFilter",

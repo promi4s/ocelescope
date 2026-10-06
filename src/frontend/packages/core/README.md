@@ -98,6 +98,22 @@ export default defineModule({
 });
 ```
 
+A route with `requiresOcel: true` is disabled while the session has no log. A
+route for an OCEL extension lists the names it needs instead, and is disabled
+unless the selected log is of all of them:
+
+```tsx
+defineModuleRoute({ name: "builder", requiresOcel: true, ... }); // any log
+defineModuleRoute({ name: "items", requiresOcel: ["qel"], ... }); // QEL logs only
+```
+
+`OcelTypeBadges` shows what a log is, "OCEL" plus one badge per OCEL extension
+it is of:
+
+```tsx
+<OcelTypeBadges extensions={ocel.extensions} />
+```
+
 ### Charts
 
 `OcelChart` runs DuckDB SQL against the selected OCEL and draws the result. The

@@ -9,13 +9,14 @@ import {
   Text,
   UnstyledButton,
 } from "@mantine/core";
-import { useGetOcels, useLogout } from "@ocelescope/api-base";
+import { useLogout } from "@ocelescope/api-base";
 import { useQueryClient } from "@tanstack/react-query";
 import { LogOutIcon, PackageIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Fragment, useMemo, useState } from "react";
 import useModulePath from "../../../hooks/useModulePath";
+import { useOcelRequirement } from "../../../hooks/useOcelRequirement";
 import type { ModuleDefinition, OcelescopeConfig } from "../../../lib/config";
 import { getModuleRoute } from "../../../lib/getModuleRoute";
 import classes from "../AppShell.module.css";
@@ -73,19 +74,19 @@ const LogoutButton: React.FC = () => {
 const NavbarGroup = ({
   modules,
   modulePath,
-  isOcelAvailable,
 }: {
   modules: ModuleDefinition[];
-  isOcelAvailable: boolean;
   modulePath?: {
     moduleName?: string;
     routeName?: string;
   };
 }) => {
+  const isRequirementMet = useOcelRequirement();
+
   return modules.map(({ label, name, icon: Icon = PackageIcon, routes }) => {
-    const isModuleDisabled =
-      !Object.values(routes).some(({ requiresOcel }) => !requiresOcel) &&
-      !isOcelAvailable;
+    const isModuleDisabled = !Object.values(routes).some(({ requiresOcel }) =>
+      isRequirementMet(requiresOcel),
+    );
 
     return (
       <NavLink
@@ -113,7 +114,7 @@ const NavbarGroup = ({
                   moduleName: name,
                   routeName: routeName,
                 })}
-                disabled={!!requiresOcel && !isOcelAvailable}
+                disabled={!isRequirementMet(requiresOcel)}
                 component={Link}
                 active={
                   name === modulePath?.moduleName &&
@@ -131,9 +132,6 @@ const NavBar: React.FC<{ config: OcelescopeConfig }> = ({ config }) => {
   const { modules = [], navbarGroups } = config;
 
   const modulePath = useModulePath(config);
-  const { data: ocels } = useGetOcels();
-
-  const isOcelAvailable = ocels?.length !== 0;
 
   const moduleGroups = useMemo(() => {
     if (!navbarGroups) {
@@ -175,11 +173,7 @@ const NavBar: React.FC<{ config: OcelescopeConfig }> = ({ config }) => {
               {index > 0 && (
                 <Divider label={title} my={!title ? 9 : undefined} />
               )}
-              <NavbarGroup
-                modules={modules}
-                isOcelAvailable={isOcelAvailable}
-                modulePath={modulePath}
-              />
+              <NavbarGroup modules={modules} modulePath={modulePath} />
             </Fragment>
           ))}
         </Stack>

@@ -2493,6 +2493,24 @@
         "title": "ObjectVariant",
         "description": "A single object variant: a distinct activity sequence objects of a type follow.\n\nAttributes:\n    variant_id: Identifier of the variant\n        (``<object_type>_<hash of the activity sequence>``). It depends only\n        on the sequence, so it stays the same across filtered views of a log.\n    activities: The ordered activity sequence that defines the variant.\n    event_count: Number of events in the variant (length of ``activities``).\n    case_count: Number of objects (cases) that follow this variant."
       },
+      "OcelExtensionMetadata": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "label"
+        ],
+        "title": "OcelExtensionMetadata"
+      },
       "OcelMetadata": {
         "properties": {
           "id": {
@@ -2517,6 +2535,13 @@
               }
             ],
             "title": "Filter Applied"
+          },
+          "extensions": {
+            "items": {
+              "$ref": "#/components/schemas/OcelExtensionMetadata"
+            },
+            "type": "array",
+            "title": "Extensions"
           }
         },
         "type": "object",
@@ -2524,7 +2549,8 @@
           "id",
           "name",
           "created_at",
-          "filter_applied"
+          "filter_applied",
+          "extensions"
         ],
         "title": "OcelMetadata"
       },

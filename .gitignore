@@ -9,5 +9,6 @@ mise.toml
 .ruff_cache
 .pnpm-store
 __pycache__
+.pytest_cache/
 
 /node_modules

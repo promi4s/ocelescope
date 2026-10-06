@@ -2,7 +2,7 @@ from typing import Self
 
 from pydantic import BaseModel
 
-from ocelescope import OCEL
+from ocelescope import OCEL, QEL
 
 
 class QuantityInfo(BaseModel):
@@ -14,10 +14,11 @@ class QuantityInfo(BaseModel):
 
     @classmethod
     def from_ocel(cls, ocel: OCEL) -> Self:
+        quantities = QEL.from_ocel(ocel).quantities
         return cls(
-            item_types=ocel.quantities.item_types,
-            total_object_count=len(ocel.quantities.objects),
-            total_event_count=len(ocel.quantities.events),
-            object_types=ocel.quantities.object_types,
-            activities=ocel.quantities.activities,
+            item_types=quantities.item_types,
+            total_object_count=len(quantities.objects),
+            total_event_count=len(quantities.events),
+            object_types=quantities.object_types,
+            activities=quantities.activities,
         )

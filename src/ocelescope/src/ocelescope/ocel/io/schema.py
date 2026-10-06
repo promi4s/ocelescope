@@ -175,51 +175,25 @@ def _create_if_missing(
     con.from_arrow(schema.empty_table()).create(table)
 
 
-def ensure_quantity_tables(con: duckdb.DuckDBPyConnection) -> None:
-    """Create any missing quantity-extension table on ``con``, empty.
-
-    Called for every OCEL, whether or not its log has an extension, so that the
-    three tables are as reliably there as the five flat ones: a reader can sum
-    ``quantity_operations`` without first proving it exists, and an importer that
-    does find an extension replaces these in place. A table that is already there
-    is left alone -- this never discards rows, so it is safe to call after the
-    extension has been read.
-    """
-
-    table_schemas = {
-        QUANTITIES_TABLE: pa.schema(QUANTITIES_TABLE_SCHEMA),
-        QUANTITY_OPERATIONS_TABLE: pa.schema(QUANTITY_OPERATIONS_TABLE_SCHEMA),
-        QUANTITY_ITEM_PROPERTIES_TABLE: pa.schema(
-            QUANTITY_ITEM_PROPERTIES_TABLE_SCHEMA
-        ),
-    }
-
-    for table, schema in table_schemas.items():
-        _create_if_missing(con, table, schema)
-
-
 def ensure_flat_tables(con: duckdb.DuckDBPyConnection) -> None:
     """Create any missing one of the five flat OCEL tables on ``con``, empty.
 
-    The quantity tables are left out: an import leaves them to the extras, which
-    create them from the log, and :func:`ensure_ocel_tables` adds whichever the log
-    did not have once the OCEL is built.
+    Tables beyond these belong to extensions of OCEL and are only there when the
+    log has them.
     """
     for table, schema in ocel_table_schemas([], []).items():
         _create_if_missing(con, table, schema)
 
 
 def ensure_ocel_tables(con: duckdb.DuckDBPyConnection) -> None:
-    """Create any missing OCEL table on ``con``, empty, the quantity ones included.
+    """Create any missing OCEL table on ``con``, empty.
 
-    The counterpart to :func:`create_ocel_tables` for a database that is not being
-    imported into. Every OCEL runs this on construction, so its managers can read
-    -- and write -- their own table without each first proving the log has one:
-    the eight tables are there from the start, however the database was built.
+    Every OCEL runs this on construction, so its managers can read -- and write --
+    their own table without each first proving the log has one: the five tables are
+    there from the start, however the database was built.
 
     A table already present is left alone, its rows and its per-log attribute
     columns with it, so this never discards anything and is safe to call on a log
     that is already loaded.
     """
     ensure_flat_tables(con)
-    ensure_quantity_tables(con)

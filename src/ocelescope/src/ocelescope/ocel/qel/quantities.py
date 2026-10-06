@@ -18,6 +18,7 @@ from ocelescope.ocel.constants.quantity import (
     QUANTITY_OPERATIONS_TABLE,
 )
 from ocelescope.ocel.constants.tables import E2O_TABLE, EVENTS_TABLE, OBJECTS_TABLE
+from ocelescope.ocel.io.schema import FIXED_COLUMN_TYPES
 from ocelescope.ocel.managers.base import BaseManager
 from ocelescope.util.sql import first_column_list, ident, literal
 
@@ -30,7 +31,26 @@ class QuantityManager(BaseManager):
     ``properties`` describes the item types themselves. Everything else here reads
     off those two -- who is involved in a quantity, and how an object's level
     develops over time.
+
+    A log only has the quantity tables it was given. One it lacks reads as empty,
+    and assigning to ``oqty``, ``qop`` or ``properties`` creates it.
     """
+
+    def _table(self, table: str) -> str:
+        """``table`` for a FROM clause: its name, or an empty stand-in if it is missing."""
+        exists = self._ocel.con.execute(
+            "SELECT 1 FROM duckdb_tables() WHERE database_name = current_database() "
+            "AND schema_name = current_schema() AND table_name = ?",
+            [table],
+        ).fetchone()
+        if exists:
+            return ident(table)
+
+        columns = ", ".join(
+            f"NULL::{dtype} AS {ident(name)}"
+            for name, dtype in FIXED_COLUMN_TYPES[table].items()
+        )
+        return f"(SELECT {columns} WHERE false)"
 
     @property
     def oqty(self) -> pd.DataFrame:
@@ -40,7 +60,7 @@ class QuantityManager(BaseManager):
             DataFrame: One row per object and item type, with the quantity the
             object carries before any event touches it.
         """
-        return self._relation(f"""SELECT * FROM {QUANTITIES_TABLE}""").df()
+        return self._relation(f"""SELECT * FROM {self._table(QUANTITIES_TABLE)}""").df()
 
     @oqty.setter
     def oqty(self, contents: Any) -> None:
@@ -55,7 +75,9 @@ class QuantityManager(BaseManager):
             DataFrame: One row per event, object and item type, with the change
             that event makes to that quantity.
         """
-        return self._relation(f"""SELECT * FROM {QUANTITY_OPERATIONS_TABLE}""").df()
+        return self._relation(
+            f"""SELECT * FROM {self._table(QUANTITY_OPERATIONS_TABLE)}"""
+        ).df()
 
     @qop.setter
     def qop(self, contents: Any) -> None:
@@ -72,7 +94,9 @@ class QuantityManager(BaseManager):
         Returns:
             DataFrame: One row per item type, with the properties declared for it.
         """
-        return self._relation(f'SELECT * FROM "{QUANTITY_ITEM_PROPERTIES_TABLE}"').df()
+        return self._relation(
+            f"SELECT * FROM {self._table(QUANTITY_ITEM_PROPERTIES_TABLE)}"
+        ).df()
 
     @properties.setter
     def properties(self, contents: Any) -> None:
@@ -89,7 +113,7 @@ class QuantityManager(BaseManager):
         """
 
         return self._relation(f"""
-            PIVOT {QUANTITY_OPERATIONS_TABLE} ON {ident(QEL_ITEM_TYPE)} USING coalesce(first({ident(QEL_QUANTITY)}), 0)
+            PIVOT {self._table(QUANTITY_OPERATIONS_TABLE)} ON {ident(QEL_ITEM_TYPE)} USING coalesce(first({ident(QEL_QUANTITY)}), 0)
         """).df()
 
     @property
@@ -102,7 +126,7 @@ class QuantityManager(BaseManager):
         """
 
         return self._relation(f"""
-            PIVOT {QUANTITIES_TABLE} ON {ident(QEL_ITEM_TYPE)} USING coalesce(first({ident(QEL_QUANTITY)}), 0)
+            PIVOT {self._table(QUANTITIES_TABLE)} ON {ident(QEL_ITEM_TYPE)} USING coalesce(first({ident(QEL_QUANTITY)}), 0)
         """).df()
 
     def _distinct_values(self, field_name: str) -> DuckDBPyRelation:
@@ -113,12 +137,12 @@ class QuantityManager(BaseManager):
             SELECT DISTINCT
                 {field}
             FROM
-                {QUANTITIES_TABLE}
+                {self._table(QUANTITIES_TABLE)}
             UNION
                 SELECT DISTINCT
                     {field}
                 FROM
-                    {QUANTITY_OPERATIONS_TABLE}
+                    {self._table(QUANTITY_OPERATIONS_TABLE)}
             ORDER BY
                 1
         """)
@@ -176,10 +200,10 @@ class QuantityManager(BaseManager):
             f"""
             SELECT DISTINCT {oid}
             FROM (
-                SELECT {oid} FROM {QUANTITIES_TABLE}
+                SELECT {oid} FROM {self._table(QUANTITIES_TABLE)}
                 WHERE {it_col} = ? AND {quantity_col} != 0
                 UNION ALL
-                SELECT {oid} FROM {QUANTITY_OPERATIONS_TABLE}
+                SELECT {oid} FROM {self._table(QUANTITY_OPERATIONS_TABLE)}
                 WHERE {it_col} = ? AND {quantity_col} != 0
             )
             ORDER BY 1
@@ -233,7 +257,7 @@ class QuantityManager(BaseManager):
         """
         return first_column_list(
             self._relation(
-                f"""SELECT DISTINCT {ident(EID_COL)} FROM {QUANTITY_OPERATIONS_TABLE}"""
+                f"""SELECT DISTINCT {ident(EID_COL)} FROM {self._table(QUANTITY_OPERATIONS_TABLE)}"""
             )
         )
 
@@ -249,7 +273,7 @@ class QuantityManager(BaseManager):
                 SELECT DISTINCT
                     {ident(ACTIVITY_COL)}
                 FROM
-                    {QUANTITY_OPERATIONS_TABLE}
+                    {self._table(QUANTITY_OPERATIONS_TABLE)}
                 JOIN {EVENTS_TABLE} USING ({ident(EID_COL)})
             """)
         )
@@ -269,7 +293,7 @@ class QuantityManager(BaseManager):
                 SELECT DISTINCT
                     {ident(EID_COL)}
                 FROM
-                    {QUANTITY_OPERATIONS_TABLE}
+                    {self._table(QUANTITY_OPERATIONS_TABLE)}
                 WHERE
                     {ident(QEL_ITEM_TYPE)} = ?
            """,
@@ -292,7 +316,7 @@ class QuantityManager(BaseManager):
                 SELECT DISTINCT
                     {ident(ACTIVITY_COL)}
                 FROM
-                    {QUANTITY_OPERATIONS_TABLE}
+                    {self._table(QUANTITY_OPERATIONS_TABLE)}
                 JOIN {EVENTS_TABLE} USING({ident(EID_COL)})
                 WHERE
                     {ident(QEL_ITEM_TYPE)} = ?
@@ -321,10 +345,10 @@ class QuantityManager(BaseManager):
             self._relation(
                 f"""
                 SELECT DISTINCT {it_col} FROM (
-                    SELECT {it_col} FROM {QUANTITY_OPERATIONS_TABLE}
+                    SELECT {it_col} FROM {self._table(QUANTITY_OPERATIONS_TABLE)}
                     WHERE {oid_col} = ? AND {quantity_col} != 0
                     UNION ALL
-                    SELECT {it_col} FROM {QUANTITIES_TABLE}
+                    SELECT {it_col} FROM {self._table(QUANTITIES_TABLE)}
                     WHERE {oid_col} = ? AND {quantity_col} != 0
                 )   
             """,
@@ -350,7 +374,7 @@ class QuantityManager(BaseManager):
             SELECT
                 {item_type}, first({quantity}) AS {quantity}
             FROM
-                {QUANTITIES_TABLE}
+                {self._table(QUANTITIES_TABLE)}
             WHERE
                 {ident(OID_COL)} = ?
             GROUP BY ALL
@@ -392,7 +416,7 @@ class QuantityManager(BaseManager):
             ),
             object_operations AS (
                 SELECT {eid}, {item_type}, {quantity}
-                FROM {QUANTITY_OPERATIONS_TABLE}
+                FROM {self._table(QUANTITY_OPERATIONS_TABLE)}
                 WHERE {oid} = {literal(object_id)} {
             f"AND {quantity} != 0" if include_events == "active" else ""
         }
@@ -404,7 +428,7 @@ class QuantityManager(BaseManager):
                     '-infinity'::TIMESTAMP AS {timestamp},
                     {item_type},
                     {quantity}
-                FROM {QUANTITIES_TABLE}
+                FROM {self._table(QUANTITIES_TABLE)}
                 WHERE {oid} = {literal(object_id)} AND {quantity} != 0
             ),
             operations_per_event AS (
@@ -557,13 +581,13 @@ class QuantityManager(BaseManager):
                     SELECT
                         *
                     FROM
-                        {QUANTITIES_TABLE}
+                        {self._table(QUANTITIES_TABLE)}
                     UNION
                     (
                         SELECT
                             * EXCLUDE {eid}
                         FROM
-                            {QUANTITY_OPERATIONS_TABLE}
+                            {self._table(QUANTITY_OPERATIONS_TABLE)}
                     )
                 )
             JOIN {OBJECTS_TABLE} USING ({oid})
@@ -588,7 +612,7 @@ class QuantityManager(BaseManager):
                 {act},
                 count(DISTINCT {eid})
             FROM
-                {QUANTITY_OPERATIONS_TABLE}
+                {self._table(QUANTITY_OPERATIONS_TABLE)}
             JOIN events USING({eid})
             WHERE
                 {iqty} != 0
@@ -639,13 +663,13 @@ class QuantityManager(BaseManager):
                     coalesce(oqty.{iqty}, 0) as {iqty},
                     '-infinity'::TIMESTAMP AS {ts},
                     FROM
-                    {QUANTITIES_TABLE} oqty
+                    {self._table(QUANTITIES_TABLE)} oqty
                     FULL OUTER JOIN (
                         SELECT DISTINCT
                         {oid},
                         {itype}
                         FROM
-                        {QUANTITY_OPERATIONS_TABLE}
+                        {self._table(QUANTITY_OPERATIONS_TABLE)}
                     ) empty_oqty USING ({oid}, {itype})
                 ),
                 joined_qop as (
@@ -654,7 +678,7 @@ class QuantityManager(BaseManager):
                     ev.{act},
                     ev.{ts}
                     FROM
-                    {QUANTITY_OPERATIONS_TABLE} oqty
+                    {self._table(QUANTITY_OPERATIONS_TABLE)} oqty
                     JOIN {EVENTS_TABLE} ev USING ({eid})
                 ),
                 unpivoted_itlvl as (

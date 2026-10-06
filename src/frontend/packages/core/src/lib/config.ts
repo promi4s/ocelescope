@@ -17,7 +17,11 @@ export type ModuleDefinition = {
 export type ModuleRouteDefinition = {
   name: string;
   label: string;
-  requiresOcel?: boolean;
+  /**
+   * `true` when the route needs a log, a list of extension names (e.g.
+   * `["qel"]`) when it needs a log of those OCEL extensions.
+   */
+  requiresOcel?: boolean | string[];
   component: React.ComponentType;
 };
 

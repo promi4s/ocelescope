@@ -4,7 +4,7 @@ import warnings
 from collections.abc import Sequence
 from os import PathLike
 from pathlib import Path
-from typing import Literal, Self
+from typing import TYPE_CHECKING, ClassVar, Literal, Self, cast
 
 import duckdb
 import pandas as pd
@@ -28,11 +28,14 @@ from ocelescope.ocel.managers import (
     EventsManager,
     O2OManager,
     ObjectsManager,
-    QuantityManager,
 )
 from ocelescope.ocel.managers.executions import ExecutionsManager
 from ocelescope.ocel.util.xes import create_ocel_from_xml, write_ocel_to_xes
 from ocelescope.util.sql import set_utc
+
+if TYPE_CHECKING:
+    from ocelescope.ocel.extension import Extension
+    from ocelescope.ocel.qel import QuantityManager
 
 _COPY_TARGET = "_copy_target"
 
@@ -47,8 +50,7 @@ class OCEL:
     High-level wrapper for an OCEL 2.0 event log.
 
     An OCEL is a **DuckDB connection** holding the flat OCEL tables (``events``,
-    ``objects``, ``e2o``, ``o2o``, ``object_changes``, plus the optional quantity
-    tables). That database is the single source of truth, and each manager reaches
+    ``objects``, ``e2o``, ``o2o``, ``object_changes``). That database is the single source of truth, and each manager reaches
     its own table on it: ``.table`` is a lazy DuckDB relation, ``.pl`` a polars
     LazyFrame and ``.df`` a pandas frame -- the first two lazy, the last read on
     access -- and each is assignable to write the table back. Reading only the
@@ -83,6 +85,9 @@ class OCEL:
             relation-count summaries.
     """
 
+    extension: ClassVar[Extension | None] = None
+    """What a subclass adds to OCEL: the tables of its format. ``None`` for a plain OCEL."""
+
     def __init__(
         self,
         connection: duckdb.DuckDBPyConnection,
@@ -104,10 +109,36 @@ class OCEL:
 
         self.objects = ObjectsManager(self)
         self.events = EventsManager(self)
-        self.quantities = QuantityManager(self)
         self.e2o = E2OManager(self)
         self.o2o = O2OManager(self)
         self.executions = ExecutionsManager(self)
+
+    @classmethod
+    def matches(cls, ocel: OCEL) -> bool:
+        """Whether ``ocel`` is a log of this class's format.
+
+        A plain OCEL class matches every log; a subclass matches the logs that have
+        the tables its ``extension`` declares.
+        """
+        return cls.extension is None or cls.extension.matches(ocel)
+
+    @property
+    def quantities(self) -> QuantityManager:
+        """The quantity tables of the log and what is read off them.
+
+        .. deprecated::
+            Quantities are an extension of OCEL. Use :class:`~ocelescope.QEL`:
+            ``QEL.from_ocel(ocel).quantities``.
+        """
+        # imported here: the extension builds on this module
+        from ocelescope.ocel.qel import QuantityManager
+
+        warnings.warn(
+            "`OCEL.quantities` is deprecated; use `QEL.from_ocel(ocel).quantities`.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return QuantityManager(self)
 
     # ------------------------------------------------------------------
     # Database access
@@ -192,12 +223,25 @@ class OCEL:
     # Construction
     # ------------------------------------------------------------------
     @classmethod
-    def from_duckdb(cls, connection: duckdb.DuckDBPyConnection) -> OCEL:
+    def from_duckdb(cls, connection: duckdb.DuckDBPyConnection) -> Self:
         """Build an :class:`OCEL` on an existing DuckDB connection.
 
         An alias of the constructor that names what it does at the call site.
         """
         return cls(connection)
+
+    @classmethod
+    def from_ocel(cls, ocel: OCEL) -> Self:
+        """View ``ocel`` as this class, over the same database.
+
+        For a subclass of :class:`OCEL` this is how a log already open is given the
+        subclass's managers: ``QEL.from_ocel(ocel).quantities``. Nothing is copied,
+        so a write through either is seen by both.
+
+        The view borrows the log. Closing the view leaves ``ocel`` open; closing
+        ``ocel`` ends the view with it.
+        """
+        return cls(ocel.con.cursor())
 
     @classmethod
     def from_frames(
@@ -208,7 +252,7 @@ class OCEL:
         o2o: Frame | None = None,
         object_changes: Frame | None = None,
         quantityExtension: tuple[Frame, Frame, Frame] | None = None,
-    ) -> OCEL:
+    ) -> Self:
         """
         Build an :class:`OCEL` from tables already held in memory.
 
@@ -232,7 +276,8 @@ class OCEL:
             object_changes: Optional dynamic object-attribute change table, as
                 :attr:`ObjectsManager.changes`. Defaults to an empty table.
             meta: Metadata for this OCEL instance.
-            quantityExtension: Optional quantity-extension tables.
+            quantityExtension: Deprecated. Optional quantity-extension tables;
+                build a :class:`~ocelescope.QEL` and assign its tables instead.
         """
         connection = duckdb.connect(":memory:")
         try:
@@ -266,10 +311,19 @@ class OCEL:
                 )
             )
             if quantityExtension is not None:
+                from ocelescope.ocel.qel import QuantityManager
+
+                warnings.warn(
+                    "The `quantityExtension` argument of `OCEL.from_frames` is "
+                    "deprecated; build a `QEL` and assign its quantity tables.",
+                    DeprecationWarning,
+                    stacklevel=2,
+                )
+                quantities = QuantityManager(ocel)
                 oqty, qop, properties = quantityExtension
-                ocel.quantities.oqty = oqty
-                ocel.quantities.qop = qop
-                ocel.quantities.properties = properties
+                quantities.oqty = oqty
+                quantities.qop = qop
+                quantities.properties = properties
         except Exception:
             connection.close()
             raise
@@ -280,7 +334,7 @@ class OCEL:
     def from_pm4py(
         cls,
         ocel: PM4PYOCEL,
-    ) -> OCEL:
+    ) -> Self:
         """
         Build an :class:`OCEL` from an existing PM4PY OCEL by writing its
         DataFrames into a fresh in-memory database.
@@ -293,11 +347,12 @@ class OCEL:
             object_changes=ocel.object_changes.drop([OTYPE_COL], axis=1),
         )
 
-    @staticmethod
+    @classmethod
     def read(
+        cls,
         path: str | Path,
         variant: Literal["r4pm", "streamed"] | None = None,
-    ) -> OCEL:
+    ) -> Self:
         """
         Read an OCEL file (.jsonocel, .xmlocel, or .sqlite) from disk.
 
@@ -336,12 +391,10 @@ class OCEL:
             connection.close()
             raise
 
-        return OCEL(
-            connection,
-        )
+        return cls(connection)
 
-    @staticmethod
-    def read_duckdb(db_path: str | Path, read_only: bool = False) -> OCEL:
+    @classmethod
+    def read_duckdb(cls, db_path: str | Path, read_only: bool = False) -> Self:
         """
         Open a flat DuckDB database (as written by :meth:`to_duckdb` or
         ``convert_ocel_duckdb``) as an :class:`OCEL`.
@@ -362,7 +415,7 @@ class OCEL:
             connection.close()
             raise
 
-        return OCEL(connection)
+        return cls(connection)
 
     def to_duckdb(self, db_path: str | Path) -> None:
         """
@@ -385,9 +438,11 @@ class OCEL:
         finally:
             self._con.execute(f"DETACH {_COPY_TARGET}")
 
-    @staticmethod
-    def read_xes(path: str | PathLike, fallback_object_name: str = "LogObject") -> OCEL:
-        return create_ocel_from_xml(str(path), fallback_object_name)
+    @classmethod
+    def read_xes(
+        cls, path: str | PathLike, fallback_object_name: str = "LogObject"
+    ) -> Self:
+        return cast(Self, create_ocel_from_xml(str(path), fallback_object_name, cls))
 
     # ------------------------------------------------------------------
     # PM4PY interop
@@ -409,7 +464,7 @@ class OCEL:
             object_changes=self.objects.changes,
         )
 
-    def filter(self, pipeline: Sequence[BaseFilter]) -> OCEL:
+    def filter(self, pipeline: Sequence[BaseFilter]) -> Self:
         """
         Apply a sequence of filters to this OCEL instance.
 
@@ -470,7 +525,7 @@ class OCEL:
 
         write_ocel_to_xes(ocel=self, object_type=object_type, path=path)
 
-    def __deepcopy__(self, memo: dict | None = None) -> OCEL:
+    def __deepcopy__(self, memo: dict | None = None) -> Self:
         """Copy the log into a database of its own.
 
         ``copy.deepcopy`` always passes its ``memo`` -- the map of objects it has
@@ -479,7 +534,7 @@ class OCEL:
         referenced twice from being copied twice, which for a database is the
         difference between one copy and two.
         """
-        clone = OCEL(self._copy_database())
+        clone = type(self)(self._copy_database())
         if memo is not None:
             memo[id(self)] = clone
         return clone

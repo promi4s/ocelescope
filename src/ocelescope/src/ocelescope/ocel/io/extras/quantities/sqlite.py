@@ -83,9 +83,8 @@ def quantities_from_extras(target: DuckDBTarget) -> None:
     :func:`~ocelescope.ocel.io.extras.sqlite.copy_tables` calls this after it
     copied ``operation``, ``quantity`` or ``itemProperties`` like any other extra
     table. Each is renamed in place -- the table to ours, its
-    :data:`SQL_RENAMED_COLUMNS` to ours -- so no row is copied again. It replaces
-    the empty table :func:`~ocelescope.ocel.io.schema.ensure_quantity_tables` put
-    there; a table the log did not have is left alone.
+    :data:`SQL_RENAMED_COLUMNS` to ours -- so no row is copied again. A table the
+    log did not have is left alone.
 
     Emits a :class:`DeprecationWarning` when there is anything to convert.
     """
