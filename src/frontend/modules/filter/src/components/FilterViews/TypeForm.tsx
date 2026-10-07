@@ -1,21 +1,17 @@
 import { InlineStyles, Stack } from "@mantine/core";
-import { useEventCounts, useObjectCounts } from "@ocelescope/api-base";
-import dynamic from "next/dynamic";
+import { ActivityPicker, ObjectTypePicker } from "@ocelescope/core";
 import { Controller } from "react-hook-form";
 import type { FilterView, FilterViewType } from "../../types/filter";
 
-const FrequencyPicker = dynamic(
-  () => import("@r4pm/components").then((module) => module.FrequencyPicker),
-  { ssr: false },
-);
-
 const PICKER_CLASS = "ocelescope-type-filter-picker";
 
+// The picker's list scrolls after eight rows; here it takes the height of
+// the tab instead.
 const FillHeightStyles = () => (
   <>
     <InlineStyles
       deduplicate
-      selector={`.${PICKER_CLASS} > :last-child`}
+      selector={`.${PICKER_CLASS} :has([role="listbox"])`}
       styles={{ flex: 1, minHeight: 0 }}
     />
     <InlineStyles
@@ -32,10 +28,7 @@ const EntityFilter: (
   (entityType) =>
   ({ ocelId, control }) => {
     const isEvents = entityType === "events";
-    const { data: counts } = (isEvents ? useEventCounts : useObjectCounts)(
-      ocelId,
-      { ocel_version: "original" },
-    );
+    const Picker = isEvents ? ActivityPicker : ObjectTypePicker;
 
     return (
       <Controller
@@ -53,28 +46,28 @@ const EntityFilter: (
           return (
             <Stack gap={4} flex={1} mih={0} className={PICKER_CLASS}>
               <FillHeightStyles />
-              <FrequencyPicker
-                items={counts ?? {}}
-                value={new Set(selected)}
+              <Picker
+                variant="list"
+                multiple
+                cutoff
+                ocelId={ocelId}
+                ocelVersion="original"
+                value={selected}
                 onChange={(next) =>
                   field.onChange(
                     isEvents
                       ? {
                           type: "activity",
-                          event_types: [...next],
+                          event_types: next,
                           mode: "include",
                         }
                       : {
                           type: "object_type",
-                          object_types: [...next],
+                          object_types: next,
                           mode: "include",
                         },
                   )
                 }
-                mode={"multi"}
-                scope={isEvents ? "activity" : "objectType"}
-                searchable
-                showCutoff
               />
             </Stack>
           );
