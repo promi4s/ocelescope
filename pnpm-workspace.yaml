@@ -15,7 +15,6 @@ catalog:
   "@floating-ui/react": ^0.27.18
   "@hpcc-js/wasm-graphviz": ^1.21.0
   "@mantine/carousel": ^9.5.1
-  "@mantine/charts": ^9.5.1
   "@mantine/core": ^9.5.1
   "@mantine/dates": ^9.5.1
   "@mantine/dropzone": ^9.5.1
@@ -65,7 +64,6 @@ catalog:
   react-hook-form: ^7.71.2
   react-plotly.js: ^4.0.0
   react-zoom-pan-pinch: ^4.0.0
-  recharts: ^3.2.1
   storybook: ^10.3.5
   tsdown: ^0.23.0
   typescript: ^6.0.3
