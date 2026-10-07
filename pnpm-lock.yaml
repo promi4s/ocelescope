@@ -622,9 +622,6 @@ importers:
       '@ocelescope/api-config':
         specifier: workspace:^
         version: link:../../packages/api/config
-      '@r4pm/components':
-        specifier: 'catalog:'
-        version: 0.3.2(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.1.21)(plotly.js@4.1.1)(react-dom@19.3.0)(react@19.3.0)
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.4
@@ -7613,7 +7610,8 @@ snapshots:
       - debug
       - supports-color
 
-  base64-arraybuffer@1.0.2: {}
+  base64-arraybuffer@1.0.2:
+    optional: true
 
   baseline-browser-mapping@2.11.27: {}
 
@@ -8846,7 +8844,8 @@ snapshots:
     dependencies:
       resolve-protobuf-schema: 2.1.0
 
-  performance-now@2.1.0: {}
+  performance-now@2.1.0:
+    optional: true
 
   pick-by-alias@1.2.0: {}
 
@@ -9020,6 +9019,7 @@ snapshots:
   raf@3.4.1:
     dependencies:
       performance-now: 2.1.0
+    optional: true
 
   react-dom@19.3.0(react@19.3.0):
     dependencies:
