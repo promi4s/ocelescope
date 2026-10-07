@@ -60,8 +60,24 @@ def flows(socel: ApiSOCEL):
     return socel.flows.table.df().to_dict("records")
 ```
 
-It takes the same `ocel_id` and `ocel_version` as `ApiOcel`. A log that is not of
-the format is answered with HTTP 422.
+It takes the same `ocel_id` and `ocel_version` as `ApiOcel`. A log that is not a
+valid log of the format is answered with HTTP 422 and the reason.
+
+A format that asks more of a log than its tables overrides `validate` and raises:
+
+```python
+class SOCEL(OCEL):
+    extension = Extension(...)
+
+    def validate(self) -> None:
+        super().validate()  # the declared tables and columns
+        if len(self.flows.table.filter("amount < 0")):
+            raise ValueError("a flow has a negative amount")
+```
+
+`SOCEL.from_ocel(ocel)` runs it and raises an `OCELExtensionError` with that
+reason; the label, `requiresOcel` and `ocel_as` all follow from it. It runs
+whenever logs are listed, so keep it cheap.
 
 ## About
 

@@ -21,6 +21,7 @@ from ocelescope.ocel.constants.pm4py import (
     OTYPE_COL,
     TIMESTAMP_COL,
 )
+from ocelescope.ocel.extension import OCELExtensionError
 from ocelescope.ocel.filter.base import BaseFilter
 from ocelescope.ocel.io import convert_ocel_duckdb, export_duckdb_ocel
 from ocelescope.ocel.managers import (
@@ -113,14 +114,23 @@ class OCEL:
         self.o2o = O2OManager(self)
         self.executions = ExecutionsManager(self)
 
-    @classmethod
-    def matches(cls, ocel: OCEL) -> bool:
-        """Whether ``ocel`` is a log of this class's format.
+    def validate(self) -> None:
+        """Raise unless this is a valid log of its format.
 
-        A plain OCEL class matches every log; a subclass matches the logs that have
-        the tables its ``extension`` declares.
+        As it stands the tables its ``extension`` declares have to be there. A
+        subclass that asks more of a log overrides it and raises, with the reason
+        as the message; any exception counts::
+
+            def validate(self) -> None:
+                super().validate()
+                if self.sql("SELECT 1 FROM flows WHERE amount < 0 LIMIT 1").fetchone():
+                    raise ValueError("a flow has a negative amount")
+
+        :meth:`from_ocel` runs it, so it is asked of every log viewed as the class.
+        Keep it cheap: applications ask it often.
         """
-        return cls.extension is None or cls.extension.matches(ocel)
+        if self.extension is not None:
+            self.extension.validate(self)
 
     @property
     def quantities(self) -> QuantityManager:
@@ -240,8 +250,19 @@ class OCEL:
 
         The view borrows the log. Closing the view leaves ``ocel`` open; closing
         ``ocel`` ends the view with it.
+
+        Raises:
+            OCELExtensionError: If ``ocel`` is not a valid log of the class's
+                format, that is if :meth:`validate` raises. The message says why.
         """
-        return cls(ocel.con.cursor())
+        view = cls(ocel.con.cursor())
+        try:
+            view.validate()
+        except Exception as error:
+            view.close()
+            label = cls.extension.label if cls.extension else cls.__name__
+            raise OCELExtensionError(f"Not a valid {label} log: {error}") from error
+        return view
 
     @classmethod
     def from_frames(

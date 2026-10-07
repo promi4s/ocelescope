@@ -1,5 +1,5 @@
 from ocelescope.ocel.core import OCEL
-from ocelescope.ocel.extension import Extension
+from ocelescope.ocel.extension import Extension, OCELExtensionError
 from ocelescope.ocel.filter import (
     BaseFilter,
     E2OCountFilter,
@@ -27,6 +27,7 @@ __all__ = [
     "Extension",
     "Keep",
     "O2OCountFilter",
+    "OCELExtensionError",
     "ObjectAttributeFilter",
     "ObjectIdFilter",
     "ObjectTypeFilter",

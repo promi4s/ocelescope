@@ -5,7 +5,7 @@ from typing import Annotated, Literal, TypeVar
 
 from fastapi import Depends, HTTPException, Request
 
-from ocelescope import OCEL
+from ocelescope import OCEL, OCELExtensionError
 from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.session import Session
 from ocelescope_backend.app.internal.tasks.plugin import PluginTask
@@ -61,16 +61,15 @@ def ocel_as(ocel_type: type[T]) -> Callable[..., T]:
             return qel.quantities.item_types
 
     Takes the same ``ocel_id`` and ``ocel_version`` as ``ApiOcel`` and shares its
-    connection. A log that is not of the format is answered with 422.
+    connection. A log that is not a valid log of the format is answered with 422
+    and the reason.
     """
 
     def dependency(ocel: ApiOcel) -> T:
-        if not ocel_type.matches(ocel):
-            label = ocel_type.extension.label if ocel_type.extension else "OCEL"
-            raise HTTPException(
-                status_code=422, detail=f"The OCEL is not a {label} log"
-            )
-        return ocel_type.from_ocel(ocel)
+        try:
+            return ocel_type.from_ocel(ocel)
+        except OCELExtensionError as error:
+            raise HTTPException(status_code=422, detail=str(error))
 
     return dependency
 

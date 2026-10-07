@@ -8,6 +8,10 @@ if TYPE_CHECKING:
     from ocelescope.ocel.core import OCEL
 
 
+class OCELExtensionError(ValueError):
+    """A log is not a valid log of an OCEL extension."""
+
+
 @dataclass(frozen=True)
 class Extension:
     """What a format adds to OCEL: a named collection of tables.
@@ -35,8 +39,8 @@ class Extension:
     tables: Mapping[str, Sequence[tuple[str, str]]]
     optional: Sequence[str] = ()
 
-    def matches(self, ocel: OCEL) -> bool:
-        """Whether ``ocel`` has this format's tables.
+    def validate(self, ocel: OCEL) -> None:
+        """Raise an :class:`OCELExtensionError` unless ``ocel`` has this format's tables.
 
         Every table not listed as optional has to be there with its declared
         columns; if all are optional, at least one. Only names are compared: a
@@ -49,13 +53,17 @@ class Extension:
         ).fetchall():
             present.setdefault(table, set()).add(column)
 
-        def has(table: str) -> bool:
-            return (
-                table in present
-                and {name for name, _ in self.tables[table]} <= present[table]
-            )
+        for table, columns in self.tables.items():
+            if table not in present:
+                if table not in self.optional:
+                    raise OCELExtensionError(f"table {table!r} is missing")
+                continue
+            if missing := [name for name, _ in columns if name not in present[table]]:
+                raise OCELExtensionError(
+                    f"table {table!r} lacks the columns {', '.join(missing)}"
+                )
 
-        required = [table for table in self.tables if table not in self.optional]
-        if required:
-            return all(has(table) for table in required)
-        return any(has(table) for table in self.tables)
+        if not any(table in present for table in self.tables):
+            raise OCELExtensionError(
+                f"none of the tables {', '.join(self.tables)} is there"
+            )
