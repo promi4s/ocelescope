@@ -1,4 +1,4 @@
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import ExitStack, contextmanager
 from copy import deepcopy
 from types import ModuleType
@@ -170,7 +170,7 @@ class PluginRegistry:
         plugin_id: str,
         method_name: str,
         input_resources: dict[str, str | None],
-    ) -> Iterator[dict[str, Any]]:
+    ) -> Generator[dict[str, Any]]:
         """Kwargs for a computed-value provider, valid for the block.
 
         A provider only reads, so its OCELs are the session's own read-only view

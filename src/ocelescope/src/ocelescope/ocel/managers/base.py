@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any
 
@@ -39,7 +39,7 @@ class BaseManager:
         return [row[0] for row in self._relation(sql, params).fetchall()]
 
     @contextmanager
-    def _bound(self, contents: Any) -> Iterator[str]:
+    def _bound(self, contents: Any) -> Generator[str]:
         """Bind ``contents`` to the OCEL's connection for one query, as a view.
 
         Anything still lazy is read out first. A relation or a LazyFrame taken off

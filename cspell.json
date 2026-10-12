@@ -22,6 +22,7 @@
     "Pydantic",
     "Plotly",
     "plotly",
+    "fillmode",
     "Graphviz",
     "Matplotlib",
     "matplotlib",
