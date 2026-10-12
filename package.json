@@ -19,7 +19,7 @@
     "format": "pnpm run format:frontend && pnpm run format:backend",
     "check:frontend": "biome check --write .",
     "check:backend": "uv run ruff check --fix ./src/ && uv run ruff format ./src/",
-    "check": "pnpm run check:backend && pnpm run check:frontend",
+    "check": "pnpm run check:backend && pnpm run check:frontend && pnpm run typecheck && pnpm run spellcheck",
     "api:generate": "pnpm -r --if-present --parallel run generate:api",
     "api:sync": "pnpm --filter @ocelescope/api-config run build && pnpm run api:generate && pnpm run build:frontend",
     "dev:deps": "pnpm -r --parallel --filter \"!@ocelescope/app\" run dev",

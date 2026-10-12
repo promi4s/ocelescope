@@ -61,15 +61,8 @@ repos:
         exclude: ^template/
       # Push-only: whole-repo passes that are too slow for every commit.
       - id: check
-        name: Lint and format (autofix)
+        name: Lint, format (autofix), typecheck and spellcheck
         entry: pnpm run check
-        language: system
-        pass_filenames: false
-        always_run: true
-        stages: [pre-push]
-      - id: spellcheck
-        name: Spellcheck
-        entry: pnpm run spellcheck
         language: system
         pass_filenames: false
         always_run: true

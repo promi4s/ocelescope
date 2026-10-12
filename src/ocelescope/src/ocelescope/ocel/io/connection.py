@@ -10,7 +10,7 @@ as the caller needs it (see :meth:`ocelescope.OCEL.read`).
 
 from __future__ import annotations
 
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
 
@@ -24,7 +24,7 @@ DuckDBTarget = str | Path | duckdb.DuckDBPyConnection
 @contextmanager
 def connect_target(
     target: DuckDBTarget, read_only: bool = False
-) -> Iterator[duckdb.DuckDBPyConnection]:
+) -> Generator[duckdb.DuckDBPyConnection]:
     """Yield a connection to ``target``, closing it only if we opened it.
 
     A path is opened here and closed on exit. A connection is borrowed and left
