@@ -7,6 +7,7 @@ from ocelescope_module_ocel.models.metadata import OcelMetadata
 from ocelescope_module_ocel.models.quantities import QuantityInfo
 from ocelescope_module_ocel.models.relations import (
     RelationCombination,
+    RelationCount,
     RelationCountSummary,
 )
 from ocelescope_module_ocel.models.time import (
@@ -25,6 +26,7 @@ __all__ = [
     "OcelMetadata",
     "QuantityInfo",
     "RelationCombination",
+    "RelationCount",
     "RelationCountSummary",
     "TypedAttribute",
 ]

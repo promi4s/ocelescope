@@ -8,7 +8,11 @@ from fastapi import APIRouter, Query
 from ocelescope_backend.app.dependencies import ApiOcel
 from ocelescope_backend.app.internal.model.base import PaginatedResponse
 
-from ocelescope_module_ocel.models import RelationCombination, RelationCountSummary
+from ocelescope_module_ocel.models import (
+    RelationCombination,
+    RelationCount,
+    RelationCountSummary,
+)
 from ocelescope_module_ocel.util import relations as relation_util
 from ocelescope_module_ocel.util.relations import Direction
 
@@ -91,3 +95,23 @@ def get_o2o_combinations(
     direction: Direction = "source",
 ) -> list[RelationCombination]:
     return relation_util.combinations(ocel, "o2o", direction)
+
+
+@router.get("/{ocel_id}/relations/o2o/count", operation_id="O2OCount")
+def get_o2o_count(ocel: ApiOcel, with_qualifier: bool = False) -> list[RelationCount]:
+    return [
+        RelationCount(source=source, target=target, count=count, qualifier=qualifier)
+        for (source, target, qualifier), count in ocel.o2o.get_count(
+            with_qualifier
+        ).items()
+    ]
+
+
+@router.get("/{ocel_id}/relations/e2o/count", operation_id="E2OCount")
+def get_e2o_count(ocel: ApiOcel, with_qualifier: bool = False) -> list[RelationCount]:
+    return [
+        RelationCount(source=source, target=target, count=count, qualifier=qualifier)
+        for (source, target, qualifier), count in ocel.e2o.get_count(
+            with_qualifier
+        ).items()
+    ]

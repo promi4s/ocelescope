@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class RelationCombination(BaseModel):
@@ -40,3 +40,10 @@ class RelationCountSummary(BaseModel):
     min_count: int
     max_count: int
     sum: int
+
+
+class RelationCount(BaseModel):
+    source: str
+    target: str
+    qualifier: str | None = Field(default=None)
+    count: int
