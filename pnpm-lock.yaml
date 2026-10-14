@@ -178,23 +178,23 @@ catalogs:
       specifier: ^1.21.0
       version: 1.29.2
     '@mantine/carousel':
-      specifier: ^9.5.1
-      version: 9.7.1
+      specifier: ^9.7.2
+      version: 9.7.2
     '@mantine/core':
-      specifier: ^9.5.1
-      version: 9.7.1
+      specifier: ^9.7.2
+      version: 9.7.2
     '@mantine/dates':
-      specifier: ^9.5.1
-      version: 9.7.1
+      specifier: ^9.7.2
+      version: 9.7.2
     '@mantine/dropzone':
-      specifier: ^9.5.1
-      version: 9.7.1
+      specifier: ^9.7.2
+      version: 9.7.2
     '@mantine/hooks':
-      specifier: ^9.5.1
-      version: 9.7.1
+      specifier: ^9.7.2
+      version: 9.7.2
     '@mantine/notifications':
-      specifier: ^9.5.1
-      version: 9.7.1
+      specifier: ^9.7.2
+      version: 9.7.2
     '@marko19907/string-to-color':
       specifier: ^1.0.2
       version: 1.0.2
@@ -220,17 +220,17 @@ catalogs:
       specifier: ^6.8.0
       version: 6.11.0
     '@tanstack/react-query':
-      specifier: ^5.90.21
-      version: 5.104.1
+      specifier: ^5.104.2
+      version: 5.104.2
     '@tanstack/react-query-devtools':
-      specifier: ^5.91.3
-      version: 5.104.1
+      specifier: ^5.104.2
+      version: 5.104.2
     '@tsconfig/strictest':
       specifier: ^2.0.8
       version: 2.0.8
     '@tsdown/css':
-      specifier: ^0.23.0
-      version: 0.23.0
+      specifier: ^0.23.1
+      version: 0.23.1
     '@types/file-saver':
       specifier: ^2.0.7
       version: 2.0.7
@@ -262,8 +262,8 @@ catalogs:
       specifier: ^0.3.1
       version: 0.3.1
     cspell:
-      specifier: ^10.3.2
-      version: 10.3.6
+      specifier: ^10.4.0
+      version: 10.4.0
     dayjs:
       specifier: ^1.11.23
       version: 1.11.23
@@ -292,8 +292,8 @@ catalogs:
       specifier: ^4.2.1
       version: 4.2.1
     lucide-react:
-      specifier: ^1.0.0
-      version: 1.52.0
+      specifier: ^1.56.0
+      version: 1.56.0
     mantine-datatable:
       specifier: ^9.4.0
       version: 9.4.0
@@ -304,8 +304,8 @@ catalogs:
       specifier: ^3.0.0
       version: 3.0.0
     orval:
-      specifier: ^8.33.0
-      version: 8.41.0
+      specifier: ^8.42.0
+      version: 8.42.0
     qs:
       specifier: ^6.16.0
       version: 6.16.0
@@ -316,8 +316,8 @@ catalogs:
       specifier: ^19.3.0
       version: 19.3.0
     react-hook-form:
-      specifier: ^7.71.2
-      version: 7.89.0
+      specifier: ^7.90.0
+      version: 7.90.0
     react-plotly.js:
       specifier: ^4.0.0
       version: 4.1.0
@@ -325,8 +325,8 @@ catalogs:
       specifier: ^4.0.0
       version: 4.2.0
     tsdown:
-      specifier: ^0.23.0
-      version: 0.23.0
+      specifier: ^0.23.1
+      version: 0.23.1
     typescript:
       specifier: ^6.0.3
       version: 6.0.3
@@ -334,8 +334,8 @@ catalogs:
       specifier: ^1.1.1
       version: 1.1.1
     zod:
-      specifier: ^4.6.5
-      version: 4.6.5
+      specifier: ^4.6.7
+      version: 4.6.7
     zustand:
       specifier: ^5.0.15
       version: 5.0.15
@@ -352,10 +352,10 @@ importers:
         version: 2.0.8
       cspell:
         specifier: 'catalog:'
-        version: 10.3.6
+        version: 10.4.0
       orval:
         specifier: 'catalog:'
-        version: 8.41.0(@tanstack/react-query@5.104.1)(typescript@6.0.3)(zod@4.6.5)
+        version: 8.42.0(@tanstack/react-query@5.104.2)(typescript@6.0.3)(zod@4.6.5)
 
   src/frontend/app:
     dependencies:
@@ -382,7 +382,7 @@ importers:
         version: link:../modules/management
       '@ocelescope/ocelot':
         specifier: 'catalog:'
-        version: 0.8.0(@dagrejs/dagre@3.1.1)(@mantine/core@9.7.1)(@mantine/hooks@9.7.1)(@ocelescope/api-base@src+frontend+packages+api+base)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@tanstack/react-query@5.104.1)(@xyflow/react@12.12.0)(axios@1.20.0)(dayjs@1.11.23)(elkjs@0.12.0)(file-saver@2.0.5)(html-to-image@1.11.13)(lucide-react@1.52.0)(mantine-datatable@9.4.0)(react-dom@19.3.0)(react@19.3.0)(recharts@3.10.1)
+        version: 0.8.0(@dagrejs/dagre@3.1.1)(@mantine/core@9.7.2)(@mantine/hooks@9.7.2)(@ocelescope/api-base@src+frontend+packages+api+base)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@tanstack/react-query@5.104.2)(@xyflow/react@12.12.0)(axios@1.20.0)(dayjs@1.11.23)(elkjs@0.12.0)(file-saver@2.0.5)(html-to-image@1.11.13)(lucide-react@1.56.0)(mantine-datatable@9.4.0)(react-dom@19.3.0)(react@19.3.0)(recharts@3.10.1)
       '@ocelescope/plugin':
         specifier: workspace:^
         version: link:../modules/plugin
@@ -416,13 +416,13 @@ importers:
     dependencies:
       '@mantine/carousel':
         specifier: 'catalog:'
-        version: 9.7.1(@mantine/core@9.7.1)(@mantine/hooks@9.7.1)(embla-carousel-react@8.6.0)(embla-carousel@8.6.0)(react-dom@19.3.0)(react@19.3.0)
+        version: 9.7.2(@mantine/core@9.7.2)(@mantine/hooks@9.7.2)(embla-carousel-react@8.6.0)(embla-carousel@8.6.0)(react-dom@19.3.0)(react@19.3.0)
       '@mantine/core':
         specifier: 'catalog:'
-        version: 9.7.1(@mantine/hooks@9.7.1)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
+        version: 9.7.2(@mantine/hooks@9.7.2)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
       '@mantine/hooks':
         specifier: 'catalog:'
-        version: 9.7.1(react@19.3.0)
+        version: 9.7.2(react@19.3.0)
       '@ocelescope/api-base':
         specifier: workspace:^
         version: link:../../packages/api/base
@@ -446,7 +446,7 @@ importers:
         version: 6.11.0(@rjsf/utils@6.11.0)
       '@tanstack/react-query':
         specifier: 'catalog:'
-        version: 5.104.1(react@19.3.0)
+        version: 5.104.2(react@19.3.0)
       embla-carousel:
         specifier: 'catalog:'
         version: 8.6.0
@@ -455,7 +455,7 @@ importers:
         version: 8.6.0(react@19.3.0)
       lucide-react:
         specifier: 'catalog:'
-        version: 1.52.0(@types/react@19.3.0)(react@19.3.0)
+        version: 1.56.0(@types/react@19.3.0)(react@19.3.0)
       next:
         specifier: 'catalog:'
         version: 16.4.0(@types/node@26.6.5)(react-dom@19.3.0)(react@19.3.0)
@@ -467,7 +467,7 @@ importers:
         version: 19.3.0(react@19.3.0)
       react-hook-form:
         specifier: 'catalog:'
-        version: 7.89.0(@types/react@19.3.0)(react@19.3.0)
+        version: 7.90.0(@types/react@19.3.0)(react@19.3.0)
       uniqolor:
         specifier: 'catalog:'
         version: 1.1.1
@@ -477,7 +477,7 @@ importers:
     devDependencies:
       '@rjsf/mantine':
         specifier: 'catalog:'
-        version: 6.11.0(@mantine/core@9.7.1)(@mantine/dates@9.7.1)(@mantine/hooks@9.7.1)(@rjsf/core@6.11.0)(@rjsf/utils@6.11.0)(react@19.3.0)
+        version: 6.11.0(@mantine/core@9.7.2)(@mantine/dates@9.7.2)(@mantine/hooks@9.7.2)(@rjsf/core@6.11.0)(@rjsf/utils@6.11.0)(react@19.3.0)
       '@types/file-saver':
         specifier: 'catalog:'
         version: 2.0.7
@@ -492,7 +492,7 @@ importers:
         version: 19.3.0(@types/react@19.3.0)
       tsdown:
         specifier: 'catalog:'
-        version: 0.23.0(@tsdown/css@0.23.0)(typescript@6.0.3)
+        version: 0.23.1(@tsdown/css@0.23.1)(typescript@6.0.3)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -501,7 +501,7 @@ importers:
     dependencies:
       '@mantine/core':
         specifier: 'catalog:'
-        version: 9.7.1(@mantine/hooks@9.7.1)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
+        version: 9.7.2(@mantine/hooks@9.7.2)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
       '@ocelescope/api-base':
         specifier: workspace:^
         version: link:../../packages/api/base
@@ -513,10 +513,10 @@ importers:
         version: 0.3.2(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.1.21)(plotly.js@4.1.2)(react-dom@19.3.0)(react@19.3.0)
       '@tanstack/react-query':
         specifier: 'catalog:'
-        version: 5.104.1(react@19.3.0)
+        version: 5.104.2(react@19.3.0)
       lucide-react:
         specifier: 'catalog:'
-        version: 1.52.0(@types/react@19.3.0)(react@19.3.0)
+        version: 1.56.0(@types/react@19.3.0)(react@19.3.0)
       next:
         specifier: 'catalog:'
         version: 16.4.0(@types/node@26.6.5)(react-dom@19.3.0)(react@19.3.0)
@@ -532,7 +532,7 @@ importers:
         version: 19.3.0
       tsdown:
         specifier: 'catalog:'
-        version: 0.23.0(@tsdown/css@0.23.0)(typescript@6.0.3)
+        version: 0.23.1(@tsdown/css@0.23.1)(typescript@6.0.3)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -544,13 +544,13 @@ importers:
         version: 3.1.1
       '@mantine/core':
         specifier: 'catalog:'
-        version: 9.7.1(@mantine/hooks@9.7.1)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
+        version: 9.7.2(@mantine/hooks@9.7.2)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
       '@mantine/dates':
         specifier: 'catalog:'
-        version: 9.7.1(@mantine/core@9.7.1)(@mantine/hooks@9.7.1)(dayjs@1.11.23)(react-dom@19.3.0)(react@19.3.0)
+        version: 9.7.2(@mantine/core@9.7.2)(@mantine/hooks@9.7.2)(dayjs@1.11.23)(react-dom@19.3.0)(react@19.3.0)
       '@mantine/hooks':
         specifier: 'catalog:'
-        version: 9.7.1(react@19.3.0)
+        version: 9.7.2(react@19.3.0)
       '@ocelescope/api-base':
         specifier: workspace:^
         version: link:../../packages/api/base
@@ -562,7 +562,7 @@ importers:
         version: link:../../packages/core
       '@tanstack/react-query':
         specifier: 'catalog:'
-        version: 5.104.1(react@19.3.0)
+        version: 5.104.2(react@19.3.0)
       axios:
         specifier: 'catalog:'
         version: 1.20.0(debug@4.4.3)
@@ -571,10 +571,10 @@ importers:
         version: 1.11.23
       lucide-react:
         specifier: 'catalog:'
-        version: 1.52.0(@types/react@19.3.0)(react@19.3.0)
+        version: 1.56.0(@types/react@19.3.0)(react@19.3.0)
       mantine-datatable:
         specifier: 'catalog:'
-        version: 9.4.0(@mantine/core@9.7.1)(@mantine/hooks@9.7.1)(clsx@2.1.1)(react-dom@19.3.0)(react@19.3.0)
+        version: 9.4.0(@mantine/core@9.7.2)(@mantine/hooks@9.7.2)(clsx@2.1.1)(react-dom@19.3.0)(react@19.3.0)
       next:
         specifier: 'catalog:'
         version: 16.4.0(@types/node@26.6.5)(react-dom@19.3.0)(react@19.3.0)
@@ -589,11 +589,11 @@ importers:
         version: 19.3.0(react@19.3.0)
       react-hook-form:
         specifier: 'catalog:'
-        version: 7.89.0(@types/react@19.3.0)(react@19.3.0)
+        version: 7.90.0(@types/react@19.3.0)(react@19.3.0)
     devDependencies:
       '@mantine/notifications':
         specifier: 'catalog:'
-        version: 9.7.1(@mantine/core@9.7.1)(@mantine/hooks@9.7.1)(react-dom@19.3.0)(react@19.3.0)
+        version: 9.7.2(@mantine/core@9.7.2)(@mantine/hooks@9.7.2)(react-dom@19.3.0)(react@19.3.0)
       '@ocelescope/api-config':
         specifier: workspace:^
         version: link:../../packages/api/config
@@ -617,7 +617,7 @@ importers:
         version: 3.0.6(echarts@6.1.0)(react@19.3.0)
       tsdown:
         specifier: 'catalog:'
-        version: 0.23.0(@tsdown/css@0.23.0)(typescript@6.0.3)
+        version: 0.23.1(@tsdown/css@0.23.1)(typescript@6.0.3)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -626,7 +626,7 @@ importers:
     dependencies:
       '@mantine/core':
         specifier: 'catalog:'
-        version: 9.7.1(@mantine/hooks@9.7.1)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
+        version: 9.7.2(@mantine/hooks@9.7.2)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
       '@marko19907/string-to-color':
         specifier: '*'
         version: 1.0.2
@@ -641,16 +641,16 @@ importers:
         version: link:../../packages/resources
       '@tanstack/react-query':
         specifier: 'catalog:'
-        version: 5.104.1(react@19.3.0)
+        version: 5.104.2(react@19.3.0)
       dayjs:
         specifier: 'catalog:'
         version: 1.11.23
       lucide-react:
         specifier: 'catalog:'
-        version: 1.52.0(@types/react@19.3.0)(react@19.3.0)
+        version: 1.56.0(@types/react@19.3.0)(react@19.3.0)
       mantine-datatable:
         specifier: 'catalog:'
-        version: 9.4.0(@mantine/core@9.7.1)(@mantine/hooks@9.7.1)(clsx@2.1.1)(react-dom@19.3.0)(react@19.3.0)
+        version: 9.4.0(@mantine/core@9.7.2)(@mantine/hooks@9.7.2)(clsx@2.1.1)(react-dom@19.3.0)(react@19.3.0)
       react:
         specifier: 'catalog:'
         version: 19.3.0
@@ -660,7 +660,7 @@ importers:
     devDependencies:
       '@tsdown/css':
         specifier: 'catalog:'
-        version: 0.23.0(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.23.0)(yaml@2.9.1)
+        version: 0.23.1(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.23.1)(yaml@2.9.1)
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.5
@@ -672,7 +672,7 @@ importers:
         version: 19.3.0(@types/react@19.3.0)
       tsdown:
         specifier: 'catalog:'
-        version: 0.23.0(@tsdown/css@0.23.0)(typescript@6.0.3)
+        version: 0.23.1(@tsdown/css@0.23.1)(typescript@6.0.3)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -681,10 +681,10 @@ importers:
     dependencies:
       '@mantine/core':
         specifier: 'catalog:'
-        version: 9.7.1(@mantine/hooks@9.7.1)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
+        version: 9.7.2(@mantine/hooks@9.7.2)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
       '@mantine/hooks':
         specifier: 'catalog:'
-        version: 9.7.1(react@19.3.0)
+        version: 9.7.2(react@19.3.0)
       '@marko19907/string-to-color':
         specifier: '*'
         version: 1.0.2
@@ -702,10 +702,10 @@ importers:
         version: 1.11.23
       lucide-react:
         specifier: 'catalog:'
-        version: 1.52.0(@types/react@19.3.0)(react@19.3.0)
+        version: 1.56.0(@types/react@19.3.0)(react@19.3.0)
       mantine-datatable:
         specifier: 'catalog:'
-        version: 9.4.0(@mantine/core@9.7.1)(@mantine/hooks@9.7.1)(clsx@2.1.1)(react-dom@19.3.0)(react@19.3.0)
+        version: 9.4.0(@mantine/core@9.7.2)(@mantine/hooks@9.7.2)(clsx@2.1.1)(react-dom@19.3.0)(react@19.3.0)
       react:
         specifier: 'catalog:'
         version: 19.3.0
@@ -715,7 +715,7 @@ importers:
     devDependencies:
       '@tsdown/css':
         specifier: 'catalog:'
-        version: 0.23.0(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.23.0)(yaml@2.9.1)
+        version: 0.23.1(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.23.1)(yaml@2.9.1)
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.5
@@ -727,7 +727,7 @@ importers:
         version: 19.3.0(@types/react@19.3.0)
       tsdown:
         specifier: 'catalog:'
-        version: 0.23.0(@tsdown/css@0.23.0)(typescript@6.0.3)
+        version: 0.23.1(@tsdown/css@0.23.1)(typescript@6.0.3)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -736,13 +736,13 @@ importers:
     dependencies:
       '@mantine/carousel':
         specifier: 'catalog:'
-        version: 9.7.1(@mantine/core@9.7.1)(@mantine/hooks@9.7.1)(embla-carousel-react@8.6.0)(embla-carousel@8.6.0)(react-dom@19.3.0)(react@19.3.0)
+        version: 9.7.2(@mantine/core@9.7.2)(@mantine/hooks@9.7.2)(embla-carousel-react@8.6.0)(embla-carousel@8.6.0)(react-dom@19.3.0)(react@19.3.0)
       '@mantine/core':
         specifier: 'catalog:'
-        version: 9.7.1(@mantine/hooks@9.7.1)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
+        version: 9.7.2(@mantine/hooks@9.7.2)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
       '@mantine/hooks':
         specifier: 'catalog:'
-        version: 9.7.1(react@19.3.0)
+        version: 9.7.2(react@19.3.0)
       '@marko19907/string-to-color':
         specifier: 'catalog:'
         version: 1.0.2
@@ -769,7 +769,7 @@ importers:
         version: 8.6.0(react@19.3.0)
       lucide-react:
         specifier: 'catalog:'
-        version: 1.52.0(@types/react@19.3.0)(react@19.3.0)
+        version: 1.56.0(@types/react@19.3.0)(react@19.3.0)
       next:
         specifier: 'catalog:'
         version: 16.4.0(@types/node@26.6.5)(react-dom@19.3.0)(react@19.3.0)
@@ -781,7 +781,7 @@ importers:
         version: 19.3.0(react@19.3.0)
       react-hook-form:
         specifier: 'catalog:'
-        version: 7.89.0(@types/react@19.3.0)(react@19.3.0)
+        version: 7.90.0(@types/react@19.3.0)(react@19.3.0)
     devDependencies:
       '@types/file-saver':
         specifier: 'catalog:'
@@ -797,7 +797,7 @@ importers:
         version: 19.3.0(@types/react@19.3.0)
       tsdown:
         specifier: 'catalog:'
-        version: 0.23.0(@tsdown/css@0.23.0)(typescript@6.0.3)
+        version: 0.23.1(@tsdown/css@0.23.1)(typescript@6.0.3)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -806,10 +806,10 @@ importers:
     dependencies:
       '@mantine/core':
         specifier: 'catalog:'
-        version: 9.7.1(@mantine/hooks@9.7.1)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
+        version: 9.7.2(@mantine/hooks@9.7.2)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
       '@mantine/hooks':
         specifier: 'catalog:'
-        version: 9.7.1(react@19.3.0)
+        version: 9.7.2(react@19.3.0)
       '@marko19907/string-to-color':
         specifier: '*'
         version: 1.0.2
@@ -827,16 +827,16 @@ importers:
         version: 0.3.2(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.1.21)(plotly.js@4.1.2)(react-dom@19.3.0)(react@19.3.0)
       '@tanstack/react-query':
         specifier: 'catalog:'
-        version: 5.104.1(react@19.3.0)
+        version: 5.104.2(react@19.3.0)
       dayjs:
         specifier: 'catalog:'
         version: 1.11.23
       lucide-react:
         specifier: 'catalog:'
-        version: 1.52.0(@types/react@19.3.0)(react@19.3.0)
+        version: 1.56.0(@types/react@19.3.0)(react@19.3.0)
       mantine-datatable:
         specifier: 'catalog:'
-        version: 9.4.0(@mantine/core@9.7.1)(@mantine/hooks@9.7.1)(clsx@2.1.1)(react-dom@19.3.0)(react@19.3.0)
+        version: 9.4.0(@mantine/core@9.7.2)(@mantine/hooks@9.7.2)(clsx@2.1.1)(react-dom@19.3.0)(react@19.3.0)
       next:
         specifier: 'catalog:'
         version: 16.4.0(@types/node@26.6.5)(react-dom@19.3.0)(react@19.3.0)
@@ -849,7 +849,7 @@ importers:
     devDependencies:
       '@tsdown/css':
         specifier: 'catalog:'
-        version: 0.23.0(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.23.0)(yaml@2.9.1)
+        version: 0.23.1(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.23.1)(yaml@2.9.1)
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.5
@@ -861,7 +861,7 @@ importers:
         version: 19.3.0(@types/react@19.3.0)
       tsdown:
         specifier: 'catalog:'
-        version: 0.23.0(@tsdown/css@0.23.0)(typescript@6.0.3)
+        version: 0.23.1(@tsdown/css@0.23.1)(typescript@6.0.3)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -873,7 +873,7 @@ importers:
         version: link:../client
       '@tanstack/react-query':
         specifier: 'catalog:'
-        version: 5.104.1(react@19.3.0)
+        version: 5.104.2(react@19.3.0)
       axios:
         specifier: 'catalog:'
         version: 1.20.0(debug@4.4.3)
@@ -898,7 +898,7 @@ importers:
         version: 19.3.0(@types/react@19.3.0)
       tsdown:
         specifier: 'catalog:'
-        version: 0.23.0(@tsdown/css@0.23.0)(typescript@6.0.3)
+        version: 0.23.1(@tsdown/css@0.23.1)(typescript@6.0.3)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -913,7 +913,7 @@ importers:
         version: 19.3.0(react@19.3.0)
       zod:
         specifier: 'catalog:'
-        version: 4.6.5
+        version: 4.6.7
       zustand:
         specifier: 'catalog:'
         version: 5.0.15(@types/react@19.3.0)(immer@11.1.21)(react@19.3.0)(use-sync-external-store@1.7.0)
@@ -929,7 +929,7 @@ importers:
         version: 1.20.0(debug@4.4.3)
       tsdown:
         specifier: 'catalog:'
-        version: 0.23.0(@tsdown/css@0.23.0)(typescript@6.0.3)
+        version: 0.23.1(@tsdown/css@0.23.1)(typescript@6.0.3)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -938,7 +938,7 @@ importers:
     dependencies:
       orval:
         specifier: 'catalog:'
-        version: 8.41.0(@tanstack/react-query@5.104.1)(typescript@6.0.3)(zod@4.6.5)
+        version: 8.42.0(@tanstack/react-query@5.104.2)(typescript@6.0.3)(zod@4.6.5)
       react:
         specifier: 'catalog:'
         version: 19.3.0
@@ -951,7 +951,7 @@ importers:
         version: 26.6.5
       tsdown:
         specifier: 'catalog:'
-        version: 0.23.0(@tsdown/css@0.23.0)(typescript@6.0.3)
+        version: 0.23.1(@tsdown/css@0.23.1)(typescript@6.0.3)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -960,13 +960,13 @@ importers:
     dependencies:
       '@mantine/core':
         specifier: 'catalog:'
-        version: 9.7.1(@mantine/hooks@9.7.1)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
+        version: 9.7.2(@mantine/hooks@9.7.2)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
       '@mantine/dropzone':
         specifier: 'catalog:'
-        version: 9.7.1(@mantine/core@9.7.1)(@mantine/hooks@9.7.1)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
+        version: 9.7.2(@mantine/core@9.7.2)(@mantine/hooks@9.7.2)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
       '@mantine/hooks':
         specifier: 'catalog:'
-        version: 9.7.1(react@19.3.0)
+        version: 9.7.2(react@19.3.0)
       '@marko19907/string-to-color':
         specifier: 'catalog:'
         version: 1.0.2
@@ -984,10 +984,10 @@ importers:
         version: 0.3.2(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.1.21)(plotly.js@4.1.2)(react-dom@19.3.0)(react@19.3.0)
       '@tanstack/react-query':
         specifier: 'catalog:'
-        version: 5.104.1(react@19.3.0)
+        version: 5.104.2(react@19.3.0)
       '@tanstack/react-query-devtools':
         specifier: 'catalog:'
-        version: 5.104.1(@tanstack/react-query@5.104.1)(@types/react@19.3.0)(csstype@3.2.3)(react@19.3.0)
+        version: 5.104.2(@tanstack/react-query@5.104.2)(@types/react@19.3.0)(csstype@3.2.3)(react@19.3.0)
       clsx:
         specifier: 'catalog:'
         version: 2.1.1
@@ -1002,10 +1002,10 @@ importers:
         version: 2.0.5
       lucide-react:
         specifier: 'catalog:'
-        version: 1.52.0(@types/react@19.3.0)(react@19.3.0)
+        version: 1.56.0(@types/react@19.3.0)(react@19.3.0)
       mantine-datatable:
         specifier: 'catalog:'
-        version: 9.4.0(@mantine/core@9.7.1)(@mantine/hooks@9.7.1)(clsx@2.1.1)(react-dom@19.3.0)(react@19.3.0)
+        version: 9.4.0(@mantine/core@9.7.2)(@mantine/hooks@9.7.2)(clsx@2.1.1)(react-dom@19.3.0)(react@19.3.0)
       next:
         specifier: 'catalog:'
         version: 16.4.0(@types/node@26.6.5)(react-dom@19.3.0)(react@19.3.0)
@@ -1017,20 +1017,20 @@ importers:
         version: 19.3.0(react@19.3.0)
       zod:
         specifier: 'catalog:'
-        version: 4.6.5
+        version: 4.6.7
       zustand:
         specifier: 'catalog:'
         version: 5.0.15(@types/react@19.3.0)(immer@11.1.21)(react@19.3.0)(use-sync-external-store@1.7.0)
     devDependencies:
       '@mantine/dates':
         specifier: 'catalog:'
-        version: 9.7.1(@mantine/core@9.7.1)(@mantine/hooks@9.7.1)(dayjs@1.11.23)(react-dom@19.3.0)(react@19.3.0)
+        version: 9.7.2(@mantine/core@9.7.2)(@mantine/hooks@9.7.2)(dayjs@1.11.23)(react-dom@19.3.0)(react@19.3.0)
       '@mantine/notifications':
         specifier: 'catalog:'
-        version: 9.7.1(@mantine/core@9.7.1)(@mantine/hooks@9.7.1)(react-dom@19.3.0)(react@19.3.0)
+        version: 9.7.2(@mantine/core@9.7.2)(@mantine/hooks@9.7.2)(react-dom@19.3.0)(react@19.3.0)
       '@tsdown/css':
         specifier: 'catalog:'
-        version: 0.23.0(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.23.0)(yaml@2.9.1)
+        version: 0.23.1(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.23.1)(yaml@2.9.1)
       '@types/file-saver':
         specifier: 'catalog:'
         version: 2.0.7
@@ -1054,7 +1054,7 @@ importers:
         version: 6.16.0
       tsdown:
         specifier: 'catalog:'
-        version: 0.23.0(@tsdown/css@0.23.0)(typescript@6.0.3)
+        version: 0.23.1(@tsdown/css@0.23.1)(typescript@6.0.3)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -1063,10 +1063,10 @@ importers:
     dependencies:
       '@mantine/core':
         specifier: 'catalog:'
-        version: 9.7.1(@mantine/hooks@9.7.1)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
+        version: 9.7.2(@mantine/hooks@9.7.2)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
       '@mantine/hooks':
         specifier: 'catalog:'
-        version: 9.7.1(react@19.3.0)
+        version: 9.7.2(react@19.3.0)
       '@marko19907/string-to-color':
         specifier: 'catalog:'
         version: 1.0.2
@@ -1087,7 +1087,7 @@ importers:
         version: 6.11.0(@rjsf/utils@6.11.0)(react@19.3.0)(solid-js@1.9.16)
       '@rjsf/mantine':
         specifier: 'catalog:'
-        version: 6.11.0(@mantine/core@9.7.1)(@mantine/dates@9.7.1)(@mantine/hooks@9.7.1)(@rjsf/core@6.11.0)(@rjsf/utils@6.11.0)(react@19.3.0)
+        version: 6.11.0(@mantine/core@9.7.2)(@mantine/dates@9.7.2)(@mantine/hooks@9.7.2)(@rjsf/core@6.11.0)(@rjsf/utils@6.11.0)(react@19.3.0)
       '@rjsf/utils':
         specifier: 'catalog:'
         version: 6.11.0(react@19.3.0)
@@ -1096,10 +1096,10 @@ importers:
         version: 6.11.0(@rjsf/utils@6.11.0)
       '@tanstack/react-query':
         specifier: 'catalog:'
-        version: 5.104.1(react@19.3.0)
+        version: 5.104.2(react@19.3.0)
       lucide-react:
         specifier: 'catalog:'
-        version: 1.52.0(@types/react@19.3.0)(react@19.3.0)
+        version: 1.56.0(@types/react@19.3.0)(react@19.3.0)
       next:
         specifier: 'catalog:'
         version: 16.4.0(@types/node@26.6.5)(react-dom@19.3.0)(react@19.3.0)
@@ -1121,7 +1121,7 @@ importers:
         version: 19.3.0(@types/react@19.3.0)
       tsdown:
         specifier: 'catalog:'
-        version: 0.23.0(@tsdown/css@0.23.0)(typescript@6.0.3)
+        version: 0.23.1(@tsdown/css@0.23.1)(typescript@6.0.3)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -1138,7 +1138,7 @@ importers:
         version: 1.29.2
       '@mantine/core':
         specifier: 'catalog:'
-        version: 9.7.1(@mantine/hooks@9.7.1)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
+        version: 9.7.2(@mantine/hooks@9.7.2)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
       '@ocelescope/api-base':
         specifier: workspace:^
         version: link:../api/base
@@ -1165,10 +1165,10 @@ importers:
         version: 4.2.1
       lucide-react:
         specifier: 'catalog:'
-        version: 1.52.0(@types/react@19.3.0)(react@19.3.0)
+        version: 1.56.0(@types/react@19.3.0)(react@19.3.0)
       mantine-datatable:
         specifier: 'catalog:'
-        version: 9.4.0(@mantine/core@9.7.1)(@mantine/hooks@9.7.1)(clsx@2.1.1)(react-dom@19.3.0)(react@19.3.0)
+        version: 9.4.0(@mantine/core@9.7.2)(@mantine/hooks@9.7.2)(clsx@2.1.1)(react-dom@19.3.0)(react@19.3.0)
       next:
         specifier: 'catalog:'
         version: 16.4.0(@types/node@26.6.5)(react-dom@19.3.0)(react@19.3.0)
@@ -1187,7 +1187,7 @@ importers:
     devDependencies:
       '@tsdown/css':
         specifier: 'catalog:'
-        version: 0.23.0(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.23.0)(yaml@2.9.1)
+        version: 0.23.1(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.23.1)(yaml@2.9.1)
       '@types/file-saver':
         specifier: 'catalog:'
         version: 2.0.7
@@ -1202,7 +1202,7 @@ importers:
         version: 19.3.0(@types/react@19.3.0)
       tsdown:
         specifier: 'catalog:'
-        version: 0.23.0(@tsdown/css@0.23.0)(typescript@6.0.3)
+        version: 0.23.1(@tsdown/css@0.23.1)(typescript@6.0.3)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -1284,36 +1284,36 @@ packages:
     peerDependencies:
       solid-js: ^1.8
 
-  '@cspell/cspell-bundled-dicts@10.3.6':
-    resolution: {integrity: sha512-C3ggnJkA3q6/uap0h/UY1CH6SsAzfn6Y5xUDoA1PH7OJUtgGgrW/LY/vo2orN6ppH072L0Ke+sxSEY1OSBRpnA==}
+  '@cspell/cspell-bundled-dicts@10.4.0':
+    resolution: {integrity: sha512-ey23dut7NdnOsQQinQhROFZUh4LvLhJnnZCiq7y+KXMngdqXnIAZuEnnwXk3IfdOX+tycDC8OuMssLXDJ3Fnxw==}
     engines: {node: '>=22.18.0'}
 
-  '@cspell/cspell-json-reporter@10.3.6':
-    resolution: {integrity: sha512-eYwTqMZDIpNntPN+9pLD64ZFWJ9EiQrbas8kB6JXrS7gd+xXnDg6U+k2CmZGCpFKsArPE66PSudYRv+PoAb4CQ==}
+  '@cspell/cspell-json-reporter@10.4.0':
+    resolution: {integrity: sha512-P4v7z0QbOaM7UiKvhws+/Vn5XSEtJLv9DyJCvPXoAn5it4U76hme646DvM/ChMlSG23BnrYGuryqufdxqQPuZQ==}
     engines: {node: '>=22.18.0'}
 
-  '@cspell/cspell-performance-monitor@10.3.6':
-    resolution: {integrity: sha512-NISfRQ1bENcT+U9otrj+N1uyizZb7NJ8bXXnB8WYp4OHp7Hztb7wUDiNNcWoF3S8joMfMjxNr6HABeThl/Ohow==}
+  '@cspell/cspell-performance-monitor@10.4.0':
+    resolution: {integrity: sha512-0hCqI8pR0waFKKOR3SZ4VtWddx7HZTr0v7MPCPG0IpaqMzzaibrXn9AtFCe+9T1+UDQrM109YKS+yr0c6xVvMQ==}
     engines: {node: '>=22.18.0'}
 
-  '@cspell/cspell-pipe@10.3.6':
-    resolution: {integrity: sha512-gh/a0TL5hNSegkDiRFPC4nz4qK0BaLXi+tyoZWWZA9cfkOWsQMHApBxmJcukKeFFPsId2jyep814yy8O3xwdrg==}
+  '@cspell/cspell-pipe@10.4.0':
+    resolution: {integrity: sha512-cXHgST9ySpECyiE5ZK7TcwBqrCb3h9X49j/lSDcWNAVp7GkwnPfcdylH+Zq/VfYMlHad24z8CNXd5H91O9DhEA==}
     engines: {node: '>=22.18.0'}
 
-  '@cspell/cspell-resolver@10.3.6':
-    resolution: {integrity: sha512-P+90E0ED3qfGhmYqV0JZcASeWBoXqddOsknnU5SYrEbEd5+LAU0SYX2H2p+GPk7uYuPE0IP1eGATfY3KkFlSfg==}
+  '@cspell/cspell-resolver@10.4.0':
+    resolution: {integrity: sha512-uyI9qX8hagtcFtRTElYGXXyVhhnVxPBSf1Ltds9AlU9cktPOFYeTXQOfBR+Dpt9dCruzX29ZJbd3hR1i5yryZg==}
     engines: {node: '>=22.18.0'}
 
-  '@cspell/cspell-service-bus@10.3.6':
-    resolution: {integrity: sha512-4voVfeS+HEJy+bsWTQw9+cX4V2v6aGf97BRQDf0QQs/mlOfa07tLIYto/ZCbjCYUBMix64xziELrmqWkWcf2Kw==}
+  '@cspell/cspell-service-bus@10.4.0':
+    resolution: {integrity: sha512-IZzx+EWADkN5xbFrW+VS+JQ52+w5tWaZNxDgGa+0Mv79hks6wNa2Vcnce+9vGcBJYgA24VcuAfekI38tYzcDtw==}
     engines: {node: '>=22.18.0'}
 
-  '@cspell/cspell-types@10.3.6':
-    resolution: {integrity: sha512-EJW6qFg/N1KcuNhOBo25nfL6QgrtBg1/KTzzsHpITxHSAnnZmLYCsSmEkunP8Voy4px2lkjDYN3OYEDBvPfd7A==}
+  '@cspell/cspell-types@10.4.0':
+    resolution: {integrity: sha512-LTOrZcDSHj5BkeNSvimuV3AMF7gWjxzXUdQ7zYT/h/57/5flHuE6NPKSXS69ty8vJM0WrVh35L5aDxnCPfDzXA==}
     engines: {node: '>=22.18.0'}
 
-  '@cspell/cspell-worker@10.3.6':
-    resolution: {integrity: sha512-gzmadwr0R20S8w2gUMqRHd1qQjzJmm8KgFyMVo9Hb7RBaVkqthwITw1FLJW6XqGGcBBZ1nNCfc8OrTOaeA2hxQ==}
+  '@cspell/cspell-worker@10.4.0':
+    resolution: {integrity: sha512-3Y1+nF1Wyyh4kwlpooNhfGSbYXK4LIYLa5xOusig2X/LmCznfN2g5wIqh8K2zSDsmjrm9PLq11MUDDXJ4ZjMKw==}
     engines: {node: '>=22.18.0'}
 
   '@cspell/dict-ada@4.1.1':
@@ -1361,14 +1361,14 @@ packages:
   '@cspell/dict-elixir@4.0.8':
     resolution: {integrity: sha512-CyfphrbMyl4Ms55Vzuj+mNmd693HjBFr9hvU+B2YbFEZprE5AG+EXLYTMRWrXbpds4AuZcvN3deM2XVB80BN/Q==}
 
-  '@cspell/dict-en-common-misspellings@2.2.4':
-    resolution: {integrity: sha512-Jy53Gk2yyX2BgJ+NKKufdJxjiNf0aou2QhUKwN1ndaKof25WgqOQ6+27jNU0Fbaw1HVi7vCyFq5oIQxBHhwk2w==}
+  '@cspell/dict-en-common-misspellings@2.2.5':
+    resolution: {integrity: sha512-c1bj+HXT8fafxrBT/nmVLwr7ILVomgVSGlWsb2wjJYanqvLJHXkCVmr0sM97F9FJeWQFIgwrRi5MWSYbNQAQ6A==}
 
-  '@cspell/dict-en-gb-mit@3.1.29':
-    resolution: {integrity: sha512-mInExsCFZui0f9Vg/MToWfQZzwMfPgHX8BCYdZNdXWbYz+jITXcnvssbdUkui/DVbriZVJ74Zu9bv2jOEqTCNA==}
+  '@cspell/dict-en-gb-mit@3.1.30':
+    resolution: {integrity: sha512-wmsPqPrO+GRfD8iA2jSKzRdEVd46ZbnDttRWM8RC4a8DkeiIanTtIgqX5V23jJibSgpsRVAtY+ktTw2nOK/Yvw==}
 
-  '@cspell/dict-en_us@4.4.40':
-    resolution: {integrity: sha512-TGyOaWP1dD28GRHH2Lt04ciMZC8Z6UX+5kJsi04pbQHq6uRxv14/bBVCBeSsajUXRZsJYUqXyHaHB9O0ODuFuQ==}
+  '@cspell/dict-en_us@4.4.41':
+    resolution: {integrity: sha512-PsfGqN/dSSPpaSl1vKaPI4DHAmgbFITON398YUEvoduDM1mWXnDOL+qBQ/ZjpWs5+aaShPq5c1vpJg8fuQFOQw==}
 
   '@cspell/dict-filetypes@3.0.18':
     resolution: {integrity: sha512-yU7RKD/x1IWmDLzWeiItMwgV+6bUcU/af23uS0+uGiFUbsY1qWV/D4rxlAAO6Z7no3J2z8aZOkYIOvUrJq0Rcw==}
@@ -1444,8 +1444,8 @@ packages:
   '@cspell/dict-node@5.0.9':
     resolution: {integrity: sha512-hO+ga+uYZ/WA4OtiMEyKt5rDUlUyu3nXMf8KVEeqq2msYvAPdldKBGH7lGONg6R/rPhv53Rb+0Y1SLdoK1+7wQ==}
 
-  '@cspell/dict-npm@5.2.53':
-    resolution: {integrity: sha512-3QDyduvLApXf2PyjmgwzapUREytih0FNRve7StuYQeHYoUHKHNjT3AX6KFWSVtSAtff0LfCcyFZVz4OyvNuQ1Q==}
+  '@cspell/dict-npm@5.2.54':
+    resolution: {integrity: sha512-7jQPRZL1XnZ0HPk5iYAq5WpJ5dpgKHRDBl9aB6uQQBJdo90mCF4bjPGSVl2HrWgx+IXlafiyx/QNO2XII/hgYg==}
 
   '@cspell/dict-php@4.1.3':
     resolution: {integrity: sha512-41oKzl7rLVrrVZA/Gs0ESnP6KliEX7c+IwaaNmOL3PAoHasFDVEmIFeENIzuDdM12UcHT+MlLkAm3Qw/lS/ERA==}
@@ -1474,8 +1474,8 @@ packages:
   '@cspell/dict-shell@1.2.0':
     resolution: {integrity: sha512-PVctvT22lJ49niMiakO8xieY7ELCAzjSqhejWR7bAMb5AZ9F4WDEs+XdGMnoVHWeXq7K5rcepLPmEJb+37zzIw==}
 
-  '@cspell/dict-software-terms@5.4.7':
-    resolution: {integrity: sha512-zgrCBh4cZt2iQ7igxXNmF04ZngKMSOxwCHGHopCQNDuPDvN2Epy/Hqjmrohnku5G5MzfzHQWEXzDu6dNPyGIlw==}
+  '@cspell/dict-software-terms@5.4.8':
+    resolution: {integrity: sha512-7Fv/jgRghpcEcvpmrRR54gPp1l85pPLmlMua74hjhMJoWklAp905V742XR6u5HwvGRH7aBTW9euNsJULav1E6A==}
 
   '@cspell/dict-sql@2.2.1':
     resolution: {integrity: sha512-qDHF8MpAYCf4pWU8NKbnVGzkoxMNrFqBHyG/dgrlic5EQiKANCLELYtGlX5auIMDLmTf1inA0eNtv74tyRJ/vg==}
@@ -1498,24 +1498,24 @@ packages:
   '@cspell/dict-zig@1.0.0':
     resolution: {integrity: sha512-XibBIxBlVosU06+M6uHWkFeT0/pW5WajDRYdXG2CgHnq85b0TI/Ks0FuBJykmsgi2CAD3Qtx8UHFEtl/DSFnAQ==}
 
-  '@cspell/dynamic-import@10.3.6':
-    resolution: {integrity: sha512-HGPM+lUJYIJqzjqEGteEy4w2WSiWxwjc1vBRVTncaxVMpRk5llk6SxnmautqGwvIGbEkipZ1CBuRnFpdwX9dGQ==}
+  '@cspell/dynamic-import@10.4.0':
+    resolution: {integrity: sha512-scSwtJDqpRT/Kqzo64XR8OWzXYfdpp9Yneq99Drhqm5gXXI2BAlgjzhBnMGKa+x7eIJZVM2+D2uFeDI2xQYM2w==}
     engines: {node: '>=22.18.0'}
 
-  '@cspell/filetypes@10.3.6':
-    resolution: {integrity: sha512-0zCfqsPhZY/1v6qB87AwpCgduLcVRAMyq+MQN6XhmRTfxrMZF8B4qsJafspOpYQ4XTNw5lyciwx60y1ba151cQ==}
+  '@cspell/filetypes@10.4.0':
+    resolution: {integrity: sha512-ez0MyFxnpYN9eMkH8vGGseQPsCRwD7ZlsR+ivQ2rPx04CX7ctp015nWv71P7m+T6V05AsyAwyEGZP9vrTlB4Ig==}
     engines: {node: '>=22.18.0'}
 
-  '@cspell/rpc@10.3.6':
-    resolution: {integrity: sha512-ZWwwYhrlcILvmH389pShyG0ef17lKMza25eSiG6snVnpVcIK96o1Pfr4ylNkbtMlYayvmbt9kLjHroMYdmFmRQ==}
+  '@cspell/rpc@10.4.0':
+    resolution: {integrity: sha512-tX1YLQYPQz+p73U5OTLmOxIrsmRkpaaKrPnfrVIpK5yv3erWE8ELVZD0zK01rursbL1rW3gyOv0ShHlmoE5VNA==}
     engines: {node: '>=22.18.0'}
 
-  '@cspell/strong-weak-map@10.3.6':
-    resolution: {integrity: sha512-tkvKTTu8GRdNGZbC/Fl8Sat5UsAVhX7qsi4YX9mfd4a/Lrp9x73/mP8wGB637qqBPoN7f9x8ZR6YtTpOFVVfDA==}
+  '@cspell/strong-weak-map@10.4.0':
+    resolution: {integrity: sha512-y8+Hk90mA3UY4HYEWBJokvNcixQOKkRDLEr+yXSYyOJnt6MhAu8D7N567HjEVNj0e7oirXl62wpNglPfo7qAcQ==}
     engines: {node: '>=22.18.0'}
 
-  '@cspell/url@10.3.6':
-    resolution: {integrity: sha512-IaEu6ePAWmb8QG+MFdhEnnGBAVhI+Qhph97x0v6RrwytwlyuO6MynaIcuYDCb9aLEDBVrDIGDj/+dplL+Sj8LQ==}
+  '@cspell/url@10.4.0':
+    resolution: {integrity: sha512-8NvDv8h3eaxejAvD+crMsSEgGq6LiunfS6iD2TBAcDqskNsIpN43AMHNNRf7T7Fd/3Y413nQDBH4RmsHcNsiqg==}
     engines: {node: '>=22.18.0'}
 
   '@dagrejs/dagre@3.1.1':
@@ -1882,56 +1882,56 @@ packages:
     peerDependencies:
       solid-js: ^1.8.8
 
-  '@mantine/carousel@9.7.1':
-    resolution: {integrity: sha512-lEa4BjqsrCUp4xJ4pJyaOCvcXGyqRfSYUumUvY/Q1KHrkqTdReiZCdURcsX+OHjqrju1KruddWH/0qNzAYJ9Ew==}
+  '@mantine/carousel@9.7.2':
+    resolution: {integrity: sha512-qjBcEh2Hd1EenToNIc+vE5+C3/HFpKoAEcG0CP68QbsKyJA/R43NtXEoR+sodkz33E9FlZk7O8YJz6GvuLYrbQ==}
     peerDependencies:
-      '@mantine/core': 9.7.1
-      '@mantine/hooks': 9.7.1
+      '@mantine/core': 9.7.2
+      '@mantine/hooks': 9.7.2
       embla-carousel: '>=8.0.0'
       embla-carousel-react: '>=8.0.0'
       react: ^19.2.0
       react-dom: ^19.2.0
 
-  '@mantine/core@9.7.1':
-    resolution: {integrity: sha512-SU1xklOfdEDzpPhw35ti9rF4QRE9HUongCe37C+xCO2Ea8MLJkAzreCrMxb8qcCij+gnF7SQbtTCBa1r+pKxYA==}
+  '@mantine/core@9.7.2':
+    resolution: {integrity: sha512-+cggJDD0PO057SwZU/dKlWPjp0LaAn1nEM9W1m/Ia4Cjb/Hy9DjZ4I7R7xirp/eZ6xnV7OqeGmPFSJ8zeGa5kQ==}
     peerDependencies:
-      '@mantine/hooks': 9.7.1
+      '@mantine/hooks': 9.7.2
       react: ^19.2.0
       react-dom: ^19.2.0
 
-  '@mantine/dates@9.7.1':
-    resolution: {integrity: sha512-oFQf8b0cW2ArcdP6r0ATMA4gJN3D8Nc29J7wE4E2xM5mI1+nW6k47L0E45uKwxFb9CqdhXaN+XA9lbrkWkMfsg==}
+  '@mantine/dates@9.7.2':
+    resolution: {integrity: sha512-z57sziOW1/hyGlR43I1kBE78hvfKvEWzRqznK0qTeKADLBflzGxUsZRL0GMQ1LUbQCp+Jog6MQnzgRFV3FHwsg==}
     peerDependencies:
-      '@mantine/core': 9.7.1
-      '@mantine/hooks': 9.7.1
+      '@mantine/core': 9.7.2
+      '@mantine/hooks': 9.7.2
       dayjs: '>=1.0.0'
       react: ^19.2.0
       react-dom: ^19.2.0
 
-  '@mantine/dropzone@9.7.1':
-    resolution: {integrity: sha512-WP4xW/2kUkfGVrMbWDsV5y3164CMvmabxoQ+jNZ77IuTsF7j7b8jHYPlgcnjMYolYG/dyOHI6UAniI8t/wmlKw==}
+  '@mantine/dropzone@9.7.2':
+    resolution: {integrity: sha512-cs9WRYE79LfWQhIUVYj40JNe/zfQDNHercuYuksW4bV6aQzcDSSZxH+H72iaR02Kz91j05iqc5ohkri8e/Q7ww==}
     engines: {node: '>=22'}
     peerDependencies:
-      '@mantine/core': 9.7.1
-      '@mantine/hooks': 9.7.1
+      '@mantine/core': 9.7.2
+      '@mantine/hooks': 9.7.2
       react: ^19.2.0
       react-dom: ^19.2.0
 
-  '@mantine/hooks@9.7.1':
-    resolution: {integrity: sha512-C1xD4A3bfB87nUsLHr42WqOabnK4G+fCyEf8FN14EEiZAcKjdcWJbK63qxhIXFKuHCc3acLbpm2ts9UqmLASTw==}
+  '@mantine/hooks@9.7.2':
+    resolution: {integrity: sha512-11emsRp/Mg+vfaKVyoMwiMdCHmO/15XOL6JG9fACkclVZnLPBVvRIaDdRBudsR3ALGZ5iTzrArPJDjjoeO6X4w==}
     peerDependencies:
       react: ^19.2.0
 
-  '@mantine/notifications@9.7.1':
-    resolution: {integrity: sha512-gmN+rTrjwYFJqaIqDQtQfoTJ/OR0wSxqxIihOHD5/S/sYUycVi9wDqK4tub5y8x0HeQH4kNkehPMN4l1Uk0A6A==}
+  '@mantine/notifications@9.7.2':
+    resolution: {integrity: sha512-Lf/oS2bpWgalgJ7Uy2Gh2V/kqnIIM3zkeWYy+GZKunfbiQGyuDBasOGd/4RYu5ga7b8vxJzC/zINi/UdpFuxoQ==}
     peerDependencies:
-      '@mantine/core': 9.7.1
-      '@mantine/hooks': 9.7.1
+      '@mantine/core': 9.7.2
+      '@mantine/hooks': 9.7.2
       react: ^19.2.0
       react-dom: ^19.2.0
 
-  '@mantine/store@9.7.1':
-    resolution: {integrity: sha512-CYCQHWt7zFrUe2kVQmFAWnQaZbiDUoN2VeMJBI/vf1XybGj+itTEB6cnvoX4C8yOrln3sXe4BIoIf46pUhnEhA==}
+  '@mantine/store@9.7.2':
+    resolution: {integrity: sha512-ERjk46CbQeSqytWTq5cAzT4o9MBAzzvVXpPlD36B5NwB5hmbjQfdUKcr0PlZfG04a/PDPdLPvAiVp7Eeh0tk8A==}
     peerDependencies:
       react: ^19.2.0
 
@@ -2054,49 +2054,52 @@ packages:
       react-dom: ^19.3.0
       recharts: ^3.2.1
 
-  '@orval/angular@8.41.0':
-    resolution: {integrity: sha512-sqJzn5eQT9MmiG8jiAMMj/TzPlw13veYvAF00t1B+uz50eOC4Rw+l45wz8OXO+SxDY5fR9Tf+IWBcnIk3Vn55A==}
+  '@orval/angular@8.42.0':
+    resolution: {integrity: sha512-wSY5s/g2nPm0icaBu630fNsvdGGH9AMbQ3x4AOx57OcPfGVyNeWlLZlI5WmWkZepT27q4AVZcdqJ0L05oc7eCw==}
 
-  '@orval/axios@8.41.0':
-    resolution: {integrity: sha512-Xj6fFLV46XWJPNalKvHth23kwuz491s1ozYUc7A4DaEeJW7yjwqMTj3WenY1tahqhGo/OH8gxlGQ37w+g7v1tw==}
+  '@orval/axios@8.42.0':
+    resolution: {integrity: sha512-TSkqySgcaZ6wK45houW2O8twDq7ZtX3Vo2PJBRjVHw6rvCuIxjaWIAKpl5Hi5/WTrSof1d5KMELaAL4pwN5IHQ==}
 
-  '@orval/core@8.41.0':
-    resolution: {integrity: sha512-0InVYWTF08kOOE+w4JY2xtk5ldASzc6ov/avr9y9qXFQE8C/YmIONMwK6qVDk6TFiUMslEJGFuOk9Fvg3/othw==}
+  '@orval/core@8.42.0':
+    resolution: {integrity: sha512-HhUK5uThHPmn9KxvSOgU/3sfCuuTxD5KcSdQARHl+6D8jHZ7jrYmjNX3oNNPpQjWKieVk7hfMD3zfpIaOrL+oQ==}
     peerDependencies:
       '@faker-js/faker': '>=8'
+      '@modelcontextprotocol/server': '>=2'
     peerDependenciesMeta:
       '@faker-js/faker':
         optional: true
+      '@modelcontextprotocol/server':
+        optional: true
 
-  '@orval/effect@8.41.0':
-    resolution: {integrity: sha512-Fqg7prTtyOT6nhT+gDs6KavMc2UgpcpcaCzxdiqQMENkEpx2nMTkojmCAZj74LM4a0hTl6gcnqovw48BVdydVw==}
+  '@orval/effect@8.42.0':
+    resolution: {integrity: sha512-yWededPudMlt+ApTy6teuFc4PG5tQQHo/byVPminQrIVdJ3DwfKyQr59znYnvppRUw+rGLXcQM1A2TsJgSew0Q==}
     peerDependencies:
       effect: '>=3'
     peerDependenciesMeta:
       effect:
         optional: true
 
-  '@orval/fetch@8.41.0':
-    resolution: {integrity: sha512-D4CQEI9sKk3kWI/VaLsDi9y4I5wziT1ZwIXsA6uWyVPW8UqqBEARCxHHVluCCIl+NWMNrNvv9bte8KzSTiC0Ng==}
+  '@orval/fetch@8.42.0':
+    resolution: {integrity: sha512-qjrsbYSfwqnrraTkx/8/x16KV13t54hD0idNL16K8LDFOMn8hYkDREc6VmTLtYIXEE8pc26BJSwLwb5NRuCoeg==}
 
-  '@orval/hono@8.41.0':
-    resolution: {integrity: sha512-qZ5UAfLwQzWAYU59jvSo0jLYTT2vrYH4/ls5rcUVxg/JAD59PI3vyz3DdtlT0xFoi81ZXbomPIS1dK8toqWwgA==}
+  '@orval/hono@8.42.0':
+    resolution: {integrity: sha512-JNPYgqbIUNeKIBJ35V+Mj59g1/LzH7ZxaO8OE8vXpSdeaDe2CNxrstNt5lGA0SvWgRO+taKWCZBkwZbTydrJ+Q==}
     peerDependencies:
       typescript: '>=5'
     peerDependenciesMeta:
       typescript:
         optional: true
 
-  '@orval/mcp@8.41.0':
-    resolution: {integrity: sha512-0r4ocPzqXwCfulXdjOnoN1GsDGP3A8QsarBOYfg+xJn942QfbuiZdw3Hto5fQcQhO07gTah249Qw7BtGiABEWA==}
+  '@orval/mcp@8.42.0':
+    resolution: {integrity: sha512-aRkxuSN5TzPg8uYrbjAUhGXNaHLKb0e/UVlA8yraLSJ/bI77cg6kh7J/cE/1UxuUiL7zdHRvr4gog6BXJ3lo9A==}
     peerDependencies:
-      '@modelcontextprotocol/sdk': '>=1'
+      '@modelcontextprotocol/server': '>=2'
     peerDependenciesMeta:
-      '@modelcontextprotocol/sdk':
+      '@modelcontextprotocol/server':
         optional: true
 
-  '@orval/mock@8.41.0':
-    resolution: {integrity: sha512-Yd1rAWLj+xcHbfK28BKDvuwmYcvNq18IBbIACUtbLMWUyzuFBG8g8oQHnHf1WYkFaKlkCbEWyNvoQS4n9mInhQ==}
+  '@orval/mock@8.42.0':
+    resolution: {integrity: sha512-z7hfJ1FtmOXrkb0hvwkyj4mXPESvSKpoBNFAdfwxPsm/Xg+KEFN+hQn6zaQOUUqxhtglx8EAC1jUjsmGGrP0zA==}
     peerDependencies:
       '@faker-js/faker': '>=8'
       msw: '>=2'
@@ -2106,16 +2109,16 @@ packages:
       msw:
         optional: true
 
-  '@orval/pinia-colada@8.41.0':
-    resolution: {integrity: sha512-HcMffSuAroYjj4NQeSh2xATAliSn/aQN3dhmpKIP/b7bTXfGVS3j16OkVCbPiQZcspJjRASCFX9/0ip3usoMHw==}
+  '@orval/pinia-colada@8.42.0':
+    resolution: {integrity: sha512-SiKLtiXx5zxhMVKdcn6/BvEEhurwPtl3Y4x7n42TJ2Wpw/n3JOTVJSIVk0zvAFYeCm4IEXEC8JKnzUWlaS8EiA==}
     peerDependencies:
       '@pinia/colada': ^1.4.4
     peerDependenciesMeta:
       '@pinia/colada':
         optional: true
 
-  '@orval/query@8.41.0':
-    resolution: {integrity: sha512-xgiTZRxpzFAbw4gxyA7+cOrqoROYKnyuKL8o4wQnhb0x/0s+Nb/dyyUHdEQIjHxw5oL9LyB+gubd4H+uA6y0VQ==}
+  '@orval/query@8.42.0':
+    resolution: {integrity: sha512-dFXQOf0u8k6LMh1LxpUkiWjh560PLuEoca+0QjFaaJYDtidv0xV9XLMljGZurFQnpp6jUfgvmTd1aDQHGl3hvw==}
     peerDependencies:
       '@tanstack/angular-query-experimental': '>=5'
       '@tanstack/react-query': '>=4'
@@ -2134,27 +2137,27 @@ packages:
       '@tanstack/vue-query':
         optional: true
 
-  '@orval/solid-start@8.41.0':
-    resolution: {integrity: sha512-OituP86e8H81xwQR9PfDhl4PkvTEYCSSg9+zBcihnDtgSiU2CTNZUtkW5pDGl6irRVGLnUvOlnqiSC3eUuFsOg==}
+  '@orval/solid-start@8.42.0':
+    resolution: {integrity: sha512-hXErVs/xfM+gOm1oZgJz28021ZxggPxQwgaAQjIkm57SfjL2XALfVn8R9nl9jQ0kJ8aC+oTAYQpPEM/JPKrl/A==}
 
-  '@orval/swr@8.41.0':
-    resolution: {integrity: sha512-37N2Mtn0HKX/EyYDpL48AMM9WJ7ckg0U5EHr7Otmk+QcdQMDbbd6SGLbaE31eqbUNG1RTlxOHmorV1Iq5DYZog==}
+  '@orval/swr@8.42.0':
+    resolution: {integrity: sha512-p2vWwzE4FCLBTr1TeQrGEtkcE7fZfZHxgXZG4ROyQFjR+rOEozUCXmjvlm+uCVJIwDd5YX7T+8PuGfsk6Nyhaw==}
     peerDependencies:
       swr: '>=2'
     peerDependenciesMeta:
       swr:
         optional: true
 
-  '@orval/zod@8.41.0':
-    resolution: {integrity: sha512-zoIM6CqQQMqB61lchpZCNudvTBCfzIdMEwI9AxsMexRP0XhskOTibRQ+TwTPB7MXNRzpJ6/CkDTZ50DY4uBtjg==}
+  '@orval/zod@8.42.0':
+    resolution: {integrity: sha512-QWEBD8ExXtbgBT13C9oW9Ayeefx6XVSBKm+H8wfq7ukG/vp2rgfMd6sajJ0Ts9KJ1TKG/JSAuFrLamxx1eFRJQ==}
     peerDependencies:
       zod: '>=3'
     peerDependenciesMeta:
       zod:
         optional: true
 
-  '@oxc-project/types@0.152.0':
-    resolution: {integrity: sha512-oM/5rLBm2tPkg0iBgkH/FOeR3PCDpY19GTgAZjMFM8h9WI9VW7cLgzp6nwtarYKmovavIQZ+Fe/RKX/8C8O/Rw==}
+  '@oxc-project/types@0.153.0':
+    resolution: {integrity: sha512-jSNrRIyvPVLL5E1z/tS5zLAprosGz/FuI1PWwEOz59j3E4TTTzSpqKb/RDGqJhhW0QHYISGXxq582wGx6T11Tw==}
 
   '@plotly/d3-sankey-circular@0.33.1':
     resolution: {integrity: sha512-FgBV1HEvCr3DV7RHhDsPXyryknucxtfnLwPtCKKxdolKyTFYoLX/ibEfX39iFYIL7DYbVeRtP43dbFcrHNE+KQ==}
@@ -2927,98 +2930,98 @@ packages:
     peerDependencies:
       '@rjsf/utils': ^6.11.0
 
-  '@rolldown/binding-android-arm-eabi@1.2.12':
-    resolution: {integrity: sha512-dB/a1214qKfHMXCpgqR4OZT+jS4kTyEXbQGJPqzobt5EwH5rX080pxE37alt3RzvR1bf1Yz/yGqRfrYAxuPw0A==}
+  '@rolldown/binding-android-arm-eabi@1.2.13':
+    resolution: {integrity: sha512-Vu/NICrgdRvUOeaJZIyB2FP63s6fO/4ud5l8dXmxDx9yDyn+mN0y+gsvsVviSli+T361Aqo0h46EuMoobrwawA==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [arm]
     os: [android]
 
-  '@rolldown/binding-android-arm64@1.2.12':
-    resolution: {integrity: sha512-7KHFgQ5VJxIHcLlrwrc3Xbds7oTNQT7Pgi9gQCJKrd2VGab/UksIOYp6VD8MzCstGxOKMgNamPwUCfxPdP1OHg==}
+  '@rolldown/binding-android-arm64@1.2.13':
+    resolution: {integrity: sha512-6LEoIrGy5vvCd2boNnv2soPSUZj/PRvhp8R/t9KlX+mIZxThIE/ZqxrGXxmuNX0FuvQFvLdZr7S4HrYpYBVhEQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [arm64]
     os: [android]
 
-  '@rolldown/binding-darwin-arm64@1.2.12':
-    resolution: {integrity: sha512-3YIhqHD96nA5SaYNRBR16HnGv4oavZvXfD/ayHM+oYZ0WD/8lBAtf6zQua4kEyAvpqrluKXl0lnOBoiNby7x9w==}
+  '@rolldown/binding-darwin-arm64@1.2.13':
+    resolution: {integrity: sha512-CaJSRzlQ6Q+zkDMVA9OkVxBjVoPRCDEE3v0FSJ9kIQBgRjFApA3Si4ijhbNVUji7ZJt+PfO0e46qy4nPInHUPA==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [arm64]
     os: [darwin]
 
-  '@rolldown/binding-darwin-x64@1.2.12':
-    resolution: {integrity: sha512-UuuJ35MFw4gmFOrE9pEqIV+K3syIKveph+Qc1/ljHZVdoDW4pz/JHR/eMVom+TZGl/5OOvGJOWaOCVt3ZfqhxA==}
+  '@rolldown/binding-darwin-x64@1.2.13':
+    resolution: {integrity: sha512-e4r340I5hxSzJkD3YJBxgzq/rJ3wwxwdLLb2FPt1Zpyem20nrQPT11DDEEkazwxaHumH8wpglsp/Ozgj/wT6mw==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [x64]
     os: [darwin]
 
-  '@rolldown/binding-freebsd-x64@1.2.12':
-    resolution: {integrity: sha512-uMvssit0a4W+/7D8CbHUvG719mH3R2jwXAlh/XcPvuHTE0g++LymF88DCGNX0HM2rBOn0xrzgXktIB6fLSJBTQ==}
+  '@rolldown/binding-freebsd-x64@1.2.13':
+    resolution: {integrity: sha512-hoBWDZ4/K/mJKVMbsgUd1jfpA2DiOrJ54mpegObU9TBHBBrtX4FLIXJJQRDPZ/2Dn91GvPob+Z2hwKJzf4E5SQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [x64]
     os: [freebsd]
 
-  '@rolldown/binding-linux-arm-gnueabihf@1.2.12':
-    resolution: {integrity: sha512-XcFu0R0xWnwzSf4IQgFH1rJIckPN1pLy2R+4r9IDB7Yfu/ys9cVqfa4pBrMHj7a3gl8mIR4nRNPg0e5IvEVs6g==}
+  '@rolldown/binding-linux-arm-gnueabihf@1.2.13':
+    resolution: {integrity: sha512-oF9fZu3vTWnTiVAkDFxU9PJLt1nh20K9RRpuHsR7ZnE2L7XookBbDBVLojCVSLGbvtSlxeUNnjAj6DbNsKyzbg==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [arm]
     os: [linux]
 
-  '@rolldown/binding-linux-arm64-gnu@1.2.12':
-    resolution: {integrity: sha512-260UrKgn8tz39ak+SMDOirKzr7V04M9dWPw5llW00SwBivCZoWcRBKV1d8cXnRkUmSZA3BdiUmBHWk7734Ulpw==}
+  '@rolldown/binding-linux-arm64-gnu@1.2.13':
+    resolution: {integrity: sha512-DTpb/+jMiqWMPgphn4ksW1zW+XLJ6dJJ9FMvnIk9I291LhCctMPhMYJrP5t9p6C9qa3KXadDdUEZHBaPh3kNxQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
 
-  '@rolldown/binding-linux-arm64-musl@1.2.12':
-    resolution: {integrity: sha512-5YK1I9SqDkbPgc1IA8BgDl34suqUS2q0KWnBrirm0E51YjOs6eo6dV6jbQfNE/argHRSvd0QUGgtpIoYx+WWpw==}
+  '@rolldown/binding-linux-arm64-musl@1.2.13':
+    resolution: {integrity: sha512-xU+Kvv9N2A3SY35zFh1FWWNjxbadE/BKeqnkXe7vScU4GZsw757BlVmDLITZEq8DPpk6m7uoDYkK7P+x/uU5Ow==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [arm64]
     os: [linux]
     libc: [musl]
 
-  '@rolldown/binding-linux-ppc64-gnu@1.2.12':
-    resolution: {integrity: sha512-Rkcrmp7eFRg74yL5fXEU91JEWbdEPLevWwGtXpmhbjlD1StScbWTmO94Bhly+Mo+ketKYkdmM1vNUKeWSlx8cQ==}
+  '@rolldown/binding-linux-ppc64-gnu@1.2.13':
+    resolution: {integrity: sha512-XMk/hnhh25oQ756Lclb1Q11h4ll0xC0Esa5w4Vzp+mAE2S3AGJgeM0SonrIgY8fHhjarb6hcoTuwoFG0VVP2ig==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [ppc64]
     os: [linux]
     libc: [glibc]
 
-  '@rolldown/binding-linux-s390x-gnu@1.2.12':
-    resolution: {integrity: sha512-qvK4DuAsQc2BSjlx+Xr+IzOIvvxbGZqxFwdWfG6F518Erj0GGISyQbJ6pIappnOxlNPzNHvo/L0BwB30GZ+zVw==}
+  '@rolldown/binding-linux-s390x-gnu@1.2.13':
+    resolution: {integrity: sha512-U1BoTHYmlywE2n3HUWjzZ+8EQsKr+OwpxYuDWaubx42tUL8QSL7nOqRz/NVHanibbFP3M1Rxuprz/wNcbMKjqw==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [s390x]
     os: [linux]
     libc: [glibc]
 
-  '@rolldown/binding-linux-x64-gnu@1.2.12':
-    resolution: {integrity: sha512-Q9uLBO53Xd4QIq1WOycVQyPP1O4HhraEV2qqb3uTrnVw6QZih9duY4vNXOivL1xoUS1/z+W8eF4NMfl2a8Sdjw==}
+  '@rolldown/binding-linux-x64-gnu@1.2.13':
+    resolution: {integrity: sha512-J4cm80Pc6wEwV5AZ42o62sIQgDk+Y7R2s646jIwuvO+4V46QB58N4vVuMPWCBaNgursXLpmUWJV//WQAkPvHBQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
 
-  '@rolldown/binding-linux-x64-musl@1.2.12':
-    resolution: {integrity: sha512-3IBxWFMjbOZskDPKv8Lf9BCnahlKuHthWkYnyIxOH/QcJrFcS4EmcenthApkwr/5+nEqZlLzeYbxeMaX7A5u4g==}
+  '@rolldown/binding-linux-x64-musl@1.2.13':
+    resolution: {integrity: sha512-W0euZS40U4V6JkmEnVCIX9mcsL6cbXQ4X8c2w+MMOIjFg68TXUW+u3RT+2e1t1pv9mg/EP3pDtK3POXdQ7Rxyw==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [x64]
     os: [linux]
     libc: [musl]
 
-  '@rolldown/binding-openharmony-arm64@1.2.12':
-    resolution: {integrity: sha512-xtX61xg4LKPkPWilZU1ynKClz5Gj4bf74LML4r3eVLWumKnGjoEr1OSHQhMdbBDoYTi+yjrujvpZe2pUnqCrrA==}
+  '@rolldown/binding-openharmony-arm64@1.2.13':
+    resolution: {integrity: sha512-do/AF/4n9MRshia3a5aXoy8xM2c6mgfT6D7H/dY6my5z+hfCIR4ab7mk4IRj++nsEQpKy39kd0DQnDq+r692tw==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [arm64]
     os: [openharmony]
 
-  '@rolldown/binding-win32-arm64-msvc@1.2.12':
-    resolution: {integrity: sha512-At7fPB6PCaIjzgIhEZFxuT+BBFqiQibJDT4d3PhiR3f4E7bbMZF4aKblbFfEM3sETRDd1YiQx/+U/g/B/ou5Ew==}
+  '@rolldown/binding-win32-arm64-msvc@1.2.13':
+    resolution: {integrity: sha512-6FtUf2cJZobutJdxnGYX8z0vtbgqU0b2v8vfBhkXb9wp2MppMFtkunE+IaOntyi01rkIQoPW2GHABtfzsC0BRQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [arm64]
     os: [win32]
 
-  '@rolldown/binding-win32-x64-msvc@1.2.12':
-    resolution: {integrity: sha512-WIw2haVKwjuYdXkHaoC0mF8Le71TuCBxjrdKqLbJGctbBABj+ClfmNvtbOnzpq3RokNo5+V1qhtSzJyXorsklQ==}
+  '@rolldown/binding-win32-x64-msvc@1.2.13':
+    resolution: {integrity: sha512-UKhFaZTeTcbKrb3iU82m17jVcPEAoqDkCN5MBqgPyZSwp/cQmib21crTS0DdH7T1B7wZRWEI89YQAOJMet5yhg==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [x64]
     os: [win32]
@@ -3026,36 +3029,40 @@ packages:
   '@rolldown/pluginutils@1.0.1':
     resolution: {integrity: sha512-2j9bGt5Jh8hj+vPtgzPtl72j0yRxHAyumoo6TNfAjsLB04UtpSvPbPcDcBMxz7n+9CYB0c1GxQFxYRg2jimqGw==}
 
-  '@scalar/helpers@0.16.1':
-    resolution: {integrity: sha512-XhEnvri3Y9p6CdByMh+TqHfxS5Tz6iVMioq40empHq+/5wfOpxqj/cu3F2SDLtAYbseck03UTtJGcRcby8Y+TQ==}
+  '@scalar/helpers@0.16.3':
+    resolution: {integrity: sha512-He0CySU4Iv4DwyVF40EoVpvPneRQ1zqC/g1eBfR2i2G9RE/BEq/F5AiUrjIkbtTPjSbIiIL1AXMkXvBvgHVdsA==}
     engines: {node: '>=22'}
 
-  '@scalar/json-magic@0.15.5':
-    resolution: {integrity: sha512-y9bFapzGuhdnTRgRxSwL12InnJgp+mkCKBawVd8efBWRBRsHAR6uofau6dUbnKM7v43gUqKB2Sxi/dlMpTrLpw==}
+  '@scalar/json-magic@0.15.7':
+    resolution: {integrity: sha512-Vnu9wFHzuqpsx1DR6ePTsXgcBFnpRTEBH8HZAS1Nj7h7HfOsxaJtV5ig7pdLlLTK9bcJI+aZLndDZud5gysKFA==}
     engines: {node: '>=22'}
 
-  '@scalar/json-schema-validator@0.1.10':
-    resolution: {integrity: sha512-y9+MMUV3n1QGJXCRPZJuYk2PPRqHU9vEDyMffq4FVVjnQoEWzlgV55qXkZ5mMDBB5tpHHI3/dBflrjlYiRa8Rg==}
+  '@scalar/json-schema-validator@0.1.12':
+    resolution: {integrity: sha512-DjRUAFiMpq+ME1pD/xCUs317I1ve7ZKz2jLJ3ff/KY9tqlBOyEmY67ns3aQs+erBDPV/v68j8d9vkZPvy5iKEQ==}
     engines: {node: '>=22'}
 
-  '@scalar/openapi-parser@0.29.11':
-    resolution: {integrity: sha512-Ck4+ccs4JwVIM/0sCmVt/wsqbK2DIulVSoGq6/B3NFuzDHVHEWJvXNbkF4bADeCFxpf+4JXyZff6l1dVUQFJrA==}
+  '@scalar/openapi-parser@0.29.13':
+    resolution: {integrity: sha512-k/4nft8xKVSP5pk7n9G8QxQ4wc+UwmtrAMQ8eCPKh5r2v8lvS3AXv2bHiBowMBnJnhua5hyomFzaaGs0LmB9yg==}
     engines: {node: '>=22'}
 
   '@scalar/openapi-types@0.9.7':
     resolution: {integrity: sha512-UVSgxRxcTaIbTZGtNRdQJHZC60uyYi29zfDqQVp0lxx07BNczIHbf9jycgI/+W3Uxxod+yUUt7hzxnKllOHE0w==}
     engines: {node: '>=22'}
 
-  '@scalar/openapi-upgrader@0.4.2':
-    resolution: {integrity: sha512-upaA06r5ilkwl4bphiBCUiGI4hFLVRKhHNY8UIrWhL0y2XkaECB60GsnUvIFRRhlNbAcyZvBC3+0TKVCt+R7IA==}
+  '@scalar/openapi-types@0.9.8':
+    resolution: {integrity: sha512-pGcpkZObsGBC7nRKYte+6gstoe0C4hp7B2UWQYjg5To1wE68s3OHVvin+muL3tn3ZAoahXeJAkn1+aEcMi802w==}
     engines: {node: '>=22'}
 
-  '@scalar/openapi-validator@0.1.10':
-    resolution: {integrity: sha512-Td897dijaKFzjrBvFeC6J782IZPhUOnnolzQ5fnc1GWP/PCucjnTTrf6wM24kDpFd+JJHwBg04iuoNk/v/metw==}
+  '@scalar/openapi-upgrader@0.4.4':
+    resolution: {integrity: sha512-Agio5QlKUsJfMVe6nwkxjoQxI2o1lzBJYbPeHg+RKt5uAzU/zLI+h4xxPgwNaY2B9Ji5ekHGWmVkwsPnRBXl8g==}
     engines: {node: '>=22'}
 
-  '@scalar/types@0.23.0':
-    resolution: {integrity: sha512-j/px3Lp52x2NU3pG2vkFZUDZ3XwdYrNtPxxzhHyNBrpAuFzWoLPkMECRZqngmWEyUz/ZaSjYb1Yg/VF/ogDPSA==}
+  '@scalar/openapi-validator@0.1.12':
+    resolution: {integrity: sha512-ZQ08rgGeQO+ikgASM09r0qRqg3H0qlGeeSKYz0mCf2TLwNGveQSGmWuMwF0hafNMmjvtsakob4XaMdWwhUpaxQ==}
+    engines: {node: '>=22'}
+
+  '@scalar/types@0.23.2':
+    resolution: {integrity: sha512-sya+RIpIODwcvem7SYRnPB0OdVZtQ15mSpVdPwB5qltYry7xgyp9skdc3PuxTDbyEmLuZ4ZmkSVybpaFMICZiQ==}
     engines: {node: '>=22'}
 
   '@sec-ant/readable-stream@0.4.1':
@@ -3143,21 +3150,21 @@ packages:
     resolution: {integrity: sha512-DIpUSOhPfQ7u/qfUi/Wgm0wBO56MyBYXGvnlI0NcauDRPqdBUlAZZjW2Dxm92m+k1UWVhKw8YJ4f47+75Aujyw==}
     engines: {node: '>=20'}
 
-  '@tanstack/query-core@5.104.1':
-    resolution: {integrity: sha512-TiRghcrGkUTE+M4JBxvpPSpBhxvIzQairw+cksrHYGr+2uwC77yW1SY9nYxnYRYOppvucf8rEg6b5byoz4rTpw==}
+  '@tanstack/query-core@5.104.2':
+    resolution: {integrity: sha512-/qbsxJK5c3Ve1aFIULWYNcT2jeRUAiD4HME6Eu2ZdpofHoVgAjpkQhLg5xHuOoBkTPQUJLfP7zOxy0qsBcqROA==}
 
-  '@tanstack/query-devtools@5.104.1':
-    resolution: {integrity: sha512-wmXnQbnwEz+SctYMTrwsOWWNHKhCsVgtaliL9E+VI2vx2Xr773d/MpcrbIU1hEOUqC3p7x59swXFUPDLbplT3g==}
+  '@tanstack/query-devtools@5.104.2':
+    resolution: {integrity: sha512-LQrdtI9mRq1WEXml1ujhRN9K9cEnxH4YGkGoUvhYhGdZx0QcD7FKSV7lUKfMAHUm3ITJsTsqjlUJ7/qNZtQHqg==}
 
-  '@tanstack/react-query-devtools@5.104.1':
-    resolution: {integrity: sha512-0GoLxe08PVxnkbrHFwO+7fkgbc07xEcoBfdYvbTv63e6Fe7uz7PGyOxKeQTOXKGMmTfoniaISOqkjDzKC/66Ng==}
+  '@tanstack/react-query-devtools@5.104.2':
+    resolution: {integrity: sha512-F88xtzaf0QrJTENPMs6xngHuf5n+1zRFatAPhXUqF+DCpIlmuPEZb05U+DQCddfs2HjW25WMx3f9B4G8gApOiA==}
     peerDependencies:
-      '@tanstack/react-query': ^5.104.1
+      '@tanstack/react-query': ^5.104.2
       '@types/react': ^18 || ^19
       react: ^18 || ^19
 
-  '@tanstack/react-query@5.104.1':
-    resolution: {integrity: sha512-Zz70EgjahNI7aCz8BZxM3vUGU44ycxEAzMuCUjLeA7SVhhOkg3ZgPjPJPvHjs6Rmky/dtmnu1WzjGHNHmhCoZQ==}
+  '@tanstack/react-query@5.104.2':
+    resolution: {integrity: sha512-xKmzWGhadbE5wGS/ZmXShRITnI9oItox5GO14KvFZco3+vhTAyXS1erYzJWdiY280zapAGJXFUL9nHgwP6SV/g==}
     peerDependencies:
       react: ^18 || ^19
 
@@ -3173,8 +3180,8 @@ packages:
   '@tsconfig/strictest@2.0.8':
     resolution: {integrity: sha512-XnQ7vNz5HRN0r88GYf1J9JJjqtZPiHt2woGJOo2dYqyHGGcd6OLGqSlBB6p1j9mpzja6Oe5BoPqWmeDx6X9rLw==}
 
-  '@tsdown/css@0.23.0':
-    resolution: {integrity: sha512-EfSQCVAz24CRz92WdJj/Yb+gJMV3m2C/iDsFO4XJkd12Ez9WnW0KtpLohAFtc4gDzflFlh9I0UHTZc6BQmxSHw==}
+  '@tsdown/css@0.23.1':
+    resolution: {integrity: sha512-FLdllF5r22So3zwAuCRCLaxOCJqiN1SzihAncdoxHfe59Zj8nHDfaCBQBGYVDUJaHbr6fshSAcUXrgkJIr9dcA==}
     engines: {node: ^22.18.0 || ^24.11.0 || >=26.0.0}
     peerDependencies:
       postcss: ^8.4.0
@@ -3182,7 +3189,7 @@ packages:
       postcss-modules: ^6.0.0 || ^7.0.0 || ^8.0.0 || ^9.0.0
       sass: '*'
       sass-embedded: '*'
-      tsdown: 0.23.0
+      tsdown: 0.23.1
     peerDependenciesMeta:
       postcss:
         optional: true
@@ -3306,164 +3313,74 @@ packages:
   '@xyflow/system@0.0.83':
     resolution: {integrity: sha512-a//eDjez3WZF47aaPTfVUDD0OINOq+WVwBZCRTqG+m0a5euX8EwlJ4jMY1Wxz0Ocj4xOeekJ70V22Pq0ll8RJw==}
 
-  '@yuku-codegen/binding-android-arm64@0.10.2':
-    resolution: {integrity: sha512-Oc2KInVkPfUjEB4PeV6X0NvIoyYTzDe/WmqFrTwBqKs6YKnz4A7XwWQvJTb7M0rLz9a6WgpUUiiS5QKaCi4O/g==}
+  '@yuku-core/binding-android-arm64@0.19.0':
+    resolution: {integrity: sha512-wdL2XmTiZixAOaHk9Z0JJZ8u9Qm8d333Zjpc6gaxXFX+UR5BlsfxZ7a2+2Rm71pamppsPYGUGFq2oVLbh6DISw==}
     cpu: [arm64]
     os: [android]
-    deprecated: yuku-codegen is pure JavaScript since 0.14
 
-  '@yuku-codegen/binding-darwin-arm64@0.10.2':
-    resolution: {integrity: sha512-3H7eNPIHJndUJXZ4QUGBPq1zC6RGcUZfm7bymJes+/N7wTVWUn1bxZ9JcozYHpkWQNm9f23G8YWbaHD9aYH72A==}
+  '@yuku-core/binding-darwin-arm64@0.19.0':
+    resolution: {integrity: sha512-7sNJa6XJhyetnTy64jw3NEi4YgUcezHk1G5GH9FSvXAuC8wIlbaOwT9lgq5qo5sspjrZJQlBR1TWflP49uRpMw==}
     cpu: [arm64]
     os: [darwin]
-    deprecated: yuku-codegen is pure JavaScript since 0.14
 
-  '@yuku-codegen/binding-darwin-x64@0.10.2':
-    resolution: {integrity: sha512-AJOUpR2s3LF9AWiiub/Uyc/UoXNTWcq8hK3cVI6fUSXtwh34dG21J6hRuNlO6JVJFTo4o3ScVvZOrh/YFfUEAA==}
+  '@yuku-core/binding-darwin-x64@0.19.0':
+    resolution: {integrity: sha512-pTC7dYEc59isdyizc3nsuyFNBu2LU5wMYZ1be6UMr59PY/AJNtO1aBLWV0MgL/z7C1nv/2sX4TNjGgKLoeevJw==}
     cpu: [x64]
     os: [darwin]
-    deprecated: yuku-codegen is pure JavaScript since 0.14
 
-  '@yuku-codegen/binding-freebsd-x64@0.10.2':
-    resolution: {integrity: sha512-ms7DcZu87u5CiK/wMwvpKAvAmtaqKjCQIXNweMLypG6qbuiaOMQf1jpbB5+j46xBcgCovo8TQMcv0bCQLKIL9w==}
+  '@yuku-core/binding-freebsd-x64@0.19.0':
+    resolution: {integrity: sha512-xrZjF6XOEwyLOiDIfrwDdRCS6ghxcJeirNC1KivQhVcUwlRonaU79S3/Uiyx3lBylPnT8qKJ3/aMT+H52nGTJQ==}
     cpu: [x64]
     os: [freebsd]
-    deprecated: yuku-codegen is pure JavaScript since 0.14
 
-  '@yuku-codegen/binding-linux-arm-gnu@0.10.2':
-    resolution: {integrity: sha512-xJDpYAsKV5+eaiBhTYl05fvT6sst4PsCeuIFMRu9b0/WCSrNQPfCDtAQ5/MS6xNpsdujdZEPR+gmfWk3ZG5i3A==}
+  '@yuku-core/binding-linux-arm-gnu@0.19.0':
+    resolution: {integrity: sha512-0OyIH53C0I1CbADHn9FSdCfX5qbpeLwJhmOVhonFJNYheybOnkSJ50qGMfTJIb8y5zrwqvLs7FVBvz6Fk8maZg==}
     cpu: [arm]
     os: [linux]
     libc: [glibc]
-    deprecated: yuku-codegen is pure JavaScript since 0.14
 
-  '@yuku-codegen/binding-linux-arm-musl@0.10.2':
-    resolution: {integrity: sha512-qfTkgd7AEx61l4K9VtXWCGTxc/fmXJ4ZheDz3i+/AAJUtg4sa0bPrc0VBxPggB/rayR8Z3+JfrBItuyanBJJ9Q==}
+  '@yuku-core/binding-linux-arm-musl@0.19.0':
+    resolution: {integrity: sha512-z/iPfkCOCSXE34VXNt0uP1ORSW+4mEa9b5CiJcWZeqZH08g49bFU/jRM2T04f+Wpw5mJ6HIzNBiojxeAbrHjeg==}
     cpu: [arm]
     os: [linux]
     libc: [musl]
-    deprecated: yuku-codegen is pure JavaScript since 0.14
 
-  '@yuku-codegen/binding-linux-arm64-gnu@0.10.2':
-    resolution: {integrity: sha512-4e6Mifm/4UdjtU3D8mATIrvgP+xEiH8xtQOjd0zpd72XKWT7ug3sdyhq2utkkZFP6BvYp7SgZrI+aR4VeIOHdw==}
+  '@yuku-core/binding-linux-arm64-gnu@0.19.0':
+    resolution: {integrity: sha512-jLNTi+gzaRwBJ+gwhCJ+rDb5dmx/8hEBx93UWd7hjMSqPTL1D1wvVSvXVAldV5kALvju7b0/m51EHEhs4+I1fA==}
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
-    deprecated: yuku-codegen is pure JavaScript since 0.14
 
-  '@yuku-codegen/binding-linux-arm64-musl@0.10.2':
-    resolution: {integrity: sha512-RdsJrUfDYFVV3JOmWFUWwSu31fa1APn12xDeIKxgl/YWxrabwtxsDBNjF2561c7tmcbiewdCUvngqRs8AyGVLA==}
+  '@yuku-core/binding-linux-arm64-musl@0.19.0':
+    resolution: {integrity: sha512-YwyPIdW/rN2Fmv0MTFWi47FaB3F9g+2b+sJISyAw83Yd60RWH4T3Nx6XkAHHVN+uKJNBAd6So7/BVihSiFYvuQ==}
     cpu: [arm64]
     os: [linux]
     libc: [musl]
-    deprecated: yuku-codegen is pure JavaScript since 0.14
 
-  '@yuku-codegen/binding-linux-x64-gnu@0.10.2':
-    resolution: {integrity: sha512-mVzWimEPPreaPyXIUvxsHoJzvO7ckZ5j0LgQFHz04zQIRwt9A9T2hA7K5/jYjJKkMxWG/U2VjhGNwVhtyU+uqg==}
+  '@yuku-core/binding-linux-x64-gnu@0.19.0':
+    resolution: {integrity: sha512-/vskaAXVX3ESR43FiTdfiYS7z1b9uoQJwVQ/0RgUHgN2sWoAyCZs+aX4CgU7eKGIHTVfp9VFwv+c+2XchYiEtQ==}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
-    deprecated: yuku-codegen is pure JavaScript since 0.14
 
-  '@yuku-codegen/binding-linux-x64-musl@0.10.2':
-    resolution: {integrity: sha512-Y77fyISurmr2mvO1yeq3u+x/WJbACgPR4w+lzEVx30ViCxZzIGrZPRN1yEdZ9xUNPNsIO5thBHIdRNG+UGUG+Q==}
+  '@yuku-core/binding-linux-x64-musl@0.19.0':
+    resolution: {integrity: sha512-FuXL5igeSKib9Rye02TdH+D6SQezTyGxIATMu1Qsn/QywrzwpGl35OLpS2C1x5vpGLeVE2XgiLd5mVPFHmIglQ==}
     cpu: [x64]
     os: [linux]
     libc: [musl]
-    deprecated: yuku-codegen is pure JavaScript since 0.14
 
-  '@yuku-codegen/binding-win32-arm64@0.10.2':
-    resolution: {integrity: sha512-1+tGLyG0u5YYy0lev4ck7/0sd8xJ9SZde0dLut7qLDPZV5WVTV8x6OxNXUne/PGuHZyO1vK+txPQzzHOyXHGSw==}
+  '@yuku-core/binding-win32-arm64@0.19.0':
+    resolution: {integrity: sha512-YuJAe7zEKT1Xa7LuHlhGJpPnYQeVtvo0rZvNjJRqkH0hQGOw4C8QeP30Tg5VKGzZfo2x8CjhjEhKt4TmLwfmdg==}
     cpu: [arm64]
     os: [win32]
-    deprecated: yuku-codegen is pure JavaScript since 0.14
 
-  '@yuku-codegen/binding-win32-x64@0.10.2':
-    resolution: {integrity: sha512-8a2SExRohRbwC0MY4VpOF0/RSckrJ2ASZqAor5/RYSJJaeadR93n10gZzcKT6pY9ukiSOIZCRKVRD2tH73T0qA==}
+  '@yuku-core/binding-win32-x64@0.19.0':
+    resolution: {integrity: sha512-o8iY/mXwlRkedp0LNTr4+TEfXTPQwoNZmv6k+1WIAd1ZXEn8xJJTBCtB0osaVvdZo/x/cNmV16UrWrrGpM5Mvw==}
     cpu: [x64]
     os: [win32]
-    deprecated: yuku-codegen is pure JavaScript since 0.14
 
-  '@yuku-parser/binding-android-arm64@0.10.2':
-    resolution: {integrity: sha512-2VPBU9fRGRAQ2xPAvghnec3oou5Nrxm2Bezhf+13UMspAxQSkF/32r+ySKXSwIPA5/RivumDJDxAxc301Sgicw==}
-    cpu: [arm64]
-    os: [android]
-    deprecated: yuku-parser runs on yuku-core since 0.14
-
-  '@yuku-parser/binding-darwin-arm64@0.10.2':
-    resolution: {integrity: sha512-LD+PMZE51tCYTOss5HBkm3/AE39MvcMDBfWJx7A4yDcjfNbAQDnHZKtzSOuqrswx+TQHY0ws5xn6+fWOwtmfBA==}
-    cpu: [arm64]
-    os: [darwin]
-    deprecated: yuku-parser runs on yuku-core since 0.14
-
-  '@yuku-parser/binding-darwin-x64@0.10.2':
-    resolution: {integrity: sha512-mmZ8cND+AoIIMRERyMinlg5ApHxP23B9jH2B5wT7T+dliPa9rubLxneB/SUjFwyUjGaFnB5G7t4YvpfbO5zbkQ==}
-    cpu: [x64]
-    os: [darwin]
-    deprecated: yuku-parser runs on yuku-core since 0.14
-
-  '@yuku-parser/binding-freebsd-x64@0.10.2':
-    resolution: {integrity: sha512-gVIjaaIddbRfAhHlC8N809wQWml7mxfSVnzaLtzGXObTeFTPAg/YVnQXt1UOhPM1ah5eG/8Y0RUlNpB4GVe7eQ==}
-    cpu: [x64]
-    os: [freebsd]
-    deprecated: yuku-parser runs on yuku-core since 0.14
-
-  '@yuku-parser/binding-linux-arm-gnu@0.10.2':
-    resolution: {integrity: sha512-q/XPPQQAPdlw05aPj30ygBhekmQryGOwxVraBgApjKK8yY1kNQgqq6XCYLF1WHSee+lhxclrTO7W0/bt7dR1GA==}
-    cpu: [arm]
-    os: [linux]
-    libc: [glibc]
-    deprecated: yuku-parser runs on yuku-core since 0.14
-
-  '@yuku-parser/binding-linux-arm-musl@0.10.2':
-    resolution: {integrity: sha512-A+Cb0I1hFF4wilTQpWs79k1aNnj4B2tkrHx3zsuUNF9BtVY2zPZ4yeQEM/zjXrS/qJlNMZVK9NrWJjwdpnTrfg==}
-    cpu: [arm]
-    os: [linux]
-    libc: [musl]
-    deprecated: yuku-parser runs on yuku-core since 0.14
-
-  '@yuku-parser/binding-linux-arm64-gnu@0.10.2':
-    resolution: {integrity: sha512-aGNSzqIqqphFwAdIFwVvKIyXD1Iy3CxrEJVIZAT87Ecyi4vCmmDD2v2l9h+Gd3/wSy3JZlOI792LJbKAjyy9rQ==}
-    cpu: [arm64]
-    os: [linux]
-    libc: [glibc]
-    deprecated: yuku-parser runs on yuku-core since 0.14
-
-  '@yuku-parser/binding-linux-arm64-musl@0.10.2':
-    resolution: {integrity: sha512-Ddl1sF0rtuCXyHGSOV6dcmdx+ETv1iD+IVFqQuOjzkJZWclxJxdBWX6ZJMRtTiGqGUTbqLEKiTXxpR/Bvqk+2A==}
-    cpu: [arm64]
-    os: [linux]
-    libc: [musl]
-    deprecated: yuku-parser runs on yuku-core since 0.14
-
-  '@yuku-parser/binding-linux-x64-gnu@0.10.2':
-    resolution: {integrity: sha512-/nlcpR6IF5U+0m5L9wvAIXeQa2DT+BXuvqKDsTcOTlcc0B4dHNyqE5hTXsS4hAyimpy2ZK8A1zMNF5hTrjg2cg==}
-    cpu: [x64]
-    os: [linux]
-    libc: [glibc]
-    deprecated: yuku-parser runs on yuku-core since 0.14
-
-  '@yuku-parser/binding-linux-x64-musl@0.10.2':
-    resolution: {integrity: sha512-GX80dxTQD/M/OryyuxJcFzFENzry3cDFPvCFTyWogNWQH3fSHfMrNfpwpl1YzMos1eV9NygK5GSDG7VArQlb4w==}
-    cpu: [x64]
-    os: [linux]
-    libc: [musl]
-    deprecated: yuku-parser runs on yuku-core since 0.14
-
-  '@yuku-parser/binding-win32-arm64@0.10.2':
-    resolution: {integrity: sha512-agePQBV4VHewiGU0ACSjscZ/hJd283f9JfAF19Gf1rI5+wy5tTgx4GS36i0b3xim15AQ4RCpDRosEvhLZ4zAOw==}
-    cpu: [arm64]
-    os: [win32]
-    deprecated: yuku-parser runs on yuku-core since 0.14
-
-  '@yuku-parser/binding-win32-x64@0.10.2':
-    resolution: {integrity: sha512-s8//CMpgL5+y1lvDCdyh1rwGI5+ytDJywFJRe1vnhI7n0j+caxshNucurikYLLVeQ2SYFex6aPrzgQxkabBQRA==}
-    cpu: [x64]
-    os: [win32]
-    deprecated: yuku-parser runs on yuku-core since 0.14
-
-  '@yuku-toolchain/types@0.10.2':
-    resolution: {integrity: sha512-sSeo4SSSToiS+sSD+bwn/s94EEcaLJ7tG5LCp8gFYC1G5VzxzX7fqB6m9RU1yMD8KTpu6zdU/I1NlQf8hVBJ9Q==}
+  '@yuku-toolchain/types@0.19.0':
+    resolution: {integrity: sha512-tFkNbsP4WXX9UMUC5syJGdK9dPMLK0PPaIuXCcCYH75sZ8MrebfBZ2XvCILRTw8AgLivSSCfDa4R67iYBDa4Kg==}
 
   abs-svg-path@0.1.1:
     resolution: {integrity: sha512-d8XPSGjfyzlXC3Xx891DJRyZfqk5JU0BJrDQcsWomFIV1/BIzPW5HDH5iDdWpqWaav0YVIEzT1RHTwWr0FFshA==}
@@ -3563,8 +3480,8 @@ packages:
   buffer-from@1.1.2:
     resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
 
-  cac@7.0.0:
-    resolution: {integrity: sha512-tixWYgm5ZoOD+3g6UTea91eow5z6AAHaho3g0V9CNSNb45gM8SmflpAc+GRd1InC4AqN/07Unrgp56Y94N9hJQ==}
+  cac@7.1.0:
+    resolution: {integrity: sha512-LMDU/U2yA4IPIY8KT0NsNPWEYZvAMkbgyspxJ6btJaYV+WMDOHAZCmB0lsTObiHaRS1V/ztKAl7+TSkTqXyeoA==}
     engines: {node: '>=20.19.0'}
 
   call-bind-apply-helpers@1.0.2:
@@ -3677,44 +3594,44 @@ packages:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
     engines: {node: '>= 8'}
 
-  cspell-config-lib@10.3.6:
-    resolution: {integrity: sha512-3LcA2uIgB90Ucn3xa1lO5VVncHtsD4LZUf2ENBtHVmxFVFw1wvm1hbXL1mhenLY2xJDONGvLKRnNoowUWIZoDQ==}
+  cspell-config-lib@10.4.0:
+    resolution: {integrity: sha512-1P0xmWIlGqwsHf8he9BWNdqV2bvRBkxCv5ctj3oHBraRFS6CPjdJBptyjuM0dgTwxmxPFcuWhTG8miTvFMje5g==}
     engines: {node: '>=22.18.0'}
 
-  cspell-dictionary@10.3.6:
-    resolution: {integrity: sha512-retLLs4RFAxrduMfcgGXrHbMBc4fEqFt9pFRAyyH2HOlBmEU7CsBupx91A1FUJXUrGWDnfYwSzhQcWuFAAX8iQ==}
+  cspell-dictionary@10.4.0:
+    resolution: {integrity: sha512-FwCQBzqOxjAg+GhymrY288As9DmJqHVrkAr++0tCQ1wWFVw2Nt1W3cCKn9W987Dr+giSuNREdQFpGbQ/cHluTg==}
     engines: {node: '>=22.18.0'}
 
-  cspell-gitignore@10.3.6:
-    resolution: {integrity: sha512-Nvvbz2JA4c/ykzfzmdRazmKFMAV/dmt7pg+PB5WCCe7oKPjyKTbWoWFMEF3ActteYatV+lyamGLdncJov3rREw==}
-    engines: {node: '>=22.18.0'}
-    hasBin: true
-
-  cspell-glob@10.3.6:
-    resolution: {integrity: sha512-mWlrUYSZh2DnXyfi5ZsHlclcd/grSbtZmv1Ug7EO2hPEWzIVctYp4RtaTEwOdjUit3dzybtSXqzqVhd4leZOKQ==}
-    engines: {node: '>=22.18.0'}
-
-  cspell-grammar@10.3.6:
-    resolution: {integrity: sha512-Z9CCWEcp+Y6lVAUtY8DykG4bcp9LEh09An0qdthRXVutAvkfNKzGeSK+m6IgJNIh+eb6jW1pZ69XoSOHFDADxg==}
+  cspell-gitignore@10.4.0:
+    resolution: {integrity: sha512-2jwooVHqRvWYr21V8lOASOYGnf8wEMXiy5ifob1oqotVZ3PfucuWAYpVaeTm3bFz6uU4yqFUU/HdizAEKWt6zg==}
     engines: {node: '>=22.18.0'}
     hasBin: true
 
-  cspell-io@10.3.6:
-    resolution: {integrity: sha512-n8iBChxmLLjpFR2BaSYGVwWwM5MK3PQe83QZj6qzastb3lYff0oyH5NVXVQspyglUDy7muViddKkNJ/MbxuV/A==}
+  cspell-glob@10.4.0:
+    resolution: {integrity: sha512-XnctlpRbhln7dTmJyISw7HdsXM38CW+S7Ygm5kkAEixSyceim8RJfRj2rhtofL7B6Ra6YdRmJnm2/PWDOIVzLw==}
     engines: {node: '>=22.18.0'}
 
-  cspell-lib@10.3.6:
-    resolution: {integrity: sha512-zlH+vh5R6/7mEARy0Qsf9fNOihYeb15r0+bKZ0bwx0CDLuyVM1rs/BEAdRIPoaAcqdvdig0ARLdakkgM1zco/g==}
+  cspell-grammar@10.4.0:
+    resolution: {integrity: sha512-zWxN9g0oh2tzJDM3C11prpsqF2nTw5AHpXtOslTm3D5d4ZL4BfBHRj5PFxbz3Px4fKz/KptPhxSP5yGDCNtjJg==}
+    engines: {node: '>=22.18.0'}
+    hasBin: true
+
+  cspell-io@10.4.0:
+    resolution: {integrity: sha512-EunMcHZbgA7PYj6172t2nPFVVWo0L7xi4awIhMay27c3vYGiA+ajowIBtIdy2MLOTSqL+XOfcjkuahXh8L8BzQ==}
     engines: {node: '>=22.18.0'}
 
-  cspell-trie-lib@10.3.6:
-    resolution: {integrity: sha512-8PWHpsMUAl8RcB5Ho+lhrSapjcjO/f7wkF8XOxw4oSAF2mERJEm9ejuTRJyXtDmUtt831HB4f/RwKmVgjJyLGg==}
+  cspell-lib@10.4.0:
+    resolution: {integrity: sha512-wfqmn19pfEUjWy7UJ4xPeRwyb/LFXHxFVJ6maX87OLRuSE9fTP+cr74VANpKycd/rieuB2ffKta7l38n+Xhj/Q==}
+    engines: {node: '>=22.18.0'}
+
+  cspell-trie-lib@10.4.0:
+    resolution: {integrity: sha512-3APfmYOrYEcoiDjupm3JsxLWvqa6IbJ76CqUTuIgXQH2EK0nOJ5SRKSTNP6AplDtalCs0o6VllbiRX6S81g8yw==}
     engines: {node: '>=22.18.0'}
     peerDependencies:
-      '@cspell/cspell-types': 10.3.6
+      '@cspell/cspell-types': 10.4.0
 
-  cspell@10.3.6:
-    resolution: {integrity: sha512-RZDeSxy1L82U7I+cF00pG2Bh3nBy0UoNRJF3Xbq4xbbKMZHwQRYrwospDyuIvsYmKjqDSAAciNvAjHOeEhP+5A==}
+  cspell@10.4.0:
+    resolution: {integrity: sha512-fr7PD9nDXtOwJmW8vk2MOXBuc+oGsYF9uLgUtg+1pWiPo2TwxJVLePfCIKmL6x4AAYSYqaRTrNGppYCDKcHOYw==}
     engines: {node: '>=22.18.0'}
     hasBin: true
 
@@ -4085,6 +4002,10 @@ packages:
 
   fast-equals@6.1.0:
     resolution: {integrity: sha512-MDA0N5wXvmx0yR0xeOf20qVMbyaEzS2kuxhBrDrIT5w3Gap7bZ/24jtvOvbthbZFmf+7PCC8XCJKGpmhVtvbIg==}
+    engines: {node: '>=6.0.0'}
+
+  fast-equals@6.1.1:
+    resolution: {integrity: sha512-VA9UvhVec1yj1UqkCLBCXgFBLbd6Pww2RGLa9biAHfl+/aOU9jTeP3idEtLLFouJIGDeugAxD/GhzHpjOSq4oA==}
     engines: {node: '>=6.0.0'}
 
   fast-isnumeric@1.1.4:
@@ -4510,8 +4431,8 @@ packages:
     resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
     hasBin: true
 
-  lucide-react@1.52.0:
-    resolution: {integrity: sha512-TUgPtl5ZI9WgxOcbu4ckaC5B3l1qxPQrCMgb6OfUB9owx/OvSJfcf93SMgUWAxRw5/1XDfh9uI5F5iNGXCcGDQ==}
+  lucide-react@1.56.0:
+    resolution: {integrity: sha512-b+hqj30/trHBma5r1zlKb6yLewQp6tUtnz9loc3xdrYerPmvLYhlEbyPVCJ8DOg2/blBf6lwPLznftFVACka6A==}
     peerDependencies:
       '@types/react': '*'
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
@@ -4657,10 +4578,6 @@ packages:
     resolution: {integrity: sha512-W67iLl4J2EXEGTbfeHCffrjDfitvLANg0UlX3wFUUSTx92KXRFegMHUVgSqE+wvhAbi4WqjGg9czysTV2Epbew==}
     engines: {node: '>= 0.4'}
 
-  obug@2.2.1:
-    resolution: {integrity: sha512-XrsrhT5sybtKI6wakr2SPOlGZWWYbUXZ7a0jT8/QOeAPau+1X/bSegNe5YR75oJmEZQbKningirmGOEJCIk61Q==}
-    engines: {node: '>=12.20.0'}
-
   obug@3.0.0:
     resolution: {integrity: sha512-5vvB5+W7ePv+p3uqxi+RcW1XAzLW0/hxt3/4X4Lc4qHudzOhmBiBwOY6DRob4WnanAEGvNcLjF+KNOufrUoEQw==}
     engines: {node: '>=12.20.0'}
@@ -4671,8 +4588,8 @@ packages:
   once@1.4.0:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
 
-  orval@8.41.0:
-    resolution: {integrity: sha512-loWTsG9ISipOWoD7aztv9Xar420e6ykuv/5//zKm42230Mm+MIt+4qSjyByiaCGNu8J9aHFDpiNQx1hDa/2cpw==}
+  orval@8.42.0:
+    resolution: {integrity: sha512-YzUKonpGnE+c/LsU0RbRwEYH2j9/4Oeh7imXcYiHMO4pX0CvqUgr41Kb8/3EAvtRzlecP1Pe4+b/pau+Gss0CQ==}
     engines: {node: '>=22.18.0'}
     hasBin: true
     peerDependencies:
@@ -4836,8 +4753,8 @@ packages:
       '@types/react':
         optional: true
 
-  react-hook-form@7.89.0:
-    resolution: {integrity: sha512-vKcoCfy8RKZDrhSdqsRFp0uEOdS1AhLjOL6hR7Wmfzg1akNxEhaPf5WORx8SgEQPVXakdDyDkqQp+KNxVnnPHg==}
+  react-hook-form@7.90.0:
+    resolution: {integrity: sha512-+NdG0FLzCPhFOp2NNxaUYLF9fyZhNjx9FTBBSYWF71/l6BBlmIc/j6xlp3DbaHWLJbIG7Zd8oznA19xJClU97w==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       '@types/react': '*'
@@ -5011,8 +4928,8 @@ packages:
     resolution: {integrity: sha512-9aZLIrhRaD97sgVhtJOW6ckOEh6/GnvQtdVNfdZ6s67+3/XwLS9lBcQYzEEhYVeUowN7pRzMLsyGhK2i/xvWbw==}
     engines: {node: '>= 0.8.15'}
 
-  rolldown-plugin-dts@0.28.6:
-    resolution: {integrity: sha512-qKrFtBfRfR2hP233m7Ic9zf3wv6MSYdZghWKMdEO6dRYZGlNfINJAa1P5ZVvyHh3mrcd7IJQvIY8L9vnm+v5rQ==}
+  rolldown-plugin-dts@0.28.8:
+    resolution: {integrity: sha512-FVhfqxorCWcc20BVT5eVRfRjzLLl6mgzjcMR4gSBf0K4oQMXT0qoHhhzfXy0L7y83fQy7Ug5ZDNk90xM3/LiCQ==}
     engines: {node: ^22.18.0 || ^24.11.0 || >=26.0.0}
     peerDependencies:
       '@typescript/native-preview': '*'
@@ -5033,8 +4950,8 @@ packages:
       vue-tsc:
         optional: true
 
-  rolldown@1.2.12:
-    resolution: {integrity: sha512-8wafseiaG80xmXSfqidUNqZcylTlhmPZZt+za2m+js2sFZ8dTNlhIOV2WcbIPx2hgwPBJpEUGFAMZ9bgBBLTSQ==}
+  rolldown@1.2.13:
+    resolution: {integrity: sha512-/5apOkwWxtACcQtZ5WlrAsKS4JwXVThQPJZ3RqIruRY9UG9M8e0VlXN068xum/JRKA4aIUoJ13ghe/kGCvidiQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
 
@@ -5112,8 +5029,8 @@ packages:
   size-sensor@1.0.3:
     resolution: {integrity: sha512-+k9mJ2/rQMiRmQUcjn+qznch260leIXY8r4FyYKKyRBO/s5UoeMAHGkCJyE1R/4wrIhTJONfyloY55SkE7ve3A==}
 
-  smol-toml@1.9.0:
-    resolution: {integrity: sha512-hpd+HLON7HdZXqYchMM/+LaTTbdK0AU3NngIJ4KVyWbY9bfQqdL9cD+4yf6dUoU2Ap4VsU0JkQi6FxAI1B2mXQ==}
+  smol-toml@1.9.1:
+    resolution: {integrity: sha512-j7WyPdf0CJoutMzMoPLF/bVXHtKZIT9Rb4eGeEbWw8X2t5oirjPgpL+OpaENZrILYaXqYwnVH+qgUwVbl+pUJQ==}
     engines: {node: '>= 18'}
 
   solid-js@1.9.16:
@@ -5260,14 +5177,14 @@ packages:
     resolution: {integrity: sha512-L0Orpi8qGpRG//Nd+H90vFB+3iHnue1zSSGmNOOCh1GLJ7rUKVwV2HvijphGQS2UmhUZewS9VgvxYIdgr+fG1A==}
     hasBin: true
 
-  tsdown@0.23.0:
-    resolution: {integrity: sha512-BaT+ep1xnj5hdyICLd5r5SYYE+TXnI1ATePLykv9vcKpHpFTWUWRH+x1AF/E2qcu3YB6+vI8IdyxIIIffEqw5Q==}
+  tsdown@0.23.1:
+    resolution: {integrity: sha512-MSC2WSOts3in95J334/VIS7KPfor3eCSvndJ6KdoVj9Aak9Kh1aNfz9ws5owhdukuTNSXRdfkPEzA/ihpDD6SA==}
     engines: {node: ^22.18.0 || ^24.11.0 || >=26.0.0}
     hasBin: true
     peerDependencies:
       '@arethetypeswrong/core': ^0.18.1
-      '@tsdown/css': 0.23.0
-      '@tsdown/exe': 0.23.0
+      '@tsdown/css': 0.23.1
+      '@tsdown/exe': 0.23.1
       '@vitejs/devtools': '*'
       publint: ^0.3.8
       tsx: '*'
@@ -5372,8 +5289,8 @@ packages:
   utrie@1.0.2:
     resolution: {integrity: sha512-1MLa5ouZiOmQzUbjbu9VmjLzn1QLXBhwpUa7kdLUQK+KQ5KA9I1vk5U4YHe/X2Ch7PYnJfWuWT+VbuxbGwljhw==}
 
-  verkit@0.4.1:
-    resolution: {integrity: sha512-mMVzj0TXExtVdlDEq+Mzp0eyOuyznNpFobNM3uAqe3HVm/Ps2c+u17BligMkZjZCA6EiXpoon8iRTer3iu40SQ==}
+  verkit@0.5.0:
+    resolution: {integrity: sha512-u4J1hr6Y+C/hit34GwL3eIcUf3wngT8TlYUjK7tk0jxydKLAq3sYvifjdTDA6U3KCKRcQCQDGf/srjxfZF3l7g==}
     engines: {node: '>=18.12.0'}
 
   victory-vendor@37.3.6:
@@ -5423,17 +5340,27 @@ packages:
     resolution: {integrity: sha512-xYqdZFUK/VYazNl/oCDYN+3WloWQwMfZxBoiNt6qNyk+xfOdi598muWE42rNZFp1kNOiqW936q5RhUdnpqElSg==}
     engines: {node: '>=18'}
 
-  yuku-ast@0.10.2:
-    resolution: {integrity: sha512-UnG9mA6giglCvSErft2/40TVFX750Sj1xgwddPLpG7J7rlr/P1wPADg9G2RK+d/1tNLtRVoLdMMOMVBB9561TQ==}
+  yuku-ast@0.19.0:
+    resolution: {integrity: sha512-PyCsiScaelhxBGzL8dyeJkLqvRZycoh78R31Vrt/WqYrm0hMFoKwIw/X7Dx5mBKLWAMlV9I9HEyBOHnj2gZVyw==}
+    engines: {node: '>=14.18.0'}
 
-  yuku-codegen@0.10.2:
-    resolution: {integrity: sha512-hentl2dtrF6cPjiAirtkfxfFZBA6Hdm61UqRJ7cA0qrlDNMk9PZGOjw5w1mx3E0hu/6pHcJF4dJW+D0SXHPZOA==}
+  yuku-codegen@0.19.0:
+    resolution: {integrity: sha512-uymAKHjDuaP4BEpkXC/BSLz4DUEF5oArZ5AuD3888nb2miChjWSgpPdojEJxm3pjpXkgUaCRJQyNAbnMN33wHg==}
+    engines: {node: '>=14.18.0'}
 
-  yuku-parser@0.10.2:
-    resolution: {integrity: sha512-CgaU0/PPjCAIEZ3WQroosOxTY3eeKldAN3h+vk8pMNz4+jl1CZzBR4pW+K/rRPF112VooCL5FdjJoiMNjDrL2A==}
+  yuku-core@0.19.0:
+    resolution: {integrity: sha512-kYK9e1XdfirNhkipzW0wmMcSWcVF/CWnuugodfVYRCUwvoBefweL9HzB96OiKEhsx78V5WbUxbJqlizMX869Qg==}
+    engines: {node: '>=14.18.0'}
+
+  yuku-parser@0.19.0:
+    resolution: {integrity: sha512-XrBh9ZiQK5mJVRxZBAvD6LwRyAYrK3MFtH3+onyuxFL5hFD44EC3QOmIC1FjTj6H2MMwq46/NAI+NZxLZPZgxg==}
+    engines: {node: '>=14.18.0'}
 
   zod@4.6.5:
     resolution: {integrity: sha512-v5l/aFXZQeai4awLbOpSoHecE9UiMrnfx75tEXLjNonXVARxQ5mOeipTjROUchszUNCqnE+hqAMujRsRHsut2Q==}
+
+  zod@4.6.7:
+    resolution: {integrity: sha512-g8W2D2kU6a8untc053fX1uVBKzM7yqAxW/3zwk83+6RyF2+SKOuV+c0wBDhUwzV1PaGapmZH+rmcUzPf+3CGwg==}
 
   zrender@6.1.0:
     resolution: {integrity: sha512-oEGMDB6pOP2S6OwRR4PdVv610zrjnA3Bh+JnSG12fYJlBKjtNAoEb5fSUoCOOINlH96I2fU38/A2UpRKs67xYQ==}
@@ -5523,7 +5450,7 @@ snapshots:
       '@floating-ui/dom': 1.8.0
       solid-js: 1.9.16
 
-  '@cspell/cspell-bundled-dicts@10.3.6':
+  '@cspell/cspell-bundled-dicts@10.4.0':
     dependencies:
       '@cspell/dict-ada': 4.1.1
       '@cspell/dict-al': 1.1.1
@@ -5540,9 +5467,9 @@ snapshots:
       '@cspell/dict-docker': 1.1.17
       '@cspell/dict-dotnet': 5.0.15
       '@cspell/dict-elixir': 4.0.8
-      '@cspell/dict-en-common-misspellings': 2.2.4
-      '@cspell/dict-en-gb-mit': 3.1.29
-      '@cspell/dict-en_us': 4.4.40
+      '@cspell/dict-en-common-misspellings': 2.2.5
+      '@cspell/dict-en-gb-mit': 3.1.30
+      '@cspell/dict-en_us': 4.4.41
       '@cspell/dict-filetypes': 3.0.18
       '@cspell/dict-flutter': 1.1.1
       '@cspell/dict-fonts': 4.0.6
@@ -5566,7 +5493,7 @@ snapshots:
       '@cspell/dict-markdown': 2.0.18(@cspell/dict-css@4.1.2)(@cspell/dict-html-symbol-entities@4.0.5)(@cspell/dict-html@4.0.16)(@cspell/dict-typescript@3.2.3)
       '@cspell/dict-monkeyc': 1.1.2
       '@cspell/dict-node': 5.0.9
-      '@cspell/dict-npm': 5.2.53
+      '@cspell/dict-npm': 5.2.54
       '@cspell/dict-php': 4.1.3
       '@cspell/dict-powershell': 5.0.17
       '@cspell/dict-public-licenses': 2.0.17
@@ -5576,7 +5503,7 @@ snapshots:
       '@cspell/dict-rust': 4.1.2
       '@cspell/dict-scala': 5.0.11
       '@cspell/dict-shell': 1.2.0
-      '@cspell/dict-software-terms': 5.4.7
+      '@cspell/dict-software-terms': 5.4.8
       '@cspell/dict-sql': 2.2.1
       '@cspell/dict-svelte': 1.0.7
       '@cspell/dict-swift': 2.0.6
@@ -5585,25 +5512,25 @@ snapshots:
       '@cspell/dict-vue': 3.0.5
       '@cspell/dict-zig': 1.0.0
 
-  '@cspell/cspell-json-reporter@10.3.6':
+  '@cspell/cspell-json-reporter@10.4.0':
     dependencies:
-      '@cspell/cspell-types': 10.3.6
+      '@cspell/cspell-types': 10.4.0
 
-  '@cspell/cspell-performance-monitor@10.3.6': {}
+  '@cspell/cspell-performance-monitor@10.4.0': {}
 
-  '@cspell/cspell-pipe@10.3.6': {}
+  '@cspell/cspell-pipe@10.4.0': {}
 
-  '@cspell/cspell-resolver@10.3.6':
+  '@cspell/cspell-resolver@10.4.0':
     dependencies:
       global-directory: 5.0.0
 
-  '@cspell/cspell-service-bus@10.3.6': {}
+  '@cspell/cspell-service-bus@10.4.0': {}
 
-  '@cspell/cspell-types@10.3.6': {}
+  '@cspell/cspell-types@10.4.0': {}
 
-  '@cspell/cspell-worker@10.3.6':
+  '@cspell/cspell-worker@10.4.0':
     dependencies:
-      cspell-lib: 10.3.6
+      cspell-lib: 10.4.0
 
   '@cspell/dict-ada@4.1.1': {}
 
@@ -5637,11 +5564,11 @@ snapshots:
 
   '@cspell/dict-elixir@4.0.8': {}
 
-  '@cspell/dict-en-common-misspellings@2.2.4': {}
+  '@cspell/dict-en-common-misspellings@2.2.5': {}
 
-  '@cspell/dict-en-gb-mit@3.1.29': {}
+  '@cspell/dict-en-gb-mit@3.1.30': {}
 
-  '@cspell/dict-en_us@4.4.40': {}
+  '@cspell/dict-en_us@4.4.41': {}
 
   '@cspell/dict-filetypes@3.0.18': {}
 
@@ -5694,7 +5621,7 @@ snapshots:
 
   '@cspell/dict-node@5.0.9': {}
 
-  '@cspell/dict-npm@5.2.53': {}
+  '@cspell/dict-npm@5.2.54': {}
 
   '@cspell/dict-php@4.1.3': {}
 
@@ -5716,7 +5643,7 @@ snapshots:
 
   '@cspell/dict-shell@1.2.0': {}
 
-  '@cspell/dict-software-terms@5.4.7': {}
+  '@cspell/dict-software-terms@5.4.8': {}
 
   '@cspell/dict-sql@2.2.1': {}
 
@@ -5732,18 +5659,18 @@ snapshots:
 
   '@cspell/dict-zig@1.0.0': {}
 
-  '@cspell/dynamic-import@10.3.6':
+  '@cspell/dynamic-import@10.4.0':
     dependencies:
-      '@cspell/url': 10.3.6
+      '@cspell/url': 10.4.0
       import-meta-resolve: 4.2.0
 
-  '@cspell/filetypes@10.3.6': {}
+  '@cspell/filetypes@10.4.0': {}
 
-  '@cspell/rpc@10.3.6': {}
+  '@cspell/rpc@10.4.0': {}
 
-  '@cspell/strong-weak-map@10.3.6': {}
+  '@cspell/strong-weak-map@10.4.0': {}
 
-  '@cspell/url@10.3.6': {}
+  '@cspell/url@10.4.0': {}
 
   '@dagrejs/dagre@3.1.1':
     dependencies:
@@ -5994,19 +5921,19 @@ snapshots:
       '@solid-primitives/utils': 6.4.1(solid-js@1.9.16)
       solid-js: 1.9.16
 
-  '@mantine/carousel@9.7.1(@mantine/core@9.7.1)(@mantine/hooks@9.7.1)(embla-carousel-react@8.6.0)(embla-carousel@8.6.0)(react-dom@19.3.0)(react@19.3.0)':
+  '@mantine/carousel@9.7.2(@mantine/core@9.7.2)(@mantine/hooks@9.7.2)(embla-carousel-react@8.6.0)(embla-carousel@8.6.0)(react-dom@19.3.0)(react@19.3.0)':
     dependencies:
-      '@mantine/core': 9.7.1(@mantine/hooks@9.7.1)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
-      '@mantine/hooks': 9.7.1(react@19.3.0)
+      '@mantine/core': 9.7.2(@mantine/hooks@9.7.2)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
+      '@mantine/hooks': 9.7.2(react@19.3.0)
       embla-carousel: 8.6.0
       embla-carousel-react: 8.6.0(react@19.3.0)
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
 
-  '@mantine/core@9.7.1(@mantine/hooks@9.7.1)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)':
+  '@mantine/core@9.7.2(@mantine/hooks@9.7.2)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)':
     dependencies:
       '@floating-ui/react': 0.27.20(react-dom@19.3.0)(react@19.3.0)
-      '@mantine/hooks': 9.7.1(react@19.3.0)
+      '@mantine/hooks': 9.7.2(react@19.3.0)
       clsx: 2.1.1
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
@@ -6016,39 +5943,39 @@ snapshots:
     transitivePeerDependencies:
       - '@types/react'
 
-  '@mantine/dates@9.7.1(@mantine/core@9.7.1)(@mantine/hooks@9.7.1)(dayjs@1.11.23)(react-dom@19.3.0)(react@19.3.0)':
+  '@mantine/dates@9.7.2(@mantine/core@9.7.2)(@mantine/hooks@9.7.2)(dayjs@1.11.23)(react-dom@19.3.0)(react@19.3.0)':
     dependencies:
-      '@mantine/core': 9.7.1(@mantine/hooks@9.7.1)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
-      '@mantine/hooks': 9.7.1(react@19.3.0)
+      '@mantine/core': 9.7.2(@mantine/hooks@9.7.2)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
+      '@mantine/hooks': 9.7.2(react@19.3.0)
       clsx: 2.1.1
       dayjs: 1.11.23
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
 
-  '@mantine/dropzone@9.7.1(@mantine/core@9.7.1)(@mantine/hooks@9.7.1)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)':
+  '@mantine/dropzone@9.7.2(@mantine/core@9.7.2)(@mantine/hooks@9.7.2)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)':
     dependencies:
-      '@mantine/core': 9.7.1(@mantine/hooks@9.7.1)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
-      '@mantine/hooks': 9.7.1(react@19.3.0)
+      '@mantine/core': 9.7.2(@mantine/hooks@9.7.2)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
+      '@mantine/hooks': 9.7.2(react@19.3.0)
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
       react-dropzone: 20.1.2(@types/react@19.3.0)(react@19.3.0)
     transitivePeerDependencies:
       - '@types/react'
 
-  '@mantine/hooks@9.7.1(react@19.3.0)':
+  '@mantine/hooks@9.7.2(react@19.3.0)':
     dependencies:
       react: 19.3.0
 
-  '@mantine/notifications@9.7.1(@mantine/core@9.7.1)(@mantine/hooks@9.7.1)(react-dom@19.3.0)(react@19.3.0)':
+  '@mantine/notifications@9.7.2(@mantine/core@9.7.2)(@mantine/hooks@9.7.2)(react-dom@19.3.0)(react@19.3.0)':
     dependencies:
-      '@mantine/core': 9.7.1(@mantine/hooks@9.7.1)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
-      '@mantine/hooks': 9.7.1(react@19.3.0)
-      '@mantine/store': 9.7.1(react@19.3.0)
+      '@mantine/core': 9.7.2(@mantine/hooks@9.7.2)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
+      '@mantine/hooks': 9.7.2(react@19.3.0)
+      '@mantine/store': 9.7.2(react@19.3.0)
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
       react-transition-group: 4.4.5(react-dom@19.3.0)(react@19.3.0)
 
-  '@mantine/store@9.7.1(react@19.3.0)':
+  '@mantine/store@9.7.2(react@19.3.0)':
     dependencies:
       react: 19.3.0
 
@@ -6130,40 +6057,42 @@ snapshots:
   '@next/swc-win32-x64-msvc@16.4.0':
     optional: true
 
-  '@ocelescope/ocelot@0.8.0(@dagrejs/dagre@3.1.1)(@mantine/core@9.7.1)(@mantine/hooks@9.7.1)(@ocelescope/api-base@src+frontend+packages+api+base)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@tanstack/react-query@5.104.1)(@xyflow/react@12.12.0)(axios@1.20.0)(dayjs@1.11.23)(elkjs@0.12.0)(file-saver@2.0.5)(html-to-image@1.11.13)(lucide-react@1.52.0)(mantine-datatable@9.4.0)(react-dom@19.3.0)(react@19.3.0)(recharts@3.10.1)':
+  '@ocelescope/ocelot@0.8.0(@dagrejs/dagre@3.1.1)(@mantine/core@9.7.2)(@mantine/hooks@9.7.2)(@ocelescope/api-base@src+frontend+packages+api+base)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@tanstack/react-query@5.104.2)(@xyflow/react@12.12.0)(axios@1.20.0)(dayjs@1.11.23)(elkjs@0.12.0)(file-saver@2.0.5)(html-to-image@1.11.13)(lucide-react@1.56.0)(mantine-datatable@9.4.0)(react-dom@19.3.0)(react@19.3.0)(recharts@3.10.1)':
     dependencies:
       '@dagrejs/dagre': 3.1.1
-      '@mantine/core': 9.7.1(@mantine/hooks@9.7.1)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
-      '@mantine/hooks': 9.7.1(react@19.3.0)
+      '@mantine/core': 9.7.2(@mantine/hooks@9.7.2)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
+      '@mantine/hooks': 9.7.2(react@19.3.0)
       '@ocelescope/api-base': link:src/frontend/packages/api/base
       '@ocelescope/api-client': link:src/frontend/packages/api/client
       '@ocelescope/core': link:src/frontend/packages/core
-      '@tanstack/react-query': 5.104.1(react@19.3.0)
+      '@tanstack/react-query': 5.104.2(react@19.3.0)
       '@xyflow/react': 12.12.0(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.1.21)(react-dom@19.3.0)(react@19.3.0)
       axios: 1.20.0(debug@4.4.3)
       dayjs: 1.11.23
       elkjs: 0.12.0
       file-saver: 2.0.5
       html-to-image: 1.11.13
-      lucide-react: 1.52.0(@types/react@19.3.0)(react@19.3.0)
-      mantine-datatable: 9.4.0(@mantine/core@9.7.1)(@mantine/hooks@9.7.1)(clsx@2.1.1)(react-dom@19.3.0)(react@19.3.0)
+      lucide-react: 1.56.0(@types/react@19.3.0)(react@19.3.0)
+      mantine-datatable: 9.4.0(@mantine/core@9.7.2)(@mantine/hooks@9.7.2)(clsx@2.1.1)(react-dom@19.3.0)(react@19.3.0)
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
       recharts: 3.10.1(@types/react@19.3.0)(react-dom@19.3.0)(react-is@18.3.1)(react@19.3.0)(redux@5.0.1)
 
-  '@orval/angular@8.41.0':
+  '@orval/angular@8.42.0':
     dependencies:
-      '@orval/core': 8.41.0
+      '@orval/core': 8.42.0
     transitivePeerDependencies:
       - '@faker-js/faker'
+      - '@modelcontextprotocol/server'
 
-  '@orval/axios@8.41.0':
+  '@orval/axios@8.42.0':
     dependencies:
-      '@orval/core': 8.41.0
+      '@orval/core': 8.42.0
     transitivePeerDependencies:
       - '@faker-js/faker'
+      - '@modelcontextprotocol/server'
 
-  '@orval/core@8.41.0':
+  '@orval/core@8.42.0':
     dependencies:
       '@scalar/openapi-types': 0.9.7
       acorn: 8.19.0
@@ -6174,81 +6103,91 @@ snapshots:
       jsesc: 3.1.0
       tinyglobby: 0.2.17
 
-  '@orval/effect@8.41.0':
+  '@orval/effect@8.42.0':
     dependencies:
-      '@orval/core': 8.41.0
+      '@orval/core': 8.42.0
     transitivePeerDependencies:
       - '@faker-js/faker'
+      - '@modelcontextprotocol/server'
 
-  '@orval/fetch@8.41.0':
+  '@orval/fetch@8.42.0':
     dependencies:
-      '@orval/core': 8.41.0
+      '@orval/core': 8.42.0
     transitivePeerDependencies:
       - '@faker-js/faker'
+      - '@modelcontextprotocol/server'
 
-  '@orval/hono@8.41.0(typescript@6.0.3)(zod@4.6.5)':
+  '@orval/hono@8.42.0(typescript@6.0.3)(zod@4.6.5)':
     dependencies:
-      '@orval/core': 8.41.0
-      '@orval/zod': 8.41.0(zod@4.6.5)
+      '@orval/core': 8.42.0
+      '@orval/zod': 8.42.0(zod@4.6.5)
     optionalDependencies:
       typescript: 6.0.3
     transitivePeerDependencies:
       - '@faker-js/faker'
+      - '@modelcontextprotocol/server'
       - zod
 
-  '@orval/mcp@8.41.0(zod@4.6.5)':
+  '@orval/mcp@8.42.0(zod@4.6.5)':
     dependencies:
-      '@orval/core': 8.41.0
-      '@orval/fetch': 8.41.0
-      '@orval/zod': 8.41.0(zod@4.6.5)
+      '@orval/core': 8.42.0
+      '@orval/fetch': 8.42.0
+      '@orval/zod': 8.42.0(zod@4.6.5)
     transitivePeerDependencies:
       - '@faker-js/faker'
       - zod
 
-  '@orval/mock@8.41.0':
+  '@orval/mock@8.42.0':
     dependencies:
-      '@orval/core': 8.41.0
+      '@orval/core': 8.42.0
+    transitivePeerDependencies:
+      - '@modelcontextprotocol/server'
 
-  '@orval/pinia-colada@8.41.0':
+  '@orval/pinia-colada@8.42.0':
     dependencies:
-      '@orval/axios': 8.41.0
-      '@orval/core': 8.41.0
-      '@orval/fetch': 8.41.0
+      '@orval/axios': 8.42.0
+      '@orval/core': 8.42.0
+      '@orval/fetch': 8.42.0
     transitivePeerDependencies:
       - '@faker-js/faker'
+      - '@modelcontextprotocol/server'
 
-  '@orval/query@8.41.0(@tanstack/react-query@5.104.1)':
+  '@orval/query@8.42.0(@tanstack/react-query@5.104.2)':
     dependencies:
-      '@orval/core': 8.41.0
-      '@orval/fetch': 8.41.0
+      '@orval/core': 8.42.0
+      '@orval/fetch': 8.42.0
     optionalDependencies:
-      '@tanstack/react-query': 5.104.1(react@19.3.0)
+      '@tanstack/react-query': 5.104.2(react@19.3.0)
     transitivePeerDependencies:
       - '@faker-js/faker'
+      - '@modelcontextprotocol/server'
 
-  '@orval/solid-start@8.41.0':
+  '@orval/solid-start@8.42.0':
     dependencies:
-      '@orval/core': 8.41.0
+      '@orval/core': 8.42.0
     transitivePeerDependencies:
       - '@faker-js/faker'
+      - '@modelcontextprotocol/server'
 
-  '@orval/swr@8.41.0':
+  '@orval/swr@8.42.0':
     dependencies:
-      '@orval/core': 8.41.0
-      '@orval/fetch': 8.41.0
+      '@orval/core': 8.42.0
+      '@orval/fetch': 8.42.0
     transitivePeerDependencies:
       - '@faker-js/faker'
+      - '@modelcontextprotocol/server'
 
-  '@orval/zod@8.41.0(zod@4.6.5)':
+  '@orval/zod@8.42.0(zod@4.6.5)':
     dependencies:
-      '@orval/core': 8.41.0
+      '@orval/core': 8.42.0
       jsesc: 3.1.0
     optionalDependencies:
       zod: 4.6.5
     transitivePeerDependencies:
       - '@faker-js/faker'
+      - '@modelcontextprotocol/server'
 
-  '@oxc-project/types@0.152.0': {}
+  '@oxc-project/types@0.153.0': {}
 
   '@plotly/d3-sankey-circular@0.33.1':
     dependencies:
@@ -7087,11 +7026,11 @@ snapshots:
       - solid-js
       - vue
 
-  '@rjsf/mantine@6.11.0(@mantine/core@9.7.1)(@mantine/dates@9.7.1)(@mantine/hooks@9.7.1)(@rjsf/core@6.11.0)(@rjsf/utils@6.11.0)(react@19.3.0)':
+  '@rjsf/mantine@6.11.0(@mantine/core@9.7.2)(@mantine/dates@9.7.2)(@mantine/hooks@9.7.2)(@rjsf/core@6.11.0)(@rjsf/utils@6.11.0)(react@19.3.0)':
     dependencies:
-      '@mantine/core': 9.7.1(@mantine/hooks@9.7.1)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
-      '@mantine/dates': 9.7.1(@mantine/core@9.7.1)(@mantine/hooks@9.7.1)(dayjs@1.11.23)(react-dom@19.3.0)(react@19.3.0)
-      '@mantine/hooks': 9.7.1(react@19.3.0)
+      '@mantine/core': 9.7.2(@mantine/hooks@9.7.2)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
+      '@mantine/dates': 9.7.2(@mantine/core@9.7.2)(@mantine/hooks@9.7.2)(dayjs@1.11.23)(react-dom@19.3.0)(react@19.3.0)
+      '@mantine/hooks': 9.7.2(react@19.3.0)
       '@rjsf/core': 6.11.0(@rjsf/utils@6.11.0)(react@19.3.0)(solid-js@1.9.16)
       '@rjsf/utils': 6.11.0(react@19.3.0)
       dayjs: 1.11.23
@@ -7112,98 +7051,100 @@ snapshots:
       ajv: 8.20.0
       ajv-formats: 2.1.1
 
-  '@rolldown/binding-android-arm-eabi@1.2.12':
+  '@rolldown/binding-android-arm-eabi@1.2.13':
     optional: true
 
-  '@rolldown/binding-android-arm64@1.2.12':
+  '@rolldown/binding-android-arm64@1.2.13':
     optional: true
 
-  '@rolldown/binding-darwin-arm64@1.2.12':
+  '@rolldown/binding-darwin-arm64@1.2.13':
     optional: true
 
-  '@rolldown/binding-darwin-x64@1.2.12':
+  '@rolldown/binding-darwin-x64@1.2.13':
     optional: true
 
-  '@rolldown/binding-freebsd-x64@1.2.12':
+  '@rolldown/binding-freebsd-x64@1.2.13':
     optional: true
 
-  '@rolldown/binding-linux-arm-gnueabihf@1.2.12':
+  '@rolldown/binding-linux-arm-gnueabihf@1.2.13':
     optional: true
 
-  '@rolldown/binding-linux-arm64-gnu@1.2.12':
+  '@rolldown/binding-linux-arm64-gnu@1.2.13':
     optional: true
 
-  '@rolldown/binding-linux-arm64-musl@1.2.12':
+  '@rolldown/binding-linux-arm64-musl@1.2.13':
     optional: true
 
-  '@rolldown/binding-linux-ppc64-gnu@1.2.12':
+  '@rolldown/binding-linux-ppc64-gnu@1.2.13':
     optional: true
 
-  '@rolldown/binding-linux-s390x-gnu@1.2.12':
+  '@rolldown/binding-linux-s390x-gnu@1.2.13':
     optional: true
 
-  '@rolldown/binding-linux-x64-gnu@1.2.12':
+  '@rolldown/binding-linux-x64-gnu@1.2.13':
     optional: true
 
-  '@rolldown/binding-linux-x64-musl@1.2.12':
+  '@rolldown/binding-linux-x64-musl@1.2.13':
     optional: true
 
-  '@rolldown/binding-openharmony-arm64@1.2.12':
+  '@rolldown/binding-openharmony-arm64@1.2.13':
     optional: true
 
-  '@rolldown/binding-win32-arm64-msvc@1.2.12':
+  '@rolldown/binding-win32-arm64-msvc@1.2.13':
     optional: true
 
-  '@rolldown/binding-win32-x64-msvc@1.2.12':
+  '@rolldown/binding-win32-x64-msvc@1.2.13':
     optional: true
 
   '@rolldown/pluginutils@1.0.1': {}
 
-  '@scalar/helpers@0.16.1': {}
+  '@scalar/helpers@0.16.3': {}
 
-  '@scalar/json-magic@0.15.5':
+  '@scalar/json-magic@0.15.7':
     dependencies:
-      '@scalar/helpers': 0.16.1
+      '@scalar/helpers': 0.16.3
       pathe: 2.0.3
       undici: 7.29.1
       yaml: 2.9.1
 
-  '@scalar/json-schema-validator@0.1.10':
+  '@scalar/json-schema-validator@0.1.12':
     dependencies:
-      '@scalar/helpers': 0.16.1
-      '@scalar/types': 0.23.0
+      '@scalar/helpers': 0.16.3
+      '@scalar/types': 0.23.2
       ajv: 8.20.0
       ajv-draft-04: 1.0.0(ajv@8.20.0)
       ajv-formats: 3.0.1
       yaml: 2.9.1
 
-  '@scalar/openapi-parser@0.29.11':
+  '@scalar/openapi-parser@0.29.13':
     dependencies:
-      '@scalar/helpers': 0.16.1
-      '@scalar/json-magic': 0.15.5
-      '@scalar/openapi-types': 0.9.7
-      '@scalar/openapi-upgrader': 0.4.2
-      '@scalar/openapi-validator': 0.1.10
-      '@scalar/types': 0.23.0
+      '@scalar/helpers': 0.16.3
+      '@scalar/json-magic': 0.15.7
+      '@scalar/openapi-types': 0.9.8
+      '@scalar/openapi-upgrader': 0.4.4
+      '@scalar/openapi-validator': 0.1.12
+      '@scalar/types': 0.23.2
       yaml: 2.9.1
 
   '@scalar/openapi-types@0.9.7': {}
 
-  '@scalar/openapi-upgrader@0.4.2':
-    dependencies:
-      '@scalar/helpers': 0.16.1
-      '@scalar/openapi-types': 0.9.7
+  '@scalar/openapi-types@0.9.8': {}
 
-  '@scalar/openapi-validator@0.1.10':
+  '@scalar/openapi-upgrader@0.4.4':
     dependencies:
-      '@scalar/helpers': 0.16.1
-      '@scalar/json-schema-validator': 0.1.10
-      '@scalar/types': 0.23.0
+      '@scalar/helpers': 0.16.3
+      '@scalar/openapi-types': 0.9.8
+
+  '@scalar/openapi-validator@0.1.12':
+    dependencies:
+      '@scalar/helpers': 0.16.3
+      '@scalar/json-schema-validator': 0.1.12
+      '@scalar/types': 0.23.2
       yaml: 2.9.1
 
-  '@scalar/types@0.23.0':
+  '@scalar/types@0.23.2':
     dependencies:
-      '@scalar/helpers': 0.16.1
+      '@scalar/helpers': 0.16.3
       nanoid: 5.1.16
       type-fest: 5.10.0
       zod: 4.6.5
@@ -7292,16 +7233,16 @@ snapshots:
     dependencies:
       remove-accents: 0.5.0
 
-  '@tanstack/query-core@5.104.1': {}
+  '@tanstack/query-core@5.104.2': {}
 
-  '@tanstack/query-devtools@5.104.1(csstype@3.2.3)':
+  '@tanstack/query-devtools@5.104.2(csstype@3.2.3)':
     dependencies:
       '@kobalte/core': 0.13.14(solid-js@1.9.16)
       '@solid-primitives/keyed': 1.5.3(solid-js@1.9.16)
       '@solid-primitives/resize-observer': 2.2.0(solid-js@1.9.16)
       '@solid-primitives/storage': 1.3.11(solid-js@1.9.16)
       '@tanstack/match-sorter-utils': 9.2.6
-      '@tanstack/query-core': 5.104.1
+      '@tanstack/query-core': 5.104.2
       clsx: 2.1.1
       goober: 2.1.19(csstype@3.2.3)
       solid-js: 1.9.16
@@ -7310,18 +7251,18 @@ snapshots:
     transitivePeerDependencies:
       - csstype
 
-  '@tanstack/react-query-devtools@5.104.1(@tanstack/react-query@5.104.1)(@types/react@19.3.0)(csstype@3.2.3)(react@19.3.0)':
+  '@tanstack/react-query-devtools@5.104.2(@tanstack/react-query@5.104.2)(@types/react@19.3.0)(csstype@3.2.3)(react@19.3.0)':
     dependencies:
-      '@tanstack/query-devtools': 5.104.1(csstype@3.2.3)
-      '@tanstack/react-query': 5.104.1(react@19.3.0)
+      '@tanstack/query-devtools': 5.104.2(csstype@3.2.3)
+      '@tanstack/react-query': 5.104.2(react@19.3.0)
       '@types/react': 19.3.0
       react: 19.3.0
     transitivePeerDependencies:
       - csstype
 
-  '@tanstack/react-query@5.104.1(react@19.3.0)':
+  '@tanstack/react-query@5.104.2(react@19.3.0)':
     dependencies:
-      '@tanstack/query-core': 5.104.1
+      '@tanstack/query-core': 5.104.2
       react: 19.3.0
 
   '@tanstack/react-virtual@3.14.13(react-dom@19.3.0)(react@19.3.0)':
@@ -7334,12 +7275,12 @@ snapshots:
 
   '@tsconfig/strictest@2.0.8': {}
 
-  '@tsdown/css@0.23.0(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.23.0)(yaml@2.9.1)':
+  '@tsdown/css@0.23.1(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.23.1)(yaml@2.9.1)':
     dependencies:
       lightningcss: 1.33.0
       postcss-load-config: 6.0.1(jiti@2.7.0)(postcss@8.5.23)(yaml@2.9.1)
-      rolldown: 1.2.12
-      tsdown: 0.23.0(@tsdown/css@0.23.0)(typescript@6.0.3)
+      rolldown: 1.2.13
+      tsdown: 0.23.1(@tsdown/css@0.23.1)(typescript@6.0.3)
     optionalDependencies:
       postcss: 8.5.23
     transitivePeerDependencies:
@@ -7474,79 +7415,43 @@ snapshots:
       d3-selection: 3.0.0
       d3-zoom: 3.0.0
 
-  '@yuku-codegen/binding-android-arm64@0.10.2':
+  '@yuku-core/binding-android-arm64@0.19.0':
     optional: true
 
-  '@yuku-codegen/binding-darwin-arm64@0.10.2':
+  '@yuku-core/binding-darwin-arm64@0.19.0':
     optional: true
 
-  '@yuku-codegen/binding-darwin-x64@0.10.2':
+  '@yuku-core/binding-darwin-x64@0.19.0':
     optional: true
 
-  '@yuku-codegen/binding-freebsd-x64@0.10.2':
+  '@yuku-core/binding-freebsd-x64@0.19.0':
     optional: true
 
-  '@yuku-codegen/binding-linux-arm-gnu@0.10.2':
+  '@yuku-core/binding-linux-arm-gnu@0.19.0':
     optional: true
 
-  '@yuku-codegen/binding-linux-arm-musl@0.10.2':
+  '@yuku-core/binding-linux-arm-musl@0.19.0':
     optional: true
 
-  '@yuku-codegen/binding-linux-arm64-gnu@0.10.2':
+  '@yuku-core/binding-linux-arm64-gnu@0.19.0':
     optional: true
 
-  '@yuku-codegen/binding-linux-arm64-musl@0.10.2':
+  '@yuku-core/binding-linux-arm64-musl@0.19.0':
     optional: true
 
-  '@yuku-codegen/binding-linux-x64-gnu@0.10.2':
+  '@yuku-core/binding-linux-x64-gnu@0.19.0':
     optional: true
 
-  '@yuku-codegen/binding-linux-x64-musl@0.10.2':
+  '@yuku-core/binding-linux-x64-musl@0.19.0':
     optional: true
 
-  '@yuku-codegen/binding-win32-arm64@0.10.2':
+  '@yuku-core/binding-win32-arm64@0.19.0':
     optional: true
 
-  '@yuku-codegen/binding-win32-x64@0.10.2':
+  '@yuku-core/binding-win32-x64@0.19.0':
     optional: true
 
-  '@yuku-parser/binding-android-arm64@0.10.2':
-    optional: true
-
-  '@yuku-parser/binding-darwin-arm64@0.10.2':
-    optional: true
-
-  '@yuku-parser/binding-darwin-x64@0.10.2':
-    optional: true
-
-  '@yuku-parser/binding-freebsd-x64@0.10.2':
-    optional: true
-
-  '@yuku-parser/binding-linux-arm-gnu@0.10.2':
-    optional: true
-
-  '@yuku-parser/binding-linux-arm-musl@0.10.2':
-    optional: true
-
-  '@yuku-parser/binding-linux-arm64-gnu@0.10.2':
-    optional: true
-
-  '@yuku-parser/binding-linux-arm64-musl@0.10.2':
-    optional: true
-
-  '@yuku-parser/binding-linux-x64-gnu@0.10.2':
-    optional: true
-
-  '@yuku-parser/binding-linux-x64-musl@0.10.2':
-    optional: true
-
-  '@yuku-parser/binding-win32-arm64@0.10.2':
-    optional: true
-
-  '@yuku-parser/binding-win32-x64@0.10.2':
-    optional: true
-
-  '@yuku-toolchain/types@0.10.2': {}
+  '@yuku-toolchain/types@0.19.0': {}
 
   abs-svg-path@0.1.1: {}
 
@@ -7634,7 +7539,7 @@ snapshots:
 
   buffer-from@1.1.2: {}
 
-  cac@7.0.0: {}
+  cac@7.1.0: {}
 
   call-bind-apply-helpers@1.0.2:
     dependencies:
@@ -7747,60 +7652,60 @@ snapshots:
       shebang-command: 2.0.0
       which: 2.0.2
 
-  cspell-config-lib@10.3.6:
+  cspell-config-lib@10.4.0:
     dependencies:
-      '@cspell/cspell-types': 10.3.6
+      '@cspell/cspell-types': 10.4.0
       comment-json: 5.0.0
-      smol-toml: 1.9.0
+      smol-toml: 1.9.1
       yaml: 2.9.1
 
-  cspell-dictionary@10.3.6:
+  cspell-dictionary@10.4.0:
     dependencies:
-      '@cspell/cspell-performance-monitor': 10.3.6
-      '@cspell/cspell-pipe': 10.3.6
-      '@cspell/cspell-types': 10.3.6
-      cspell-trie-lib: 10.3.6(@cspell/cspell-types@10.3.6)
-      fast-equals: 6.1.0
+      '@cspell/cspell-performance-monitor': 10.4.0
+      '@cspell/cspell-pipe': 10.4.0
+      '@cspell/cspell-types': 10.4.0
+      cspell-trie-lib: 10.4.0(@cspell/cspell-types@10.4.0)
+      fast-equals: 6.1.1
 
-  cspell-gitignore@10.3.6:
+  cspell-gitignore@10.4.0:
     dependencies:
-      '@cspell/url': 10.3.6
-      cspell-glob: 10.3.6
-      cspell-io: 10.3.6
+      '@cspell/url': 10.4.0
+      cspell-glob: 10.4.0
+      cspell-io: 10.4.0
 
-  cspell-glob@10.3.6:
+  cspell-glob@10.4.0:
     dependencies:
-      '@cspell/url': 10.3.6
+      '@cspell/url': 10.4.0
       picomatch: 4.0.7
 
-  cspell-grammar@10.3.6:
+  cspell-grammar@10.4.0:
     dependencies:
-      '@cspell/cspell-pipe': 10.3.6
-      '@cspell/cspell-types': 10.3.6
+      '@cspell/cspell-pipe': 10.4.0
+      '@cspell/cspell-types': 10.4.0
 
-  cspell-io@10.3.6:
+  cspell-io@10.4.0:
     dependencies:
-      '@cspell/cspell-service-bus': 10.3.6
-      '@cspell/url': 10.3.6
+      '@cspell/cspell-service-bus': 10.4.0
+      '@cspell/url': 10.4.0
 
-  cspell-lib@10.3.6:
+  cspell-lib@10.4.0:
     dependencies:
-      '@cspell/cspell-bundled-dicts': 10.3.6
-      '@cspell/cspell-performance-monitor': 10.3.6
-      '@cspell/cspell-pipe': 10.3.6
-      '@cspell/cspell-resolver': 10.3.6
-      '@cspell/cspell-types': 10.3.6
-      '@cspell/dynamic-import': 10.3.6
-      '@cspell/filetypes': 10.3.6
-      '@cspell/rpc': 10.3.6
-      '@cspell/strong-weak-map': 10.3.6
-      '@cspell/url': 10.3.6
-      cspell-config-lib: 10.3.6
-      cspell-dictionary: 10.3.6
-      cspell-glob: 10.3.6
-      cspell-grammar: 10.3.6
-      cspell-io: 10.3.6
-      cspell-trie-lib: 10.3.6(@cspell/cspell-types@10.3.6)
+      '@cspell/cspell-bundled-dicts': 10.4.0
+      '@cspell/cspell-performance-monitor': 10.4.0
+      '@cspell/cspell-pipe': 10.4.0
+      '@cspell/cspell-resolver': 10.4.0
+      '@cspell/cspell-types': 10.4.0
+      '@cspell/dynamic-import': 10.4.0
+      '@cspell/filetypes': 10.4.0
+      '@cspell/rpc': 10.4.0
+      '@cspell/strong-weak-map': 10.4.0
+      '@cspell/url': 10.4.0
+      cspell-config-lib: 10.4.0
+      cspell-dictionary: 10.4.0
+      cspell-glob: 10.4.0
+      cspell-grammar: 10.4.0
+      cspell-io: 10.4.0
+      cspell-trie-lib: 10.4.0(@cspell/cspell-types@10.4.0)
       env-paths: 4.0.0
       gensequence: 8.0.8
       import-fresh: 4.0.1
@@ -7809,29 +7714,29 @@ snapshots:
       vscode-uri: 3.2.0
       xdg-basedir: 5.1.0
 
-  cspell-trie-lib@10.3.6(@cspell/cspell-types@10.3.6):
+  cspell-trie-lib@10.4.0(@cspell/cspell-types@10.4.0):
     dependencies:
-      '@cspell/cspell-types': 10.3.6
+      '@cspell/cspell-types': 10.4.0
 
-  cspell@10.3.6:
+  cspell@10.4.0:
     dependencies:
-      '@cspell/cspell-json-reporter': 10.3.6
-      '@cspell/cspell-performance-monitor': 10.3.6
-      '@cspell/cspell-pipe': 10.3.6
-      '@cspell/cspell-types': 10.3.6
-      '@cspell/cspell-worker': 10.3.6
-      '@cspell/dynamic-import': 10.3.6
-      '@cspell/url': 10.3.6
+      '@cspell/cspell-json-reporter': 10.4.0
+      '@cspell/cspell-performance-monitor': 10.4.0
+      '@cspell/cspell-pipe': 10.4.0
+      '@cspell/cspell-types': 10.4.0
+      '@cspell/cspell-worker': 10.4.0
+      '@cspell/dynamic-import': 10.4.0
+      '@cspell/url': 10.4.0
       ansi-regex: 6.4.0
       chalk: 6.0.1
       chalk-template: 1.1.3
       commander: 15.0.0
-      cspell-config-lib: 10.3.6
-      cspell-dictionary: 10.3.6
-      cspell-gitignore: 10.3.6
-      cspell-glob: 10.3.6
-      cspell-io: 10.3.6
-      cspell-lib: 10.3.6
+      cspell-config-lib: 10.4.0
+      cspell-dictionary: 10.4.0
+      cspell-gitignore: 10.4.0
+      cspell-glob: 10.4.0
+      cspell-io: 10.4.0
+      cspell-lib: 10.4.0
       flatted: 3.4.4
       semver: 7.8.5
       tinyglobby: 0.2.17
@@ -8223,6 +8128,8 @@ snapshots:
   fast-deep-equal@3.1.3: {}
 
   fast-equals@6.1.0: {}
+
+  fast-equals@6.1.1: {}
 
   fast-isnumeric@1.1.4:
     dependencies:
@@ -8633,16 +8540,16 @@ snapshots:
     dependencies:
       js-tokens: 4.0.0
 
-  lucide-react@1.52.0(@types/react@19.3.0)(react@19.3.0):
+  lucide-react@1.56.0(@types/react@19.3.0)(react@19.3.0):
     dependencies:
       react: 19.3.0
     optionalDependencies:
       '@types/react': 19.3.0
 
-  mantine-datatable@9.4.0(@mantine/core@9.7.1)(@mantine/hooks@9.7.1)(clsx@2.1.1)(react-dom@19.3.0)(react@19.3.0):
+  mantine-datatable@9.4.0(@mantine/core@9.7.2)(@mantine/hooks@9.7.2)(clsx@2.1.1)(react-dom@19.3.0)(react@19.3.0):
     dependencies:
-      '@mantine/core': 9.7.1(@mantine/hooks@9.7.1)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
-      '@mantine/hooks': 9.7.1(react@19.3.0)
+      '@mantine/core': 9.7.2(@mantine/hooks@9.7.2)(@types/react@19.3.0)(react-dom@19.3.0)(react@19.3.0)
+      '@mantine/hooks': 9.7.2(react@19.3.0)
       clsx: 2.1.1
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
@@ -8764,8 +8671,6 @@ snapshots:
 
   object-inspect@1.13.4: {}
 
-  obug@2.2.1: {}
-
   obug@3.0.0: {}
 
   once@1.3.3:
@@ -8776,24 +8681,24 @@ snapshots:
     dependencies:
       wrappy: 1.0.2
 
-  orval@8.41.0(@tanstack/react-query@5.104.1)(typescript@6.0.3)(zod@4.6.5):
+  orval@8.42.0(@tanstack/react-query@5.104.2)(typescript@6.0.3)(zod@4.6.5):
     dependencies:
       '@commander-js/extra-typings': 15.0.0(commander@15.0.0)
-      '@orval/angular': 8.41.0
-      '@orval/axios': 8.41.0
-      '@orval/core': 8.41.0
-      '@orval/effect': 8.41.0
-      '@orval/fetch': 8.41.0
-      '@orval/hono': 8.41.0(typescript@6.0.3)(zod@4.6.5)
-      '@orval/mcp': 8.41.0(zod@4.6.5)
-      '@orval/mock': 8.41.0
-      '@orval/pinia-colada': 8.41.0
-      '@orval/query': 8.41.0(@tanstack/react-query@5.104.1)
-      '@orval/solid-start': 8.41.0
-      '@orval/swr': 8.41.0
-      '@orval/zod': 8.41.0(zod@4.6.5)
-      '@scalar/json-magic': 0.15.5
-      '@scalar/openapi-parser': 0.29.11
+      '@orval/angular': 8.42.0
+      '@orval/axios': 8.42.0
+      '@orval/core': 8.42.0
+      '@orval/effect': 8.42.0
+      '@orval/fetch': 8.42.0
+      '@orval/hono': 8.42.0(typescript@6.0.3)(zod@4.6.5)
+      '@orval/mcp': 8.42.0(zod@4.6.5)
+      '@orval/mock': 8.42.0
+      '@orval/pinia-colada': 8.42.0
+      '@orval/query': 8.42.0(@tanstack/react-query@5.104.2)
+      '@orval/solid-start': 8.42.0
+      '@orval/swr': 8.42.0
+      '@orval/zod': 8.42.0(zod@4.6.5)
+      '@scalar/json-magic': 0.15.7
+      '@scalar/openapi-parser': 0.29.13
       '@scalar/openapi-types': 0.9.7
       chokidar: 5.0.0
       commander: 15.0.0
@@ -8805,7 +8710,7 @@ snapshots:
       string-argv: 0.3.2
     transitivePeerDependencies:
       - '@faker-js/faker'
-      - '@modelcontextprotocol/sdk'
+      - '@modelcontextprotocol/server'
       - '@pinia/colada'
       - '@tanstack/angular-query-experimental'
       - '@tanstack/react-query'
@@ -9034,7 +8939,7 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.3.0
 
-  react-hook-form@7.89.0(@types/react@19.3.0)(react@19.3.0):
+  react-hook-form@7.90.0(@types/react@19.3.0)(react@19.3.0):
     dependencies:
       react: 19.3.0
     optionalDependencies:
@@ -9240,40 +9145,40 @@ snapshots:
   rgbcolor@1.0.1:
     optional: true
 
-  rolldown-plugin-dts@0.28.6(rolldown@1.2.12)(typescript@6.0.3):
+  rolldown-plugin-dts@0.28.8(rolldown@1.2.13)(typescript@6.0.3):
     dependencies:
       dts-resolver: 3.0.0
       get-tsconfig: 5.0.0-beta.6
       obug: 3.0.0
-      rolldown: 1.2.12
-      yuku-ast: 0.10.2
-      yuku-codegen: 0.10.2
-      yuku-parser: 0.10.2
+      rolldown: 1.2.13
+      yuku-ast: 0.19.0
+      yuku-codegen: 0.19.0
+      yuku-parser: 0.19.0
     optionalDependencies:
       typescript: 6.0.3
     transitivePeerDependencies:
       - oxc-resolver
 
-  rolldown@1.2.12:
+  rolldown@1.2.13:
     dependencies:
-      '@oxc-project/types': 0.152.0
+      '@oxc-project/types': 0.153.0
       '@rolldown/pluginutils': 1.0.1
     optionalDependencies:
-      '@rolldown/binding-android-arm-eabi': 1.2.12
-      '@rolldown/binding-android-arm64': 1.2.12
-      '@rolldown/binding-darwin-arm64': 1.2.12
-      '@rolldown/binding-darwin-x64': 1.2.12
-      '@rolldown/binding-freebsd-x64': 1.2.12
-      '@rolldown/binding-linux-arm-gnueabihf': 1.2.12
-      '@rolldown/binding-linux-arm64-gnu': 1.2.12
-      '@rolldown/binding-linux-arm64-musl': 1.2.12
-      '@rolldown/binding-linux-ppc64-gnu': 1.2.12
-      '@rolldown/binding-linux-s390x-gnu': 1.2.12
-      '@rolldown/binding-linux-x64-gnu': 1.2.12
-      '@rolldown/binding-linux-x64-musl': 1.2.12
-      '@rolldown/binding-openharmony-arm64': 1.2.12
-      '@rolldown/binding-win32-arm64-msvc': 1.2.12
-      '@rolldown/binding-win32-x64-msvc': 1.2.12
+      '@rolldown/binding-android-arm-eabi': 1.2.13
+      '@rolldown/binding-android-arm64': 1.2.13
+      '@rolldown/binding-darwin-arm64': 1.2.13
+      '@rolldown/binding-darwin-x64': 1.2.13
+      '@rolldown/binding-freebsd-x64': 1.2.13
+      '@rolldown/binding-linux-arm-gnueabihf': 1.2.13
+      '@rolldown/binding-linux-arm64-gnu': 1.2.13
+      '@rolldown/binding-linux-arm64-musl': 1.2.13
+      '@rolldown/binding-linux-ppc64-gnu': 1.2.13
+      '@rolldown/binding-linux-s390x-gnu': 1.2.13
+      '@rolldown/binding-linux-x64-gnu': 1.2.13
+      '@rolldown/binding-linux-x64-musl': 1.2.13
+      '@rolldown/binding-openharmony-arm64': 1.2.13
+      '@rolldown/binding-win32-arm64-msvc': 1.2.13
+      '@rolldown/binding-win32-x64-msvc': 1.2.13
 
   safe-buffer@5.1.2: {}
 
@@ -9367,7 +9272,7 @@ snapshots:
 
   size-sensor@1.0.3: {}
 
-  smol-toml@1.9.0: {}
+  smol-toml@1.9.1: {}
 
   solid-js@1.9.16:
     dependencies:
@@ -9503,24 +9408,24 @@ snapshots:
 
   tree-kill@1.2.2: {}
 
-  tsdown@0.23.0(@tsdown/css@0.23.0)(typescript@6.0.3):
+  tsdown@0.23.1(@tsdown/css@0.23.1)(typescript@6.0.3):
     dependencies:
-      cac: 7.0.0
+      cac: 7.1.0
       defu: 6.1.7
       empathic: 2.1.0
       hookable: 6.1.2
       import-without-cache: 0.4.1
-      obug: 2.2.1
+      obug: 3.0.0
       picomatch: 4.0.7
-      rolldown: 1.2.12
-      rolldown-plugin-dts: 0.28.6(rolldown@1.2.12)(typescript@6.0.3)
+      rolldown: 1.2.13
+      rolldown-plugin-dts: 0.28.8(rolldown@1.2.13)(typescript@6.0.3)
       tinyexec: 1.3.1
       tinyglobby: 0.2.17
       tree-kill: 1.2.2
       unconfig-core: 7.5.0
-      verkit: 0.4.1
+      verkit: 0.5.0
     optionalDependencies:
-      '@tsdown/css': 0.23.0(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.23.0)(yaml@2.9.1)
+      '@tsdown/css': 0.23.1(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.23.1)(yaml@2.9.1)
       typescript: 6.0.3
     transitivePeerDependencies:
       - '@typescript/native-preview'
@@ -9591,7 +9496,7 @@ snapshots:
       base64-arraybuffer: 1.0.2
     optional: true
 
-  verkit@0.4.1: {}
+  verkit@0.5.0: {}
 
   victory-vendor@37.3.6:
     dependencies:
@@ -9640,46 +9545,39 @@ snapshots:
 
   yoctocolors@2.2.0: {}
 
-  yuku-ast@0.10.2:
+  yuku-ast@0.19.0:
     dependencies:
-      '@yuku-toolchain/types': 0.10.2
+      '@yuku-toolchain/types': 0.19.0
 
-  yuku-codegen@0.10.2:
+  yuku-codegen@0.19.0:
     dependencies:
-      '@yuku-toolchain/types': 0.10.2
-    optionalDependencies:
-      '@yuku-codegen/binding-android-arm64': 0.10.2
-      '@yuku-codegen/binding-darwin-arm64': 0.10.2
-      '@yuku-codegen/binding-darwin-x64': 0.10.2
-      '@yuku-codegen/binding-freebsd-x64': 0.10.2
-      '@yuku-codegen/binding-linux-arm-gnu': 0.10.2
-      '@yuku-codegen/binding-linux-arm-musl': 0.10.2
-      '@yuku-codegen/binding-linux-arm64-gnu': 0.10.2
-      '@yuku-codegen/binding-linux-arm64-musl': 0.10.2
-      '@yuku-codegen/binding-linux-x64-gnu': 0.10.2
-      '@yuku-codegen/binding-linux-x64-musl': 0.10.2
-      '@yuku-codegen/binding-win32-arm64': 0.10.2
-      '@yuku-codegen/binding-win32-x64': 0.10.2
+      '@yuku-toolchain/types': 0.19.0
 
-  yuku-parser@0.10.2:
+  yuku-core@0.19.0:
     dependencies:
-      '@yuku-toolchain/types': 0.10.2
-      yuku-ast: 0.10.2
+      '@yuku-toolchain/types': 0.19.0
     optionalDependencies:
-      '@yuku-parser/binding-android-arm64': 0.10.2
-      '@yuku-parser/binding-darwin-arm64': 0.10.2
-      '@yuku-parser/binding-darwin-x64': 0.10.2
-      '@yuku-parser/binding-freebsd-x64': 0.10.2
-      '@yuku-parser/binding-linux-arm-gnu': 0.10.2
-      '@yuku-parser/binding-linux-arm-musl': 0.10.2
-      '@yuku-parser/binding-linux-arm64-gnu': 0.10.2
-      '@yuku-parser/binding-linux-arm64-musl': 0.10.2
-      '@yuku-parser/binding-linux-x64-gnu': 0.10.2
-      '@yuku-parser/binding-linux-x64-musl': 0.10.2
-      '@yuku-parser/binding-win32-arm64': 0.10.2
-      '@yuku-parser/binding-win32-x64': 0.10.2
+      '@yuku-core/binding-android-arm64': 0.19.0
+      '@yuku-core/binding-darwin-arm64': 0.19.0
+      '@yuku-core/binding-darwin-x64': 0.19.0
+      '@yuku-core/binding-freebsd-x64': 0.19.0
+      '@yuku-core/binding-linux-arm-gnu': 0.19.0
+      '@yuku-core/binding-linux-arm-musl': 0.19.0
+      '@yuku-core/binding-linux-arm64-gnu': 0.19.0
+      '@yuku-core/binding-linux-arm64-musl': 0.19.0
+      '@yuku-core/binding-linux-x64-gnu': 0.19.0
+      '@yuku-core/binding-linux-x64-musl': 0.19.0
+      '@yuku-core/binding-win32-arm64': 0.19.0
+      '@yuku-core/binding-win32-x64': 0.19.0
+
+  yuku-parser@0.19.0:
+    dependencies:
+      '@yuku-toolchain/types': 0.19.0
+      yuku-core: 0.19.0
 
   zod@4.6.5: {}
+
+  zod@4.6.7: {}
 
   zrender@6.1.0:
     dependencies:

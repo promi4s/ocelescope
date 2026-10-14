@@ -1,4 +1,7 @@
-import { useRunSqlQuery } from "@ocelescope/api-base";
+import {
+  type RunSqlQueryQueryResult,
+  useRunSqlQuery,
+} from "@ocelescope/api-base";
 import { useMemo } from "react";
 import { useCurrentOcel } from "./useCurrentOCEL";
 
@@ -34,7 +37,9 @@ export const useOcelQuery = ({
     () => ({ sql, parameters: parameters ?? [] }),
     [sql, parameters],
   );
-  const query = useRunSqlQuery(
+  // `error` is replaced by `sqlError` below; leaving it `unknown` keeps the
+  // generated per-spec `HTTPValidationError` out of this hook's emitted type.
+  const query = useRunSqlQuery<RunSqlQueryQueryResult, unknown>(
     ocelId,
     request,
     { ocel_version: ocelVersion },
