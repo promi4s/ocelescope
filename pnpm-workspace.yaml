@@ -14,12 +14,12 @@ catalog:
   "@dagrejs/dagre": ^3.0.0
   "@floating-ui/react": ^0.27.18
   "@hpcc-js/wasm-graphviz": ^1.21.0
-  "@mantine/carousel": ^9.5.1
-  "@mantine/core": ^9.5.1
-  "@mantine/dates": ^9.5.1
-  "@mantine/dropzone": ^9.5.1
-  "@mantine/hooks": ^9.5.1
-  "@mantine/notifications": ^9.5.1
+  "@mantine/carousel": ^9.7.2
+  "@mantine/core": ^9.7.2
+  "@mantine/dates": ^9.7.2
+  "@mantine/dropzone": ^9.7.2
+  "@mantine/hooks": ^9.7.2
+  "@mantine/notifications": ^9.7.2
   "@marko19907/string-to-color": ^1.0.2
   "@monaco-editor/react": ^4.7.0
   '@ocelescope/ocelot': ^0.8.0
@@ -29,10 +29,10 @@ catalog:
   "@rjsf/utils": ^6.8.0
   "@rjsf/validator-ajv8": ^6.8.0
   "@storybook/react-vite": ^10.3.5
-  "@tanstack/react-query": ^5.90.21
-  "@tanstack/react-query-devtools": ^5.91.3
+  "@tanstack/react-query": ^5.104.2
+  "@tanstack/react-query-devtools": ^5.104.2
   "@tsconfig/strictest": ^2.0.8
-  "@tsdown/css": ^0.23.0
+  "@tsdown/css": ^0.23.1
   "@types/file-saver": ^2.0.7
   "@types/node": ^26.6.1
   '@types/object-hash': ^3.0.6
@@ -45,7 +45,7 @@ catalog:
   content-disposition-attachment: ^0.3.1
   echarts: ^6.1.0
   echarts-for-react: ^3.0.6
-  cspell: ^10.3.2
+  cspell: ^10.4.0
   dayjs: ^1.11.23
   elkjs: ^0.12.0
   embla-carousel: ^8.6.0
@@ -53,22 +53,22 @@ catalog:
   file-saver: ^2.0.5
   html-to-image: 1.11.13
   jspdf: ^4.2.1
-  lucide-react: ^1.0.0
+  lucide-react: ^1.56.0
   mantine-datatable: ^9.4.0
   next: 16.4.0
   object-hash: ^3.0.0
-  orval: ^8.33.0
+  orval: ^8.42.0
   qs: ^6.16.0
   react: ^19.3.0
   react-dom: ^19.3.0
-  react-hook-form: ^7.71.2
+  react-hook-form: ^7.90.0
   react-plotly.js: ^4.0.0
   react-zoom-pan-pinch: ^4.0.0
   storybook: ^10.3.5
-  tsdown: ^0.23.0
+  tsdown: ^0.23.1
   typescript: ^6.0.3
   uniqolor: ^1.1.1
-  zod: ^4.6.5
+  zod: ^4.6.7
   zustand: ^5.0.15
 
 catalogMode: prefer
@@ -82,3 +82,39 @@ ignoredBuiltDependencies:
 
 minimumReleaseAgeExclude:
   - '@ocelescope/ocelot@0.5.0 || 0.6.0 || 0.6.1 || 0.8.0'
+  - "@cspell/cspell-bundled-dicts@10.4.0"
+  - "@cspell/cspell-json-reporter@10.4.0"
+  - "@cspell/cspell-performance-monitor@10.4.0"
+  - "@cspell/cspell-pipe@10.4.0"
+  - "@cspell/cspell-resolver@10.4.0"
+  - "@cspell/cspell-service-bus@10.4.0"
+  - "@cspell/cspell-types@10.4.0"
+  - "@cspell/cspell-worker@10.4.0"
+  - "@cspell/dynamic-import@10.4.0"
+  - "@cspell/filetypes@10.4.0"
+  - "@cspell/rpc@10.4.0"
+  - "@cspell/strong-weak-map@10.4.0"
+  - "@cspell/url@10.4.0"
+  - "@orval/angular@8.42.0"
+  - "@orval/axios@8.42.0"
+  - "@orval/core@8.42.0"
+  - "@orval/effect@8.42.0"
+  - "@orval/fetch@8.42.0"
+  - "@orval/hono@8.42.0"
+  - "@orval/mcp@8.42.0"
+  - "@orval/mock@8.42.0"
+  - "@orval/pinia-colada@8.42.0"
+  - "@orval/query@8.42.0"
+  - "@orval/solid-start@8.42.0"
+  - "@orval/swr@8.42.0"
+  - "@orval/zod@8.42.0"
+  - cspell-config-lib@10.4.0
+  - cspell-dictionary@10.4.0
+  - cspell-gitignore@10.4.0
+  - cspell-glob@10.4.0
+  - cspell-grammar@10.4.0
+  - cspell-io@10.4.0
+  - cspell-lib@10.4.0
+  - cspell-trie-lib@10.4.0
+  - cspell@10.4.0
+  - orval@8.42.0

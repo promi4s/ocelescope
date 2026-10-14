@@ -11,6 +11,11 @@
   },
   "packageRules": [
     {
+      "description": "tsdown and @tsdown/css are released in lockstep and must be updated together",
+      "matchPackageNames": ["tsdown", "@tsdown/css"],
+      "groupName": "tsdown"
+    },
+    {
       "description": "Action version and digest bumps are low-risk; majors are still held back by the rule below",
       "matchManagers": ["github-actions"],
       "automerge": true

@@ -20,17 +20,11 @@ export const FILTER_MAP: { [T in FilterKey]: FilterViewType<T> } = {
 } as const;
 
 export const generateDefaultFilter = (currentFilters: NativeFilter[]) => {
-  const groupedFilter = currentFilters.reduce(
-    (acc, curr) => {
-      return {
-        ...acc,
-        [curr.type]: acc[curr.type]
-          ? [...(acc[curr.type] ?? []), curr]
-          : [curr],
-      };
-    },
-    {} as Partial<GroupedFilter>,
-  );
+  const grouped: Partial<Record<FilterKey, NativeFilter[]>> = {};
+  for (const filter of currentFilters) {
+    grouped[filter.type] = [...(grouped[filter.type] ?? []), filter];
+  }
+  const groupedFilter = grouped as Partial<GroupedFilter>;
 
   const missingFilterKeys = Object.keys(FILTER_MAP).filter(
     (key) => !(key in groupedFilter),

@@ -121,7 +121,7 @@
   color: var(--mantine-color-black);
 }
 
-:global([data-mantine-color-scheme="dark"])
+:where(:global([data-mantine-color-scheme="dark"]))
   .button:hover
   .linkIcon {
   color: var(--mantine-color-white);
