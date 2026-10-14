@@ -1,14 +1,13 @@
 import hashlib
 import json
-from abc import ABC
 from pathlib import Path
 from typing import Any, ClassVar, Generic, Self, TypeVar
 
 import orjson
 from pydantic import BaseModel, Field, PrivateAttr, computed_field
-from pydantic_core import PydanticSerializationError, to_json
+from pydantic_core import to_json
 
-from ocelescope.visualization.visualization import Visualization
+from ocelescope.resource.base import ResourceBase
 
 
 class ResourceMeta(BaseModel):
@@ -20,52 +19,15 @@ class ResourceMeta(BaseModel):
     extra: dict[str, Any] = Field(default_factory=dict)
 
 
-class Resource(BaseModel, ABC):
-    """Abstract base class for resources.
-
-    Attributes:
-        label: Optional human-readable label for this resource class.
-        description: Optional human-readable description for this resource class.
-    """
-
-    label: ClassVar[str | None] = None
-    description: ClassVar[str | None] = None
+class Resource(BaseModel, ResourceBase):
+    """Abstract base class for pydantic (JSON-serializable) resources."""
 
     _meta: dict[str, Any] = PrivateAttr(default_factory=dict)
-
-    @property
-    def meta(self) -> dict[str, Any]:
-        return self._meta
-
-    def with_meta(self, **entries: Any) -> Self:
-        """Attach metadata entries and return ``self`` for chaining.
-
-        Every value is dumped once up front, so a value that would break
-        serialization of the whole resource fails here instead of at dump time.
-        Nothing is attached if any entry is rejected.
-
-        Raises:
-            ValueError: If an entry cannot be serialized by pydantic.
-        """
-        for key, value in entries.items():
-            try:
-                to_json(value)
-            except PydanticSerializationError as error:
-                raise ValueError(
-                    f"Meta entry {key!r} of {type(self).__name__} is not serializable: {error}"
-                ) from error
-
-        self._meta.update(entries)
-        return self
 
     @classmethod
     def get_schema_hash(cls) -> str:
         schema = json.dumps(cls.model_json_schema(), sort_keys=True)
         return hashlib.sha256(schema.encode()).hexdigest()
-
-    @classmethod
-    def get_label(cls) -> str:
-        return cls.label or cls.__name__
 
     @computed_field
     @property
@@ -94,16 +56,6 @@ class Resource(BaseModel, ABC):
             )
 
         return cls(**data).with_meta(**meta.extra)
-
-    def visualize(self) -> Visualization | None:
-        """Produce a visualization for this resource.
-
-        Implementations should return a concrete :class:`Visualization`
-        or ``None`` if no visualization exists.
-
-        Returns:
-            Optional[Visualization]: A visualization object or ``None``.
-        """
 
 
 T = TypeVar("T", bound=Resource)
