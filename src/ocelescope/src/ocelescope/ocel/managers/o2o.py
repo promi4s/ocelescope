@@ -17,6 +17,7 @@ from ocelescope.ocel.constants.pm4py import (
 )
 from ocelescope.ocel.constants.tables import O2O_TABLE, OBJECTS_TABLE
 from ocelescope.ocel.managers.base import BaseManager
+from ocelescope.util.sql import ident
 
 
 class O2OManager(BaseManager):
@@ -150,3 +151,47 @@ class O2OManager(BaseManager):
             f'SELECT DISTINCT "{O2O_QUALIFIER}" FROM {O2O_TABLE} '
             f'WHERE "{O2O_QUALIFIER}" IS NOT NULL ORDER BY 1'
         )
+
+    def get_count(
+        self, with_qualifier: bool = False
+    ) -> dict[tuple[str, str, str], int]:
+        otype, oid, source_id, target_id, qualifier_col = (
+            ident(OTYPE_COL),
+            ident(OID_COL),
+            ident(O2O_SOURCE_ID),
+            ident(O2O_TARGET_ID),
+            ident(O2O_QUALIFIER),
+        )
+
+        return {
+            (
+                source,
+                target,
+                qualifier,
+            ): count
+            for (source, target, qualifier, count) in self._relation(f"""
+            SELECT
+                source.{otype},
+                target.{otype},
+                {qualifier_col if with_qualifier else "NULL"},
+                count(*)
+            FROM
+                {ident(O2O_TABLE)} rel
+                LEFT JOIN {ident(OBJECTS_TABLE)} source ON rel.{source_id} = source.{oid}
+                LEFT JOIN {ident(OBJECTS_TABLE)} target ON rel.{target_id} = target.{oid}
+            GROUP BY ALL
+        """).fetchall()
+        }
+
+    @property
+    def count(self) -> dict[tuple[str, str], int]:
+        return {
+            (source, target): count
+            for (source, target, _), count in self.get_count(
+                with_qualifier=False
+            ).items()
+        }
+
+    @property
+    def qualified_count(self) -> dict[tuple[str, str, str], int]:
+        return self.get_count(with_qualifier=True)

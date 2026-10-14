@@ -7,6 +7,7 @@ import pandas as pd
 import polars
 
 from ocelescope.ocel.constants.pm4py import (
+    ACTIVITY_COL,
     E2O_ACTIVITY,
     E2O_EVENT_ID,
     E2O_OBJECT_ID,
@@ -14,10 +15,12 @@ from ocelescope.ocel.constants.pm4py import (
     E2O_QUALIFIER,
     EID_COL,
     OID_COL,
+    OTYPE_COL,
     TIMESTAMP_COL,
 )
 from ocelescope.ocel.constants.tables import E2O_TABLE, EVENTS_TABLE, OBJECTS_TABLE
 from ocelescope.ocel.managers.base import BaseManager
+from ocelescope.util.sql import ident
 
 
 class E2OManager(BaseManager):
@@ -170,3 +173,43 @@ class E2OManager(BaseManager):
     def get_last_event_of_object(self, object_id: str) -> str | None:
         """The id of the object's latest event, or None if it has none."""
         return self._boundary_event_of_object(object_id, "max")
+
+    def get_count(
+        self, with_qualifier: bool = False
+    ) -> dict[tuple[str, str, str], int]:
+        act, otype, oid, eid, qualifier_col = (
+            ident(ACTIVITY_COL),
+            ident(OTYPE_COL),
+            ident(OID_COL),
+            ident(EID_COL),
+            ident(E2O_QUALIFIER),
+        )
+
+        return {
+            (source, target, qualifier): count
+            for (source, target, qualifier, count) in self._relation(f"""
+                SELECT
+                    {act},
+                    {otype},
+                    {qualifier_col if with_qualifier else "NULL"},
+                    count(*) as 'count'
+                FROM
+                    {ident(E2O_TABLE)}
+                    LEFT JOIN {ident(OBJECTS_TABLE)} USING({oid})
+                    LEFT JOIN {ident(EVENTS_TABLE)} USING({eid})
+                GROUP BY ALL
+        """).fetchall()
+        }
+
+    @property
+    def count(self) -> dict[tuple[str, str], int]:
+        return {
+            (source, target): count
+            for (source, target, _), count in self.get_count(
+                with_qualifier=False
+            ).items()
+        }
+
+    @property
+    def qualified_count(self) -> dict[tuple[str, str, str], int]:
+        return self.get_count(with_qualifier=True)
