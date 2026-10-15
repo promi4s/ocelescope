@@ -1,3 +1,4 @@
+import functools
 import hashlib
 import json
 import tempfile
@@ -171,6 +172,7 @@ class TabularResource(ResourceBase):
         return self._con
 
     @classmethod
+    @functools.cache
     def get_schema_hash(cls) -> str:
         schema = {name: table.schema for name, table in sorted(cls.tables.items())}
         return hashlib.sha256(json.dumps(schema).encode()).hexdigest()

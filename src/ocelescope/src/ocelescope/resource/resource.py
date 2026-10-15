@@ -1,3 +1,4 @@
+import functools
 import hashlib
 import json
 from pathlib import Path
@@ -17,6 +18,7 @@ class Resource(BaseModel, ResourceBase):
     """
 
     @classmethod
+    @functools.cache
     def get_schema_hash(cls) -> str:
         schema = json.dumps(cls.model_json_schema(), sort_keys=True)
         return hashlib.sha256(schema.encode()).hexdigest()
