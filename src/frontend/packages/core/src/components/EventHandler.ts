@@ -29,6 +29,14 @@ export const sseHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const webStream = backendRes.body as unknown as NodeReadableStream;
     const nodeStream = Readable.fromWeb(webStream);
+
+    nodeStream.on("error", (err) => {
+      if (!controller.signal.aborted) {
+        console.error("SSE stream error:", err);
+      }
+      res.end();
+    });
+
     nodeStream.pipe(res);
 
     res.on("close", () => {
