@@ -58,9 +58,8 @@ def download_resource_as_pnml(
     import pm4py
 
     resource = session.get_resource(id=resource_id)
-    resource_instance = session.load_resource(resource_id, PetriNet)
-
-    pm4py_net, initial_marking, final_marking = resource_instance.to_pm4py()
+    with session.open_resource(resource_id, PetriNet) as petri_net:
+        pm4py_net, initial_marking, final_marking = petri_net.to_pm4py()
 
     file_response = TempFileResponse(
         prefix=resource.name,
