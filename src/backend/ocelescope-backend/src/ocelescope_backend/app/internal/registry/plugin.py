@@ -111,7 +111,7 @@ class PluginRegistry:
         session: "Session",
         io: PluginIO,
         input_resources: dict[str, str | None],
-        ocel_stack: ExitStack | None = None,
+        input_stack: ExitStack | None = None,
     ) -> ResourceBase | OCEL | None:
         id = input_resources.get(io.name, None)
 
@@ -121,8 +121,8 @@ class PluginRegistry:
         if io.io_type == "ocel":
             ocel = session.get_ocel(id)
 
-            if ocel_stack is not None:
-                return ocel_stack.enter_context(ocel)
+            if input_stack is not None:
+                return input_stack.enter_context(ocel)
 
             with ocel:
                 return deepcopy(ocel)
@@ -138,8 +138,8 @@ class PluginRegistry:
                 + " or ".join(t.__name__ for t in io.resource_types)
             )
 
-        if ocel_stack is not None:
-            return ocel_stack.enter_context(session.open_resource(id, resource_class))
+        if input_stack is not None:
+            return input_stack.enter_context(session.open_resource(id, resource_class))
 
         return session.load_resource(id, resource_class)
 
@@ -150,14 +150,14 @@ class PluginRegistry:
         method_name: str,
         input_resources: dict[str, str | None],
         require_inputs: bool = True,
-        ocel_stack: ExitStack | None = None,
+        input_stack: ExitStack | None = None,
     ) -> dict[str, Any]:
 
         method = self.get_method(plugin_id, method_name)
 
         kwargs: dict[str, Any] = {
             io.name: self._resolve_plugin_input(
-                session, io, input_resources, ocel_stack
+                session, io, input_resources, input_stack
             )
             for io in method.inputs
         }
@@ -184,19 +184,19 @@ class PluginRegistry:
     ) -> Generator[dict[str, Any]]:
         """Kwargs for a computed-value provider, valid for the block.
 
-        A provider only reads, so its OCELs are the session's own read-only view
-        rather than a copy of the whole log -- they are closed when the block
+        A provider only reads, so its OCELs and resources are read-only views
+        rather than in-memory copies -- they are closed when the block
         exits and must not outlive it. Inputs are not required to be filled in
         yet either: the form the provider computes a field for is still open.
         """
-        with ExitStack() as ocel_stack:
+        with ExitStack() as input_stack:
             yield self.get_plugin_kwargs(
                 session=session,
                 plugin_id=plugin_id,
                 method_name=method_name,
                 input_resources=input_resources,
                 require_inputs=False,
-                ocel_stack=ocel_stack,
+                input_stack=input_stack,
             )
 
     def unload_module(self, id: str):

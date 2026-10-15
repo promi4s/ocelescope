@@ -59,6 +59,7 @@ class PluginTask(TaskBase, Generic[P]):
 
     def run(self):
         self.state = TaskState.STARTED
+        kwargs: dict[str, Any] = {}
         try:
             plugin = registry_manager.get_plugin(self.plugin_id)
 
@@ -110,6 +111,13 @@ class PluginTask(TaskBase, Generic[P]):
             )
         finally:
             self.session.running_tasks.pop(self.id, None)
+
+            results = self.result or []
+            for value in kwargs.values():
+                if isinstance(value, ResourceBase) and not any(
+                    value is result for result in results
+                ):
+                    value.close()
 
     def summarize(self) -> PluginTaskSummary:
         return PluginTaskSummary(

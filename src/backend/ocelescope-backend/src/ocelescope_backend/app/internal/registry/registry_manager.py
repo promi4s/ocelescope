@@ -75,7 +75,7 @@ class RegistryManager:
         method_name: str,
         input_resources: dict[str, str | None],
     ) -> AbstractContextManager[dict[str, Any]]:
-        """Kwargs for a computed-value provider; its OCELs live for the block."""
+        """Kwargs for a computed-value provider; its inputs live for the block."""
         return self._plugin_registry.computed_kwargs(
             session=session,
             plugin_id=plugin_id,
