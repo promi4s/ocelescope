@@ -38,6 +38,18 @@
       "description": "TypeScript 7 has no stable compiler API yet (tsdown) and is outside typedoc's peer range",
       "matchPackageNames": ["typescript"],
       "allowedVersions": "<7"
+    },
+    {
+      "description": "Backend Python is part of the plugin contract: plugin wheels are built per CPython version (e.g. cp313), so bump it deliberately. Digest updates within 3.13 are still allowed",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["python"],
+      "allowedVersions": "/^3\\.13[.-]/"
+    },
+    {
+      "description": "Keep the uv builder image on the same Python as the runtime image",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["ghcr.io/astral-sh/uv"],
+      "allowedVersions": "/^python3\\.13-/"
     }
   ]
 }
