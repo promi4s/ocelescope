@@ -126,16 +126,29 @@ class Session:
         sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
         return id
 
+    def dump_ocel(self, ocel: OCEL) -> Path:
+        """Persist an OCEL to its own DuckDB file without adding it to the session."""
+        db_path = self._ocel_dir / f"{uuid4()}.duckdb"
+        ocel.to_duckdb(db_path)
+        return db_path
+
     def add_ocel(self, ocel: OCEL, name: str) -> str:
         """Persist an in-memory OCEL to a DuckDB file and register a handle."""
-        ocel_id = str(uuid4())
+        return self._register_ocel(
+            str(uuid4()),
+            self.dump_ocel(ocel),
+            name,
+            created_at=datetime.now(tz=UTC).isoformat(),
+        )
 
-        db_path = self._ocel_dir / f"{ocel_id}.duckdb"
-        ocel.to_duckdb(db_path)
+    def add_ocel_copy(self, db_path: Path, name: str) -> str:
+        """Add a copy of a dumped OCEL, e.g. a plugin result, to the session."""
+        copy = self._ocel_dir / f"{uuid4()}.duckdb"
+        shutil.copyfile(db_path, copy)
 
         return self._register_ocel(
-            ocel_id,
-            db_path,
+            str(uuid4()),
+            copy,
             name,
             created_at=datetime.now(tz=UTC).isoformat(),
         )
@@ -206,20 +219,30 @@ class Session:
 
         return id
 
-    def add_resource_instance(
+    def dump_resource(
         self, resource: ResourceBase, name: str, source_id: str | None = None
-    ) -> str:
-        """Dump a resource returned by a plugin into its own file."""
-        id = str(uuid4())
-
-        store = ResourceStore(
-            path=resource.dump(self._resource_dir / id),
+    ) -> ResourceStore:
+        """Dump a resource into its own file without adding it to the session."""
+        return ResourceStore(
+            path=resource.dump(self._resource_dir / str(uuid4())),
             name=name,
             schema_hash=resource.get_schema_hash(),
             source_id=source_id,
         )
 
-        return self._add_resource(id, store)
+    def add_resource_copy(self, store: ResourceStore, name: str) -> str:
+        """Add a copy of a dumped resource, e.g. a plugin result, to the session."""
+        path = self._resource_dir / str(uuid4())
+        shutil.copyfile(store.path, path)
+
+        copy = ResourceStore(
+            path=path,
+            name=name,
+            schema_hash=store.schema_hash,
+            source_id=store.source_id,
+        )
+
+        return self._add_resource(str(uuid4()), copy)
 
     def add_resource_from_file(self, file_path: Path, name: str) -> ResourceStore:
         """Import a ``.ocelescope`` exchange file of a registered resource class."""
@@ -283,12 +306,17 @@ class Session:
     def open_resource(
         self, id: str, resource_class: type[R]
     ) -> AbstractContextManager[R]: ...
-    @contextmanager
     def open_resource(
         self, id: str, resource_class: type[R] | None = None
-    ) -> Generator[R | ResourceBase]:
+    ) -> AbstractContextManager[R | ResourceBase]:
         """A read-only view on the stored resource, valid for the block."""
-        store = self.get_resource(id)
+        return self.open_store(self.get_resource(id), resource_class)
+
+    @contextmanager
+    def open_store(
+        self, store: ResourceStore, resource_class: type[R] | None = None
+    ) -> Generator[R | ResourceBase]:
+        """A read-only view on a dumped resource, valid for the block."""
         with self._resource_class(store, resource_class).open(
             store.path, resolve=registry_manager.get_resource_class
         ) as resource:

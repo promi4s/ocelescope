@@ -8,9 +8,9 @@ from typing import Annotated, Any
 from fastapi import Body
 from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
+from ocelescope.ocel.io import export_duckdb_ocel
 from pydantic import BaseModel
 
-from ocelescope import OCEL
 from ocelescope_backend.app.dependencies import ApiPluginTask, ApiSession
 from ocelescope_backend.app.internal.config import config
 from ocelescope_backend.app.internal.exceptions import NotFound
@@ -120,14 +120,10 @@ def save_plugin_results(
             index=index,
         )
 
-        if isinstance(entity, OCEL):
-            saved.ocel_ids.append(session.add_ocel(entity, name))
+        if isinstance(entity, Path):
+            saved.ocel_ids.append(session.add_ocel_copy(entity, name))
         else:
-            saved.resource_ids.append(
-                session.add_resource_instance(
-                    entity, name=name, source_id=plugin_task.plugin_id
-                )
-            )
+            saved.resource_ids.append(session.add_resource_copy(entity, name=name))
 
     return saved
 
@@ -167,13 +163,16 @@ def download_plugin_results(
         for index, entity in selected:
             name = default_result_name(plugin_id, method_name, index)
 
-            if isinstance(entity, OCEL):
+            if isinstance(entity, Path):
                 with NamedTemporaryFile(suffix=".json") as ocel_file:
-                    entity.write(Path(ocel_file.name))
+                    export_duckdb_ocel(entity, ocel_file.name)
                     archive.write(ocel_file.name, arcname=_unique(name, ".json"))
             else:
-                with NamedTemporaryFile(suffix=".ocelescope") as resource_file:
-                    entity.write(resource_file.name)
+                with (
+                    NamedTemporaryFile(suffix=".ocelescope") as resource_file,
+                    plugin_task.session.open_store(entity) as resource,
+                ):
+                    resource.write(resource_file.name)
                     archive.write(
                         resource_file.name, arcname=_unique(name, ".ocelescope")
                     )

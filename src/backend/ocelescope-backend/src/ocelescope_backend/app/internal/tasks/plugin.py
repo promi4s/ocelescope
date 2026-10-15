@@ -1,5 +1,6 @@
 import traceback
 from collections.abc import Hashable
+from pathlib import Path
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -10,6 +11,7 @@ from typing import (
 from typing_extensions import TypedDict
 
 from ocelescope import OCEL, BaseFilter, ResourceBase
+from ocelescope_backend.app.internal.model.resource import ResourceStore
 from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.registry.plugin import PluginNotFound
 from ocelescope_backend.app.internal.tasks.base import (
@@ -54,12 +56,13 @@ class PluginTask(TaskBase, Generic[P]):
         self.method_name = method_name
         self.method_label = method_label
         self.input = input
-        self.result: list[OCEL | ResourceBase] | None = None
+        self.result: list[Path | ResourceStore] | None = None
         self.session = session
 
     def run(self):
         self.state = TaskState.STARTED
         kwargs: dict[str, Any] = {}
+        entities: list[OCEL | ResourceBase] = []
         try:
             plugin = registry_manager.get_plugin(self.plugin_id)
 
@@ -84,15 +87,22 @@ class PluginTask(TaskBase, Generic[P]):
 
             returned = result if isinstance(result, tuple) else (result,)
 
-            entities: list[OCEL | ResourceBase] = []
-
             for item in returned:
                 if isinstance(item, list):
                     entities.extend(item)
                 else:
                     entities.append(item)
 
-            self.result = entities
+            self.result = [
+                self.session.dump_ocel(entity)
+                if isinstance(entity, OCEL)
+                else self.session.dump_resource(
+                    entity,
+                    name=f"{self.method_name}_{index}",
+                    source_id=self.plugin_id,
+                )
+                for index, entity in enumerate(entities)
+            ]
 
             if self.state != TaskState.CANCELLED:
                 self.state = TaskState.SUCCESS
@@ -112,11 +122,8 @@ class PluginTask(TaskBase, Generic[P]):
         finally:
             self.session.running_tasks.pop(self.id, None)
 
-            results = self.result or []
-            for value in kwargs.values():
-                if isinstance(value, ResourceBase) and not any(
-                    value is result for result in results
-                ):
+            for value in [*kwargs.values(), *entities]:
+                if isinstance(value, OCEL | ResourceBase):
                     value.close()
 
     def summarize(self) -> PluginTaskSummary:
