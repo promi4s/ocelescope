@@ -5,7 +5,7 @@ from typing import (
 )
 
 from ocelescope.plugin.decorators import PluginMethod
-from ocelescope.resource.resource import Resource
+from ocelescope.resource.base import ResourceBase
 
 
 class Plugin(ABC):
@@ -31,7 +31,7 @@ class Plugin(ABC):
         return method_map
 
     @classmethod
-    def get_resources(cls) -> list[type[Resource]]:
+    def get_resources(cls) -> list[type[ResourceBase]]:
         return list(
             dict.fromkeys(
                 resource_type

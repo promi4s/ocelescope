@@ -36,12 +36,12 @@ from ocelescope.visualization.default.petri_net import (
 )
 from ocelescope.visualization.default.plotly import Plotly
 from ocelescope.visualization.default.svg import SVGVis
-from ocelescope.visualization.default.table import Table, TableColumn
+from ocelescope.visualization.default.table import TableColumn, TableViz
 from ocelescope.visualization.util.color import generate_color_map
 
 Visualization: TypeAlias = Annotated[
     Graph
-    | Table
+    | TableViz
     | SVGVis
     | DotVis
     | Plotly
@@ -78,8 +78,8 @@ __all__ = [
     "Place",
     "Plotly",
     "SVGVis",
-    "Table",
     "TableColumn",
+    "TableViz",
     "Transition",
     "Visualization",
     "generate_color_map",

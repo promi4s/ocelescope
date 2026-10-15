@@ -9,7 +9,7 @@ from typing import (
 
 from typing_extensions import TypedDict
 
-from ocelescope import OCEL, BaseFilter, Resource
+from ocelescope import OCEL, BaseFilter, ResourceBase
 from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.registry.plugin import PluginNotFound
 from ocelescope_backend.app.internal.tasks.base import (
@@ -54,7 +54,7 @@ class PluginTask(TaskBase, Generic[P]):
         self.method_name = method_name
         self.method_label = method_label
         self.input = input
-        self.result: list[OCEL | Resource] | None = None
+        self.result: list[OCEL | ResourceBase] | None = None
         self.session = session
 
     def run(self):
@@ -83,7 +83,7 @@ class PluginTask(TaskBase, Generic[P]):
 
             returned = result if isinstance(result, tuple) else (result,)
 
-            entities: list[OCEL | Resource] = []
+            entities: list[OCEL | ResourceBase] = []
 
             for item in returned:
                 if isinstance(item, list):

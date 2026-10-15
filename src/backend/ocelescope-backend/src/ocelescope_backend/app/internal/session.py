@@ -2,22 +2,27 @@ from __future__ import annotations
 
 import json
 import tempfile
-from collections.abc import Callable, Hashable, Sequence
+from collections.abc import Callable, Generator, Hashable, Sequence
+from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, ClassVar, Self, TypeVar, cast
 from uuid import uuid4
 
-from ocelescope import OCEL, BaseFilter
+from ocelescope import OCEL, BaseFilter, ResourceBase
 from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.model.ocel import SessionOCEL
-from ocelescope_backend.app.internal.model.resource import ResourceApi, ResourceStore
+from ocelescope_backend.app.internal.model.resource import (
+    ResourceApi,
+    ResourceStore,
+)
 from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.tasks.base import TaskBase
 from ocelescope_backend.app.sse_manager import InvalidationRequest, sse_manager
 
 S = TypeVar("S", bound=TaskBase)
 T = TypeVar("T")
+R = TypeVar("R", bound=ResourceBase)
 
 
 class Session:
@@ -39,6 +44,9 @@ class Session:
 
         # Resources
         self._resources: dict[str, ResourceStore] = {}
+        self._resource_dir = Path(
+            tempfile.mkdtemp(prefix=f"ocelescope_{self.id}_resources_")
+        )
 
         # OCELS
         self.ocels: dict[str, SessionOCEL] = {}
@@ -184,22 +192,96 @@ class Session:
 
     # endregion
     # region Resource management
-    def add_resource(self, resource: ResourceStore) -> str:
-        id = str(uuid4())
-
+    def _add_resource(self, id: str, resource: ResourceStore) -> str:
         self._resources[id] = resource
 
         sse_manager.send_safe(self.id, InvalidationRequest(routes=["resources"]))
 
         return id
 
+    def add_resource_instance(
+        self, resource: ResourceBase, name: str, source_id: str | None = None
+    ) -> str:
+        """Dump a resource returned by a plugin into its own file."""
+        id = str(uuid4())
+
+        store = ResourceStore(
+            path=resource.dump(self._resource_dir / id),
+            name=name,
+            schema_hash=resource.get_schema_hash(),
+            source_id=source_id,
+        )
+
+        return self._add_resource(id, store)
+
+    def add_resource_from_file(self, file_path: Path, name: str) -> ResourceStore:
+        """Import a ``.ocelescope`` exchange file of a registered resource class."""
+        resource_class = registry_manager.get_resource_class(
+            ResourceBase.read_schema_hash(file_path)
+        )
+
+        id = str(uuid4())
+        with resource_class.read(
+            file_path, resolve=registry_manager.get_resource_class
+        ) as resource:
+            path = self._resource_dir / id
+            try:
+                resource.dump(path)
+            except Exception:
+                path.unlink(missing_ok=True)
+                raise
+
+        store = ResourceStore(
+            path=path,
+            name=name,
+            schema_hash=resource_class.get_schema_hash(),
+        )
+
+        self._add_resource(id, store)
+        return store
+
     def get_resource(self, id: str) -> ResourceStore:
         if id not in self._resources:
             raise NotFound(f"Resource with id {id} not found")
         return self._resources[id]
 
+    def _resource_class(
+        self, store: ResourceStore, resource_class: type[R] | None
+    ) -> type[R | ResourceBase]:
+        return resource_class or registry_manager.get_resource_class(store.schema_hash)
+
+    def load_resource(
+        self, id: str, resource_class: type[R] | None = None
+    ) -> R | ResourceBase:
+        """An in-memory copy of the stored resource the caller may modify.
+
+        ``resource_class`` defaults to the class registered for its schema hash.
+        """
+        store = self.get_resource(id)
+        return self._resource_class(store, resource_class).load(
+            store.path, resolve=registry_manager.get_resource_class
+        )
+
+    @contextmanager
+    def open_resource(
+        self, id: str, resource_class: type[R] | None = None
+    ) -> Generator[R | ResourceBase]:
+        """A read-only view on the stored resource, valid for the block."""
+        store = self.get_resource(id)
+        with self._resource_class(store, resource_class).open(
+            store.path, resolve=registry_manager.get_resource_class
+        ) as resource:
+            yield resource
+
+    def write_resource(self, id: str, path: Path) -> None:
+        """Write the stored resource's ``.ocelescope`` exchange file to ``path``."""
+        with self.open_resource(id) as resource:
+            resource.write(path)
+
     def delete_resource(self, id: str):
-        self._resources.pop(id, None)
+        store = self._resources.pop(id, None)
+        if store is not None:
+            store.delete()
         sse_manager.send_safe(self.id, InvalidationRequest(routes=["resources"]))
 
     def list_resources(self) -> list[ResourceApi]:

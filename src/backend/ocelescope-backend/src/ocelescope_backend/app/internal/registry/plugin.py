@@ -5,9 +5,8 @@ from types import ModuleType
 from typing import TYPE_CHECKING, Any
 
 from ocelescope.plugin.decorators import PluginIO
-from ocelescope.resource.resource import ResourceMeta
 
-from ocelescope import OCEL, Plugin, PluginMethod, Resource
+from ocelescope import OCEL, Plugin, PluginMethod, ResourceBase
 from ocelescope_backend.app.internal.model.plugin import PluginApi
 from ocelescope_backend.app.internal.registry.resource import RegistryError
 
@@ -113,7 +112,7 @@ class PluginRegistry:
         io: PluginIO,
         input_resources: dict[str, str | None],
         ocel_stack: ExitStack | None = None,
-    ) -> Resource | OCEL | None:
+    ) -> ResourceBase | OCEL | None:
         id = input_resources.get(io.name, None)
 
         if not id:
@@ -128,9 +127,21 @@ class PluginRegistry:
             with ocel:
                 return deepcopy(ocel)
 
-        data = session.get_resource(id).data
+        schema_hash = session.get_resource(id).schema_hash
+        resource_class = next(
+            (t for t in io.resource_types if t.get_schema_hash() == schema_hash), None
+        )
 
-        return io.type(**{k: v for k, v in data.items() if k != ResourceMeta.META_KEY})
+        if resource_class is None:
+            raise TypeError(
+                f"Resource {id} cannot be passed as {io.name!r}: expected "
+                + " or ".join(t.__name__ for t in io.resource_types)
+            )
+
+        if ocel_stack is not None:
+            return ocel_stack.enter_context(session.open_resource(id, resource_class))
+
+        return session.load_resource(id, resource_class)
 
     def get_plugin_kwargs(
         self,

@@ -13,8 +13,13 @@ from duckdb import (
     InvalidInputException,
 )
 from duckdb.sqltypes import DuckDBPyType
+from pydantic_core import to_json
 
-from ocelescope.resource.base import ResourceBase
+from ocelescope.resource.base import (
+    ResourceBase,
+    ResourceMeta,
+    ResourceResolver,
+)
 from ocelescope.util.sql import ident, literal
 
 COLUMN_TYPE = Literal[
@@ -135,7 +140,8 @@ class Table:
 class TabularResource(ResourceBase):
     """A resource whose data lives in DuckDB tables declared as ``Table`` attributes.
 
-    Internal storage is a single ``.duckdb`` file opened lazily via :meth:`open`;
+    Internal storage is a single ``.duckdb`` file written by :meth:`dump` and
+    opened lazily via :meth:`open` or copied into memory by :meth:`load`;
     the exchange format is a zip of Parquet files (one per table) plus a
     ``manifest.json``, written by :meth:`write` and read by :meth:`read`.
     """
@@ -153,7 +159,6 @@ class TabularResource(ResourceBase):
 
     def __init__(self, con: DuckDBPyConnection | None = None):
         self._con = con or duckdb.connect(":memory:")
-        self._meta = {}
 
         for table in self.tables.values():
             try:
@@ -171,11 +176,33 @@ class TabularResource(ResourceBase):
         return hashlib.sha256(json.dumps(schema).encode()).hexdigest()
 
     @classmethod
-    def open(cls, path: str | Path, read_only: bool = True) -> Self:
-        """Open a ``.duckdb`` file without loading it into memory."""
+    def open(
+        cls,
+        path: str | Path,
+        resolve: ResourceResolver | None = None,
+        read_only: bool = True,
+    ) -> Self:
+        """Open a file written by :meth:`dump` without loading it into memory."""
         return cls(duckdb.connect(str(path), read_only=read_only))
 
-    def save(self, path: str | Path) -> Path:
+    @classmethod
+    def load(
+        cls,
+        path: str | Path,
+        resolve: ResourceResolver | None = None,
+        con: DuckDBPyConnection | None = None,
+    ) -> Self:
+        """Copy the tables of a file written by :meth:`dump` into ``con`` (in-memory by default)."""
+        con = con or duckdb.connect(":memory:")
+        con.sql(f"ATTACH {literal(str(path))} AS _load (READ_ONLY)")
+        try:
+            for name in cls.tables:
+                con.sql(f"CREATE TABLE {ident(name)} AS FROM _load.{ident(name)}")
+        finally:
+            con.sql("DETACH _load")
+        return cls(con)
+
+    def dump(self, path: str | Path) -> Path:
         """Persist all tables into a new ``.duckdb`` file."""
         path = Path(path)
         self.con.sql(f"ATTACH {literal(str(path))} AS _save")
@@ -188,9 +215,7 @@ class TabularResource(ResourceBase):
 
     def write(self, path: str | Path) -> Path:
         """Write the exchange format: a single zip file with ``manifest.json`` + ``<table>.parquet``."""
-        path = Path(path)
-        if path.suffix != ".ocelescope":
-            path = path.with_name(path.name + ".ocelescope")
+        path = self.exchange_path(path)
 
         with tempfile.TemporaryDirectory() as tmp, zipfile.ZipFile(path, "w") as zf:
             for name in self.tables:
@@ -202,42 +227,47 @@ class TabularResource(ResourceBase):
 
             zf.writestr(
                 MANIFEST_FILE,
-                json.dumps(
+                to_json(
                     {
                         "resource": type(self).__name__,
                         "schema_hash": self.get_schema_hash(),
                         "tables": list(self.tables),
-                        "extra": self.meta,
                     }
                 ),
             )
         return path
 
     @classmethod
-    def read(cls, path: str | Path, con: DuckDBPyConnection | None = None) -> Self:
+    def detect_schema_hash(cls, path: Path) -> str | None:
+        if not zipfile.is_zipfile(path):
+            return None
+
+        with zipfile.ZipFile(path) as zf:
+            if MANIFEST_FILE not in zf.namelist():
+                return None
+            return ResourceMeta.model_validate_json(zf.read(MANIFEST_FILE)).schema_hash
+
+    @classmethod
+    def read(
+        cls,
+        path: str | Path,
+        resolve: ResourceResolver | None = None,
+        con: DuckDBPyConnection | None = None,
+    ) -> Self:
         """Read the exchange format into ``con`` (in-memory by default)."""
         path = Path(path)
         con = con or duckdb.connect(":memory:")
 
         with tempfile.TemporaryDirectory() as tmp, zipfile.ZipFile(path) as zf:
-            manifest = json.loads(zf.read(MANIFEST_FILE))
-            if manifest["schema_hash"] != cls.get_schema_hash():
-                raise ValueError(
-                    f"{path.name} was written by a different version of {cls.__name__}"
-                )
+            meta = ResourceMeta.model_validate_json(zf.read(MANIFEST_FILE))
+            cls.check_schema_hash(meta.schema_hash, path)
 
             for name in cls.tables:
                 file = Path(zf.extract(f"{name}.parquet", tmp))
                 con.sql(
                     f"CREATE TABLE {ident(name)} AS FROM read_parquet({literal(str(file))})"
                 )
-        return cls(con).with_meta(**manifest.get("extra", {}))
+        return cls(con)
 
-    def close(self):
-        return self._con.close()
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exec_type, exc, tb):
-        self.close()
+    def close(self) -> None:
+        self._con.close()

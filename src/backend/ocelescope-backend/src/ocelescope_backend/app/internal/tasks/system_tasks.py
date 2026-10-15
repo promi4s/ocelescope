@@ -7,12 +7,10 @@ from tempfile import NamedTemporaryFile
 from typing import Literal
 from uuid import uuid4
 
-import orjson
 from typing_extensions import TypedDict
 
 from ocelescope import OCEL
 from ocelescope_backend.app.internal.config import config
-from ocelescope_backend.app.internal.model.resource import ResourceStore
 from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.session import Session
 from ocelescope_backend.app.internal.tasks.system import system_task
@@ -238,12 +236,16 @@ def _import_resource(
     session: Session, file_path: Path, name: str
 ) -> list[SystemNotification | InvalidationRequest]:
     try:
-        data = orjson.loads(file_path.read_bytes())
-        resource = ResourceStore.read_from_dict(data=data, name=name)
+        if zipfile.is_zipfile(file_path):
+            with zipfile.ZipFile(file_path) as archive:
+                size = sum(member.file_size for member in archive.infolist())
+            if size > config.ARCHIVE_MAX_UNCOMPRESSED_BYTES:
+                raise ArchiveError("The uploaded resource is too large to unpack")
+
+        resource = session.add_resource_from_file(file_path, name=name)
     finally:
         file_path.unlink(missing_ok=True)
 
-    session.add_resource(resource)
     return [
         SystemNotification(
             title="Resource successfully uploaded",

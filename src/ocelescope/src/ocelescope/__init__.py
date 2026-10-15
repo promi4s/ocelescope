@@ -27,7 +27,14 @@ from ocelescope.plugin import (
     ResourceAnnotation,
     plugin_method,
 )
-from ocelescope.resource import DirectlyFollowsGraph, PetriNet, Resource
+from ocelescope.resource import (
+    DirectlyFollowsGraph,
+    PetriNet,
+    Resource,
+    ResourceBase,
+    Table,
+    TabularResource,
+)
 from ocelescope.visualization import (
     DIRECTED_ELK_GRAPH_LAYOUT,
     DIRECTED_GRAPH_LAYOUT,
@@ -45,8 +52,8 @@ from ocelescope.visualization import (
     LayoutConfig,
     Plotly,
     SVGVis,
-    Table,
     TableColumn,
+    TableViz,
     Visualization,
     generate_color_map,
 )
@@ -93,9 +100,12 @@ __all__ = [
     "PluginMethod",
     "Resource",
     "ResourceAnnotation",
+    "ResourceBase",
     "SVGVis",
     "Table",
     "TableColumn",
+    "TableViz",
+    "TabularResource",
     "TimeFrameFilter",
     "Visualization",
     "generate_color_map",

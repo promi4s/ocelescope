@@ -14,7 +14,7 @@ from typing import (
 
 from ocelescope import OCEL
 from ocelescope.plugin.input import PluginInput
-from ocelescope.resource.resource import Resource
+from ocelescope.resource.base import ResourceBase
 
 if TYPE_CHECKING:
     from ocelescope.plugin.plugin import Plugin
@@ -43,7 +43,7 @@ class OCELAnnotation(Annotation):
 
 @dataclass
 class ResourceAnnotation(Annotation):
-    """UI annotation metadata for a `Resource`-typed parameter or result.
+    """UI annotation metadata for a resource-typed parameter or result.
 
     This annotation is used to provide frontend-facing text (label/description)
     for resources.
@@ -55,7 +55,7 @@ class ResourceAnnotation(Annotation):
             alongside the declared one.
     """
 
-    annotation_resources: list[type[Resource]] | None = None
+    annotation_resources: list[type[ResourceBase]] | None = None
 
 
 def _unwrap_annotated(typ) -> tuple[Any, Annotation | None]:
@@ -108,17 +108,17 @@ class PluginIO:
             self.is_list = True
 
         if not isinstance(base_class, type) or not issubclass(
-            base_class, (OCEL, Resource)
+            base_class, (OCEL, ResourceBase)
         ):
             target = f"parameter {name!r}" if name else "the return type"
             raise TypeError(
                 f"Unsupported type for {target}: {io_type!r}. Plugin inputs and outputs must be "
-                f"`OCEL` or a `Resource` subclass, optionally wrapped in `list[...]`, `T | None` "
+                f"`OCEL`, a `Resource` or a `TabularResource` subclass, optionally wrapped in `list[...]`, `T | None` "
                 f"or `Annotated[...]`."
             )
 
         self.name = name
-        self.type: type[OCEL | Resource] = base_class
+        self.type: type[OCEL | ResourceBase] = base_class
         self.is_optional = is_optional
 
         is_annotation = isinstance(annotation, Annotation)
@@ -135,7 +135,7 @@ class PluginIO:
     @property
     def resource_types(self):
         return (
-            [self.type] if issubclass(self.type, Resource) else []
+            [self.type] if issubclass(self.type, ResourceBase) else []
         ) + self.annotated_resources
 
     @property
@@ -155,7 +155,7 @@ class PluginIO:
         )
 
 
-PluginReturnItemType = OCEL | Resource | list[OCEL] | list[Resource]
+PluginReturnItemType = OCEL | ResourceBase | list[OCEL] | list[ResourceBase]
 PluginReturnType = tuple[PluginReturnItemType, ...] | PluginReturnItemType
 
 

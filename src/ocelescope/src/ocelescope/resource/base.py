@@ -1,9 +1,24 @@
 from abc import ABC, abstractmethod
-from typing import Any, ClassVar, Self
+from collections.abc import Callable
+from pathlib import Path
+from typing import ClassVar, Self
 
-from pydantic_core import PydanticSerializationError, to_json
+from pydantic import BaseModel
 
 from ocelescope.visualization.visualization import Visualization
+
+EXCHANGE_SUFFIX = ".ocelescope"
+
+ResourceResolver = Callable[[str], type["ResourceBase"]]
+"""Looks up a resource class by its schema hash, e.g. to rebuild nested resources."""
+
+
+class ResourceMeta(BaseModel):
+    """Envelope emitted next to the payload of every dumped resource."""
+
+    META_KEY: ClassVar[str] = "_ocelescope_meta"
+
+    schema_hash: str
 
 
 class ResourceBase(ABC):
@@ -17,36 +32,90 @@ class ResourceBase(ABC):
     label: ClassVar[str | None] = None
     description: ClassVar[str | None] = None
 
-    _meta: dict[str, Any]
-
-    @property
-    def meta(self) -> dict[str, Any]:
-        return self._meta
-
-    def with_meta(self, **entries: Any) -> Self:
-        """Attach metadata entries and return ``self`` for chaining.
-
-        Every value is dumped once up front, so a value that would break
-        serialization of the whole resource fails here instead of at dump time.
-        Nothing is attached if any entry is rejected.
-
-        Raises:
-            ValueError: If an entry cannot be serialized by pydantic.
-        """
-        for key, value in entries.items():
-            try:
-                to_json(value)
-            except PydanticSerializationError as error:
-                raise ValueError(
-                    f"Meta entry {key!r} of {type(self).__name__} is not serializable: {error}"
-                ) from error
-
-        self._meta.update(entries)
-        return self
-
     @classmethod
     @abstractmethod
     def get_schema_hash(cls) -> str: ...
+
+    @classmethod
+    def check_schema_hash(cls, schema_hash: str, path: str | Path) -> None:
+        if schema_hash != cls.get_schema_hash():
+            raise ValueError(
+                f"{Path(path).name} was written by a different version of {cls.__name__}"
+            )
+
+    # region Storage
+    @abstractmethod
+    def dump(self, path: str | Path) -> Path:
+        """Persist the resource in its internal storage format."""
+
+    @classmethod
+    @abstractmethod
+    def load(cls, path: str | Path, resolve: ResourceResolver | None = None) -> Self:
+        """Load a resource written by :meth:`dump` into memory.
+
+        Args:
+            path: The file written by :meth:`dump`.
+            resolve: Resolves nested resources by schema hash, for resources that
+                hold other resources.
+        """
+
+    @classmethod
+    def open(cls, path: str | Path, resolve: ResourceResolver | None = None) -> Self:
+        """A read-only view on a file written by :meth:`dump`; :meth:`close` it when done.
+
+        Defaults to :meth:`load`; resources that can read their file lazily override it.
+        """
+        return cls.load(path, resolve)
+
+    @abstractmethod
+    def write(self, path: str | Path) -> Path:
+        """Write the ``.ocelescope`` exchange format to ``path``."""
+
+    @classmethod
+    @abstractmethod
+    def read(cls, path: str | Path, resolve: ResourceResolver | None = None) -> Self:
+        """Read a file written by :meth:`write`."""
+
+    @classmethod
+    @abstractmethod
+    def detect_schema_hash(cls, path: Path) -> str | None:
+        """The schema hash of ``path`` if it is in this kind's exchange format, else ``None``."""
+
+    @staticmethod
+    def read_schema_hash(path: str | Path) -> str:
+        """The schema hash of an exchange file, used to look up its resource class.
+
+        Each direct subclass of :class:`ResourceBase` is one exchange format and
+        gets asked in turn whether ``path`` is one of its files.
+
+        Raises:
+            ValueError: If no format recognizes the file.
+        """
+        path = Path(path)
+
+        for kind in ResourceBase.__subclasses__():
+            if (schema_hash := kind.detect_schema_hash(path)) is not None:
+                return schema_hash
+
+        raise ValueError(f"{path.name} is not an Ocelescope resource file")
+
+    @staticmethod
+    def exchange_path(path: str | Path) -> Path:
+        path = Path(path)
+        if path.suffix != EXCHANGE_SUFFIX:
+            path = path.with_name(path.name + EXCHANGE_SUFFIX)
+        return path
+
+    def close(self) -> None:
+        """Release what :meth:`open` holds on to; a no-op by default."""
+
+    def __enter__(self) -> Self:
+        return self
+
+    def __exit__(self, exc_type, exc, tb) -> None:
+        self.close()
+
+    # endregion
 
     @classmethod
     def get_label(cls) -> str:

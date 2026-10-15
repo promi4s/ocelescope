@@ -1,4 +1,3 @@
-import json
 import shutil
 import zipfile
 from datetime import UTC, datetime
@@ -20,7 +19,6 @@ from ocelescope_backend.app.internal.model.plugin_result import (
     PluginOutput,
     ResultSelection,
 )
-from ocelescope_backend.app.internal.model.resource import ResourceStore
 from ocelescope_backend.app.internal.model.response import TempFileResponse
 from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.registry.resource import RegistryError
@@ -126,10 +124,8 @@ def save_plugin_results(
             saved.ocel_ids.append(session.add_ocel(entity, name))
         else:
             saved.resource_ids.append(
-                session.add_resource(
-                    ResourceStore.from_resource(
-                        name=name, source_id=plugin_task.plugin_id, resource=entity
-                    )
+                session.add_resource_instance(
+                    entity, name=name, source_id=plugin_task.plugin_id
                 )
             )
 
@@ -176,14 +172,11 @@ def download_plugin_results(
                     entity.write(Path(ocel_file.name))
                     archive.write(ocel_file.name, arcname=_unique(name, ".json"))
             else:
-                resource_with_meta = ResourceStore.from_resource(
-                    resource=entity, name=name, source_id=plugin_id
-                ).export()
-
-                archive.writestr(
-                    _unique(name, ".ocelescope"),
-                    json.dumps(resource_with_meta, indent=2),
-                )
+                with NamedTemporaryFile(suffix=".ocelescope") as resource_file:
+                    entity.write(resource_file.name)
+                    archive.write(
+                        resource_file.name, arcname=_unique(name, ".ocelescope")
+                    )
 
     return file_response
 

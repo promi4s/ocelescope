@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 from typing import cast
 
 from fastapi.exceptions import HTTPException
@@ -45,8 +44,7 @@ def download_resource(session: ApiSession, resource_id: str) -> TempFileResponse
         filename=f"{resource.name}.ocelescope",
     )
 
-    with open(file_response.tmp_path, "w", encoding="utf-8") as output_file:
-        json.dump(resource.export(), output_file, indent=2)
+    session.write_resource(resource_id, file_response.tmp_path)
 
     return file_response
 
@@ -60,9 +58,10 @@ def download_resource_as_pnml(
     import pm4py
 
     resource = session.get_resource(id=resource_id)
-    resource_instance = registry_manager.get_resource_instance(
-        resource.data, registry_manager.BASE_PLUGIN_ID
-    )
+    if resource.schema_hash != PetriNet.get_schema_hash():
+        raise HTTPException(status_code=400, detail="Resource is not a Petri net.")
+
+    resource_instance = session.load_resource(resource_id, PetriNet)
 
     if not isinstance(resource_instance, PetriNet):
         raise HTTPException(status_code=400, detail="Resource is not a Petri net.")
@@ -88,18 +87,15 @@ class GetResourceResponse(BaseModel):
 def get_resource(session: ApiSession, resource_id: str) -> GetResourceResponse:
     resource = session.get_resource(resource_id)
 
-    resource_instance = registry_manager.get_resource_instance(resource.data)
-
-    return GetResourceResponse(
-        resource=ResourceApi(
-            id=resource_id,
-            resource_type_label=resource_instance.get_label(),
-            **resource.model_dump(),
-        ),
-        visualization=cast(Visualization, resource_instance.visualize())
-        if resource_instance is not None
-        else None,
-    )
+    with session.open_resource(resource_id) as resource_instance:
+        return GetResourceResponse(
+            resource=ResourceApi(
+                id=resource_id,
+                resource_type_label=resource_instance.get_label(),
+                **resource.model_dump(),
+            ),
+            visualization=cast(Visualization, resource_instance.visualize()),
+        )
 
 
 @resource_router.delete(path="/resource/{resource_id}", operation_id="deleteResource")
