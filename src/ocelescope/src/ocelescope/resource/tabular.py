@@ -90,8 +90,8 @@ class Table:
 
         try:
             table_desc = {
-                (col_descr[0], col_descr[1])
-                for col_descr in con.table(self.table_name).description
+                (column[0], column[1])
+                for column in con.table(self.table_name).description
             }
         except CatalogException:
             raise TableNotFoundException(self.table_name)
@@ -106,7 +106,7 @@ class Table:
                 table_name=self.table_name, table_ddl=table_desc, schema_ddl=schema
             )
 
-    def __get__(self, obj: "TabularResource | None", objtype=None):
+    def __get__(self, obj: "TabularResource | None", owner=None):
         if obj is None:
             return self
         return obj.con.table(self.table_name)
@@ -152,8 +152,8 @@ class TabularResource(ResourceBase):
         super().__init_subclass__(**kwargs)
         cls.tables = {
             name: attr
-            for klass in reversed(cls.__mro__)
-            for name, attr in vars(klass).items()
+            for base in reversed(cls.__mro__)
+            for name, attr in vars(base).items()
             if isinstance(attr, Table)
         }
 
