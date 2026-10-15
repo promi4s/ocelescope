@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
 from typing import cast
 
 from fastapi.routing import APIRouter
@@ -44,7 +43,8 @@ def download_resource(session: ApiSession, resource_id: str) -> TempFileResponse
         filename=f"{resource.name}.ocelescope",
     )
 
-    session.write_resource(resource_id, Path(file_response.tmp_path))
+    with session.open_resource(resource_id) as resource_instance:
+        resource_instance.write(file_response.tmp_path)
 
     return file_response
 

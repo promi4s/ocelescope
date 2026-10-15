@@ -90,7 +90,6 @@ class SystemTask(TaskBase, Generic[P]):
                 else result
                 for result in self.result
             ]
-            self.session.running_tasks.pop(self.id, None)
             for result in self.result:
                 sse_manager.send_safe(self.session.id, result)
 
@@ -143,7 +142,6 @@ class SystemTask(TaskBase, Generic[P]):
             metadata=metadata,
         )
         session.tasks[task.id] = task
-        session.running_tasks[task.id] = task
         if dedupe or run_once:
             session._dedupe_keys[key] = task.id
 

@@ -17,7 +17,7 @@ class ResourceHeader(ResourceInfo):
 
 
 class ResourceStore(ResourceHeader):
-    """A resource held by a session, dumped into its own file at ``path``."""
+    """A resource dumped into its own file at ``path``, e.g. by a session."""
 
     path: Path
 

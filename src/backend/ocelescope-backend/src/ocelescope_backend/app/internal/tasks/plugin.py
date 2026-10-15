@@ -120,8 +120,6 @@ class PluginTask(TaskBase, Generic[P]):
                 ),
             )
         finally:
-            self.session.running_tasks.pop(self.id, None)
-
             for value in [*kwargs.values(), *entities]:
                 if isinstance(value, OCEL | ResourceBase):
                     value.close()
@@ -178,7 +176,6 @@ class PluginTask(TaskBase, Generic[P]):
             input=input,
         )
         session.tasks[task.id] = task
-        session.running_tasks[task.id] = task
         session._dedupe_keys[key] = task.id
 
         print(f"[Task] Starting in thread (ID: {task.id})")

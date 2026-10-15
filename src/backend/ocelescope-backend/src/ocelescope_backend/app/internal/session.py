@@ -13,10 +13,7 @@ from uuid import uuid4
 from ocelescope import OCEL, BaseFilter, ResourceBase
 from ocelescope_backend.app.internal.exceptions import BadRequest, NotFound
 from ocelescope_backend.app.internal.model.ocel import SessionOCEL
-from ocelescope_backend.app.internal.model.resource import (
-    ResourceApi,
-    ResourceStore,
-)
+from ocelescope_backend.app.internal.model.resource import ResourceApi, ResourceStore
 from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.tasks.base import TaskBase
 from ocelescope_backend.app.sse_manager import InvalidationRequest, sse_manager
@@ -37,7 +34,6 @@ class Session:
 
         # Tasks
         self._tasks: dict[str, TaskBase] = {}
-        self._running_tasks: dict[str, TaskBase] = {}
         self._dedupe_keys: dict[Hashable, str] = {}  # dedupe key → task_id
 
         # Plugins
@@ -63,10 +59,6 @@ class Session:
     @property
     def tasks(self):
         return self._tasks
-
-    @property
-    def running_tasks(self):
-        return self._running_tasks
 
     def get_task(self, task_id: str):
         return self._tasks.get(task_id, None)
@@ -260,6 +252,10 @@ class Session:
         """An in-memory copy of the stored resource the caller may modify.
 
         ``resource_class`` defaults to the class registered for its schema hash.
+
+        Raises:
+            NotFound: If there is no resource with ``id``.
+            BadRequest: If the resource is not a ``resource_class``.
         """
         store = self.get_resource(id)
         return self._resource_class(store, resource_class).load(
@@ -275,7 +271,12 @@ class Session:
     def open_resource(
         self, id: str, resource_class: type[R] | None = None
     ) -> AbstractContextManager[R | ResourceBase]:
-        """A read-only view on the stored resource, valid for the block."""
+        """A read-only view on the stored resource, valid for the block.
+
+        Raises:
+            NotFound: If there is no resource with ``id``.
+            BadRequest: If the resource is not a ``resource_class``.
+        """
         return self.open_store(self.get_resource(id), resource_class)
 
     @contextmanager
@@ -287,11 +288,6 @@ class Session:
             store.path, resolve=registry_manager.get_resource_class
         ) as resource:
             yield resource
-
-    def write_resource(self, id: str, path: Path) -> None:
-        """Write the stored resource's ``.ocelescope`` exchange file to ``path``."""
-        with self.open_resource(id) as resource:
-            resource.write(path)
 
     def delete_resource(self, id: str):
         store = self._resources.pop(id, None)

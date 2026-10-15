@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any
 from ocelescope.plugin.decorators import PluginIO
 
 from ocelescope import OCEL, Plugin, PluginMethod, ResourceBase
+from ocelescope_backend.app.internal.exceptions import BadRequest
 from ocelescope_backend.app.internal.model.plugin import PluginApi
 from ocelescope_backend.app.internal.registry.resource import RegistryError
 
@@ -133,7 +134,7 @@ class PluginRegistry:
         )
 
         if resource_class is None:
-            raise TypeError(
+            raise BadRequest(
                 f"Resource {id} cannot be passed as {io.name!r}: expected "
                 + " or ".join(t.__name__ for t in io.resource_types)
             )
