@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 import tempfile
 from collections.abc import Callable, Generator, Hashable, Sequence
 from contextlib import AbstractContextManager, contextmanager
@@ -101,6 +102,12 @@ class Session:
 
     def update_state(self):
         self.state = str(uuid4())
+
+    def close(self) -> None:
+        """Forget the session and delete the files of its OCELs and resources."""
+        Session.sessions.pop(self.id, None)
+        shutil.rmtree(self._ocel_dir, ignore_errors=True)
+        shutil.rmtree(self._resource_dir, ignore_errors=True)
 
     # region OCEL management
     def _register_ocel(
