@@ -3,14 +3,14 @@ from __future__ import annotations
 import json
 import tempfile
 from collections.abc import Callable, Generator, Hashable, Sequence
-from contextlib import contextmanager
+from contextlib import AbstractContextManager, contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, ClassVar, Self, TypeVar, cast
+from typing import Any, ClassVar, Self, TypeVar, cast, overload
 from uuid import uuid4
 
 from ocelescope import OCEL, BaseFilter, ResourceBase
-from ocelescope_backend.app.internal.exceptions import NotFound
+from ocelescope_backend.app.internal.exceptions import BadRequest, NotFound
 from ocelescope_backend.app.internal.model.ocel import SessionOCEL
 from ocelescope_backend.app.internal.model.resource import (
     ResourceApi,
@@ -248,8 +248,16 @@ class Session:
     def _resource_class(
         self, store: ResourceStore, resource_class: type[R] | None
     ) -> type[R | ResourceBase]:
-        return resource_class or registry_manager.get_resource_class(store.schema_hash)
+        if resource_class is None:
+            return registry_manager.get_resource_class(store.schema_hash)
+        if store.schema_hash != resource_class.get_schema_hash():
+            raise BadRequest(f"Resource is not a {resource_class.__name__}.")
+        return resource_class
 
+    @overload
+    def load_resource(self, id: str) -> ResourceBase: ...
+    @overload
+    def load_resource(self, id: str, resource_class: type[R]) -> R: ...
     def load_resource(
         self, id: str, resource_class: type[R] | None = None
     ) -> R | ResourceBase:
@@ -262,6 +270,12 @@ class Session:
             store.path, resolve=registry_manager.get_resource_class
         )
 
+    @overload
+    def open_resource(self, id: str) -> AbstractContextManager[ResourceBase]: ...
+    @overload
+    def open_resource(
+        self, id: str, resource_class: type[R]
+    ) -> AbstractContextManager[R]: ...
     @contextmanager
     def open_resource(
         self, id: str, resource_class: type[R] | None = None

@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+from pathlib import Path
 from typing import cast
 
-from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
 from pydantic.main import BaseModel
 
@@ -44,7 +44,7 @@ def download_resource(session: ApiSession, resource_id: str) -> TempFileResponse
         filename=f"{resource.name}.ocelescope",
     )
 
-    session.write_resource(resource_id, file_response.tmp_path)
+    session.write_resource(resource_id, Path(file_response.tmp_path))
 
     return file_response
 
@@ -58,13 +58,7 @@ def download_resource_as_pnml(
     import pm4py
 
     resource = session.get_resource(id=resource_id)
-    if resource.schema_hash != PetriNet.get_schema_hash():
-        raise HTTPException(status_code=400, detail="Resource is not a Petri net.")
-
     resource_instance = session.load_resource(resource_id, PetriNet)
-
-    if not isinstance(resource_instance, PetriNet):
-        raise HTTPException(status_code=400, detail="Resource is not a Petri net.")
 
     pm4py_net, initial_marking, final_marking = resource_instance.to_pm4py()
 
