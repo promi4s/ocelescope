@@ -9,7 +9,7 @@ from uuid import uuid4
 
 from typing_extensions import TypedDict
 
-from ocelescope import OCEL
+from ocelescope import OCEL, ResourceBase
 from ocelescope_backend.app.internal.config import config
 from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.session import Session
@@ -48,10 +48,9 @@ def _import_ocel(
         name = name[: -len(".ocel")]
 
     try:
-        ocel_id = session.add_ocel_from_file(
-            file_path,
-            name=name,
-        )
+        # Streamed entity by entity, so the upload is never held in memory whole.
+        with OCEL.read(file_path) as ocel:
+            ocel_id = session.add_ocel(ocel, name=name)
     finally:
         file_path.unlink(missing_ok=True)
 
@@ -242,14 +241,20 @@ def _import_resource(
             if size > config.ARCHIVE_MAX_UNCOMPRESSED_BYTES:
                 raise ArchiveError("The uploaded resource is too large to unpack")
 
-        resource = session.add_resource_from_file(file_path, name=name)
+        resource_class = registry_manager.get_resource_class(
+            ResourceBase.read_schema_hash(file_path)
+        )
+        with resource_class.read(
+            file_path, resolve=registry_manager.get_resource_class
+        ) as resource:
+            session.add_resource(resource, name=name)
     finally:
         file_path.unlink(missing_ok=True)
 
     return [
         SystemNotification(
             title="Resource successfully uploaded",
-            message=f"{resource.name} uploaded successfully",
+            message=f"{name} uploaded successfully",
             notification_type="info",
         ),
         InvalidationRequest(routes=["resources", "tasks"]),

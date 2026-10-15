@@ -110,57 +110,34 @@ class Session:
         shutil.rmtree(self._resource_dir, ignore_errors=True)
 
     # region OCEL management
-    def _register_ocel(
-        self,
-        id: str,
-        db_path: Path,
-        name: str,
-        created_at: str,
-    ) -> str:
-        self.ocels[id] = SessionOCEL(
-            id=id,
-            db_path=db_path,
-            name=name,
-            created_at=created_at,
-        )
-        sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
-        return id
-
     def dump_ocel(self, ocel: OCEL) -> Path:
         """Persist an OCEL to its own DuckDB file without adding it to the session."""
         db_path = self._ocel_dir / f"{uuid4()}.duckdb"
         ocel.to_duckdb(db_path)
         return db_path
 
-    def add_ocel(self, ocel: OCEL, name: str) -> str:
-        """Persist an in-memory OCEL to a DuckDB file and register a handle."""
-        return self._register_ocel(
-            str(uuid4()),
-            self.dump_ocel(ocel),
-            name,
-            created_at=datetime.now(tz=UTC).isoformat(),
-        )
+    def add_ocel(self, ocel: OCEL | Path, name: str) -> str:
+        """Add an OCEL to the session.
 
-    def add_ocel_copy(self, db_path: Path, name: str) -> str:
-        """Add a copy of a dumped OCEL, e.g. a plugin result, to the session."""
-        copy = self._ocel_dir / f"{uuid4()}.duckdb"
-        shutil.copyfile(db_path, copy)
-
-        return self._register_ocel(
-            str(uuid4()),
-            copy,
-            name,
-            created_at=datetime.now(tz=UTC).isoformat(),
-        )
-
-    def add_ocel_from_file(self, source_path: Path, name: str) -> str:
-        """Register an OCEL file, streamed entity by entity into its own DuckDB file.
-
-        The log is never materialized as a whole, so peak memory stays bounded by its
-        widest single entity however big the upload is.
+        ``ocel`` is either an OCEL, which is dumped, or a DuckDB file written by
+        :meth:`dump_ocel` (e.g. a plugin result), which is copied.
         """
-        with OCEL.read(source_path) as ocel:
-            return self.add_ocel(ocel, name=name)
+        if isinstance(ocel, OCEL):
+            db_path = self.dump_ocel(ocel)
+        else:
+            db_path = self._ocel_dir / f"{uuid4()}.duckdb"
+            shutil.copyfile(ocel, db_path)
+
+        id = str(uuid4())
+        self.ocels[id] = SessionOCEL(
+            id=id,
+            db_path=db_path,
+            name=name,
+            created_at=datetime.now(tz=UTC).isoformat(),
+        )
+        sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
+
+        return id
 
     def get_ocel(self, ocel_id: str, use_original: bool = False) -> OCEL:
         if ocel_id not in self.ocels:
@@ -212,63 +189,52 @@ class Session:
 
     # endregion
     # region Resource management
-    def _add_resource(self, id: str, resource: ResourceStore) -> str:
-        self._resources[id] = resource
-
-        sse_manager.send_safe(self.id, InvalidationRequest(routes=["resources"]))
-
-        return id
-
     def dump_resource(
         self, resource: ResourceBase, name: str, source_id: str | None = None
     ) -> ResourceStore:
         """Dump a resource into its own file without adding it to the session."""
+        path = self._resource_dir / str(uuid4())
+        try:
+            resource.dump(path)
+        except Exception:
+            path.unlink(missing_ok=True)
+            raise
+
         return ResourceStore(
-            path=resource.dump(self._resource_dir / str(uuid4())),
+            path=path,
             name=name,
             schema_hash=resource.get_schema_hash(),
             source_id=source_id,
         )
 
-    def add_resource_copy(self, store: ResourceStore, name: str) -> str:
-        """Add a copy of a dumped resource, e.g. a plugin result, to the session."""
-        path = self._resource_dir / str(uuid4())
-        shutil.copyfile(store.path, path)
+    def add_resource(
+        self,
+        resource: ResourceBase | ResourceStore,
+        name: str,
+        source_id: str | None = None,
+    ) -> str:
+        """Add a resource to the session.
 
-        copy = ResourceStore(
-            path=path,
-            name=name,
-            schema_hash=store.schema_hash,
-            source_id=store.source_id,
-        )
-
-        return self._add_resource(str(uuid4()), copy)
-
-    def add_resource_from_file(self, file_path: Path, name: str) -> ResourceStore:
-        """Import a ``.ocelescope`` exchange file of a registered resource class."""
-        resource_class = registry_manager.get_resource_class(
-            ResourceBase.read_schema_hash(file_path)
-        )
+        ``resource`` is either a resource, which is dumped, or a store written by
+        :meth:`dump_resource` (e.g. a plugin result), whose file is copied.
+        """
+        if isinstance(resource, ResourceBase):
+            store = self.dump_resource(resource, name, source_id)
+        else:
+            path = self._resource_dir / str(uuid4())
+            shutil.copyfile(resource.path, path)
+            store = ResourceStore(
+                path=path,
+                name=name,
+                schema_hash=resource.schema_hash,
+                source_id=source_id or resource.source_id,
+            )
 
         id = str(uuid4())
-        with resource_class.read(
-            file_path, resolve=registry_manager.get_resource_class
-        ) as resource:
-            path = self._resource_dir / id
-            try:
-                resource.dump(path)
-            except Exception:
-                path.unlink(missing_ok=True)
-                raise
+        self._resources[id] = store
+        sse_manager.send_safe(self.id, InvalidationRequest(routes=["resources"]))
 
-        store = ResourceStore(
-            path=path,
-            name=name,
-            schema_hash=resource_class.get_schema_hash(),
-        )
-
-        self._add_resource(id, store)
-        return store
+        return id
 
     def get_resource(self, id: str) -> ResourceStore:
         if id not in self._resources:
