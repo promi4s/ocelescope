@@ -8,7 +8,7 @@ TableDataType = Literal["string", "number", "boolean", "date", "datetime"]
 
 
 class TableColumn(BaseModel):
-    """Column definition for a `Table` visualization.
+    """Column definition for a `TableViz` visualization.
 
     Attributes:
         id: Column id (used as key in each row dict).
@@ -25,7 +25,7 @@ class TableColumn(BaseModel):
     visible: bool = True
 
 
-class Table(Visualization):
+class TableViz(Visualization):
     """Tabular visualization with typed columns and row data.
 
     Rows are dictionaries keyed by `TableColumn.id`.

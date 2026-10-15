@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Self, cast
 
 from pydantic import BaseModel
@@ -17,23 +18,34 @@ class PluginOutput(BaseModel):
     @classmethod
     def from_plugin_result(cls, task: PluginTask) -> list[Self]:
         plugin_id, method_name = task.plugin_id, task.method_name
+        outputs: list[Self] = []
 
-        return [
-            cls(
-                result_index=index,
-                default_name=default_result_name(plugin_id, method_name, index),
-                type_label="OCEL",
-                visualization=visualize_ocel(result),
-            )
-            if isinstance(result, OCEL)
-            else cls(
-                result_index=index,
-                default_name=default_result_name(plugin_id, method_name, index),
-                type_label=result.label or result.get_label(),
-                visualization=cast(Visualization, result.visualize()),
-            )
-            for index, result in enumerate(task.result or [])
-        ]
+        for index, result in enumerate(task.result or []):
+            default_name = default_result_name(plugin_id, method_name, index)
+
+            if isinstance(result, Path):
+                with OCEL.read_duckdb(result, read_only=True) as ocel:
+                    outputs.append(
+                        cls(
+                            result_index=index,
+                            default_name=default_name,
+                            type_label="OCEL",
+                            visualization=visualize_ocel(ocel),
+                        )
+                    )
+                continue
+
+            with task.session.open_store(result) as resource:
+                outputs.append(
+                    cls(
+                        result_index=index,
+                        default_name=default_name,
+                        type_label=resource.get_label(),
+                        visualization=cast(Visualization, resource.visualize()),
+                    )
+                )
+
+        return outputs
 
 
 class ResultSelection(BaseModel):

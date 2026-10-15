@@ -5,9 +5,9 @@ from types import ModuleType
 from typing import TYPE_CHECKING, Any
 
 from ocelescope.plugin.decorators import PluginIO
-from ocelescope.resource.resource import ResourceMeta
 
-from ocelescope import OCEL, Plugin, PluginMethod, Resource
+from ocelescope import OCEL, Plugin, PluginMethod, ResourceBase
+from ocelescope_backend.app.internal.exceptions import BadRequest
 from ocelescope_backend.app.internal.model.plugin import PluginApi
 from ocelescope_backend.app.internal.registry.resource import RegistryError
 
@@ -112,8 +112,8 @@ class PluginRegistry:
         session: "Session",
         io: PluginIO,
         input_resources: dict[str, str | None],
-        ocel_stack: ExitStack | None = None,
-    ) -> Resource | OCEL | None:
+        input_stack: ExitStack | None = None,
+    ) -> ResourceBase | OCEL | None:
         id = input_resources.get(io.name, None)
 
         if not id:
@@ -122,15 +122,27 @@ class PluginRegistry:
         if io.io_type == "ocel":
             ocel = session.get_ocel(id)
 
-            if ocel_stack is not None:
-                return ocel_stack.enter_context(ocel)
+            if input_stack is not None:
+                return input_stack.enter_context(ocel)
 
             with ocel:
                 return deepcopy(ocel)
 
-        data = session.get_resource(id).data
+        schema_hash = session.get_resource(id).schema_hash
+        resource_class = next(
+            (t for t in io.resource_types if t.get_schema_hash() == schema_hash), None
+        )
 
-        return io.type(**{k: v for k, v in data.items() if k != ResourceMeta.META_KEY})
+        if resource_class is None:
+            raise BadRequest(
+                f"Resource {id} cannot be passed as {io.name!r}: expected "
+                + " or ".join(t.__name__ for t in io.resource_types)
+            )
+
+        if input_stack is not None:
+            return input_stack.enter_context(session.open_resource(id, resource_class))
+
+        return session.load_resource(id, resource_class)
 
     def get_plugin_kwargs(
         self,
@@ -139,14 +151,14 @@ class PluginRegistry:
         method_name: str,
         input_resources: dict[str, str | None],
         require_inputs: bool = True,
-        ocel_stack: ExitStack | None = None,
+        input_stack: ExitStack | None = None,
     ) -> dict[str, Any]:
 
         method = self.get_method(plugin_id, method_name)
 
         kwargs: dict[str, Any] = {
             io.name: self._resolve_plugin_input(
-                session, io, input_resources, ocel_stack
+                session, io, input_resources, input_stack
             )
             for io in method.inputs
         }
@@ -173,19 +185,19 @@ class PluginRegistry:
     ) -> Generator[dict[str, Any]]:
         """Kwargs for a computed-value provider, valid for the block.
 
-        A provider only reads, so its OCELs are the session's own read-only view
-        rather than a copy of the whole log -- they are closed when the block
+        A provider only reads, so its OCELs and resources are read-only views
+        rather than in-memory copies -- they are closed when the block
         exits and must not outlive it. Inputs are not required to be filled in
         yet either: the form the provider computes a field for is still open.
         """
-        with ExitStack() as ocel_stack:
+        with ExitStack() as input_stack:
             yield self.get_plugin_kwargs(
                 session=session,
                 plugin_id=plugin_id,
                 method_name=method_name,
                 input_resources=input_resources,
                 require_inputs=False,
-                ocel_stack=ocel_stack,
+                input_stack=input_stack,
             )
 
     def unload_module(self, id: str):

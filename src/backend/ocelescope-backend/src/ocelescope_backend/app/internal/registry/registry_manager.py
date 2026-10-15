@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any
 
 from typing_extensions import TypedDict
 
-from ocelescope import Plugin, Resource
+from ocelescope import Plugin, ResourceBase
 from ocelescope_backend.app.internal.config import config
 from ocelescope_backend.app.internal.model.plugin import PluginApi
 from ocelescope_backend.app.internal.registry.plugin import (
@@ -75,7 +75,7 @@ class RegistryManager:
         method_name: str,
         input_resources: dict[str, str | None],
     ) -> AbstractContextManager[dict[str, Any]]:
-        """Kwargs for a computed-value provider; its OCELs live for the block."""
+        """Kwargs for a computed-value provider; its inputs live for the block."""
         return self._plugin_registry.computed_kwargs(
             session=session,
             plugin_id=plugin_id,
@@ -83,10 +83,10 @@ class RegistryManager:
             input_resources=input_resources,
         )
 
-    def get_resource_instance(
-        self, resource: dict, source_id: str | None = None
-    ) -> Resource:
-        return self._resource_registry.get_resource_instance(resource, source_id)
+    def get_resource_class(
+        self, schema_hash: str, source_id: str | None = None
+    ) -> type[ResourceBase]:
+        return self._resource_registry.get_resource_class(schema_hash, source_id)
 
     def load_plugins(
         self, plugin_ids: list[str], ignore_errors: bool = True

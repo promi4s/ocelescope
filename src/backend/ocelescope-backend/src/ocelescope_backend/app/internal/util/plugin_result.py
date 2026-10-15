@@ -1,18 +1,20 @@
+from pathlib import Path
+
 from fastapi.exceptions import HTTPException
 
-from ocelescope import OCEL, Resource
+from ocelescope_backend.app.internal.model.resource import ResourceStore
 from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.tasks.plugin import PluginTask
 
 
 def select_results(
     plugin_task: PluginTask, indices: list[int]
-) -> list[tuple[int, OCEL | Resource]]:
+) -> list[tuple[int, Path | ResourceStore]]:
     """Resolve the requested result indices, validating each one."""
     if plugin_task.result is None:
         raise HTTPException(status_code=409, detail="Task has no results yet")
 
-    selected: list[tuple[int, OCEL | Resource]] = []
+    selected: list[tuple[int, Path | ResourceStore]] = []
     for index in indices:
         if index < 0 or index >= len(plugin_task.result):
             raise HTTPException(

@@ -96,7 +96,7 @@ def logout(request: Request, response: Response):
     session_id = request.headers.get(config.SESSION_ID_HEADER)
 
     response = JSONResponse({"message": "Logged out"}, status_code=200)
-    if session_id is not None and session_id in Session.sessions:
-        Session.sessions.pop(session_id)
+    if session_id is not None and (session := Session.get(session_id)) is not None:
+        session.close()
 
     return response

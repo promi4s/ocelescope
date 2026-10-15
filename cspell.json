@@ -194,7 +194,8 @@
     "mult",
     "dfgs",
     "iterchildren",
-    "levelprefix"
+    "levelprefix",
+    "sqltypes"
   ],
   "ignorePaths": [
     "pnpm-lock.yaml",

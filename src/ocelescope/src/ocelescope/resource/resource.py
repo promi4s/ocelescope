@@ -1,109 +1,102 @@
+import functools
 import hashlib
 import json
-from abc import ABC
 from pathlib import Path
-from typing import Any, ClassVar, Generic, Self, TypeVar
+from typing import Any, Generic, Self, TypeVar
 
 import orjson
-from pydantic import BaseModel, Field, PrivateAttr, computed_field
-from pydantic_core import PydanticSerializationError, to_json
+from pydantic import BaseModel, computed_field
+from pydantic_core import to_json
 
-from ocelescope.visualization.visualization import Visualization
-
-
-class ResourceMeta(BaseModel):
-    """Envelope emitted next to the payload of every dumped resource."""
-
-    META_KEY: ClassVar[str] = "_ocelescope_meta"
-
-    schema_hash: str
-    extra: dict[str, Any] = Field(default_factory=dict)
+from ocelescope.resource.base import ResourceBase, ResourceMeta, ResourceResolver
 
 
-class Resource(BaseModel, ABC):
-    """Abstract base class for resources.
+class Resource(BaseModel, ResourceBase):
+    """Abstract base class for pydantic (JSON-serializable) resources.
 
-    Attributes:
-        label: Optional human-readable label for this resource class.
-        description: Optional human-readable description for this resource class.
+    Its internal storage and exchange format are the same JSON document.
     """
 
-    label: ClassVar[str | None] = None
-    description: ClassVar[str | None] = None
-
-    _meta: dict[str, Any] = PrivateAttr(default_factory=dict)
-
-    @property
-    def meta(self) -> dict[str, Any]:
-        return self._meta
-
-    def with_meta(self, **entries: Any) -> Self:
-        """Attach metadata entries and return ``self`` for chaining.
-
-        Every value is dumped once up front, so a value that would break
-        serialization of the whole resource fails here instead of at dump time.
-        Nothing is attached if any entry is rejected.
-
-        Raises:
-            ValueError: If an entry cannot be serialized by pydantic.
-        """
-        for key, value in entries.items():
-            try:
-                to_json(value)
-            except PydanticSerializationError as error:
-                raise ValueError(
-                    f"Meta entry {key!r} of {type(self).__name__} is not serializable: {error}"
-                ) from error
-
-        self._meta.update(entries)
-        return self
-
     @classmethod
+    @functools.cache
     def get_schema_hash(cls) -> str:
         schema = json.dumps(cls.model_json_schema(), sort_keys=True)
         return hashlib.sha256(schema.encode()).hexdigest()
 
-    @classmethod
-    def get_label(cls) -> str:
-        return cls.label or cls.__name__
-
     @computed_field
     @property
     def _ocelescope_meta(self) -> ResourceMeta:
-        return ResourceMeta(schema_hash=self.get_schema_hash(), extra=self._meta)
+        return ResourceMeta(schema_hash=self.get_schema_hash())
 
-    def write(self, path: str | Path) -> Path:
+    def dump(self, path: str | Path) -> Path:
         path = Path(path)
-
-        if path.suffix != ".ocelescope":
-            path = path.with_name(path.name + ".ocelescope")
-
         path.write_bytes(to_json(self))
-
         return path
 
     @classmethod
-    def read(cls, path: str | Path) -> Self:
+    def load(cls, path: str | Path, resolve: ResourceResolver | None = None) -> Self:
         data = orjson.loads(Path(path).read_bytes())
+        meta = ResourceMeta(**data.get(ResourceMeta.META_KEY, {"schema_hash": ""}))
+        cls.check_schema_hash(meta.schema_hash, path)
 
-        meta = ResourceMeta(**data.pop(ResourceMeta.META_KEY, {"schema_hash": ""}))
+        return cls.from_data(data, resolve)
 
-        if meta.schema_hash != cls.get_schema_hash():
-            raise ValueError(
-                f"{Path(path).name} was written by a different version of {cls.__name__}"
-            )
+    def write(self, path: str | Path) -> Path:
+        return self.dump(self.exchange_path(path))
 
-        return cls(**data).with_meta(**meta.extra)
+    @classmethod
+    def detect_schema_hash(cls, path: Path) -> str | None:
+        try:
+            data = orjson.loads(path.read_bytes())
+        except orjson.JSONDecodeError:
+            return None
 
-    def visualize(self) -> Visualization | None:
-        """Produce a visualization for this resource.
+        if not isinstance(data, dict) or ResourceMeta.META_KEY not in data:
+            return None
+        return ResourceMeta(**data[ResourceMeta.META_KEY]).schema_hash
 
-        Implementations should return a concrete :class:`Visualization`
-        or ``None`` if no visualization exists.
+    @classmethod
+    def read(cls, path: str | Path, resolve: ResourceResolver | None = None) -> Self:
+        return cls.load(path, resolve)
 
-        Returns:
-            Optional[Visualization]: A visualization object or ``None``.
+    @classmethod
+    def from_data(
+        cls, data: dict[str, Any], resolve: ResourceResolver | None = None
+    ) -> Self:
+        """Build the resource from its JSON dump.
+
+        Nested dumps are rebuilt as the class ``resolve`` returns for their schema
+        hash; without it they are left to pydantic, which only knows the declared types.
         """
+        fields = {
+            key: _hydrate(value, resolve)
+            for key, value in data.items()
+            if key != ResourceMeta.META_KEY
+        }
+
+        return cls(**fields)
+
+
+def _hydrate(value: Any, resolve: ResourceResolver | None) -> Any:
+    if resolve is None:
+        return value
+
+    if isinstance(value, list):
+        return [_hydrate(item, resolve) for item in value]
+
+    if not isinstance(value, dict):
+        return value
+
+    if ResourceMeta.META_KEY not in value:
+        return {key: _hydrate(item, resolve) for key, item in value.items()}
+
+    resource_class = resolve(value[ResourceMeta.META_KEY]["schema_hash"])
+    if not issubclass(resource_class, Resource):
+        raise TypeError(
+            f"{resource_class.__name__} cannot be nested in a JSON resource"
+        )
+
+    return resource_class.from_data(value, resolve)
 
 
 T = TypeVar("T", bound=Resource)

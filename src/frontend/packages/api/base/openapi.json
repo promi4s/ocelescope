@@ -1321,7 +1321,7 @@
                     "$ref": "#/components/schemas/Graph"
                   },
                   {
-                    "$ref": "#/components/schemas/Table"
+                    "$ref": "#/components/schemas/TableViz"
                   },
                   {
                     "$ref": "#/components/schemas/SVGVis"
@@ -1356,7 +1356,7 @@
                     "r4pm_ocdfg": "#/components/schemas/OCDirectlyFollowsGraphViz",
                     "r4pm_petri_net": "#/components/schemas/PetriNetViz",
                     "svg": "#/components/schemas/SVGVis",
-                    "table": "#/components/schemas/Table"
+                    "table": "#/components/schemas/TableViz"
                   }
                 }
               },
@@ -2337,7 +2337,7 @@
                     "$ref": "#/components/schemas/Graph"
                   },
                   {
-                    "$ref": "#/components/schemas/Table"
+                    "$ref": "#/components/schemas/TableViz"
                   },
                   {
                     "$ref": "#/components/schemas/SVGVis"
@@ -2372,7 +2372,7 @@
                     "r4pm_ocdfg": "#/components/schemas/OCDirectlyFollowsGraphViz",
                     "r4pm_petri_net": "#/components/schemas/PetriNetViz",
                     "svg": "#/components/schemas/SVGVis",
-                    "table": "#/components/schemas/Table"
+                    "table": "#/components/schemas/TableViz"
                   }
                 }
               },
@@ -2613,38 +2613,6 @@
         ],
         "title": "SystemTaskSummary"
       },
-      "Table": {
-        "properties": {
-          "type": {
-            "type": "string",
-            "const": "table",
-            "title": "Type",
-            "default": "table"
-          },
-          "columns": {
-            "items": {
-              "$ref": "#/components/schemas/TableColumn"
-            },
-            "type": "array",
-            "title": "Columns"
-          },
-          "rows": {
-            "items": {
-              "additionalProperties": true,
-              "type": "object"
-            },
-            "type": "array",
-            "title": "Rows"
-          }
-        },
-        "type": "object",
-        "required": [
-          "columns",
-          "rows"
-        ],
-        "title": "Table",
-        "description": "Tabular visualization with typed columns and row data.\n\nRows are dictionaries keyed by `TableColumn.id`.\n\nAttributes:\n    type: Fixed discriminator `\"table\"`.\n    columns: Column definitions.\n    rows: List of row dicts."
-      },
       "TableColumn": {
         "properties": {
           "id": {
@@ -2690,7 +2658,39 @@
           "id"
         ],
         "title": "TableColumn",
-        "description": "Column definition for a `Table` visualization.\n\nAttributes:\n    id: Column id (used as key in each row dict).\n    label: Optional human-readable column label.\n    data_type: Column data type (for example `\"string\"` or `\"number\"`).\n    sortable: Whether the column can be sorted in the frontend.\n    visible: Whether the column is visible by default."
+        "description": "Column definition for a `TableViz` visualization.\n\nAttributes:\n    id: Column id (used as key in each row dict).\n    label: Optional human-readable column label.\n    data_type: Column data type (for example `\"string\"` or `\"number\"`).\n    sortable: Whether the column can be sorted in the frontend.\n    visible: Whether the column is visible by default."
+      },
+      "TableViz": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "table",
+            "title": "Type",
+            "default": "table"
+          },
+          "columns": {
+            "items": {
+              "$ref": "#/components/schemas/TableColumn"
+            },
+            "type": "array",
+            "title": "Columns"
+          },
+          "rows": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Rows"
+          }
+        },
+        "type": "object",
+        "required": [
+          "columns",
+          "rows"
+        ],
+        "title": "TableViz",
+        "description": "Tabular visualization with typed columns and row data.\n\nRows are dictionaries keyed by `TableColumn.id`.\n\nAttributes:\n    type: Fixed discriminator `\"table\"`.\n    columns: Column definitions.\n    rows: List of row dicts."
       },
       "TaskState": {
         "type": "string",

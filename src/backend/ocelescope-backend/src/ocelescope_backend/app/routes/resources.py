@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-import json
 from typing import cast
 
-from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
 from pydantic.main import BaseModel
 
@@ -45,8 +43,8 @@ def download_resource(session: ApiSession, resource_id: str) -> TempFileResponse
         filename=f"{resource.name}.ocelescope",
     )
 
-    with open(file_response.tmp_path, "w", encoding="utf-8") as output_file:
-        json.dump(resource.export(), output_file, indent=2)
+    with session.open_resource(resource_id) as resource_instance:
+        resource_instance.write(file_response.tmp_path)
 
     return file_response
 
@@ -60,14 +58,8 @@ def download_resource_as_pnml(
     import pm4py
 
     resource = session.get_resource(id=resource_id)
-    resource_instance = registry_manager.get_resource_instance(
-        resource.data, registry_manager.BASE_PLUGIN_ID
-    )
-
-    if not isinstance(resource_instance, PetriNet):
-        raise HTTPException(status_code=400, detail="Resource is not a Petri net.")
-
-    pm4py_net, initial_marking, final_marking = resource_instance.to_pm4py()
+    with session.open_resource(resource_id, PetriNet) as petri_net:
+        pm4py_net, initial_marking, final_marking = petri_net.to_pm4py()
 
     file_response = TempFileResponse(
         prefix=resource.name,
@@ -88,18 +80,15 @@ class GetResourceResponse(BaseModel):
 def get_resource(session: ApiSession, resource_id: str) -> GetResourceResponse:
     resource = session.get_resource(resource_id)
 
-    resource_instance = registry_manager.get_resource_instance(resource.data)
-
-    return GetResourceResponse(
-        resource=ResourceApi(
-            id=resource_id,
-            resource_type_label=resource_instance.get_label(),
-            **resource.model_dump(),
-        ),
-        visualization=cast(Visualization, resource_instance.visualize())
-        if resource_instance is not None
-        else None,
-    )
+    with session.open_resource(resource_id) as resource_instance:
+        return GetResourceResponse(
+            resource=ResourceApi(
+                id=resource_id,
+                resource_type_label=resource_instance.get_label(),
+                **resource.model_dump(),
+            ),
+            visualization=cast(Visualization, resource_instance.visualize()),
+        )
 
 
 @resource_router.delete(path="/resource/{resource_id}", operation_id="deleteResource")

@@ -1,15 +1,17 @@
 from __future__ import annotations
 
 import json
+import shutil
 import tempfile
-from collections.abc import Callable, Hashable, Sequence
+from collections.abc import Callable, Generator, Hashable, Sequence
+from contextlib import AbstractContextManager, contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, ClassVar, Self, TypeVar, cast
+from typing import Any, ClassVar, Self, TypeVar, cast, overload
 from uuid import uuid4
 
-from ocelescope import OCEL, BaseFilter
-from ocelescope_backend.app.internal.exceptions import NotFound
+from ocelescope import OCEL, BaseFilter, ResourceBase
+from ocelescope_backend.app.internal.exceptions import BadRequest, NotFound
 from ocelescope_backend.app.internal.model.ocel import SessionOCEL
 from ocelescope_backend.app.internal.model.resource import ResourceApi, ResourceStore
 from ocelescope_backend.app.internal.registry import registry_manager
@@ -18,6 +20,7 @@ from ocelescope_backend.app.sse_manager import InvalidationRequest, sse_manager
 
 S = TypeVar("S", bound=TaskBase)
 T = TypeVar("T")
+R = TypeVar("R", bound=ResourceBase)
 
 
 class Session:
@@ -31,7 +34,6 @@ class Session:
 
         # Tasks
         self._tasks: dict[str, TaskBase] = {}
-        self._running_tasks: dict[str, TaskBase] = {}
         self._dedupe_keys: dict[Hashable, str] = {}  # dedupe key → task_id
 
         # Plugins
@@ -39,6 +41,9 @@ class Session:
 
         # Resources
         self._resources: dict[str, ResourceStore] = {}
+        self._resource_dir = Path(
+            tempfile.mkdtemp(prefix=f"ocelescope_{self.id}_resources_")
+        )
 
         # OCELS
         self.ocels: dict[str, SessionOCEL] = {}
@@ -54,10 +59,6 @@ class Session:
     @property
     def tasks(self):
         return self._tasks
-
-    @property
-    def running_tasks(self):
-        return self._running_tasks
 
     def get_task(self, task_id: str):
         return self._tasks.get(task_id, None)
@@ -94,45 +95,41 @@ class Session:
     def update_state(self):
         self.state = str(uuid4())
 
+    def close(self) -> None:
+        """Forget the session and delete the files of its OCELs and resources."""
+        Session.sessions.pop(self.id, None)
+        shutil.rmtree(self._ocel_dir, ignore_errors=True)
+        shutil.rmtree(self._resource_dir, ignore_errors=True)
+
     # region OCEL management
-    def _register_ocel(
-        self,
-        id: str,
-        db_path: Path,
-        name: str,
-        created_at: str,
-    ) -> str:
+    def dump_ocel(self, ocel: OCEL) -> Path:
+        """Persist an OCEL to its own DuckDB file without adding it to the session."""
+        db_path = self._ocel_dir / f"{uuid4()}.duckdb"
+        ocel.to_duckdb(db_path)
+        return db_path
+
+    def add_ocel(self, ocel: OCEL | Path, name: str) -> str:
+        """Add an OCEL to the session.
+
+        ``ocel`` is either an OCEL, which is dumped, or a DuckDB file written by
+        :meth:`dump_ocel` (e.g. a plugin result), which is copied.
+        """
+        if isinstance(ocel, OCEL):
+            db_path = self.dump_ocel(ocel)
+        else:
+            db_path = self._ocel_dir / f"{uuid4()}.duckdb"
+            shutil.copyfile(ocel, db_path)
+
+        id = str(uuid4())
         self.ocels[id] = SessionOCEL(
             id=id,
             db_path=db_path,
             name=name,
-            created_at=created_at,
-        )
-        sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
-        return id
-
-    def add_ocel(self, ocel: OCEL, name: str) -> str:
-        """Persist an in-memory OCEL to a DuckDB file and register a handle."""
-        ocel_id = str(uuid4())
-
-        db_path = self._ocel_dir / f"{ocel_id}.duckdb"
-        ocel.to_duckdb(db_path)
-
-        return self._register_ocel(
-            ocel_id,
-            db_path,
-            name,
             created_at=datetime.now(tz=UTC).isoformat(),
         )
+        sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
 
-    def add_ocel_from_file(self, source_path: Path, name: str) -> str:
-        """Register an OCEL file, streamed entity by entity into its own DuckDB file.
-
-        The log is never materialized as a whole, so peak memory stays bounded by its
-        widest single entity however big the upload is.
-        """
-        with OCEL.read(source_path) as ocel:
-            return self.add_ocel(ocel, name=name)
+        return id
 
     def get_ocel(self, ocel_id: str, use_original: bool = False) -> OCEL:
         if ocel_id not in self.ocels:
@@ -184,11 +181,49 @@ class Session:
 
     # endregion
     # region Resource management
-    def add_resource(self, resource: ResourceStore) -> str:
+    def dump_resource(
+        self, resource: ResourceBase, name: str, source_id: str | None = None
+    ) -> ResourceStore:
+        """Dump a resource into its own file without adding it to the session."""
+        path = self._resource_dir / str(uuid4())
+        try:
+            resource.dump(path)
+        except Exception:
+            path.unlink(missing_ok=True)
+            raise
+
+        return ResourceStore(
+            path=path,
+            name=name,
+            schema_hash=resource.get_schema_hash(),
+            source_id=source_id,
+        )
+
+    def add_resource(
+        self,
+        resource: ResourceBase | ResourceStore,
+        name: str,
+        source_id: str | None = None,
+    ) -> str:
+        """Add a resource to the session.
+
+        ``resource`` is either a resource, which is dumped, or a store written by
+        :meth:`dump_resource` (e.g. a plugin result), whose file is copied.
+        """
+        if isinstance(resource, ResourceBase):
+            store = self.dump_resource(resource, name, source_id)
+        else:
+            path = self._resource_dir / str(uuid4())
+            shutil.copyfile(resource.path, path)
+            store = ResourceStore(
+                path=path,
+                name=name,
+                schema_hash=resource.schema_hash,
+                source_id=source_id or resource.source_id,
+            )
+
         id = str(uuid4())
-
-        self._resources[id] = resource
-
+        self._resources[id] = store
         sse_manager.send_safe(self.id, InvalidationRequest(routes=["resources"]))
 
         return id
@@ -198,8 +233,66 @@ class Session:
             raise NotFound(f"Resource with id {id} not found")
         return self._resources[id]
 
+    def _resource_class(
+        self, store: ResourceStore, resource_class: type[R] | None
+    ) -> type[R | ResourceBase]:
+        if resource_class is None:
+            return registry_manager.get_resource_class(store.schema_hash)
+        if store.schema_hash != resource_class.get_schema_hash():
+            raise BadRequest(f"Resource is not a {resource_class.__name__}.")
+        return resource_class
+
+    @overload
+    def load_resource(self, id: str) -> ResourceBase: ...
+    @overload
+    def load_resource(self, id: str, resource_class: type[R]) -> R: ...
+    def load_resource(
+        self, id: str, resource_class: type[R] | None = None
+    ) -> R | ResourceBase:
+        """An in-memory copy of the stored resource the caller may modify.
+
+        ``resource_class`` defaults to the class registered for its schema hash.
+
+        Raises:
+            NotFound: If there is no resource with ``id``.
+            BadRequest: If the resource is not a ``resource_class``.
+        """
+        store = self.get_resource(id)
+        return self._resource_class(store, resource_class).load(
+            store.path, resolve=registry_manager.get_resource_class
+        )
+
+    @overload
+    def open_resource(self, id: str) -> AbstractContextManager[ResourceBase]: ...
+    @overload
+    def open_resource(
+        self, id: str, resource_class: type[R]
+    ) -> AbstractContextManager[R]: ...
+    def open_resource(
+        self, id: str, resource_class: type[R] | None = None
+    ) -> AbstractContextManager[R | ResourceBase]:
+        """A read-only view on the stored resource, valid for the block.
+
+        Raises:
+            NotFound: If there is no resource with ``id``.
+            BadRequest: If the resource is not a ``resource_class``.
+        """
+        return self.open_store(self.get_resource(id), resource_class)
+
+    @contextmanager
+    def open_store(
+        self, store: ResourceStore, resource_class: type[R] | None = None
+    ) -> Generator[R | ResourceBase]:
+        """A read-only view on a dumped resource, valid for the block."""
+        with self._resource_class(store, resource_class).open(
+            store.path, resolve=registry_manager.get_resource_class
+        ) as resource:
+            yield resource
+
     def delete_resource(self, id: str):
-        self._resources.pop(id, None)
+        store = self._resources.pop(id, None)
+        if store is not None:
+            store.delete()
         sse_manager.send_safe(self.id, InvalidationRequest(routes=["resources"]))
 
     def list_resources(self) -> list[ResourceApi]:
