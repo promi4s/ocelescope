@@ -1,3 +1,4 @@
+import alignments from "@ocelescope/alignments";
 import type { OcelescopeConfig } from "@ocelescope/core";
 import discovery from "@ocelescope/discovery";
 import exploration from "@ocelescope/exploration";
@@ -5,6 +6,7 @@ import filter from "@ocelescope/filter";
 import overview from "@ocelescope/log-overview";
 import management from "@ocelescope/management";
 import ocelot from "@ocelescope/ocelot";
+import ocpnEditor from "@ocelescope/ocpn-editor";
 import plugin from "@ocelescope/plugin";
 import variants from "@ocelescope/variants";
 export default {
@@ -16,6 +18,8 @@ export default {
     discovery,
     filter,
     ocelot,
+    alignments,
+    ocpnEditor,
     variants,
   ],
   navbarGroups: [
@@ -32,6 +36,9 @@ export default {
     {
       modulesNames: [plugin.name],
     },
-    { title: "Modules", modulesNames: [ocelot.name] },
+    {
+      title: "Modules",
+      modulesNames: [ocelot.name, alignments.name, ocpnEditor.name],
+    },
   ],
 } satisfies OcelescopeConfig;

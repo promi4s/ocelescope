@@ -11,6 +11,7 @@
     "format": "biome format --write"
   },
   "dependencies": {
+    "@ocelescope/alignments": "catalog:",
     "@ocelescope/api-base": "workspace:^",
     "@ocelescope/api-client": "workspace:^",
     "@ocelescope/core": "workspace:^",
@@ -19,7 +20,9 @@
     "@ocelescope/log-overview": "workspace:^",
     "@ocelescope/management": "workspace:^",
     "@ocelescope/ocelot": "catalog:",
+    "@ocelescope/ocpn-editor": "catalog:",
     "@ocelescope/plugin": "workspace:^",
+    "@ocelescope/resources": "workspace:^",
     "@ocelescope/variants": "workspace:^",
     "next": "catalog:",
     "react": "catalog:",
