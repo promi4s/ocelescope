@@ -22,6 +22,8 @@ catalog:
   "@mantine/notifications": ^9.7.2
   "@marko19907/string-to-color": ^1.0.2
   "@monaco-editor/react": ^4.7.0
+  '@ocelescope/alignments': ^0.10.4
+  '@ocelescope/ocpn-editor': ^0.10.5
   '@ocelescope/ocelot': ^0.8.0
   '@r4pm/components': ^0.3.2
   "@rjsf/core": ^6.8.0
@@ -81,6 +83,8 @@ ignoredBuiltDependencies:
   - sharp
 
 minimumReleaseAgeExclude:
+  - '@ocelescope/alignments@0.10.4'
+  - '@ocelescope/ocpn-editor@0.10.5'
   - '@ocelescope/ocelot@0.5.0 || 0.6.0 || 0.6.1 || 0.8.0'
   - "@cspell/cspell-bundled-dicts@10.4.0"
   - "@cspell/cspell-json-reporter@10.4.0"
