@@ -1,16 +1,15 @@
 import {
   ActionIcon,
-  ActionIconGroup,
   Box,
   Center,
+  Divider,
   Group,
-  ScrollArea,
   Stack,
   Text,
   Title,
   Tooltip,
 } from "@mantine/core";
-import { CheckIcon, RotateCcwIcon, Trash2Icon } from "lucide-react";
+import { CheckIcon, InfoIcon, RotateCcwIcon, Trash2Icon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import type { FilterKey, NativeFilter, Pipeline } from "../types/filter";
@@ -24,7 +23,7 @@ type FilterFormProps = {
 };
 
 const CLEANUP_NOTE =
-  "After the last step the log is cleaned up: relations whose event or object is gone are removed, events without at least one E2O relation are filtered out, and objects without any E2O or O2O relation are filtered out too.";
+  "The steps run from top to bottom. After the last step the log is cleaned up: relations whose event or object is gone are removed, events without at least one E2O relation are filtered out, and objects without any E2O or O2O relation are filtered out too.";
 
 const FilterForm = ({ ocelId, currentFilter, onSubmit }: FilterFormProps) => {
   const { control, handleSubmit, reset, formState } = useForm<Pipeline>({
@@ -102,20 +101,31 @@ const FilterForm = ({ ocelId, currentFilter, onSubmit }: FilterFormProps) => {
       <Stack
         w={320}
         gap="sm"
-        p="md"
+        py="md"
         style={{ borderLeft: "1px solid var(--mantine-color-default-border)" }}
       >
-        <Group justify="space-between" wrap="nowrap">
-          <Title order={5}>Pipeline</Title>
-          <ActionIconGroup>
+        <Group justify="space-between" wrap="nowrap" h={28} px="md">
+          <Group gap={6} wrap="nowrap">
+            <Title order={5} lh={1}>
+              Pipeline
+            </Title>
+            <Tooltip label={CLEANUP_NOTE} multiline w={280} withArrow>
+              <InfoIcon
+                size={16}
+                color="var(--mantine-color-dimmed)"
+                aria-label="How the pipeline is applied"
+              />
+            </Tooltip>
+          </Group>
+          <Group justify="flex-end" gap={4} wrap="nowrap" ml="auto">
             {formState.isDirty && (
               <>
                 <Tooltip label="Apply">
                   <ActionIcon
+                    variant="subtle"
                     onClick={handleSubmit((data) =>
                       onSubmit?.(completeSteps(data.steps)),
                     )}
-                    size="lg"
                     color="green"
                   >
                     <CheckIcon size={20} />
@@ -123,7 +133,7 @@ const FilterForm = ({ ocelId, currentFilter, onSubmit }: FilterFormProps) => {
                 </Tooltip>
                 <Tooltip label="Discard changes">
                   <ActionIcon
-                    size="lg"
+                    variant="subtle"
                     color="yellow"
                     onClick={() => reset({ steps: currentFilter })}
                   >
@@ -135,7 +145,7 @@ const FilterForm = ({ ocelId, currentFilter, onSubmit }: FilterFormProps) => {
             {currentFilter.length > 0 && (
               <Tooltip label="Remove all filters">
                 <ActionIcon
-                  size="lg"
+                  variant="subtle"
                   color="red"
                   onClick={() => onSubmit?.([])}
                 >
@@ -143,22 +153,21 @@ const FilterForm = ({ ocelId, currentFilter, onSubmit }: FilterFormProps) => {
                 </ActionIcon>
               </Tooltip>
             )}
-          </ActionIconGroup>
+          </Group>
         </Group>
-        <ScrollArea flex={1} mih={0} type="auto" offsetScrollbars>
-          <PipelineList
-            ids={ids}
-            steps={steps}
-            selectedId={selectedId}
-            onSelect={setSelectedId}
-            onRemove={remove}
-            onMove={move}
-            onAdd={addStep}
-          />
-        </ScrollArea>
-        <Text size="xs" c="dimmed">
-          {CLEANUP_NOTE}
-        </Text>
+        <Divider />
+        <PipelineList
+          flex={1}
+          mih={0}
+          px="md"
+          ids={ids}
+          steps={steps}
+          selectedId={selectedId}
+          onSelect={setSelectedId}
+          onRemove={remove}
+          onMove={move}
+          onAdd={addStep}
+        />
       </Stack>
     </Group>
   );
