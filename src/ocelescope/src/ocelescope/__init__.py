@@ -3,6 +3,7 @@ import matplotlib
 from ocelescope.ocel import (
     OCEL,
     BaseFilter,
+    Clean,
     E2OCountFilter,
     EventAttributeFilter,
     EventTypeFilter,
@@ -12,7 +13,9 @@ from ocelescope.ocel import (
     ObjectIdFilter,
     ObjectTypeFilter,
     ObjectTypeFrequencyFilter,
+    OCELView,
     TimeFrameFilter,
+    ViewOperation,
 )
 from ocelescope.plugin import (
     CODE_FIELD,
@@ -73,6 +76,7 @@ __all__ = [
     "SLIDER_FIELD",
     "SQL_FIELD",
     "BaseFilter",
+    "Clean",
     "DirectlyFollowsGraph",
     "DotVis",
     "E2OCountFilter",
@@ -89,6 +93,7 @@ __all__ = [
     "LayoutConfig",
     "O2OCountFilter",
     "OCELAnnotation",
+    "OCELView",
     "ObjectAttributeFilter",
     "ObjectIdFilter",
     "ObjectTypeFilter",
@@ -107,6 +112,7 @@ __all__ = [
     "TableViz",
     "TabularResource",
     "TimeFrameFilter",
+    "ViewOperation",
     "Visualization",
     "generate_color_map",
     "plugin_method",

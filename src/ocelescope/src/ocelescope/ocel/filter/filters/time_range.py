@@ -1,9 +1,14 @@
 from typing import Literal
 
-import polars as pl
-
 from ocelescope.ocel.constants.pm4py import EID_COL, TIMESTAMP_COL
-from ocelescope.ocel.filter.base import BaseFilter, Keep, utc_bound
+from ocelescope.ocel.constants.tables import EVENTS_TABLE
+from ocelescope.ocel.filter.base import (
+    BaseFilter,
+    Step,
+    timestamp_literal,
+    utc_bound,
+)
+from ocelescope.util.sql import ident
 
 
 class TimeFrameFilter(BaseFilter):
@@ -12,15 +17,23 @@ class TimeFrameFilter(BaseFilter):
     time_range: tuple[str | None, str | None]
     mode: Literal["exclude", "include"] = "include"
 
-    def keep(self, ocel) -> Keep:
-        start, end = (utc_bound(bound) for bound in self.time_range)
+    def build(self, step: Step) -> None:
+        timestamp = ident(TIMESTAMP_COL)
+        conditions = [
+            f"{timestamp} {comparison} {timestamp_literal(bound)}"
+            for bound, comparison in zip(
+                (utc_bound(bound) for bound in self.time_range),
+                (">=", "<="),
+                strict=True,
+            )
+            if bound is not None
+        ]
 
-        within = pl.lit(True)
-        if start is not None:
-            within = within & (pl.col(TIMESTAMP_COL) >= pl.lit(start))
-        if end is not None:
-            within = within & (pl.col(TIMESTAMP_COL) <= pl.lit(end))
+        within = " AND ".join(conditions) or "true"
         if self.mode == "exclude":
-            within = ~within
+            within = f"NOT ({within})"
 
-        return Keep(events=ocel.events.pl.filter(within).select(EID_COL))
+        step.keep(
+            EVENTS_TABLE,
+            f"SELECT {ident(EID_COL)} FROM {step[EVENTS_TABLE]} WHERE {within}",
+        )

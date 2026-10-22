@@ -1,6 +1,7 @@
 from collections.abc import Sequence
 from pathlib import Path
 
+from ocelescope.ocel.filter import filter_view
 from ocelescope.ocel.io import export_duckdb_ocel
 
 from ocelescope import OCEL, BaseFilter
@@ -37,9 +38,10 @@ class SessionOCEL:
     def _active_path(self, use_original: bool) -> Path:
         """The DuckDB file to read: the origin, or the (once-computed) filtered one.
 
-        The filtered file is built by reading the origin, applying the pipeline and
-        writing the result back out -- so the cost is paid here, when the pipeline
-        changes, rather than on every read.
+        The filtered file is built by viewing the origin through the pipeline and
+        having DuckDB write the view out -- so the cost is paid here, when the
+        pipeline changes, rather than on every read, and the log never passes
+        through Python on the way.
 
         """
         filters = self._all_filters()
@@ -52,9 +54,9 @@ class SessionOCEL:
             )
             with (
                 OCEL.read_duckdb(self.db_path, read_only=True) as origin,
-                origin.filter(filters) as subset,
+                filter_view(origin, filters) as view,
             ):
-                subset.to_duckdb(filtered)
+                view.to_duckdb(filtered)
             self._filtered_db_path = filtered
         return self._filtered_db_path
 

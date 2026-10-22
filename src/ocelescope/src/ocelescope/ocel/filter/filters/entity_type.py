@@ -1,18 +1,19 @@
 from typing import Annotated, Literal
 
-import polars as pl
 from pydantic import Field
 
 from ocelescope.ocel.constants.pm4py import ACTIVITY_COL, EID_COL, OID_COL, OTYPE_COL
-from ocelescope.ocel.filter.base import BaseFilter, Keep
+from ocelescope.ocel.constants.tables import EVENTS_TABLE, OBJECTS_TABLE
+from ocelescope.ocel.filter.base import BaseFilter, Step
+from ocelescope.util.sql import ident, in_list
 
 
 def _selected(
     column: str, values: list[str], mode: Literal["exclude", "include"]
-) -> pl.Expr:
-    """Whether ``column`` is (or, excluding, is not) one of ``values``."""
-    is_selected = pl.col(column).is_in(values)
-    return ~is_selected if mode == "exclude" else is_selected
+) -> str:
+    """SQL for whether ``column`` is (or, excluding, is not) one of ``values``."""
+    is_selected = in_list(ident(column), values)
+    return f"NOT ({is_selected})" if mode == "exclude" else is_selected
 
 
 class EventTypeFilter(BaseFilter):
@@ -23,11 +24,12 @@ class EventTypeFilter(BaseFilter):
     ]
     mode: Literal["exclude", "include"] = "exclude"
 
-    def keep(self, ocel) -> Keep:
-        events = ocel.events.pl.filter(
-            _selected(ACTIVITY_COL, self.event_types, self.mode)
+    def build(self, step: Step) -> None:
+        step.keep(
+            EVENTS_TABLE,
+            f"SELECT {ident(EID_COL)} FROM {step[EVENTS_TABLE]} "
+            f"WHERE {_selected(ACTIVITY_COL, self.event_types, self.mode)}",
         )
-        return Keep(events=events.select(EID_COL))
 
 
 class ObjectTypeFilter(BaseFilter):
@@ -38,11 +40,12 @@ class ObjectTypeFilter(BaseFilter):
     ]
     mode: Literal["exclude", "include"] = "exclude"
 
-    def keep(self, ocel) -> Keep:
-        objects = ocel.objects.pl.filter(
-            _selected(OTYPE_COL, self.object_types, self.mode)
+    def build(self, step: Step) -> None:
+        step.keep(
+            OBJECTS_TABLE,
+            f"SELECT {ident(OID_COL)} FROM {step[OBJECTS_TABLE]} "
+            f"WHERE {_selected(OTYPE_COL, self.object_types, self.mode)}",
         )
-        return Keep(objects=objects.select(OID_COL))
 
 
 class ObjectIdFilter(BaseFilter):
@@ -51,6 +54,9 @@ class ObjectIdFilter(BaseFilter):
     object_ids: list[str]
     mode: Literal["exclude", "include"] = "include"
 
-    def keep(self, ocel) -> Keep:
-        objects = ocel.objects.pl.filter(_selected(OID_COL, self.object_ids, self.mode))
-        return Keep(objects=objects.select(OID_COL))
+    def build(self, step: Step) -> None:
+        step.keep(
+            OBJECTS_TABLE,
+            f"SELECT {ident(OID_COL)} FROM {step[OBJECTS_TABLE]} "
+            f"WHERE {_selected(OID_COL, self.object_ids, self.mode)}",
+        )

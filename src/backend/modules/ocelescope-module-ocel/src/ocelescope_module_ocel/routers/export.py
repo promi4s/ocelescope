@@ -11,27 +11,14 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Annotated, Literal
 
-import polars as pl
 from fastapi import APIRouter, Query
-from ocelescope.ocel import Keep
+from ocelescope.ocel import ObjectIdFilter
 from ocelescope.ocel.constants.misc import OCELFileExtensions
-from ocelescope.ocel.constants.pm4py import OID_COL
 from ocelescope_backend.app.dependencies import ApiOcel, ApiSession
 from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.model.response import TempFileResponse
 
-from ocelescope import OCEL, BaseFilter
-
 router = APIRouter()
-
-
-class _ObjectIdKeep(BaseFilter):
-    """A ModuleFilter that keeps only the given object ids (for a variant sub-log)."""
-
-    object_ids: list[str]
-
-    def keep(self, ocel: OCEL) -> Keep:
-        return Keep(objects=pl.LazyFrame({OID_COL: self.object_ids}))
 
 
 @router.get("/{ocel_id}/download", summary="Download OCEL", operation_id="downloadOCEL")
@@ -103,6 +90,6 @@ def download_variant_flat_log(
         prefix=tmp_file_prefix, suffix=".xes", filename=f"{name}_{object_type}.xes"
     )
 
-    with ocel.filter([_ObjectIdKeep(object_ids=object_ids)]) as variant_ocel:
+    with ocel.filter([ObjectIdFilter(object_ids=object_ids)]) as variant_ocel:
         variant_ocel.write_xes(object_type, Path(file_response.tmp_path))
     return file_response
