@@ -1,20 +1,18 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from datetime import UTC, datetime
-from typing import TYPE_CHECKING, NamedTuple
 
-import polars as pl
 from pydantic import BaseModel
 
-if TYPE_CHECKING:
-    from ocelescope.ocel.core import OCEL
+from ocelescope.ocel.view.step import Step, ViewOperation
+from ocelescope.util.sql import literal
 
 
 def utc_bound(value: str | None) -> datetime | None:
     """An ISO bound as the zone-less UTC timestamps are stored as -- an offset is
-    converted, not dropped. Polars will not compare a zone-aware literal against a
-    zone-less column at all, so the zone has to go before the comparison is built."""
+    converted, not dropped. A zone-aware literal would be compared in the session's
+    zone instead, so the zone has to go before the comparison is built."""
     if value is None:
         return None
     parsed = datetime.fromisoformat(value)
@@ -23,22 +21,26 @@ def utc_bound(value: str | None) -> datetime | None:
     return parsed.astimezone(UTC).replace(tzinfo=None)
 
 
-class Keep(NamedTuple):
-    """The ids a filter keeps.
+def timestamp_literal(value: datetime) -> str:
+    """``value`` as a SQL ``TIMESTAMP`` literal."""
+    return f"TIMESTAMP {literal(value.isoformat(sep=' '))}"
 
-    ``events`` / ``objects`` are single-column lazy frames of the surviving event /
-    object ids. ``None`` on a side means "keep all" of that entity, which is not
-    the same as an empty frame -- that keeps none.
+
+def number_literal(value: float) -> str:
+    """``value`` as a SQL ``DOUBLE``; cast from text so ``inf`` and ``nan`` survive."""
+    return f"CAST({literal(repr(float(value)))} AS DOUBLE)"
+
+
+class BaseFilter(BaseModel, ViewOperation):
+    """A step that only drops events and objects, never changes them.
+
+    A filter narrows the log with :meth:`Step.keep` and leaves cleaning up to
+    the one :class:`Clean` :func:`filter_view` puts after the last filter. So
+    the log a filter reads need not be clean: a relation can point at an event
+    or object an earlier filter dropped, and an entity can be in no relation.
+    Join a relation to the events and objects to read only those still there.
     """
 
-    events: pl.LazyFrame | None = None
-    objects: pl.LazyFrame | None = None
-
-
-class BaseFilter(BaseModel, ABC):
-    """A valid subset of an OCEL, expressed as the event/object ids to keep."""
-
     @abstractmethod
-    def keep(self, ocel: OCEL) -> Keep:
-        """Return the event/object ids to keep as a :class:`Keep`."""
-        ...
+    def build(self, step: Step) -> None:
+        """Narrow ``step``'s events and/or objects with :meth:`Step.keep`."""

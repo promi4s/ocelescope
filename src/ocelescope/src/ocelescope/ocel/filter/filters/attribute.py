@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import polars as pl
-
 from ocelescope.ocel.constants.pm4py import (
     ACTIVITY_COL,
     EID_COL,
@@ -17,8 +15,19 @@ from ocelescope.ocel.constants.tables import (
     OBJECT_CHANGES_TABLE,
     OBJECTS_TABLE,
 )
-from ocelescope.ocel.filter.base import BaseFilter, Keep, utc_bound
+from ocelescope.ocel.filter.base import (
+    BaseFilter,
+    Step,
+    number_literal,
+    timestamp_literal,
+    utc_bound,
+)
 from ocelescope.util.sql import ident, literal
+
+
+def _attribute_names(step: Step, table: str) -> list[str]:
+    """The attributes ``table`` has a column for -- every one not an OCEL column."""
+    return [column for column in step.columns(table) if not column.startswith("ocel:")]
 
 
 class _AttributeFilter(BaseFilter):
@@ -42,13 +51,16 @@ class _AttributeFilter(BaseFilter):
     values: list[str | int | float] | None = None
     regex: str | None = None
 
-    def _match(self, params: list[object]) -> str:
-        """The condition on ``value``, appending its binds to ``params``.
+    def _match(self) -> str:
+        """The condition on ``value``.
 
         Casts rather than compares directly: an attribute is stored under the type
         the log declares for it, which a bound of a different kind would not
         compare against at all. ``TRY_CAST`` makes a value that contradicts the
         condition's kind NULL, so it fails the comparison instead of the query.
+
+        Values are inlined as literals rather than bound: the query ends up in a
+        view, and a view cannot take parameters.
         """
         conditions: list[str] = []
 
@@ -56,72 +68,74 @@ class _AttributeFilter(BaseFilter):
             low, high = self.number_range
             for bound, comparison in ((low, ">="), (high, "<=")):
                 if bound is not None:
-                    conditions.append(f"TRY_CAST(value AS DOUBLE) {comparison} ?")
-                    params.append(float(bound))
+                    conditions.append(
+                        f"TRY_CAST(value AS DOUBLE) {comparison} {number_literal(bound)}"
+                    )
 
         if self.time_range is not None:
             low, high = (utc_bound(bound) for bound in self.time_range)
             for bound, comparison in ((low, ">="), (high, "<=")):
                 if bound is not None:
-                    conditions.append(f"TRY_CAST(value AS TIMESTAMP) {comparison} ?")
-                    params.append(bound)
+                    conditions.append(
+                        f"TRY_CAST(value AS TIMESTAMP) {comparison} "
+                        f"{timestamp_literal(bound)}"
+                    )
 
         if self.values is not None:
             numeric = all(
                 isinstance(value, (int, float)) and not isinstance(value, bool)
                 for value in self.values
             )
-            placeholders = ", ".join(["?"] * len(self.values))
             if not self.values:
                 conditions.append("false")
             elif numeric:
-                conditions.append(f"TRY_CAST(value AS DOUBLE) IN ({placeholders})")
-                params.extend(float(value) for value in self.values)
+                values = ", ".join(
+                    number_literal(float(value)) for value in self.values
+                )
+                conditions.append(f"TRY_CAST(value AS DOUBLE) IN ({values})")
             else:
-                conditions.append(f"value::VARCHAR IN ({placeholders})")
-                params.extend(str(value) for value in self.values)
+                values = ", ".join(literal(str(value)) for value in self.values)
+                conditions.append(f"value::VARCHAR IN ({values})")
 
         if self.regex is not None:
-            conditions.append("regexp_matches(value::VARCHAR, ?)")
-            params.append(self.regex)
+            conditions.append(
+                f"regexp_matches(coalesce(value::VARCHAR, ''), {literal(self.regex)})"
+            )
 
         return " AND ".join(conditions) or "true"
 
-    def _keep(self, ocel, source: str, id_col: str) -> pl.LazyFrame:
+    def _keep(self, source: str, id_col: str) -> str:
         """The ids to keep, over a ``source`` selecting ``(id, type, value)``.
 
         The id goes back out under its own name: the engine intersects what the
         filters keep by joining the frames on it.
         """
-        params: list[object] = []
         if self.target_type is not None:
-            untouched = "type IS DISTINCT FROM ?"
-            params.append(self.target_type)
+            untouched = f"type IS DISTINCT FROM {literal(self.target_type)}"
         else:
             untouched = "type NOT IN (SELECT type FROM entity WHERE value IS NOT NULL)"
 
-        return ocel.sql(
+        return (
             f"WITH entity AS ({source}) "
             f"SELECT id AS {ident(id_col)} FROM entity "
-            f"WHERE {untouched} OR ({self._match(params)})",
-            params,
-        ).pl(lazy=True)
+            f"WHERE {untouched} OR ({self._match()})"
+        )
 
 
 class EventAttributeFilter(_AttributeFilter):
     """Keep the events whose attribute matches; activities without it are untouched."""
 
-    def keep(self, ocel) -> Keep:
-        if self.attribute not in ocel.events.attribute_names:
-            return Keep()
+    def build(self, step: Step) -> None:
+        if self.attribute not in _attribute_names(step, EVENTS_TABLE):
+            return
 
-        return Keep(
-            events=self._keep(
-                ocel,
+        step.keep(
+            EVENTS_TABLE,
+            self._keep(
                 f"SELECT {ident(EID_COL)} AS id, {ident(ACTIVITY_COL)} AS type, "
-                f"{ident(self.attribute)} AS value FROM {EVENTS_TABLE}",
+                f"{ident(self.attribute)} AS value FROM {step[EVENTS_TABLE]}",
                 EID_COL,
-            )
+            ),
         )
 
 
@@ -133,21 +147,21 @@ class ObjectAttributeFilter(_AttributeFilter):
     earliest is the one filtered on -- the object's value as it started out.
     """
 
-    def keep(self, ocel) -> Keep:
-        if self.attribute not in ocel.objects.attribute_names:
-            return Keep()
+    def build(self, step: Step) -> None:
+        if self.attribute not in _attribute_names(step, OBJECT_CHANGES_TABLE):
+            return
 
         oid, ts = ident(OID_COL), ident(TIMESTAMP_COL)
-        return Keep(
-            objects=self._keep(
-                ocel,
+        step.keep(
+            OBJECTS_TABLE,
+            self._keep(
                 f"SELECT o.{oid} AS id, o.{ident(OTYPE_COL)} AS type, earliest.value "
-                f"FROM {OBJECTS_TABLE} o LEFT JOIN ("
+                f"FROM {step[OBJECTS_TABLE]} o LEFT JOIN ("
                 f"SELECT {oid}, arg_min({ident(self.attribute)}, {ts}) AS value "
-                f"FROM {OBJECT_CHANGES_TABLE} "
+                f"FROM {step[OBJECT_CHANGES_TABLE]} "
                 f"WHERE {ident(OBJECT_CHANGED_FIELD)} = {literal(self.attribute)} "
                 f"GROUP BY {oid}"
                 f") earliest ON earliest.{oid} = o.{oid}",
                 OID_COL,
-            )
+            ),
         )

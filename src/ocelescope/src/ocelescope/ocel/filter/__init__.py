@@ -1,5 +1,5 @@
-from ocelescope.ocel.filter.base import BaseFilter, Keep
-from ocelescope.ocel.filter.engine import apply_filters
+from ocelescope.ocel.filter.base import BaseFilter
+from ocelescope.ocel.filter.engine import apply_filters, filter_view
 from ocelescope.ocel.filter.filters.attribute import (
     EventAttributeFilter,
     ObjectAttributeFilter,
@@ -22,7 +22,6 @@ __all__ = [
     "EventAttributeFilter",
     "EventTypeFilter",
     "EventTypeFrequencyFilter",
-    "Keep",
     "O2OCountFilter",
     "ObjectAttributeFilter",
     "ObjectIdFilter",
@@ -30,4 +29,5 @@ __all__ = [
     "ObjectTypeFrequencyFilter",
     "TimeFrameFilter",
     "apply_filters",
+    "filter_view",
 ]
