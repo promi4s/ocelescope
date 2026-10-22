@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
 from typing import Literal
 
-import polars as pl
 from pydantic import BaseModel
 
 from ocelescope.ocel.constants.pm4py import (
@@ -14,15 +12,18 @@ from ocelescope.ocel.constants.pm4py import (
     EID_COL,
     O2O_QUALIFIER,
     O2O_SOURCE_ID,
-    O2O_SOURCE_TYPE,
     O2O_TARGET_ID,
-    O2O_TARGET_TYPE,
     OID_COL,
     OTYPE_COL,
 )
-from ocelescope.ocel.filter.base import BaseFilter, Keep
-
-_COUNT = "__n"
+from ocelescope.ocel.constants.tables import (
+    E2O_TABLE,
+    EVENTS_TABLE,
+    O2O_TABLE,
+    OBJECTS_TABLE,
+)
+from ocelescope.ocel.filter.base import BaseFilter, Step
+from ocelescope.util.sql import ident, literal
 
 
 class RelationCountFilterConfig(BaseModel):
@@ -31,42 +32,46 @@ class RelationCountFilterConfig(BaseModel):
     range: tuple[int | None, int | None]
     qualifier: str | None = None
 
-
-def _in_range(count: pl.Expr, low: int | None, high: int | None) -> pl.Expr:
-    predicate = pl.lit(True)
-    if low is not None:
-        predicate = predicate & (count >= low)
-    if high is not None:
-        predicate = predicate & (count <= high)
-    return predicate
+    def _qualified(self, column: str) -> str:
+        """SQL restricting the relations to ``qualifier``, if one is set."""
+        if self.qualifier is None:
+            return ""
+        return f"AND {column} = {literal(self.qualifier)}"
 
 
 def _keep_counted(
-    entities: Callable[[], pl.LazyFrame],
-    counts: pl.LazyFrame,
-    matched: pl.Expr,
+    table: str,
     id_col: str,
+    type_col: str,
+    counted_type: str,
+    counted: str,
     count_range: tuple[int | None, int | None],
-) -> pl.LazyFrame:
+) -> str:
     """Ids of the counted type whose count is in range, plus every other entity.
 
+    ``counted`` selects, under ``id``, one row per matching relation of an entity.
     An entity of another type is not what the filter is about, so it is kept
     untouched. One of the counted type with no matching relation counts as zero
-    rather than going missing -- hence the left join and the fill -- so a "0 to 2"
-    filter keeps the ones that have none.
-
-    ``entities()`` is called afresh for each of the two scans: a table's LazyFrame
-    is bound to one DuckDB cursor and cannot be read twice in one query.
+    rather than going missing -- hence the left join and the coalesce -- so a
+    "0 to 2" filter keeps the ones that have none.
     """
-    counted = entities().filter(matched).select(id_col)
-    survivors = (
-        counted.join(counts, on=id_col, how="left")
-        .with_columns(pl.col(_COUNT).fill_null(0))
-        .filter(_in_range(pl.col(_COUNT), *count_range))
-        .select(id_col)
+    id_col, type_col = ident(id_col), ident(type_col)
+    count = "coalesce(counts.n, 0)"
+    low, high = count_range
+    in_range = " AND ".join(
+        f"{count} {comparison} {int(bound)}"
+        for bound, comparison in ((low, ">="), (high, "<="))
+        if bound is not None
     )
-    unaffected = entities().filter(~matched).select(id_col)
-    return pl.concat([unaffected, survivors]).unique()
+    counted_type = literal(counted_type)
+
+    return f"""
+        SELECT e.{id_col} FROM {table} e
+        LEFT JOIN (SELECT id, count(*) AS n FROM ({counted}) GROUP BY id) counts
+            ON counts.id = e.{id_col}
+        WHERE e.{type_col} <> {counted_type}
+            OR (e.{type_col} = {counted_type} AND {in_range or "true"})
+    """
 
 
 class E2OCountFilter(BaseFilter, RelationCountFilterConfig):
@@ -79,34 +84,42 @@ class E2OCountFilter(BaseFilter, RelationCountFilterConfig):
 
     direction: Literal["source", "target"] = "source"
 
-    def keep(self, ocel) -> Keep:
-        # The E2O table already carries the activity and the object type.
-        matched = ocel.e2o.pl.filter(
-            (pl.col(ACTIVITY_COL) == self.source) & (pl.col(OTYPE_COL) == self.target)
-        )
-        if self.qualifier is not None:
-            matched = matched.filter(pl.col(E2O_QUALIFIER) == self.qualifier)
+    def build(self, step: Step) -> None:
+        eid, oid = ident(EID_COL), ident(OID_COL)
+        counted_col = eid if self.direction == "source" else oid
+        counted = f"""
+            SELECT r.{counted_col} AS id FROM {step[E2O_TABLE]} r
+            JOIN {step[EVENTS_TABLE]} e USING ({eid})
+            JOIN {step[OBJECTS_TABLE]} o USING ({oid})
+            WHERE e.{ident(ACTIVITY_COL)} = {literal(self.source)}
+                AND o.{ident(OTYPE_COL)} = {literal(self.target)}
+                {self._qualified(f"r.{ident(E2O_QUALIFIER)}")}
+        """
 
         if self.direction == "source":
-            return Keep(
-                events=_keep_counted(
-                    entities=lambda: ocel.events.pl,
-                    counts=matched.group_by(EID_COL).agg(pl.len().alias(_COUNT)),
-                    matched=pl.col(ACTIVITY_COL) == self.source,
-                    id_col=EID_COL,
-                    count_range=self.range,
-                )
+            step.keep(
+                EVENTS_TABLE,
+                _keep_counted(
+                    step[EVENTS_TABLE],
+                    EID_COL,
+                    ACTIVITY_COL,
+                    self.source,
+                    counted,
+                    self.range,
+                ),
             )
-
-        return Keep(
-            objects=_keep_counted(
-                entities=lambda: ocel.objects.pl,
-                counts=matched.group_by(OID_COL).agg(pl.len().alias(_COUNT)),
-                matched=pl.col(OTYPE_COL) == self.target,
-                id_col=OID_COL,
-                count_range=self.range,
+        else:
+            step.keep(
+                OBJECTS_TABLE,
+                _keep_counted(
+                    step[OBJECTS_TABLE],
+                    OID_COL,
+                    OTYPE_COL,
+                    self.target,
+                    counted,
+                    self.range,
+                ),
             )
-        )
 
 
 class O2OCountFilter(BaseFilter, RelationCountFilterConfig):
@@ -119,26 +132,27 @@ class O2OCountFilter(BaseFilter, RelationCountFilterConfig):
 
     direction: Literal["source", "target"] = "source"
 
-    def keep(self, ocel) -> Keep:
-        matched = ocel.o2o.typed_pl.filter(
-            (pl.col(O2O_SOURCE_TYPE) == self.source)
-            & (pl.col(O2O_TARGET_TYPE) == self.target)
-        )
-        if self.qualifier is not None:
-            matched = matched.filter(pl.col(O2O_QUALIFIER) == self.qualifier)
-
+    def build(self, step: Step) -> None:
+        oid, otype = ident(OID_COL), ident(OTYPE_COL)
         is_source = self.direction == "source"
-        key_col = O2O_SOURCE_ID if is_source else O2O_TARGET_ID
-        counted_type = self.source if is_source else self.target
+        counted_col = ident(O2O_SOURCE_ID if is_source else O2O_TARGET_ID)
+        counted = f"""
+            SELECT r.{counted_col} AS id FROM {step[O2O_TABLE]} r
+            JOIN {step[OBJECTS_TABLE]} s ON s.{oid} = r.{ident(O2O_SOURCE_ID)}
+            JOIN {step[OBJECTS_TABLE]} t ON t.{oid} = r.{ident(O2O_TARGET_ID)}
+            WHERE s.{otype} = {literal(self.source)}
+                AND t.{otype} = {literal(self.target)}
+                {self._qualified(f"r.{ident(O2O_QUALIFIER)}")}
+        """
 
-        return Keep(
-            objects=_keep_counted(
-                entities=lambda: ocel.objects.pl,
-                counts=matched.group_by(key_col)
-                .agg(pl.len().alias(_COUNT))
-                .rename({key_col: OID_COL}),
-                matched=pl.col(OTYPE_COL) == counted_type,
-                id_col=OID_COL,
-                count_range=self.range,
-            )
+        step.keep(
+            OBJECTS_TABLE,
+            _keep_counted(
+                step[OBJECTS_TABLE],
+                OID_COL,
+                OTYPE_COL,
+                self.source if is_source else self.target,
+                counted,
+                self.range,
+            ),
         )

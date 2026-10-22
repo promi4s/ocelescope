@@ -12,7 +12,6 @@ import polars as pl
 from pm4py.objects.ocel.obj import OCEL as PM4PYOCEL
 
 from ocelescope.ocel.constants.pm4py import (
-    EID_COL,
     O2O_QUALIFIER,
     O2O_SOURCE_ID,
     O2O_TARGET_ID,
@@ -20,6 +19,12 @@ from ocelescope.ocel.constants.pm4py import (
     OID_COL,
     OTYPE_COL,
     TIMESTAMP_COL,
+)
+from ocelescope.ocel.constants.tables import (
+    E2O_TABLE,
+    EVENTS_TABLE,
+    O2O_TABLE,
+    OBJECTS_TABLE,
 )
 from ocelescope.ocel.filter.base import BaseFilter
 from ocelescope.ocel.io import convert_ocel_duckdb, export_duckdb_ocel
@@ -31,10 +36,13 @@ from ocelescope.ocel.managers import (
     QuantityManager,
 )
 from ocelescope.ocel.managers.executions import ExecutionsManager
+from ocelescope.ocel.util.clean import kept_rows, surviving_ids
 from ocelescope.ocel.util.xes import create_ocel_from_xml, write_ocel_to_xes
-from ocelescope.util.sql import set_utc
+from ocelescope.util.sql import ident, set_utc
 
 _COPY_TARGET = "_copy_target"
+_KEPT_EVENTS = "_clean_kept_events"
+_KEPT_OBJECTS = "_clean_kept_objects"
 
 Frame = pd.DataFrame | pl.DataFrame | pl.LazyFrame
 
@@ -150,33 +158,33 @@ class OCEL:
         * an event with no E2O relation is dropped,
         * object changes follow their object.
 
-        Order matters: relations are pruned first, so the orphan checks that follow
-        read a relation table that is already true. Quantities are left alone.
+        The rules are :mod:`ocelescope.ocel.util.clean`'s, shared with the
+        :class:`Clean` view step. The surviving event and object ids are worked
+        out first, from the log as it is, then every table is cut down to them.
+        Quantities are left alone.
 
         Removing rows yourself (``ocel.events.df = ...``) leaves the log in exactly
-        that state, so this is what makes it whole again -- :meth:`filter` runs it
-        for you.
+        that state, so this is what makes it whole again -- :meth:`filter` applies
+        the same cleanup after its last filter.
         """
         con = self._con
-        con.execute(
-            f'DELETE FROM e2o WHERE "{EID_COL}" NOT IN (SELECT "{EID_COL}" FROM events) '
-            f'OR "{OID_COL}" NOT IN (SELECT "{OID_COL}" FROM objects)'
-        )
-        con.execute(
-            f'DELETE FROM o2o WHERE "{O2O_SOURCE_ID}" NOT IN (SELECT "{OID_COL}" FROM objects) '
-            f'OR "{O2O_TARGET_ID}" NOT IN (SELECT "{OID_COL}" FROM objects)'
-        )
-        con.execute(
-            f'DELETE FROM objects WHERE "{OID_COL}" NOT IN (SELECT "{OID_COL}" FROM e2o) '
-            f'AND "{OID_COL}" NOT IN (SELECT "{O2O_SOURCE_ID}" FROM o2o) '
-            f'AND "{OID_COL}" NOT IN (SELECT "{O2O_TARGET_ID}" FROM o2o)'
-        )
-        con.execute(
-            f'DELETE FROM events WHERE "{EID_COL}" NOT IN (SELECT "{EID_COL}" FROM e2o)'
-        )
-        con.execute(
-            f'DELETE FROM object_changes WHERE "{OID_COL}" NOT IN (SELECT "{OID_COL}" FROM objects)'
-        )
+        tables = {
+            name: ident(name)
+            for name in (EVENTS_TABLE, OBJECTS_TABLE, E2O_TABLE, O2O_TABLE)
+        }
+        events, objects = surviving_ids(tables)
+        kept_events, kept_objects = ident(_KEPT_EVENTS), ident(_KEPT_OBJECTS)
+
+        con.execute(f"CREATE OR REPLACE TEMP TABLE {kept_events} AS {events}")
+        try:
+            con.execute(f"CREATE OR REPLACE TEMP TABLE {kept_objects} AS {objects}")
+            for table, condition in kept_rows(kept_events, kept_objects).items():
+                con.execute(
+                    f"DELETE FROM {ident(table)} WHERE ({condition}) IS NOT TRUE"
+                )
+        finally:
+            con.execute(f"DROP TABLE IF EXISTS {kept_events}")
+            con.execute(f"DROP TABLE IF EXISTS {kept_objects}")
 
     def close(self) -> None:
         """Close the underlying connection, dropping an in-memory database."""
@@ -413,15 +421,16 @@ class OCEL:
         """
         Apply a sequence of filters to this OCEL instance.
 
-        Each filter names the event/object ids it keeps; the pipeline keeps what
-        all of them keep. The result is a new OCEL over its own database, cleaned
+        The filters run one after the other: each keeps some of the events and
+        objects the ones before it left, and the log is cleaned once at the end.
+        The result is a new OCEL over its own database, cleaned
         so it is a valid log in its own right: relations whose event or object is
         gone go too, and an entity left in no relation goes with them. This OCEL is
         untouched.
 
         Args:
             pipeline (list[BaseFilter]):
-                A list of filter objects, each implementing ``keep()``.
+                The filters to apply in order, each implementing ``keep()``.
 
         Returns:
             OCEL: A new OCEL instance holding the filtered log.
