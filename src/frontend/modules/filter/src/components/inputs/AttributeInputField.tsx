@@ -1,185 +1,145 @@
 import { Group, NumberInput, Text, TextInput } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
 import type { TypedAttribute } from "@ocelescope/api-base";
-
 import { memo } from "react";
-import { type Control, Controller } from "react-hook-form";
-import type { GroupedFilter } from "../../types/filter";
+import type { FilterOf } from "../../types/filter";
 
-type FilterPath = "event_attribute" | "object_attribute";
+type AttributeFilter = FilterOf<"event_attribute" | "object_attribute">;
 
-const StringFilterField = memo(function StringFilterField({
-  control,
-  name,
-}: {
-  control: Control<GroupedFilter>;
-  name: `${FilterPath}.${number}.regex`;
-}) {
-  return (
-    <Controller
-      name={name}
-      control={control}
-      render={({ field }) => (
-        <TextInput
-          value={field.value ?? ""}
-          onChange={field.onChange}
-          placeholder="Enter regex"
-        />
-      )}
-    />
-  );
-});
+type FieldProps = {
+  filter: AttributeFilter;
+  onChange: (filter: AttributeFilter) => void;
+};
 
-const NumberFilterField = memo(function NumberFilterField({
-  control,
-  name,
+const StringFilterField = ({ filter, onChange }: FieldProps) => (
+  <TextInput
+    value={filter.regex ?? ""}
+    onChange={(event) => onChange({ ...filter, regex: event.target.value })}
+    placeholder="Enter regex"
+  />
+);
+
+const NumberFilterField = ({
+  filter,
+  onChange,
   min,
   max,
   allowDecimals,
-}: {
-  control: Control<GroupedFilter>;
-  name: `${FilterPath}.${number}.number_range`;
-  min: number;
-  max: number;
-  allowDecimals?: boolean;
-}) {
+}: FieldProps & { min: number; max: number; allowDecimals?: boolean }) => {
+  const currentMin =
+    typeof filter.number_range?.[0] === "number"
+      ? filter.number_range[0]
+      : undefined;
+  const currentMax =
+    typeof filter.number_range?.[1] === "number"
+      ? filter.number_range[1]
+      : undefined;
+
+  const setRange = (low: number | undefined, high: number | undefined) =>
+    onChange({ ...filter, number_range: [low ?? null, high ?? null] });
+
   return (
-    <Controller
-      name={name}
-      control={control}
-      render={({ field }) => {
-        const currentMin =
-          typeof field.value?.[0] === "number" ? field.value[0] : undefined;
-        const currentMax =
-          typeof field.value?.[1] === "number" ? field.value[1] : undefined;
-
-        return (
-          <Group wrap="nowrap" align="end" gap="xs">
-            <NumberInput
-              value={currentMin}
-              min={min}
-              max={currentMax ?? max}
-              onChange={(nextMin) => {
-                field.onChange([nextMin, currentMax]);
-              }}
-              allowDecimal={allowDecimals}
-              style={{ flex: 1 }}
-            />
-
-            <Text c="dimmed" size="sm" pb={8}>
-              -
-            </Text>
-
-            <NumberInput
-              value={currentMax}
-              min={currentMin ?? min}
-              max={max}
-              allowDecimal={allowDecimals}
-              onChange={(nextMax) => {
-                field.onChange([currentMin, nextMax]);
-              }}
-              style={{ flex: 1 }}
-            />
-          </Group>
-        );
-      }}
-    />
+    <Group wrap="nowrap" align="end" gap="xs">
+      <NumberInput
+        value={currentMin}
+        min={min}
+        max={currentMax ?? max}
+        onChange={(next) =>
+          setRange(typeof next === "number" ? next : undefined, currentMax)
+        }
+        allowDecimal={allowDecimals}
+        style={{ flex: 1 }}
+      />
+      <Text c="dimmed" size="sm" pb={8}>
+        -
+      </Text>
+      <NumberInput
+        value={currentMax}
+        min={currentMin ?? min}
+        max={max}
+        allowDecimal={allowDecimals}
+        onChange={(next) =>
+          setRange(currentMin, typeof next === "number" ? next : undefined)
+        }
+        style={{ flex: 1 }}
+      />
+    </Group>
   );
-});
+};
 
-const DateFilterField = memo(function DateFilterField({
-  control,
-  name,
+const DateFilterField = ({
+  filter,
+  onChange,
   min,
   max,
-}: {
-  control: Control<GroupedFilter>;
-  name: `${FilterPath}.${number}.time_range`;
-  min: string;
-  max: string;
-  allowDecimals?: boolean;
-}) {
+}: FieldProps & { min: string; max: string }) => {
+  const [start, end] = filter.time_range ?? [null, null];
+
   return (
-    <Controller
-      name={name}
-      control={control}
-      render={({ field }) => {
-        return (
-          <Group wrap="nowrap" align="end" gap="xs">
-            <DateTimePicker
-              value={field.value?.[0] ?? undefined}
-              minDate={min}
-              maxDate={field.value?.[1] ?? max}
-              withSeconds
-              onChange={(nextMin) => {
-                field.onChange([nextMin, field.value?.[1] ?? max]);
-              }}
-              style={{ flex: 1 }}
-            />
-
-            <Text c="dimmed" size="sm" pb={8}>
-              -
-            </Text>
-
-            <DateTimePicker
-              value={field.value?.[1] ?? undefined}
-              minDate={field.value?.[0] ?? min}
-              maxDate={max}
-              withSeconds
-              onChange={(nextMax) => {
-                field.onChange([field.value?.[0] ?? min, nextMax]);
-              }}
-              style={{ flex: 1 }}
-            />
-          </Group>
-        );
-      }}
-    />
+    <Group wrap="nowrap" align="end" gap="xs">
+      <DateTimePicker
+        value={start ?? undefined}
+        minDate={min}
+        maxDate={end ?? max}
+        withSeconds
+        onChange={(next) =>
+          onChange({ ...filter, time_range: [next, end ?? max] })
+        }
+        style={{ flex: 1 }}
+      />
+      <Text c="dimmed" size="sm" pb={8}>
+        -
+      </Text>
+      <DateTimePicker
+        value={end ?? undefined}
+        minDate={start ?? min}
+        maxDate={max}
+        withSeconds
+        onChange={(next) =>
+          onChange({ ...filter, time_range: [start ?? min, next] })
+        }
+        style={{ flex: 1 }}
+      />
+    </Group>
   );
-});
+};
 
 export const AttributeInputField = memo(function AttributeInputField({
-  control,
   record,
-  path,
-}: {
-  control: Control<GroupedFilter>;
-  path: `${FilterPath}.${number}`;
-  record: Omit<TypedAttribute, "name" | "entity_type">;
-}) {
+  filter,
+  onChange,
+}: FieldProps & { record: Omit<TypedAttribute, "name" | "entity_type"> }) {
   switch (record.type) {
     case "string":
-      return <StringFilterField control={control} name={`${path}.regex`} />;
+      return <StringFilterField filter={filter} onChange={onChange} />;
     case "int":
       return (
         <NumberFilterField
-          control={control}
-          name={`${path}.number_range`}
+          filter={filter}
+          onChange={onChange}
           min={Number.parseInt(`${record.min}`, 10)}
           max={Number.parseInt(`${record.max}`, 10)}
           allowDecimals={false}
         />
       );
-    case "float": {
+    case "float":
       return (
         <NumberFilterField
-          control={control}
-          name={`${path}.number_range`}
+          filter={filter}
+          onChange={onChange}
           min={Number.parseFloat(`${record.min}`)}
           max={Number.parseFloat(`${record.max}`)}
         />
       );
-    }
     case "date":
       return (
         <DateFilterField
-          control={control}
-          name={`${path}.time_range`}
+          filter={filter}
+          onChange={onChange}
           min={record.min.toString()}
           max={record.max.toString()}
         />
       );
-
     default:
       return <Text size="sm">Not Implemented</Text>;
   }

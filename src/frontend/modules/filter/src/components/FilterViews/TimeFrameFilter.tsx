@@ -11,8 +11,7 @@ import { useTimeInfo } from "@ocelescope/api-base";
 import type { EChartsOption } from "echarts";
 import EChartsReact from "echarts-for-react";
 import { memo, useMemo } from "react";
-import { Controller, Watch } from "react-hook-form";
-import type { FilterView, FilterViewType } from "../../types/filter";
+import type { FilterKind, FilterPanel } from "../../types/filter";
 import dayjs from "../../util/dayjs";
 
 const DATE_FORMAT = "YYYY-MM-DD HH:mm";
@@ -119,12 +118,15 @@ const TimeFrameSlider: React.FC<{
   );
 };
 
-const TimeFrameFilterView: FilterView<"time_frame"> = memo(
-  ({ ocelId, control }) => {
+const TimeFramePanel: FilterPanel<"time_frame"> = memo(
+  ({ ocelId, filter, onChange }) => {
     const { data: timeInfo, isLoading } = useTimeInfo(ocelId, {
       periods: 100,
       ocel_version: "original",
     });
+    const [start, end] = filter.time_range;
+    const setRange = (time_range: [string | null, string | null]) =>
+      onChange({ ...filter, time_range });
 
     return (
       <Box pos={"relative"} w={"100%"} h={"100%"}>
@@ -132,60 +134,36 @@ const TimeFrameFilterView: FilterView<"time_frame"> = memo(
         {timeInfo && (
           <Grid justify="center" align="center">
             <Grid.Col span={12}>
-              <Watch
-                control={control}
-                name={
-                  [
-                    "time_frame.0.time_range.0",
-                    "time_frame.0.time_range.1",
-                  ] as const
-                }
-                render={([startTime, endTime]) => (
-                  <TimeGraph
-                    timeInfo={timeInfo}
-                    startDate={startTime ?? undefined}
-                    endDate={endTime ?? undefined}
-                  />
-                )}
+              <TimeGraph
+                timeInfo={timeInfo}
+                startDate={start ?? undefined}
+                endDate={end ?? undefined}
               />
             </Grid.Col>
-            <Controller
-              control={control}
-              name={"time_frame.0.time_range"}
-              defaultValue={[timeInfo.start_time, timeInfo.end_time]}
-              render={({ field }) => (
-                <>
-                  <Grid.Col span={3}>
-                    <DateTimePicker
-                      minDate={timeInfo.start_time}
-                      maxDate={field.value?.[1] ?? timeInfo.end_time}
-                      onChange={(newStart) => {
-                        field.onChange([newStart, field.value?.[1]]);
-                      }}
-                      value={field.value?.[0] ?? timeInfo.start_time}
-                    />
-                  </Grid.Col>
-                  <Grid.Col span={6}>
-                    <TimeFrameSlider
-                      onChange={field.onChange}
-                      timeInfo={timeInfo}
-                      startTime={field.value?.[0] ?? timeInfo.start_time}
-                      endTime={field.value?.[1] ?? timeInfo.end_time}
-                    />
-                  </Grid.Col>
-                  <Grid.Col span={3}>
-                    <DateTimePicker
-                      minDate={field.value?.[0] ?? timeInfo.start_time}
-                      maxDate={timeInfo.end_time}
-                      onChange={(newEnd) => {
-                        field.onChange([field.value?.[0], newEnd]);
-                      }}
-                      value={field.value?.[1] ?? timeInfo.end_time}
-                    />
-                  </Grid.Col>
-                </>
-              )}
-            />
+            <Grid.Col span={3}>
+              <DateTimePicker
+                minDate={timeInfo.start_time}
+                maxDate={end ?? timeInfo.end_time}
+                onChange={(newStart) => setRange([newStart, end])}
+                value={start ?? timeInfo.start_time}
+              />
+            </Grid.Col>
+            <Grid.Col span={6}>
+              <TimeFrameSlider
+                onChange={setRange}
+                timeInfo={timeInfo}
+                startTime={start ?? timeInfo.start_time}
+                endTime={end ?? timeInfo.end_time}
+              />
+            </Grid.Col>
+            <Grid.Col span={3}>
+              <DateTimePicker
+                minDate={start ?? timeInfo.start_time}
+                maxDate={timeInfo.end_time}
+                onChange={(newEnd) => setRange([start, newEnd])}
+                value={end ?? timeInfo.end_time}
+              />
+            </Grid.Col>
           </Grid>
         )}
       </Box>
@@ -193,21 +171,18 @@ const TimeFrameFilterView: FilterView<"time_frame"> = memo(
   },
 );
 
-export const TimeFrameFilter: FilterViewType<"time_frame"> = {
+const bound = (value: string | null, open: string) =>
+  value ? dayjs(value).format(DATE_FORMAT) : open;
+
+export const TimeFrameFilter: FilterKind<"time_frame"> = {
   title: "Timeframe",
   description:
-    "Filters events by their timestamp, keeping only those that occur within the selected time range. Use the date pickers or drag the range slider to set the start and end; the bar chart shows the event distribution over time, with events inside the range highlighted and events outside it dimmed.",
-  ViewComponent: TimeFrameFilterView,
-  generateDefault: () => [{ type: "time_frame", time_range: [null, null] }],
-  cleanUpFilters: (currentFilter) => {
-    if (
-      !currentFilter[0] ||
-      (currentFilter[0].time_range[0] == null &&
-        currentFilter[0].time_range[1] == null)
-    ) {
-      return [];
-    }
-
-    return [currentFilter[0]];
-  },
+    "Keeps only the events that occur within the selected time range. Use the date pickers or drag the range slider to set the start and end; the bar chart shows the event distribution over time, with events inside the range highlighted and events outside it dimmed.",
+  Panel: TimeFramePanel,
+  create: () => ({ type: "time_frame", time_range: [null, null] }),
+  summary: ({ time_range: [start, end] }) =>
+    start || end
+      ? `${bound(start, "start")} – ${bound(end, "end")}`
+      : "No range set",
+  isComplete: ({ time_range: [start, end] }) => start != null || end != null,
 };

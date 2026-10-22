@@ -1,12 +1,9 @@
 import { InlineStyles, Stack } from "@mantine/core";
 import { ActivityPicker, ObjectTypePicker } from "@ocelescope/core";
-import { Controller } from "react-hook-form";
-import type { FilterView, FilterViewType } from "../../types/filter";
+import type { FilterKind, FilterPanel } from "../../types/filter";
 
 const PICKER_CLASS = "ocelescope-type-filter-picker";
 
-// The picker's list scrolls after eight rows; here it takes the height of
-// the tab instead.
 const FillHeightStyles = () => (
   <>
     <InlineStyles
@@ -22,88 +19,68 @@ const FillHeightStyles = () => (
   </>
 );
 
-const EntityFilter: (
-  entityType: "events" | "objects",
-) => FilterView<"activity" | "object_type"> =
-  (entityType) =>
-  ({ ocelId, control }) => {
-    const isEvents = entityType === "events";
-    const Picker = isEvents ? ActivityPicker : ObjectTypePicker;
-
-    return (
-      <Controller
-        name={isEvents ? `activity.${0}` : `object_type.${0}`}
-        control={control}
-        render={({ field }) => {
-          const filter = field.value;
-          const selected =
-            filter?.type === "activity"
-              ? filter.event_types
-              : filter?.type === "object_type"
-                ? filter.object_types
-                : [];
-
-          return (
-            <Stack gap={4} flex={1} mih={0} className={PICKER_CLASS}>
-              <FillHeightStyles />
-              <Picker
-                variant="list"
-                multiple
-                cutoff
-                ocelId={ocelId}
-                ocelVersion="original"
-                value={selected}
-                onChange={(next) =>
-                  field.onChange(
-                    isEvents
-                      ? {
-                          type: "activity",
-                          event_types: next,
-                          mode: "include",
-                        }
-                      : {
-                          type: "object_type",
-                          object_types: next,
-                          mode: "include",
-                        },
-                  )
-                }
-              />
-            </Stack>
-          );
-        }}
-      />
-    );
-  };
-
-export const ActivityFilter: FilterViewType<"activity"> = {
-  title: "Activity",
-  description:
-    "Filters the event log by activity (the event type). Only events of the selected activities are kept. The list shows how many events exist per activity to help you decide what to keep.",
-  ViewComponent: EntityFilter("events"),
-  generateDefault: () => [
-    { type: "activity", event_types: [], mode: "include" },
-  ],
-  cleanUpFilters: (filter) => {
-    if (!filter[0] || filter[0].event_types.length === 0) {
-      return [];
-    }
-    return [filter[0]];
-  },
+const listed = (names: string[], noun: string) => {
+  if (names.length === 0) {
+    return `No ${noun} selected`;
+  }
+  const shown = names.slice(0, 2).join(", ");
+  return names.length > 2 ? `${shown} +${names.length - 2} more` : shown;
 };
 
-export const ObjectTypeFilter: FilterViewType<"object_type"> = {
+const ActivityPanel: FilterPanel<"activity"> = ({
+  ocelId,
+  filter,
+  onChange,
+}) => (
+  <Stack gap={4} flex={1} mih={0} className={PICKER_CLASS}>
+    <FillHeightStyles />
+    <ActivityPicker
+      variant="list"
+      multiple
+      cutoff
+      ocelId={ocelId}
+      ocelVersion="original"
+      value={filter.event_types}
+      onChange={(next) => onChange({ ...filter, event_types: next })}
+    />
+  </Stack>
+);
+
+const ObjectTypePanel: FilterPanel<"object_type"> = ({
+  ocelId,
+  filter,
+  onChange,
+}) => (
+  <Stack gap={4} flex={1} mih={0} className={PICKER_CLASS}>
+    <FillHeightStyles />
+    <ObjectTypePicker
+      variant="list"
+      multiple
+      cutoff
+      ocelId={ocelId}
+      ocelVersion="original"
+      value={filter.object_types}
+      onChange={(next) => onChange({ ...filter, object_types: next })}
+    />
+  </Stack>
+);
+
+export const ActivityFilter: FilterKind<"activity"> = {
+  title: "Activity",
+  description:
+    "Keeps only the events of the selected activities (the event types). The list shows how many events exist per activity to help you decide what to keep.",
+  Panel: ActivityPanel,
+  create: () => ({ type: "activity", event_types: [], mode: "include" }),
+  summary: (filter) => listed(filter.event_types, "activities"),
+  isComplete: (filter) => filter.event_types.length > 0,
+};
+
+export const ObjectTypeFilter: FilterKind<"object_type"> = {
   title: "Object Type",
   description:
-    "Filters the log by object type. Only objects of the selected types are kept. The list shows how many objects exist per type to help you decide what to keep.",
-  ViewComponent: EntityFilter("objects"),
-  generateDefault: () => [
-    { type: "object_type", object_types: [], mode: "include" },
-  ],
-  cleanUpFilters: (filter) => {
-    if (!filter[0] || filter[0].object_types.length === 0) {
-      return [];
-    }
-    return [filter[0]];
-  },
+    "Keeps only the objects of the selected types. The list shows how many objects exist per type to help you decide what to keep.",
+  Panel: ObjectTypePanel,
+  create: () => ({ type: "object_type", object_types: [], mode: "include" }),
+  summary: (filter) => listed(filter.object_types, "object types"),
+  isComplete: (filter) => filter.object_types.length > 0,
 };

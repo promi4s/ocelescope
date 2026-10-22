@@ -1,23 +1,20 @@
-import { ActionIcon, Switch, Text } from "@mantine/core";
+import { Button, Switch, Text } from "@mantine/core";
 import type { AggregatedAttribute, TypedAttribute } from "@ocelescope/api-base";
-import { PlusIcon, XIcon } from "lucide-react";
+import { CheckIcon } from "lucide-react";
 import type { DataTableColumn } from "mantine-datatable";
 import { useMemo, useState } from "react";
-import { type Control, useFieldArray } from "react-hook-form";
-import type { EventAttributeFilter, ObjectAttributeFilter } from "../api/base";
 import { AttributeInputField } from "../components/inputs/AttributeInputField";
-import type { GroupedFilter } from "../types/filter";
+import type { FilterOf } from "../types/filter";
 
-type FilterRecord = Omit<
-  EventAttributeFilter | ObjectAttributeFilter,
-  "target_type" | "type" | "attribute"
->;
+type AttributeFilter = FilterOf<"event_attribute" | "object_attribute">;
+
+type Condition = Omit<AttributeFilter, "target_type" | "type" | "attribute">;
 
 type AttributeUnion = AggregatedAttribute | TypedAttribute;
 
-const getInitialFilter = (
+const getInitialCondition = (
   attribute: Omit<TypedAttribute, "name" | "entity_type">,
-): FilterRecord => {
+): Condition => {
   switch (attribute.type) {
     case "string":
       return { regex: "" };
@@ -57,122 +54,90 @@ const getEntityType = (attribute: AttributeUnion): string | undefined => {
     : undefined;
 };
 
-const generateRecordId = (attribute: AttributeUnion) => {
-  const entityName = getEntityType(attribute);
+const recordId = (attribute: string, entityType?: string | null) =>
+  `${attribute}::${entityType ?? ""}`;
 
-  return `${attribute.name}::${entityName ?? ""}`;
-};
-
-type UseFilterColumnsProps = {
-  control: Control<GroupedFilter>;
-  path: "event_attribute" | "object_attribute";
+type UseAttributeFilterProps = {
+  filter: AttributeFilter;
+  onChange: (filter: AttributeFilter) => void;
 };
 
 export const useAttributeFilter = ({
-  path,
-  control,
-}: UseFilterColumnsProps) => {
-  const { fields, append, remove } = useFieldArray<
-    GroupedFilter,
-    "event_attribute" | "object_attribute"
-  >({
-    name: path,
-    control,
-  });
-
-  const filterIndexMap = useMemo(() => {
-    const map = new Map<string, number>();
-
-    fields.forEach(({ attribute, target_type }, index) => {
-      map.set(`${attribute}::${target_type ?? ""}`, index);
-    });
-
-    return map;
-  }, [fields]);
-
-  const [showOnlyFiltered, setShowOnlyFiltered] = useState(false);
-
-  const filteredAttributeNames = useMemo(
-    () => Array.from(new Set(fields.map(({ attribute }) => attribute))),
-    [fields],
-  );
+  filter,
+  onChange,
+}: UseAttributeFilterProps) => {
+  const [showOnlySelected, setShowOnlySelected] = useState(false);
+  const selectedId = filter.attribute
+    ? recordId(filter.attribute, filter.target_type)
+    : undefined;
 
   const filterColumns = useMemo<DataTableColumn<AttributeUnion>[]>(
     () => [
       {
         accessor: "filter",
-        title: "Filter",
+        title: "Condition",
         filter: () => (
           <Switch
-            label="Show only filtered attributes"
-            checked={showOnlyFiltered}
+            label="Show only the selected attribute"
+            checked={showOnlySelected}
             onChange={(event) =>
-              setShowOnlyFiltered(event.currentTarget.checked)
+              setShowOnlySelected(event.currentTarget.checked)
             }
           />
         ),
-        filtering: showOnlyFiltered,
-        render: (record) => {
-          const filterIndex =
-            filterIndexMap.get(generateRecordId(record)) ?? -1;
-
-          return filterIndex < 0 ? (
+        filtering: showOnlySelected,
+        render: (record) =>
+          recordId(record.name, getEntityType(record)) === selectedId ? (
+            <AttributeInputField
+              record={record}
+              filter={filter}
+              onChange={onChange}
+            />
+          ) : (
             <Text size="sm" c="dimmed">
               {record.min} - {record.max}
             </Text>
-          ) : (
-            <AttributeInputField
-              record={record}
-              control={control}
-              path={`${path}.${filterIndex}`}
-            />
-          );
-        },
+          ),
       },
       {
         accessor: "action",
         title: "",
-        width: "50px",
-        render: (record) => {
-          const key = generateRecordId(record);
-          const filterIndex = filterIndexMap.get(key) ?? -1;
-
-          return filterIndex < 0 ? (
-            <ActionIcon
+        width: "90px",
+        render: (record) =>
+          recordId(record.name, getEntityType(record)) === selectedId ? (
+            <Button
+              size="compact-sm"
+              variant="light"
               color="green"
-              variant="light"
-              onClick={(event) => {
-                event.stopPropagation();
-                append({
-                  attribute: record.name,
-                  type: path,
-                  target_type: getEntityType(record),
-                  ...getInitialFilter(record),
-                });
-              }}
+              leftSection={<CheckIcon size={14} />}
             >
-              <PlusIcon size={16} />
-            </ActionIcon>
+              Used
+            </Button>
           ) : (
-            <ActionIcon
-              color="red"
-              variant="light"
+            <Button
+              size="compact-sm"
+              variant="default"
               onClick={(event) => {
                 event.stopPropagation();
-                remove(filterIndex);
+                onChange({
+                  type: filter.type,
+                  attribute: record.name,
+                  target_type: getEntityType(record),
+                  ...getInitialCondition(record),
+                } as AttributeFilter);
               }}
             >
-              <XIcon size={16} />
-            </ActionIcon>
-          );
-        },
+              Use
+            </Button>
+          ),
       },
     ],
-    [append, remove, filterIndexMap, path, control, showOnlyFiltered],
+    [filter, onChange, selectedId, showOnlySelected],
   );
 
   return {
     filterColumns,
-    visibleAttributes: showOnlyFiltered ? filteredAttributeNames : undefined,
+    visibleAttributes:
+      showOnlySelected && filter.attribute ? [filter.attribute] : undefined,
   };
 };
