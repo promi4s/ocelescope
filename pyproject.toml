@@ -23,6 +23,11 @@ members = [
 ocelescope-module-filter = { workspace = true }
 ocelescope-module-ocel = { workspace = true }
 
+[tool.ruff]
+# `uv format` downloads its own (older) ruff instead of the one in uv.lock,
+# which formats differently from CI. Fail loudly rather than reformat files.
+required-version = ">=0.17.2"
+
 [tool.ruff.lint]
 ignore = ["E731", "BLE001", "S110"]
 extend-select = ["RUF022" ]

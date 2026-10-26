@@ -40,6 +40,11 @@
       "allowedVersions": "<7"
     },
     {
+      "description": "DuckDB 2 may change the on-disk format of stored OCELs and r4pm imports, and would force library users onto 2.x; bump deliberately after testing",
+      "matchPackageNames": ["duckdb"],
+      "allowedVersions": "<2"
+    },
+    {
       "description": "Backend Python is part of the plugin contract: plugin wheels are built per CPython version (e.g. cp313), so bump it deliberately. Digest updates within 3.13 are still allowed",
       "matchDatasources": ["docker"],
       "matchPackageNames": ["python"],

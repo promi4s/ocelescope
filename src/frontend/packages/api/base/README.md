@@ -13,7 +13,7 @@ pnpm add @ocelescope/api-base
 ## Usage
 
 ```ts
-import { /* hooks and client */ } from "@ocelescope/api-base";
+import {/* hooks and client */} from "@ocelescope/api-base";
 ```
 
 ## About

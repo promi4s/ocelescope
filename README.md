@@ -2,7 +2,7 @@
 
 🔗 **Documentation:** <https://www.ocelescope.org>
 
-Ocelescope is part of a project by the Chair of Process and Data Science ([PADS](https://www.pads.rwth-aachen.de/go/id/pnbx/)) at RWTH Aachen University. 
+Ocelescope is part of a project by the Chair of Process and Data Science ([PADS](https://www.pads.rwth-aachen.de/go/id/pnbx/)) at RWTH Aachen University.
 
 > ⚠️ **Project Status: Active Development**
 >
@@ -23,7 +23,6 @@ If you only want to **run** Ocelescope, please follow the installation steps in 
 ## 🧱 Prerequisites
 
 Make sure you have the following tools installed:
-
 - [uv](https://docs.astral.sh/uv/)
 - [pnpm](https://pnpm.io/)
 
@@ -40,7 +39,6 @@ pnpm run init
 ```
 
 This will:
-
 - install backend dependencies (via `uv`)
 - install frontend dependencies (via `pnpm`)
 - generate and build the frontend API client
@@ -54,19 +52,19 @@ To update dependencies later (e.g. after pulling), run `pnpm run sync`.
 
 Common tasks are exposed as `pnpm` scripts at the repository root.
 
-| Command | Description |
-|---|---|
-| `pnpm run dev:docs` | Launch documentation locally (MkDocs) with live reload |
-| `pnpm run api:sync` | Generate OpenAPI spec and rebuild the frontend API client |
-| `pnpm run dev:backend` | Run the FastAPI dev server (uvicorn) with auto-reload |
-| `pnpm run dev:frontend` | Run the app dev server |
-| `pnpm run dev:app` | Run backend + app dev servers together |
-| `pnpm run dev:deps` | Run dev servers for all frontend packages **except** the app |
-| `pnpm run docker:up` | Build and run the production stack (`docker-compose.yml`) |
-| `pnpm run docker:down` | Stop containers (`docker compose down`) |
-| `pnpm run lint` | Lint backend (ruff) + frontend (biome) |
-| `pnpm run format` | Format backend (ruff) + frontend (biome) |
-| `pnpm run notebook` | Launch JupyterLab in `notebooks/` (via `uv`) with `jupyter-ruff` |
+| Command                 | Description                                                      |
+| ----------------------- | ---------------------------------------------------------------- |
+| `pnpm run dev:docs`     | Launch documentation locally (MkDocs) with live reload           |
+| `pnpm run api:sync`     | Generate OpenAPI spec and rebuild the frontend API client        |
+| `pnpm run dev:backend`  | Run the FastAPI dev server (uvicorn) with auto-reload            |
+| `pnpm run dev:frontend` | Run the app dev server                                           |
+| `pnpm run dev:app`      | Run backend + app dev servers together                           |
+| `pnpm run dev:deps`     | Run dev servers for all frontend packages **except** the app     |
+| `pnpm run docker:up`    | Build and run the production stack (`docker-compose.yml`)        |
+| `pnpm run docker:down`  | Stop containers (`docker compose down`)                          |
+| `pnpm run lint`         | Lint backend (ruff) + frontend (biome)                           |
+| `pnpm run format`       | Format backend (ruff) + frontend (biome)                         |
+| `pnpm run notebook`     | Launch JupyterLab in `notebooks/` (via `uv`) with `jupyter-ruff` |
 
 To see all available scripts:
 
@@ -82,5 +80,6 @@ pnpm run
 - If you change backend routes/schemas, run `pnpm run api:sync` to refresh the generated client.
 
 ## Acknowledgement
+
 The project on which this work is based upon was funded by the German Federal Ministry of
 Research, Technology and Space under grant number 16IS26019.
