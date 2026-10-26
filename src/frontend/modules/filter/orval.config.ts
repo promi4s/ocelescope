@@ -13,6 +13,7 @@ const PREVIEWS = [
   "previewAttributeValues",
   "previewRelations",
   "previewRelationCombinations",
+  "previewRelationCountDistribution",
 ];
 
 export default defineConfig({

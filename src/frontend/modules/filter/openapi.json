@@ -1554,6 +1554,166 @@
           }
         }
       }
+    },
+    "/modules/filter/v1/{ocel_id}/preview/relations/{kind}/distribution": {
+      "post": {
+        "summary": "Preview Relation Count Distribution",
+        "operationId": "previewRelationCountDistribution",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "kind",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "e2o",
+                "o2o"
+              ],
+              "type": "string",
+              "title": "Kind"
+            }
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Source"
+            }
+          },
+          {
+            "name": "target",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Target"
+            }
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "source",
+                "target"
+              ],
+              "type": "string",
+              "default": "source",
+              "title": "Direction"
+            }
+          },
+          {
+            "name": "qualifier",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Qualifier"
+            }
+          },
+          {
+            "name": "bins",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 50,
+              "title": "Bins"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TimeFrameFilter"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ActivityFilter"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ObjectTypeFilter"
+                    },
+                    {
+                      "$ref": "#/components/schemas/EventAttributeFilter"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ObjectAttributeFilter"
+                    },
+                    {
+                      "$ref": "#/components/schemas/E2OCountFilter"
+                    },
+                    {
+                      "$ref": "#/components/schemas/O2OCountFilter"
+                    }
+                  ],
+                  "discriminator": {
+                    "propertyName": "type",
+                    "mapping": {
+                      "time_frame": "#/components/schemas/TimeFrameFilter",
+                      "activity": "#/components/schemas/ActivityFilter",
+                      "object_type": "#/components/schemas/ObjectTypeFilter",
+                      "event_attribute": "#/components/schemas/EventAttributeFilter",
+                      "object_attribute": "#/components/schemas/ObjectAttributeFilter",
+                      "e2o_count": "#/components/schemas/E2OCountFilter",
+                      "o2o_count": "#/components/schemas/O2OCountFilter"
+                    }
+                  }
+                },
+                "title": "Steps"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelationCountDistribution"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2439,6 +2599,42 @@
         ],
         "title": "RelationCombination",
         "description": "A distinct (source, target, qualifier) combination of a relation.\n\nAttributes:\n    source: The source object or event type.\n    target: The target object or event type.\n    qualifier: The relation qualifier (empty string when none applies)."
+      },
+      "RelationCountDistribution": {
+        "properties": {
+          "entities": {
+            "type": "integer",
+            "title": "Entities"
+          },
+          "relations": {
+            "type": "integer",
+            "title": "Relations"
+          },
+          "min": {
+            "type": "integer",
+            "title": "Min"
+          },
+          "max": {
+            "type": "integer",
+            "title": "Max"
+          },
+          "bins": {
+            "items": {
+              "$ref": "#/components/schemas/AttributeBin"
+            },
+            "type": "array",
+            "title": "Bins"
+          }
+        },
+        "type": "object",
+        "required": [
+          "entities",
+          "relations",
+          "min",
+          "max",
+          "bins"
+        ],
+        "title": "RelationCountDistribution"
       },
       "RelationCountSummary": {
         "properties": {

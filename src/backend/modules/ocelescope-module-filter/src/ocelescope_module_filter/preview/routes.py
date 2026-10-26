@@ -20,6 +20,7 @@ from ocelescope_module_ocel.models import (
     AttributeMatches,
     Entity_Time_Info,
     RelationCombination,
+    RelationCountDistribution,
     RelationCountSummary,
     TypedAttribute,
 )
@@ -202,3 +203,23 @@ def preview_relation_combinations(
 ) -> list[RelationCombination]:
     with preview(session, ocel_id, steps) as view:
         return relations.combinations(view, kind, direction)
+
+
+@router.post(
+    "/relations/{kind}/distribution", operation_id="previewRelationCountDistribution"
+)
+def preview_relation_count_distribution(
+    ocel_id: str,
+    kind: RelationKind,
+    session: ApiSession,
+    steps: Steps,
+    source: Annotated[str, Query()],
+    target: Annotated[str, Query()],
+    direction: Direction = "source",
+    qualifier: Annotated[str | None, Query()] = None,
+    bins: Annotated[int, Query(ge=1, le=500)] = 50,
+) -> RelationCountDistribution:
+    with preview(session, ocel_id, steps) as view:
+        return relations.count_distribution(
+            view, kind, source, target, direction, qualifier, bins
+        )

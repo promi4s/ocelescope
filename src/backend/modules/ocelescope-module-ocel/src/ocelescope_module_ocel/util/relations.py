@@ -9,6 +9,7 @@ the min / max / sum number of targets a single source instance relates to;
 
 from __future__ import annotations
 
+import math
 from typing import Literal
 
 from ocelescope.ocel.constants.pm4py import (
@@ -26,10 +27,15 @@ from ocelescope.ocel.constants.tables import (
     OBJECTS_TABLE,
 )
 from ocelescope.ocel.view import OCELView
-from ocelescope.util.sql import ident
+from ocelescope.util.sql import ident, literal
 
 from ocelescope import OCEL
-from ocelescope_module_ocel.models import RelationCombination, RelationCountSummary
+from ocelescope_module_ocel.models import (
+    AttributeBin,
+    RelationCombination,
+    RelationCountDistribution,
+    RelationCountSummary,
+)
 
 QUALIFIER = "ocel:qualifier"
 
@@ -202,3 +208,95 @@ def combinations(
         RelationCombination(source=src_type, target=tgt_type, qualifier=qualifier or "")
         for src_type, tgt_type, qualifier in ocel.sql(query).fetchall()
     ]
+
+
+def _counted(
+    kind: RelationKind,
+    source: str,
+    target: str,
+    direction: Direction,
+    qualifier: str | None,
+) -> tuple[str, str]:
+    eid, oid, otype = ident(EID_COL), ident(OID_COL), ident(OTYPE_COL)
+    qualified = (
+        f"AND r.{ident(QUALIFIER)} = {literal(qualifier)}"
+        if qualifier is not None
+        else ""
+    )
+    if kind == "e2o":
+        counted = eid if direction == "source" else oid
+        relations = (
+            f"SELECT r.{counted} AS id FROM {ident(E2O_TABLE)} r "
+            f"JOIN {ident(EVENTS_TABLE)} e USING ({eid}) "
+            f"JOIN {ident(OBJECTS_TABLE)} o USING ({oid}) "
+            f"WHERE e.{ident(ACTIVITY_COL)} = {literal(source)} "
+            f"AND o.{otype} = {literal(target)} {qualified}"
+        )
+        entities = (
+            f"SELECT {eid} AS id FROM {ident(EVENTS_TABLE)} "
+            f"WHERE {ident(ACTIVITY_COL)} = {literal(source)}"
+            if direction == "source"
+            else f"SELECT {oid} AS id FROM {ident(OBJECTS_TABLE)} "
+            f"WHERE {otype} = {literal(target)}"
+        )
+        return entities, relations
+
+    counted = ident(O2O_SOURCE_ID if direction == "source" else O2O_TARGET_ID)
+    relations = (
+        f"SELECT r.{counted} AS id FROM {ident(O2O_TABLE)} r "
+        f"JOIN {ident(OBJECTS_TABLE)} s ON s.{oid} = r.{ident(O2O_SOURCE_ID)} "
+        f"JOIN {ident(OBJECTS_TABLE)} t ON t.{oid} = r.{ident(O2O_TARGET_ID)} "
+        f"WHERE s.{otype} = {literal(source)} AND t.{otype} = {literal(target)} "
+        f"{qualified}"
+    )
+    entities = (
+        f"SELECT {oid} AS id FROM {ident(OBJECTS_TABLE)} "
+        f"WHERE {otype} = {literal(source if direction == 'source' else target)}"
+    )
+    return entities, relations
+
+
+def count_distribution(
+    ocel: OCEL | OCELView,
+    kind: RelationKind,
+    source: str,
+    target: str,
+    direction: Direction = "source",
+    qualifier: str | None = None,
+    bins: int = 50,
+) -> RelationCountDistribution:
+    entities, relations = _counted(kind, source, target, direction, qualifier)
+    per_entity = ocel.sql(
+        f"SELECT coalesce(c.n, 0) AS n FROM ({entities}) x "
+        f"LEFT JOIN (SELECT id, count(*) AS n FROM ({relations}) GROUP BY id) c "
+        f"ON c.id = x.id"
+    )
+    total, relation_count, low, high = per_entity.query(
+        "per_entity",
+        "SELECT count(*), coalesce(sum(n), 0), min(n), max(n) FROM per_entity",
+    ).fetchone() or (0, 0, None, None)
+    if not total or low is None or high is None:
+        return RelationCountDistribution(entities=0, relations=0, min=0, max=0, bins=[])
+
+    width = max(1, math.ceil((high - low + 1) / bins))
+    n = (high - low) // width + 1
+    counts = dict(
+        per_entity.query(
+            "per_entity",
+            f"SELECT (n - {int(low)}) // {width} AS b, count(*) FROM per_entity GROUP BY b",
+        ).fetchall()
+    )
+    return RelationCountDistribution(
+        entities=total,
+        relations=int(relation_count),
+        min=low,
+        max=high,
+        bins=[
+            AttributeBin(
+                start=low + i * width,
+                end=high if i == n - 1 else low + (i + 1) * width,
+                count=int(counts.get(i, 0)),
+            )
+            for i in range(n)
+        ],
+    )

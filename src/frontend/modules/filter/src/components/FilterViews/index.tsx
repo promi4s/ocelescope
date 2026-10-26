@@ -8,7 +8,10 @@ import {
   EventAttributeFilter,
   ObjectAttributeFilter,
 } from "./AttributeFilter/AttributeFilter";
-import { E2OCountFilter, O2OCountFilter } from "./RelationCountFilter";
+import {
+  E2OCountFilter,
+  O2OCountFilter,
+} from "./RelationCountFilter/RelationCountFilter";
 import { TimeFrameFilter } from "./TimeFrameFilter";
 import { ActivityFilter, ObjectTypeFilter } from "./TypeForm";
 

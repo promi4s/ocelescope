@@ -1,7 +1,7 @@
 import { Group, NumberInput, Text } from "@mantine/core";
 import { useMemo } from "react";
+import RangeView, { type Bin, type Range } from "../../../../RangeView";
 import type { DistributionViewProps } from "../../util";
-import RangeView, { type Bin, type Range } from "./RangeView";
 
 const formatInt = (value: number) => value.toLocaleString();
 

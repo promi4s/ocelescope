@@ -2,8 +2,8 @@ import { Group, Text } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
 import { useMemo } from "react";
 import dayjs from "../../../../../util/dayjs";
+import RangeView, { type Bin, type Range } from "../../../../RangeView";
 import type { DistributionViewProps } from "../../util";
-import RangeView, { type Bin, type Range } from "./RangeView";
 
 const PICKER_FORMAT = "YYYY-MM-DD HH:mm:ss";
 
