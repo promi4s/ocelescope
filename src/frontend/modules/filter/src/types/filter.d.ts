@@ -15,6 +15,8 @@ export type FilterPanel<T extends FilterKey> = ComponentType<{
   ocelId: string;
   filter: FilterOf<T>;
   onChange: (filter: FilterOf<T>) => void;
+  /** The complete steps before this one: the panel shows the log as they leave it. */
+  before: NativeFilter[];
 }>;
 
 export type FilterKind<T extends FilterKey> = {

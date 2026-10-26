@@ -8,6 +8,7 @@ from ocelescope_backend.app.dependencies import ApiOcel
 from ocelescope_backend.app.internal.model.base import PaginatedResponse
 
 from ocelescope_module_ocel.models import ObjectTypeVariants
+from ocelescope_module_ocel.util import events as event_util
 from ocelescope_module_ocel.util import variants as variant_util
 from ocelescope_module_ocel.util.pagination import paginate_ids
 
@@ -26,10 +27,7 @@ def get_object_types(ocel: ApiOcel) -> list[str]:
 )
 def get_object_counts(ocel: ApiOcel) -> dict[str, int]:
     # Ordered most frequent first, which the response preserves.
-    return {
-        str(object_type): int(count)
-        for object_type, count in ocel.objects.counts.items()
-    }
+    return event_util.object_counts(ocel)
 
 
 @router.get("/{ocel_id}/objects/ids", operation_id="objectIds")

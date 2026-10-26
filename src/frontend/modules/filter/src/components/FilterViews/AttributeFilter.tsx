@@ -1,7 +1,16 @@
 import { AttributesTable } from "@ocelescope/core";
+import { keepPreviousData } from "@tanstack/react-query";
+import {
+  usePreviewAggregatedAttributes,
+  usePreviewTypedAttributes,
+} from "../../api/base";
 import { useAttributeFilter } from "../../hooks/useAttributeFilterColumns";
 import type { FilterKind, FilterOf, FilterPanel } from "../../types/filter";
 import dayjs from "../../util/dayjs";
+import Previewed from "./Previewed";
+
+// every attribute in one page: the table pages them itself
+const ALL = 100_000;
 
 type AttributeKey = "event_attribute" | "object_attribute";
 
@@ -9,23 +18,48 @@ const AttributePanel: (
   entityType: "objects" | "events",
 ) => FilterPanel<AttributeKey> =
   (entityType) =>
-  ({ ocelId, filter, onChange }) => {
+  ({ ocelId, filter, onChange, before }) => {
     const { filterColumns, visibleAttributes } = useAttributeFilter({
       filter,
       onChange,
     });
+    const options = { query: { placeholderData: keepPreviousData } };
+    const aggregated = usePreviewAggregatedAttributes(
+      ocelId,
+      before,
+      { entity_type: entityType, page_size: ALL },
+      options,
+    );
+    const typed = usePreviewTypedAttributes(
+      ocelId,
+      before,
+      { entity_type: entityType },
+      options,
+    );
+    const both = {
+      data:
+        aggregated.data && typed.data
+          ? { attributes: aggregated.data.response, typed: typed.data }
+          : undefined,
+      isPending: aggregated.isPending || typed.isPending,
+      error: aggregated.error ?? typed.error,
+    };
 
     return (
-      <AttributesTable
-        ocelId={ocelId}
-        entityType={entityType}
-        ocelVersion={"original"}
-        extraColumns={filterColumns}
-        subTableExtraColumns={filterColumns}
-        visibleAttributes={visibleAttributes}
-        hideRange
-        hideValues
-      />
+      <Previewed query={both}>
+        {(data) => (
+          <AttributesTable
+            ocelId={ocelId}
+            entityType={entityType}
+            data={data}
+            extraColumns={filterColumns}
+            subTableExtraColumns={filterColumns}
+            visibleAttributes={visibleAttributes}
+            hideRange
+            hideValues
+          />
+        )}
+      </Previewed>
     );
   };
 

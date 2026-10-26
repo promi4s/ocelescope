@@ -30,6 +30,7 @@ from ocelescope.ocel.constants.tables import (
     OBJECT_CHANGES_TABLE,
     OBJECTS_TABLE,
 )
+from ocelescope.ocel.view import OCELView
 from ocelescope.util.sql import ident, literal
 
 from ocelescope import OCEL
@@ -71,23 +72,24 @@ def _marshal(value: str | None, value_type: ValueType) -> str | int | float:
     return value
 
 
-def _attribute_types(ocel: OCEL, entity_type: EntityType) -> dict[str, ValueType]:
+def _attribute_types(
+    ocel: OCEL | OCELView, entity_type: EntityType
+) -> dict[str, ValueType]:
     """Every attribute of ``entity_type``, with the ValueType its column reports.
 
     Attributes are the stored table's columns bar the OCEL ones -- an event table
     holds one per event attribute, a change table one per object attribute.
     """
     table = EVENTS_TABLE if entity_type == "events" else OBJECT_CHANGES_TABLE
-    columns = ocel.con.execute(f"DESCRIBE {ident(table)}").fetchall()
     return {
         name: _value_type(dtype)
-        for name, dtype, *_ in columns
+        for name, dtype, *_ in ocel.sql(f"DESCRIBE {ident(table)}").fetchall()
         if not name.startswith("ocel:")
     }
 
 
 def long_table(
-    ocel: OCEL,
+    ocel: OCEL | OCELView,
     entity_type: EntityType,
     attribute_names: list[str] | None = None,
     entity_names: list[str] | None = None,
@@ -120,7 +122,7 @@ def long_table(
         values = ", ".join(f"{ident(name)}::VARCHAR AS {ident(name)}" for name in names)
         source = (
             f"SELECT {ident(ACTIVITY_COL)} AS {ident(ENTITY_TYPE)}, {values} "
-            f"FROM {EVENTS_TABLE} {_type_filter(ident(ACTIVITY_COL), entity_names, params)}"
+            f"FROM {ident(EVENTS_TABLE)} {_type_filter(ident(ACTIVITY_COL), entity_names, params)}"
         )
         kept = "true"
     else:
@@ -131,7 +133,7 @@ def long_table(
         source = (
             f"SELECT o.{ident(OTYPE_COL)} AS {ident(ENTITY_TYPE)}, "
             f"c.{ident(OBJECT_CHANGED_FIELD)} AS field, {values} "
-            f"FROM {OBJECT_CHANGES_TABLE} c JOIN {OBJECTS_TABLE} o USING ({ident(OID_COL)}) "
+            f"FROM {ident(OBJECT_CHANGES_TABLE)} c JOIN {ident(OBJECTS_TABLE)} o USING ({ident(OID_COL)}) "
             f"{_type_filter(f'o.{ident(OTYPE_COL)}', entity_names, params)}"
         )
         kept = "field = name"
@@ -177,7 +179,7 @@ def _extremes(numeric: list[str]) -> str:
 
 
 def attribute_names(
-    ocel: OCEL,
+    ocel: OCEL | OCELView,
     entity_type: EntityType,
     attribute_names: list[str] | None = None,
     entity_names: list[str] | None = None,
@@ -198,7 +200,7 @@ def attribute_names(
 
 
 def aggregate_attributes(
-    ocel: OCEL,
+    ocel: OCEL | OCELView,
     entity_type: EntityType,
     attribute_names: list[str] | None = None,
     entity_names: list[str] | None = None,
@@ -236,7 +238,7 @@ def aggregate_attributes(
 
 
 def typed_attributes(
-    ocel: OCEL,
+    ocel: OCEL | OCELView,
     entity_type: EntityType,
     attribute_names: list[str] | None = None,
     entity_names: list[str] | None = None,

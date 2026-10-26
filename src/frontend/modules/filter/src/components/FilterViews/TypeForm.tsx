@@ -1,6 +1,9 @@
 import { InlineStyles, Stack } from "@mantine/core";
 import { ActivityPicker, ObjectTypePicker } from "@ocelescope/core";
+import { keepPreviousData } from "@tanstack/react-query";
+import { usePreviewEventCounts, usePreviewObjectCounts } from "../../api/base";
 import type { FilterKind, FilterPanel } from "../../types/filter";
+import Previewed from "./Previewed";
 
 const PICKER_CLASS = "ocelescope-type-filter-picker";
 
@@ -31,39 +34,59 @@ const ActivityPanel: FilterPanel<"activity"> = ({
   ocelId,
   filter,
   onChange,
-}) => (
-  <Stack gap={4} flex={1} mih={0} className={PICKER_CLASS}>
-    <FillHeightStyles />
-    <ActivityPicker
-      variant="list"
-      multiple
-      cutoff
-      ocelId={ocelId}
-      ocelVersion="original"
-      value={filter.event_types}
-      onChange={(next) => onChange({ ...filter, event_types: next })}
-    />
-  </Stack>
-);
+  before,
+}) => {
+  const counts = usePreviewEventCounts(ocelId, before, {
+    query: { placeholderData: keepPreviousData },
+  });
+  return (
+    <Previewed query={counts}>
+      {(data) => (
+        <Stack gap={4} flex={1} mih={0} className={PICKER_CLASS}>
+          <FillHeightStyles />
+          <ActivityPicker
+            variant="list"
+            multiple
+            cutoff
+            ocelId={ocelId}
+            data={data}
+            value={filter.event_types}
+            onChange={(next) => onChange({ ...filter, event_types: next })}
+          />
+        </Stack>
+      )}
+    </Previewed>
+  );
+};
 
 const ObjectTypePanel: FilterPanel<"object_type"> = ({
   ocelId,
   filter,
   onChange,
-}) => (
-  <Stack gap={4} flex={1} mih={0} className={PICKER_CLASS}>
-    <FillHeightStyles />
-    <ObjectTypePicker
-      variant="list"
-      multiple
-      cutoff
-      ocelId={ocelId}
-      ocelVersion="original"
-      value={filter.object_types}
-      onChange={(next) => onChange({ ...filter, object_types: next })}
-    />
-  </Stack>
-);
+  before,
+}) => {
+  const counts = usePreviewObjectCounts(ocelId, before, {
+    query: { placeholderData: keepPreviousData },
+  });
+  return (
+    <Previewed query={counts}>
+      {(data) => (
+        <Stack gap={4} flex={1} mih={0} className={PICKER_CLASS}>
+          <FillHeightStyles />
+          <ObjectTypePicker
+            variant="list"
+            multiple
+            cutoff
+            ocelId={ocelId}
+            data={data}
+            value={filter.object_types}
+            onChange={(next) => onChange({ ...filter, object_types: next })}
+          />
+        </Stack>
+      )}
+    </Previewed>
+  );
+};
 
 export const ActivityFilter: FilterKind<"activity"> = {
   title: "Activity",

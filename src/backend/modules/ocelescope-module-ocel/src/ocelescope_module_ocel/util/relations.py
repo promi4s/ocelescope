@@ -19,8 +19,14 @@ from ocelescope.ocel.constants.pm4py import (
     OID_COL,
     OTYPE_COL,
 )
+from ocelescope.ocel.constants.tables import (
+    E2O_TABLE,
+    EVENTS_TABLE,
+    O2O_TABLE,
+    OBJECTS_TABLE,
+)
+from ocelescope.ocel.view import OCELView
 from ocelescope.util.sql import ident
-from ocelescope_backend.app.internal.model.base import PaginatedResponse
 
 from ocelescope import OCEL
 from ocelescope_module_ocel.models import RelationCombination, RelationCountSummary
@@ -37,22 +43,23 @@ def _normalized_relation(kind: RelationKind, direction: Direction) -> str:
     ``direction`` picks which side of the relation is the *source*:
       - e2o "source": event -> object   ("target": object -> event)
       - o2o "source": oid_1 -> oid_2     ("target": oid_2 -> oid_1)
-    The object/event types are joined on so grouping can be done by type.
+    The object/event types are joined on so grouping can be done by type; that
+    also drops a relation whose event or object is gone.
     """
     if kind == "e2o":
         base = (
-            f"e2o r "
-            f"JOIN events e ON r.{ident(EID_COL)} = e.{ident(EID_COL)} "
-            f"JOIN objects o ON r.{ident(OID_COL)} = o.{ident(OID_COL)}"
+            f"{ident(E2O_TABLE)} r "
+            f"JOIN {ident(EVENTS_TABLE)} e ON r.{ident(EID_COL)} = e.{ident(EID_COL)} "
+            f"JOIN {ident(OBJECTS_TABLE)} o ON r.{ident(OID_COL)} = o.{ident(OID_COL)}"
         )
         event = (f"e.{ident(EID_COL)}", f"e.{ident(ACTIVITY_COL)}")
         obj = (f"o.{ident(OID_COL)}", f"o.{ident(OTYPE_COL)}")
         src, tgt = (event, obj) if direction == "source" else (obj, event)
     else:
         base = (
-            f"o2o r "
-            f"JOIN objects s ON r.{ident(O2O_SOURCE_ID)} = s.{ident(OID_COL)} "
-            f"JOIN objects t ON r.{ident(O2O_TARGET_ID)} = t.{ident(OID_COL)}"
+            f"{ident(O2O_TABLE)} r "
+            f"JOIN {ident(OBJECTS_TABLE)} s ON r.{ident(O2O_SOURCE_ID)} = s.{ident(OID_COL)} "
+            f"JOIN {ident(OBJECTS_TABLE)} t ON r.{ident(O2O_TARGET_ID)} = t.{ident(OID_COL)}"
         )
         first = (f"s.{ident(OID_COL)}", f"s.{ident(OTYPE_COL)}")
         second = (f"t.{ident(OID_COL)}", f"t.{ident(OTYPE_COL)}")
@@ -66,7 +73,7 @@ def _normalized_relation(kind: RelationKind, direction: Direction) -> str:
 
 
 def relation_summary(
-    ocel: OCEL,
+    ocel: OCEL | OCELView,
     kind: RelationKind,
     direction: Direction = "source",
     source_types: list[str] | None = None,
@@ -74,9 +81,7 @@ def relation_summary(
     qualifiers: list[str] | None = None,
     with_qualifier: bool = True,
     drop_constant: bool = False,
-    page: int | None = None,
-    page_size: int | None = None,
-) -> PaginatedResponse[list[RelationCountSummary]]:
+) -> list[RelationCountSummary]:
     """Per (source_type, target_type[, qualifier]) multiplicity stats, in DuckDB.
 
     For every source instance we count how many targets it relates to, then per group
@@ -87,10 +92,9 @@ def relation_summary(
     ``None`` = no filter). ``drop_constant`` drops groups whose multiplicity never
     varies (``min_count == max_count``, e.g. always exactly one target).
 
-    Groups are ordered by (source, target, qualifier) for stable pages and sliced by
-    ``page`` / ``page_size``; omitting both returns a single page with every group. The
-    grouped result is small -- one row per type combination -- so it is ordered and
-    paged in Python; the heavy per-instance aggregation happens in DuckDB.
+    Groups are ordered by (source, target, qualifier) for stable pages. The grouped
+    result is small -- one row per type combination -- so it is ordered in Python;
+    the heavy per-instance aggregation happens in DuckDB.
     """
     keys = ["src_type", "tgt_type"] + (["qualifier"] if with_qualifier else [])
     key_sql = ", ".join(keys)
@@ -110,9 +114,11 @@ def relation_summary(
 
     # All instances of the source type -- so min can drop to 0 when some don't relate.
     if kind == "e2o" and direction == "source":
-        instances = f"SELECT {ident(ACTIVITY_COL)} AS src_type FROM events"
+        instances = (
+            f"SELECT {ident(ACTIVITY_COL)} AS src_type FROM {ident(EVENTS_TABLE)}"
+        )
     else:
-        instances = f"SELECT {ident(OTYPE_COL)} AS src_type FROM objects"
+        instances = f"SELECT {ident(OTYPE_COL)} AS src_type FROM {ident(OBJECTS_TABLE)}"
 
     if with_qualifier:
         # the group is keyed by its qualifier, so it already names the only one it covers
@@ -174,21 +180,11 @@ def relation_summary(
         summaries = [s for s in summaries if s.min_count != s.max_count]
 
     summaries.sort(key=lambda s: (s.source, s.target, s.qualifier))
-
-    total_items = len(summaries)
-    page = page or 1
-    page_size = page_size or total_items or 1
-    start = (page - 1) * page_size
-    return PaginatedResponse(
-        response=summaries[start : start + page_size],
-        page=page,
-        page_size=page_size,
-        total_items=total_items,
-    )
+    return summaries
 
 
 def combinations(
-    ocel: OCEL,
+    ocel: OCEL | OCELView,
     kind: RelationKind,
     direction: Direction = "source",
 ) -> list[RelationCombination]:

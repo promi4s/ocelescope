@@ -1,6 +1,9 @@
 import { RelationTable } from "@ocelescope/core";
+import { keepPreviousData } from "@tanstack/react-query";
+import { usePreviewRelations } from "../../api/base";
 import { useRelationCountFilter } from "../../hooks/useRelationFilterColumns";
 import type { FilterKind, FilterOf, FilterPanel } from "../../types/filter";
+import Previewed from "./Previewed";
 
 type RelationKey = "e2o_count" | "o2o_count";
 
@@ -8,23 +11,50 @@ const RelationCountPanel: (
   relationType: "e2o" | "o2o",
 ) => FilterPanel<RelationKey> =
   (relationType) =>
-  ({ ocelId, filter, onChange }) => {
+  ({ ocelId, filter, onChange, before }) => {
     const { filterColumns, visibleRelations } = useRelationCountFilter({
       filter,
       onChange,
     });
+    const options = { query: { placeholderData: keepPreviousData } };
+    const pairs = usePreviewRelations(
+      ocelId,
+      relationType,
+      before,
+      { with_qualifier: false },
+      options,
+    );
+    const qualified = usePreviewRelations(
+      ocelId,
+      relationType,
+      before,
+      { with_qualifier: true },
+      options,
+    );
+    const both = {
+      data:
+        pairs.data && qualified.data
+          ? { pairs: pairs.data.response, qualified: qualified.data.response }
+          : undefined,
+      isPending: pairs.isPending || qualified.isPending,
+      error: pairs.error ?? qualified.error,
+    };
 
     return (
-      <RelationTable
-        ocelId={ocelId}
-        ocelVersion={"original"}
-        relationType={relationType}
-        extraColumns={filterColumns}
-        subTableExtraColumns={filterColumns}
-        visibleRelations={visibleRelations}
-        hideRange
-        hideTotal
-      />
+      <Previewed query={both}>
+        {(data) => (
+          <RelationTable
+            ocelId={ocelId}
+            relationType={relationType}
+            data={data}
+            extraColumns={filterColumns}
+            subTableExtraColumns={filterColumns}
+            visibleRelations={visibleRelations}
+            hideRange
+            hideTotal
+          />
+        )}
+      </Previewed>
     );
   };
 

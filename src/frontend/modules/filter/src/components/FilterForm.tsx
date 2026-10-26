@@ -42,6 +42,7 @@ const FilterForm = ({ ocelId, currentFilter, onSubmit }: FilterFormProps) => {
   const ids = fields.map(({ id }) => id);
   const selectedIndex = fields.findIndex(({ id }) => id === selectedId);
   const selectedStep = steps[selectedIndex];
+  const before = completeSteps(steps.slice(0, Math.max(selectedIndex, 0)));
 
   const selectAdded = useRef(false);
   useEffect(() => {
@@ -79,6 +80,7 @@ const FilterForm = ({ ocelId, currentFilter, onSubmit }: FilterFormProps) => {
                   <Panel
                     ocelId={ocelId}
                     filter={field.value}
+                    before={before}
                     onChange={(step) =>
                       field.onChange({ target: { value: step } })
                     }

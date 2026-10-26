@@ -10,6 +10,7 @@ from ocelescope_backend.app.internal.model.base import PaginatedResponse
 
 from ocelescope_module_ocel.models import RelationCombination, RelationCountSummary
 from ocelescope_module_ocel.util import relations as relation_util
+from ocelescope_module_ocel.util.pagination import paginate_list
 from ocelescope_module_ocel.util.relations import Direction
 
 router = APIRouter()
@@ -27,7 +28,7 @@ def get_e2o(
     with_qualifier: Annotated[bool, Query()] = True,
     drop_constant: Annotated[bool, Query()] = False,
 ) -> PaginatedResponse[list[RelationCountSummary]]:
-    return relation_util.relation_summary(
+    summaries = relation_util.relation_summary(
         ocel,
         "e2o",
         direction,
@@ -36,9 +37,8 @@ def get_e2o(
         qualifiers,
         with_qualifier=with_qualifier,
         drop_constant=drop_constant,
-        page=page,
-        page_size=page_size,
     )
+    return paginate_list(summaries, page, page_size)
 
 
 @router.get("/{ocel_id}/relations/e2o/qualifiers", operation_id="e2oQualifier")
@@ -58,7 +58,7 @@ def get_o2o(
     with_qualifier: Annotated[bool, Query()] = True,
     drop_constant: Annotated[bool, Query()] = False,
 ) -> PaginatedResponse[list[RelationCountSummary]]:
-    return relation_util.relation_summary(
+    summaries = relation_util.relation_summary(
         ocel,
         "o2o",
         direction,
@@ -67,9 +67,8 @@ def get_o2o(
         qualifiers,
         with_qualifier=with_qualifier,
         drop_constant=drop_constant,
-        page=page,
-        page_size=page_size,
     )
+    return paginate_list(summaries, page, page_size)
 
 
 @router.get("/{ocel_id}/relations/o2o/qualifiers", operation_id="o2oQualifier")

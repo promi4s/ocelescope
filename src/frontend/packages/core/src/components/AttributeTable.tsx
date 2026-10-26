@@ -37,6 +37,8 @@ const SubAttributeTable: React.FC<{
   hideValues?: boolean;
   ocelVersion?: OcelVersion;
   extraColumns?: DataTableColumn<TypedAttribute>[];
+  /** The attribute's rows; set, nothing is fetched. */
+  data?: TypedAttribute[];
 }> = ({
   ocelId,
   entityType = "objects",
@@ -46,20 +48,26 @@ const SubAttributeTable: React.FC<{
   hideValues = false,
   ocelVersion,
   extraColumns = [],
+  data: given,
 }) => {
   const isEvent = entityType === "events";
 
-  const { data, isFetching } = (
-    isEvent ? useEventAttributes : useObjectAttributes
-  )(
+  const fetched = (isEvent ? useEventAttributes : useObjectAttributes)(
     ocelId,
     {
       attribute_names: [attributeName],
       names: entityNames,
       ocel_version: ocelVersion,
     },
-    { query: { placeholderData: keepPreviousData } },
+    {
+      query: {
+        placeholderData: keepPreviousData,
+        enabled: given === undefined,
+      },
+    },
   );
+  const data = given ?? fetched.data;
+  const isFetching = given === undefined && fetched.isFetching;
 
   const columns: DataTableColumn<TypedAttribute>[] = useMemo(
     () =>
@@ -128,6 +136,13 @@ const AttributesTable: React.FC<{
   height?: string | number;
   className?: string;
   style?: React.CSSProperties;
+  /**
+   * All of the table's data at once: each attribute across its types, and per
+   * type. Set, nothing is fetched -- the table filters, pages and expands it
+   * itself. The type filter then narrows which attributes show, without
+   * recomputing their range and values over just those types.
+   */
+  data?: { attributes: AggregatedAttribute[]; typed: TypedAttribute[] };
 }> = ({
   ocelId,
   entityType = "objects",
@@ -141,21 +156,33 @@ const AttributesTable: React.FC<{
   height,
   className,
   style,
+  data: given,
 }) => {
   const isEvent = entityType === "events";
+  const fetching = given === undefined;
 
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { data: attributeNames } = useAttributeNames(ocelId, {
-    entity_type: entityType,
-    ocel_version: ocelVersion,
-  });
+  const { data: fetchedAttributeNames } = useAttributeNames(
+    ocelId,
+    { entity_type: entityType, ocel_version: ocelVersion },
+    { query: { enabled: fetching } },
+  );
+  const attributeNames = given
+    ? given.attributes.map(({ name }) => name)
+    : fetchedAttributeNames;
 
   const [filteredAttributes, setFilteredAttributes] = useState<string[]>([]);
 
-  const { data: entityNames } = (isEvent ? useActivities : useObjectTypes)(
-    ocelId,
-    { ocel_version: ocelVersion },
+  const { data: fetchedEntityNames } = (
+    isEvent ? useActivities : useObjectTypes
+  )(ocelId, { ocel_version: ocelVersion }, { query: { enabled: fetching } });
+  const entityNames = useMemo(
+    () =>
+      given
+        ? Array.from(new Set(given.typed.map(({ entity_type }) => entity_type)))
+        : fetchedEntityNames,
+    [given, fetchedEntityNames],
   );
 
   const [filteredEntityNames, setFilteredEntityNames] = useState<string[]>([]);
@@ -187,7 +214,7 @@ const AttributesTable: React.FC<{
   const showNoAttributes =
     isConstrained && effectiveAttributeNames.length === 0;
 
-  const { data, isFetching } = useAggregatedAttributes(
+  const fetched = useAggregatedAttributes(
     ocelId,
     {
       entity_type: entityType,
@@ -202,9 +229,45 @@ const AttributesTable: React.FC<{
       }),
     },
     {
-      query: { placeholderData: keepPreviousData, enabled: !showNoAttributes },
+      query: {
+        placeholderData: keepPreviousData,
+        enabled: fetching && !showNoAttributes,
+      },
     },
   );
+
+  // the given attributes, filtered like the server would
+  const givenRows = useMemo(() => {
+    if (!given) {
+      return [];
+    }
+    return given.attributes
+      .filter(
+        ({ name }) =>
+          effectiveAttributeNames.length === 0 ||
+          effectiveAttributeNames.includes(name),
+      )
+      .map((attribute) =>
+        filteredEntityNames.length === 0
+          ? attribute
+          : {
+              ...attribute,
+              entity_type_names: attribute.entity_type_names.filter((name) =>
+                filteredEntityNames.includes(name),
+              ),
+            },
+      )
+      .filter(({ entity_type_names }) => entity_type_names.length > 0);
+  }, [given, effectiveAttributeNames, filteredEntityNames]);
+
+  const records = given
+    ? givenRows.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+    : fetched.data?.response;
+  const totalRecords = given
+    ? givenRows.length
+    : (fetched.data?.total_items ?? 0);
+  const isFetching = fetching && fetched.isFetching;
+
   const [selectedAttributes, setSelectedAttributes] = useState<string[]>([]);
 
   const columns: DataTableColumn<AggregatedAttribute>[] = useMemo(
@@ -306,11 +369,11 @@ const AttributesTable: React.FC<{
   return (
     <DataTable
       idAccessor={"name"}
-      records={showNoAttributes ? [] : data?.response}
+      records={showNoAttributes ? [] : records}
       columns={columns}
       withTableBorder
       fetching={isFetching}
-      totalRecords={showNoAttributes ? 0 : (data?.total_items ?? 0)}
+      totalRecords={showNoAttributes ? 0 : totalRecords}
       page={currentPage}
       recordsPerPage={PAGE_SIZE}
       onPageChange={setCurrentPage}
@@ -337,6 +400,14 @@ const AttributesTable: React.FC<{
             ocelVersion={ocelVersion}
             {...(filteredEntityNames.length > 0 && {
               entityNames: filteredEntityNames,
+            })}
+            {...(given && {
+              data: given.typed.filter(
+                ({ name, entity_type }) =>
+                  name === record.name &&
+                  (filteredEntityNames.length === 0 ||
+                    filteredEntityNames.includes(entity_type)),
+              ),
             })}
           />
         ),
