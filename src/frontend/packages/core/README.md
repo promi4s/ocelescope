@@ -137,7 +137,7 @@ ranges:
   series="measure"
   yAxes="independent"
   sql={measurements}
-/>
+/>;
 ```
 
 Charts are r4pm viewers. Colours come from the ambient `ViewerConfig` when a
@@ -149,7 +149,7 @@ clicks report a `ViewerTarget` to `onSelect`; and a chart inside a
 <ViewerExportFrame filename="activities">
   <OcelChart title="Events per activity" sql={events} />
   <OcelChart title="Objects per type" sql={objects} series="type" stacked />
-</ViewerExportFrame>
+</ViewerExportFrame>;
 ```
 
 ## About

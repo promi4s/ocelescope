@@ -5,7 +5,6 @@ Thanks for helping improve Ocelescope.
 ## Issues
 
 Please use the issue templates:
-
 - Bug report: <https://github.com/promi4s/ocelescope/issues/new?template=bug-report.yml>
 - Feature request: <https://github.com/promi4s/ocelescope/issues/new?template=feature-request.yml>
 - Package update (plugin environment): <https://github.com/promi4s/ocelescope/issues/new?template=plugin-package-request.yml>
@@ -27,7 +26,6 @@ Use:
 Types: `fix`, `feat`, `docs`, `chore`, `ci`
 
 Examples:
-
 - `fix/plugin-runner-crash`
 - `feat/add-filter-preset-dropdown`
 - `docs/update-plugin-environment-docs`
@@ -41,7 +39,6 @@ Format:
 `<gitmoji> <short description>`
 
 Examples:
-
 - 🐛 Fix plugin runner crash on missing metadata
 - ✨ Add filter preset dropdown
 - 📝 Update plugin environment documentation
@@ -56,7 +53,6 @@ Examples:
 ## More details (wiki)
 
 For more details about the project and internal step-by-step guides, see the repo wiki:
-
 - Home: <https://github.com/promi4s/ocelescope/wiki>
 - Development setup: <https://github.com/promi4s/ocelescope/wiki/Development-Setup>
 - Repository structure: <https://github.com/promi4s/ocelescope/wiki/Repository-Structure>

@@ -37,6 +37,8 @@ repos:
     hooks:
       - id: biome-check
         additional_dependencies: ["@biomejs/biome@2.6.2"]
+        # Upstream default plus YAML and Markdown (lockfiles are excluded in biome.json).
+        files: \.(jsx?|tsx?|c(js|ts)|m(js|ts)|d\.(ts|cts|mts)|jsonc?|css|graphql|gql|ya?ml|md)$
   - repo: local
     hooks:
       - id: generate-api

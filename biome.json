@@ -3,7 +3,7 @@
   "files": {
     "ignoreUnknown": true,
     "maxSize": 2000000,
-    "includes": ["**", "!**/*openapi.json"]
+    "includes": ["**", "!**/*openapi.json", "!**/pnpm-lock.yaml"]
   },
   "formatter": {
     "indentStyle": "space"
@@ -24,12 +24,12 @@
   },
   "yaml": {
     "formatter": {
-      "enabled": false
+      "enabled": true
     }
   },
   "markdown": {
     "formatter": {
-      "enabled": false
+      "enabled": true
     }
   },
   "css": {

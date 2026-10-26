@@ -6,13 +6,13 @@ backend, so an analysis is only ever one place in the code.
 
 ## Layout
 
-| File | Contents |
-| --- | --- |
-| `analyses.ts` | Every analysis: its question, parameters, SQL and chart |
-| `Dashboard.tsx` | The searchable analysis catalog and responsive card grid |
-| `Card.tsx` | One card: information, configuration, chart and export frame |
-| `Controls.tsx` | The parameter inputs, and the log facts they offer |
-| `store.ts` | The cards a reader has added, kept per OCEL in the browser |
+| File            | Contents                                                     |
+| --------------- | ------------------------------------------------------------ |
+| `analyses.ts`   | Every analysis: its question, parameters, SQL and chart      |
+| `Dashboard.tsx` | The searchable analysis catalog and responsive card grid     |
+| `Card.tsx`      | One card: information, configuration, chart and export frame |
+| `Controls.tsx`  | The parameter inputs, and the log facts they offer           |
+| `store.ts`      | The cards a reader has added, kept per OCEL in the browser   |
 
 To add an analysis, add an entry to `analyses.ts`.
 

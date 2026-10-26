@@ -46,6 +46,9 @@ jobs:
               - '**/tsconfig*.json'
               - 'pnpm-lock.yaml'
               - 'pnpm-workspace.yaml'
+              - '**/*.md'
+              - '**/*.yml'
+              - '**/*.yaml'
 
   python-ruff:
     name: Python - ruff (lint + format check)
