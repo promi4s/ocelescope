@@ -1,4 +1,5 @@
 import { Table, UnstyledButton } from "@mantine/core";
+import clsx from "clsx";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import styles from "./BarList.module.css";
 
@@ -7,11 +8,15 @@ export const BarList: React.FC<{
   labelHeader: string;
   valueHeader?: string;
   maxVisibleItems?: number;
+  className?: string;
+  style?: React.CSSProperties;
 }> = ({
   data,
   labelHeader,
   valueHeader = "Frequency",
   maxVisibleItems = 8,
+  className,
+  style,
 }) => {
   const [expanded, setExpanded] = useState(false);
 
@@ -45,7 +50,7 @@ export const BarList: React.FC<{
   }, [expanded, typeCount, maxVisibleItems]);
 
   return (
-    <div className={styles.container}>
+    <div className={clsx(styles.container, className)} style={style}>
       <div
         ref={scrollRef}
         className={styles.scrollArea}
