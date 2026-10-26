@@ -36,7 +36,7 @@ repos:
     rev: "v0.6.1"
     hooks:
       - id: biome-check
-        additional_dependencies: ["@biomejs/biome@2.5.12"]
+        additional_dependencies: ["@biomejs/biome@2.6.2"]
   - repo: local
     hooks:
       - id: generate-api

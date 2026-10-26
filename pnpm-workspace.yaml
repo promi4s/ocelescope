@@ -10,20 +10,20 @@ allowBuilds:
   sharp: true
 
 catalog:
-  '@biomejs/biome': 2.5.15
-  "@dagrejs/dagre": ^3.0.0
+  '@biomejs/biome': 2.6.2
+  "@dagrejs/dagre": ^3.1.3
   "@floating-ui/react": ^0.27.18
-  "@hpcc-js/wasm-graphviz": ^1.21.0
-  "@mantine/carousel": ^9.7.2
-  "@mantine/core": ^9.7.2
-  "@mantine/dates": ^9.7.2
-  "@mantine/dropzone": ^9.7.2
-  "@mantine/hooks": ^9.7.2
-  "@mantine/notifications": ^9.7.2
+  "@hpcc-js/wasm-graphviz": ^1.30.0
+  "@mantine/carousel": ^9.7.3
+  "@mantine/core": ^9.7.3
+  "@mantine/dates": ^9.7.3
+  "@mantine/dropzone": ^9.7.3
+  "@mantine/hooks": ^9.7.3
+  "@mantine/notifications": ^9.7.3
   "@marko19907/string-to-color": ^1.0.2
   "@monaco-editor/react": ^4.7.0
   '@ocelescope/alignments': ^0.10.4
-  '@ocelescope/ocpn-editor': ^0.10.5
+  '@ocelescope/ocpn-editor': ^0.10.6
   '@ocelescope/ocelot': ^0.8.0
   '@r4pm/components': ^0.3.2
   "@rjsf/core": ^6.8.0
@@ -31,10 +31,10 @@ catalog:
   "@rjsf/utils": ^6.8.0
   "@rjsf/validator-ajv8": ^6.8.0
   "@storybook/react-vite": ^10.3.5
-  "@tanstack/react-query": ^5.104.2
-  "@tanstack/react-query-devtools": ^5.104.2
+  "@tanstack/react-query": ^5.104.5
+  "@tanstack/react-query-devtools": ^5.104.5
   "@tsconfig/strictest": ^2.0.8
-  "@tsdown/css": ^0.23.1
+  "@tsdown/css": ^0.23.2
   "@types/file-saver": ^2.0.7
   "@types/node": ^26.6.1
   '@types/object-hash': ^3.0.6
@@ -55,23 +55,23 @@ catalog:
   file-saver: ^2.0.5
   html-to-image: 1.11.13
   jspdf: ^4.2.1
-  lucide-react: ^1.56.0
+  lucide-react: ^1.61.0
   mantine-datatable: ^9.4.0
-  next: 16.4.2
+  next: 16.4.3
   object-hash: ^3.0.0
-  orval: ^8.42.0
-  qs: ^6.16.0
+  orval: ^8.44.0
+  qs: ^6.16.1
   react: ^19.3.0
   react-dom: ^19.3.0
-  react-hook-form: ^7.90.0
+  react-hook-form: ^7.91.0
   react-plotly.js: ^4.0.0
   react-zoom-pan-pinch: ^4.0.0
   storybook: ^10.3.5
-  tsdown: ^0.23.1
+  tsdown: ^0.23.2
   typescript: ^6.0.3
   uniqolor: ^1.1.1
   zod: ^4.6.7
-  zustand: ^5.0.15
+  zustand: ^5.0.16
 
 catalogMode: prefer
 
