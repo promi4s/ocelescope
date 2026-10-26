@@ -1,73 +1,85 @@
-from collections.abc import Callable
 from typing import Literal
 
-import polars as pl
 from pydantic import Field
 
 from ocelescope.ocel.constants.pm4py import ACTIVITY_COL, EID_COL, OID_COL, OTYPE_COL
-from ocelescope.ocel.filter.base import BaseFilter, Keep
-
-
-def _cumulative_qualifying(
-    counts: pl.LazyFrame, column: str, threshold: float
-) -> pl.LazyFrame:
-    """The types whose cumulative frequency (most common first) is <= ``threshold``.
-
-    A step function: type k qualifies once the threshold reaches the cumulative
-    frequency of the top k types. At 1.0 every type qualifies, at 0.0 none do.
-    """
-    return (
-        counts.group_by(column)
-        .len(name="count")
-        .sort("count", descending=True)
-        .with_columns(
-            (pl.col("count").cum_sum() / pl.col("count").sum()).alias("cumulative")
-        )
-        .filter(pl.col("cumulative") <= threshold)
-        .select(column)
-    )
+from ocelescope.ocel.constants.tables import EVENTS_TABLE, OBJECTS_TABLE
+from ocelescope.ocel.filter.base import BaseFilter, Step, number_literal
+from ocelescope.ocel.util.clean import surviving_ids
+from ocelescope.util.sql import ident
 
 
 def _frequent(
-    entities: Callable[[], pl.LazyFrame], type_column: str, threshold: float, mode: str
-) -> pl.Expr:
-    """Whether an entity's type is (or is not) among the qualifying ones.
+    table: str,
+    id_col: str,
+    type_col: str,
+    counted: str,
+    threshold: float,
+    mode: str,
+) -> str:
+    """The ids of ``table`` whose type makes up at least ``threshold`` of it.
 
-    ``entities()`` is called afresh per scan: a table's LazyFrame is bound to one
-    DuckDB cursor and cannot be read twice in one query.
+    Each type is judged by its own share, so no order or tie between types
+    matters: at 0.0 every type is frequent, at 0.1 those with 10% or more.
+    Excluding keeps the rest -- the rare types.
+
+    Only the entities ``counted`` selects are counted: the log a filter reads is
+    not cleaned, and what the cleaning will drop must not tip the shares.
     """
-    qualifying = _cumulative_qualifying(entities(), type_column, threshold)
-    is_frequent = pl.col(type_column).is_in(
-        qualifying.select(type_column).collect().to_series()
-    )
-    return ~is_frequent if mode == "exclude" else is_frequent
+    id_col, type_col = ident(id_col), ident(type_col)
+    frequent = f"""
+        SELECT {type_col} FROM (
+            SELECT {type_col}, count(*) / sum(count(*)) OVER () AS share
+            FROM {table} WHERE {id_col} IN ({counted}) GROUP BY {type_col}
+        ) WHERE share >= {number_literal(threshold)}
+    """
+    is_frequent = f"{type_col} IN ({frequent})"
+    if mode == "exclude":
+        is_frequent = f"NOT ({is_frequent})"
+    return f"SELECT {id_col} FROM {table} WHERE {is_frequent}"
 
 
 class EventTypeFrequencyFilter(BaseFilter):
-    """Keep the events of the most common activities, by cumulative frequency."""
+    """Keep the events of activities with at least ``threshold`` of all events.
+
+    Shares are counted over the events the log keeps once cleaned.
+    """
 
     mode: Literal["include", "exclude"] = "include"
-    threshold: float = Field(default=1.0, ge=0.0, le=1.0)
+    threshold: float = Field(default=0.0, ge=0.0, le=1.0)
 
-    def keep(self, ocel) -> Keep:
-        return Keep(
-            events=ocel.events.pl.filter(
-                _frequent(
-                    lambda: ocel.events.pl, ACTIVITY_COL, self.threshold, self.mode
-                )
-            ).select(EID_COL)
+    def build(self, step: Step) -> None:
+        step.keep(
+            EVENTS_TABLE,
+            _frequent(
+                step[EVENTS_TABLE],
+                EID_COL,
+                ACTIVITY_COL,
+                surviving_ids(step.tables)[0],
+                self.threshold,
+                self.mode,
+            ),
         )
 
 
 class ObjectTypeFrequencyFilter(BaseFilter):
-    """Keep the objects of the most common types, by cumulative frequency."""
+    """Keep the objects of types with at least ``threshold`` of all objects.
+
+    Shares are counted over the objects the log keeps once cleaned.
+    """
 
     mode: Literal["include", "exclude"] = "include"
-    threshold: float = Field(default=1.0, ge=0.0, le=1.0)
+    threshold: float = Field(default=0.0, ge=0.0, le=1.0)
 
-    def keep(self, ocel) -> Keep:
-        return Keep(
-            objects=ocel.objects.pl.filter(
-                _frequent(lambda: ocel.objects.pl, OTYPE_COL, self.threshold, self.mode)
-            ).select(OID_COL)
+    def build(self, step: Step) -> None:
+        step.keep(
+            OBJECTS_TABLE,
+            _frequent(
+                step[OBJECTS_TABLE],
+                OID_COL,
+                OTYPE_COL,
+                surviving_ids(step.tables)[1],
+                self.threshold,
+                self.mode,
+            ),
         )
