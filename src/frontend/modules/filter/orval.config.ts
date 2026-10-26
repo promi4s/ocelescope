@@ -9,6 +9,8 @@ const PREVIEWS = [
   "previewAttributeNames",
   "previewAggregatedAttributes",
   "previewTypedAttributes",
+  "previewAttributeDistribution",
+  "previewAttributeValues",
   "previewRelations",
   "previewRelationCombinations",
 ];

@@ -3,7 +3,7 @@ import { ActivityPicker, ObjectTypePicker } from "@ocelescope/core";
 import { keepPreviousData } from "@tanstack/react-query";
 import { usePreviewEventCounts, usePreviewObjectCounts } from "../../api/base";
 import type { FilterKind, FilterPanel } from "../../types/filter";
-import Previewed from "./Previewed";
+import Previewed from "../Previewed";
 
 const PICKER_CLASS = "ocelescope-type-filter-picker";
 

@@ -3,7 +3,7 @@ import { keepPreviousData } from "@tanstack/react-query";
 import { usePreviewRelations } from "../../api/base";
 import { useRelationCountFilter } from "../../hooks/useRelationFilterColumns";
 import type { FilterKind, FilterOf, FilterPanel } from "../../types/filter";
-import Previewed from "./Previewed";
+import Previewed from "../Previewed";
 
 type RelationKey = "e2o_count" | "o2o_count";
 

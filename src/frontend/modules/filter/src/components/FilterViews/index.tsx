@@ -4,7 +4,10 @@ import type {
   FilterOf,
   NativeFilter,
 } from "../../types/filter";
-import { EventAttributeFilter, ObjectAttributeFilter } from "./AttributeFilter";
+import {
+  EventAttributeFilter,
+  ObjectAttributeFilter,
+} from "./AttributeFilter/AttributeFilter";
 import { E2OCountFilter, O2OCountFilter } from "./RelationCountFilter";
 import { TimeFrameFilter } from "./TimeFrameFilter";
 import { ActivityFilter, ObjectTypeFilter } from "./TypeForm";

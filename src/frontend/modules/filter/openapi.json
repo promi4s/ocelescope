@@ -747,6 +747,335 @@
         }
       }
     },
+    "/modules/filter/v1/{ocel_id}/preview/attributes/distribution": {
+      "post": {
+        "summary": "Preview Attribute Distribution",
+        "operationId": "previewAttributeDistribution",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "attribute",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Attribute"
+            }
+          },
+          {
+            "name": "entity_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "events",
+                "objects"
+              ],
+              "type": "string",
+              "default": "events",
+              "title": "Entity Type"
+            }
+          },
+          {
+            "name": "entity_names",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Entity Names"
+            }
+          },
+          {
+            "name": "bins",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 50,
+              "title": "Bins"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TimeFrameFilter"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ActivityFilter"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ObjectTypeFilter"
+                    },
+                    {
+                      "$ref": "#/components/schemas/EventAttributeFilter"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ObjectAttributeFilter"
+                    },
+                    {
+                      "$ref": "#/components/schemas/E2OCountFilter"
+                    },
+                    {
+                      "$ref": "#/components/schemas/O2OCountFilter"
+                    }
+                  ],
+                  "discriminator": {
+                    "propertyName": "type",
+                    "mapping": {
+                      "time_frame": "#/components/schemas/TimeFrameFilter",
+                      "activity": "#/components/schemas/ActivityFilter",
+                      "object_type": "#/components/schemas/ObjectTypeFilter",
+                      "event_attribute": "#/components/schemas/EventAttributeFilter",
+                      "object_attribute": "#/components/schemas/ObjectAttributeFilter",
+                      "e2o_count": "#/components/schemas/E2OCountFilter",
+                      "o2o_count": "#/components/schemas/O2OCountFilter"
+                    }
+                  }
+                },
+                "title": "Steps"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/AttributeDistribution"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Previewattributedistribution"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/modules/filter/v1/{ocel_id}/preview/attributes/values": {
+      "post": {
+        "summary": "Preview Attribute Values",
+        "operationId": "previewAttributeValues",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "attribute",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Attribute"
+            }
+          },
+          {
+            "name": "entity_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "events",
+                "objects"
+              ],
+              "type": "string",
+              "default": "events",
+              "title": "Entity Type"
+            }
+          },
+          {
+            "name": "entity_names",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Entity Names"
+            }
+          },
+          {
+            "name": "regex",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Regex"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Search"
+            }
+          },
+          {
+            "name": "values",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Values"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TimeFrameFilter"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ActivityFilter"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ObjectTypeFilter"
+                    },
+                    {
+                      "$ref": "#/components/schemas/EventAttributeFilter"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ObjectAttributeFilter"
+                    },
+                    {
+                      "$ref": "#/components/schemas/E2OCountFilter"
+                    },
+                    {
+                      "$ref": "#/components/schemas/O2OCountFilter"
+                    }
+                  ],
+                  "discriminator": {
+                    "propertyName": "type",
+                    "mapping": {
+                      "time_frame": "#/components/schemas/TimeFrameFilter",
+                      "activity": "#/components/schemas/ActivityFilter",
+                      "object_type": "#/components/schemas/ObjectTypeFilter",
+                      "event_attribute": "#/components/schemas/EventAttributeFilter",
+                      "object_attribute": "#/components/schemas/ObjectAttributeFilter",
+                      "e2o_count": "#/components/schemas/E2OCountFilter",
+                      "o2o_count": "#/components/schemas/O2OCountFilter"
+                    }
+                  }
+                },
+                "title": "Steps"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttributeMatches"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/modules/filter/v1/{ocel_id}/preview/attributes/typed": {
       "post": {
         "summary": "Preview Typed Attributes",
@@ -1323,6 +1652,160 @@
         "title": "AggregatedAttribute",
         "description": "An attribute summarized across every entity type that carries it."
       },
+      "AttributeBin": {
+        "properties": {
+          "start": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Start"
+          },
+          "end": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "End"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "start",
+          "end",
+          "count"
+        ],
+        "title": "AttributeBin"
+      },
+      "AttributeDistribution": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ValueType"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "distinct_values": {
+            "type": "integer",
+            "title": "Distinct Values"
+          },
+          "min": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Min"
+          },
+          "max": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Max"
+          },
+          "bins": {
+            "items": {
+              "$ref": "#/components/schemas/AttributeBin"
+            },
+            "type": "array",
+            "title": "Bins",
+            "default": []
+          },
+          "values": {
+            "items": {
+              "$ref": "#/components/schemas/AttributeValueCount"
+            },
+            "type": "array",
+            "title": "Values",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "type",
+          "count",
+          "distinct_values",
+          "min",
+          "max"
+        ],
+        "title": "AttributeDistribution"
+      },
+      "AttributeMatches": {
+        "properties": {
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "distinct_values": {
+            "type": "integer",
+            "title": "Distinct Values"
+          },
+          "values": {
+            "items": {
+              "$ref": "#/components/schemas/AttributeValueCount"
+            },
+            "type": "array",
+            "title": "Values"
+          }
+        },
+        "type": "object",
+        "required": [
+          "count",
+          "distinct_values",
+          "values"
+        ],
+        "title": "AttributeMatches"
+      },
+      "AttributeValueCount": {
+        "properties": {
+          "value": {
+            "type": "string",
+            "title": "Value"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "value",
+          "count"
+        ],
+        "title": "AttributeValueCount"
+      },
       "Date_Distribution_Item": {
         "properties": {
           "start_timestamp": {
@@ -1571,6 +2054,15 @@
             ],
             "title": "Regex"
           },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "exclude",
+              "include"
+            ],
+            "title": "Mode",
+            "default": "include"
+          },
           "type": {
             "type": "string",
             "const": "event_attribute",
@@ -1793,6 +2285,15 @@
               }
             ],
             "title": "Regex"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "exclude",
+              "include"
+            ],
+            "title": "Mode",
+            "default": "include"
           },
           "type": {
             "type": "string",

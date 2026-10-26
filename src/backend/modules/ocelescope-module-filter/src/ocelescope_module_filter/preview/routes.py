@@ -9,11 +9,15 @@ from __future__ import annotations
 
 from typing import Annotated
 
+import duckdb
 from fastapi import APIRouter, Body, Query
 from ocelescope_backend.app.dependencies import ApiSession
+from ocelescope_backend.app.internal.exceptions import BadRequest
 from ocelescope_backend.app.internal.model.base import PaginatedResponse
 from ocelescope_module_ocel.models import (
     AggregatedAttribute,
+    AttributeDistribution,
+    AttributeMatches,
     Entity_Time_Info,
     RelationCombination,
     RelationCountSummary,
@@ -103,6 +107,43 @@ def preview_aggregated_attributes(
                 entity_names,
             ),
         )
+
+
+@router.post("/attributes/distribution", operation_id="previewAttributeDistribution")
+def preview_attribute_distribution(
+    ocel_id: str,
+    session: ApiSession,
+    steps: Steps,
+    attribute: Annotated[str, Query()],
+    entity_type: Annotated[EntityType, Query()] = "events",
+    entity_names: Annotated[list[str] | None, Query()] = None,
+    bins: Annotated[int, Query(ge=1, le=500)] = 50,
+) -> AttributeDistribution | None:
+    with preview(session, ocel_id, steps) as view:
+        return attributes.attribute_distribution(
+            view, entity_type, attribute, entity_names, bins
+        )
+
+
+@router.post("/attributes/values", operation_id="previewAttributeValues")
+def preview_attribute_values(
+    ocel_id: str,
+    session: ApiSession,
+    steps: Steps,
+    attribute: Annotated[str, Query()],
+    entity_type: Annotated[EntityType, Query()] = "events",
+    entity_names: Annotated[list[str] | None, Query()] = None,
+    regex: Annotated[str | None, Query()] = None,
+    search: Annotated[str | None, Query()] = None,
+    values: Annotated[list[str] | None, Query()] = None,
+) -> AttributeMatches:
+    with preview(session, ocel_id, steps) as view:
+        try:
+            return attributes.attribute_values(
+                view, entity_type, attribute, entity_names, regex, search, values
+            )
+        except duckdb.InvalidInputException as error:
+            raise BadRequest(str(error)) from error
 
 
 @router.post("/attributes/typed", operation_id="previewTypedAttributes")
