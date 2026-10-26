@@ -7,13 +7,14 @@ from collections.abc import Callable, Generator, Hashable, Sequence
 from contextlib import AbstractContextManager, contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, ClassVar, Self, TypeVar, cast, overload
+from typing import Any, ClassVar, Self, TypeVar, overload
 from uuid import uuid4
 
 from ocelescope import OCEL, BaseFilter, ResourceBase
 from ocelescope_backend.app.internal.exceptions import BadRequest, NotFound
 from ocelescope_backend.app.internal.model.ocel import SessionOCEL
 from ocelescope_backend.app.internal.model.resource import ResourceApi, ResourceStore
+from ocelescope_backend.app.internal.model.state import StateStore
 from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.tasks.base import TaskBase
 from ocelescope_backend.app.sse_manager import InvalidationRequest, sse_manager
@@ -37,7 +38,7 @@ class Session:
         self._dedupe_keys: dict[Hashable, str] = {}  # dedupe key → task_id
 
         # Plugins
-        self._module_states: dict[str, Any] = {}
+        self.module_states = StateStore()
 
         # Resources
         self._resources: dict[str, ResourceStore] = {}
@@ -69,18 +70,6 @@ class Session:
             for task in self._tasks.values()
             if isinstance(task, task_type) and filter(task)
         ]
-
-    def get_module_state(self, key: str, state_cls: type[T]) -> T:
-        state = self._module_states.get(key)
-
-        if state is None:
-            state = state_cls()
-            self._module_states[key] = state
-
-        return cast(T, state)
-
-    def clear_module_state(self, key: str) -> None:
-        self._module_states.pop(key, None)
 
     @staticmethod
     def get(session_id: str) -> Session | None:
@@ -158,6 +147,7 @@ class Session:
         if handle is None:
             return
 
+        self.module_states.drop_ocel(ocel_id)
         handle.delete()
         sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
 
