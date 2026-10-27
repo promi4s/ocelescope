@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from itertools import count
 from typing import Any
 
-from duckdb import DuckDBPyConnection
+from duckdb import DuckDBPyConnection, DuckDBPyRelation
 
 from ocelescope.ocel.constants.pm4py import EID_COL, OID_COL
 from ocelescope.ocel.constants.tables import EVENTS_TABLE, OBJECTS_TABLE
@@ -56,9 +56,8 @@ class Step:
     def _name(self, name: str) -> str:
         return f"{self._schema}.{ident(f'{self._index}_{next(self._names)}_{name}')}"
 
-    def columns(self, table: str) -> list[str]:
-        """The columns ``table`` has as of this step."""
-        return self._con.sql(f"SELECT * FROM {self[table]} LIMIT 0").columns
+    def sql(self, query: str) -> DuckDBPyRelation:
+        return self._con.sql(query)
 
     def keep(self, table: str, ids: str) -> None:
         """Keep only the events or objects whose id ``ids`` selects.

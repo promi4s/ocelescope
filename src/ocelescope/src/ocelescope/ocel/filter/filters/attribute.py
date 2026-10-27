@@ -29,7 +29,8 @@ from ocelescope.util.sql import ident, literal
 
 def _attribute_names(step: Step, table: str) -> list[str]:
     """The attributes ``table`` has a column for -- every one not an OCEL column."""
-    return [column for column in step.columns(table) if not column.startswith("ocel:")]
+    columns = step.sql(f"SELECT * FROM {step[table]} LIMIT 0").columns
+    return [column for column in columns if not column.startswith("ocel:")]
 
 
 class _AttributeFilter(BaseFilter):
