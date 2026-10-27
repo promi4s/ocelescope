@@ -8,10 +8,7 @@ class Clean(ViewOperation):
     """Drop everything the log no longer supports -- :meth:`OCEL.clean`, as a step.
 
     The rules are :mod:`ocelescope.ocel.util.clean`'s. Only the surviving ids are
-    stored; every table is then restricted to them with :meth:`Step.restrict`,
-    which narrows the table as it was last defined rather than stacking on the
-    restrictions before -- so cleaning after every step does not make each
-    query read through all the steps before it.
+    stored; every table is then set to its rows with them.
     """
 
     def build(self, step: Step) -> None:
@@ -21,4 +18,4 @@ class Clean(ViewOperation):
             step.materialize("kept_objects", objects),
         )
         for table, condition in conditions.items():
-            step.restrict(table, condition)
+            step[table] = f"SELECT * FROM {step[table]} WHERE {condition}"
