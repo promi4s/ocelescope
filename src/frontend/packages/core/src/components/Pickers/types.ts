@@ -48,6 +48,8 @@ export interface OcelSource {
   ocelId?: string;
   /** The unfiltered log, for choices that must not shift under a filter. */
   ocelVersion?: "filtered" | "original";
+  /** A view of the OCEL; takes precedence over `ocelVersion`. */
+  viewId?: string;
 }
 
 /** The props of a picker that reads its choices from an OCEL endpoint. */

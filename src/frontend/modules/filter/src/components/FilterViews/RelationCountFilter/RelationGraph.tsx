@@ -16,7 +16,7 @@ import { keepPreviousData } from "@tanstack/react-query";
 import { FilterIcon, XIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import { type ReactNode, useMemo, useState } from "react";
-import { useView } from "../../../hooks/useView";
+import { useView, viewProps } from "../../../hooks/useView";
 import Previewed from "../../Previewed";
 import type { RelationFilter, RelationViewProps } from "./util";
 
@@ -105,7 +105,13 @@ const RelationGraph: React.FC<RelationViewProps> = ({
   });
 
   const graph = useMemo(() => {
-    if (!relations.data || !qualified.data || !events.data || !objects.data) {
+    if (
+      !view ||
+      !relations.data ||
+      !qualified.data ||
+      !events.data ||
+      !objects.data
+    ) {
       return undefined;
     }
     const summaries = relations.data.response;
@@ -163,8 +169,9 @@ const RelationGraph: React.FC<RelationViewProps> = ({
       })),
     ];
 
-    return { nodes, edges, activityCounts, objectTypeCounts };
+    return { view, nodes, edges, activityCounts, objectTypeCounts };
   }, [
+    view,
     relations.data,
     qualified.data,
     events.data,
@@ -193,7 +200,7 @@ const RelationGraph: React.FC<RelationViewProps> = ({
 
   return (
     <Previewed query={query}>
-      {({ nodes, edges: allEdges, activityCounts, objectTypeCounts }) => {
+      {({ view, nodes, edges: allEdges, activityCounts, objectTypeCounts }) => {
         const activities = pickedActivities ?? Object.keys(activityCounts);
         const objectTypes = pickedObjectTypes ?? Object.keys(objectTypeCounts);
         const picked = new Set([
@@ -266,7 +273,7 @@ const RelationGraph: React.FC<RelationViewProps> = ({
                   >
                     <ActivityPicker
                       ocelId={ocelId}
-                      data={activityCounts}
+                      {...viewProps(view)}
                       variant="list"
                       multiple
                       cutoff
@@ -282,7 +289,7 @@ const RelationGraph: React.FC<RelationViewProps> = ({
                 >
                   <ObjectTypePicker
                     ocelId={ocelId}
-                    data={objectTypeCounts}
+                    {...viewProps(view)}
                     variant="list"
                     multiple
                     cutoff

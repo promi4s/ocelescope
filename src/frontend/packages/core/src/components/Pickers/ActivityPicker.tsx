@@ -5,28 +5,22 @@ import { useOcelId } from "./internal/useOcelId";
 import { OptionPicker } from "./OptionPicker";
 import type { OcelPickerProps } from "./types";
 
-export type ActivityPickerProps = OcelPickerProps<string> & {
-  /** The events per activity to pick from; set, nothing is fetched. */
-  data?: Record<string, number>;
-};
+export type ActivityPickerProps = OcelPickerProps<string>;
 
 /** The log's activities, by how many events each has. */
 export const ActivityPicker = ({
   ocelId,
   ocelVersion = "filtered",
-  data: given,
+  viewId,
   ...picker
 }: ActivityPickerProps) => {
   const id = useOcelId(ocelId);
   const colorOf = useColorOf("activity");
-  const fetched = useEventCounts(
+  const { data, isPending, error } = useEventCounts(
     id,
-    { ocel_version: ocelVersion },
-    { query: { enabled: id != null && given === undefined } },
+    { ocel_version: ocelVersion, view_id: viewId },
+    { query: { enabled: id != null } },
   );
-  const data = given ?? fetched.data;
-  const isPending = given === undefined && fetched.isPending;
-  const error = given === undefined ? fetched.error : null;
   const options = useMemo(
     () =>
       Object.entries(data ?? {}).map(([name, count]) => ({

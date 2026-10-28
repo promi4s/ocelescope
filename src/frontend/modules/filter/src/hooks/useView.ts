@@ -18,3 +18,8 @@ export const useView = (
   }
   return data === null ? ORIGINAL : { view_id: data };
 };
+
+export const viewProps = (view: ViewParams) =>
+  "view_id" in view
+    ? { viewId: view.view_id }
+    : { ocelVersion: "original" as const };

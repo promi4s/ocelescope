@@ -8,8 +8,6 @@ import type { OcelPickerProps } from "./types";
 export type ObjectTypePickerProps = OcelPickerProps<string> & {
   /** Offer only the object types that events of this activity relate to. */
   activity?: string;
-  /** The objects per type to pick from; set, the counts are not fetched. */
-  data?: Record<string, number>;
 };
 
 /** The log's object types, by how many objects each has. */
@@ -17,24 +15,22 @@ export const ObjectTypePicker = ({
   activity,
   ocelId,
   ocelVersion = "filtered",
-  data: given,
+  viewId,
   ...picker
 }: ObjectTypePickerProps) => {
   const id = useOcelId(ocelId);
   const colorOf = useColorOf("objectType");
-  const fetched = useObjectCounts(
+  const { data, isPending, error } = useObjectCounts(
     id,
-    { ocel_version: ocelVersion },
-    { query: { enabled: id != null && given === undefined } },
+    { ocel_version: ocelVersion, view_id: viewId },
+    { query: { enabled: id != null } },
   );
-  const data = given ?? fetched.data;
-  const isPending = given === undefined && fetched.isPending;
-  const error = given === undefined ? fetched.error : null;
   const relations = useE2o(
     id,
     {
       source_types: activity ? [activity] : [],
       ocel_version: ocelVersion,
+      view_id: viewId,
       page_size: 1000,
     },
     { query: { enabled: id != null && activity !== undefined } },

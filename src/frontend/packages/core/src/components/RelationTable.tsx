@@ -38,9 +38,8 @@ const SubRelationTable: React.FC<{
   hideRange?: boolean;
   hideTotal?: boolean;
   ocelVersion?: OcelVersion;
+  viewId?: string;
   extraColumns?: DataTableColumn<RelationCountSummary>[];
-  /** The pair's rows per qualifier; set, nothing is fetched. */
-  data?: RelationCountSummary[];
 }> = ({
   ocelId,
   relationType,
@@ -50,12 +49,12 @@ const SubRelationTable: React.FC<{
   hideRange = false,
   hideTotal = false,
   ocelVersion,
+  viewId,
   extraColumns = [],
-  data: given,
 }) => {
   const useRelations = relationType === "e2o" ? useE2o : useO2o;
 
-  const fetched = useRelations(
+  const { data, isFetching } = useRelations(
     ocelId,
     {
       direction,
@@ -63,16 +62,10 @@ const SubRelationTable: React.FC<{
       target_types: [target],
       with_qualifier: true,
       ocel_version: ocelVersion,
+      view_id: viewId,
     },
-    {
-      query: {
-        placeholderData: keepPreviousData,
-        enabled: given === undefined,
-      },
-    },
+    { query: { placeholderData: keepPreviousData } },
   );
-  const data = given ?? fetched.data?.response;
-  const isFetching = given === undefined && fetched.isFetching;
 
   const columns: DataTableColumn<RelationCountSummary>[] = useMemo(
     () =>
@@ -122,7 +115,7 @@ const SubRelationTable: React.FC<{
     <DataTable
       noHeader
       idAccessor={"qualifier"}
-      records={data ?? []}
+      records={data?.response ?? []}
       columns={columns}
       fetching={isFetching}
       backgroundColor={{ light: "gray.0", dark: "dark.6" }}
@@ -139,20 +132,11 @@ const RelationTable: React.FC<{
   hideRange?: boolean;
   hideTotal?: boolean;
   ocelVersion?: OcelVersion;
+  viewId?: string;
   visibleRelations?: { source: string; target: string }[];
   height?: string | number;
   className?: string;
   style?: React.CSSProperties;
-  /**
-   * All of the table's data at once: each (source, target) pair, and each pair
-   * per qualifier. Set, nothing is fetched -- the table filters, pages and
-   * expands it itself. The qualifier filter then narrows which pairs show,
-   * without recomputing their counts over just those qualifiers.
-   */
-  data?: {
-    pairs: RelationCountSummary[];
-    qualified: RelationCountSummary[];
-  };
 }> = ({
   ocelId,
   relationType = "o2o",
@@ -162,26 +146,20 @@ const RelationTable: React.FC<{
   hideRange = false,
   hideTotal = false,
   ocelVersion,
+  viewId,
   visibleRelations,
   height,
   className,
   style,
-  data: given,
 }) => {
   const isE2O = relationType === "e2o";
   const isSource = direction === "source";
-  const fetching = given === undefined;
 
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { data: fetchedCombinations } = (
+  const { data: combinations = [] } = (
     isE2O ? useE2oCombinations : useO2oCombinations
-  )(
-    ocelId,
-    { direction, ocel_version: ocelVersion },
-    { query: { enabled: fetching } },
-  );
-  const combinations = given?.qualified ?? fetchedCombinations ?? [];
+  )(ocelId, { direction, ocel_version: ocelVersion, view_id: viewId });
 
   const sourceOptions = useMemo(
     () => Array.from(new Set(combinations.map(({ source }) => source))),
@@ -255,7 +233,7 @@ const RelationTable: React.FC<{
 
   const useRelations = isE2O ? useE2o : useO2o;
 
-  const fetched = useRelations(
+  const { data, isFetching } = useRelations(
     ocelId,
     {
       direction,
@@ -263,53 +241,15 @@ const RelationTable: React.FC<{
       page_size: PAGE_SIZE,
       with_qualifier: false,
       ocel_version: ocelVersion,
+      view_id: viewId,
       ...(effectiveSources.length > 0 && { source_types: effectiveSources }),
       ...(effectiveTargets.length > 0 && { target_types: effectiveTargets }),
       ...(filteredQualifiers.length > 0 && { qualifiers: filteredQualifiers }),
     },
     {
-      query: {
-        placeholderData: keepPreviousData,
-        enabled: fetching && !showNoRelations,
-      },
+      query: { placeholderData: keepPreviousData, enabled: !showNoRelations },
     },
   );
-
-  // the given pairs, filtered like the server would
-  const givenRows = useMemo(() => {
-    if (!given) {
-      return [];
-    }
-    return given.pairs
-      .filter(
-        ({ source, target }) =>
-          (effectiveSources.length === 0 ||
-            effectiveSources.includes(source)) &&
-          (effectiveTargets.length === 0 || effectiveTargets.includes(target)),
-      )
-      .map((pair) =>
-        filteredQualifiers.length === 0
-          ? pair
-          : {
-              ...pair,
-              qualifiers: (pair.qualifiers ?? []).filter((qualifier) =>
-                filteredQualifiers.includes(qualifier),
-              ),
-            },
-      )
-      .filter(
-        ({ qualifiers }) =>
-          filteredQualifiers.length === 0 || (qualifiers ?? []).length > 0,
-      );
-  }, [given, effectiveSources, effectiveTargets, filteredQualifiers]);
-
-  const records = given
-    ? givenRows.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
-    : fetched.data?.response;
-  const totalRecords = given
-    ? givenRows.length
-    : (fetched.data?.total_items ?? 0);
-  const isFetching = fetching && fetched.isFetching;
 
   const [selectedRelations, setSelectedRelations] = useState<string[]>([]);
 
@@ -429,11 +369,11 @@ const RelationTable: React.FC<{
   return (
     <DataTable
       idAccessor={relationId}
-      records={showNoRelations ? [] : records}
+      records={showNoRelations ? [] : data?.response}
       columns={columns}
       withTableBorder
       fetching={isFetching}
-      totalRecords={showNoRelations ? 0 : totalRecords}
+      totalRecords={showNoRelations ? 0 : (data?.total_items ?? 0)}
       page={currentPage}
       recordsPerPage={PAGE_SIZE}
       onPageChange={setCurrentPage}
@@ -458,13 +398,8 @@ const RelationTable: React.FC<{
             hideRange={hideRange}
             hideTotal={hideTotal}
             ocelVersion={ocelVersion}
+            viewId={viewId}
             extraColumns={subTableExtraColumns}
-            {...(given && {
-              data: given.qualified.filter(
-                ({ source, target }) =>
-                  source === record.source && target === record.target,
-              ),
-            })}
           />
         ),
       }}

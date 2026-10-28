@@ -3,12 +3,7 @@ import type { ReactNode } from "react";
 
 type PreviewQuery<T> = { data?: T; isPending: boolean; error: unknown };
 
-/**
- * Renders ``children`` with the preview data once it is there.
- *
- * The pickers and tables fetch the log themselves when they are given no data,
- * so they must not be rendered before it has arrived.
- */
+/** Renders ``children`` with the preview data once it is there. */
 const Previewed = <T,>({
   query,
   children,

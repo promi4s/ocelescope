@@ -1,19 +1,13 @@
-import {
-  useAggregatedAttributes,
-  useEventAttributes,
-  useObjectAttributes,
-} from "@ocelescope/api-base";
+import { useEventAttributes, useObjectAttributes } from "@ocelescope/api-base";
 import { AttributesTable } from "@ocelescope/core";
 import { keepPreviousData } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useAttributeFilter } from "../../../hooks/useAttributeFilterColumns";
-import { useView } from "../../../hooks/useView";
+import { useView, viewProps } from "../../../hooks/useView";
 import type { FilterKind, FilterOf, FilterPanel } from "../../../types/filter";
 import dayjs from "../../../util/dayjs";
 import Previewed from "../../Previewed";
 import AttributeDetail from "./AttributeDetail";
-
-const ALL = 100_000;
 
 type AttributeKey = "event_attribute" | "object_attribute";
 
@@ -25,23 +19,9 @@ const AttributePanel: (
   return ({ ocelId, filter, onChange, before }) => {
     const { filterColumns } = useAttributeFilter({ filter, onChange });
     const view = useView(ocelId, before);
-    const options = {
+    const typed = useTypedAttributes(ocelId, view, {
       query: { enabled: view !== undefined, placeholderData: keepPreviousData },
-    };
-    const aggregated = useAggregatedAttributes(
-      ocelId,
-      { ...view, entity_type: entityType, page_size: ALL },
-      options,
-    );
-    const typed = useTypedAttributes(ocelId, view, options);
-    const both = {
-      data:
-        aggregated.data && typed.data
-          ? { attributes: aggregated.data.response, typed: typed.data }
-          : undefined,
-      isPending: aggregated.isPending || typed.isPending,
-      error: aggregated.error ?? typed.error,
-    };
+    });
     const scopes = useMemo(
       () =>
         (typed.data ?? [])
@@ -65,12 +45,12 @@ const AttributePanel: (
     }
 
     return (
-      <Previewed query={both}>
-        {(data) => (
+      <Previewed query={{ data: view, isPending: true, error: null }}>
+        {(view) => (
           <AttributesTable
             ocelId={ocelId}
             entityType={entityType}
-            data={data}
+            {...viewProps(view)}
             extraColumns={filterColumns}
             subTableExtraColumns={filterColumns}
             hideRange

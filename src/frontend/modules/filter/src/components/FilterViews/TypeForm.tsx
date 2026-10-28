@@ -1,8 +1,6 @@
 import { InlineStyles, Stack } from "@mantine/core";
-import { useEventCounts, useObjectCounts } from "@ocelescope/api-base";
 import { ActivityPicker, ObjectTypePicker } from "@ocelescope/core";
-import { keepPreviousData } from "@tanstack/react-query";
-import { useView } from "../../hooks/useView";
+import { useView, viewProps } from "../../hooks/useView";
 import type { FilterKind, FilterPanel } from "../../types/filter";
 import Previewed from "../Previewed";
 
@@ -38,12 +36,9 @@ const ActivityPanel: FilterPanel<"activity"> = ({
   before,
 }) => {
   const view = useView(ocelId, before);
-  const counts = useEventCounts(ocelId, view, {
-    query: { enabled: view !== undefined, placeholderData: keepPreviousData },
-  });
   return (
-    <Previewed query={counts}>
-      {(data) => (
+    <Previewed query={{ data: view, isPending: true, error: null }}>
+      {(view) => (
         <Stack gap={4} flex={1} mih={0} className={PICKER_CLASS}>
           <FillHeightStyles />
           <ActivityPicker
@@ -51,7 +46,7 @@ const ActivityPanel: FilterPanel<"activity"> = ({
             multiple
             cutoff
             ocelId={ocelId}
-            data={data}
+            {...viewProps(view)}
             value={filter.event_types}
             onChange={(next) => onChange({ ...filter, event_types: next })}
           />
@@ -68,12 +63,9 @@ const ObjectTypePanel: FilterPanel<"object_type"> = ({
   before,
 }) => {
   const view = useView(ocelId, before);
-  const counts = useObjectCounts(ocelId, view, {
-    query: { enabled: view !== undefined, placeholderData: keepPreviousData },
-  });
   return (
-    <Previewed query={counts}>
-      {(data) => (
+    <Previewed query={{ data: view, isPending: true, error: null }}>
+      {(view) => (
         <Stack gap={4} flex={1} mih={0} className={PICKER_CLASS}>
           <FillHeightStyles />
           <ObjectTypePicker
@@ -81,7 +73,7 @@ const ObjectTypePanel: FilterPanel<"object_type"> = ({
             multiple
             cutoff
             ocelId={ocelId}
-            data={data}
+            {...viewProps(view)}
             value={filter.object_types}
             onChange={(next) => onChange({ ...filter, object_types: next })}
           />
