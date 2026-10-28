@@ -33,10 +33,10 @@ class Step:
         schema: str,
         index: int,
         tables: dict[str, str],
-        created: list[tuple[str, str | None]] | None = None,
+        created: list[tuple[str, str | None]],
     ):
         self._con = con
-        self._created = created if created is not None else []
+        self._created = created
         self._schema = schema
         self._index = index
         self._names = count()
