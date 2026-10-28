@@ -1,11 +1,13 @@
+import {
+  useAggregatedAttributes,
+  useEventAttributes,
+  useObjectAttributes,
+} from "@ocelescope/api-base";
 import { AttributesTable } from "@ocelescope/core";
 import { keepPreviousData } from "@tanstack/react-query";
 import { useMemo } from "react";
-import {
-  usePreviewAggregatedAttributes,
-  usePreviewTypedAttributes,
-} from "../../../api/base";
 import { useAttributeFilter } from "../../../hooks/useAttributeFilterColumns";
+import { useView } from "../../../hooks/useView";
 import type { FilterKind, FilterOf, FilterPanel } from "../../../types/filter";
 import dayjs from "../../../util/dayjs";
 import Previewed from "../../Previewed";
@@ -17,23 +19,21 @@ type AttributeKey = "event_attribute" | "object_attribute";
 
 const AttributePanel: (
   entityType: "objects" | "events",
-) => FilterPanel<AttributeKey> =
-  (entityType) =>
-  ({ ocelId, filter, onChange, before }) => {
+) => FilterPanel<AttributeKey> = (entityType) => {
+  const useTypedAttributes =
+    entityType === "events" ? useEventAttributes : useObjectAttributes;
+  return ({ ocelId, filter, onChange, before }) => {
     const { filterColumns } = useAttributeFilter({ filter, onChange });
-    const options = { query: { placeholderData: keepPreviousData } };
-    const aggregated = usePreviewAggregatedAttributes(
+    const view = useView(ocelId, before);
+    const options = {
+      query: { enabled: view !== undefined, placeholderData: keepPreviousData },
+    };
+    const aggregated = useAggregatedAttributes(
       ocelId,
-      before,
-      { entity_type: entityType, page_size: ALL },
+      { ...view, entity_type: entityType, page_size: ALL },
       options,
     );
-    const typed = usePreviewTypedAttributes(
-      ocelId,
-      before,
-      { entity_type: entityType },
-      options,
-    );
+    const typed = useTypedAttributes(ocelId, view, options);
     const both = {
       data:
         aggregated.data && typed.data
@@ -80,6 +80,7 @@ const AttributePanel: (
       </Previewed>
     );
   };
+};
 
 const condition = (filter: FilterOf<AttributeKey>) => {
   if (filter.regex) {

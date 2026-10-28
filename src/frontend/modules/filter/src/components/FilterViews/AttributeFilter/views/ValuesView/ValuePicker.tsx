@@ -1,12 +1,13 @@
 import { Stack, Text, useMantineTheme } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
+import {
+  type AttributeValueCount,
+  useAttributeValues,
+} from "@ocelescope/api-base";
 import { OptionPicker, type PickerOption } from "@ocelescope/core";
 import { keepPreviousData } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import {
-  type AttributeValueCount,
-  usePreviewAttributeValues,
-} from "../../../../../api/base";
+import { useView } from "../../../../../hooks/useView";
 import type { DistributionViewProps, PreviewProps } from "../../util";
 
 const ValuePicker: React.FC<DistributionViewProps & PreviewProps> = ({
@@ -21,16 +22,22 @@ const ValuePicker: React.FC<DistributionViewProps & PreviewProps> = ({
   const [search, setSearch] = useState("");
   const [debounced] = useDebouncedValue(search.trim(), 300);
 
-  const found = usePreviewAttributeValues(
+  const view = useView(ocelId, before);
+  const found = useAttributeValues(
     ocelId,
-    before,
     {
+      ...view,
       attribute: filter.attribute,
       search: debounced,
       entity_type: entityType,
       entity_names: filter.target_type ? [filter.target_type] : undefined,
     },
-    { query: { enabled: debounced !== "", placeholderData: keepPreviousData } },
+    {
+      query: {
+        enabled: view !== undefined && debounced !== "",
+        placeholderData: keepPreviousData,
+      },
+    },
   );
 
   const isSearching = debounced !== "";
@@ -54,10 +61,10 @@ const ValuePicker: React.FC<DistributionViewProps & PreviewProps> = ({
 
   const selected = (filter.values ?? []).map(String);
   const exclude = filter.mode === "exclude";
-  const picked = usePreviewAttributeValues(
+  const picked = useAttributeValues(
     ocelId,
-    before,
     {
+      ...view,
       attribute: filter.attribute,
       values: selected,
       entity_type: entityType,
@@ -65,7 +72,7 @@ const ValuePicker: React.FC<DistributionViewProps & PreviewProps> = ({
     },
     {
       query: {
-        enabled: selected.length > 0,
+        enabled: view !== undefined && selected.length > 0,
         placeholderData: keepPreviousData,
       },
     },

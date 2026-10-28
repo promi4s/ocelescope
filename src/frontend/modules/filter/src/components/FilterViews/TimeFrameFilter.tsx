@@ -8,12 +8,13 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
-import type { EntityTimeInfo } from "@ocelescope/api-base";
+import { type EntityTimeInfo, useTimeInfo } from "@ocelescope/api-base";
 import { keepPreviousData } from "@tanstack/react-query";
 import type { EChartsOption } from "echarts";
 import EChartsReact from "echarts-for-react";
 import { memo, useMemo } from "react";
-import { type TimeFrameFilterMode, usePreviewTimeInfo } from "../../api/base";
+import type { TimeFrameFilterMode } from "../../api/base";
+import { useView } from "../../hooks/useView";
 import type { FilterKind, FilterPanel } from "../../types/filter";
 import dayjs from "../../util/dayjs";
 
@@ -141,11 +142,16 @@ const TimeFrameSlider: React.FC<{
 
 const TimeFramePanel: FilterPanel<"time_frame"> = memo(
   ({ ocelId, filter, onChange, before }) => {
-    const { data: timeInfo, isLoading } = usePreviewTimeInfo(
+    const view = useView(ocelId, before);
+    const { data: timeInfo, isLoading } = useTimeInfo(
       ocelId,
-      before,
-      { periods: 100 },
-      { query: { placeholderData: keepPreviousData } },
+      { ...view, periods: 100 },
+      {
+        query: {
+          enabled: view !== undefined,
+          placeholderData: keepPreviousData,
+        },
+      },
     );
     const [start, end] = filter.time_range;
     const mode = filter.mode ?? "include";

@@ -9,10 +9,11 @@ import {
   Text,
   Title,
 } from "@mantine/core";
+import { useAttributeDistribution } from "@ocelescope/api-base";
 import { keepPreviousData } from "@tanstack/react-query";
 import { ArrowLeftIcon } from "lucide-react";
 import { memo } from "react";
-import { usePreviewAttributeDistribution } from "../../../api/base";
+import { useView } from "../../../hooks/useView";
 import type { NativeFilter } from "../../../types/filter";
 import Previewed from "../../Previewed";
 import { type AttributeFilter, type FieldProps, formatValue } from "./util";
@@ -52,16 +53,22 @@ type AttributeDetailProps = FieldProps & {
 
 const AttributeDetail: React.FC<AttributeDetailProps> = memo(
   ({ ocelId, entityType, filter, onChange, before, scopes, onClear }) => {
-    const distribution = usePreviewAttributeDistribution(
+    const view = useView(ocelId, before);
+    const distribution = useAttributeDistribution(
       ocelId,
-      before,
       {
+        ...view,
         attribute: filter.attribute,
         entity_type: entityType,
         entity_names: filter.target_type ? [filter.target_type] : undefined,
         bins: BINS,
       },
-      { query: { placeholderData: keepPreviousData } },
+      {
+        query: {
+          enabled: view !== undefined,
+          placeholderData: keepPreviousData,
+        },
+      },
     );
 
     const typeNoun = entityType === "events" ? "activities" : "object types";

@@ -1,4 +1,4 @@
-import type { AttributeDistribution } from "../../../api/base";
+import type { AttributeDistribution } from "@ocelescope/api-base";
 import type { FilterOf, NativeFilter } from "../../../types/filter";
 import dayjs from "../../../util/dayjs";
 

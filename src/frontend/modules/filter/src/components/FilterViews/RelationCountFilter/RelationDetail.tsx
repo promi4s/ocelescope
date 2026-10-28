@@ -9,14 +9,11 @@ import {
   Text,
   Title,
 } from "@mantine/core";
+import type { RelationCountDistribution } from "@ocelescope/api-base";
 import { keepPreviousData } from "@tanstack/react-query";
 import { ArrowLeftIcon } from "lucide-react";
 import { useMemo } from "react";
-import {
-  type RelationCountDistribution,
-  usePreviewRelationCountDistribution,
-  usePreviewRelations,
-} from "../../../api/base";
+import { useView } from "../../../hooks/useView";
 import Previewed from "../../Previewed";
 import RangeView, { type Bin, type Range } from "../../RangeView";
 import type { RelationViewProps } from "./util";
@@ -40,19 +37,23 @@ const Stat: React.FC<{ label: string; value: number }> = ({ label, value }) => (
 const RelationDetail: React.FC<RelationViewProps & { onClear: () => void }> = ({
   ocelId,
   kind,
+  hooks,
   filter,
   onChange,
   before,
   onClear,
 }) => {
   const direction = filter.direction ?? "source";
-  const options = { query: { placeholderData: keepPreviousData } };
+  const view = useView(ocelId, before);
 
-  const relations = usePreviewRelations(
+  const options = {
+    query: { enabled: view !== undefined, placeholderData: keepPreviousData },
+  };
+
+  const relations = hooks.useRelations(
     ocelId,
-    kind,
-    before,
     {
+      ...view,
       with_qualifier: false,
       source_types: [filter.source],
       target_types: [filter.target],
@@ -61,11 +62,10 @@ const RelationDetail: React.FC<RelationViewProps & { onClear: () => void }> = ({
   );
   const qualifiers = relations.data?.response[0]?.qualifiers ?? [];
 
-  const distribution = usePreviewRelationCountDistribution(
+  const distribution = hooks.useDistribution(
     ocelId,
-    kind,
-    before,
     {
+      ...view,
       source: filter.source,
       target: filter.target,
       direction,

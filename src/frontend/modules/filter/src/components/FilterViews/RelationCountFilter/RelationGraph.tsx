@@ -10,16 +10,13 @@ import {
   Text,
   useMantineTheme,
 } from "@mantine/core";
+import { useEventCounts, useObjectCounts } from "@ocelescope/api-base";
 import { ActivityPicker, ObjectTypePicker } from "@ocelescope/core";
 import { keepPreviousData } from "@tanstack/react-query";
 import { FilterIcon, XIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import { type ReactNode, useMemo, useState } from "react";
-import {
-  usePreviewEventCounts,
-  usePreviewObjectCounts,
-  usePreviewRelations,
-} from "../../../api/base";
+import { useView } from "../../../hooks/useView";
 import Previewed from "../../Previewed";
 import type { RelationFilter, RelationViewProps } from "./util";
 
@@ -74,6 +71,7 @@ const ScopePicker: React.FC<{
 const RelationGraph: React.FC<RelationViewProps> = ({
   ocelId,
   kind,
+  hooks,
   filter,
   onChange,
   before,
@@ -85,24 +83,26 @@ const RelationGraph: React.FC<RelationViewProps> = ({
   const [pending, setPending] = useState<string | null>(null);
   const [edgeLimit, setEdgeLimit] = useState(EDGE_LIMIT);
 
-  const options = { query: { placeholderData: keepPreviousData } };
-  const relations = usePreviewRelations(
+  const view = useView(ocelId, before);
+  const options = {
+    query: { enabled: view !== undefined, placeholderData: keepPreviousData },
+  };
+  const relations = hooks.useRelations(
     ocelId,
-    kind,
-    before,
-    { with_qualifier: false },
+    { ...view, with_qualifier: false },
     options,
   );
-  const qualified = usePreviewRelations(
+  const qualified = hooks.useRelations(
     ocelId,
-    kind,
-    before,
-    { with_qualifier: true },
+    { ...view, with_qualifier: true },
     options,
   );
-
-  const events = usePreviewEventCounts(ocelId, before, options);
-  const objects = usePreviewObjectCounts(ocelId, before, options);
+  const events = useEventCounts(ocelId, view, {
+    query: { enabled: view !== undefined, placeholderData: keepPreviousData },
+  });
+  const objects = useObjectCounts(ocelId, view, {
+    query: { enabled: view !== undefined, placeholderData: keepPreviousData },
+  });
 
   const graph = useMemo(() => {
     if (!relations.data || !qualified.data || !events.data || !objects.data) {

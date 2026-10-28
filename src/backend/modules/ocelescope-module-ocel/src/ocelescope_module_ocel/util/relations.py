@@ -26,8 +26,8 @@ from ocelescope.ocel.constants.tables import (
     O2O_TABLE,
     OBJECTS_TABLE,
 )
-from ocelescope.ocel.view import OCELView
 from ocelescope.util.sql import ident, literal
+from ocelescope_backend.app.internal.model.base import PaginatedResponse
 
 from ocelescope import OCEL
 from ocelescope_module_ocel.models import (
@@ -79,7 +79,7 @@ def _normalized_relation(kind: RelationKind, direction: Direction) -> str:
 
 
 def relation_summary(
-    ocel: OCEL | OCELView,
+    ocel: OCEL,
     kind: RelationKind,
     direction: Direction = "source",
     source_types: list[str] | None = None,
@@ -87,7 +87,9 @@ def relation_summary(
     qualifiers: list[str] | None = None,
     with_qualifier: bool = True,
     drop_constant: bool = False,
-) -> list[RelationCountSummary]:
+    page: int | None = None,
+    page_size: int | None = None,
+) -> PaginatedResponse[list[RelationCountSummary]]:
     """Per (source_type, target_type[, qualifier]) multiplicity stats, in DuckDB.
 
     For every source instance we count how many targets it relates to, then per group
@@ -98,9 +100,10 @@ def relation_summary(
     ``None`` = no filter). ``drop_constant`` drops groups whose multiplicity never
     varies (``min_count == max_count``, e.g. always exactly one target).
 
-    Groups are ordered by (source, target, qualifier) for stable pages. The grouped
-    result is small -- one row per type combination -- so it is ordered in Python;
-    the heavy per-instance aggregation happens in DuckDB.
+    Groups are ordered by (source, target, qualifier) for stable pages and sliced by
+    ``page`` / ``page_size``; omitting both returns a single page with every group. The
+    grouped result is small -- one row per type combination -- so it is ordered and
+    paged in Python; the heavy per-instance aggregation happens in DuckDB.
     """
     keys = ["src_type", "tgt_type"] + (["qualifier"] if with_qualifier else [])
     key_sql = ", ".join(keys)
@@ -186,11 +189,21 @@ def relation_summary(
         summaries = [s for s in summaries if s.min_count != s.max_count]
 
     summaries.sort(key=lambda s: (s.source, s.target, s.qualifier))
-    return summaries
+
+    total_items = len(summaries)
+    page = page or 1
+    page_size = page_size or total_items or 1
+    start = (page - 1) * page_size
+    return PaginatedResponse(
+        response=summaries[start : start + page_size],
+        page=page,
+        page_size=page_size,
+        total_items=total_items,
+    )
 
 
 def combinations(
-    ocel: OCEL | OCELView,
+    ocel: OCEL,
     kind: RelationKind,
     direction: Direction = "source",
 ) -> list[RelationCombination]:
@@ -257,7 +270,7 @@ def _counted(
 
 
 def count_distribution(
-    ocel: OCEL | OCELView,
+    ocel: OCEL,
     kind: RelationKind,
     source: str,
     target: str,

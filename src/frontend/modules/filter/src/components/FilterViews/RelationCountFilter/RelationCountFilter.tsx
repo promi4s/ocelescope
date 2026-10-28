@@ -1,15 +1,18 @@
 import type { FilterKind, FilterOf, FilterPanel } from "../../../types/filter";
 import RelationDetail from "./RelationDetail";
 import RelationGraph from "./RelationGraph";
-import type { RelationKey, RelationKind } from "./util";
+import { RELATION_HOOKS, type RelationKey, type RelationKind } from "./util";
 
-const RelationCountPanel: (kind: RelationKind) => FilterPanel<RelationKey> =
-  (kind) =>
-  ({ ocelId, filter, onChange, before }) =>
+const RelationCountPanel: (kind: RelationKind) => FilterPanel<RelationKey> = (
+  kind,
+) => {
+  const hooks = RELATION_HOOKS[kind];
+  return ({ ocelId, filter, onChange, before }) =>
     filter.source ? (
       <RelationDetail
         ocelId={ocelId}
         kind={kind}
+        hooks={hooks}
         filter={filter}
         onChange={onChange}
         before={before}
@@ -26,11 +29,13 @@ const RelationCountPanel: (kind: RelationKind) => FilterPanel<RelationKey> =
       <RelationGraph
         ocelId={ocelId}
         kind={kind}
+        hooks={hooks}
         filter={filter}
         onChange={onChange}
         before={before}
       />
     );
+};
 
 const summary = (filter: FilterOf<RelationKey>) => {
   if (!filter.source) {

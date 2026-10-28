@@ -34,7 +34,14 @@ const SystemNotification = z.object({
 const InvalidationRequest = z.object({
   type: z.literal("invalidation"),
   routes: z.array(
-    z.enum(["ocels", "resources", "tasks", "plugins", "discoveryMethods"]),
+    z.enum([
+      "ocels",
+      "views",
+      "resources",
+      "tasks",
+      "plugins",
+      "discoveryMethods",
+    ]),
   ),
 });
 

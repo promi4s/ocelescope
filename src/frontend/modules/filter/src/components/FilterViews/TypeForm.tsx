@@ -1,7 +1,8 @@
 import { InlineStyles, Stack } from "@mantine/core";
+import { useEventCounts, useObjectCounts } from "@ocelescope/api-base";
 import { ActivityPicker, ObjectTypePicker } from "@ocelescope/core";
 import { keepPreviousData } from "@tanstack/react-query";
-import { usePreviewEventCounts, usePreviewObjectCounts } from "../../api/base";
+import { useView } from "../../hooks/useView";
 import type { FilterKind, FilterPanel } from "../../types/filter";
 import Previewed from "../Previewed";
 
@@ -36,8 +37,9 @@ const ActivityPanel: FilterPanel<"activity"> = ({
   onChange,
   before,
 }) => {
-  const counts = usePreviewEventCounts(ocelId, before, {
-    query: { placeholderData: keepPreviousData },
+  const view = useView(ocelId, before);
+  const counts = useEventCounts(ocelId, view, {
+    query: { enabled: view !== undefined, placeholderData: keepPreviousData },
   });
   return (
     <Previewed query={counts}>
@@ -65,8 +67,9 @@ const ObjectTypePanel: FilterPanel<"object_type"> = ({
   onChange,
   before,
 }) => {
-  const counts = usePreviewObjectCounts(ocelId, before, {
-    query: { placeholderData: keepPreviousData },
+  const view = useView(ocelId, before);
+  const counts = useObjectCounts(ocelId, view, {
+    query: { enabled: view !== undefined, placeholderData: keepPreviousData },
   });
   return (
     <Previewed query={counts}>
