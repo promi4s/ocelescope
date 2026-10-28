@@ -10,7 +10,9 @@ from ocelescope.ocel.view import ViewOperation
 from ocelescope.util.sql import literal, set_utc
 
 from ocelescope import OCEL
+from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.model.view import SessionView
+from ocelescope_backend.app.sse_manager import Notify
 
 MAX_TEMPORARY_VIEWS = 32
 
@@ -27,13 +29,19 @@ class SessionOCEL:
         db_path: Path,
         name: str,
         created_at: str,
+        notify: Notify,
     ):
         self.id = id
         self.db_path = db_path
         self.name = name
         self.created_at = created_at
+        self._notify = notify
         self._views: OrderedDict[str, SessionView] = OrderedDict()
         self.active_view_id: str | None = None
+
+    def rename(self, name: str) -> None:
+        self.name = name
+        self._notify(["ocels"])
 
     @property
     def active_view(self) -> SessionView | None:
@@ -48,7 +56,7 @@ class SessionOCEL:
     def prepare_view(self, view_id: str) -> None:
         view = self._views.get(view_id)
         if view is None:
-            raise KeyError(view_id)
+            raise NotFound(f"View {view_id} not found")
         view.temporary = False
         view.materialize()
 
@@ -56,8 +64,9 @@ class SessionOCEL:
         if view_id is not None:
             self.prepare_view(view_id)
         self.active_view_id = view_id
+        self._notify(["ocels", "views"])
 
-    def ocel(self, use_original: bool = False) -> OCEL:
+    def open(self, use_original: bool = False) -> OCEL:
         view = None if use_original else self.active_view
         if view is None:
             return OCEL.read_duckdb(self.db_path, read_only=True)
@@ -113,6 +122,8 @@ class SessionOCEL:
             evicted = self._views.pop(other_id, None)
             if evicted is not None:
                 evicted.close()
+        if not temporary:
+            self._notify(["views"])
         return view
 
     def get_view(self, view_id: str) -> SessionView | None:
@@ -124,13 +135,20 @@ class SessionOCEL:
     def list_views(self) -> list[SessionView]:
         return [view for view in self._views.values() if not view.temporary]
 
+    def rename_view(self, view_id: str, name: str) -> None:
+        self._views[view_id].name = name
+        self._notify(["views"])
+
     def delete_view(self, view_id: str) -> SessionView | None:
         view = self._views.pop(view_id, None)
         if view is None:
             return None
-        if view_id == self.active_view_id:
+        was_active = view_id == self.active_view_id
+        if was_active:
             self.active_view_id = None
         view.close()
+        if not view.temporary:
+            self._notify(["views", "ocels"] if was_active else ["views"])
         return view
 
     def delete(self) -> None:

@@ -3,21 +3,22 @@ from __future__ import annotations
 import json
 import shutil
 import tempfile
-from collections.abc import Callable, Generator, Hashable, Sequence
+from collections.abc import Callable, Generator, Hashable
 from contextlib import AbstractContextManager, contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, ClassVar, Self, TypeVar, overload
 from uuid import uuid4
 
-from ocelescope import OCEL, BaseFilter, ResourceBase
+from ocelescope import OCEL, ResourceBase
 from ocelescope_backend.app.internal.exceptions import BadRequest, NotFound
 from ocelescope_backend.app.internal.model.ocel import SessionOCEL
 from ocelescope_backend.app.internal.model.resource import ResourceApi, ResourceStore
 from ocelescope_backend.app.internal.model.state import StateStore
+from ocelescope_backend.app.internal.model.view import SessionView
 from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.tasks.base import TaskBase
-from ocelescope_backend.app.sse_manager import InvalidationRequest, sse_manager
+from ocelescope_backend.app.sse_manager import InvalidationRequest, Route, sse_manager
 
 S = TypeVar("S", bound=TaskBase)
 T = TypeVar("T")
@@ -35,7 +36,7 @@ class Session:
 
         # Tasks
         self._tasks: dict[str, TaskBase] = {}
-        self._dedupe_keys: dict[Hashable, str] = {}  # dedupe key → task_id
+        self._dedupe_keys: dict[Hashable, str] = {}
 
         # Plugins
         self.module_states = StateStore()
@@ -87,6 +88,8 @@ class Session:
     def close(self) -> None:
         """Forget the session and delete the files of its OCELs and resources."""
         Session.sessions.pop(self.id, None)
+        for handle in self.ocels.values():
+            handle.delete()
         shutil.rmtree(self._ocel_dir, ignore_errors=True)
         shutil.rmtree(self._resource_dir, ignore_errors=True)
 
@@ -115,32 +118,27 @@ class Session:
             db_path=db_path,
             name=name,
             created_at=datetime.now(tz=UTC).isoformat(),
+            notify=self._invalidate,
         )
-        sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
+        self._invalidate(["ocels"])
 
         return id
 
-    def get_ocel(self, ocel_id: str, use_original: bool = False) -> OCEL:
-        if ocel_id not in self.ocels:
+    def _invalidate(self, routes: list[Route]) -> None:
+        sse_manager.send_safe(self.id, InvalidationRequest(routes=routes))
+
+    def get_ocel(self, ocel_id: str) -> SessionOCEL:
+        handle = self.ocels.get(ocel_id)
+        if handle is None:
             raise NotFound(f"OCEL with id {ocel_id} not found")
+        return handle
 
-        return self.ocels[ocel_id].ocel(use_original=use_original)
-
-    def export_ocel(
-        self, ocel_id: str, target_path: Path, use_original: bool = False
-    ) -> None:
-        """Stream an OCEL to a file straight from its DuckDB store (no full load)."""
-        if ocel_id not in self.ocels:
-            raise NotFound(f"OCEL with id {ocel_id} not found")
-
-        self.ocels[ocel_id].export(target_path, use_original=use_original)
-
-    def rename_ocel(self, ocel_id: str, new_name: str):
-        if ocel_id not in self.ocels:
-            raise NotFound(f"OCEL with id {ocel_id} not found")
-
-        self.ocels[ocel_id].name = new_name
-        sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
+    def find_view(self, view_id: str) -> SessionView:
+        for handle in self.ocels.values():
+            view = handle.get_view(view_id)
+            if view is not None:
+                return view
+        raise NotFound(f"View {view_id} not found")
 
     def delete_ocel(self, ocel_id: str):
         handle = self.ocels.pop(ocel_id, None)
@@ -149,25 +147,7 @@ class Session:
 
         self.module_states.drop_ocel(ocel_id)
         handle.delete()
-        sse_manager.send_safe(self.id, InvalidationRequest(routes=["ocels"]))
-
-    # endregion
-    # region Resource management
-    def get_filter(
-        self, ocel_id: str, module_source: str | None = None
-    ) -> list[BaseFilter]:
-        if ocel_id not in self.ocels:
-            raise NotFound(f"OCEL with id {ocel_id} not found")
-
-        return self.ocels[ocel_id].get_filters(module_source)
-
-    def set_filter(
-        self, ocel_id: str, module_source: str, pipeline: Sequence[BaseFilter]
-    ):
-        if ocel_id not in self.ocels:
-            raise NotFound(f"OCEL with id {ocel_id} not found")
-
-        self.ocels[ocel_id].set_filters(module_source, pipeline)
+        self._invalidate(["ocels"])
 
     # endregion
     # region Resource management
