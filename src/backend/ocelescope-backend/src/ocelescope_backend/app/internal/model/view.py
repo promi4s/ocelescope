@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import threading
 from collections.abc import Generator, Sequence
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING
+from uuid import uuid4
 
 from ocelescope.ocel.view import OCELView, ViewOperation
 
@@ -21,7 +22,7 @@ class SessionView:
         origin: SessionOCEL,
         name: str,
         operations: Sequence[ViewOperation],
-        source: str | None = None,
+        source: str,
         temporary: bool = False,
     ):
         self.id = id
@@ -34,12 +35,18 @@ class SessionView:
         self.materialized = False
         self._lock = threading.Lock()
 
-        with (
-            OCEL.read_duckdb(origin.db_path, read_only=True) as ocel,
-            OCELView(ocel) as view,
-        ):
-            view.apply(*operations)
-            view.save(self.path)
+        building = self.path.with_name(f"{id}.{uuid4().hex}.building")
+        try:
+            with (
+                OCEL.read_duckdb(origin.db_path, read_only=True) as ocel,
+                OCELView(ocel) as view,
+            ):
+                view.apply(*operations)
+                view.save(building)
+            with suppress(FileExistsError):
+                self.path.hardlink_to(building)
+        finally:
+            building.unlink(missing_ok=True)
 
     @property
     def ocel_id(self) -> str:
