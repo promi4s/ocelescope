@@ -11,12 +11,12 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { useEventCounts, useObjectCounts } from "@ocelescope/api-base";
-import { ActivityPicker, ObjectTypePicker } from "@ocelescope/core";
+import { OptionPicker } from "@ocelescope/core";
 import { keepPreviousData } from "@tanstack/react-query";
 import { FilterIcon, XIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import { type ReactNode, useMemo, useState } from "react";
-import { useView, viewProps } from "../../../hooks/useView";
+import { useView } from "../../../hooks/useView";
 import Previewed from "../../Previewed";
 import type { RelationFilter, RelationViewProps } from "./util";
 
@@ -29,6 +29,13 @@ const eventId = (activity: string) => `event:${activity}`;
 const objectId = (objectType: string) => `object:${objectType}`;
 
 const EDGE_LIMIT = 10;
+
+const countOptions = (counts: Record<string, number>) =>
+  Object.entries(counts).map(([name, count]) => ({
+    value: name,
+    label: name,
+    count,
+  }));
 
 const MIN_WIDTH = 1;
 const MAX_WIDTH = 6;
@@ -105,13 +112,7 @@ const RelationGraph: React.FC<RelationViewProps> = ({
   });
 
   const graph = useMemo(() => {
-    if (
-      !view ||
-      !relations.data ||
-      !qualified.data ||
-      !events.data ||
-      !objects.data
-    ) {
+    if (!relations.data || !qualified.data || !events.data || !objects.data) {
       return undefined;
     }
     const summaries = relations.data.response;
@@ -169,9 +170,8 @@ const RelationGraph: React.FC<RelationViewProps> = ({
       })),
     ];
 
-    return { view, nodes, edges, activityCounts, objectTypeCounts };
+    return { nodes, edges, activityCounts, objectTypeCounts };
   }, [
-    view,
     relations.data,
     qualified.data,
     events.data,
@@ -200,7 +200,7 @@ const RelationGraph: React.FC<RelationViewProps> = ({
 
   return (
     <Previewed query={query}>
-      {({ view, nodes, edges: allEdges, activityCounts, objectTypeCounts }) => {
+      {({ nodes, edges: allEdges, activityCounts, objectTypeCounts }) => {
         const activities = pickedActivities ?? Object.keys(activityCounts);
         const objectTypes = pickedObjectTypes ?? Object.keys(objectTypeCounts);
         const picked = new Set([
@@ -271,9 +271,8 @@ const RelationGraph: React.FC<RelationViewProps> = ({
                     count={activities.length}
                     total={Object.keys(activityCounts).length}
                   >
-                    <ActivityPicker
-                      ocelId={ocelId}
-                      {...viewProps(view)}
+                    <OptionPicker<string>
+                      options={countOptions(activityCounts)}
                       variant="list"
                       multiple
                       cutoff
@@ -287,9 +286,8 @@ const RelationGraph: React.FC<RelationViewProps> = ({
                   count={objectTypes.length}
                   total={Object.keys(objectTypeCounts).length}
                 >
-                  <ObjectTypePicker
-                    ocelId={ocelId}
-                    {...viewProps(view)}
+                  <OptionPicker<string>
+                    options={countOptions(objectTypeCounts)}
                     variant="list"
                     multiple
                     cutoff
