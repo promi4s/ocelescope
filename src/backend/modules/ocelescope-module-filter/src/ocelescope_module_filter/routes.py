@@ -7,8 +7,6 @@ from ocelescope.ocel.view import Clean
 from ocelescope_backend.app.dependencies import ApiSession
 from ocelescope_backend.app.internal.model.ocel import SessionOCEL
 from ocelescope_backend.app.internal.model.view import SessionView
-from ocelescope_backend.app.internal.session import Session
-from ocelescope_backend.app.modules import ModuleStateHandle
 from ocelescope_backend.app.sse_manager import SystemNotification, sse_manager
 
 from ocelescope_module_filter.filters import FILTER_SOURCE, NativeFilter
@@ -78,59 +76,34 @@ def getFilter(
     return [] if current is None else list(current.pipeline)
 
 
-def is_filter_view(handle: SessionOCEL, view_id: str) -> bool:
-    view = handle.get_view(view_id)
-    return view is not None and view.source == FILTER_SOURCE
-
-
-def apply_filter(
-    session: Session,
+@router.post("/{ocel_id}/filter", operation_id="setFilter")
+def setFilter(
     ocel_id: str,
-    filters: ModuleStateHandle[FilterModuleState],
     pipeline: list[NativeFilter],
-) -> None:
+    session: ApiSession,
+    filters: ApiFilterState,
+):
     handle = session.get_ocel(ocel_id)
-    name = DEFAULT_VIEW_NAME
-    current = active_filter(handle, filters.get())
-    if current is not None and current.view_id is not None:
-        current_view = handle.get_view(current.view_id)
-        if current_view is not None:
-            name = current_view.name
+    started_at = time.perf_counter()
 
     view_id = None
     if pipeline:
-        view_id = create_filter_view(handle, pipeline, name).id
+        view_id = create_filter_view(handle, pipeline, DEFAULT_VIEW_NAME).id
         handle.prepare_view(view_id)
 
     with filters.update() as state:
         previous = active_filter(handle, state)
         handle.set_active_view(view_id)
         state.ocels[ocel_id] = FilterState(pipeline=list(pipeline), view_id=view_id)
-        if (
-            previous is not None
-            and previous.view_id is not None
-            and previous.view_id != view_id
-            and is_filter_view(handle, previous.view_id)
-        ):
+        if previous is not None and previous.view_id not in (None, view_id):
             handle.delete_view(previous.view_id)
 
-
-@router.post("/{ocel_id}/filter", operation_id="setFilter")
-def setFilter(
-    ocel_id: str,
-    body: list[NativeFilter],
-    session: ApiSession,
-    filters: ApiFilterState,
-):
-    started_at = time.perf_counter()
-    apply_filter(session, ocel_id, filters, body)
     duration = time.perf_counter() - started_at
-
-    ocel_name = session.get_ocel(ocel_id).name
+    ocel_name = handle.name
 
     with (
-        session.get_ocel(ocel_id).open() as filtered_ocel,
-        session.get_ocel(ocel_id).open(use_original=True) as original_ocel,
+        handle.open() as filtered_ocel,
+        handle.open(use_original=True) as original_ocel,
     ):
         event_difference = original_ocel.events.count - filtered_ocel.events.count
         object_difference = original_ocel.objects.count - filtered_ocel.objects.count
