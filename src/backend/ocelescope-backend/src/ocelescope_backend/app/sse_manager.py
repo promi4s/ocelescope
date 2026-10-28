@@ -42,7 +42,7 @@ class ErrorNotification(BaseModel):
     trace: str
 
 
-Route = Literal["resources", "ocels", "views", "tasks", "plugins"]
+Route = Literal["resources", "ocels", "views", "tasks", "plugins", "discoveryMethods"]
 Notify = Callable[[list[Route]], None]
 
 

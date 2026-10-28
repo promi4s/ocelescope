@@ -483,6 +483,22 @@
               "default": "filtered",
               "title": "Ocel Version"
             }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
           }
         ],
         "responses": {
@@ -573,6 +589,22 @@
               "type": "string",
               "default": "filtered",
               "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
             }
           }
         ],
@@ -669,6 +701,22 @@
               "default": "filtered",
               "title": "Ocel Version"
             }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
           }
         ],
         "responses": {
@@ -752,6 +800,22 @@
               "type": "string",
               "default": "filtered",
               "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
             }
           }
         ],
@@ -870,6 +934,22 @@
               "type": "string",
               "default": "filtered",
               "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
             }
           }
         ],
@@ -1032,6 +1112,22 @@
               "default": "filtered",
               "title": "Ocel Version"
             }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
           }
         ],
         "responses": {
@@ -1091,6 +1187,22 @@
               "type": "string",
               "default": "filtered",
               "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
             }
           }
         ],
@@ -1155,6 +1267,22 @@
               "type": "string",
               "default": "filtered",
               "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
             }
           }
         ],
@@ -1256,6 +1384,22 @@
               "default": "filtered",
               "title": "Ocel Version"
             }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
           }
         ],
         "responses": {
@@ -1326,6 +1470,22 @@
               "default": "filtered",
               "title": "Ocel Version"
             }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
           }
         ],
         "responses": {
@@ -1385,6 +1545,22 @@
               "type": "string",
               "default": "filtered",
               "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
             }
           }
         ],
@@ -1449,6 +1625,22 @@
               "type": "string",
               "default": "filtered",
               "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
             }
           }
         ],
@@ -1550,6 +1742,22 @@
               "default": "filtered",
               "title": "Ocel Version"
             }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
           }
         ],
         "responses": {
@@ -1641,6 +1849,22 @@
               "type": "string",
               "default": "filtered",
               "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
             }
           }
         ],
@@ -1827,6 +2051,22 @@
               "default": "filtered",
               "title": "Ocel Version"
             }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
           }
         ],
         "responses": {
@@ -1886,6 +2126,22 @@
               "type": "string",
               "default": "filtered",
               "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
             }
           }
         ],
@@ -2076,6 +2332,22 @@
               "default": "filtered",
               "title": "Ocel Version"
             }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
           }
         ],
         "responses": {
@@ -2135,6 +2407,22 @@
               "type": "string",
               "default": "filtered",
               "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
             }
           }
         ],
@@ -2214,6 +2502,22 @@
               "default": "filtered",
               "title": "Ocel Version"
             }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
           }
         ],
         "responses": {
@@ -2291,6 +2595,22 @@
               "type": "string",
               "default": "filtered",
               "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
             }
           }
         ],
@@ -2416,6 +2736,22 @@
               "default": "filtered",
               "title": "Ocel Version"
             }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
           }
         ],
         "responses": {
@@ -2536,6 +2872,22 @@
               "default": "filtered",
               "title": "Ocel Version"
             }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
           }
         ],
         "responses": {
@@ -2595,6 +2947,22 @@
               "type": "string",
               "default": "filtered",
               "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
             }
           }
         ],
@@ -2740,6 +3108,22 @@
               "default": "filtered",
               "title": "Ocel Version"
             }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
           }
         ],
         "responses": {
@@ -2821,6 +3205,22 @@
               "default": "filtered",
               "title": "Ocel Version"
             }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
           }
         ],
         "responses": {
@@ -2878,6 +3278,22 @@
               "type": "string",
               "default": "filtered",
               "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
             }
           }
         ],

@@ -10,7 +10,7 @@ from typing import (
 
 from typing_extensions import TypedDict
 
-from ocelescope import OCEL, BaseFilter, ResourceBase
+from ocelescope import OCEL, ResourceBase
 from ocelescope_backend.app.internal.model.resource import ResourceStore
 from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.registry.plugin import PluginNotFound
@@ -137,9 +137,9 @@ class PluginTask(TaskBase, Generic[P]):
         plugin_name: str,
         method_name: str,
         input: PluginInput,
-        filter: dict[str, list[BaseFilter]],
+        views: dict[str, str | None],
     ) -> Hashable:
-        return generate_tuple_hash("plugin", plugin_name, method_name, input, filter)
+        return generate_tuple_hash("plugin", plugin_name, method_name, input, views)
 
     @classmethod
     def create_plugin_task(
@@ -153,13 +153,13 @@ class PluginTask(TaskBase, Generic[P]):
 
         ocel_fields = [input.name for input in method.inputs if input.io_type == "ocel"]
 
-        filters = {
-            field_name: session.get_filter(input_id)
+        views = {
+            field_name: session.get_ocel(input_id).active_view_id
             for field_name, input_id in input["input_resources"].items()
             if input_id is not None and field_name in ocel_fields
         }
 
-        key = cls._dedupe_key(plugin_id, method_name, input, filters)
+        key = cls._dedupe_key(plugin_id, method_name, input, views)
 
         existing_id = session._dedupe_keys.get(key)
         if existing_id and existing_id in session.tasks:
