@@ -15,7 +15,6 @@ from ocelescope_backend.app.internal.exceptions import BadRequest, NotFound
 from ocelescope_backend.app.internal.model.ocel import SessionOCEL
 from ocelescope_backend.app.internal.model.resource import ResourceApi, ResourceStore
 from ocelescope_backend.app.internal.model.state import StateStore
-from ocelescope_backend.app.internal.model.view import SessionView
 from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.tasks.base import TaskBase
 from ocelescope_backend.app.sse_manager import InvalidationRequest, Route, sse_manager
@@ -132,13 +131,6 @@ class Session:
         if handle is None:
             raise NotFound(f"OCEL with id {ocel_id} not found")
         return handle
-
-    def find_view(self, view_id: str) -> SessionView:
-        for handle in self.ocels.values():
-            view = handle.get_view(view_id)
-            if view is not None:
-                return view
-        raise NotFound(f"View {view_id} not found")
 
     def delete_ocel(self, ocel_id: str):
         handle = self.ocels.pop(ocel_id, None)

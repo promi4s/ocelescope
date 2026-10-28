@@ -2,7 +2,6 @@ import { useQueryClient } from "@tanstack/react-query";
 
 type InvalidationRouteName =
   | "ocels"
-  | "views"
   | "resources"
   | "tasks"
   | "plugins"
@@ -10,7 +9,6 @@ type InvalidationRouteName =
 
 const ROUTE_PATH: Record<InvalidationRouteName, string> = {
   ocels: "modules/ocel/",
-  views: "modules/ocel/v1/views",
   resources: "resources",
   tasks: "tasks",
   plugins: "plugins",

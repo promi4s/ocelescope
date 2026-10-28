@@ -64,7 +64,7 @@ class SessionOCEL:
         if view_id is not None:
             self.prepare_view(view_id)
         self.active_view_id = view_id
-        self._notify(["ocels", "views"])
+        self._notify(["ocels"])
 
     def open(self, use_original: bool = False) -> OCEL:
         view = None if use_original else self.active_view
@@ -122,8 +122,6 @@ class SessionOCEL:
             evicted = self._views.pop(other_id, None)
             if evicted is not None:
                 evicted.close()
-        if not temporary:
-            self._notify(["views"])
         return view
 
     def get_view(self, view_id: str) -> SessionView | None:
@@ -131,13 +129,6 @@ class SessionOCEL:
         if view is not None:
             self._views.move_to_end(view_id)
         return view
-
-    def list_views(self) -> list[SessionView]:
-        return [view for view in self._views.values() if not view.temporary]
-
-    def rename_view(self, view_id: str, name: str) -> None:
-        self._views[view_id].name = name
-        self._notify(["views"])
 
     def delete_view(self, view_id: str) -> SessionView | None:
         view = self._views.pop(view_id, None)
@@ -147,8 +138,8 @@ class SessionOCEL:
         if was_active:
             self.active_view_id = None
         view.close()
-        if not view.temporary:
-            self._notify(["views", "ocels"] if was_active else ["views"])
+        if was_active:
+            self._notify(["ocels"])
         return view
 
     def delete(self) -> None:

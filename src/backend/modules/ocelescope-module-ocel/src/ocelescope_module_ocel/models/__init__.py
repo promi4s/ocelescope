@@ -7,7 +7,7 @@ from ocelescope_module_ocel.models.attributes import (
     AttributeValueCount,
     TypedAttribute,
 )
-from ocelescope_module_ocel.models.metadata import OcelMetadata, ViewMetadata
+from ocelescope_module_ocel.models.metadata import OcelMetadata
 from ocelescope_module_ocel.models.quantities import QuantityInfo
 from ocelescope_module_ocel.models.relations import (
     RelationCombination,
@@ -37,5 +37,4 @@ __all__ = [
     "RelationCountDistribution",
     "RelationCountSummary",
     "TypedAttribute",
-    "ViewMetadata",
 ]
