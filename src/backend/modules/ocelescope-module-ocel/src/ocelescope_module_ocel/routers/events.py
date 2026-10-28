@@ -94,7 +94,7 @@ def get_time_info(
             end_timestamp=edges[window_id + 1].isoformat(),
             entity_count=counts_by_window[window_id],
         )
-        for window_id in sorted(counts_by_window)
+        for window_id in range(len(edges) - 1)
     ]
 
     return Entity_Time_Info(
