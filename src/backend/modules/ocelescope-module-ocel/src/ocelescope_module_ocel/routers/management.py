@@ -9,7 +9,7 @@ from ocelescope_backend.app.internal.exceptions import NotFound
 
 from ocelescope import OCEL
 from ocelescope_module_ocel.config import DefaultOCELs
-from ocelescope_module_ocel.models import OcelMetadata
+from ocelescope_module_ocel.models import OcelMetadata, ViewMetadata
 from ocelescope_module_ocel.models.default_ocel import DefaultOCEL
 
 router = APIRouter()
@@ -29,9 +29,44 @@ def get_ocels(
     session: ApiSession,
 ) -> list[OcelMetadata]:
     return [
-        OcelMetadata.from_handle(handle, filter_applied=handle.is_filtered)
+        OcelMetadata.from_handle(handle, filter_applied=handle.has_active_view)
         for handle in session.ocels.values()
     ]
+
+
+@router.get(
+    "/views",
+    summary="List the named views",
+    description="Returns the named views of all OCELs, or of `ocel_id` only.",
+    operation_id="getViews",
+)
+def get_views(session: ApiSession, ocel_id: str | None = None) -> list[ViewMetadata]:
+    handles = session.ocels.values() if ocel_id is None else [session.get_ocel(ocel_id)]
+    return [
+        ViewMetadata.from_view(view, active=handle.active_view_id == view.id)
+        for handle in handles
+        for view in handle.list_views()
+    ]
+
+
+@router.post(
+    "/views/{view_id}/rename",
+    summary="Rename a view",
+    operation_id="renameView",
+)
+def rename_view(session: ApiSession, view_id: str, new_name: str):
+    view = session.find_view(view_id)
+    view.origin.rename_view(view.id, new_name)
+
+
+@router.post(
+    "/views/{view_id}/delete",
+    summary="Delete a view",
+    operation_id="deleteView",
+)
+def delete_view(session: ApiSession, view_id: str):
+    view = session.find_view(view_id)
+    view.origin.delete_view(view.id)
 
 
 @router.get(
@@ -77,11 +112,8 @@ def import_default_ocel(
     operation_id="getOcel",
 )
 def get_ocel(session: ApiSession, ocel_id: str) -> OcelMetadata:
-    if ocel_id not in session.ocels:
-        raise NotFound("OCEL not found")
-
-    handle = session.ocels[ocel_id]
-    return OcelMetadata.from_handle(handle, filter_applied=handle.is_filtered)
+    handle = session.get_ocel(ocel_id)
+    return OcelMetadata.from_handle(handle, filter_applied=handle.has_active_view)
 
 
 @router.post(
@@ -101,4 +133,4 @@ def delete_ocel(session: ApiSession, ocel_id: str):
     operation_id="renameOcel",
 )
 def rename_ocel(session: ApiSession, ocel_id: str, new_name: str):
-    session.rename_ocel(ocel_id, new_name)
+    session.get_ocel(ocel_id).rename(new_name)
