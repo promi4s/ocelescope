@@ -72,7 +72,7 @@ class SessionView:
         with self.open() as ocel:
             yield ocel
 
-    def close(self) -> None:
+    def delete(self) -> None:
         with self._lock:
             self.path.unlink(missing_ok=True)
             self.path.with_suffix(".building").unlink(missing_ok=True)

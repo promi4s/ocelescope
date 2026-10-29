@@ -121,7 +121,7 @@ class SessionOCEL:
         for other_id in evictable[: max(0, len(evictable) - MAX_TEMPORARY_VIEWS)]:
             evicted = self._views.pop(other_id, None)
             if evicted is not None:
-                evicted.close()
+                evicted.delete()
         return view
 
     def get_view(self, view_id: str) -> SessionView | None:
@@ -137,13 +137,13 @@ class SessionOCEL:
         was_active = view_id == self.active_view_id
         if was_active:
             self.active_view_id = None
-        view.close()
+        view.delete()
         if was_active:
             self._notify(["ocels"])
         return view
 
     def delete(self) -> None:
         for view in self._views.values():
-            view.close()
+            view.delete()
         self._views.clear()
         self.db_path.unlink(missing_ok=True)
