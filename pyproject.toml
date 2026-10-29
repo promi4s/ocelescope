@@ -9,7 +9,7 @@ dependencies = [
   "ocelescope-module-filter>=0.11.0,<0.12.0",
   "ocelescope-module-ocel>=0.11.0,<0.12.0",
   "ocelescope-module-ocelot>=0.8.0,<0.9.0",
-  "ocelescope-module-ocpn-editor>=0.10.4,<0.11.0",
+  "ocelescope-module-ocpn-editor>=0.11.0,<0.12.0",
 ]
 
 [tool.uv.workspace]
