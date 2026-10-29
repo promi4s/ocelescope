@@ -1,13 +1,13 @@
 [project]
 name = "ocelescope-workspace"
-version = "0.10.2"
+version = "0.11.0"
 description = "Workspace for ocelescope package"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
   "ocelescope-module-alignments>=0.10.4,<0.11.0",
-  "ocelescope-module-filter>=0.10.2,<0.11.0",
-  "ocelescope-module-ocel>=0.10.2,<0.11.0",
+  "ocelescope-module-filter>=0.11.0,<0.12.0",
+  "ocelescope-module-ocel>=0.11.0,<0.12.0",
   "ocelescope-module-ocelot>=0.8.0,<0.9.0",
   "ocelescope-module-ocpn-editor>=0.10.4,<0.11.0",
 ]
@@ -20,8 +20,16 @@ members = [
 ]
 
 [tool.uv.sources]
+ocelescope-backend = { workspace = true }
 ocelescope-module-filter = { workspace = true }
 ocelescope-module-ocel = { workspace = true }
+
+[tool.uv]
+override-dependencies = [
+  "ocelescope-module-filter>=0.11.0,<0.12.0",
+  "ocelescope-module-ocel>=0.11.0,<0.12.0",
+  "ocelescope-backend>=0.11.0,<0.12.0",
+]
 
 [tool.ruff]
 # `uv format` downloads its own (older) ruff instead of the one in uv.lock,
