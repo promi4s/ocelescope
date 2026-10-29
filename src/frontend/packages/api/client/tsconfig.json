@@ -3,6 +3,7 @@
   "compilerOptions": {
     "target": "esnext",
     "jsx": "react-jsx",
+    "exactOptionalPropertyTypes": false,
     "lib": ["es2023", "DOM"],
     "moduleDetection": "force",
     "module": "preserve",

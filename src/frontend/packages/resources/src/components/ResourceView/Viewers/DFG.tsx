@@ -1,7 +1,4 @@
-import type {
-  DirectlyFollowsGraph,
-  OCDirectlyFollowsGraph,
-} from "@r4pm/components";
+import type { Dfg, OcDfg } from "@r4pm/components";
 import { useMemo } from "react";
 import type { VisualizationProps } from "..";
 import { R4pmViewerContainer, r4pmViewer } from "./R4pm";
@@ -19,7 +16,7 @@ const toR4pmDfg = ({
   directly_follows_relations,
   start_activities,
   end_activities,
-}: DFGVisualization): DirectlyFollowsGraph => ({
+}: DFGVisualization): Dfg => ({
   activities: activities ?? {},
   directly_follows_relations: directly_follows_relations ?? [],
   start_activities: start_activities ?? {},
@@ -41,21 +38,24 @@ export const DFGViewer = ({
 export const OCDFGViewer = ({
   visualization,
 }: VisualizationProps<"r4pm_ocdfg">) => {
-  const ocdfg = useMemo<OCDirectlyFollowsGraph>(
+  const ocdfg = useMemo<OcDfg>(
     () => ({
       object_type_to_dfg: Object.fromEntries(
         Object.entries(visualization.object_type_to_dfg ?? {}).map(
           ([objectType, dfg]) => [objectType, toR4pmDfg(dfg)],
         ),
       ),
-      object_counts: visualization.object_counts ?? {},
     }),
     [visualization],
   );
 
   return (
     <R4pmViewerContainer filename="oc-dfg">
-      <R4pmOcdfg actions={[]} data={ocdfg} />
+      <R4pmOcdfg
+        actions={[]}
+        data={ocdfg}
+        objectCounts={visualization.object_counts}
+      />
     </R4pmViewerContainer>
   );
 };
