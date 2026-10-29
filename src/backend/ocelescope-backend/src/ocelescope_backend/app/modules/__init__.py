@@ -1,4 +1,4 @@
-from ocelescope_backend.app.modules.base import Module, ModuleFilter, ModuleMeta
+from ocelescope_backend.app.modules.base import Module, ModuleMeta
 from ocelescope_backend.app.modules.state import (
     ModuleState,
     ModuleStateHandle,
@@ -7,7 +7,6 @@ from ocelescope_backend.app.modules.state import (
 
 __all__ = [
     "Module",
-    "ModuleFilter",
     "ModuleMeta",
     "ModuleState",
     "ModuleStateHandle",
