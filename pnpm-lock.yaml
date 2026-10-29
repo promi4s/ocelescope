@@ -211,14 +211,14 @@ catalogs:
       specifier: ^4.7.0
       version: 4.7.0
     '@ocelescope/alignments':
-      specifier: ^0.10.5
-      version: 0.10.5
+      specifier: ^0.11.0
+      version: 0.11.0
     '@ocelescope/ocelot':
       specifier: ^0.8.0
       version: 0.8.0
     '@ocelescope/ocpn-editor':
-      specifier: ^0.10.7
-      version: 0.10.7
+      specifier: ^0.11.0
+      version: 0.11.0
     '@r4pm/components':
       specifier: ^0.4.0
       version: 0.4.1
@@ -376,7 +376,7 @@ importers:
     dependencies:
       '@ocelescope/alignments':
         specifier: 'catalog:'
-        version: 0.10.5(@mantine/core@9.7.4)(@mantine/hooks@9.7.4)(@mantine/notifications@9.7.4)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@ocelescope/resources@src+frontend+packages+resources)(@r4pm/components@0.3.2)(@tanstack/react-query@5.105.0)(@xyflow/react@12.12.0)(axios@1.21.0)(lucide-react@1.63.0)(next@16.4.3)(react-dom@19.3.1)(react@19.3.1)
+        version: 0.11.0(@mantine/core@9.7.4)(@mantine/hooks@9.7.4)(@mantine/notifications@9.7.4)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@ocelescope/resources@src+frontend+packages+resources)(@r4pm/components@0.4.1)(@tanstack/react-query@5.105.0)(@xyflow/react@12.12.0)(axios@1.21.0)(lucide-react@1.63.0)(next@16.4.3)(react-dom@19.3.1)(react@19.3.1)
       '@ocelescope/api-base':
         specifier: workspace:^
         version: link:../packages/api/base
@@ -403,7 +403,7 @@ importers:
         version: 0.8.0(@dagrejs/dagre@3.1.3)(@mantine/core@9.7.4)(@mantine/hooks@9.7.4)(@ocelescope/api-base@src+frontend+packages+api+base)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@tanstack/react-query@5.105.0)(@xyflow/react@12.12.0)(axios@1.21.0)(dayjs@1.11.23)(elkjs@0.12.0)(file-saver@2.0.5)(html-to-image@1.11.13)(lucide-react@1.63.0)(mantine-datatable@9.4.0)(react-dom@19.3.1)(react@19.3.1)(recharts@3.10.1)
       '@ocelescope/ocpn-editor':
         specifier: 'catalog:'
-        version: 0.10.7(@mantine/core@9.7.4)(@mantine/hooks@9.7.4)(@mantine/notifications@9.7.4)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@ocelescope/resources@src+frontend+packages+resources)(@r4pm/components@0.3.2)(@tanstack/react-query@5.105.0)(@xyflow/react@12.12.0)(axios@1.21.0)(lucide-react@1.63.0)(react-dom@19.3.1)(react@19.3.1)
+        version: 0.11.0(@mantine/core@9.7.4)(@mantine/hooks@9.7.4)(@mantine/notifications@9.7.4)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@ocelescope/resources@src+frontend+packages+resources)(@r4pm/components@0.4.1)(@tanstack/react-query@5.105.0)(@xyflow/react@12.12.0)(axios@1.21.0)(lucide-react@1.63.0)(react-dom@19.3.1)(react@19.3.1)
       '@ocelescope/plugin':
         specifier: workspace:^
         version: link:../modules/plugin
@@ -2102,23 +2102,23 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@ocelescope/alignments@0.10.5':
-    resolution: {integrity: sha512-MIWSaRUrYFiAbQ3a9ySWdzzXOgSZOJpzfX693J0pOQ/FLtP1VLoo9j2qrryY4xF2ASR0yejB2aJsM9F1z+MB7Q==}
+  '@ocelescope/alignments@0.11.0':
+    resolution: {integrity: sha512-wK+mxuoVkFpWAgSosSflwCLPJ9UiQMrHqw+/lwZh5t496BOxfSeD2Il0SzK8udfP1Otn+RkwkDUlRTos7vGYcA==}
     peerDependencies:
-      '@mantine/core': ^9.7.2
-      '@mantine/hooks': ^9.7.2
-      '@mantine/notifications': ^9.7.2
-      '@ocelescope/api-client': ^0.10.2
-      '@ocelescope/core': ^0.10.2
-      '@ocelescope/resources': ^0.10.2
-      '@r4pm/components': ^0.3.2
-      '@tanstack/react-query': ^5.104.2
-      '@xyflow/react': ^12.11.3
-      axios: ^1.20.0
-      lucide-react: ^1.56.0
-      next: 16.4.0
-      react: ^19.3.0
-      react-dom: ^19.3.0
+      '@mantine/core': ^9.7.4
+      '@mantine/hooks': ^9.7.4
+      '@mantine/notifications': ^9.7.4
+      '@ocelescope/api-client': ^0.11.0
+      '@ocelescope/core': ^0.11.0
+      '@ocelescope/resources': ^0.11.0
+      '@r4pm/components': ^0.4.0
+      '@tanstack/react-query': ^5.105.0
+      '@xyflow/react': ^12.12.0
+      axios: ^1.21.0
+      lucide-react: ^1.63.0
+      next: 16.4.3
+      react: ^19.3.1
+      react-dom: ^19.3.1
 
   '@ocelescope/ocelot@0.8.0':
     resolution: {integrity: sha512-thZZnXH+jUYIS9OQfwsEG095iDrYHHCXYy18vDfGmckhtLThf+xjJwP91lx1LPHXH38z1NUVc4ncWTdxIPlHbA==}
@@ -2142,22 +2142,22 @@ packages:
       react-dom: ^19.3.0
       recharts: ^3.2.1
 
-  '@ocelescope/ocpn-editor@0.10.7':
-    resolution: {integrity: sha512-Er1kOU4uQHrVGQtzzD2SMbV62a62kgPiWnsRKm3eJGxa9/zvFakyaQEJq6y/NPFqrXXqCSy28Cn0h8ybZpM+RA==}
+  '@ocelescope/ocpn-editor@0.11.0':
+    resolution: {integrity: sha512-zRx2xOZG1hJFRcQEG0NTpbOwmIh0XN0Ln1wHllwUz6dcU3pWjaM0QO+kyf1S1h3LG+I5Bo0V/fF+Rwvx9EpKgQ==}
     peerDependencies:
-      '@mantine/core': ^9.7.2
-      '@mantine/hooks': ^9.7.2
-      '@mantine/notifications': ^9.7.2
-      '@ocelescope/api-client': ^0.10.2
-      '@ocelescope/core': ^0.10.2
-      '@ocelescope/resources': ^0.10.2
-      '@r4pm/components': ^0.3.2
-      '@tanstack/react-query': ^5.104.2
-      '@xyflow/react': ^12.11.3
-      axios: ^1.20.0
-      lucide-react: ^1.56.0
-      react: ^19.3.0
-      react-dom: ^19.3.0
+      '@mantine/core': ^9.7.4
+      '@mantine/hooks': ^9.7.4
+      '@mantine/notifications': ^9.7.4
+      '@ocelescope/api-client': ^0.11.0
+      '@ocelescope/core': ^0.11.0
+      '@ocelescope/resources': ^0.11.0
+      '@r4pm/components': ^0.4.0
+      '@tanstack/react-query': ^5.105.0
+      '@xyflow/react': ^12.12.0
+      axios: ^1.21.0
+      lucide-react: ^1.63.0
+      react: ^19.3.1
+      react-dom: ^19.3.1
 
   '@orval/angular@8.45.0':
     resolution: {integrity: sha512-0Z9pIozQ34VfuNKvAYD1GdCg2cplWa6Q2HJixaw5/2z0RWKy/6jI3S83A4t3/CLgtVyU/eIFdvQpS72RUS+fFA==}
@@ -2281,12 +2281,6 @@ packages:
 
   '@quansync/fs@1.1.0':
     resolution: {integrity: sha512-qAPG/t3HqML1TlN7sY/pTbEjzFVAKsMjNNMGheyDosro+kT4iw2KCUoHcVdmliwWjorm4elZbgNQyU2eD97eDg==}
-
-  '@r4pm/components@0.3.2':
-    resolution: {integrity: sha512-2aEjDhAOSUKpvpvyVLShvby43pWNlXkL7ojkDgxGhxyKyjN9FoYX1gwDrTKam6Yx8pFJdUIIjx/xF6bm3cdkRQ==}
-    peerDependencies:
-      react: '>=18'
-      react-dom: '>=18'
 
   '@r4pm/components@0.4.1':
     resolution: {integrity: sha512-VBLiIrbuc3h6DNjE+w73OQr4rhS8ujBoWNjiXiyDOpt4Uf53ah6rznjXNa2mwkNiXTbiouzIIbNMTKr9K4sM0Q==}
@@ -4002,9 +3996,6 @@ packages:
 
   elementary-circuits-directed-graph@1.3.1:
     resolution: {integrity: sha512-ZEiB5qkn2adYmpXGnJKkxT8uJHlW/mxmBpmeqawEHzPxh9HkLD4/1mFYX5l0On+f6rcPIt8/EWlRU2Vo3fX6dQ==}
-
-  elkjs@0.10.2:
-    resolution: {integrity: sha512-Yx3ORtbAFrXelYkAy2g0eYyVY8QG0XEmGdQXmy0eithKKjbWRfl3Xe884lfkszfBF6UKyIy4LwfcZ3AZc8oxFw==}
 
   elkjs@0.12.0:
     resolution: {integrity: sha512-YZcKynxVxYoKIOEpywEPwCFdg+BTbxQRNf3pbwdDCvc8O3kQD8bmIwSxKU1eOTVc4Xo+VG9Te+575mlfvOrhEQ==}
@@ -6205,7 +6196,7 @@ snapshots:
   '@next/swc-win32-x64-msvc@16.4.3':
     optional: true
 
-  '@ocelescope/alignments@0.10.5(@mantine/core@9.7.4)(@mantine/hooks@9.7.4)(@mantine/notifications@9.7.4)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@ocelescope/resources@src+frontend+packages+resources)(@r4pm/components@0.3.2)(@tanstack/react-query@5.105.0)(@xyflow/react@12.12.0)(axios@1.21.0)(lucide-react@1.63.0)(next@16.4.3)(react-dom@19.3.1)(react@19.3.1)':
+  '@ocelescope/alignments@0.11.0(@mantine/core@9.7.4)(@mantine/hooks@9.7.4)(@mantine/notifications@9.7.4)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@ocelescope/resources@src+frontend+packages+resources)(@r4pm/components@0.4.1)(@tanstack/react-query@5.105.0)(@xyflow/react@12.12.0)(axios@1.21.0)(lucide-react@1.63.0)(next@16.4.3)(react-dom@19.3.1)(react@19.3.1)':
     dependencies:
       '@mantine/core': 9.7.4(@mantine/hooks@9.7.4)(@types/react@19.3.0)(react-dom@19.3.1)(react@19.3.1)
       '@mantine/hooks': 9.7.4(react@19.3.1)
@@ -6213,7 +6204,7 @@ snapshots:
       '@ocelescope/api-client': link:src/frontend/packages/api/client
       '@ocelescope/core': link:src/frontend/packages/core
       '@ocelescope/resources': link:src/frontend/packages/resources
-      '@r4pm/components': 0.3.2(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(plotly.js@4.1.2)(react-dom@19.3.1)(react@19.3.1)
+      '@r4pm/components': 0.4.1(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(plotly.js@4.1.2)(react-dom@19.3.1)(react@19.3.1)
       '@tanstack/react-query': 5.105.0(@types/react@19.3.0)(react@19.3.1)
       '@xyflow/react': 12.12.0(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(react-dom@19.3.1)(react@19.3.1)
       axios: 1.21.0(debug@4.4.3)
@@ -6243,7 +6234,7 @@ snapshots:
       react-dom: 19.3.1(react@19.3.1)
       recharts: 3.10.1(@types/react@19.3.0)(react-dom@19.3.1)(react-is@18.3.1)(react@19.3.1)(redux@5.0.1)
 
-  '@ocelescope/ocpn-editor@0.10.7(@mantine/core@9.7.4)(@mantine/hooks@9.7.4)(@mantine/notifications@9.7.4)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@ocelescope/resources@src+frontend+packages+resources)(@r4pm/components@0.3.2)(@tanstack/react-query@5.105.0)(@xyflow/react@12.12.0)(axios@1.21.0)(lucide-react@1.63.0)(react-dom@19.3.1)(react@19.3.1)':
+  '@ocelescope/ocpn-editor@0.11.0(@mantine/core@9.7.4)(@mantine/hooks@9.7.4)(@mantine/notifications@9.7.4)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@ocelescope/resources@src+frontend+packages+resources)(@r4pm/components@0.4.1)(@tanstack/react-query@5.105.0)(@xyflow/react@12.12.0)(axios@1.21.0)(lucide-react@1.63.0)(react-dom@19.3.1)(react@19.3.1)':
     dependencies:
       '@mantine/core': 9.7.4(@mantine/hooks@9.7.4)(@types/react@19.3.0)(react-dom@19.3.1)(react@19.3.1)
       '@mantine/hooks': 9.7.4(react@19.3.1)
@@ -6251,7 +6242,7 @@ snapshots:
       '@ocelescope/api-client': link:src/frontend/packages/api/client
       '@ocelescope/core': link:src/frontend/packages/core
       '@ocelescope/resources': link:src/frontend/packages/resources
-      '@r4pm/components': 0.3.2(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(plotly.js@4.1.2)(react-dom@19.3.1)(react@19.3.1)
+      '@r4pm/components': 0.4.1(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(plotly.js@4.1.2)(react-dom@19.3.1)(react@19.3.1)
       '@tanstack/react-query': 5.105.0(@types/react@19.3.0)(react@19.3.1)
       '@xyflow/react': 12.12.0(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(react-dom@19.3.1)(react@19.3.1)
       axios: 1.21.0(debug@4.4.3)
@@ -6404,23 +6395,6 @@ snapshots:
   '@quansync/fs@1.1.0':
     dependencies:
       quansync: 1.0.0
-
-  '@r4pm/components@0.3.2(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(plotly.js@4.1.2)(react-dom@19.3.1)(react@19.3.1)':
-    dependencies:
-      '@radix-ui/themes': 3.3.0(@types/react-dom@19.3.0)(@types/react@19.3.0)(react-dom@19.3.1)(react@19.3.1)
-      '@tanstack/react-virtual': 3.14.23(react-dom@19.3.1)(react@19.3.1)
-      '@xyflow/react': 12.12.0(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(react-dom@19.3.1)(react@19.3.1)
-      elkjs: 0.10.2
-      html-to-image: 1.11.13
-      react: 19.3.1
-      react-dom: 19.3.1(react@19.3.1)
-      react-icons: 5.7.0(react@19.3.1)
-      react-plotly.js: 2.6.0(plotly.js@4.1.2)(react@19.3.1)
-    transitivePeerDependencies:
-      - '@types/react'
-      - '@types/react-dom'
-      - immer
-      - plotly.js
 
   '@r4pm/components@0.4.1(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(plotly.js@4.1.2)(react-dom@19.3.1)(react@19.3.1)':
     dependencies:
@@ -8175,8 +8149,6 @@ snapshots:
   elementary-circuits-directed-graph@1.3.1:
     dependencies:
       strongly-connected-components: 1.0.1
-
-  elkjs@0.10.2: {}
 
   elkjs@0.12.0: {}
 

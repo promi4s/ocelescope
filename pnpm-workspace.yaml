@@ -25,8 +25,8 @@ catalog:
   "@mantine/notifications": ^9.7.4
   "@marko19907/string-to-color": ^1.0.2
   "@monaco-editor/react": ^4.7.0
-  "@ocelescope/alignments": ^0.10.5
-  "@ocelescope/ocpn-editor": ^0.10.7
+  "@ocelescope/alignments": ^0.11.0
+  "@ocelescope/ocpn-editor": ^0.11.0
   "@ocelescope/ocelot": ^0.8.0
   "@r4pm/components": ^0.4.0
   "@rjsf/core": ^6.8.0
