@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Literal
+
 from ocelescope.ocel.constants.pm4py import (
     ACTIVITY_COL,
     EID_COL,
@@ -27,7 +29,8 @@ from ocelescope.util.sql import ident, literal
 
 def _attribute_names(step: Step, table: str) -> list[str]:
     """The attributes ``table`` has a column for -- every one not an OCEL column."""
-    return [column for column in step.columns(table) if not column.startswith("ocel:")]
+    columns = step.sql(f"SELECT * FROM {step[table]} LIMIT 0").columns
+    return [column for column in columns if not column.startswith("ocel:")]
 
 
 class _AttributeFilter(BaseFilter):
@@ -50,6 +53,7 @@ class _AttributeFilter(BaseFilter):
     number_range: tuple[float | None, float | None] | None = None
     values: list[str | int | float] | None = None
     regex: str | None = None
+    mode: Literal["exclude", "include"] = "include"
 
     def _match(self) -> str:
         """The condition on ``value``.
@@ -115,10 +119,14 @@ class _AttributeFilter(BaseFilter):
         else:
             untouched = "type NOT IN (SELECT type FROM entity WHERE value IS NOT NULL)"
 
+        match = self._match()
+        if self.mode == "exclude":
+            match = f"NOT coalesce(({match}), false)"
+
         return (
             f"WITH entity AS ({source}) "
             f"SELECT id AS {ident(id_col)} FROM entity "
-            f"WHERE {untouched} OR ({self._match()})"
+            f"WHERE {untouched} OR ({match})"
         )
 
 

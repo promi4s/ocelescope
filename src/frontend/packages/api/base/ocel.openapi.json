@@ -349,6 +349,22 @@
               "default": "filtered",
               "title": "Ocel Version"
             }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
           }
         ],
         "responses": {
@@ -439,6 +455,22 @@
               "type": "string",
               "default": "filtered",
               "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
             }
           }
         ],
@@ -535,6 +567,22 @@
               "default": "filtered",
               "title": "Ocel Version"
             }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
           }
         ],
         "responses": {
@@ -619,6 +667,22 @@
               "default": "filtered",
               "title": "Ocel Version"
             }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
           }
         ],
         "responses": {
@@ -632,6 +696,313 @@
                     "type": "string"
                   },
                   "title": "Response Attributenames"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/modules/ocel/v1/{ocel_id}/attributes/distribution": {
+      "get": {
+        "summary": "Get Attribute Distribution",
+        "operationId": "attributeDistribution",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "attribute",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Attribute"
+            }
+          },
+          {
+            "name": "entity_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "events",
+                "objects"
+              ],
+              "type": "string",
+              "default": "events",
+              "title": "Entity Type"
+            }
+          },
+          {
+            "name": "entity_names",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Entity Names"
+            }
+          },
+          {
+            "name": "bins",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 50,
+              "title": "Bins"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "original",
+                "filtered"
+              ],
+              "type": "string",
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/AttributeDistribution"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Attributedistribution"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/modules/ocel/v1/{ocel_id}/attributes/values": {
+      "get": {
+        "summary": "Get Attribute Values",
+        "operationId": "attributeValues",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "attribute",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Attribute"
+            }
+          },
+          {
+            "name": "entity_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "events",
+                "objects"
+              ],
+              "type": "string",
+              "default": "events",
+              "title": "Entity Type"
+            }
+          },
+          {
+            "name": "entity_names",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Entity Names"
+            }
+          },
+          {
+            "name": "regex",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Regex"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Search"
+            }
+          },
+          {
+            "name": "values",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Values"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "original",
+                "filtered"
+              ],
+              "type": "string",
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttributeMatches"
                 }
               }
             }
@@ -682,6 +1053,22 @@
               "type": "string",
               "default": "filtered",
               "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
             }
           }
         ],
@@ -746,6 +1133,22 @@
               "type": "string",
               "default": "filtered",
               "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
             }
           }
         ],
@@ -847,6 +1250,22 @@
               "default": "filtered",
               "title": "Ocel Version"
             }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
           }
         ],
         "responses": {
@@ -917,6 +1336,22 @@
               "default": "filtered",
               "title": "Ocel Version"
             }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
           }
         ],
         "responses": {
@@ -976,6 +1411,22 @@
               "type": "string",
               "default": "filtered",
               "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
             }
           }
         ],
@@ -1040,6 +1491,22 @@
               "type": "string",
               "default": "filtered",
               "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
             }
           }
         ],
@@ -1141,6 +1608,22 @@
               "default": "filtered",
               "title": "Ocel Version"
             }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
           }
         ],
         "responses": {
@@ -1232,6 +1715,22 @@
               "type": "string",
               "default": "filtered",
               "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
             }
           }
         ],
@@ -1418,6 +1917,22 @@
               "default": "filtered",
               "title": "Ocel Version"
             }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
           }
         ],
         "responses": {
@@ -1477,6 +1992,22 @@
               "type": "string",
               "default": "filtered",
               "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
             }
           }
         ],
@@ -1667,6 +2198,22 @@
               "default": "filtered",
               "title": "Ocel Version"
             }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
           }
         ],
         "responses": {
@@ -1726,6 +2273,22 @@
               "type": "string",
               "default": "filtered",
               "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
             }
           }
         ],
@@ -1805,6 +2368,22 @@
               "default": "filtered",
               "title": "Ocel Version"
             }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
           }
         ],
         "responses": {
@@ -1883,6 +2462,22 @@
               "default": "filtered",
               "title": "Ocel Version"
             }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
           }
         ],
         "responses": {
@@ -1896,6 +2491,278 @@
                     "$ref": "#/components/schemas/RelationCombination"
                   },
                   "title": "Response O2Ocombinations"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/modules/ocel/v1/{ocel_id}/relations/e2o/distribution": {
+      "get": {
+        "summary": "Get E2O Count Distribution",
+        "operationId": "e2oCountDistribution",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Source"
+            }
+          },
+          {
+            "name": "target",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Target"
+            }
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "source",
+                "target"
+              ],
+              "type": "string",
+              "default": "source",
+              "title": "Direction"
+            }
+          },
+          {
+            "name": "qualifier",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Qualifier"
+            }
+          },
+          {
+            "name": "bins",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 50,
+              "title": "Bins"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "original",
+                "filtered"
+              ],
+              "type": "string",
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelationCountDistribution"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/modules/ocel/v1/{ocel_id}/relations/o2o/distribution": {
+      "get": {
+        "summary": "Get O2O Count Distribution",
+        "operationId": "o2oCountDistribution",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Source"
+            }
+          },
+          {
+            "name": "target",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Target"
+            }
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "source",
+                "target"
+              ],
+              "type": "string",
+              "default": "source",
+              "title": "Direction"
+            }
+          },
+          {
+            "name": "qualifier",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Qualifier"
+            }
+          },
+          {
+            "name": "bins",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 50,
+              "title": "Bins"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "original",
+                "filtered"
+              ],
+              "type": "string",
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelationCountDistribution"
                 }
               }
             }
@@ -1946,6 +2813,22 @@
               "type": "string",
               "default": "filtered",
               "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
             }
           }
         ],
@@ -2091,6 +2974,22 @@
               "default": "filtered",
               "title": "Ocel Version"
             }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
           }
         ],
         "responses": {
@@ -2172,6 +3071,22 @@
               "default": "filtered",
               "title": "Ocel Version"
             }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
           }
         ],
         "responses": {
@@ -2229,6 +3144,22 @@
               "type": "string",
               "default": "filtered",
               "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
             }
           }
         ],
@@ -2329,6 +3260,160 @@
         ],
         "title": "AggregatedAttribute",
         "description": "An attribute summarized across every entity type that carries it."
+      },
+      "AttributeBin": {
+        "properties": {
+          "start": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Start"
+          },
+          "end": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "End"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "start",
+          "end",
+          "count"
+        ],
+        "title": "AttributeBin"
+      },
+      "AttributeDistribution": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ValueType"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "distinct_values": {
+            "type": "integer",
+            "title": "Distinct Values"
+          },
+          "min": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Min"
+          },
+          "max": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Max"
+          },
+          "bins": {
+            "items": {
+              "$ref": "#/components/schemas/AttributeBin"
+            },
+            "type": "array",
+            "title": "Bins",
+            "default": []
+          },
+          "values": {
+            "items": {
+              "$ref": "#/components/schemas/AttributeValueCount"
+            },
+            "type": "array",
+            "title": "Values",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "type",
+          "count",
+          "distinct_values",
+          "min",
+          "max"
+        ],
+        "title": "AttributeDistribution"
+      },
+      "AttributeMatches": {
+        "properties": {
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "distinct_values": {
+            "type": "integer",
+            "title": "Distinct Values"
+          },
+          "values": {
+            "items": {
+              "$ref": "#/components/schemas/AttributeValueCount"
+            },
+            "type": "array",
+            "title": "Values"
+          }
+        },
+        "type": "object",
+        "required": [
+          "count",
+          "distinct_values",
+          "values"
+        ],
+        "title": "AttributeMatches"
+      },
+      "AttributeValueCount": {
+        "properties": {
+          "value": {
+            "type": "string",
+            "title": "Value"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "value",
+          "count"
+        ],
+        "title": "AttributeValueCount"
       },
       "Date_Distribution_Item": {
         "properties": {
@@ -2704,6 +3789,42 @@
         ],
         "title": "RelationCombination",
         "description": "A distinct (source, target, qualifier) combination of a relation.\n\nAttributes:\n    source: The source object or event type.\n    target: The target object or event type.\n    qualifier: The relation qualifier (empty string when none applies)."
+      },
+      "RelationCountDistribution": {
+        "properties": {
+          "entities": {
+            "type": "integer",
+            "title": "Entities"
+          },
+          "relations": {
+            "type": "integer",
+            "title": "Relations"
+          },
+          "min": {
+            "type": "integer",
+            "title": "Min"
+          },
+          "max": {
+            "type": "integer",
+            "title": "Max"
+          },
+          "bins": {
+            "items": {
+              "$ref": "#/components/schemas/AttributeBin"
+            },
+            "type": "array",
+            "title": "Bins"
+          }
+        },
+        "type": "object",
+        "required": [
+          "entities",
+          "relations",
+          "min",
+          "max",
+          "bins"
+        ],
+        "title": "RelationCountDistribution"
       },
       "RelationCountSummary": {
         "properties": {

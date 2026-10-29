@@ -120,7 +120,7 @@ class PluginRegistry:
             return
 
         if io.io_type == "ocel":
-            ocel = session.get_ocel(id)
+            ocel = session.get_ocel(id).open()
 
             if input_stack is not None:
                 return input_stack.enter_context(ocel)

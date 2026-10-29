@@ -2105,6 +2105,7 @@ dependencies = [
     { name = "fastapi" },
     { name = "ocelescope" },
     { name = "ocelescope-backend" },
+    { name = "ocelescope-module-ocel" },
     { name = "packaging" },
     { name = "pydantic" },
 ]
@@ -2114,6 +2115,7 @@ requires-dist = [
     { name = "fastapi", specifier = ">=0.136.0" },
     { name = "ocelescope", editable = "src/ocelescope" },
     { name = "ocelescope-backend", editable = "src/backend/ocelescope-backend" },
+    { name = "ocelescope-module-ocel", editable = "src/backend/modules/ocelescope-module-ocel" },
     { name = "packaging", specifier = ">=24.0" },
     { name = "pydantic", specifier = ">=2.11.7" },
 ]

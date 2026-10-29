@@ -1,4 +1,5 @@
 import asyncio
+from collections.abc import Callable
 from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field
@@ -41,9 +42,13 @@ class ErrorNotification(BaseModel):
     trace: str
 
 
+Route = Literal["resources", "ocels", "tasks", "plugins", "discoveryMethods"]
+Notify = Callable[[list[Route]], None]
+
+
 class InvalidationRequest(BaseModel):
     type: Literal["invalidation"] = "invalidation"
-    routes: list[Literal["resources", "ocels", "tasks", "plugins", "discoveryMethods"]]
+    routes: list[Route]
 
 
 SSEMessage = Annotated[

@@ -25,6 +25,7 @@ def get_ocel(
     session: ApiSession,
     ocel_id: str | None = None,
     ocel_version: Literal["original", "filtered"] = "filtered",
+    view_id: str | None = None,
 ) -> Iterator[OCEL]:
     """The request's OCEL, opened read-only over the session's DuckDB file.
 
@@ -35,7 +36,14 @@ def get_ocel(
     if not ocel_id:
         raise HTTPException(status_code=500, detail="Ocel id is required")
     try:
-        ocel = session.get_ocel(ocel_id, use_original=ocel_version == "original")
+        handle = session.get_ocel(ocel_id)
+        if view_id is None:
+            ocel = handle.open(use_original=ocel_version == "original")
+        else:
+            view = handle.get_view(view_id)
+            if view is None:
+                raise NotFound(f"View {view_id} not found")
+            ocel = view.open()
     except NotFound:
         raise HTTPException(status_code=404, detail="OCEL not found")
     try:

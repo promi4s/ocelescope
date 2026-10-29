@@ -36,6 +36,7 @@ const SubAttributeTable: React.FC<{
   hideRange?: boolean;
   hideValues?: boolean;
   ocelVersion?: OcelVersion;
+  viewId?: string;
   extraColumns?: DataTableColumn<TypedAttribute>[];
 }> = ({
   ocelId,
@@ -45,6 +46,7 @@ const SubAttributeTable: React.FC<{
   hideRange = false,
   hideValues = false,
   ocelVersion,
+  viewId,
   extraColumns = [],
 }) => {
   const isEvent = entityType === "events";
@@ -57,6 +59,7 @@ const SubAttributeTable: React.FC<{
       attribute_names: [attributeName],
       names: entityNames,
       ocel_version: ocelVersion,
+      view_id: viewId,
     },
     { query: { placeholderData: keepPreviousData } },
   );
@@ -123,6 +126,7 @@ const AttributesTable: React.FC<{
   hideRange?: boolean;
   hideValues?: boolean;
   ocelVersion?: OcelVersion;
+  viewId?: string;
   alwaysExpandable?: boolean;
   visibleAttributes?: string[];
   height?: string | number;
@@ -136,6 +140,7 @@ const AttributesTable: React.FC<{
   hideValues = false,
   subTableExtraColumns,
   ocelVersion,
+  viewId,
   alwaysExpandable = false,
   visibleAttributes,
   height,
@@ -149,13 +154,14 @@ const AttributesTable: React.FC<{
   const { data: attributeNames } = useAttributeNames(ocelId, {
     entity_type: entityType,
     ocel_version: ocelVersion,
+    view_id: viewId,
   });
 
   const [filteredAttributes, setFilteredAttributes] = useState<string[]>([]);
 
   const { data: entityNames } = (isEvent ? useActivities : useObjectTypes)(
     ocelId,
-    { ocel_version: ocelVersion },
+    { ocel_version: ocelVersion, view_id: viewId },
   );
 
   const [filteredEntityNames, setFilteredEntityNames] = useState<string[]>([]);
@@ -194,6 +200,7 @@ const AttributesTable: React.FC<{
       page: currentPage,
       page_size: PAGE_SIZE,
       ocel_version: ocelVersion,
+      view_id: viewId,
       ...(effectiveAttributeNames.length > 0 && {
         attribute_names: effectiveAttributeNames,
       }),
@@ -335,6 +342,7 @@ const AttributesTable: React.FC<{
             hideRange={hideRange}
             hideValues={hideValues}
             ocelVersion={ocelVersion}
+            viewId={viewId}
             {...(filteredEntityNames.length > 0 && {
               entityNames: filteredEntityNames,
             })}

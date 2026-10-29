@@ -1,5 +1,7 @@
 from pydantic import BaseModel
 
+from ocelescope_module_ocel.models.attributes import AttributeBin
+
 
 class RelationCombination(BaseModel):
     """A distinct (source, target, qualifier) combination of a relation.
@@ -40,3 +42,11 @@ class RelationCountSummary(BaseModel):
     min_count: int
     max_count: int
     sum: int
+
+
+class RelationCountDistribution(BaseModel):
+    entities: int
+    relations: int
+    min: int
+    max: int
+    bins: list[AttributeBin]

@@ -8,6 +8,7 @@ dependencies = [
   "fastapi>=0.136.0",
   "ocelescope>=0.10.2,<0.11.0",
   "ocelescope-backend>=0.10.2,<0.11.0",
+  "ocelescope-module-ocel>=0.10.2,<0.11.0",
   "packaging>=24.0",
   "pydantic>=2.11.7",
 ]
@@ -26,3 +27,4 @@ package = true
 [tool.uv.sources]
 ocelescope = { workspace = true }
 ocelescope-backend = { workspace = true }
+ocelescope-module-ocel = { workspace = true }

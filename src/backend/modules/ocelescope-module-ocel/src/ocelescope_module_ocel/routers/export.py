@@ -28,17 +28,14 @@ def download_ocel(
     ext: OCELFileExtensions = ".json",
     ocel_version: Literal["original", "filtered"] | None = "filtered",
 ) -> TempFileResponse:
-    if ocel_id not in session.ocels:
-        raise NotFound("OCEL not found")
-
-    name = session.ocels[ocel_id].name
+    name = session.get_ocel(ocel_id).name
     tmp_file_prefix = datetime.now(tz=UTC).strftime("%Y%m%d-%H%M%S") + "-" + name
     file_response = TempFileResponse(
         prefix=tmp_file_prefix, suffix=ext, filename=name + ext
     )
 
-    session.export_ocel(
-        ocel_id, Path(file_response.tmp_path), use_original=ocel_version == "original"
+    session.get_ocel(ocel_id).export(
+        Path(file_response.tmp_path), use_original=ocel_version == "original"
     )
     return file_response
 
@@ -51,7 +48,7 @@ def download_ocel(
 def download_flat_log(
     ocel: ApiOcel, ocel_id: str, session: ApiSession, object_type_name: str
 ) -> TempFileResponse:
-    name = session.ocels[ocel_id].name
+    name = session.get_ocel(ocel_id).name
     tmp_file_prefix = f"{datetime.now(tz=UTC).strftime('%Y%m%d-%H%M%S')}-{name}"
     file_response = TempFileResponse(
         prefix=tmp_file_prefix, suffix=".xes", filename=f"{name}_{object_type_name}.xes"
@@ -78,7 +75,7 @@ def download_variant_flat_log(
     object_type: str,
     variant_ids: Annotated[list[str], Query(min_length=1)],
 ) -> TempFileResponse:
-    name = session.ocels[ocel_id].name
+    name = session.get_ocel(ocel_id).name
 
     object_ids = ocel.executions.get_variant_object_ids(object_type, variant_ids)
 

@@ -29,7 +29,7 @@ def get_ocels(
     session: ApiSession,
 ) -> list[OcelMetadata]:
     return [
-        OcelMetadata.from_handle(handle, filter_applied=handle.is_filtered)
+        OcelMetadata.from_handle(handle, filter_applied=handle.has_active_view)
         for handle in session.ocels.values()
     ]
 
@@ -77,11 +77,8 @@ def import_default_ocel(
     operation_id="getOcel",
 )
 def get_ocel(session: ApiSession, ocel_id: str) -> OcelMetadata:
-    if ocel_id not in session.ocels:
-        raise NotFound("OCEL not found")
-
-    handle = session.ocels[ocel_id]
-    return OcelMetadata.from_handle(handle, filter_applied=handle.is_filtered)
+    handle = session.get_ocel(ocel_id)
+    return OcelMetadata.from_handle(handle, filter_applied=handle.has_active_view)
 
 
 @router.post(
@@ -101,4 +98,4 @@ def delete_ocel(session: ApiSession, ocel_id: str):
     operation_id="renameOcel",
 )
 def rename_ocel(session: ApiSession, ocel_id: str, new_name: str):
-    session.rename_ocel(ocel_id, new_name)
+    session.get_ocel(ocel_id).rename(new_name)

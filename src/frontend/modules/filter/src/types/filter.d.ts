@@ -1,21 +1,29 @@
 import type { ComponentType } from "react";
 import type { getFilter } from "../api/base";
 
-type NativeFilter = NonNullable<Awaited<ReturnType<typeof getFilter>>>[number];
+export type NativeFilter = NonNullable<
+  Awaited<ReturnType<typeof getFilter>>
+>[number];
 
-type FilterKey = NonNullable<NativeFilter["type"]>;
+export type FilterKey = NonNullable<NativeFilter["type"]>;
 
-type GroupedFilter = { [T in FilterKey]: Extract<NativeFilter, { type: T }>[] };
+export type FilterOf<T extends FilterKey> = Extract<NativeFilter, { type: T }>;
 
-export type FilterView<_T extends FilterKey> = ComponentType<{
+export type Pipeline = { steps: NativeFilter[] };
+
+export type FilterPanel<T extends FilterKey> = ComponentType<{
   ocelId: string;
-  control: Control<GroupedFilter>;
+  filter: FilterOf<T>;
+  onChange: (filter: FilterOf<T>) => void;
+  /** The complete steps before this one: the panel shows the log as they leave it. */
+  before: NativeFilter[];
 }>;
 
-export type FilterViewType<T extends FilterKey> = {
+export type FilterKind<T extends FilterKey> = {
   title: string;
   description: string;
-  ViewComponent: FilterView<T>;
-  generateDefault: () => GroupedFilter[T];
-  cleanUpFilters?: (filter: GroupedFilter[T]) => GroupedFilter[T];
+  Panel: FilterPanel<T>;
+  create: () => FilterOf<T>;
+  summary: (filter: FilterOf<T>) => string;
+  isComplete: (filter: FilterOf<T>) => boolean;
 };

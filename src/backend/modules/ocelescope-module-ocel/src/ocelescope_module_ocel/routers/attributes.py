@@ -4,11 +4,18 @@ from __future__ import annotations
 
 from typing import Annotated
 
+import duckdb
 from fastapi import APIRouter, Query
 from ocelescope_backend.app.dependencies import ApiOcel
+from ocelescope_backend.app.internal.exceptions import BadRequest
 from ocelescope_backend.app.internal.model.base import PaginatedResponse
 
-from ocelescope_module_ocel.models import AggregatedAttribute, TypedAttribute
+from ocelescope_module_ocel.models import (
+    AggregatedAttribute,
+    AttributeDistribution,
+    AttributeMatches,
+    TypedAttribute,
+)
 from ocelescope_module_ocel.util import attributes as attribute_util
 from ocelescope_module_ocel.util.attributes import EntityType
 
@@ -81,3 +88,34 @@ def get_attribute_names(
     if entity_type != "objects":
         names += attribute_util.attribute_names(ocel, "events")
     return names
+
+
+@router.get("/{ocel_id}/attributes/distribution", operation_id="attributeDistribution")
+def get_attribute_distribution(
+    ocel: ApiOcel,
+    attribute: Annotated[str, Query()],
+    entity_type: Annotated[EntityType, Query()] = "events",
+    entity_names: Annotated[list[str] | None, Query()] = None,
+    bins: Annotated[int, Query(ge=1, le=500)] = 50,
+) -> AttributeDistribution | None:
+    return attribute_util.attribute_distribution(
+        ocel, entity_type, attribute, entity_names, bins
+    )
+
+
+@router.get("/{ocel_id}/attributes/values", operation_id="attributeValues")
+def get_attribute_values(
+    ocel: ApiOcel,
+    attribute: Annotated[str, Query()],
+    entity_type: Annotated[EntityType, Query()] = "events",
+    entity_names: Annotated[list[str] | None, Query()] = None,
+    regex: Annotated[str | None, Query()] = None,
+    search: Annotated[str | None, Query()] = None,
+    values: Annotated[list[str] | None, Query()] = None,
+) -> AttributeMatches:
+    try:
+        return attribute_util.attribute_values(
+            ocel, entity_type, attribute, entity_names, regex, search, values
+        )
+    except duckdb.InvalidInputException as error:
+        raise BadRequest(str(error)) from error

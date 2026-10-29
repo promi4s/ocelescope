@@ -11,13 +11,14 @@ export type ActivityPickerProps = OcelPickerProps<string>;
 export const ActivityPicker = ({
   ocelId,
   ocelVersion = "filtered",
+  viewId,
   ...picker
 }: ActivityPickerProps) => {
   const id = useOcelId(ocelId);
   const colorOf = useColorOf("activity");
   const { data, isPending, error } = useEventCounts(
     id,
-    { ocel_version: ocelVersion },
+    { ocel_version: ocelVersion, view_id: viewId },
     { query: { enabled: id != null } },
   );
   const options = useMemo(

@@ -38,6 +38,7 @@ const SubRelationTable: React.FC<{
   hideRange?: boolean;
   hideTotal?: boolean;
   ocelVersion?: OcelVersion;
+  viewId?: string;
   extraColumns?: DataTableColumn<RelationCountSummary>[];
 }> = ({
   ocelId,
@@ -48,6 +49,7 @@ const SubRelationTable: React.FC<{
   hideRange = false,
   hideTotal = false,
   ocelVersion,
+  viewId,
   extraColumns = [],
 }) => {
   const useRelations = relationType === "e2o" ? useE2o : useO2o;
@@ -60,6 +62,7 @@ const SubRelationTable: React.FC<{
       target_types: [target],
       with_qualifier: true,
       ocel_version: ocelVersion,
+      view_id: viewId,
     },
     { query: { placeholderData: keepPreviousData } },
   );
@@ -129,6 +132,7 @@ const RelationTable: React.FC<{
   hideRange?: boolean;
   hideTotal?: boolean;
   ocelVersion?: OcelVersion;
+  viewId?: string;
   visibleRelations?: { source: string; target: string }[];
   height?: string | number;
   className?: string;
@@ -142,6 +146,7 @@ const RelationTable: React.FC<{
   hideRange = false,
   hideTotal = false,
   ocelVersion,
+  viewId,
   visibleRelations,
   height,
   className,
@@ -154,7 +159,7 @@ const RelationTable: React.FC<{
 
   const { data: combinations = [] } = (
     isE2O ? useE2oCombinations : useO2oCombinations
-  )(ocelId, { direction, ocel_version: ocelVersion });
+  )(ocelId, { direction, ocel_version: ocelVersion, view_id: viewId });
 
   const sourceOptions = useMemo(
     () => Array.from(new Set(combinations.map(({ source }) => source))),
@@ -236,6 +241,7 @@ const RelationTable: React.FC<{
       page_size: PAGE_SIZE,
       with_qualifier: false,
       ocel_version: ocelVersion,
+      view_id: viewId,
       ...(effectiveSources.length > 0 && { source_types: effectiveSources }),
       ...(effectiveTargets.length > 0 && { target_types: effectiveTargets }),
       ...(filteredQualifiers.length > 0 && { qualifiers: filteredQualifiers }),
@@ -392,6 +398,7 @@ const RelationTable: React.FC<{
             hideRange={hideRange}
             hideTotal={hideTotal}
             ocelVersion={ocelVersion}
+            viewId={viewId}
             extraColumns={subTableExtraColumns}
           />
         ),

@@ -1,15 +1,21 @@
 import type {
   FilterKey,
-  FilterViewType,
-  GroupedFilter,
+  FilterKind,
+  FilterOf,
   NativeFilter,
 } from "../../types/filter";
-import { EventAttributeFilter, ObjectAttributeFilter } from "./AttributeFilter";
-import { E2OCountFilter, O2OCountFilter } from "./RelationCountFilter";
+import {
+  EventAttributeFilter,
+  ObjectAttributeFilter,
+} from "./AttributeFilter/AttributeFilter";
+import {
+  E2OCountFilter,
+  O2OCountFilter,
+} from "./RelationCountFilter/RelationCountFilter";
 import { TimeFrameFilter } from "./TimeFrameFilter";
 import { ActivityFilter, ObjectTypeFilter } from "./TypeForm";
 
-export const FILTER_MAP: { [T in FilterKey]: FilterViewType<T> } = {
+export const FILTER_KINDS: { [T in FilterKey]: FilterKind<T> } = {
   activity: ActivityFilter,
   object_type: ObjectTypeFilter,
   time_frame: TimeFrameFilter,
@@ -19,48 +25,8 @@ export const FILTER_MAP: { [T in FilterKey]: FilterViewType<T> } = {
   o2o_count: O2OCountFilter,
 } as const;
 
-export const generateDefaultFilter = (currentFilters: NativeFilter[]) => {
-  const grouped: Partial<Record<FilterKey, NativeFilter[]>> = {};
-  for (const filter of currentFilters) {
-    grouped[filter.type] = [...(grouped[filter.type] ?? []), filter];
-  }
-  const groupedFilter = grouped as Partial<GroupedFilter>;
+export const kindOf = <T extends FilterKey>(filter: FilterOf<T>) =>
+  FILTER_KINDS[filter.type as T] as FilterKind<T>;
 
-  const missingFilterKeys = Object.keys(FILTER_MAP).filter(
-    (key) => !(key in groupedFilter),
-  ) as FilterKey[];
-
-  return {
-    ...groupedFilter,
-    ...Object.fromEntries(
-      missingFilterKeys.map((key) => [key, FILTER_MAP[key].generateDefault()]),
-    ),
-  } as GroupedFilter;
-};
-
-const defaultFilter = <T extends NativeFilter>(filters?: T[]) => {
-  if (!filters || filters.length === 0) {
-    return [];
-  }
-
-  return filters;
-};
-
-const cleanUpFilterByKey = <K extends FilterKey>(
-  key: K,
-  filters: GroupedFilter[K],
-) => {
-  const cleanUp = FILTER_MAP[key].cleanUpFilters ?? defaultFilter;
-  return cleanUp(filters);
-};
-
-export const cleanUpFilters = (filter: Partial<GroupedFilter>) => {
-  return (Object.keys(filter) as FilterKey[])
-    .flatMap((key) => {
-      const filters = filter[key];
-      if (!filters) return [];
-
-      return cleanUpFilterByKey(key, filters);
-    })
-    .filter((filter) => !!filter);
-};
+export const completeSteps = (steps: NativeFilter[]) =>
+  steps.filter((step) => kindOf(step).isComplete(step));

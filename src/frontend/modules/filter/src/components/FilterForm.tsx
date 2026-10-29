@@ -1,21 +1,20 @@
 import {
   ActionIcon,
-  ActionIconGroup,
+  Box,
+  Center,
+  Divider,
   Group,
-  Scroller,
   Stack,
-  Tabs,
   Text,
+  Title,
+  Tooltip,
 } from "@mantine/core";
-import { CheckIcon, RotateCcwIcon, Trash2Icon } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { useCurrentFilterTab } from "../hooks/useSearchParams";
-import type { FilterKey, NativeFilter } from "../types/filter";
-import {
-  cleanUpFilters,
-  FILTER_MAP,
-  generateDefaultFilter,
-} from "./FilterViews";
+import { CheckIcon, InfoIcon, RotateCcwIcon, Trash2Icon } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
+import type { FilterKey, NativeFilter, Pipeline } from "../types/filter";
+import { completeSteps, FILTER_KINDS, kindOf } from "./FilterViews";
+import PipelineList from "./Pipeline/PipelineList";
 
 type FilterFormProps = {
   ocelId: string;
@@ -23,87 +22,156 @@ type FilterFormProps = {
   onSubmit?: (filters: NativeFilter[]) => void;
 };
 
+const CLEANUP_NOTE =
+  "The steps run from top to bottom. After the last step the log is cleaned up: relations whose event or object is gone are removed, events without at least one E2O relation are filtered out, and objects without any E2O or O2O relation are filtered out too.";
+
 const FilterForm = ({ ocelId, currentFilter, onSubmit }: FilterFormProps) => {
-  const { control, handleSubmit, reset, formState } = useForm({
-    defaultValues: generateDefaultFilter(currentFilter),
+  const { control, handleSubmit, reset, formState } = useForm<Pipeline>({
+    defaultValues: { steps: currentFilter },
   });
 
-  const { currentTab, setCurrentTab } = useCurrentFilterTab({
-    tabs: Object.keys(FILTER_MAP) as FilterKey[],
-    defaultTab: "activity",
-    queryKey: "tab",
+  const { fields, append, remove, move } = useFieldArray({
+    control,
+    name: "steps",
   });
+  const steps = useWatch({ control, name: "steps" });
+
+  const [selectedId, setSelectedId] = useState<string | undefined>(
+    fields[0]?.id,
+  );
+  const ids = fields.map(({ id }) => id);
+  const selectedIndex = fields.findIndex(({ id }) => id === selectedId);
+  const selectedStep = steps[selectedIndex];
+  const before = completeSteps(steps.slice(0, Math.max(selectedIndex, 0)));
+
+  const selectAdded = useRef(false);
+  useEffect(() => {
+    if (selectAdded.current) {
+      selectAdded.current = false;
+      setSelectedId(fields[fields.length - 1]?.id);
+    }
+  }, [fields]);
+
+  const addStep = (key: FilterKey) => {
+    selectAdded.current = true;
+    append(FILTER_KINDS[key].create());
+  };
 
   return (
-    <Tabs
-      value={currentTab}
-      onChange={(newTab) => setCurrentTab(newTab as FilterKey)}
-      keepMounted={false}
-      style={{ display: "flex", flexDirection: "column" }}
-      h={"100%"}
-    >
-      <Group py={"xs"} gap={0} wrap="nowrap">
-        <Tabs.List flex={1} miw={0}>
-          <Scroller>
-            {Object.entries(FILTER_MAP).map(([key, { title }]) => (
-              <Tabs.Tab key={key} value={key}>
-                {title}
-              </Tabs.Tab>
-            ))}
-          </Scroller>
-        </Tabs.List>
-        <ActionIconGroup>
-          {formState.isDirty && (
-            <>
-              <ActionIcon
-                onClick={handleSubmit((data) => {
-                  onSubmit?.(cleanUpFilters(data));
-                })}
-                size={"lg"}
-                color="green"
-              >
-                <CheckIcon size={24} />
-              </ActionIcon>
-              <ActionIcon
-                size={"lg"}
-                color="yellow"
-                onClick={() => reset(generateDefaultFilter(currentFilter))}
-              >
-                <RotateCcwIcon size={24} />
-              </ActionIcon>
-            </>
-          )}
-          {currentFilter.length > 0 && (
-            <ActionIcon size={"lg"} color="red" onClick={() => onSubmit?.([])}>
-              <Trash2Icon size={24} />
-            </ActionIcon>
-          )}
-        </ActionIconGroup>
-      </Group>
-
-      {Object.entries(FILTER_MAP).map(
-        ([key, { ViewComponent, description }]) => (
-          <Tabs.Panel
-            key={key}
-            value={key}
-            p={"md"}
-            flex={1}
-            mih={0}
-            style={{ overflow: "auto" }}
-          >
-            <Stack gap={"md"} h={"100%"}>
+    <Group h="100%" gap={0} wrap="nowrap" align="stretch">
+      <Box flex={1} miw={0} p="md" style={{ overflow: "auto" }}>
+        {selectedStep ? (
+          <Stack gap="md" h="100%">
+            <Stack gap={4}>
+              <Title order={4}>
+                {selectedIndex + 1}. {kindOf(selectedStep).title}
+              </Title>
               <Text size="sm" c="dimmed">
-                {description} Afterwards the log is cleaned up automatically:
-                relations whose source or target is missing are removed, events
-                without at least one E2O relation are filtered out, and objects
-                without any E2O or O2O relation are filtered out too.
+                {kindOf(selectedStep).description}
               </Text>
-              <ViewComponent control={control} ocelId={ocelId} />
             </Stack>
-          </Tabs.Panel>
-        ),
-      )}
-    </Tabs>
+            <Controller
+              key={selectedId}
+              control={control}
+              name={`steps.${selectedIndex}`}
+              render={({ field }) => {
+                const { Panel } = kindOf(field.value);
+                return (
+                  <Panel
+                    ocelId={ocelId}
+                    filter={field.value}
+                    before={before}
+                    onChange={(step) =>
+                      field.onChange({ target: { value: step } })
+                    }
+                  />
+                );
+              }}
+            />
+          </Stack>
+        ) : (
+          <Center h="100%">
+            <Text c="dimmed" size="sm" maw={360} ta="center">
+              {fields.length === 0
+                ? "Add a filter to the pipeline on the right to start filtering."
+                : "Select a step on the right to edit it."}
+            </Text>
+          </Center>
+        )}
+      </Box>
+
+      <Stack
+        w={320}
+        gap="sm"
+        py="md"
+        style={{ borderLeft: "1px solid var(--mantine-color-default-border)" }}
+      >
+        <Group justify="space-between" wrap="nowrap" h={28} px="md">
+          <Group gap={6} wrap="nowrap">
+            <Title order={5} lh={1}>
+              Pipeline
+            </Title>
+            <Tooltip label={CLEANUP_NOTE} multiline w={280} withArrow>
+              <InfoIcon
+                size={16}
+                color="var(--mantine-color-dimmed)"
+                aria-label="How the pipeline is applied"
+              />
+            </Tooltip>
+          </Group>
+          <Group justify="flex-end" gap={4} wrap="nowrap" ml="auto">
+            {formState.isDirty && (
+              <>
+                <Tooltip label="Apply">
+                  <ActionIcon
+                    variant="subtle"
+                    onClick={handleSubmit((data) =>
+                      onSubmit?.(completeSteps(data.steps)),
+                    )}
+                    color="green"
+                  >
+                    <CheckIcon size={20} />
+                  </ActionIcon>
+                </Tooltip>
+                <Tooltip label="Discard changes">
+                  <ActionIcon
+                    variant="subtle"
+                    color="yellow"
+                    onClick={() => reset({ steps: currentFilter })}
+                  >
+                    <RotateCcwIcon size={20} />
+                  </ActionIcon>
+                </Tooltip>
+              </>
+            )}
+            {currentFilter.length > 0 && (
+              <Tooltip label="Remove all filters">
+                <ActionIcon
+                  variant="subtle"
+                  color="red"
+                  onClick={() => onSubmit?.([])}
+                >
+                  <Trash2Icon size={20} />
+                </ActionIcon>
+              </Tooltip>
+            )}
+          </Group>
+        </Group>
+        <Divider />
+        <PipelineList
+          flex={1}
+          mih={0}
+          px="md"
+          ids={ids}
+          steps={steps}
+          selectedId={selectedId}
+          onSelect={setSelectedId}
+          onRemove={remove}
+          onMove={move}
+          onAdd={addStep}
+        />
+      </Stack>
+    </Group>
   );
 };
 

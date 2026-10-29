@@ -1,7 +1,9 @@
-"""An OCEL changed step by step through views, without copying it.
+"""An OCEL changed step by step through views, without writing to the log.
 
-A view's steps live in a catalog of its own, an in-memory database attached for
-the purpose:
+Each operation's views read the ones before.
+
+A view's steps live in a catalog of its own, a database attached for the purpose
+-- in memory, or at a path given -- either:
 
 * next to the log's own database, when that can be written to -- an in-memory
   log, or a file opened for writing;
@@ -9,8 +11,9 @@ the purpose:
   when the log is read-only -- DuckDB will not attach anything to a read-only
   database, not even an in-memory one.
 
-Nothing is computed until the view is queried with :meth:`OCELView.sql` or
-written out, by :meth:`OCELView.to_ocel` or :meth:`OCELView.to_duckdb`.
+The tables, under their own names, are published in the catalog's ``main``, or,
+on a connection of the view's own, in that connection's default database -- where
+an :class:`OCEL` over it looks for them, see :meth:`OCELView.ocel`.
 """
 
 from __future__ import annotations
@@ -29,23 +32,30 @@ if TYPE_CHECKING:
     from ocelescope.ocel.core import OCEL
 
 _SOURCE = "ocel_view_source"
+_SAVED = "ocel_view_saved"
 _TARGET = "ocel_view_target"
 
 
 class OCELView:
-    """``ocel`` as a stack of operations leaves it, each defining views.
+    """``ocel`` as a stack of operations leaves it.
 
     Operations are applied in order with :meth:`apply`; the log as they leave it
-    is queried with :meth:`sql`. The views live until :meth:`close`.
+    is queried with :meth:`sql`. What they create lives until :meth:`close`, in
+    memory or, given ``path``, in a DuckDB file there, replacing any.
     """
 
-    def __init__(self, ocel: OCEL):
-        catalog, schema, read_only, path = ocel.con.execute(
+    def __init__(self, ocel: OCEL, path: str | Path | None = None):
+        catalog, schema, read_only, source_path = ocel.con.execute(
             "SELECT database_name, current_schema(), readonly, path "
             "FROM duckdb_databases() WHERE database_name = current_database()"
         ).fetchall()[0]
 
+        if path is not None:
+            Path(path).unlink(missing_ok=True)
         self._catalog = ident(f"ocel_view_{uuid4().hex[:12]}")
+        self._source_path: str | None = source_path if read_only else None
+        self._created: list[tuple[str, str | None]] = []
+
         if read_only:
             self._con = duckdb.connect(":memory:")
             source = _SOURCE
@@ -56,10 +66,16 @@ class OCELView:
         try:
             set_utc(self._con)
             if read_only:
+                default = self._con.execute("SELECT current_database()").fetchall()
+                self._main = f"{ident(default[0][0])}.main"
+            else:
+                self._main = f"{self._catalog}.main"
+            if read_only:
                 self._con.execute(
-                    f"ATTACH {literal(path)} AS {ident(source)} (READ_ONLY)"
+                    f"ATTACH {literal(source_path)} AS {ident(source)} (READ_ONLY)"
                 )
-            self._con.execute(f"ATTACH ':memory:' AS {self._catalog}")
+            target = ":memory:" if path is None else str(path)
+            self._con.execute(f"ATTACH {literal(target)} AS {self._catalog}")
             self._con.execute(f"CREATE SCHEMA {self._catalog}.steps")
 
             names = self._con.execute(
@@ -69,7 +85,6 @@ class OCELView:
             ).fetchall()
             stored = f"{ident(source)}.{ident(schema)}"
             self._tables = {name: f"{stored}.{ident(name)}" for (name,) in names}
-            self._bases = dict(self._tables)
             self._steps = 0
             self._publish()
         except Exception:
@@ -103,10 +118,10 @@ class OCELView:
                 f"{self._catalog}.steps",
                 self._steps,
                 self._tables,
-                self._bases,
+                self._created,
             )
             operation.build(step)
-            self._tables, self._bases = step.tables, step.bases
+            self._tables = step.tables
         self._publish()
         return self
 
@@ -114,7 +129,7 @@ class OCELView:
         """Make this view's tables, under their own names, what they are now."""
         for table, relation in self._tables.items():
             self._con.execute(
-                f"CREATE OR REPLACE VIEW {self._catalog}.main.{ident(table)} "
+                f"CREATE OR REPLACE VIEW {self._main}.{ident(table)} "
                 f"AS SELECT * FROM {relation}"
             )
 
@@ -127,26 +142,97 @@ class OCELView:
         """
         cursor = self._con.cursor()
         set_utc(cursor)
-        cursor.execute(f"USE {self._catalog}.main")
+        cursor.execute(f"USE {self._main}")
         return cursor.sql(query, params=list(params)) if params else cursor.sql(query)
 
-    def to_duckdb(self, path: str | Path) -> None:
-        """Write the log into a DuckDB file at ``path``, replacing any there.
+    def ocel(self) -> OCEL:
+        from ocelescope.ocel.core import OCEL
 
-        Each table is one ``CREATE TABLE ... AS``, so DuckDB computes and writes
-        it without the log passing through Python.
-        """
+        if self._source_path is None:
+            raise ValueError("Only a view of a log read from a file is an OCEL")
+        cursor = self._con.cursor()
+        set_utc(cursor)
+        return OCEL(cursor)
+
+    def save(self, path: str | Path) -> None:
+        if self._source_path is None:
+            raise ValueError("Only a view of a log read from a file can be saved")
+
         path = Path(path)
         path.unlink(missing_ok=True)
-        target = ident(f"{_TARGET}_{uuid4().hex[:12]}")
-        self._con.execute(f"ATTACH {literal(str(path))} AS {target}")
+        saved = ident(_SAVED)
+        own, renamed = f"{self._catalog}.", f"{saved}."
+        self._con.execute(f"ATTACH {literal(str(path))} AS {saved}")
         try:
-            for table, relation in self.tables.items():
+            self._con.execute(f"CREATE SCHEMA {saved}.steps")
+            self._con.execute(f"CREATE SCHEMA {saved}.meta")
+            self._con.execute(
+                f"CREATE TABLE {saved}.meta.source AS "
+                f"SELECT {literal(self._source_path)} AS path"
+            )
+            for name, query in self._created:
+                target = name.replace(own, renamed, 1)
+                if query is None:
+                    self._con.execute(f"CREATE TABLE {target} AS FROM {name}")
+                else:
+                    self._con.execute(
+                        f"CREATE VIEW {target} AS {query.replace(own, renamed)}"
+                    )
+            for table, relation in self._tables.items():
                 self._con.execute(
-                    f"CREATE TABLE {target}.main.{ident(table)} AS FROM {relation}"
+                    f"CREATE VIEW {saved}.main.{ident(table)} AS "
+                    f"SELECT * FROM {relation.replace(own, renamed, 1)}"
                 )
         finally:
-            self._con.execute(f"DETACH {target}")
+            self._con.execute(f"DETACH {saved}")
+
+    @staticmethod
+    def load(path: str | Path) -> OCEL:
+        from ocelescope.ocel.core import OCEL
+
+        con = duckdb.connect(":memory:")
+        try:
+            set_utc(con)
+            saved = ident(_SAVED)
+            con.execute(f"ATTACH {literal(str(path))} AS {saved} (READ_ONLY)")
+            row = con.execute(f"SELECT path FROM {saved}.meta.source").fetchone()
+            if row is None:
+                raise ValueError(f"{path} is not a saved view")
+            (source,) = row
+            con.execute(f"ATTACH {literal(source)} AS {ident(_SOURCE)} (READ_ONLY)")
+            for (table,) in con.execute(
+                "SELECT table_name FROM information_schema.tables "
+                "WHERE table_catalog = ? AND table_schema = 'main'",
+                [_SAVED],
+            ).fetchall():
+                con.execute(
+                    f"CREATE VIEW main.{ident(table)} AS "
+                    f"SELECT * FROM {saved}.main.{ident(table)}"
+                )
+        except Exception:
+            con.close()
+            raise
+        return OCEL(con)
+
+    @staticmethod
+    def materialize(saved: str | Path, path: str | Path) -> None:
+        path = Path(path)
+        path.unlink(missing_ok=True)
+        target = ident(_TARGET)
+        with OCELView.load(saved) as ocel:
+            tables = ocel.con.execute(
+                "SELECT table_name FROM information_schema.tables "
+                "WHERE table_catalog = current_database() AND table_schema = 'main'"
+            ).fetchall()
+            ocel.con.execute(f"ATTACH {literal(str(path))} AS {target}")
+            try:
+                for (table,) in tables:
+                    ocel.con.execute(
+                        f"CREATE TABLE {target}.main.{ident(table)} "
+                        f"AS FROM main.{ident(table)}"
+                    )
+            finally:
+                ocel.con.execute(f"DETACH {target}")
 
     def to_ocel(self) -> OCEL:
         """The log as a new, in-memory :class:`OCEL` of its own.

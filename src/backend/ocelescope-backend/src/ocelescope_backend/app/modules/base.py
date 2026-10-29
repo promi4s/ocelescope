@@ -6,7 +6,7 @@ from typing import ClassVar
 from fastapi import FastAPI
 from packaging.version import Version
 
-from ocelescope import BaseFilter, Resource
+from ocelescope import Resource
 from ocelescope_backend.app.modules.context import ModuleContext, ModuleRegistry
 
 
@@ -34,7 +34,3 @@ class Module(ABC):
     @abstractmethod
     def create_app(self) -> FastAPI:
         raise NotImplementedError
-
-
-class ModuleFilter(BaseFilter):
-    OcelescopeModuleSource: ClassVar[str]

@@ -30,10 +30,13 @@
     "build": "orval && tsdown",
     "dev": "tsdown --watch ./src",
     "typecheck": "tsc --noEmit",
-    "generate:api": "uv run ocelescope-backend openapi --module filter & orval"
+    "generate:api": "uv run ocelescope-backend openapi --module filter && orval"
   },
   "peerDependencies": {
     "@dagrejs/dagre": "catalog:",
+    "@dnd-kit/core": "catalog:",
+    "@dnd-kit/sortable": "catalog:",
+    "@dnd-kit/utilities": "catalog:",
     "@mantine/core": "catalog:",
     "@mantine/dates": "catalog:",
     "@mantine/hooks": "catalog:",
@@ -41,6 +44,7 @@
     "@ocelescope/api-base": "workspace:^",
     "@ocelescope/api-client": "workspace:^",
     "@ocelescope/core": "workspace:^",
+    "@r4pm/components": "catalog:",
     "@tanstack/react-query": "catalog:",
     "axios": "catalog:",
     "dayjs": "catalog:",
@@ -55,6 +59,9 @@
     "react-hook-form": "catalog:"
   },
   "devDependencies": {
+    "@dnd-kit/core": "catalog:",
+    "@dnd-kit/sortable": "catalog:",
+    "@dnd-kit/utilities": "catalog:",
     "@mantine/notifications": "catalog:",
     "@ocelescope/api-config": "workspace:^",
     "@types/node": "catalog:",

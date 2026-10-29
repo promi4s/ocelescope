@@ -20,12 +20,16 @@
 }
 
 .container {
+  display: flex;
+  flex-direction: column;
   border: 1px solid var(--mantine-color-default-border);
   border-radius: var(--mantine-radius-default);
   overflow: hidden;
 }
 
 .scrollArea {
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
 }
 

@@ -9,6 +9,7 @@ the min / max / sum number of targets a single source instance relates to;
 
 from __future__ import annotations
 
+import math
 from typing import Literal
 
 from ocelescope.ocel.constants.pm4py import (
@@ -19,11 +20,22 @@ from ocelescope.ocel.constants.pm4py import (
     OID_COL,
     OTYPE_COL,
 )
-from ocelescope.util.sql import ident
+from ocelescope.ocel.constants.tables import (
+    E2O_TABLE,
+    EVENTS_TABLE,
+    O2O_TABLE,
+    OBJECTS_TABLE,
+)
+from ocelescope.util.sql import ident, literal
 from ocelescope_backend.app.internal.model.base import PaginatedResponse
 
 from ocelescope import OCEL
-from ocelescope_module_ocel.models import RelationCombination, RelationCountSummary
+from ocelescope_module_ocel.models import (
+    AttributeBin,
+    RelationCombination,
+    RelationCountDistribution,
+    RelationCountSummary,
+)
 
 QUALIFIER = "ocel:qualifier"
 
@@ -37,22 +49,23 @@ def _normalized_relation(kind: RelationKind, direction: Direction) -> str:
     ``direction`` picks which side of the relation is the *source*:
       - e2o "source": event -> object   ("target": object -> event)
       - o2o "source": oid_1 -> oid_2     ("target": oid_2 -> oid_1)
-    The object/event types are joined on so grouping can be done by type.
+    The object/event types are joined on so grouping can be done by type; that
+    also drops a relation whose event or object is gone.
     """
     if kind == "e2o":
         base = (
-            f"e2o r "
-            f"JOIN events e ON r.{ident(EID_COL)} = e.{ident(EID_COL)} "
-            f"JOIN objects o ON r.{ident(OID_COL)} = o.{ident(OID_COL)}"
+            f"{ident(E2O_TABLE)} r "
+            f"JOIN {ident(EVENTS_TABLE)} e ON r.{ident(EID_COL)} = e.{ident(EID_COL)} "
+            f"JOIN {ident(OBJECTS_TABLE)} o ON r.{ident(OID_COL)} = o.{ident(OID_COL)}"
         )
         event = (f"e.{ident(EID_COL)}", f"e.{ident(ACTIVITY_COL)}")
         obj = (f"o.{ident(OID_COL)}", f"o.{ident(OTYPE_COL)}")
         src, tgt = (event, obj) if direction == "source" else (obj, event)
     else:
         base = (
-            f"o2o r "
-            f"JOIN objects s ON r.{ident(O2O_SOURCE_ID)} = s.{ident(OID_COL)} "
-            f"JOIN objects t ON r.{ident(O2O_TARGET_ID)} = t.{ident(OID_COL)}"
+            f"{ident(O2O_TABLE)} r "
+            f"JOIN {ident(OBJECTS_TABLE)} s ON r.{ident(O2O_SOURCE_ID)} = s.{ident(OID_COL)} "
+            f"JOIN {ident(OBJECTS_TABLE)} t ON r.{ident(O2O_TARGET_ID)} = t.{ident(OID_COL)}"
         )
         first = (f"s.{ident(OID_COL)}", f"s.{ident(OTYPE_COL)}")
         second = (f"t.{ident(OID_COL)}", f"t.{ident(OTYPE_COL)}")
@@ -110,9 +123,11 @@ def relation_summary(
 
     # All instances of the source type -- so min can drop to 0 when some don't relate.
     if kind == "e2o" and direction == "source":
-        instances = f"SELECT {ident(ACTIVITY_COL)} AS src_type FROM events"
+        instances = (
+            f"SELECT {ident(ACTIVITY_COL)} AS src_type FROM {ident(EVENTS_TABLE)}"
+        )
     else:
-        instances = f"SELECT {ident(OTYPE_COL)} AS src_type FROM objects"
+        instances = f"SELECT {ident(OTYPE_COL)} AS src_type FROM {ident(OBJECTS_TABLE)}"
 
     if with_qualifier:
         # the group is keyed by its qualifier, so it already names the only one it covers
@@ -206,3 +221,95 @@ def combinations(
         RelationCombination(source=src_type, target=tgt_type, qualifier=qualifier or "")
         for src_type, tgt_type, qualifier in ocel.sql(query).fetchall()
     ]
+
+
+def _counted(
+    kind: RelationKind,
+    source: str,
+    target: str,
+    direction: Direction,
+    qualifier: str | None,
+) -> tuple[str, str]:
+    eid, oid, otype = ident(EID_COL), ident(OID_COL), ident(OTYPE_COL)
+    qualified = (
+        f"AND r.{ident(QUALIFIER)} = {literal(qualifier)}"
+        if qualifier is not None
+        else ""
+    )
+    if kind == "e2o":
+        counted = eid if direction == "source" else oid
+        relations = (
+            f"SELECT r.{counted} AS id FROM {ident(E2O_TABLE)} r "
+            f"JOIN {ident(EVENTS_TABLE)} e USING ({eid}) "
+            f"JOIN {ident(OBJECTS_TABLE)} o USING ({oid}) "
+            f"WHERE e.{ident(ACTIVITY_COL)} = {literal(source)} "
+            f"AND o.{otype} = {literal(target)} {qualified}"
+        )
+        entities = (
+            f"SELECT {eid} AS id FROM {ident(EVENTS_TABLE)} "
+            f"WHERE {ident(ACTIVITY_COL)} = {literal(source)}"
+            if direction == "source"
+            else f"SELECT {oid} AS id FROM {ident(OBJECTS_TABLE)} "
+            f"WHERE {otype} = {literal(target)}"
+        )
+        return entities, relations
+
+    counted = ident(O2O_SOURCE_ID if direction == "source" else O2O_TARGET_ID)
+    relations = (
+        f"SELECT r.{counted} AS id FROM {ident(O2O_TABLE)} r "
+        f"JOIN {ident(OBJECTS_TABLE)} s ON s.{oid} = r.{ident(O2O_SOURCE_ID)} "
+        f"JOIN {ident(OBJECTS_TABLE)} t ON t.{oid} = r.{ident(O2O_TARGET_ID)} "
+        f"WHERE s.{otype} = {literal(source)} AND t.{otype} = {literal(target)} "
+        f"{qualified}"
+    )
+    entities = (
+        f"SELECT {oid} AS id FROM {ident(OBJECTS_TABLE)} "
+        f"WHERE {otype} = {literal(source if direction == 'source' else target)}"
+    )
+    return entities, relations
+
+
+def count_distribution(
+    ocel: OCEL,
+    kind: RelationKind,
+    source: str,
+    target: str,
+    direction: Direction = "source",
+    qualifier: str | None = None,
+    bins: int = 50,
+) -> RelationCountDistribution:
+    entities, relations = _counted(kind, source, target, direction, qualifier)
+    per_entity = ocel.sql(
+        f"SELECT coalesce(c.n, 0) AS n FROM ({entities}) x "
+        f"LEFT JOIN (SELECT id, count(*) AS n FROM ({relations}) GROUP BY id) c "
+        f"ON c.id = x.id"
+    )
+    total, relation_count, low, high = per_entity.query(
+        "per_entity",
+        "SELECT count(*), coalesce(sum(n), 0), min(n), max(n) FROM per_entity",
+    ).fetchone() or (0, 0, None, None)
+    if not total or low is None or high is None:
+        return RelationCountDistribution(entities=0, relations=0, min=0, max=0, bins=[])
+
+    width = max(1, math.ceil((high - low + 1) / bins))
+    n = (high - low) // width + 1
+    counts = dict(
+        per_entity.query(
+            "per_entity",
+            f"SELECT (n - {int(low)}) // {width} AS b, count(*) FROM per_entity GROUP BY b",
+        ).fetchall()
+    )
+    return RelationCountDistribution(
+        entities=total,
+        relations=int(relation_count),
+        min=low,
+        max=high,
+        bins=[
+            AttributeBin(
+                start=low + i * width,
+                end=high if i == n - 1 else low + (i + 1) * width,
+                count=int(counts.get(i, 0)),
+            )
+            for i in range(n)
+        ],
+    )

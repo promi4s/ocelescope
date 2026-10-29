@@ -5,6 +5,117 @@
     "version": "1.0"
   },
   "paths": {
+    "/modules/filter/v1/{ocel_id}/views": {
+      "post": {
+        "summary": "Register View",
+        "operationId": "registerView",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Name"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TimeFrameFilter"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ActivityFilter"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ObjectTypeFilter"
+                    },
+                    {
+                      "$ref": "#/components/schemas/EventAttributeFilter"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ObjectAttributeFilter"
+                    },
+                    {
+                      "$ref": "#/components/schemas/E2OCountFilter"
+                    },
+                    {
+                      "$ref": "#/components/schemas/O2OCountFilter"
+                    }
+                  ],
+                  "discriminator": {
+                    "propertyName": "type",
+                    "mapping": {
+                      "time_frame": "#/components/schemas/TimeFrameFilter",
+                      "activity": "#/components/schemas/ActivityFilter",
+                      "object_type": "#/components/schemas/ObjectTypeFilter",
+                      "event_attribute": "#/components/schemas/EventAttributeFilter",
+                      "object_attribute": "#/components/schemas/ObjectAttributeFilter",
+                      "e2o_count": "#/components/schemas/E2OCountFilter",
+                      "o2o_count": "#/components/schemas/O2OCountFilter"
+                    }
+                  }
+                },
+                "title": "Steps"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Registerview"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/modules/filter/v1/{ocel_id}/filter": {
       "get": {
         "summary": "Getfilter",
@@ -138,7 +249,7 @@
                     }
                   }
                 },
-                "title": "Body"
+                "title": "Pipeline"
               }
             }
           }
@@ -397,6 +508,15 @@
             ],
             "title": "Regex"
           },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "exclude",
+              "include"
+            ],
+            "title": "Mode",
+            "default": "include"
+          },
           "type": {
             "type": "string",
             "const": "event_attribute",
@@ -619,6 +739,15 @@
               }
             ],
             "title": "Regex"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "exclude",
+              "include"
+            ],
+            "title": "Mode",
+            "default": "include"
           },
           "type": {
             "type": "string",

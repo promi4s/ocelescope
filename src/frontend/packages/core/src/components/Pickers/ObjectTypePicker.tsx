@@ -15,13 +15,14 @@ export const ObjectTypePicker = ({
   activity,
   ocelId,
   ocelVersion = "filtered",
+  viewId,
   ...picker
 }: ObjectTypePickerProps) => {
   const id = useOcelId(ocelId);
   const colorOf = useColorOf("objectType");
   const { data, isPending, error } = useObjectCounts(
     id,
-    { ocel_version: ocelVersion },
+    { ocel_version: ocelVersion, view_id: viewId },
     { query: { enabled: id != null } },
   );
   const relations = useE2o(
@@ -29,6 +30,7 @@ export const ObjectTypePicker = ({
     {
       source_types: activity ? [activity] : [],
       ocel_version: ocelVersion,
+      view_id: viewId,
       page_size: 1000,
     },
     { query: { enabled: id != null && activity !== undefined } },

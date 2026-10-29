@@ -15,7 +15,8 @@ types are read from the stored columns before that and the extremes are cast bac
 
 from __future__ import annotations
 
-from datetime import datetime
+import math
+from datetime import UTC, datetime
 from typing import Literal
 
 import duckdb
@@ -24,6 +25,7 @@ from ocelescope.ocel.constants.pm4py import (
     OBJECT_CHANGED_FIELD,
     OID_COL,
     OTYPE_COL,
+    TIMESTAMP_COL,
 )
 from ocelescope.ocel.constants.tables import (
     EVENTS_TABLE,
@@ -33,7 +35,14 @@ from ocelescope.ocel.constants.tables import (
 from ocelescope.util.sql import ident, literal
 
 from ocelescope import OCEL
-from ocelescope_module_ocel.models import AggregatedAttribute, TypedAttribute
+from ocelescope_module_ocel.models import (
+    AggregatedAttribute,
+    AttributeBin,
+    AttributeDistribution,
+    AttributeMatches,
+    AttributeValueCount,
+    TypedAttribute,
+)
 from ocelescope_module_ocel.models.attributes import ValueType
 
 EntityType = Literal["events", "objects"]
@@ -120,7 +129,7 @@ def long_table(
         values = ", ".join(f"{ident(name)}::VARCHAR AS {ident(name)}" for name in names)
         source = (
             f"SELECT {ident(ACTIVITY_COL)} AS {ident(ENTITY_TYPE)}, {values} "
-            f"FROM {EVENTS_TABLE} {_type_filter(ident(ACTIVITY_COL), entity_names, params)}"
+            f"FROM {ident(EVENTS_TABLE)} {_type_filter(ident(ACTIVITY_COL), entity_names, params)}"
         )
         kept = "true"
     else:
@@ -131,7 +140,7 @@ def long_table(
         source = (
             f"SELECT o.{ident(OTYPE_COL)} AS {ident(ENTITY_TYPE)}, "
             f"c.{ident(OBJECT_CHANGED_FIELD)} AS field, {values} "
-            f"FROM {OBJECT_CHANGES_TABLE} c JOIN {OBJECTS_TABLE} o USING ({ident(OID_COL)}) "
+            f"FROM {ident(OBJECT_CHANGES_TABLE)} c JOIN {ident(OBJECTS_TABLE)} o USING ({ident(OID_COL)}) "
             f"{_type_filter(f'o.{ident(OTYPE_COL)}', entity_names, params)}"
         )
         kept = "field = name"
@@ -272,3 +281,154 @@ def typed_attributes(
         )
         for name, entity, distinct, minimum, maximum in rows
     ]
+
+
+def entity_values(
+    ocel: OCEL,
+    entity_type: EntityType,
+    attribute: str,
+    entity_names: list[str] | None = None,
+) -> duckdb.DuckDBPyRelation:
+    if entity_type == "events" or attribute not in _attribute_types(ocel, "objects"):
+        return long_table(ocel, entity_type, [attribute], entity_names)
+
+    params: list[object] = []
+    oid = ident(OID_COL)
+    return ocel.sql(
+        f"SELECT o.{ident(OTYPE_COL)} AS {ident(ENTITY_TYPE)}, "
+        f"{literal(attribute)} AS name, earliest.value "
+        f"FROM (SELECT {oid}, arg_min({ident(attribute)}, {ident(TIMESTAMP_COL)})::VARCHAR AS value "
+        f"FROM {ident(OBJECT_CHANGES_TABLE)} "
+        f"WHERE {ident(OBJECT_CHANGED_FIELD)} = {literal(attribute)} GROUP BY {oid}) earliest "
+        f"JOIN {ident(OBJECTS_TABLE)} o USING ({oid}) "
+        f"{_type_filter(f'o.{ident(OTYPE_COL)}', entity_names, params) or 'WHERE true'} "
+        f"AND earliest.value <> ''",
+        params,
+    )
+
+
+def attribute_distribution(
+    ocel: OCEL,
+    entity_type: EntityType,
+    attribute: str,
+    entity_names: list[str] | None = None,
+    bins: int = 50,
+    top: int = 200,
+) -> AttributeDistribution | None:
+    value_type = _attribute_types(ocel, entity_type).get(attribute)
+    if value_type is None:
+        return None
+
+    long = entity_values(ocel, entity_type, attribute, entity_names)
+    count, distinct, first, last = long.query(
+        "long",
+        "SELECT count(*), count(DISTINCT value), min(value), max(value) FROM long",
+    ).fetchone() or (0, 0, None, None)
+    if not count:
+        return None
+
+    if value_type in (ValueType.INT, ValueType.FLOAT, ValueType.DATE):
+        x = (
+            "epoch(try_cast(value AS TIMESTAMP))"
+            if value_type is ValueType.DATE
+            else "try_cast(value AS DOUBLE)"
+        )
+        low, high = long.query(
+            "long", f"SELECT min({x}), max({x}) FROM long"
+        ).fetchone() or (None, None)
+        if low is None or high is None:
+            return None
+        span = high - low
+        if value_type is ValueType.INT:
+            width = float(max(1, math.ceil((span + 1) / bins)))
+            n = int(span // width) + 1
+        else:
+            n = bins if span > 0 else 1
+            width = span / n if span > 0 else 1.0
+
+        counts = dict(
+            long.query(
+                "long",
+                f"SELECT least(floor(({x} - {low!r}) / {width!r})::BIGINT, {n - 1}) AS b, "
+                f"count(*) FROM long WHERE {x} IS NOT NULL GROUP BY b",
+            ).fetchall()
+        )
+
+        def bound(value: float) -> float | str:
+            if value_type is ValueType.DATE:
+                return (
+                    datetime.fromtimestamp(value, UTC).replace(tzinfo=None).isoformat()
+                )
+            return value
+
+        histogram = [
+            AttributeBin(
+                start=bound(low + i * width),
+                end=bound(high if i == n - 1 else low + (i + 1) * width),
+                count=int(counts.get(i, 0)),
+            )
+            for i in range(n)
+        ]
+        return AttributeDistribution(
+            name=attribute,
+            type=value_type,
+            count=count,
+            distinct_values=distinct,
+            min=bound(low)
+            if value_type is ValueType.DATE
+            else _marshal(str(low), value_type),
+            max=bound(high)
+            if value_type is ValueType.DATE
+            else _marshal(str(high), value_type),
+            bins=histogram,
+        )
+
+    frequent = long.query(
+        "long",
+        f"SELECT value, count(*) AS n FROM long GROUP BY value ORDER BY n DESC, value LIMIT {int(top)}",
+    ).fetchall()
+    return AttributeDistribution(
+        name=attribute,
+        type=value_type,
+        count=count,
+        distinct_values=distinct,
+        min=_marshal(first, value_type),
+        max=_marshal(last, value_type),
+        values=[AttributeValueCount(value=value, count=n) for value, n in frequent],
+    )
+
+
+def attribute_values(
+    ocel: OCEL,
+    entity_type: EntityType,
+    attribute: str,
+    entity_names: list[str] | None = None,
+    regex: str | None = None,
+    search: str | None = None,
+    values: list[str] | None = None,
+    top: int = 200,
+) -> AttributeMatches:
+    conditions = ["true"]
+    if regex is not None:
+        conditions.append(f"regexp_matches(value, {literal(regex)})")
+    if search:
+        conditions.append(f"contains(lower(value), lower({literal(search)}))")
+    if values is not None:
+        listed = ", ".join(literal(value) for value in values) or "NULL"
+        conditions.append(f"value IN ({listed})")
+    long = entity_values(ocel, entity_type, attribute, entity_names).query(
+        "long", f"SELECT * FROM long WHERE {' AND '.join(conditions)}"
+    )
+    count, distinct = long.query(
+        "matched", "SELECT count(*), count(DISTINCT value) FROM matched"
+    ).fetchone() or (0, 0)
+    frequent = long.query(
+        "matched",
+        f"SELECT value, count(*) AS n FROM matched GROUP BY value "
+        f"ORDER BY n DESC, value LIMIT {int(top)}",
+    ).fetchall()
+    return AttributeMatches(
+        count=count,
+        distinct_values=distinct,
+        values=[AttributeValueCount(value=value, count=n) for value, n in frequent],
+    )
