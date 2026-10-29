@@ -24,11 +24,6 @@ members = [
     "ocelescope-module-ocel",
     "ocelescope-workspace",
 ]
-overrides = [
-    { name = "ocelescope-backend", editable = "src/backend/ocelescope-backend" },
-    { name = "ocelescope-module-filter", editable = "src/backend/modules/ocelescope-module-filter" },
-    { name = "ocelescope-module-ocel", editable = "src/backend/modules/ocelescope-module-ocel" },
-]
 
 [[package]]
 name = "agent-detector"
@@ -2097,16 +2092,16 @@ requires-dist = [
 
 [[package]]
 name = "ocelescope-module-alignments"
-version = "0.10.5"
+version = "0.11.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ocelescope-backend" },
     { name = "ocelescope-module-filter" },
     { name = "ocelescope-module-ocel" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/23/17/74fb8b2a5cf00fb7197c36f682c33e488db6b7cd79bbfd829554f1525767/ocelescope_module_alignments-0.10.5.tar.gz", hash = "sha256:5fe6dd6ab97cf9f2c64b9d8fa1a19d1c7af342c81b658a494ed9fccf1cc6c511", size = 5181, upload-time = "2026-10-27T12:32:04.948Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e2/c5/e79a2ffccdf1cb0d2b95f247eda233bb596c8bafb79c8807ae6e980b9ce6/ocelescope_module_alignments-0.11.0.tar.gz", hash = "sha256:3784bbed763772a077d2b6d23bf1b45e1d4d3b317430e0c8a15eebb1eec9a602", size = 5176, upload-time = "2026-10-29T12:52:16.726Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/32/f7/6580af10516231ecf7aa69cb8cd4b57d640e8d2a941df1204932696e03d4/ocelescope_module_alignments-0.10.5-py3-none-any.whl", hash = "sha256:63c76ec38e0823f0bb77a323eb7e9041fd9f60acff0e66c4d64b43655caa6dd3", size = 7250, upload-time = "2026-10-27T12:32:04.106Z" },
+    { url = "https://files.pythonhosted.org/packages/58/fe/f8493c0fc5dfc27e563fd1f727d20cd45408025d654116aaa9b04bb62305/ocelescope_module_alignments-0.11.0-py3-none-any.whl", hash = "sha256:23594c04a9ebe97fa39fea44ba6fff5c70742d546669095f4df0cb6e82ccad66", size = 7248, upload-time = "2026-10-29T12:52:15.954Z" },
 ]
 
 [[package]]
@@ -2171,16 +2166,16 @@ wheels = [
 
 [[package]]
 name = "ocelescope-module-ocpn-editor"
-version = "0.10.7"
+version = "0.11.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ocelescope-backend" },
     { name = "ocelescope-module-filter" },
     { name = "ocelescope-module-ocel" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/78/83/1a9694f785b703607768f36edc9d68c17c547e244132330ab43035f7281c/ocelescope_module_ocpn_editor-0.10.7.tar.gz", hash = "sha256:4c635cf3d077fc9a0b76d2a8b0dc057e54a8ea68989f62febfa8e0d9069c290e", size = 4429, upload-time = "2026-10-27T12:36:41.302Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/37/64/cc837e46c75b6f941d24a78ffa65f805c321c1ca6958d78cc8f75d818578/ocelescope_module_ocpn_editor-0.11.0.tar.gz", hash = "sha256:5452fcb4a1b925ad3edaa508c881bca6d9913988d7598eb7ab84c9fd548bbae5", size = 4422, upload-time = "2026-10-29T12:53:25.429Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d2/42/f7c6ae13bb1298cdd6ecbdff435b8780d3d701f3b579f2df8a9eed11f565/ocelescope_module_ocpn_editor-0.10.7-py3-none-any.whl", hash = "sha256:d16748829f5d3477ae915899dafb79d49ddf405bebe20414c3b010ae9ddcd819", size = 6824, upload-time = "2026-10-27T12:36:39.905Z" },
+    { url = "https://files.pythonhosted.org/packages/99/3d/a1a9b502bf6a3cfdf0f98aa1dae02a5fbbc30de5580a525866c7a7df9e8d/ocelescope_module_ocpn_editor-0.11.0-py3-none-any.whl", hash = "sha256:8ad438c0496e850597a4bfd933b78e22f2ab6f16eef0d3fb02ca87fa2c323d17", size = 6822, upload-time = "2026-10-29T12:53:24.621Z" },
 ]
 
 [[package]]
@@ -2217,11 +2212,11 @@ typecheck = [
 
 [package.metadata]
 requires-dist = [
-    { name = "ocelescope-module-alignments", specifier = ">=0.10.4,<0.11.0" },
+    { name = "ocelescope-module-alignments", specifier = ">=0.11.0,<0.12.0" },
     { name = "ocelescope-module-filter", editable = "src/backend/modules/ocelescope-module-filter" },
     { name = "ocelescope-module-ocel", editable = "src/backend/modules/ocelescope-module-ocel" },
     { name = "ocelescope-module-ocelot", specifier = ">=0.8.0,<0.9.0" },
-    { name = "ocelescope-module-ocpn-editor", specifier = ">=0.10.4,<0.11.0" },
+    { name = "ocelescope-module-ocpn-editor", specifier = ">=0.11.0,<0.12.0" },
 ]
 
 [package.metadata.requires-dev]
