@@ -11,11 +11,11 @@ COPY src/frontend/app ./src/frontend/app
 COPY src/frontend/packages ./src/frontend/packages
 COPY src/frontend/modules ./src/frontend/modules
 
-RUN corepack enable && pnpm install --frozen-lockfile
+RUN npm install -g corepack@0.36.0 && corepack enable && pnpm install --frozen-lockfile
 
 FROM node:${NODE_VERSION} AS builder
 WORKDIR /repo
-RUN corepack enable 
+RUN npm install -g corepack@0.36.0 && corepack enable
 
 COPY --from=deps /repo/node_modules ./node_modules
 COPY --from=deps /repo/pnpm-lock.yaml ./pnpm-lock.yaml
