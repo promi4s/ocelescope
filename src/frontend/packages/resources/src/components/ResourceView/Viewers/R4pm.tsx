@@ -9,13 +9,13 @@ export const r4pmViewer = <P extends object>(
 ) =>
   dynamic<P>(
     async () => {
-      const [components, { wasmLayout }] = await Promise.all([
+      const [components, { wasmViz }] = await Promise.all([
         import("@r4pm/components"),
-        import("@r4pm/components/rust-layout/wasm"),
+        import("@r4pm/components/viz/wasm"),
       ]);
       const { ViewerConfigProvider } = components;
       const Viewer = pick(components);
-      const viewerConfig = { layout: wasmLayout };
+      const viewerConfig = { viz: wasmViz };
 
       return (props: P) => (
         <ViewerConfigProvider value={viewerConfig}>

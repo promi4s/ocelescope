@@ -1,4 +1,4 @@
-ARG NODE_VERSION=24-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205
+ARG NODE_VERSION=26-slim@sha256:e4db4c914bf8ad241bd24804fc25d272d89bad97e68cdc8a1414862790a02c39
 
 FROM node:${NODE_VERSION} AS deps
 WORKDIR /repo
@@ -11,11 +11,11 @@ COPY src/frontend/app ./src/frontend/app
 COPY src/frontend/packages ./src/frontend/packages
 COPY src/frontend/modules ./src/frontend/modules
 
-RUN corepack enable && pnpm install --frozen-lockfile
+RUN npm install -g corepack@0.36.0 && corepack enable && pnpm install --frozen-lockfile
 
 FROM node:${NODE_VERSION} AS builder
 WORKDIR /repo
-RUN corepack enable 
+RUN npm install -g corepack@0.36.0 && corepack enable
 
 COPY --from=deps /repo/node_modules ./node_modules
 COPY --from=deps /repo/pnpm-lock.yaml ./pnpm-lock.yaml
