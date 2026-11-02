@@ -236,22 +236,22 @@ catalogs:
       version: 6.11.0
     '@tanstack/react-query':
       specifier: ^5.105.0
-      version: 5.105.0
+      version: 5.105.1
     '@tanstack/react-query-devtools':
       specifier: ^5.105.0
-      version: 5.105.0
+      version: 5.105.1
     '@tsconfig/strictest':
       specifier: ^2.0.8
       version: 2.0.8
     '@tsdown/css':
       specifier: ^0.23.3
-      version: 0.23.3
+      version: 0.23.4
     '@types/file-saver':
       specifier: ^2.0.7
       version: 2.0.7
     '@types/node':
       specifier: ^26.6.5
-      version: 26.6.5
+      version: 26.6.6
     '@types/object-hash':
       specifier: ^3.0.6
       version: 3.0.6
@@ -290,7 +290,7 @@ catalogs:
       version: 3.0.6
     elkjs:
       specifier: ^0.12.0
-      version: 0.12.0
+      version: 0.12.1
     embla-carousel:
       specifier: ^8.6.0
       version: 8.6.0
@@ -308,7 +308,7 @@ catalogs:
       version: 4.2.1
     lucide-react:
       specifier: ^1.63.0
-      version: 1.63.0
+      version: 1.66.0
     mantine-datatable:
       specifier: ^9.4.0
       version: 9.4.0
@@ -320,10 +320,10 @@ catalogs:
       version: 3.0.0
     orval:
       specifier: ^8.45.0
-      version: 8.45.0
+      version: 8.46.0
     qs:
       specifier: ^6.17.0
-      version: 6.17.0
+      version: 6.17.1
     react:
       specifier: ^19.3.1
       version: 19.3.1
@@ -341,7 +341,7 @@ catalogs:
       version: 4.2.0
     tsdown:
       specifier: ^0.23.3
-      version: 0.23.3
+      version: 0.23.4
     typescript:
       specifier: ^6.0.3
       version: 6.0.3
@@ -370,13 +370,13 @@ importers:
         version: 10.4.0
       orval:
         specifier: 'catalog:'
-        version: 8.45.0(@tanstack/react-query@5.105.0)(typescript@6.0.3)(zod@4.6.7)
+        version: 8.46.0(@tanstack/react-query@5.105.1)(zod@4.6.7)
 
   src/frontend/app:
     dependencies:
       '@ocelescope/alignments':
         specifier: 'catalog:'
-        version: 0.11.0(@mantine/core@9.7.4)(@mantine/hooks@9.7.4)(@mantine/notifications@9.7.4)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@ocelescope/resources@src+frontend+packages+resources)(@r4pm/components@0.4.1)(@tanstack/react-query@5.105.0)(@xyflow/react@12.12.0)(axios@1.21.0)(lucide-react@1.63.0)(next@16.4.3)(react-dom@19.3.1)(react@19.3.1)
+        version: 0.11.0(@mantine/core@9.7.4)(@mantine/hooks@9.7.4)(@mantine/notifications@9.7.4)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@ocelescope/resources@src+frontend+packages+resources)(@r4pm/components@0.4.1)(@tanstack/react-query@5.105.1)(@xyflow/react@12.12.0)(axios@1.21.0)(lucide-react@1.66.0)(next@16.4.3)(react-dom@19.3.1)(react@19.3.1)
       '@ocelescope/api-base':
         specifier: workspace:^
         version: link:../packages/api/base
@@ -400,10 +400,10 @@ importers:
         version: link:../modules/management
       '@ocelescope/ocelot':
         specifier: 'catalog:'
-        version: 0.8.0(@dagrejs/dagre@3.1.3)(@mantine/core@9.7.4)(@mantine/hooks@9.7.4)(@ocelescope/api-base@src+frontend+packages+api+base)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@tanstack/react-query@5.105.0)(@xyflow/react@12.12.0)(axios@1.21.0)(dayjs@1.11.23)(elkjs@0.12.0)(file-saver@2.0.5)(html-to-image@1.11.13)(lucide-react@1.63.0)(mantine-datatable@9.4.0)(react-dom@19.3.1)(react@19.3.1)(recharts@3.10.1)
+        version: 0.8.0(@dagrejs/dagre@3.1.3)(@mantine/core@9.7.4)(@mantine/hooks@9.7.4)(@ocelescope/api-base@src+frontend+packages+api+base)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@tanstack/react-query@5.105.1)(@xyflow/react@12.12.0)(axios@1.21.0)(dayjs@1.11.23)(elkjs@0.12.1)(file-saver@2.0.5)(html-to-image@1.11.13)(lucide-react@1.66.0)(mantine-datatable@9.4.0)(react-dom@19.3.1)(react@19.3.1)(recharts@3.10.1)
       '@ocelescope/ocpn-editor':
         specifier: 'catalog:'
-        version: 0.11.0(@mantine/core@9.7.4)(@mantine/hooks@9.7.4)(@mantine/notifications@9.7.4)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@ocelescope/resources@src+frontend+packages+resources)(@r4pm/components@0.4.1)(@tanstack/react-query@5.105.0)(@xyflow/react@12.12.0)(axios@1.21.0)(lucide-react@1.63.0)(react-dom@19.3.1)(react@19.3.1)
+        version: 0.11.0(@mantine/core@9.7.4)(@mantine/hooks@9.7.4)(@mantine/notifications@9.7.4)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@ocelescope/resources@src+frontend+packages+resources)(@r4pm/components@0.4.1)(@tanstack/react-query@5.105.1)(@xyflow/react@12.12.0)(axios@1.21.0)(lucide-react@1.66.0)(react-dom@19.3.1)(react@19.3.1)
       '@ocelescope/plugin':
         specifier: workspace:^
         version: link:../modules/plugin
@@ -415,7 +415,7 @@ importers:
         version: link:../modules/variants
       next:
         specifier: 'catalog:'
-        version: 16.4.3(@types/node@26.6.5)(react-dom@19.3.1)(react@19.3.1)
+        version: 16.4.3(@types/node@26.6.6)(react-dom@19.3.1)(react@19.3.1)
       react:
         specifier: 'catalog:'
         version: 19.3.1
@@ -425,7 +425,7 @@ importers:
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
-        version: 26.6.5
+        version: 26.6.6
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
@@ -461,7 +461,7 @@ importers:
         version: link:../../packages/resources
       '@rjsf/core':
         specifier: 'catalog:'
-        version: 6.11.0(@rjsf/utils@6.11.0)(react@19.3.1)(solid-js@1.9.17)
+        version: 6.11.0(@rjsf/utils@6.11.0)(react@19.3.1)(solid-js@1.9.18)
       '@rjsf/utils':
         specifier: 'catalog:'
         version: 6.11.0(react@19.3.1)
@@ -470,7 +470,7 @@ importers:
         version: 6.11.0(@rjsf/utils@6.11.0)
       '@tanstack/react-query':
         specifier: 'catalog:'
-        version: 5.105.0(@types/react@19.3.0)(react@19.3.1)
+        version: 5.105.1(@types/react@19.3.0)(react@19.3.1)
       embla-carousel:
         specifier: 'catalog:'
         version: 8.6.0
@@ -479,10 +479,10 @@ importers:
         version: 8.6.0(react@19.3.1)
       lucide-react:
         specifier: 'catalog:'
-        version: 1.63.0(@types/react@19.3.0)(react@19.3.1)
+        version: 1.66.0(@types/react@19.3.0)(react@19.3.1)
       next:
         specifier: 'catalog:'
-        version: 16.4.3(@types/node@26.6.5)(react-dom@19.3.1)(react@19.3.1)
+        version: 16.4.3(@types/node@26.6.6)(react-dom@19.3.1)(react@19.3.1)
       react:
         specifier: 'catalog:'
         version: 19.3.1
@@ -507,7 +507,7 @@ importers:
         version: 2.0.7
       '@types/node':
         specifier: 'catalog:'
-        version: 26.6.5
+        version: 26.6.6
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
@@ -516,7 +516,7 @@ importers:
         version: 19.3.0(@types/react@19.3.0)
       tsdown:
         specifier: 'catalog:'
-        version: 0.23.3(@tsdown/css@0.23.3)(typescript@6.0.3)
+        version: 0.23.4(@tsdown/css@0.23.4)(typescript@6.0.3)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -534,29 +534,29 @@ importers:
         version: link:../../packages/core
       '@r4pm/components':
         specifier: 'catalog:'
-        version: 0.4.1(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(plotly.js@4.1.2)(react-dom@19.3.1)(react@19.3.1)
+        version: 0.4.1(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(plotly.js@4.2.0)(react-dom@19.3.1)(react@19.3.1)
       '@tanstack/react-query':
         specifier: 'catalog:'
-        version: 5.105.0(@types/react@19.3.0)(react@19.3.1)
+        version: 5.105.1(@types/react@19.3.0)(react@19.3.1)
       lucide-react:
         specifier: 'catalog:'
-        version: 1.63.0(@types/react@19.3.0)(react@19.3.1)
+        version: 1.66.0(@types/react@19.3.0)(react@19.3.1)
       next:
         specifier: 'catalog:'
-        version: 16.4.3(@types/node@26.6.5)(react-dom@19.3.1)(react@19.3.1)
+        version: 16.4.3(@types/node@26.6.6)(react-dom@19.3.1)(react@19.3.1)
       react:
         specifier: 'catalog:'
         version: 19.3.1
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
-        version: 26.6.5
+        version: 26.6.6
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
       tsdown:
         specifier: 'catalog:'
-        version: 0.23.3(@tsdown/css@0.23.3)(typescript@6.0.3)
+        version: 0.23.4(@tsdown/css@0.23.4)(typescript@6.0.3)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -586,10 +586,10 @@ importers:
         version: link:../../packages/core
       '@r4pm/components':
         specifier: 'catalog:'
-        version: 0.4.1(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(plotly.js@4.1.2)(react-dom@19.3.1)(react@19.3.1)
+        version: 0.4.1(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(plotly.js@4.2.0)(react-dom@19.3.1)(react@19.3.1)
       '@tanstack/react-query':
         specifier: 'catalog:'
-        version: 5.105.0(@types/react@19.3.0)(react@19.3.1)
+        version: 5.105.1(@types/react@19.3.0)(react@19.3.1)
       axios:
         specifier: 'catalog:'
         version: 1.21.0(debug@4.4.3)
@@ -598,13 +598,13 @@ importers:
         version: 1.11.23
       lucide-react:
         specifier: 'catalog:'
-        version: 1.63.0(@types/react@19.3.0)(react@19.3.1)
+        version: 1.66.0(@types/react@19.3.0)(react@19.3.1)
       mantine-datatable:
         specifier: 'catalog:'
         version: 9.4.0(@mantine/core@9.7.4)(@mantine/hooks@9.7.4)(clsx@2.1.1)(react-dom@19.3.1)(react@19.3.1)
       next:
         specifier: 'catalog:'
-        version: 16.4.3(@types/node@26.6.5)(react-dom@19.3.1)(react@19.3.1)
+        version: 16.4.3(@types/node@26.6.6)(react-dom@19.3.1)(react@19.3.1)
       object-hash:
         specifier: 'catalog:'
         version: 3.0.0
@@ -635,7 +635,7 @@ importers:
         version: link:../../packages/api/config
       '@types/node':
         specifier: 'catalog:'
-        version: 26.6.5
+        version: 26.6.6
       '@types/object-hash':
         specifier: 'catalog:'
         version: 3.0.6
@@ -653,7 +653,7 @@ importers:
         version: 3.0.6(echarts@6.1.0)(react@19.3.1)
       tsdown:
         specifier: 'catalog:'
-        version: 0.23.3(@tsdown/css@0.23.3)(typescript@6.0.3)
+        version: 0.23.4(@tsdown/css@0.23.4)(typescript@6.0.3)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -677,13 +677,13 @@ importers:
         version: link:../../packages/resources
       '@tanstack/react-query':
         specifier: 'catalog:'
-        version: 5.105.0(@types/react@19.3.0)(react@19.3.1)
+        version: 5.105.1(@types/react@19.3.0)(react@19.3.1)
       dayjs:
         specifier: 'catalog:'
         version: 1.11.23
       lucide-react:
         specifier: 'catalog:'
-        version: 1.63.0(@types/react@19.3.0)(react@19.3.1)
+        version: 1.66.0(@types/react@19.3.0)(react@19.3.1)
       mantine-datatable:
         specifier: 'catalog:'
         version: 9.4.0(@mantine/core@9.7.4)(@mantine/hooks@9.7.4)(clsx@2.1.1)(react-dom@19.3.1)(react@19.3.1)
@@ -696,10 +696,10 @@ importers:
     devDependencies:
       '@tsdown/css':
         specifier: 'catalog:'
-        version: 0.23.3(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.23.3)(yaml@2.9.1)
+        version: 0.23.4(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.23.4)(yaml@2.9.1)
       '@types/node':
         specifier: 'catalog:'
-        version: 26.6.5
+        version: 26.6.6
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
@@ -708,7 +708,7 @@ importers:
         version: 19.3.0(@types/react@19.3.0)
       tsdown:
         specifier: 'catalog:'
-        version: 0.23.3(@tsdown/css@0.23.3)(typescript@6.0.3)
+        version: 0.23.4(@tsdown/css@0.23.4)(typescript@6.0.3)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -738,7 +738,7 @@ importers:
         version: 1.11.23
       lucide-react:
         specifier: 'catalog:'
-        version: 1.63.0(@types/react@19.3.0)(react@19.3.1)
+        version: 1.66.0(@types/react@19.3.0)(react@19.3.1)
       mantine-datatable:
         specifier: 'catalog:'
         version: 9.4.0(@mantine/core@9.7.4)(@mantine/hooks@9.7.4)(clsx@2.1.1)(react-dom@19.3.1)(react@19.3.1)
@@ -751,10 +751,10 @@ importers:
     devDependencies:
       '@tsdown/css':
         specifier: 'catalog:'
-        version: 0.23.3(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.23.3)(yaml@2.9.1)
+        version: 0.23.4(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.23.4)(yaml@2.9.1)
       '@types/node':
         specifier: 'catalog:'
-        version: 26.6.5
+        version: 26.6.6
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
@@ -763,7 +763,7 @@ importers:
         version: 19.3.0(@types/react@19.3.0)
       tsdown:
         specifier: 'catalog:'
-        version: 0.23.3(@tsdown/css@0.23.3)(typescript@6.0.3)
+        version: 0.23.4(@tsdown/css@0.23.4)(typescript@6.0.3)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -796,7 +796,7 @@ importers:
         version: link:../../packages/resources
       '@rjsf/core':
         specifier: 'catalog:'
-        version: 6.11.0(@rjsf/utils@6.11.0)(react@19.3.1)(solid-js@1.9.17)
+        version: 6.11.0(@rjsf/utils@6.11.0)(react@19.3.1)(solid-js@1.9.18)
       embla-carousel:
         specifier: 'catalog:'
         version: 8.6.0
@@ -805,10 +805,10 @@ importers:
         version: 8.6.0(react@19.3.1)
       lucide-react:
         specifier: 'catalog:'
-        version: 1.63.0(@types/react@19.3.0)(react@19.3.1)
+        version: 1.66.0(@types/react@19.3.0)(react@19.3.1)
       next:
         specifier: 'catalog:'
-        version: 16.4.3(@types/node@26.6.5)(react-dom@19.3.1)(react@19.3.1)
+        version: 16.4.3(@types/node@26.6.6)(react-dom@19.3.1)(react@19.3.1)
       react:
         specifier: 'catalog:'
         version: 19.3.1
@@ -824,7 +824,7 @@ importers:
         version: 2.0.7
       '@types/node':
         specifier: 'catalog:'
-        version: 26.6.5
+        version: 26.6.6
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
@@ -833,7 +833,7 @@ importers:
         version: 19.3.0(@types/react@19.3.0)
       tsdown:
         specifier: 'catalog:'
-        version: 0.23.3(@tsdown/css@0.23.3)(typescript@6.0.3)
+        version: 0.23.4(@tsdown/css@0.23.4)(typescript@6.0.3)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -860,22 +860,22 @@ importers:
         version: link:../../packages/resources
       '@r4pm/components':
         specifier: 'catalog:'
-        version: 0.4.1(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(plotly.js@4.1.2)(react-dom@19.3.1)(react@19.3.1)
+        version: 0.4.1(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(plotly.js@4.2.0)(react-dom@19.3.1)(react@19.3.1)
       '@tanstack/react-query':
         specifier: 'catalog:'
-        version: 5.105.0(@types/react@19.3.0)(react@19.3.1)
+        version: 5.105.1(@types/react@19.3.0)(react@19.3.1)
       dayjs:
         specifier: 'catalog:'
         version: 1.11.23
       lucide-react:
         specifier: 'catalog:'
-        version: 1.63.0(@types/react@19.3.0)(react@19.3.1)
+        version: 1.66.0(@types/react@19.3.0)(react@19.3.1)
       mantine-datatable:
         specifier: 'catalog:'
         version: 9.4.0(@mantine/core@9.7.4)(@mantine/hooks@9.7.4)(clsx@2.1.1)(react-dom@19.3.1)(react@19.3.1)
       next:
         specifier: 'catalog:'
-        version: 16.4.3(@types/node@26.6.5)(react-dom@19.3.1)(react@19.3.1)
+        version: 16.4.3(@types/node@26.6.6)(react-dom@19.3.1)(react@19.3.1)
       react:
         specifier: 'catalog:'
         version: 19.3.1
@@ -885,10 +885,10 @@ importers:
     devDependencies:
       '@tsdown/css':
         specifier: 'catalog:'
-        version: 0.23.3(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.23.3)(yaml@2.9.1)
+        version: 0.23.4(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.23.4)(yaml@2.9.1)
       '@types/node':
         specifier: 'catalog:'
-        version: 26.6.5
+        version: 26.6.6
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
@@ -897,7 +897,7 @@ importers:
         version: 19.3.0(@types/react@19.3.0)
       tsdown:
         specifier: 'catalog:'
-        version: 0.23.3(@tsdown/css@0.23.3)(typescript@6.0.3)
+        version: 0.23.4(@tsdown/css@0.23.4)(typescript@6.0.3)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -909,7 +909,7 @@ importers:
         version: link:../client
       '@tanstack/react-query':
         specifier: 'catalog:'
-        version: 5.105.0(@types/react@19.3.0)(react@19.3.1)
+        version: 5.105.1(@types/react@19.3.0)(react@19.3.1)
       axios:
         specifier: 'catalog:'
         version: 1.21.0(debug@4.4.3)
@@ -925,7 +925,7 @@ importers:
         version: link:../config
       '@types/node':
         specifier: 'catalog:'
-        version: 26.6.5
+        version: 26.6.6
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
@@ -934,7 +934,7 @@ importers:
         version: 19.3.0(@types/react@19.3.0)
       tsdown:
         specifier: 'catalog:'
-        version: 0.23.3(@tsdown/css@0.23.3)(typescript@6.0.3)
+        version: 0.23.4(@tsdown/css@0.23.4)(typescript@6.0.3)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -956,7 +956,7 @@ importers:
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
-        version: 26.6.5
+        version: 26.6.6
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
@@ -965,7 +965,7 @@ importers:
         version: 1.21.0(debug@4.4.3)
       tsdown:
         specifier: 'catalog:'
-        version: 0.23.3(@tsdown/css@0.23.3)(typescript@6.0.3)
+        version: 0.23.4(@tsdown/css@0.23.4)(typescript@6.0.3)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -974,7 +974,7 @@ importers:
     dependencies:
       orval:
         specifier: 'catalog:'
-        version: 8.45.0(@tanstack/react-query@5.105.0)(typescript@6.0.3)(zod@4.6.7)
+        version: 8.46.0(@tanstack/react-query@5.105.1)(zod@4.6.7)
       react:
         specifier: 'catalog:'
         version: 19.3.1
@@ -984,10 +984,10 @@ importers:
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
-        version: 26.6.5
+        version: 26.6.6
       tsdown:
         specifier: 'catalog:'
-        version: 0.23.3(@tsdown/css@0.23.3)(typescript@6.0.3)
+        version: 0.23.4(@tsdown/css@0.23.4)(typescript@6.0.3)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -1017,13 +1017,13 @@ importers:
         version: link:../resources
       '@r4pm/components':
         specifier: 'catalog:'
-        version: 0.4.1(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(plotly.js@4.1.2)(react-dom@19.3.1)(react@19.3.1)
+        version: 0.4.1(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(plotly.js@4.2.0)(react-dom@19.3.1)(react@19.3.1)
       '@tanstack/react-query':
         specifier: 'catalog:'
-        version: 5.105.0(@types/react@19.3.0)(react@19.3.1)
+        version: 5.105.1(@types/react@19.3.0)(react@19.3.1)
       '@tanstack/react-query-devtools':
         specifier: 'catalog:'
-        version: 5.105.0(@tanstack/react-query@5.105.0)(@types/react@19.3.0)(csstype@3.2.3)(react@19.3.1)
+        version: 5.105.1(@tanstack/react-query@5.105.1)(@types/react@19.3.0)(csstype@3.2.3)(react@19.3.1)
       clsx:
         specifier: 'catalog:'
         version: 2.1.1
@@ -1038,13 +1038,13 @@ importers:
         version: 2.0.5
       lucide-react:
         specifier: 'catalog:'
-        version: 1.63.0(@types/react@19.3.0)(react@19.3.1)
+        version: 1.66.0(@types/react@19.3.0)(react@19.3.1)
       mantine-datatable:
         specifier: 'catalog:'
         version: 9.4.0(@mantine/core@9.7.4)(@mantine/hooks@9.7.4)(clsx@2.1.1)(react-dom@19.3.1)(react@19.3.1)
       next:
         specifier: 'catalog:'
-        version: 16.4.3(@types/node@26.6.5)(react-dom@19.3.1)(react@19.3.1)
+        version: 16.4.3(@types/node@26.6.6)(react-dom@19.3.1)(react@19.3.1)
       react:
         specifier: 'catalog:'
         version: 19.3.1
@@ -1066,13 +1066,13 @@ importers:
         version: 9.7.4(@mantine/core@9.7.4)(@mantine/hooks@9.7.4)(react-dom@19.3.1)(react@19.3.1)
       '@tsdown/css':
         specifier: 'catalog:'
-        version: 0.23.3(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.23.3)(yaml@2.9.1)
+        version: 0.23.4(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.23.4)(yaml@2.9.1)
       '@types/file-saver':
         specifier: 'catalog:'
         version: 2.0.7
       '@types/node':
         specifier: 'catalog:'
-        version: 26.6.5
+        version: 26.6.6
       '@types/qs':
         specifier: 'catalog:'
         version: 6.15.1
@@ -1087,10 +1087,10 @@ importers:
         version: 12.12.0(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(react-dom@19.3.1)(react@19.3.1)
       qs:
         specifier: 'catalog:'
-        version: 6.17.0
+        version: 6.17.1
       tsdown:
         specifier: 'catalog:'
-        version: 0.23.3(@tsdown/css@0.23.3)(typescript@6.0.3)
+        version: 0.23.4(@tsdown/css@0.23.4)(typescript@6.0.3)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -1120,10 +1120,10 @@ importers:
         version: link:../resources
       '@r4pm/components':
         specifier: 'catalog:'
-        version: 0.4.1(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(plotly.js@4.1.2)(react-dom@19.3.1)(react@19.3.1)
+        version: 0.4.1(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(plotly.js@4.2.0)(react-dom@19.3.1)(react@19.3.1)
       '@rjsf/core':
         specifier: 'catalog:'
-        version: 6.11.0(@rjsf/utils@6.11.0)(react@19.3.1)(solid-js@1.9.17)
+        version: 6.11.0(@rjsf/utils@6.11.0)(react@19.3.1)(solid-js@1.9.18)
       '@rjsf/mantine':
         specifier: 'catalog:'
         version: 6.11.0(@mantine/core@9.7.4)(@mantine/dates@9.7.4)(@mantine/hooks@9.7.4)(@rjsf/core@6.11.0)(@rjsf/utils@6.11.0)(react@19.3.1)
@@ -1135,16 +1135,16 @@ importers:
         version: 6.11.0(@rjsf/utils@6.11.0)
       '@tanstack/react-query':
         specifier: 'catalog:'
-        version: 5.105.0(@types/react@19.3.0)(react@19.3.1)
+        version: 5.105.1(@types/react@19.3.0)(react@19.3.1)
       axios:
         specifier: 'catalog:'
         version: 1.21.0(debug@4.4.3)
       lucide-react:
         specifier: 'catalog:'
-        version: 1.63.0(@types/react@19.3.0)(react@19.3.1)
+        version: 1.66.0(@types/react@19.3.0)(react@19.3.1)
       next:
         specifier: 'catalog:'
-        version: 16.4.3(@types/node@26.6.5)(react-dom@19.3.1)(react@19.3.1)
+        version: 16.4.3(@types/node@26.6.6)(react-dom@19.3.1)(react@19.3.1)
       react:
         specifier: 'catalog:'
         version: 19.3.1
@@ -1157,7 +1157,7 @@ importers:
         version: link:../api/config
       '@types/node':
         specifier: 'catalog:'
-        version: 26.6.5
+        version: 26.6.6
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
@@ -1166,7 +1166,7 @@ importers:
         version: 19.3.0(@types/react@19.3.0)
       tsdown:
         specifier: 'catalog:'
-        version: 0.23.3(@tsdown/css@0.23.3)(typescript@6.0.3)
+        version: 0.23.4(@tsdown/css@0.23.4)(typescript@6.0.3)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -1189,7 +1189,7 @@ importers:
         version: link:../api/base
       '@r4pm/components':
         specifier: 'catalog:'
-        version: 0.4.1(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(plotly.js@4.1.2)(react-dom@19.3.1)(react@19.3.1)
+        version: 0.4.1(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(plotly.js@4.2.0)(react-dom@19.3.1)(react@19.3.1)
       '@xyflow/react':
         specifier: 'catalog:'
         version: 12.12.0(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(react-dom@19.3.1)(react@19.3.1)
@@ -1198,7 +1198,7 @@ importers:
         version: 1.11.23
       elkjs:
         specifier: 'catalog:'
-        version: 0.12.0
+        version: 0.12.1
       file-saver:
         specifier: 'catalog:'
         version: 2.0.5
@@ -1210,13 +1210,13 @@ importers:
         version: 4.2.1
       lucide-react:
         specifier: 'catalog:'
-        version: 1.63.0(@types/react@19.3.0)(react@19.3.1)
+        version: 1.66.0(@types/react@19.3.0)(react@19.3.1)
       mantine-datatable:
         specifier: 'catalog:'
         version: 9.4.0(@mantine/core@9.7.4)(@mantine/hooks@9.7.4)(clsx@2.1.1)(react-dom@19.3.1)(react@19.3.1)
       next:
         specifier: 'catalog:'
-        version: 16.4.3(@types/node@26.6.5)(react-dom@19.3.1)(react@19.3.1)
+        version: 16.4.3(@types/node@26.6.6)(react-dom@19.3.1)(react@19.3.1)
       react:
         specifier: 'catalog:'
         version: 19.3.1
@@ -1225,20 +1225,20 @@ importers:
         version: 19.3.1(react@19.3.1)
       react-plotly.js:
         specifier: 'catalog:'
-        version: 4.1.0(plotly.js@4.1.2)(react@19.3.1)
+        version: 4.1.0(plotly.js@4.2.0)(react@19.3.1)
       react-zoom-pan-pinch:
         specifier: 'catalog:'
         version: 4.2.0(react-dom@19.3.1)(react@19.3.1)
     devDependencies:
       '@tsdown/css':
         specifier: 'catalog:'
-        version: 0.23.3(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.23.3)(yaml@2.9.1)
+        version: 0.23.4(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.23.4)(yaml@2.9.1)
       '@types/file-saver':
         specifier: 'catalog:'
         version: 2.0.7
       '@types/node':
         specifier: 'catalog:'
-        version: 26.6.5
+        version: 26.6.6
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
@@ -1247,7 +1247,7 @@ importers:
         version: 19.3.0(@types/react@19.3.0)
       tsdown:
         specifier: 'catalog:'
-        version: 0.23.3(@tsdown/css@0.23.3)(typescript@6.0.3)
+        version: 0.23.4(@tsdown/css@0.23.4)(typescript@6.0.3)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -2033,8 +2033,8 @@ packages:
   '@maplibre/geojson-vt@6.3.0':
     resolution: {integrity: sha512-3Zw2jsU9pIJG3G2CQFbLjWj2MlAHodhD7cSY+15iywUuLmmkgzcKRnueVRZ4AcC/5wOtfhidcJAAzBpoBNs3Xg==}
 
-  '@maplibre/maplibre-gl-style-spec@26.4.4':
-    resolution: {integrity: sha512-hG4RZR4PBd/+6A3ODdZ3AnQRF106ZQk1y3bhwDg8bH/A4Oz2tnRUJVVWs9BZa6gXZ1d3UKe89C+Mm+olGBELvA==}
+  '@maplibre/maplibre-gl-style-spec@26.5.0':
+    resolution: {integrity: sha512-Tli0Mi9rF3117uVFkqsysXu9TPLx3AODPmWklUjbDhR4jJ849vGT5/EqWM3dBjIQgU6xxj5SZQ9ONjibqjEP+Q==}
     hasBin: true
 
   '@maplibre/mlt@1.3.0':
@@ -2168,14 +2168,14 @@ packages:
       react: ^19.3.1
       react-dom: ^19.3.1
 
-  '@orval/angular@8.45.0':
-    resolution: {integrity: sha512-0Z9pIozQ34VfuNKvAYD1GdCg2cplWa6Q2HJixaw5/2z0RWKy/6jI3S83A4t3/CLgtVyU/eIFdvQpS72RUS+fFA==}
+  '@orval/angular@8.46.0':
+    resolution: {integrity: sha512-t8fPU4Zkh7TLvjJdRY8JK4SDPFfhEzPeH56zhjSvr+Vmk10VrkkjiohLu69P+x53C/9D6xirz0cuEH4YN+XxNw==}
 
-  '@orval/axios@8.45.0':
-    resolution: {integrity: sha512-SzZMzcXtBT5cy/kFoymbMO7hOiCFR2zITPeSSAwSJb0VgjSVrpRYkCSBfPOP5gSIr2v/hBMfxRF4hH440/+fVg==}
+  '@orval/axios@8.46.0':
+    resolution: {integrity: sha512-8o8DNV3CL+Jk2eB0tYr8yzOi7uGpwRzSqDAGPbkcKWGHH91CKyCxJgPs0j105PgwLI1WkOEK0rXbiV59E49FqQ==}
 
-  '@orval/core@8.45.0':
-    resolution: {integrity: sha512-HUh8QTcaJC/cqm2MmRcdvxEgPX9oNbQFV460RdjGBMwVkkgVgICgx7tkp/c1me31hygCBkOFmmv5GOR7UnWphg==}
+  '@orval/core@8.46.0':
+    resolution: {integrity: sha512-k0TEDk3rgxaGbbG5/FnDVtW+dpK6fc5NTicZT4AxiaYLzvPs03mhDXCgxsuOvNGpTwJe4j3YlFazV8dpvU8d6A==}
     peerDependencies:
       '@faker-js/faker': '>=8'
       '@modelcontextprotocol/server': '>=2'
@@ -2185,35 +2185,30 @@ packages:
       '@modelcontextprotocol/server':
         optional: true
 
-  '@orval/effect@8.45.0':
-    resolution: {integrity: sha512-/lqaSHq+82PXqE12y76GoSX2wC8ke3qzW4x7Rs4YwFs2qh79CeXHOAhXS178YwqGVSHsPimqCX0OktHpMh+CZQ==}
+  '@orval/effect@8.46.0':
+    resolution: {integrity: sha512-WmCMOFxDa90Etdf9qEffIhU5xKsbuzOu3oiNE7WX6zRMTw4LehAb280KqJWrGshiRc14yUnOeH6VgF953J9keQ==}
     peerDependencies:
       effect: '>=3'
     peerDependenciesMeta:
       effect:
         optional: true
 
-  '@orval/fetch@8.45.0':
-    resolution: {integrity: sha512-KyBqvfpVJaQUG8NFe7Mlz7Pgc3zMS3ldYNVLC37hG3SI/4+Vaxy2c1kVJ5yCEtS+o7SxAz1aBhoRElOf+hy6lA==}
+  '@orval/fetch@8.46.0':
+    resolution: {integrity: sha512-ZzPDxxbThvw/A88V28ekIx2g2gBoeZFtRO5h9/+L9nEstvbT5BTxdup/EBNuF80AhPUiUpio8Or4AN2cjEvTmw==}
 
-  '@orval/hono@8.45.0':
-    resolution: {integrity: sha512-4pYY3B6fl0EXGrTFb9JWbCgVNVay35mU2vX19vQ5AXM9g+qXieC6uBPiPUHs7atGMuEIEqHtwBit+aOULmtnTA==}
-    peerDependencies:
-      typescript: '>=5'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
+  '@orval/hono@8.46.0':
+    resolution: {integrity: sha512-cSiFgF57MneK1uzUbHTtoJgqFzFPaBEcB9wsoumT+H2uv4L6IHGFIBtbJ184v++AQHzMkoKB11bMrZg2PQTNsA==}
 
-  '@orval/mcp@8.45.0':
-    resolution: {integrity: sha512-AhPaKTfv/xAWGnLg2dSd0DDfTYEEXzUKlTNxTArMjydRiyy/cthHL0Q2N6BkdjLVGXIOqgMr86IrfMSa12PvHg==}
+  '@orval/mcp@8.46.0':
+    resolution: {integrity: sha512-K83QMD4iJrUdKk0FdfPcb9MCQBRzFP66ovVwW80xC5BDR0bF7cyWqLG1q3lHS1RpgxbV6n8l3b/lQvNVKaPylQ==}
     peerDependencies:
       '@modelcontextprotocol/server': '>=2'
     peerDependenciesMeta:
       '@modelcontextprotocol/server':
         optional: true
 
-  '@orval/mock@8.45.0':
-    resolution: {integrity: sha512-Xf5FiIVyjx0eqSFD2nhCnko8SglKySQcSLLy8fQeKOHZQRD1bIBJykKLbdu0jqMj4vznt7Sg7DbDfpXMLCsN0w==}
+  '@orval/mock@8.46.0':
+    resolution: {integrity: sha512-DnO4OA0/FheRTA9aIMN6WL42iPjBW/RJQADZ/zMO0tSNVRrdDG+Lhy299Kro06Ix/HD7gCXWwktmR1c2YppmbA==}
     peerDependencies:
       '@faker-js/faker': '>=8'
       msw: '>=2'
@@ -2223,16 +2218,16 @@ packages:
       msw:
         optional: true
 
-  '@orval/pinia-colada@8.45.0':
-    resolution: {integrity: sha512-yivYzVTjcOau+YNwBRfivxHxVSfUbYUghSNOml9Ab3onDxjJ5CjYvbcHzfCRHJ7Hh1eRk+PC4gGh2Qb+jTm0vg==}
+  '@orval/pinia-colada@8.46.0':
+    resolution: {integrity: sha512-j1OHOH/Pyuwa9kBbjXlARqITIZSwY4JHCo6oPVbTn5I9k2Cj4eh7cjw6vboUZDum65pyCZudvjdUuG3P8fi+5g==}
     peerDependencies:
       '@pinia/colada': ^1.4.4
     peerDependenciesMeta:
       '@pinia/colada':
         optional: true
 
-  '@orval/query@8.45.0':
-    resolution: {integrity: sha512-4d1YpOx4C5FuZA8r6nB9wXosQfjgcjavR4RstoSeoBkyVUNStx0ytEbRXRm1mRpA0RfmHljy03VURvF4/zRJPg==}
+  '@orval/query@8.46.0':
+    resolution: {integrity: sha512-x2vCboz0rsmDLor3UQ9B/Y9ZRPST6U7Dhvx74I8iFebFqzljJLY6nUeC6K/FMtjJh8EOEwal99aLYC/ZdQzd6Q==}
     peerDependencies:
       '@tanstack/angular-query-experimental': '>=5'
       '@tanstack/react-query': '>=4'
@@ -2251,27 +2246,27 @@ packages:
       '@tanstack/vue-query':
         optional: true
 
-  '@orval/solid-start@8.45.0':
-    resolution: {integrity: sha512-xoyI2bxa+I8ZgdHzmsCynx8MJX/04z62RpLrK8IFf+nOKmnMhNykzRih4Pp3f2fdqHPQYQbqCqao9ujxpoxp3A==}
+  '@orval/solid-start@8.46.0':
+    resolution: {integrity: sha512-VXB3OwhqAT1p758MO4YdtjtTa9MhYVNqSXj9I/szhfvFbgcKJHdMR50SeSGCJORP8cUEu+MCBI8EOzNG8FHy8w==}
 
-  '@orval/swr@8.45.0':
-    resolution: {integrity: sha512-/hU4PZcpg04VzPG3J3LM0C8zCodUwIIqvgB8m+N62P4dEuSulT/G3VIWxmi9YcjCGR8jQG25MYVNWfZPIpUaKA==}
+  '@orval/swr@8.46.0':
+    resolution: {integrity: sha512-m0iHYJHvnYDydlwGeJMRgcoJpXD/mGY4JFXWU+p/bIKmPYvO4g6sh7pAsLamE5BKEr+U/oHuzS483DueUizfGA==}
     peerDependencies:
       swr: '>=2'
     peerDependenciesMeta:
       swr:
         optional: true
 
-  '@orval/zod@8.45.0':
-    resolution: {integrity: sha512-rEwAJx8GEvg77UIUIpjt8dtgcxFcvOXTO6HtN0QUJWanhU8AH+zopKGkDBxcUAoAM5IyG/iphD+4YiHCjGKWaA==}
+  '@orval/zod@8.46.0':
+    resolution: {integrity: sha512-cwIjyBr5Ck9FIqwBi07NToNNqdrU+mH60YS3oIXbh1SLCQsx12QawpzHS1HRXXETMs7Ibq1SVCxm2HO5Ezo8Fw==}
     peerDependencies:
       zod: '>=3'
     peerDependenciesMeta:
       zod:
         optional: true
 
-  '@oxc-project/types@0.155.0':
-    resolution: {integrity: sha512-SeE8JPwW1xs1tHeNycjUtUBdhorRa8o4jlvjwk49R7/Z291i+4DQa7JJIgOm/TaYQZx+QrPQbVJ/9c8dMIZN8Q==}
+  '@oxc-project/types@0.156.0':
+    resolution: {integrity: sha512-1Duyg48TdJNdyhEB8Xn1L36bT9Pv6GUtlKjHxOys8xkaF/rQq3XJE+bAurSK/AgIz5mGFsb77cn9Pb20+WCScw==}
 
   '@plotly/d3-sankey-circular@0.33.1':
     resolution: {integrity: sha512-FgBV1HEvCr3DV7RHhDsPXyryknucxtfnLwPtCKKxdolKyTFYoLX/ibEfX39iFYIL7DYbVeRtP43dbFcrHNE+KQ==}
@@ -3044,98 +3039,98 @@ packages:
     peerDependencies:
       '@rjsf/utils': ^6.11.0
 
-  '@rolldown/binding-android-arm-eabi@1.2.15':
-    resolution: {integrity: sha512-aLcgK9gIJ3YRvrrtfSBbRa27F5WrpiTaPulnFpsHPxpUHgFlSgnU4854MHwoRGEBhfRJDWCS2WQ7lIjskE9Olw==}
+  '@rolldown/binding-android-arm-eabi@1.2.16':
+    resolution: {integrity: sha512-ia3DwAs0OsMGS7+IConptSiyk9pEXkOx/AbJ2n/lAGxH3QkWQus1t8d7gnAT38FCU2sQu8lUbeR6AiZFv4JxaA==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [arm]
     os: [android]
 
-  '@rolldown/binding-android-arm64@1.2.15':
-    resolution: {integrity: sha512-xD7DdZCrbThKuxNg7ooQmvp07ys4J/pnSEMTG3/OdOWl6daC67m/Q4fL78sRHMxTH/N4fGUbYhcPM0MF5WFHkg==}
+  '@rolldown/binding-android-arm64@1.2.16':
+    resolution: {integrity: sha512-kx5wBiMB6E7TEvpl2B9gjLU004BkvEm2Dr941BFjx/SontPwSzNuQUIoVKxHHoSjpFIfHMmcguyLOtyn0hObRg==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [arm64]
     os: [android]
 
-  '@rolldown/binding-darwin-arm64@1.2.15':
-    resolution: {integrity: sha512-m2WuQ6r0B4OTYxyPpNLtXaMRbRDUbG8YQV2Q3KTdSSK8Th6KHCnC8jVCJt8bvYeSB5WivkkNbc85mKadaSdOxA==}
+  '@rolldown/binding-darwin-arm64@1.2.16':
+    resolution: {integrity: sha512-qslZrXnKJU4cUpjoAmtAo/KQM9e2IRMlmpig6Zpwj+8KWxW8v+nkAf9216Bsek9lOC1jvg2yCjygCFo2f83msQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [arm64]
     os: [darwin]
 
-  '@rolldown/binding-darwin-x64@1.2.15':
-    resolution: {integrity: sha512-5RtnsHM36nodM9WbMy+zip0LGS/G+y5wro5RHrpOlr4ac24+1zSi9kiV2MP1myZeZ/ifEHfulQcWjnAXzc2C2A==}
+  '@rolldown/binding-darwin-x64@1.2.16':
+    resolution: {integrity: sha512-FdF+y48ND13eAyM2mQn+85kvAqNlvRWROy2rhgA463X/0Gv4vGtazZtfaF1mRBLscYvtOlh4QnLjOWiFzX69OQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [x64]
     os: [darwin]
 
-  '@rolldown/binding-freebsd-x64@1.2.15':
-    resolution: {integrity: sha512-g3l09pyFqhu+135JKkbkwiKGQmwU5hUMUPJ4VdBADvuqR8d33L6H578rh8m7rtxbdp+VmX/+nzI7nvhSZlzpUQ==}
+  '@rolldown/binding-freebsd-x64@1.2.16':
+    resolution: {integrity: sha512-ddjqFM5e95AgLbUPtKIS7V1KTVlA0RUgCVr5mn+/IEhsdy3pr+Vuj/HZ7nlMN2FyxIwUktOH1LEPIQXO1v9y1Q==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [x64]
     os: [freebsd]
 
-  '@rolldown/binding-linux-arm-gnueabihf@1.2.15':
-    resolution: {integrity: sha512-nIe3VugI97nGQtspPxDqA4sXMUpeiocKIP/CqpY/u/vgbT+alX+cVxu1C/oVBPKg4feNTmYovE91v4DgXvXNwQ==}
+  '@rolldown/binding-linux-arm-gnueabihf@1.2.16':
+    resolution: {integrity: sha512-tHdKWbFkFBI687iim3LIyIvyL7j66VvQYkDPss5Stn/qyE2tWkR1YD0dXmXPFKKqT/o5ZEJVsaRsWS2meQwGOA==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [arm]
     os: [linux]
 
-  '@rolldown/binding-linux-arm64-gnu@1.2.15':
-    resolution: {integrity: sha512-iTBjXx+B5QSvgI89lJfmqh4wTh8NabR1YZIIN3hNx4zSG0EVfVqkOvLulNpG4251pbd6/IAmZ/LefVk1Y4rPhw==}
+  '@rolldown/binding-linux-arm64-gnu@1.2.16':
+    resolution: {integrity: sha512-FJiLGAblPBMlBEdbOqw6kW6QcXDWAf/oJu7gYs9ZJZwmg+K+/zjFLxPTIY9izJUzxzc24FHvmseyA0IvJSl17w==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
 
-  '@rolldown/binding-linux-arm64-musl@1.2.15':
-    resolution: {integrity: sha512-uN26XOnVR7rqQupG3V9oAG2EGGatWjcJHOeDOHUFCh4TBWmP2tHTFoVN13aYbwfm0aHqJAEmcwhAu6sooIjfqQ==}
+  '@rolldown/binding-linux-arm64-musl@1.2.16':
+    resolution: {integrity: sha512-hrJpblMsrQ58U9veWpbXzkhV5zStunds6HWLprqq1qauvgBr1E6P+24kLj6lSLI9vjRn/RYpjprhkHQPKGWpNg==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [arm64]
     os: [linux]
     libc: [musl]
 
-  '@rolldown/binding-linux-ppc64-gnu@1.2.15':
-    resolution: {integrity: sha512-9nWkcdd+H+XhaA3fQIwpHnKIrfx/PQ6rO0pivr78Og07tXlUlctBBJoEYLPfhTmCR/QxEVdn6uPjHV5SymPhdw==}
+  '@rolldown/binding-linux-ppc64-gnu@1.2.16':
+    resolution: {integrity: sha512-qJd/dC6j6CwLG9/s/RP2nb1RZ0GIgj7Ioj7x/SYa3RzjVrlzrmH0fhIOpfvqQDeIsdP0loi+kHaMhJzY1PBIaA==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [ppc64]
     os: [linux]
     libc: [glibc]
 
-  '@rolldown/binding-linux-s390x-gnu@1.2.15':
-    resolution: {integrity: sha512-Ggh0ciFjLwIusLSLz7LZYEaGdxOAUJXI+Qu5JCbhPJJHEt8vP+IjRATTJheiJsdzzTYgUiHUiw3X1Ea3ZpMBdA==}
+  '@rolldown/binding-linux-s390x-gnu@1.2.16':
+    resolution: {integrity: sha512-Vx7Xg5uUJuNcujJjI70OICaH0EYj80BtOLZTSN7uOYg8QOLlyKnaG0IW7Fn/J0IpJsaKzmDKMhOQv1JBM9m9vg==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [s390x]
     os: [linux]
     libc: [glibc]
 
-  '@rolldown/binding-linux-x64-gnu@1.2.15':
-    resolution: {integrity: sha512-FHg60rS6DBePAYZ9X9F67x+JObFdmgn6tupA1C/a3B+CufFmTD4mX+e8M75tCiAO3foR/6xwVBI0KQiI7sn/rw==}
+  '@rolldown/binding-linux-x64-gnu@1.2.16':
+    resolution: {integrity: sha512-TNKhgE3uJTsTzatUSSYt0Kgo+Oa2uSlSjz4r1aEIea7HX6ULBym4fAlYUhG1i6pjNf2njfCUAfKwr6C3E9Xg1w==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
 
-  '@rolldown/binding-linux-x64-musl@1.2.15':
-    resolution: {integrity: sha512-/cvV/7v5VGz/moiz0XKRj2dE8DzsKyhIu1KpOvJGPjRywg3yscON889UGvAe8zfiJLHup7VLjBduoGWi3HusWQ==}
+  '@rolldown/binding-linux-x64-musl@1.2.16':
+    resolution: {integrity: sha512-7chXdpjXZ8qG0+mIxECN3cT9kvhZ3/oZhMX6Pp876P7CDrIy8nJswva6Mq357JR7eYXfuskwZxMeV1SzoZdHrA==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [x64]
     os: [linux]
     libc: [musl]
 
-  '@rolldown/binding-openharmony-arm64@1.2.15':
-    resolution: {integrity: sha512-MyzC5Hrv/sm+Z7TSGKP/j8001RO2xQm1zOpCNVL4j0cY/VhBZviludA2YFQ7i4lH6ZAXxQm0lcMdBzM+99mE7w==}
+  '@rolldown/binding-openharmony-arm64@1.2.16':
+    resolution: {integrity: sha512-Kwjt+7uNTJK5/MDkGWGVO2KQPnj8yAV75dMpfwyHZrJSXWHrniOB0aUEWlVYf3H1hOqFLIStLdM5QXq6bnKmOQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [arm64]
     os: [openharmony]
 
-  '@rolldown/binding-win32-arm64-msvc@1.2.15':
-    resolution: {integrity: sha512-+PgYiS+AH5omy6L45ZLxybasauJaj3M8buoT83D+nzPmCayXlxUV9hydhciCKVyIg0B/v0BtXPDE1uGqNwCPpg==}
+  '@rolldown/binding-win32-arm64-msvc@1.2.16':
+    resolution: {integrity: sha512-/LH6WfjDRXXJz/p5xl4TmU+jpcnwcxbKEQBW/GZE0JHfN0lGIyTtsUEGaQ/q/GikkGJ2yLKe6pwm7AnEWO8pdw==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [arm64]
     os: [win32]
 
-  '@rolldown/binding-win32-x64-msvc@1.2.15':
-    resolution: {integrity: sha512-HFZd2QNQYn1JbIi+Hpd7H+r/lkWxcfIu28nirZ6eCn2LafuvmExMlb/P96Sfx5tf7pPArw39IdhmCF8vmV+NhQ==}
+  '@rolldown/binding-win32-x64-msvc@1.2.16':
+    resolution: {integrity: sha512-1lv1KvX0Z871zfk7vw+dnXMMnHNyDwMzWG8Kv3HxDXMOhzCX4SHc7HK319fInP0i+0p9D8brkfzL7pJOaGl+tw==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [x64]
     os: [win32]
@@ -3155,12 +3150,12 @@ packages:
     resolution: {integrity: sha512-YmJAO9NoGCcU/vx7P4Dy9DGv+Vntp+ny3Fh99slHOOh/IZxvbdK5hWeZdzQ3x+ezab9XJNscFoX8H/P6W+H8lA==}
     engines: {node: '>=22.19.0'}
 
-  '@scalar/json-schema-validator@0.1.14':
-    resolution: {integrity: sha512-+UDt9xn3Gad8i+JP2V6WC16Q0NjGWRXtp8ePacCg9H1A/8mHOdUmRP5MSC+LMO6Ukr5eaKwk7GbcCylU//1N5Q==}
+  '@scalar/json-schema-validator@0.1.17':
+    resolution: {integrity: sha512-4Kmbvpng0V0kgPyqDWUZ1qstKjtDfz7seUCK1/inHjeQ+EJIcXPhoW47sOXf9yQBPbSjp42Wt8a7MZvizyoCPg==}
     engines: {node: '>=22'}
 
-  '@scalar/openapi-parser@0.29.16':
-    resolution: {integrity: sha512-nxIbR7ZFToK21q5CQcHpQed2UQ3PrYbNzWQXxS8hxhmfswRK5Eeyiitr8D3SIY5+34EOSAb/WFDhaKi6x7UJYg==}
+  '@scalar/openapi-parser@0.29.19':
+    resolution: {integrity: sha512-ajtjKM9sQQOxEKP/VCtLbM9kQCAa0M4XWKsfadVnPvga1p7t1wPtIW+uDph8sHe+nKyydqwYxlZ8Q6RluxhbXw==}
     engines: {node: '>=22'}
 
   '@scalar/openapi-types@0.9.8':
@@ -3171,12 +3166,12 @@ packages:
     resolution: {integrity: sha512-wkTbowGZAlDA5AhCAnBVft6y3veoE17P+okH/zrwM/BZWBSzPghGpa4BPTCg3+IzRmRP/8ZeaYO7LfxCDAEmcA==}
     engines: {node: '>=22'}
 
-  '@scalar/openapi-validator@0.1.14':
-    resolution: {integrity: sha512-02r1/T7/KufhnOQ0r2/Le7ASSKBCSQLoP+r4wjGCEkQFRyjREBe01lAWHXl/nycq3l/ONFAN94vWKTFd1NVtLw==}
+  '@scalar/openapi-validator@0.1.17':
+    resolution: {integrity: sha512-vBZZgD5k5mp5ii3kNdAti3bZZO0kEvUWYbr9E+Dkjdb67LAdgD5y4Ym0pNIik7prN6KUuUVUu1UMFGFvu1Udqw==}
     engines: {node: '>=22'}
 
-  '@scalar/types@0.25.0':
-    resolution: {integrity: sha512-EdwOVV5ajKks4MX5BorHIdMLG0L8EAxfz+NisAPV8l7Rsic50+YoWnqkY1eqB6K96iyreIKUdl7B/PIFGLqylg==}
+  '@scalar/types@0.26.0':
+    resolution: {integrity: sha512-T78Dj1Q+W0E1RsMyPoydfR+L+p9IUIkntBCRYlWaRibM98jAxABRYGQoU/qDHX0PR1IAFdE+d7ZqslypZbJzcg==}
     engines: {node: '>=22'}
 
   '@sec-ant/readable-stream@0.4.1':
@@ -3264,24 +3259,24 @@ packages:
     resolution: {integrity: sha512-DIpUSOhPfQ7u/qfUi/Wgm0wBO56MyBYXGvnlI0NcauDRPqdBUlAZZjW2Dxm92m+k1UWVhKw8YJ4f47+75Aujyw==}
     engines: {node: '>=20'}
 
-  '@tanstack/query-core@5.105.0':
-    resolution: {integrity: sha512-7p56vRmT/z4UJ6sctGIdl5WRUQyUv53IUpUwEKi2g97zMbO7zh8ZsCLffGAvCPBR4xD72e3VXsDyLwXHhoNTMQ==}
+  '@tanstack/query-core@5.105.1':
+    resolution: {integrity: sha512-B/rNlZoZ54w1dlddiUt9oEe1SLM+37c00SKLJEg9YH+7as3Y54P81o9Fh+2ujZ36tXPnQJ5oVe7AcyEWkyFhPg==}
 
-  '@tanstack/query-devtools@5.105.0':
-    resolution: {integrity: sha512-vRJf9XRHB+P2aMSAEHWtMLsAf1nC9NSsHVqSHiT/FZYU/+5LEo2BOrXKskURQnJEzg6whaBeP6iMn0PS30KJrQ==}
+  '@tanstack/query-devtools@5.105.1':
+    resolution: {integrity: sha512-3iHdlC/S1e1W+7bemP5WN/feZapc0WW6XHXtmfY3AmWVlA20tEK4WxVXcKhh7IngjPGHlY6eXi1MVkrHuaxDzQ==}
 
-  '@tanstack/react-query-devtools@5.105.0':
-    resolution: {integrity: sha512-FfRQxvqngBYqTLsuAB+qaj0Ef3KkUpknuRoyUjcl8OCZhwPocTHEvhMPAoBmk1FtO6nXUIVCC7F9A2AHH01SLQ==}
+  '@tanstack/react-query-devtools@5.105.1':
+    resolution: {integrity: sha512-VJwunCp9fPbGGkbXlKn4T8w20sNdlFZoMqTjOdzqdhfk0Ujthln4LSN7xkVLCTAq0OGaV/0srQ/5esNpaktRvw==}
     peerDependencies:
-      '@tanstack/react-query': ^5.105.0
+      '@tanstack/react-query': ^5.105.1
       '@types/react': ^18 || ^19
       react: ^18 || ^19
     peerDependenciesMeta:
       '@types/react':
         optional: true
 
-  '@tanstack/react-query@5.105.0':
-    resolution: {integrity: sha512-y+hMuDERvgg6ay1da0V1a6ZC0ZONt7dELxSFkqRZuwm7p1TTZs0MoXrPlBRflIpRoYjvzQVYxycnLImpFLhWrw==}
+  '@tanstack/react-query@5.105.1':
+    resolution: {integrity: sha512-qcu+/+PtBOjW8qU4/0l47QVmNG7hPOWsCLzP0bTRhE1X7HYa757C4732wXTUH0QhCjTV1yedX8onsCiEwlNYrA==}
     peerDependencies:
       '@types/react': ^18 || ^19
       react: ^18 || ^19
@@ -3289,20 +3284,20 @@ packages:
       '@types/react':
         optional: true
 
-  '@tanstack/react-virtual@3.14.23':
-    resolution: {integrity: sha512-Oyy58qQwdaQieA+A4WUDtnh9D1rv5FZvGdw8og9Xeyh88V6HH94vMSyV5i9ATIbYNe9t5Ix0WXRo9NOTpHDkYw==}
+  '@tanstack/react-virtual@3.14.24':
+    resolution: {integrity: sha512-JoNsByXR68fNlB2NZuT3bSk8uYBxuOWl6YNJ7djTrw7IMwBWuaOtffxj/TcuMa80WmL6byb+80i1NEM/8Qmocw==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
-  '@tanstack/virtual-core@3.19.8':
-    resolution: {integrity: sha512-Oz/SYBo/aVPyQkwtOw7Q23myITUgFIof2glQqydYJAPL6mH2SkJDkvDKZTklB+7gv5jGLZQhyTcd7SO1A1EODQ==}
+  '@tanstack/virtual-core@3.19.9':
+    resolution: {integrity: sha512-Syiaf3w69dFyYv4o2mqJ1/2VtBJTNq5Hu5cVXfnzOuJKFpUojukQR13ZW+5NvdMJM7GFHeNPmveMNhoIubiFyA==}
 
   '@tsconfig/strictest@2.0.8':
     resolution: {integrity: sha512-XnQ7vNz5HRN0r88GYf1J9JJjqtZPiHt2woGJOo2dYqyHGGcd6OLGqSlBB6p1j9mpzja6Oe5BoPqWmeDx6X9rLw==}
 
-  '@tsdown/css@0.23.3':
-    resolution: {integrity: sha512-cQ1MIWt85eBZDxG/y0qYytK1wJTHml2BANuUH7ATmY5qUA3GlR2zt6ds3rW9IWkVDZDkfFj1ZNJLYiRMZKuoPw==}
+  '@tsdown/css@0.23.4':
+    resolution: {integrity: sha512-lkEj33E0r7KhmiTQC+UYkOUoe5W50eHsDXoloDkj52OMFxAUfRieF1k4QcOIqMFKd7s0BjFHD8PFElnThVLHGA==}
     engines: {node: ^22.18.0 || ^24.11.0 || >=26.0.0}
     peerDependencies:
       postcss: ^8.4.0
@@ -3310,7 +3305,7 @@ packages:
       postcss-modules: ^6.0.0 || ^7.0.0 || ^8.0.0 || ^9.0.0
       sass: '*'
       sass-embedded: '*'
-      tsdown: 0.23.3
+      tsdown: 0.23.4
     peerDependenciesMeta:
       postcss:
         optional: true
@@ -3386,8 +3381,8 @@ packages:
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
-  '@types/node@26.6.5':
-    resolution: {integrity: sha512-uMzsv9stDdofIZBx4UGh4Z9ZgXnGC9seRDscilBcTHAeOFk67MZg/k9bWVfO+bk4qZmG+l52hRnLwUiH2LnJTg==}
+  '@types/node@26.6.6':
+    resolution: {integrity: sha512-MzQj+8Kx3XI40OmUAE6Qoh58ZMNstNNMwn2nfd3qWsfe7nDNSqJNzes4njhz6AHwrSHOffSLwXU6yb474Q4aog==}
 
   '@types/object-hash@3.0.6':
     resolution: {integrity: sha512-fOBV8C1FIu2ELinoILQ+ApxcUKz4ngq+IWUYrxSGjXzzjUALijilampwkMgEtJ+h2njAW3pi853QpzNVCHB73w==}
@@ -3547,8 +3542,8 @@ packages:
   ajv@8.20.0:
     resolution: {integrity: sha512-Thbli+OlOj+iMPYFBVBfJ3OmCAnaSyNn4M1vz9T6Gka5Jt9ba/HIR56joy65tY6kx/FCF5VXNB819Y7/GUrBGA==}
 
-  ansi-regex@6.4.0:
-    resolution: {integrity: sha512-KzTVk2tCWAHtYrvvvaP8bJKJq2pVinhLcGEQdtLIYPbmNGNyYe8QwNaTUYQp2J7/vIsUKt5QCqAfUkYyG9DkOw==}
+  ansi-regex@6.5.0:
+    resolution: {integrity: sha512-zhvbbbdt1kbw7EJ9OQoxmQcuaNR9P5kTj7e/YdmOSU10aHWbycofJxA6jKfoEy3vlLdctOF9ZHaxLtmSm998wQ==}
     engines: {node: '>=12'}
 
   argparse@2.0.1:
@@ -3623,8 +3618,8 @@ packages:
     resolution: {integrity: sha512-+ys997U96po4Kx/ABpBCqhA9EuxJaQWDQg7295H4hBphv3IZg0boBKuwYpt4YXp6MZ5AmZQnU/tyMTlRpaSejg==}
     engines: {node: '>= 0.4'}
 
-  caniuse-lite@1.0.30001819:
-    resolution: {integrity: sha512-LFUqIIAwpzsIuevnKnsR9qnStBcgzPShTX61lBwN9uFkkf8o8zLiebEjbW8AYtZiF+1YKDWfdt/pWDtMuG8Xwg==}
+  caniuse-lite@1.0.30001820:
+    resolution: {integrity: sha512-gfWD6MxqVCqAOwmODfZf7DchWvlrA+SRdNX7ceLfg3xRqe5ssjjpF7EgslC/0tiLiNTajdaNN/q8c/5u/7Gz8w==}
 
   canvg@3.0.11:
     resolution: {integrity: sha512-5ON+q7jCTgMp9cjpu4Jo6XbvfYwSB2Ow3kzHKfIyJfaCAOHLbdKPQqGKgfED/R5B+3TFFfe8pegYA+b423SRyA==}
@@ -4006,8 +4001,8 @@ packages:
   elementary-circuits-directed-graph@1.3.1:
     resolution: {integrity: sha512-ZEiB5qkn2adYmpXGnJKkxT8uJHlW/mxmBpmeqawEHzPxh9HkLD4/1mFYX5l0On+f6rcPIt8/EWlRU2Vo3fX6dQ==}
 
-  elkjs@0.12.0:
-    resolution: {integrity: sha512-YZcKynxVxYoKIOEpywEPwCFdg+BTbxQRNf3pbwdDCvc8O3kQD8bmIwSxKU1eOTVc4Xo+VG9Te+575mlfvOrhEQ==}
+  elkjs@0.12.1:
+    resolution: {integrity: sha512-IhMYKHE4S2vtx0QrhBP3lYOIKDeIiJXBrdq9MGYkuB8ZHqhrBnHNfSUndjXFewrX1CPK8chwq+2NA0K0hliYuw==}
 
   embla-carousel-react@8.6.0:
     resolution: {integrity: sha512-0/PjqU7geVmo6F734pmPqpyHqiM99olvyecY7zdweCw+6tKEXnrE90pBiBbMMU8s5tICemzpQ3hi5EpxzGW+JA==}
@@ -4049,8 +4044,8 @@ packages:
     resolution: {integrity: sha512-j6vWzfrGVfyXxge+O0x5sh6cvxAog0a/4Rdd2K36zCMV5eJ+/+tOAngRO8cODMNWbVRdVlmGZQL2YS3yR8bIUA==}
     engines: {node: '>= 0.4'}
 
-  es-toolkit@1.53.0:
-    resolution: {integrity: sha512-3+AYXp9fmJ/UhHBMYj2/U+RaUouMD90SzoItyDOB2Za7W6dB7fQApFGnZPl2MF6K8/Tv1koh1JyirSx/kju6Pw==}
+  es-toolkit@1.53.1:
+    resolution: {integrity: sha512-VhMc6IXmexu8iYFfL2aaAww6IvJTdHlqBLruLoEUs33YD4IcP5DdZcLOybMsMmmLsiy1c8PsiLsrM0DdIuuRUA==}
 
   es5-ext@0.10.64:
     resolution: {integrity: sha512-p2snDhiLaXe6dahss1LddxqEm+SkuDvV8dnIQG0MWjyHpcMNfXKPE+/Cc0y+PhxJX3A4xGNeFCj5oc0BUh6deg==}
@@ -4155,8 +4150,8 @@ packages:
   file-saver@2.0.5:
     resolution: {integrity: sha512-P9bmyZ3h/PRG+Nzga+rbdI4OEpNDzAVyy74uVO9ATgzLK6VtAsYybF/+TOCvrc0MO793d6+42lLyZTw7/ArVzA==}
 
-  file-selector@5.0.1:
-    resolution: {integrity: sha512-v0g/PTeuQgvKCBrVRsfVudvwXlRHSWHEQkVgKawgCGHkEpKA1clp3Om5jvEVhz8G9W/mOYjJH9FhkH4C888PgQ==}
+  file-selector@5.0.2:
+    resolution: {integrity: sha512-1hAy178VaMCWWj/vSUITOTpLWH1PoGW3eO7i3kPIppuSyOHBm3o1cHq+CvKAM5hQKQXlazrDt/3K1HCXgs7MpQ==}
     engines: {node: '>= 22'}
 
   flatted@3.4.4:
@@ -4236,8 +4231,8 @@ packages:
     resolution: {integrity: sha512-1pgFdhK3J2LeM+dVf2Pd424yHx2ou338lC0ErNP2hPx4j8eW1Sp0XqSjNxtk6Tc4Kr5wlWtSvz8cn2yb7/SG/w==}
     engines: {node: '>=20'}
 
-  globals@17.13.0:
-    resolution: {integrity: sha512-RwMTC61u7hrG3ZJMkZQOK4JLJrKS8QtoTii63EmWvFXHqycY9FObBJQCbsLxSO8kjKhWE5kV1GC+Vb1g3RI0Zg==}
+  globals@17.14.0:
+    resolution: {integrity: sha512-UtdkTVyAJePQv0J2M9Xe4L0ruNSDV314XiIJsADI2Zf40bcdAonE/D/OhAU8AT99oij9mhLByb+NvA3QWZYgCg==}
     engines: {node: '>=18'}
 
   glsl-inject-defines@1.0.3:
@@ -4551,8 +4546,8 @@ packages:
     resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
     hasBin: true
 
-  lucide-react@1.63.0:
-    resolution: {integrity: sha512-GkBfQG+FUJ41x6y3/lNXiOziVU0Rcqqq0TCzhHS8avsFXHZmOdmfBqsVTvHSaVmbI+wbdGkxHRmhYWhD3N4/yA==}
+  lucide-react@1.66.0:
+    resolution: {integrity: sha512-8zjbi/Us+ETXqfBwmXF/FHrWGIqOdE6zT1yUdRJLQVoptomSkB0zdFWVIM667t9K8djWDaXdkBkqi2qVTuDNiw==}
     peerDependencies:
       '@types/react': '*'
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
@@ -4576,8 +4571,8 @@ packages:
     resolution: {integrity: sha512-Xh06pxoipjX/Ad1sUPGhiNh9go9naCNGZZ1IJm3sIeqK1kYGuMaMDSTIGDQ2igOLfVyukJU7kvEOA089VO7Z7g==}
     engines: {node: '>=16.14.0', npm: '>=8.1.0'}
 
-  markdown-to-jsx@9.10.3:
-    resolution: {integrity: sha512-J5/NCmNYQ0ExsnThzvF3F1fSzNYLgROcW2diUqRqoIoiyhoy8DSI06jLuMYk0c86SQd/FiVYJrV6tIgci9S2tQ==}
+  markdown-to-jsx@9.10.4:
+    resolution: {integrity: sha512-l0jxHMVbWzE2AWzBpNrxZAMcjZfpUOMjzK/AWTzvto2Oc+eki3WNEMMwTYHeM/ZogjbHbg1A518ytYMsHcMjVQ==}
     engines: {node: '>= 18'}
     peerDependencies:
       react: '>= 16.0.0'
@@ -4705,8 +4700,8 @@ packages:
   once@1.4.0:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
 
-  orval@8.45.0:
-    resolution: {integrity: sha512-IrPIhGmAhWEnnjLNLPUpcyn/4dngbT4Wrhw33MV0UEbjClBLG+vKBDPPzK2QJqDijWtWXYsqInkalusIUbpxcQ==}
+  orval@8.46.0:
+    resolution: {integrity: sha512-HXR1IVn9CHHxyKBX/26DmL+s545q22z04gNdxVzLRleTIKeAcw0Tod4vkjNzOL4+VwUIcBUtfprMs9tPwyCjtg==}
     engines: {node: '>=22.18.0'}
     hasBin: true
     peerDependencies:
@@ -4774,8 +4769,8 @@ packages:
     resolution: {integrity: sha512-qcJu88Q2IWqJsDD529JKMdwGm/dvInW4HvQnRwiH9JtihJvzGOscDtHE3x1pBKeUOTysQ8kVmLnJ2kJu7yhcGA==}
     engines: {node: '>=12'}
 
-  plotly.js@4.1.2:
-    resolution: {integrity: sha512-+0CpavZ4QofYgr1OBigX1Ut+CyMkx74gQWiWRBNoAHwBnyrOjKaLq7UWWa0YFArYF3TMx50HvnUh2RjVatedzg==}
+  plotly.js@4.2.0:
+    resolution: {integrity: sha512-981kV6uik6mKxPz1ztaoFR27rKWRGvjrXRLIQokPbaTEA04osqc1599O5GrCWl51cu6jmhdAUnJfBjt31NLgdw==}
     engines: {node: '>=22.0.0'}
 
   point-in-polygon@1.1.0:
@@ -4829,8 +4824,8 @@ packages:
     resolution: {integrity: sha512-cJ+oHTW1VAEa8cJslgmUZrc+sjRKgAKl3Zyse6+PV38hZe/V6Z14TbCuXcan9F9ghlz4QrFr2c92TNF82UkYHA==}
     engines: {node: '>=10'}
 
-  qs@6.17.0:
-    resolution: {integrity: sha512-5LK5BZ2XDHMvcUJaf0CQ5HL3aVgKbpklvByC7qLSxYkfE8COEEbJg5xCHWCTqzqi0Gs4Jn5Mv5v3R38W6edscA==}
+  qs@6.17.1:
+    resolution: {integrity: sha512-jd3COkaKVgGUW+ZHyEHCG9bH7RoaaiWuMgzsIBjUMVjLAaWGWpoUAVwljVvBHxRu/2qEHnadLGZrkutYUBPQJA==}
     engines: {node: '>=0.6'}
 
   quansync@1.0.0:
@@ -5067,8 +5062,8 @@ packages:
       vue-tsc:
         optional: true
 
-  rolldown@1.2.15:
-    resolution: {integrity: sha512-6odND+fel5zVw3I4Yc2e69gvguDnX0CAAGiNDZSq4ik5WUcaLrkD2GLuog0XcODbor31hZ5ayEMgVDno+KPV5g==}
+  rolldown@1.2.16:
+    resolution: {integrity: sha512-bWvlMpFKiTfDKfnK7FC2MPgPeWCf/Kpwsq49ApdW+FQaBZb6O6dZ4MAPbPUjp7hYQrw/RobqCzn64BRrQecGHw==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
 
@@ -5150,8 +5145,8 @@ packages:
     resolution: {integrity: sha512-j7WyPdf0CJoutMzMoPLF/bVXHtKZIT9Rb4eGeEbWw8X2t5oirjPgpL+OpaENZrILYaXqYwnVH+qgUwVbl+pUJQ==}
     engines: {node: '>= 18'}
 
-  solid-js@1.9.17:
-    resolution: {integrity: sha512-4GAmLOWPfNV8H9Jfn2LSFTpNEG6jiOKPiwd5lnLGQtehHaX6l3TOLzJqQ7mqwB/3k1Yy3zyumFVopmc/tm34ow==}
+  solid-js@1.9.18:
+    resolution: {integrity: sha512-CHGO5YFk6Y9m/1YSxVtKnXfrW7JD3Tmof8HmR4z6TmCPsS8efo8LnzIR8CQh3cUvffqYm6DWyBFfk8dQw1CNQQ==}
 
   solid-presence@0.2.0:
     resolution: {integrity: sha512-YM92o+jvpzX3XGaD4rLYmq/Kc2ZVh47GSCLEufHBFQQIurvZTs8SoGJxO8BJGNDxBKdcS8F3dYhW1SDXp4BNjA==}
@@ -5274,6 +5269,9 @@ packages:
     resolution: {integrity: sha512-wXR/dYpcqKmfWpEdZjiKJOwCNFndD0DMnrW/cYjVGttEkBfVgcLFHoNrlj47mjOVic9yyNu65alsgF4NQyTa2g==}
     engines: {node: '>=12.0.0'}
 
+  tinyps@0.5.1:
+    resolution: {integrity: sha512-B6Ykif5HflC3AdDkS4Zst/2muYVfeXoVMy+KorqH80s/1x4vunIORpNySH681X7fjj+dFM9MDKD6/Hsccjb87Q==}
+
   tinyqueue@3.0.0:
     resolution: {integrity: sha512-gRa9gwYU3ECmQYv3lslts5hxuIa90veaEcxDYuu3QGOIAEM2mOZkVHp48ANJuu1CURtRdHKUBY5Lm1tHV+sD4g==}
 
@@ -5287,18 +5285,14 @@ packages:
     resolution: {integrity: sha512-605uxS6bcYxGXw9qi62XyrV6Q3xwbndjachmNxu8HWTtVPxZfEJN9fd/SZS1Q54Sn2y0TMyMxFj/cJINqGHrKw==}
     hasBin: true
 
-  tree-kill@1.2.2:
-    resolution: {integrity: sha512-L0Orpi8qGpRG//Nd+H90vFB+3iHnue1zSSGmNOOCh1GLJ7rUKVwV2HvijphGQS2UmhUZewS9VgvxYIdgr+fG1A==}
-    hasBin: true
-
-  tsdown@0.23.3:
-    resolution: {integrity: sha512-yAju1F5b7GDEPCLl4ewM3g54lq0NyyYpFnK2lh/ax7/uznmsn4wBOS9/49pI3cGvxtj2LoOjBUtzaT17UEQkhQ==}
+  tsdown@0.23.4:
+    resolution: {integrity: sha512-AQQ/2Y7KBnf15GL4Ynjdltc94PkbKRI+arStyrp7inSQkRmTWNiXgfv50ESsjhBEsoVtiSloCAO2VyrqojWIOQ==}
     engines: {node: ^22.18.0 || ^24.11.0 || >=26.0.0}
     hasBin: true
     peerDependencies:
       '@arethetypeswrong/core': ^0.18.1
-      '@tsdown/css': 0.23.3
-      '@tsdown/exe': 0.23.3
+      '@tsdown/css': 0.23.4
+      '@tsdown/exe': 0.23.4
       '@vitejs/devtools': '*'
       publint: ^0.3.8
       tsx: '*'
@@ -5328,8 +5322,8 @@ packages:
   tslib@2.3.0:
     resolution: {integrity: sha512-N82ooyxVNm6h1riLCoyS9e3fuJ3AMG2zIZs2Gd1ATcSFjSA23Q0fzjjZeh0jbJvWVDZ0cJT8yaNNaaXHzueNjg==}
 
-  tslib@2.8.1:
-    resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
+  tslib@2.9.1:
+    resolution: {integrity: sha512-a4Ux9VKuIMHsOS7ENbEq6hK2ZGYIT27Rtl0E4eD9KqwxhKiQeMZE/9xb3IdYwWaSOyIBQLExhQgXDTYoiCxnWA==}
 
   type-fest@5.10.0:
     resolution: {integrity: sha512-NoSdpq/WEiAg5sjmBkmV/hfxv6HJH4NqPNrqjtSO5CwRmpsDfaf4begxW34KdJykH/l1yHtwBWQkCRdoXO8mPA==}
@@ -5568,10 +5562,10 @@ snapshots:
     dependencies:
       commander: 15.0.0
 
-  '@corvu/utils@0.4.2(solid-js@1.9.17)':
+  '@corvu/utils@0.4.2(solid-js@1.9.18)':
     dependencies:
       '@floating-ui/dom': 1.8.0
-      solid-js: 1.9.17
+      solid-js: 1.9.18
 
   '@cspell/cspell-bundled-dicts@10.4.0':
     dependencies:
@@ -5804,7 +5798,7 @@ snapshots:
   '@dnd-kit/accessibility@3.1.1(react@19.3.1)':
     dependencies:
       react: 19.3.1
-      tslib: 2.8.1
+      tslib: 2.9.1
 
   '@dnd-kit/core@6.3.1(react-dom@19.3.1)(react@19.3.1)':
     dependencies:
@@ -5812,23 +5806,23 @@ snapshots:
       '@dnd-kit/utilities': 3.2.2(react@19.3.1)
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
-      tslib: 2.8.1
+      tslib: 2.9.1
 
   '@dnd-kit/sortable@10.0.0(@dnd-kit/core@6.3.1)(react@19.3.1)':
     dependencies:
       '@dnd-kit/core': 6.3.1(react-dom@19.3.1)(react@19.3.1)
       '@dnd-kit/utilities': 3.2.2(react@19.3.1)
       react: 19.3.1
-      tslib: 2.8.1
+      tslib: 2.9.1
 
   '@dnd-kit/utilities@3.2.2(react@19.3.1)':
     dependencies:
       react: 19.3.1
-      tslib: 2.8.1
+      tslib: 2.9.1
 
   '@emnapi/runtime@1.11.3':
     dependencies:
-      tslib: 2.8.1
+      tslib: 2.9.1
     optional: true
 
   '@esbuild/aix-ppc64@0.28.2':
@@ -6047,27 +6041,27 @@ snapshots:
     dependencies:
       '@swc/helpers': 0.5.23
 
-  '@kobalte/core@0.13.14(solid-js@1.9.17)':
+  '@kobalte/core@0.13.14(solid-js@1.9.18)':
     dependencies:
       '@floating-ui/dom': 1.8.0
       '@internationalized/number': 3.6.9
-      '@kobalte/utils': 0.9.2(solid-js@1.9.17)
-      '@solid-primitives/props': 3.2.4(solid-js@1.9.17)
-      '@solid-primitives/resize-observer': 2.2.0(solid-js@1.9.17)
-      solid-js: 1.9.17
-      solid-presence: 0.2.0(solid-js@1.9.17)
-      solid-prevent-scroll: 0.1.11(solid-js@1.9.17)
+      '@kobalte/utils': 0.9.2(solid-js@1.9.18)
+      '@solid-primitives/props': 3.2.4(solid-js@1.9.18)
+      '@solid-primitives/resize-observer': 2.2.0(solid-js@1.9.18)
+      solid-js: 1.9.18
+      solid-presence: 0.2.0(solid-js@1.9.18)
+      solid-prevent-scroll: 0.1.11(solid-js@1.9.18)
 
-  '@kobalte/utils@0.9.2(solid-js@1.9.17)':
+  '@kobalte/utils@0.9.2(solid-js@1.9.18)':
     dependencies:
-      '@solid-primitives/event-listener': 2.4.6(solid-js@1.9.17)
-      '@solid-primitives/keyed': 1.5.3(solid-js@1.9.17)
-      '@solid-primitives/map': 0.4.13(solid-js@1.9.17)
-      '@solid-primitives/media': 2.3.6(solid-js@1.9.17)
-      '@solid-primitives/props': 3.2.4(solid-js@1.9.17)
-      '@solid-primitives/refs': 1.1.4(solid-js@1.9.17)
-      '@solid-primitives/utils': 6.4.1(solid-js@1.9.17)
-      solid-js: 1.9.17
+      '@solid-primitives/event-listener': 2.4.6(solid-js@1.9.18)
+      '@solid-primitives/keyed': 1.5.3(solid-js@1.9.18)
+      '@solid-primitives/map': 0.4.13(solid-js@1.9.18)
+      '@solid-primitives/media': 2.3.6(solid-js@1.9.18)
+      '@solid-primitives/props': 3.2.4(solid-js@1.9.18)
+      '@solid-primitives/refs': 1.1.4(solid-js@1.9.18)
+      '@solid-primitives/utils': 6.4.1(solid-js@1.9.18)
+      solid-js: 1.9.18
 
   '@mantine/carousel@9.7.4(@mantine/core@9.7.4)(@mantine/hooks@9.7.4)(embla-carousel-react@8.6.0)(embla-carousel@8.6.0)(react-dom@19.3.1)(react@19.3.1)':
     dependencies:
@@ -6145,7 +6139,7 @@ snapshots:
     dependencies:
       kdbush: 4.1.0
 
-  '@maplibre/maplibre-gl-style-spec@26.4.4':
+  '@maplibre/maplibre-gl-style-spec@26.5.0':
     dependencies:
       '@mapbox/jsonlint-lines-primitives': 2.0.3
       '@mapbox/unitbezier': 1.0.0
@@ -6205,7 +6199,7 @@ snapshots:
   '@next/swc-win32-x64-msvc@16.4.3':
     optional: true
 
-  '@ocelescope/alignments@0.11.0(@mantine/core@9.7.4)(@mantine/hooks@9.7.4)(@mantine/notifications@9.7.4)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@ocelescope/resources@src+frontend+packages+resources)(@r4pm/components@0.4.1)(@tanstack/react-query@5.105.0)(@xyflow/react@12.12.0)(axios@1.21.0)(lucide-react@1.63.0)(next@16.4.3)(react-dom@19.3.1)(react@19.3.1)':
+  '@ocelescope/alignments@0.11.0(@mantine/core@9.7.4)(@mantine/hooks@9.7.4)(@mantine/notifications@9.7.4)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@ocelescope/resources@src+frontend+packages+resources)(@r4pm/components@0.4.1)(@tanstack/react-query@5.105.1)(@xyflow/react@12.12.0)(axios@1.21.0)(lucide-react@1.66.0)(next@16.4.3)(react-dom@19.3.1)(react@19.3.1)':
     dependencies:
       '@mantine/core': 9.7.4(@mantine/hooks@9.7.4)(@types/react@19.3.0)(react-dom@19.3.1)(react@19.3.1)
       '@mantine/hooks': 9.7.4(react@19.3.1)
@@ -6213,16 +6207,16 @@ snapshots:
       '@ocelescope/api-client': link:src/frontend/packages/api/client
       '@ocelescope/core': link:src/frontend/packages/core
       '@ocelescope/resources': link:src/frontend/packages/resources
-      '@r4pm/components': 0.4.1(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(plotly.js@4.1.2)(react-dom@19.3.1)(react@19.3.1)
-      '@tanstack/react-query': 5.105.0(@types/react@19.3.0)(react@19.3.1)
+      '@r4pm/components': 0.4.1(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(plotly.js@4.2.0)(react-dom@19.3.1)(react@19.3.1)
+      '@tanstack/react-query': 5.105.1(@types/react@19.3.0)(react@19.3.1)
       '@xyflow/react': 12.12.0(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(react-dom@19.3.1)(react@19.3.1)
       axios: 1.21.0(debug@4.4.3)
-      lucide-react: 1.63.0(@types/react@19.3.0)(react@19.3.1)
-      next: 16.4.3(@types/node@26.6.5)(react-dom@19.3.1)(react@19.3.1)
+      lucide-react: 1.66.0(@types/react@19.3.0)(react@19.3.1)
+      next: 16.4.3(@types/node@26.6.6)(react-dom@19.3.1)(react@19.3.1)
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
 
-  '@ocelescope/ocelot@0.8.0(@dagrejs/dagre@3.1.3)(@mantine/core@9.7.4)(@mantine/hooks@9.7.4)(@ocelescope/api-base@src+frontend+packages+api+base)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@tanstack/react-query@5.105.0)(@xyflow/react@12.12.0)(axios@1.21.0)(dayjs@1.11.23)(elkjs@0.12.0)(file-saver@2.0.5)(html-to-image@1.11.13)(lucide-react@1.63.0)(mantine-datatable@9.4.0)(react-dom@19.3.1)(react@19.3.1)(recharts@3.10.1)':
+  '@ocelescope/ocelot@0.8.0(@dagrejs/dagre@3.1.3)(@mantine/core@9.7.4)(@mantine/hooks@9.7.4)(@ocelescope/api-base@src+frontend+packages+api+base)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@tanstack/react-query@5.105.1)(@xyflow/react@12.12.0)(axios@1.21.0)(dayjs@1.11.23)(elkjs@0.12.1)(file-saver@2.0.5)(html-to-image@1.11.13)(lucide-react@1.66.0)(mantine-datatable@9.4.0)(react-dom@19.3.1)(react@19.3.1)(recharts@3.10.1)':
     dependencies:
       '@dagrejs/dagre': 3.1.3
       '@mantine/core': 9.7.4(@mantine/hooks@9.7.4)(@types/react@19.3.0)(react-dom@19.3.1)(react@19.3.1)
@@ -6230,20 +6224,20 @@ snapshots:
       '@ocelescope/api-base': link:src/frontend/packages/api/base
       '@ocelescope/api-client': link:src/frontend/packages/api/client
       '@ocelescope/core': link:src/frontend/packages/core
-      '@tanstack/react-query': 5.105.0(@types/react@19.3.0)(react@19.3.1)
+      '@tanstack/react-query': 5.105.1(@types/react@19.3.0)(react@19.3.1)
       '@xyflow/react': 12.12.0(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(react-dom@19.3.1)(react@19.3.1)
       axios: 1.21.0(debug@4.4.3)
       dayjs: 1.11.23
-      elkjs: 0.12.0
+      elkjs: 0.12.1
       file-saver: 2.0.5
       html-to-image: 1.11.13
-      lucide-react: 1.63.0(@types/react@19.3.0)(react@19.3.1)
+      lucide-react: 1.66.0(@types/react@19.3.0)(react@19.3.1)
       mantine-datatable: 9.4.0(@mantine/core@9.7.4)(@mantine/hooks@9.7.4)(clsx@2.1.1)(react-dom@19.3.1)(react@19.3.1)
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
       recharts: 3.10.1(@types/react@19.3.0)(react-dom@19.3.1)(react-is@18.3.1)(react@19.3.1)(redux@5.0.1)
 
-  '@ocelescope/ocpn-editor@0.11.0(@mantine/core@9.7.4)(@mantine/hooks@9.7.4)(@mantine/notifications@9.7.4)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@ocelescope/resources@src+frontend+packages+resources)(@r4pm/components@0.4.1)(@tanstack/react-query@5.105.0)(@xyflow/react@12.12.0)(axios@1.21.0)(lucide-react@1.63.0)(react-dom@19.3.1)(react@19.3.1)':
+  '@ocelescope/ocpn-editor@0.11.0(@mantine/core@9.7.4)(@mantine/hooks@9.7.4)(@mantine/notifications@9.7.4)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@ocelescope/resources@src+frontend+packages+resources)(@r4pm/components@0.4.1)(@tanstack/react-query@5.105.1)(@xyflow/react@12.12.0)(axios@1.21.0)(lucide-react@1.66.0)(react-dom@19.3.1)(react@19.3.1)':
     dependencies:
       '@mantine/core': 9.7.4(@mantine/hooks@9.7.4)(@types/react@19.3.0)(react-dom@19.3.1)(react@19.3.1)
       '@mantine/hooks': 9.7.4(react@19.3.1)
@@ -6251,29 +6245,29 @@ snapshots:
       '@ocelescope/api-client': link:src/frontend/packages/api/client
       '@ocelescope/core': link:src/frontend/packages/core
       '@ocelescope/resources': link:src/frontend/packages/resources
-      '@r4pm/components': 0.4.1(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(plotly.js@4.1.2)(react-dom@19.3.1)(react@19.3.1)
-      '@tanstack/react-query': 5.105.0(@types/react@19.3.0)(react@19.3.1)
+      '@r4pm/components': 0.4.1(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(plotly.js@4.2.0)(react-dom@19.3.1)(react@19.3.1)
+      '@tanstack/react-query': 5.105.1(@types/react@19.3.0)(react@19.3.1)
       '@xyflow/react': 12.12.0(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(react-dom@19.3.1)(react@19.3.1)
       axios: 1.21.0(debug@4.4.3)
-      lucide-react: 1.63.0(@types/react@19.3.0)(react@19.3.1)
+      lucide-react: 1.66.0(@types/react@19.3.0)(react@19.3.1)
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
 
-  '@orval/angular@8.45.0':
+  '@orval/angular@8.46.0':
     dependencies:
-      '@orval/core': 8.45.0
+      '@orval/core': 8.46.0
     transitivePeerDependencies:
       - '@faker-js/faker'
       - '@modelcontextprotocol/server'
 
-  '@orval/axios@8.45.0':
+  '@orval/axios@8.46.0':
     dependencies:
-      '@orval/core': 8.45.0
+      '@orval/core': 8.46.0
     transitivePeerDependencies:
       - '@faker-js/faker'
       - '@modelcontextprotocol/server'
 
-  '@orval/core@8.45.0':
+  '@orval/core@8.46.0':
     dependencies:
       '@scalar/openapi-types': 0.9.8
       acorn: 8.19.0
@@ -6284,84 +6278,83 @@ snapshots:
       jsesc: 3.1.0
       tinyglobby: 0.2.17
 
-  '@orval/effect@8.45.0':
+  '@orval/effect@8.46.0':
     dependencies:
-      '@orval/core': 8.45.0
+      '@orval/core': 8.46.0
     transitivePeerDependencies:
       - '@faker-js/faker'
       - '@modelcontextprotocol/server'
 
-  '@orval/fetch@8.45.0':
+  '@orval/fetch@8.46.0':
     dependencies:
-      '@orval/core': 8.45.0
+      '@orval/core': 8.46.0
     transitivePeerDependencies:
       - '@faker-js/faker'
       - '@modelcontextprotocol/server'
 
-  '@orval/hono@8.45.0(typescript@6.0.3)(zod@4.6.7)':
+  '@orval/hono@8.46.0(zod@4.6.7)':
     dependencies:
-      '@orval/core': 8.45.0
-      '@orval/zod': 8.45.0(zod@4.6.7)
-    optionalDependencies:
+      '@orval/core': 8.46.0
+      '@orval/zod': 8.46.0(zod@4.6.7)
       typescript: 6.0.3
     transitivePeerDependencies:
       - '@faker-js/faker'
       - '@modelcontextprotocol/server'
       - zod
 
-  '@orval/mcp@8.45.0(zod@4.6.7)':
+  '@orval/mcp@8.46.0(zod@4.6.7)':
     dependencies:
-      '@orval/core': 8.45.0
-      '@orval/fetch': 8.45.0
-      '@orval/zod': 8.45.0(zod@4.6.7)
+      '@orval/core': 8.46.0
+      '@orval/fetch': 8.46.0
+      '@orval/zod': 8.46.0(zod@4.6.7)
     transitivePeerDependencies:
       - '@faker-js/faker'
       - zod
 
-  '@orval/mock@8.45.0':
+  '@orval/mock@8.46.0':
     dependencies:
-      '@orval/core': 8.45.0
+      '@orval/core': 8.46.0
     transitivePeerDependencies:
       - '@modelcontextprotocol/server'
 
-  '@orval/pinia-colada@8.45.0':
+  '@orval/pinia-colada@8.46.0':
     dependencies:
-      '@orval/axios': 8.45.0
-      '@orval/core': 8.45.0
-      '@orval/fetch': 8.45.0
+      '@orval/axios': 8.46.0
+      '@orval/core': 8.46.0
+      '@orval/fetch': 8.46.0
     transitivePeerDependencies:
       - '@faker-js/faker'
       - '@modelcontextprotocol/server'
 
-  '@orval/query@8.45.0(@tanstack/react-query@5.105.0)':
+  '@orval/query@8.46.0(@tanstack/react-query@5.105.1)':
     dependencies:
-      '@orval/core': 8.45.0
-      '@orval/fetch': 8.45.0
+      '@orval/core': 8.46.0
+      '@orval/fetch': 8.46.0
     optionalDependencies:
-      '@tanstack/react-query': 5.105.0(@types/react@19.3.0)(react@19.3.1)
+      '@tanstack/react-query': 5.105.1(@types/react@19.3.0)(react@19.3.1)
     transitivePeerDependencies:
       - '@faker-js/faker'
       - '@modelcontextprotocol/server'
 
-  '@orval/solid-start@8.45.0':
+  '@orval/solid-start@8.46.0':
     dependencies:
-      '@orval/core': 8.45.0
+      '@orval/core': 8.46.0
     transitivePeerDependencies:
       - '@faker-js/faker'
       - '@modelcontextprotocol/server'
 
-  '@orval/swr@8.45.0':
+  '@orval/swr@8.46.0':
     dependencies:
-      '@orval/core': 8.45.0
-      '@orval/fetch': 8.45.0
+      '@orval/core': 8.46.0
+      '@orval/fetch': 8.46.0
     transitivePeerDependencies:
       - '@faker-js/faker'
       - '@modelcontextprotocol/server'
 
-  '@orval/zod@8.45.0(zod@4.6.7)':
+  '@orval/zod@8.46.0(zod@4.6.7)':
     dependencies:
-      '@orval/core': 8.45.0
-      globals: 17.13.0
+      '@orval/core': 8.46.0
+      globals: 17.14.0
       jsesc: 3.1.0
       typescript: 6.0.3
     optionalDependencies:
@@ -6370,7 +6363,7 @@ snapshots:
       - '@faker-js/faker'
       - '@modelcontextprotocol/server'
 
-  '@oxc-project/types@0.155.0': {}
+  '@oxc-project/types@0.156.0': {}
 
   '@plotly/d3-sankey-circular@0.33.1':
     dependencies:
@@ -6405,16 +6398,16 @@ snapshots:
     dependencies:
       quansync: 1.0.0
 
-  '@r4pm/components@0.4.1(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(plotly.js@4.1.2)(react-dom@19.3.1)(react@19.3.1)':
+  '@r4pm/components@0.4.1(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(plotly.js@4.2.0)(react-dom@19.3.1)(react@19.3.1)':
     dependencies:
       '@radix-ui/themes': 3.3.0(@types/react-dom@19.3.0)(@types/react@19.3.0)(react-dom@19.3.1)(react@19.3.1)
-      '@tanstack/react-virtual': 3.14.23(react-dom@19.3.1)(react@19.3.1)
+      '@tanstack/react-virtual': 3.14.24(react-dom@19.3.1)(react@19.3.1)
       '@xyflow/react': 12.12.0(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(react-dom@19.3.1)(react@19.3.1)
       html-to-image: 1.11.13
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
       react-icons: 5.7.0(react@19.3.1)
-      react-plotly.js: 2.6.0(plotly.js@4.1.2)(react@19.3.1)
+      react-plotly.js: 2.6.0(plotly.js@4.2.0)(react@19.3.1)
     transitivePeerDependencies:
       - '@types/react'
       - '@types/react-dom'
@@ -7199,10 +7192,10 @@ snapshots:
       react: 19.3.1
       react-redux: 9.3.1(@types/react@19.3.0)(react@19.3.1)(redux@5.0.1)
 
-  '@rjsf/core@6.11.0(@rjsf/utils@6.11.0)(react@19.3.1)(solid-js@1.9.17)':
+  '@rjsf/core@6.11.0(@rjsf/utils@6.11.0)(react@19.3.1)(solid-js@1.9.18)':
     dependencies:
       '@rjsf/utils': 6.11.0(react@19.3.1)
-      markdown-to-jsx: 9.10.3(react@19.3.1)(solid-js@1.9.17)
+      markdown-to-jsx: 9.10.4(react@19.3.1)(solid-js@1.9.18)
       react: 19.3.1
     transitivePeerDependencies:
       - react-native
@@ -7214,7 +7207,7 @@ snapshots:
       '@mantine/core': 9.7.4(@mantine/hooks@9.7.4)(@types/react@19.3.0)(react-dom@19.3.1)(react@19.3.1)
       '@mantine/dates': 9.7.4(@mantine/core@9.7.4)(@mantine/hooks@9.7.4)(dayjs@1.11.23)(react-dom@19.3.1)(react@19.3.1)
       '@mantine/hooks': 9.7.4(react@19.3.1)
-      '@rjsf/core': 6.11.0(@rjsf/utils@6.11.0)(react@19.3.1)(solid-js@1.9.17)
+      '@rjsf/core': 6.11.0(@rjsf/utils@6.11.0)(react@19.3.1)(solid-js@1.9.18)
       '@rjsf/utils': 6.11.0(react@19.3.1)
       dayjs: 1.11.23
       react: 19.3.1
@@ -7234,49 +7227,49 @@ snapshots:
       ajv: 8.20.0
       ajv-formats: 2.1.1
 
-  '@rolldown/binding-android-arm-eabi@1.2.15':
+  '@rolldown/binding-android-arm-eabi@1.2.16':
     optional: true
 
-  '@rolldown/binding-android-arm64@1.2.15':
+  '@rolldown/binding-android-arm64@1.2.16':
     optional: true
 
-  '@rolldown/binding-darwin-arm64@1.2.15':
+  '@rolldown/binding-darwin-arm64@1.2.16':
     optional: true
 
-  '@rolldown/binding-darwin-x64@1.2.15':
+  '@rolldown/binding-darwin-x64@1.2.16':
     optional: true
 
-  '@rolldown/binding-freebsd-x64@1.2.15':
+  '@rolldown/binding-freebsd-x64@1.2.16':
     optional: true
 
-  '@rolldown/binding-linux-arm-gnueabihf@1.2.15':
+  '@rolldown/binding-linux-arm-gnueabihf@1.2.16':
     optional: true
 
-  '@rolldown/binding-linux-arm64-gnu@1.2.15':
+  '@rolldown/binding-linux-arm64-gnu@1.2.16':
     optional: true
 
-  '@rolldown/binding-linux-arm64-musl@1.2.15':
+  '@rolldown/binding-linux-arm64-musl@1.2.16':
     optional: true
 
-  '@rolldown/binding-linux-ppc64-gnu@1.2.15':
+  '@rolldown/binding-linux-ppc64-gnu@1.2.16':
     optional: true
 
-  '@rolldown/binding-linux-s390x-gnu@1.2.15':
+  '@rolldown/binding-linux-s390x-gnu@1.2.16':
     optional: true
 
-  '@rolldown/binding-linux-x64-gnu@1.2.15':
+  '@rolldown/binding-linux-x64-gnu@1.2.16':
     optional: true
 
-  '@rolldown/binding-linux-x64-musl@1.2.15':
+  '@rolldown/binding-linux-x64-musl@1.2.16':
     optional: true
 
-  '@rolldown/binding-openharmony-arm64@1.2.15':
+  '@rolldown/binding-openharmony-arm64@1.2.16':
     optional: true
 
-  '@rolldown/binding-win32-arm64-msvc@1.2.15':
+  '@rolldown/binding-win32-arm64-msvc@1.2.16':
     optional: true
 
-  '@rolldown/binding-win32-x64-msvc@1.2.15':
+  '@rolldown/binding-win32-x64-msvc@1.2.16':
     optional: true
 
   '@rolldown/pluginutils@1.0.1': {}
@@ -7297,23 +7290,23 @@ snapshots:
       undici: 8.12.3
       yaml: 2.9.1
 
-  '@scalar/json-schema-validator@0.1.14':
+  '@scalar/json-schema-validator@0.1.17':
     dependencies:
       '@scalar/helpers': 0.16.4
-      '@scalar/types': 0.25.0
+      '@scalar/types': 0.26.0
       ajv: 8.20.0
       ajv-draft-04: 1.0.0(ajv@8.20.0)
       ajv-formats: 3.0.1
       yaml: 2.9.1
 
-  '@scalar/openapi-parser@0.29.16':
+  '@scalar/openapi-parser@0.29.19':
     dependencies:
       '@scalar/helpers': 0.16.4
       '@scalar/json-magic': 0.17.0
       '@scalar/openapi-types': 0.9.8
       '@scalar/openapi-upgrader': 0.4.6
-      '@scalar/openapi-validator': 0.1.14
-      '@scalar/types': 0.25.0
+      '@scalar/openapi-validator': 0.1.17
+      '@scalar/types': 0.26.0
       yaml: 2.9.1
 
   '@scalar/openapi-types@0.9.8': {}
@@ -7323,14 +7316,14 @@ snapshots:
       '@scalar/helpers': 0.16.4
       '@scalar/openapi-types': 0.9.8
 
-  '@scalar/openapi-validator@0.1.14':
+  '@scalar/openapi-validator@0.1.17':
     dependencies:
       '@scalar/helpers': 0.16.4
-      '@scalar/json-schema-validator': 0.1.14
-      '@scalar/types': 0.25.0
+      '@scalar/json-schema-validator': 0.1.17
+      '@scalar/types': 0.26.0
       yaml: 2.9.1
 
-  '@scalar/types@0.25.0':
+  '@scalar/types@0.26.0':
     dependencies:
       '@scalar/helpers': 0.16.4
       nanoid: 5.1.16
@@ -7341,73 +7334,73 @@ snapshots:
 
   '@sindresorhus/merge-streams@4.0.0': {}
 
-  '@solid-primitives/event-listener@2.4.6(solid-js@1.9.17)':
+  '@solid-primitives/event-listener@2.4.6(solid-js@1.9.18)':
     dependencies:
-      '@solid-primitives/utils': 6.4.1(solid-js@1.9.17)
-      solid-js: 1.9.17
+      '@solid-primitives/utils': 6.4.1(solid-js@1.9.18)
+      solid-js: 1.9.18
 
-  '@solid-primitives/keyed@1.5.3(solid-js@1.9.17)':
+  '@solid-primitives/keyed@1.5.3(solid-js@1.9.18)':
     dependencies:
-      solid-js: 1.9.17
+      solid-js: 1.9.18
 
-  '@solid-primitives/map@0.4.13(solid-js@1.9.17)':
+  '@solid-primitives/map@0.4.13(solid-js@1.9.18)':
     dependencies:
-      '@solid-primitives/trigger': 1.2.4(solid-js@1.9.17)
-      solid-js: 1.9.17
+      '@solid-primitives/trigger': 1.2.4(solid-js@1.9.18)
+      solid-js: 1.9.18
 
-  '@solid-primitives/media@2.3.6(solid-js@1.9.17)':
+  '@solid-primitives/media@2.3.6(solid-js@1.9.18)':
     dependencies:
-      '@solid-primitives/event-listener': 2.4.6(solid-js@1.9.17)
-      '@solid-primitives/rootless': 1.5.4(solid-js@1.9.17)
-      '@solid-primitives/static-store': 0.1.4(solid-js@1.9.17)
-      '@solid-primitives/utils': 6.4.1(solid-js@1.9.17)
-      solid-js: 1.9.17
+      '@solid-primitives/event-listener': 2.4.6(solid-js@1.9.18)
+      '@solid-primitives/rootless': 1.5.4(solid-js@1.9.18)
+      '@solid-primitives/static-store': 0.1.4(solid-js@1.9.18)
+      '@solid-primitives/utils': 6.4.1(solid-js@1.9.18)
+      solid-js: 1.9.18
 
-  '@solid-primitives/props@3.2.4(solid-js@1.9.17)':
+  '@solid-primitives/props@3.2.4(solid-js@1.9.18)':
     dependencies:
-      '@solid-primitives/utils': 6.4.1(solid-js@1.9.17)
-      solid-js: 1.9.17
+      '@solid-primitives/utils': 6.4.1(solid-js@1.9.18)
+      solid-js: 1.9.18
 
-  '@solid-primitives/refs@1.1.4(solid-js@1.9.17)':
+  '@solid-primitives/refs@1.1.4(solid-js@1.9.18)':
     dependencies:
-      '@solid-primitives/utils': 6.4.1(solid-js@1.9.17)
-      solid-js: 1.9.17
+      '@solid-primitives/utils': 6.4.1(solid-js@1.9.18)
+      solid-js: 1.9.18
 
-  '@solid-primitives/resize-observer@2.2.0(solid-js@1.9.17)':
+  '@solid-primitives/resize-observer@2.2.0(solid-js@1.9.18)':
     dependencies:
-      '@solid-primitives/event-listener': 2.4.6(solid-js@1.9.17)
-      '@solid-primitives/rootless': 1.5.4(solid-js@1.9.17)
-      '@solid-primitives/static-store': 0.1.4(solid-js@1.9.17)
-      '@solid-primitives/utils': 6.4.1(solid-js@1.9.17)
-      solid-js: 1.9.17
+      '@solid-primitives/event-listener': 2.4.6(solid-js@1.9.18)
+      '@solid-primitives/rootless': 1.5.4(solid-js@1.9.18)
+      '@solid-primitives/static-store': 0.1.4(solid-js@1.9.18)
+      '@solid-primitives/utils': 6.4.1(solid-js@1.9.18)
+      solid-js: 1.9.18
 
-  '@solid-primitives/rootless@1.5.4(solid-js@1.9.17)':
+  '@solid-primitives/rootless@1.5.4(solid-js@1.9.18)':
     dependencies:
-      '@solid-primitives/utils': 6.4.1(solid-js@1.9.17)
-      solid-js: 1.9.17
+      '@solid-primitives/utils': 6.4.1(solid-js@1.9.18)
+      solid-js: 1.9.18
 
-  '@solid-primitives/static-store@0.1.4(solid-js@1.9.17)':
+  '@solid-primitives/static-store@0.1.4(solid-js@1.9.18)':
     dependencies:
-      '@solid-primitives/utils': 6.4.1(solid-js@1.9.17)
-      solid-js: 1.9.17
+      '@solid-primitives/utils': 6.4.1(solid-js@1.9.18)
+      solid-js: 1.9.18
 
-  '@solid-primitives/storage@1.3.11(solid-js@1.9.17)':
+  '@solid-primitives/storage@1.3.11(solid-js@1.9.18)':
     dependencies:
-      '@solid-primitives/utils': 6.4.1(solid-js@1.9.17)
-      solid-js: 1.9.17
+      '@solid-primitives/utils': 6.4.1(solid-js@1.9.18)
+      solid-js: 1.9.18
 
-  '@solid-primitives/transition-group@1.1.2(solid-js@1.9.17)':
+  '@solid-primitives/transition-group@1.1.2(solid-js@1.9.18)':
     dependencies:
-      solid-js: 1.9.17
+      solid-js: 1.9.18
 
-  '@solid-primitives/trigger@1.2.4(solid-js@1.9.17)':
+  '@solid-primitives/trigger@1.2.4(solid-js@1.9.18)':
     dependencies:
-      '@solid-primitives/utils': 6.4.1(solid-js@1.9.17)
-      solid-js: 1.9.17
+      '@solid-primitives/utils': 6.4.1(solid-js@1.9.18)
+      solid-js: 1.9.18
 
-  '@solid-primitives/utils@6.4.1(solid-js@1.9.17)':
+  '@solid-primitives/utils@6.4.1(solid-js@1.9.18)':
     dependencies:
-      solid-js: 1.9.17
+      solid-js: 1.9.18
 
   '@standard-schema/spec@1.1.0': {}
 
@@ -7415,63 +7408,63 @@ snapshots:
 
   '@swc/helpers@0.5.23':
     dependencies:
-      tslib: 2.8.1
+      tslib: 2.9.1
 
   '@tanstack/match-sorter-utils@9.2.6':
     dependencies:
       remove-accents: 0.5.0
 
-  '@tanstack/query-core@5.105.0': {}
+  '@tanstack/query-core@5.105.1': {}
 
-  '@tanstack/query-devtools@5.105.0(csstype@3.2.3)':
+  '@tanstack/query-devtools@5.105.1(csstype@3.2.3)':
     dependencies:
-      '@kobalte/core': 0.13.14(solid-js@1.9.17)
-      '@solid-primitives/keyed': 1.5.3(solid-js@1.9.17)
-      '@solid-primitives/resize-observer': 2.2.0(solid-js@1.9.17)
-      '@solid-primitives/storage': 1.3.11(solid-js@1.9.17)
+      '@kobalte/core': 0.13.14(solid-js@1.9.18)
+      '@solid-primitives/keyed': 1.5.3(solid-js@1.9.18)
+      '@solid-primitives/resize-observer': 2.2.0(solid-js@1.9.18)
+      '@solid-primitives/storage': 1.3.11(solid-js@1.9.18)
       '@tanstack/match-sorter-utils': 9.2.6
-      '@tanstack/query-core': 5.105.0
+      '@tanstack/query-core': 5.105.1
       clsx: 2.1.1
       goober: 2.1.19(csstype@3.2.3)
-      solid-js: 1.9.17
-      solid-transition-group: 0.2.3(solid-js@1.9.17)
+      solid-js: 1.9.18
+      solid-transition-group: 0.2.3(solid-js@1.9.18)
       superjson: 2.2.6
     transitivePeerDependencies:
       - csstype
 
-  '@tanstack/react-query-devtools@5.105.0(@tanstack/react-query@5.105.0)(@types/react@19.3.0)(csstype@3.2.3)(react@19.3.1)':
+  '@tanstack/react-query-devtools@5.105.1(@tanstack/react-query@5.105.1)(@types/react@19.3.0)(csstype@3.2.3)(react@19.3.1)':
     dependencies:
-      '@tanstack/query-devtools': 5.105.0(csstype@3.2.3)
-      '@tanstack/react-query': 5.105.0(@types/react@19.3.0)(react@19.3.1)
+      '@tanstack/query-devtools': 5.105.1(csstype@3.2.3)
+      '@tanstack/react-query': 5.105.1(@types/react@19.3.0)(react@19.3.1)
       react: 19.3.1
     optionalDependencies:
       '@types/react': 19.3.0
     transitivePeerDependencies:
       - csstype
 
-  '@tanstack/react-query@5.105.0(@types/react@19.3.0)(react@19.3.1)':
+  '@tanstack/react-query@5.105.1(@types/react@19.3.0)(react@19.3.1)':
     dependencies:
-      '@tanstack/query-core': 5.105.0
+      '@tanstack/query-core': 5.105.1
       react: 19.3.1
     optionalDependencies:
       '@types/react': 19.3.0
 
-  '@tanstack/react-virtual@3.14.23(react-dom@19.3.1)(react@19.3.1)':
+  '@tanstack/react-virtual@3.14.24(react-dom@19.3.1)(react@19.3.1)':
     dependencies:
-      '@tanstack/virtual-core': 3.19.8
+      '@tanstack/virtual-core': 3.19.9
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
 
-  '@tanstack/virtual-core@3.19.8': {}
+  '@tanstack/virtual-core@3.19.9': {}
 
   '@tsconfig/strictest@2.0.8': {}
 
-  '@tsdown/css@0.23.3(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.23.3)(yaml@2.9.1)':
+  '@tsdown/css@0.23.4(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.23.4)(yaml@2.9.1)':
     dependencies:
       lightningcss: 1.33.0
       postcss-load-config: 6.0.1(jiti@2.7.0)(postcss@8.5.23)(yaml@2.9.1)
-      rolldown: 1.2.15
-      tsdown: 0.23.3(@tsdown/css@0.23.3)(typescript@6.0.3)
+      rolldown: 1.2.16
+      tsdown: 0.23.4(@tsdown/css@0.23.4)(typescript@6.0.3)
     optionalDependencies:
       postcss: 8.5.23
     transitivePeerDependencies:
@@ -7484,25 +7477,25 @@ snapshots:
       '@turf/helpers': 7.4.0
       '@turf/meta': 7.4.0
       '@types/geojson': 7946.0.16
-      tslib: 2.8.1
+      tslib: 2.9.1
 
   '@turf/centroid@7.4.0':
     dependencies:
       '@turf/helpers': 7.4.0
       '@turf/meta': 7.4.0
       '@types/geojson': 7946.0.16
-      tslib: 2.8.1
+      tslib: 2.9.1
 
   '@turf/helpers@7.4.0':
     dependencies:
       '@types/geojson': 7946.0.16
-      tslib: 2.8.1
+      tslib: 2.9.1
 
   '@turf/meta@7.4.0':
     dependencies:
       '@turf/helpers': 7.4.0
       '@types/geojson': 7946.0.16
-      tslib: 2.8.1
+      tslib: 2.9.1
 
   '@types/d3-array@3.2.2': {}
 
@@ -7551,7 +7544,7 @@ snapshots:
 
   '@types/json-schema@7.0.15': {}
 
-  '@types/node@26.6.5':
+  '@types/node@26.6.6':
     dependencies:
       undici-types: 8.9.0
 
@@ -7675,13 +7668,13 @@ snapshots:
       json-schema-traverse: 1.0.0
       require-from-string: 2.0.2
 
-  ansi-regex@6.4.0: {}
+  ansi-regex@6.5.0: {}
 
   argparse@2.0.1: {}
 
   aria-hidden@1.2.6:
     dependencies:
-      tslib: 2.8.1
+      tslib: 2.9.1
 
   array-bounds@1.0.1: {}
 
@@ -7742,7 +7735,7 @@ snapshots:
       call-bind-apply-helpers: 1.0.2
       get-intrinsic: 1.3.0
 
-  caniuse-lite@1.0.30001819: {}
+  caniuse-lite@1.0.30001820: {}
 
   canvg@3.0.11:
     dependencies:
@@ -7918,7 +7911,7 @@ snapshots:
       '@cspell/cspell-worker': 10.4.0
       '@cspell/dynamic-import': 10.4.0
       '@cspell/url': 10.4.0
-      ansi-regex: 6.4.0
+      ansi-regex: 6.5.0
       chalk: 6.0.1
       chalk-template: 1.1.3
       commander: 15.0.0
@@ -8159,7 +8152,7 @@ snapshots:
     dependencies:
       strongly-connected-components: 1.0.1
 
-  elkjs@0.12.0: {}
+  elkjs@0.12.1: {}
 
   embla-carousel-react@8.6.0(react@19.3.1):
     dependencies:
@@ -8198,7 +8191,7 @@ snapshots:
       has-tostringtag: 1.0.2
       hasown: 2.0.4
 
-  es-toolkit@1.53.0: {}
+  es-toolkit@1.53.1: {}
 
   es5-ext@0.10.64:
     dependencies:
@@ -8340,7 +8333,7 @@ snapshots:
 
   file-saver@2.0.5: {}
 
-  file-selector@5.0.1: {}
+  file-selector@5.0.2: {}
 
   flatted@3.4.4: {}
 
@@ -8450,7 +8443,7 @@ snapshots:
     dependencies:
       ini: 6.0.0
 
-  globals@17.13.0: {}
+  globals@17.14.0: {}
 
   glsl-inject-defines@1.0.3:
     dependencies:
@@ -8725,7 +8718,7 @@ snapshots:
     dependencies:
       js-tokens: 4.0.0
 
-  lucide-react@1.63.0(@types/react@19.3.0)(react@19.3.1):
+  lucide-react@1.66.0(@types/react@19.3.0)(react@19.3.1):
     dependencies:
       react: 19.3.1
     optionalDependencies:
@@ -8750,7 +8743,7 @@ snapshots:
       '@mapbox/unitbezier': 1.0.0
       '@mapbox/vector-tile': 3.0.0
       '@maplibre/geojson-vt': 6.3.0
-      '@maplibre/maplibre-gl-style-spec': 26.4.4
+      '@maplibre/maplibre-gl-style-spec': 26.5.0
       '@maplibre/mlt': 1.3.0
       '@maplibre/vt-pbf': 4.3.3
       '@types/geojson': 7946.0.16
@@ -8764,10 +8757,10 @@ snapshots:
       quickselect: 3.0.0
       tinyqueue: 3.0.0
 
-  markdown-to-jsx@9.10.3(react@19.3.1)(solid-js@1.9.17):
+  markdown-to-jsx@9.10.4(react@19.3.1)(solid-js@1.9.18):
     optionalDependencies:
       react: 19.3.1
-      solid-js: 1.9.17
+      solid-js: 1.9.18
 
   marked@14.0.0: {}
 
@@ -8810,12 +8803,12 @@ snapshots:
 
   next-tick@1.1.0: {}
 
-  next@16.4.3(@types/node@26.6.5)(react-dom@19.3.1)(react@19.3.1):
+  next@16.4.3(@types/node@26.6.6)(react-dom@19.3.1)(react@19.3.1):
     dependencies:
       '@next/env': 16.4.3
       '@swc/helpers': 0.5.23
       baseline-browser-mapping: 2.11.34
-      caniuse-lite: 1.0.30001819
+      caniuse-lite: 1.0.30001820
       postcss: 8.5.23
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
@@ -8829,7 +8822,7 @@ snapshots:
       '@next/swc-linux-x64-musl': 16.4.3
       '@next/swc-win32-arm64-msvc': 16.4.3
       '@next/swc-win32-x64-msvc': 16.4.3
-      sharp: 0.35.5(@types/node@26.6.5)
+      sharp: 0.35.5(@types/node@26.6.6)
     transitivePeerDependencies:
       - '@babel/core'
       - '@types/node'
@@ -8864,24 +8857,24 @@ snapshots:
     dependencies:
       wrappy: 1.0.2
 
-  orval@8.45.0(@tanstack/react-query@5.105.0)(typescript@6.0.3)(zod@4.6.7):
+  orval@8.46.0(@tanstack/react-query@5.105.1)(zod@4.6.7):
     dependencies:
       '@commander-js/extra-typings': 15.0.0(commander@15.0.0)
-      '@orval/angular': 8.45.0
-      '@orval/axios': 8.45.0
-      '@orval/core': 8.45.0
-      '@orval/effect': 8.45.0
-      '@orval/fetch': 8.45.0
-      '@orval/hono': 8.45.0(typescript@6.0.3)(zod@4.6.7)
-      '@orval/mcp': 8.45.0(zod@4.6.7)
-      '@orval/mock': 8.45.0
-      '@orval/pinia-colada': 8.45.0
-      '@orval/query': 8.45.0(@tanstack/react-query@5.105.0)
-      '@orval/solid-start': 8.45.0
-      '@orval/swr': 8.45.0
-      '@orval/zod': 8.45.0(zod@4.6.7)
+      '@orval/angular': 8.46.0
+      '@orval/axios': 8.46.0
+      '@orval/core': 8.46.0
+      '@orval/effect': 8.46.0
+      '@orval/fetch': 8.46.0
+      '@orval/hono': 8.46.0(zod@4.6.7)
+      '@orval/mcp': 8.46.0(zod@4.6.7)
+      '@orval/mock': 8.46.0
+      '@orval/pinia-colada': 8.46.0
+      '@orval/query': 8.46.0(@tanstack/react-query@5.105.1)
+      '@orval/solid-start': 8.46.0
+      '@orval/swr': 8.46.0
+      '@orval/zod': 8.46.0(zod@4.6.7)
       '@scalar/json-magic': 0.16.1
-      '@scalar/openapi-parser': 0.29.16
+      '@scalar/openapi-parser': 0.29.19
       '@scalar/openapi-types': 0.9.8
       chokidar: 5.0.0
       commander: 15.0.0
@@ -8903,7 +8896,6 @@ snapshots:
       - effect
       - msw
       - swr
-      - typescript
       - zod
 
   pako@2.2.0: {}
@@ -8942,7 +8934,7 @@ snapshots:
 
   picomatch@4.0.7: {}
 
-  plotly.js@4.1.2:
+  plotly.js@4.2.0:
     dependencies:
       '@plotly/d3': 3.8.2
       '@plotly/d3-sankey': 0.12.3
@@ -9032,7 +9024,7 @@ snapshots:
 
   proxy-from-env@2.1.0: {}
 
-  qs@6.17.0:
+  qs@6.17.1:
     dependencies:
       es-define-property: 1.0.1
       side-channel: 1.1.1
@@ -9116,7 +9108,7 @@ snapshots:
   react-dropzone@20.1.2(@types/react@19.3.0)(react@19.3.1):
     dependencies:
       attr-accept: 4.0.1
-      file-selector: 5.0.1
+      file-selector: 5.0.2
       react: 19.3.1
     optionalDependencies:
       '@types/react': 19.3.0
@@ -9140,15 +9132,15 @@ snapshots:
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
 
-  react-plotly.js@2.6.0(plotly.js@4.1.2)(react@19.3.1):
+  react-plotly.js@2.6.0(plotly.js@4.2.0)(react@19.3.1):
     dependencies:
-      plotly.js: 4.1.2
+      plotly.js: 4.2.0
       prop-types: 15.8.1
       react: 19.3.1
 
-  react-plotly.js@4.1.0(plotly.js@4.1.2)(react@19.3.1):
+  react-plotly.js@4.1.0(plotly.js@4.2.0)(react@19.3.1):
     dependencies:
-      plotly.js: 4.1.2
+      plotly.js: 4.2.0
       react: 19.3.1
 
   react-redux@9.3.1(@types/react@19.3.0)(react@19.3.1)(redux@5.0.1):
@@ -9164,7 +9156,7 @@ snapshots:
     dependencies:
       react: 19.3.1
       react-style-singleton: 2.2.3(@types/react@19.3.0)(react@19.3.1)
-      tslib: 2.8.1
+      tslib: 2.9.1
     optionalDependencies:
       '@types/react': 19.3.0
 
@@ -9173,7 +9165,7 @@ snapshots:
       react: 19.3.1
       react-remove-scroll-bar: 2.3.8(@types/react@19.3.0)(react@19.3.1)
       react-style-singleton: 2.2.3(@types/react@19.3.0)(react@19.3.1)
-      tslib: 2.8.1
+      tslib: 2.9.1
       use-callback-ref: 1.3.3(@types/react@19.3.0)(react@19.3.1)
       use-sidecar: 1.1.3(@types/react@19.3.0)(react@19.3.1)
     optionalDependencies:
@@ -9183,7 +9175,7 @@ snapshots:
     dependencies:
       get-nonce: 1.0.1
       react: 19.3.1
-      tslib: 2.8.1
+      tslib: 2.9.1
     optionalDependencies:
       '@types/react': 19.3.0
 
@@ -9227,7 +9219,7 @@ snapshots:
       '@reduxjs/toolkit': 2.13.0(react-redux@9.3.1)(react@19.3.1)
       clsx: 2.1.1
       decimal.js-light: 2.5.1
-      es-toolkit: 1.53.0
+      es-toolkit: 1.53.1
       eventemitter3: 5.0.4
       immer: 11.2.9
       react: 19.3.1
@@ -9327,12 +9319,12 @@ snapshots:
   rgbcolor@1.0.1:
     optional: true
 
-  rolldown-plugin-dts@0.28.8(rolldown@1.2.15)(typescript@6.0.3):
+  rolldown-plugin-dts@0.28.8(rolldown@1.2.16)(typescript@6.0.3):
     dependencies:
       dts-resolver: 3.0.0
       get-tsconfig: 5.0.0-beta.6
       obug: 3.0.0
-      rolldown: 1.2.15
+      rolldown: 1.2.16
       yuku-ast: 0.19.0
       yuku-codegen: 0.19.0
       yuku-parser: 0.19.0
@@ -9341,26 +9333,26 @@ snapshots:
     transitivePeerDependencies:
       - oxc-resolver
 
-  rolldown@1.2.15:
+  rolldown@1.2.16:
     dependencies:
-      '@oxc-project/types': 0.155.0
+      '@oxc-project/types': 0.156.0
       '@rolldown/pluginutils': 1.0.1
     optionalDependencies:
-      '@rolldown/binding-android-arm-eabi': 1.2.15
-      '@rolldown/binding-android-arm64': 1.2.15
-      '@rolldown/binding-darwin-arm64': 1.2.15
-      '@rolldown/binding-darwin-x64': 1.2.15
-      '@rolldown/binding-freebsd-x64': 1.2.15
-      '@rolldown/binding-linux-arm-gnueabihf': 1.2.15
-      '@rolldown/binding-linux-arm64-gnu': 1.2.15
-      '@rolldown/binding-linux-arm64-musl': 1.2.15
-      '@rolldown/binding-linux-ppc64-gnu': 1.2.15
-      '@rolldown/binding-linux-s390x-gnu': 1.2.15
-      '@rolldown/binding-linux-x64-gnu': 1.2.15
-      '@rolldown/binding-linux-x64-musl': 1.2.15
-      '@rolldown/binding-openharmony-arm64': 1.2.15
-      '@rolldown/binding-win32-arm64-msvc': 1.2.15
-      '@rolldown/binding-win32-x64-msvc': 1.2.15
+      '@rolldown/binding-android-arm-eabi': 1.2.16
+      '@rolldown/binding-android-arm64': 1.2.16
+      '@rolldown/binding-darwin-arm64': 1.2.16
+      '@rolldown/binding-darwin-x64': 1.2.16
+      '@rolldown/binding-freebsd-x64': 1.2.16
+      '@rolldown/binding-linux-arm-gnueabihf': 1.2.16
+      '@rolldown/binding-linux-arm64-gnu': 1.2.16
+      '@rolldown/binding-linux-arm64-musl': 1.2.16
+      '@rolldown/binding-linux-ppc64-gnu': 1.2.16
+      '@rolldown/binding-linux-s390x-gnu': 1.2.16
+      '@rolldown/binding-linux-x64-gnu': 1.2.16
+      '@rolldown/binding-linux-x64-musl': 1.2.16
+      '@rolldown/binding-openharmony-arm64': 1.2.16
+      '@rolldown/binding-win32-arm64-msvc': 1.2.16
+      '@rolldown/binding-win32-x64-msvc': 1.2.16
 
   safe-buffer@5.1.2: {}
 
@@ -9382,7 +9374,7 @@ snapshots:
 
   shallow-copy@0.0.1: {}
 
-  sharp@0.35.5(@types/node@26.6.5):
+  sharp@0.35.5(@types/node@26.6.6):
     dependencies:
       '@img/colour': 1.1.0
       detect-libc: 2.1.2
@@ -9413,7 +9405,7 @@ snapshots:
       '@img/sharp-win32-arm64': 0.35.5
       '@img/sharp-win32-ia32': 0.35.5
       '@img/sharp-win32-x64': 0.35.5
-      '@types/node': 26.6.5
+      '@types/node': 26.6.6
     optional: true
 
   shebang-command@2.0.0:
@@ -9456,27 +9448,27 @@ snapshots:
 
   smol-toml@1.9.1: {}
 
-  solid-js@1.9.17:
+  solid-js@1.9.18:
     dependencies:
       csstype: 3.2.3
       seroval: 1.6.12
       seroval-plugins: 1.6.12(seroval@1.6.12)
 
-  solid-presence@0.2.0(solid-js@1.9.17):
+  solid-presence@0.2.0(solid-js@1.9.18):
     dependencies:
-      '@corvu/utils': 0.4.2(solid-js@1.9.17)
-      solid-js: 1.9.17
+      '@corvu/utils': 0.4.2(solid-js@1.9.18)
+      solid-js: 1.9.18
 
-  solid-prevent-scroll@0.1.11(solid-js@1.9.17):
+  solid-prevent-scroll@0.1.11(solid-js@1.9.18):
     dependencies:
-      '@corvu/utils': 0.4.2(solid-js@1.9.17)
-      solid-js: 1.9.17
+      '@corvu/utils': 0.4.2(solid-js@1.9.18)
+      solid-js: 1.9.18
 
-  solid-transition-group@0.2.3(solid-js@1.9.17):
+  solid-transition-group@0.2.3(solid-js@1.9.18):
     dependencies:
-      '@solid-primitives/refs': 1.1.4(solid-js@1.9.17)
-      '@solid-primitives/transition-group': 1.1.2(solid-js@1.9.17)
-      solid-js: 1.9.17
+      '@solid-primitives/refs': 1.1.4(solid-js@1.9.18)
+      '@solid-primitives/transition-group': 1.1.2(solid-js@1.9.18)
+      solid-js: 1.9.18
 
   source-map-js@1.2.2: {}
 
@@ -9570,6 +9562,8 @@ snapshots:
       fdir: 6.5.0(picomatch@4.0.7)
       picomatch: 4.0.7
 
+  tinyps@0.5.1: {}
+
   tinyqueue@3.0.0: {}
 
   to-float32@1.1.0: {}
@@ -9582,9 +9576,7 @@ snapshots:
     dependencies:
       commander: 2.20.3
 
-  tree-kill@1.2.2: {}
-
-  tsdown@0.23.3(@tsdown/css@0.23.3)(typescript@6.0.3):
+  tsdown@0.23.4(@tsdown/css@0.23.4)(typescript@6.0.3):
     dependencies:
       cac: 7.1.0
       defu: 6.1.7
@@ -9593,15 +9585,15 @@ snapshots:
       import-without-cache: 0.4.1
       obug: 3.0.0
       picomatch: 4.0.7
-      rolldown: 1.2.15
-      rolldown-plugin-dts: 0.28.8(rolldown@1.2.15)(typescript@6.0.3)
+      rolldown: 1.2.16
+      rolldown-plugin-dts: 0.28.8(rolldown@1.2.16)(typescript@6.0.3)
       tinyexec: 1.3.1
       tinyglobby: 0.2.17
-      tree-kill: 1.2.2
+      tinyps: 0.5.1
       unconfig-core: 7.5.0
       verkit: 0.5.0
     optionalDependencies:
-      '@tsdown/css': 0.23.3(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.23.3)(yaml@2.9.1)
+      '@tsdown/css': 0.23.4(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.23.4)(yaml@2.9.1)
       typescript: 6.0.3
     transitivePeerDependencies:
       - '@typescript/native-preview'
@@ -9612,7 +9604,7 @@ snapshots:
 
   tslib@2.3.0: {}
 
-  tslib@2.8.1: {}
+  tslib@2.9.1: {}
 
   type-fest@5.10.0:
     dependencies:
@@ -9651,7 +9643,7 @@ snapshots:
   use-callback-ref@1.3.3(@types/react@19.3.0)(react@19.3.1):
     dependencies:
       react: 19.3.1
-      tslib: 2.8.1
+      tslib: 2.9.1
     optionalDependencies:
       '@types/react': 19.3.0
 
@@ -9659,7 +9651,7 @@ snapshots:
     dependencies:
       detect-node-es: 1.1.0
       react: 19.3.1
-      tslib: 2.8.1
+      tslib: 2.9.1
     optionalDependencies:
       '@types/react': 19.3.0
 
