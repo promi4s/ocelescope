@@ -58,13 +58,6 @@ class PluginTask(TaskBase, Generic[P]):
         self.input = input
         self.session = session
 
-    def _discard_outputs(self) -> None:
-        session = self.session
-        for ocel in session.list_ocels(source_id=self.id, include_hidden=True):
-            session.delete_ocel(ocel.id)
-        for resource in session.list_resources(source_id=self.id, include_hidden=True):
-            session.delete_resource(resource.id)
-
     def run(self):
         self.state = TaskState.STARTED
         kwargs: dict[str, Any] = {}
@@ -112,7 +105,12 @@ class PluginTask(TaskBase, Generic[P]):
 
         except Exception as e:
             self.error = e
-            self._discard_outputs()
+            for ocel in self.session.list_ocels(source_id=self.id, include_hidden=True):
+                self.session.delete_ocel(ocel.id)
+            for resource in self.session.list_resources(
+                source_id=self.id, include_hidden=True
+            ):
+                self.session.delete_resource(resource.id)
             self.state = TaskState.FAILURE
             sse_manager.send_safe(
                 session_id=self.session.id,
