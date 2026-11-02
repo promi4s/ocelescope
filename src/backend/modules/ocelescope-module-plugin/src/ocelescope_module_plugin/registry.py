@@ -1,18 +1,27 @@
+import importlib.util
+import shutil
+import sys
 from collections.abc import Generator
 from contextlib import ExitStack, contextmanager
 from copy import deepcopy
+from pathlib import Path
 from types import ModuleType
 from typing import TYPE_CHECKING, Any
 
 from ocelescope.plugin.decorators import PluginIO
+from ocelescope_backend.app.internal.exceptions import BadRequest
+from ocelescope_backend.app.internal.registry.resource import RegistryError
 
 from ocelescope import OCEL, Plugin, PluginMethod, ResourceBase
-from ocelescope_backend.app.internal.exceptions import BadRequest
-from ocelescope_backend.app.internal.model.plugin import PluginApi
-from ocelescope_backend.app.internal.registry.resource import RegistryError
+from ocelescope_module_plugin.dynamic_import import (
+    import_wheel_dynamically,
+    is_wheel_compatible,
+)
+from ocelescope_module_plugin.models.plugin import PluginApi
 
 if TYPE_CHECKING:
     from ocelescope_backend.app.internal.session import Session
+    from ocelescope_backend.app.modules.context import ModuleRegistry
 
 
 class PluginNotFound(RegistryError):
@@ -57,21 +66,28 @@ class PluginAlreadyRegistered(RegistryError):
         )
 
 
+def find_plugin_class(module: ModuleType) -> type[Plugin]:
+    plugin_class = next(
+        (
+            var
+            for var in vars(module).values()
+            if isinstance(var, type) and issubclass(var, Plugin) and var is not Plugin
+        ),
+        None,
+    )
+
+    if plugin_class is None:
+        raise PluginNotFound(module.__name__)
+
+    return plugin_class
+
+
 class PluginRegistry:
-    def __init__(self):
+    BASE_PLUGIN_ID: str = "__BASE_PLUGIN_ID__"
+
+    def __init__(self, module_registry: "ModuleRegistry"):
         self._registry: dict[str, Plugin] = {}
-
-    def register(self, module: ModuleType) -> Plugin:
-        plugin: type[Plugin] | None = None
-        for var in vars(module).values():
-            if isinstance(var, type) and issubclass(var, Plugin):
-                plugin = var
-                break
-
-        if plugin is None:
-            raise PluginNotFound(module.__name__)
-
-        return self.add_plugin(module.__name__, plugin)
+        self._module_registry = module_registry
 
     def add_plugin(self, id: str, plugin_class: type[Plugin]) -> Plugin:
         if any(
@@ -84,8 +100,60 @@ class PluginRegistry:
             )
 
         self._registry[id] = plugin_class()
+        self._module_registry.load(plugin_class.get_resources(), namespace=id)
 
         return self._registry[id]
+
+    def load_from_dir(
+        self, plugin_dir: Path, plugin_ids: list[str], ignore_errors: bool = True
+    ) -> list[str]:
+        loaded_plugins = []
+
+        for id in plugin_ids:
+            module_path = plugin_dir / id
+            if not (module_path / "__init__.py").exists():
+                shutil.rmtree(module_path, ignore_errors=True)
+                continue
+
+            if id in sys.modules:
+                continue
+
+            # TODO: Put wheels folder into config
+            if (module_path / "wheels").exists():
+                compatible_wheels = [
+                    wheel_file
+                    for wheel_file in (module_path / "wheels").iterdir()
+                    if wheel_file.suffix == ".whl"
+                    and is_wheel_compatible(wheel_file.name)
+                ]
+
+                for wheel in compatible_wheels:
+                    import_wheel_dynamically(wheel)
+
+            spec = importlib.util.spec_from_file_location(
+                id, module_path / "__init__.py"
+            )
+
+            try:
+                if spec and spec.loader:
+                    module = importlib.util.module_from_spec(spec)
+                    sys.modules[id] = module
+                    spec.loader.exec_module(module)
+                    try:
+                        self.add_plugin(id, find_plugin_class(module))
+                        loaded_plugins.append(id)
+                    except Exception:
+                        self.unload_module(id)
+                        raise
+                else:
+                    raise ImportError(f"Could not create module spec for plugin {id!r}")
+            except Exception:
+                shutil.rmtree(module_path, ignore_errors=True)
+
+                if not ignore_errors:
+                    raise
+
+        return loaded_plugins
 
     def list_plugins(self) -> list[PluginApi]:
         return [
@@ -202,3 +270,4 @@ class PluginRegistry:
 
     def unload_module(self, id: str):
         self._registry.pop(id, None)
+        self._module_registry.unload(namespace=id)

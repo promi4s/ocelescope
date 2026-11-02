@@ -10,6 +10,7 @@ dependencies = [
   "ocelescope-module-ocel>=0.11.0,<0.12.0",
   "ocelescope-module-ocelot>=0.8.0,<0.9.0",
   "ocelescope-module-ocpn-editor>=0.11.0,<0.12.0",
+  "ocelescope-module-plugin>=0.11.0,<0.12.0",
 ]
 
 [tool.uv.workspace]
@@ -23,6 +24,7 @@ members = [
 ocelescope-backend = { workspace = true }
 ocelescope-module-filter = { workspace = true }
 ocelescope-module-ocel = { workspace = true }
+ocelescope-module-plugin = { workspace = true }
 
 [tool.ruff]
 # `uv format` downloads its own (older) ruff instead of the one in uv.lock,

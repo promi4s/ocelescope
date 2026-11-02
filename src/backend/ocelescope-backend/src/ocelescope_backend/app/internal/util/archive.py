@@ -12,7 +12,6 @@ class ArchiveError(ValueError):
 class ArchiveKind(StrEnum):
     LOGS = "logs"
     MIXED = "mixed"
-    PLUGIN = "plugin"
     RESOURCES = "resources"
 
 
@@ -61,7 +60,7 @@ def _safe_member_path(info: zipfile.ZipInfo) -> PurePosixPath:
     return path
 
 
-def _is_ignored(path: PurePosixPath) -> bool:
+def is_ignored(path: PurePosixPath) -> bool:
     return any(
         part in _IGNORED_PATH_PARTS or part.startswith("._") for part in path.parts
     )
@@ -75,13 +74,13 @@ def _is_supported_log(path: PurePosixPath) -> bool:
     )
 
 
-def inspect_archive(
+def validate_archive(
     archive: zipfile.ZipFile,
     *,
     max_files: int,
     max_uncompressed_bytes: int,
-) -> ArchiveContents:
-    """Validate and classify an uploaded ZIP without extracting it."""
+) -> list[tuple[zipfile.ZipInfo, PurePosixPath]]:
+    """Validate an uploaded ZIP without extracting it; returns its usable members."""
     infos = archive.infolist()
     if not infos:
         raise ArchiveError("The uploaded zip archive is empty")
@@ -97,7 +96,7 @@ def inspect_archive(
             raise ArchiveError(f"Archive contains a duplicate path: {info.filename!r}")
         seen_paths.add(path)
 
-        if _is_ignored(path):
+        if is_ignored(path):
             continue
 
         paths.append((info, path))
@@ -118,18 +117,13 @@ def inspect_archive(
     if not paths:
         raise ArchiveError("The uploaded zip archive contains no usable files")
 
-    # Preserve the existing plugin contract: one or more top-level Python
-    # packages with an __init__.py entry point. A plugin may legitimately ship
-    # JSON/XML fixtures, so a valid plugin signature takes precedence over log
-    # suffixes elsewhere in the archive.
-    plugin_roots = {
-        path.parts[0]
-        for info, path in paths
-        if not info.is_dir() and len(path.parts) == 2 and path.name == "__init__.py"
-    }
-    if plugin_roots:
-        return ArchiveContents(kind=ArchiveKind.PLUGIN)
+    return paths
 
+
+def classify_archive(
+    paths: list[tuple[zipfile.ZipInfo, PurePosixPath]],
+) -> ArchiveContents:
+    """Sort validated members into the logs and resources Ocelescope imports."""
     log_members = tuple(
         info for info, path in paths if not info.is_dir() and _is_supported_log(path)
     )
@@ -146,10 +140,7 @@ def inspect_archive(
     elif resource_members:
         kind = ArchiveKind.RESOURCES
     else:
-        raise ArchiveError(
-            "Archive contains neither an Ocelescope plugin nor a supported "
-            "log or resource file"
-        )
+        raise ArchiveError("Archive contains no supported log or resource file")
 
     return ArchiveContents(
         kind=kind,
@@ -170,7 +161,7 @@ def extract_archive(
 
     for info in archive.infolist():
         member_path = _safe_member_path(info)
-        if _is_ignored(member_path):
+        if is_ignored(member_path):
             continue
 
         target = destination.joinpath(*member_path.parts)

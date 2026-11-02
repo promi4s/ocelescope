@@ -5,7 +5,10 @@ from fastapi import FastAPI
 
 from ocelescope_backend.app.internal.docs import init_custom_docs
 from ocelescope_backend.app.internal.logger import get_logger, logger
-from ocelescope_backend.app.internal.registry import registry_manager
+from ocelescope_backend.app.internal.registry import (
+    archive_handlers,
+    resource_registry,
+)
 from ocelescope_backend.app.modules.base import Module
 from ocelescope_backend.app.modules.context import ModuleContext, ModuleRegistry
 
@@ -25,7 +28,7 @@ def build_module(module_cls: type[Module]) -> Module:
     return module_cls(
         ModuleContext(
             logger=get_logger(f"modules.{module_cls.meta.key}"),
-            registry=ModuleRegistry(registry_manager.resource_registry, source_id),
+            registry=ModuleRegistry(resource_registry, source_id),
             source_id=source_id,
             mount_path=get_module_path(module_cls),
         )
@@ -74,6 +77,7 @@ def mount_modules(app: FastAPI) -> list[type[Module]]:
             init_custom_docs(sub_app)
 
         app.mount(module_path, sub_app)
+        archive_handlers.append(module.import_archive)
         logger.info(f"Mounted module {meta.key} v{meta.version} at {module_path}")
 
         seen_modules.add((meta.key, meta.version.major))

@@ -62,3 +62,12 @@ class ResourceRegistry:
 
             if not entry:
                 del self.resources[schema_hash]
+
+    def resource_types(self) -> dict[str, type[ResourceBase]]:
+        return {
+            schema_hash: next(iter(entry.values()))
+            for schema_hash, entry in self.resources.items()
+        }
+
+
+resource_registry = ResourceRegistry()
