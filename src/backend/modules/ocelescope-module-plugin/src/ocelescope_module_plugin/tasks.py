@@ -15,7 +15,6 @@ from ocelescope_backend.app.internal.tasks.base import (
     TaskSummary,
     call_with_known_params,
 )
-from ocelescope_backend.app.internal.util.hashing import generate_tuple_hash
 from ocelescope_backend.app.sse_manager import (
     ErrorNotification,
     sse_manager,
@@ -23,6 +22,7 @@ from ocelescope_backend.app.sse_manager import (
 from typing_extensions import TypedDict
 
 from ocelescope import OCEL, ResourceBase
+from ocelescope_module_plugin.hashing import generate_tuple_hash
 from ocelescope_module_plugin.registry import PluginNotFound, PluginRegistry
 
 if TYPE_CHECKING:

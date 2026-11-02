@@ -1,10 +1,10 @@
 from pathlib import Path
 from typing import Self, cast
 
-from ocelescope_backend.app.internal.util.ocel_visualization import visualize_ocel
 from pydantic import BaseModel
 
 from ocelescope import OCEL, Visualization
+from ocelescope_module_plugin.ocel_visualization import visualize_ocel
 from ocelescope_module_plugin.results import default_result_name
 from ocelescope_module_plugin.tasks import PluginTask
 

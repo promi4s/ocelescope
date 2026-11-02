@@ -2187,7 +2187,10 @@ dependencies = [
     { name = "fastapi" },
     { name = "ocelescope", extra = ["plugin"] },
     { name = "ocelescope-backend" },
+    { name = "orjson" },
     { name = "packaging" },
+    { name = "pandas" },
+    { name = "plotly" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
 ]
@@ -2197,7 +2200,10 @@ requires-dist = [
     { name = "fastapi", specifier = ">=0.136.0" },
     { name = "ocelescope", extras = ["plugin"], editable = "src/ocelescope" },
     { name = "ocelescope-backend", editable = "src/backend/ocelescope-backend" },
+    { name = "orjson", specifier = ">=3.11.3" },
     { name = "packaging", specifier = ">=24.0" },
+    { name = "pandas", specifier = ">=2.3.1" },
+    { name = "plotly", specifier = ">=6.3.1" },
     { name = "pydantic", specifier = ">=2.11.7" },
     { name = "pydantic-settings", specifier = ">=2.2.1,<3" },
 ]
