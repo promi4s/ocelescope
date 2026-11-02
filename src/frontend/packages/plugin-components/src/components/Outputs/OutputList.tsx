@@ -15,35 +15,31 @@ import { useSaveOutputs } from "../../hooks/useSaveOutputs";
 import { SaveOutputsModal } from "./SaveOutputsModal";
 
 const OutputRowActions = ({
-  outputIndices,
+  outputIds,
   onView,
   onSave,
   onDownload,
 }: {
-  outputIndices: number[];
-  onView: (outputIndices: number[]) => void;
-  onSave: (outputIndices: number[]) => void;
-  onDownload: (outputIndices: number[]) => void;
+  outputIds: string[];
+  onView: (outputIds: string[]) => void;
+  onSave: (outputIds: string[]) => void;
+  onDownload: (outputIds: string[]) => void;
 }) => (
   <ActionIcon.Group onClick={(event) => event.stopPropagation()}>
     <Tooltip label="Show visualization">
-      <ActionIcon
-        variant="subtle"
-        onClick={() => onView(outputIndices)}
-        bdrs={0}
-      >
+      <ActionIcon variant="subtle" onClick={() => onView(outputIds)} bdrs={0}>
         <EyeIcon size={16} />
       </ActionIcon>
     </Tooltip>
     <Tooltip label="Save to session">
-      <ActionIcon variant="subtle" onClick={() => onSave(outputIndices)}>
+      <ActionIcon variant="subtle" onClick={() => onSave(outputIds)}>
         <DatabaseIcon size={16} />
       </ActionIcon>
     </Tooltip>
     <Tooltip label="Download">
       <ActionIcon
         variant="subtle"
-        onClick={() => onDownload(outputIndices)}
+        onClick={() => onDownload(outputIds)}
         bdrs={0}
       >
         <DownloadIcon size={16} />
@@ -59,23 +55,20 @@ export const OutputList = ({
 }: {
   taskId: string;
   outputs: PluginOutput[];
-  onView: (outputIndices: number[]) => void;
+  onView: (outputIds: string[]) => void;
 }) => {
-  const [checkedIndices, setCheckedIndices] = useState<number[]>([]);
-  const [indicesToSave, setIndicesToSave] = useState<number[] | null>(null);
+  const [checkedIds, setCheckedIds] = useState<string[]>([]);
+  const [idsToSave, setIdsToSave] = useState<string[] | null>(null);
 
   const { handleDownload } = useDownloadOutputs({ taskId });
   const { handleSave } = useSaveOutputs({ taskId });
 
-  const toggleOutput = (index: number) =>
-    setCheckedIndices((prev) =>
-      prev.includes(index)
-        ? prev.filter((value) => value !== index)
-        : [...prev, index],
+  const toggleOutput = (id: string) =>
+    setCheckedIds((prev) =>
+      prev.includes(id) ? prev.filter((value) => value !== id) : [...prev, id],
     );
 
-  const allChecked =
-    outputs.length > 0 && checkedIndices.length === outputs.length;
+  const allChecked = outputs.length > 0 && checkedIds.length === outputs.length;
 
   return (
     <Box
@@ -87,13 +80,11 @@ export const OutputList = ({
       }}
     >
       <SaveOutputsModal
-        key={indicesToSave?.join(",")}
-        outputs={outputs.filter(({ result_index }) =>
-          indicesToSave?.includes(result_index),
-        )}
+        key={idsToSave?.join(",")}
+        outputs={outputs.filter(({ id }) => idsToSave?.includes(id))}
         onSave={handleSave}
-        opened={!!indicesToSave}
-        onClose={() => setIndicesToSave(null)}
+        opened={!!idsToSave}
+        onClose={() => setIdsToSave(null)}
       />
       <Table stickyHeader highlightOnHover>
         <Table.Thead h={42}>
@@ -101,11 +92,11 @@ export const OutputList = ({
             <Table.Th w={0}>
               <Checkbox
                 checked={allChecked}
-                indeterminate={checkedIndices.length > 0 && !allChecked}
+                indeterminate={checkedIds.length > 0 && !allChecked}
                 onChange={(event) =>
-                  setCheckedIndices(
+                  setCheckedIds(
                     event.currentTarget.checked
-                      ? outputs.map(({ result_index }) => result_index)
+                      ? outputs.map(({ id }) => id)
                       : [],
                   )
                 }
@@ -114,11 +105,11 @@ export const OutputList = ({
             <Table.Th>Name</Table.Th>
             <Table.Th>Type</Table.Th>
             <Table.Th w={0}>
-              {checkedIndices.length > 0 && (
+              {checkedIds.length > 0 && (
                 <OutputRowActions
-                  outputIndices={checkedIndices}
+                  outputIds={checkedIds}
                   onView={onView}
-                  onSave={setIndicesToSave}
+                  onSave={setIdsToSave}
                   onDownload={handleDownload}
                 />
               )}
@@ -126,27 +117,24 @@ export const OutputList = ({
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
-          {outputs.map(({ default_name, type_label, result_index }) => (
-            <Table.Tr
-              key={result_index}
-              onClick={() => toggleOutput(result_index)}
-            >
+          {outputs.map(({ id, name, type_label }) => (
+            <Table.Tr key={id} onClick={() => toggleOutput(id)}>
               <Table.Td>
                 <Checkbox
-                  checked={checkedIndices.includes(result_index)}
-                  onChange={() => toggleOutput(result_index)}
+                  checked={checkedIds.includes(id)}
+                  onChange={() => toggleOutput(id)}
                   onClick={(event) => event.stopPropagation()}
                 />
               </Table.Td>
-              <Table.Td>{default_name}</Table.Td>
+              <Table.Td>{name}</Table.Td>
               <Table.Td>
                 <Badge color={generateColor(type_label)}>{type_label}</Badge>
               </Table.Td>
               <Table.Td>
                 <OutputRowActions
-                  outputIndices={[result_index]}
+                  outputIds={[id]}
                   onView={onView}
-                  onSave={setIndicesToSave}
+                  onSave={setIdsToSave}
                   onDownload={handleDownload}
                 />
               </Table.Td>

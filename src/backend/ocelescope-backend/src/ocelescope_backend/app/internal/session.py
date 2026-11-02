@@ -147,7 +147,7 @@ class Session:
     ) -> list[SessionOCEL]:
         return [
             handle
-            for handle in self.ocels.values()
+            for handle in list(self.ocels.values())
             if (include_hidden or not handle.hidden)
             and (source_id is None or handle.source_id == source_id)
         ]
@@ -298,7 +298,7 @@ class Session:
                 resource_type_label=resource_types[resource.schema_hash].get_label(),
                 **resource.model_dump(),
             )
-            for id, resource in self._resources.items()
+            for id, resource in list(self._resources.items())
             if resource.schema_hash in resource_types
             and (include_hidden or not resource.hidden)
             and (source_id is None or resource.source_id == source_id)

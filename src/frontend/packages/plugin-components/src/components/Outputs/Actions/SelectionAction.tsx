@@ -25,14 +25,14 @@ export const SelectionAction = ({
   onChange,
 }: {
   outputs: PluginOutput[];
-  value: number[];
-  onChange: (outputIndices: number[]) => void;
+  value: string[];
+  onChange: (outputIds: string[]) => void;
 }) => {
   const options = useMemo(
     () =>
-      outputs.map(({ result_index, default_name, type_label }) => ({
-        value: result_index,
-        label: default_name,
+      outputs.map(({ id, name, type_label }) => ({
+        value: id,
+        label: name,
         typeLabel: type_label,
       })),
     [outputs],

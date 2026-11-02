@@ -1,5 +1,4 @@
 import {
-  Badge,
   Box,
   Center,
   Group,
@@ -9,9 +8,6 @@ import {
   Text,
 } from "@mantine/core";
 import { useToggle } from "@mantine/hooks";
-import { generateColor } from "@marko19907/string-to-color";
-import { Visualization, type VisualizationsType } from "@ocelescope/resources";
-import { EyeOffIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { usePluginResult } from "../../api/plugin";
 import { DownloadAction } from "./Actions/DownloadAction";
@@ -19,12 +15,12 @@ import { OrientationAction } from "./Actions/OrientationAction";
 import { SaveAction } from "./Actions/SaveAction";
 import { SelectionAction } from "./Actions/SelectionAction";
 import { OutputList } from "./OutputList";
+import { OutputVisualization } from "./OutputVisualization";
 
 export type OutputSectionProps = {
   taskId?: string;
   extraActions?: React.ReactNode;
   noTaskIdInfo?: string;
-  /** Show the first output's visualization once the task finishes instead of the output list. */
   autoShowFirstOutput?: boolean;
 };
 
@@ -46,14 +42,12 @@ const OutputSection: React.FC<OutputSectionProps> = ({
     },
   });
 
-  const [shownIndices, setShownIndices] = useState<number[]>([]);
+  const [shownIds, setShownIds] = useState<string[]>([]);
   const [initializedTaskId, setInitializedTaskId] = useState<string>();
 
   if (outputs && taskId !== initializedTaskId) {
     setInitializedTaskId(taskId);
-    setShownIndices(
-      autoShowFirstOutput && outputs[0] ? [outputs[0].result_index] : [],
-    );
+    setShownIds(autoShowFirstOutput && outputs[0] ? [outputs[0].id] : []);
   }
 
   const [isHorizontal, toggleOrientation] = useToggle();
@@ -61,11 +55,8 @@ const OutputSection: React.FC<OutputSectionProps> = ({
   const isLoading = !!taskId && !outputs;
 
   const shownOutputs = useMemo(
-    () =>
-      (outputs ?? []).filter(({ result_index }) =>
-        shownIndices.includes(result_index),
-      ),
-    [outputs, shownIndices],
+    () => (outputs ?? []).filter(({ id }) => shownIds.includes(id)),
+    [outputs, shownIds],
   );
 
   return (
@@ -84,8 +75,8 @@ const OutputSection: React.FC<OutputSectionProps> = ({
           <>
             <SelectionAction
               outputs={outputs ?? []}
-              value={shownIndices}
-              onChange={setShownIndices}
+              value={shownIds}
+              onChange={setShownIds}
             />
             {shownOutputs.length > 1 && (
               <OrientationAction
@@ -93,7 +84,7 @@ const OutputSection: React.FC<OutputSectionProps> = ({
                 toggleOrientation={toggleOrientation}
               />
             )}
-            <DownloadAction taskId={taskId} outputIndices={shownIndices} />
+            <DownloadAction taskId={taskId} outputIds={shownIds} />
             <SaveAction taskId={taskId} outputs={shownOutputs} />
           </>
         )}
@@ -106,7 +97,7 @@ const OutputSection: React.FC<OutputSectionProps> = ({
           outputs &&
           (shownOutputs.length > 0 ? (
             <Splitter
-              key={`${isHorizontal}:${shownIndices.join(",")}`}
+              key={`${isHorizontal}:${shownIds.join(",")}`}
               orientation={isHorizontal ? "horizontal" : "vertical"}
               lineSize={4}
               handleColor="var(--mantine-color-default-border)"
@@ -114,40 +105,12 @@ const OutputSection: React.FC<OutputSectionProps> = ({
             >
               {shownOutputs.map((output) => (
                 <Splitter.Pane
-                  key={output.result_index}
+                  key={output.id}
                   defaultSize={100 / shownOutputs.length}
                   min="15%"
                 >
                   <Box h="100%" pos="relative">
-                    {output.visualization ? (
-                      <Visualization
-                        visualization={
-                          output.visualization as VisualizationsType
-                        }
-                      />
-                    ) : (
-                      <Center h="100%" p="md">
-                        <Stack align="center" gap="xs">
-                          <EyeOffIcon
-                            size={64}
-                            strokeWidth={1.5}
-                            color="var(--mantine-color-dimmed)"
-                          />
-                          <Text fw={500}>No visualization available</Text>
-                          <Group gap={6} justify="center">
-                            <Badge
-                              size="sm"
-                              color={generateColor(output.type_label)}
-                            >
-                              {output.type_label}
-                            </Badge>
-                            <Text size="sm" c="dimmed">
-                              does not provide a visualization
-                            </Text>
-                          </Group>
-                        </Stack>
-                      </Center>
-                    )}
+                    <OutputVisualization output={output} />
                   </Box>
                 </Splitter.Pane>
               ))}
@@ -157,7 +120,7 @@ const OutputSection: React.FC<OutputSectionProps> = ({
               key={taskId}
               taskId={taskId}
               outputs={outputs}
-              onView={setShownIndices}
+              onView={setShownIds}
             />
           ))}
         {!taskId && (

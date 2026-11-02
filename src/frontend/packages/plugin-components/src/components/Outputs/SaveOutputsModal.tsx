@@ -14,22 +14,22 @@ export const SaveOutputsModal = ({
   onSave: (selections: ResultSelection[]) => void;
   outputs: PluginOutput[];
 }) => {
-  const [names, setNames] = useState<Record<number, string>>({});
+  const [names, setNames] = useState<Record<string, string>>({});
 
   return (
     <Modal opened={opened} onClose={onClose} title={"Save to Session"}>
       <Stack>
         <Stack gap={"xs"}>
-          {outputs.map(({ default_name, result_index, type_label }) => (
-            <Group key={result_index}>
+          {outputs.map(({ id, name, type_label }) => (
+            <Group key={id}>
               <TextInput
-                placeholder={default_name}
-                value={names[result_index] ?? ""}
+                placeholder={name}
+                value={names[id] ?? ""}
                 flex={1}
                 onChange={(event) =>
                   setNames({
                     ...names,
-                    [result_index]: event.currentTarget.value,
+                    [id]: event.currentTarget.value,
                   })
                 }
               />
@@ -42,9 +42,9 @@ export const SaveOutputsModal = ({
         <Button
           onClick={() => {
             onSave(
-              outputs.map(({ result_index }) => ({
-                index: result_index,
-                name: names[result_index] || null,
+              outputs.map(({ id }) => ({
+                id,
+                name: names[id] || null,
               })),
             );
             onClose();

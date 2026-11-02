@@ -4,13 +4,13 @@ import { type ResultSelection, useSavePluginResults } from "../api/plugin";
 export const useSaveOutputs = ({ taskId }: { taskId: string }) => {
   const { mutate: saveOutputs, isPending: isSaving } = useSavePluginResults();
 
-  const [saved, setSaved] = useState<{ taskId: string; indices: number[] }>({
+  const [saved, setSaved] = useState<{ taskId: string; ids: string[] }>({
     taskId,
-    indices: [],
+    ids: [],
   });
 
-  const savedIndices = useMemo(
-    () => (saved.taskId === taskId ? saved.indices : []),
+  const savedIds = useMemo(
+    () => (saved.taskId === taskId ? saved.ids : []),
     [saved, taskId],
   );
 
@@ -21,15 +21,10 @@ export const useSaveOutputs = ({ taskId }: { taskId: string }) => {
         {
           onSuccess: () =>
             setSaved((prev) => {
-              const indices = prev.taskId === taskId ? prev.indices : [];
+              const ids = prev.taskId === taskId ? prev.ids : [];
               return {
                 taskId,
-                indices: [
-                  ...new Set([
-                    ...indices,
-                    ...selections.map(({ index }) => index),
-                  ]),
-                ],
+                ids: [...new Set([...ids, ...selections.map(({ id }) => id)])],
               };
             }),
         },
@@ -38,11 +33,10 @@ export const useSaveOutputs = ({ taskId }: { taskId: string }) => {
   );
 
   const isSaved = useCallback(
-    (indices: number[]) =>
-      indices.length > 0 &&
-      indices.every((index) => savedIndices.includes(index)),
-    [savedIndices],
+    (ids: string[]) =>
+      ids.length > 0 && ids.every((id) => savedIds.includes(id)),
+    [savedIds],
   );
 
-  return { handleSave, savedIndices, isSaved, isSaving };
+  return { handleSave, savedIds, isSaved, isSaving };
 };

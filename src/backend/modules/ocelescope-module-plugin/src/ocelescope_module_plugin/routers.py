@@ -1,7 +1,6 @@
 import shutil
 import zipfile
 from datetime import UTC, datetime
-from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import Annotated, Any
 
@@ -9,17 +8,21 @@ from fastapi import Body
 from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
 from ocelescope.ocel.io import export_duckdb_ocel
-from ocelescope_backend.app.dependencies import ApiSession
+from ocelescope_backend.app.dependencies import ApiOcel, ApiSession
 from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.model.response import TempFileResponse
 from ocelescope_backend.app.internal.registry.resource import RegistryError
-from ocelescope_backend.app.internal.tasks.base import call_with_known_params
+from ocelescope_backend.app.internal.tasks.base import (
+    TaskState,
+    call_with_known_params,
+)
 from ocelescope_backend.app.sse_manager import (
     InvalidationRequest,
     sse_manager,
 )
 from pydantic import BaseModel
 
+from ocelescope import Plotly
 from ocelescope_module_plugin.config import config
 from ocelescope_module_plugin.dependencies import ApiPluginRegistry, ApiPluginTask
 from ocelescope_module_plugin.models.plugin import MethodApi, PluginApi
@@ -27,11 +30,9 @@ from ocelescope_module_plugin.models.plugin_result import (
     PluginOutput,
     ResultSelection,
 )
+from ocelescope_module_plugin.ocel_visualization import visualize_ocel
 from ocelescope_module_plugin.registry import PluginRegistry
-from ocelescope_module_plugin.results import (
-    default_result_name,
-    select_results,
-)
+from ocelescope_module_plugin.results import select_outputs
 from ocelescope_module_plugin.tasks import PluginTask
 
 router = APIRouter(tags=["plugins"])
@@ -93,10 +94,15 @@ def run_plugin(
 def get_plugin_result(
     plugin_task: ApiPluginTask,
 ) -> list[PluginOutput] | None:
-    if plugin_task.result is None:
+    if plugin_task.state in (TaskState.PENDING, TaskState.STARTED):
         return None
 
-    return PluginOutput.from_plugin_result(plugin_task)
+    return PluginOutput.from_task(plugin_task)
+
+
+@router.get("/ocel/{ocel_id}/visualization", operation_id="ocelVisualization")
+def get_ocel_visualization(ocel: ApiOcel) -> Plotly:
+    return visualize_ocel(ocel)
 
 
 class SavedResults(BaseModel):
@@ -114,24 +120,29 @@ def save_plugin_results(
     selection: list[ResultSelection],
 ) -> SavedResults:
     """Save the selected results into the session as OCELs / resources."""
-    selected = select_results(plugin_task, [result.index for result in selection])
+    selected = select_outputs(plugin_task, [result.id for result in selection])
 
     saved = SavedResults(ocel_ids=[], resource_ids=[])
 
-    for result, (index, entity) in zip(selection, selected, strict=True):
-        name = result.name or default_result_name(
-            registry=plugin_task.registry,
-            plugin_id=plugin_task.plugin_id,
-            method_name=plugin_task.method_name,
-            index=index,
-        )
+    for result, output in zip(selection, selected, strict=True):
+        name = result.name or output.name
 
-        if isinstance(entity, Path):
+        if output.type == "ocel":
             saved.ocel_ids.append(
-                session.add_ocel(entity, name, source_id=plugin_task.plugin_id)
+                session.add_ocel(
+                    session.get_ocel(output.id).db_path,
+                    name,
+                    source_id=plugin_task.plugin_id,
+                )
             )
         else:
-            saved.resource_ids.append(session.add_resource(entity, name=name))
+            saved.resource_ids.append(
+                session.add_resource(
+                    session.get_resource(output.id),
+                    name=name,
+                    source_id=plugin_task.plugin_id,
+                )
+            )
 
     return saved
 
@@ -142,14 +153,12 @@ def save_plugin_results(
 )
 def download_plugin_results(
     plugin_task: ApiPluginTask,
-    indices: Annotated[list[int], Body(embed=True)],
+    ids: Annotated[list[str], Body(embed=True)],
 ) -> TempFileResponse:
     """Bundle the selected results into a zip for download."""
-    selected = select_results(plugin_task, indices)
-    plugin_id = plugin_task.plugin_id
-    method_name = plugin_task.method_name
+    selected = select_outputs(plugin_task, ids)
 
-    archive_name = f"{plugin_id}_{method_name}_results"
+    archive_name = f"{plugin_task.plugin_id}_{plugin_task.method_name}_results"
     file_response = TempFileResponse(
         prefix=datetime.now(tz=UTC).strftime("%Y%m%d-%H%M%S") + "-",
         suffix=".zip",
@@ -168,23 +177,21 @@ def download_plugin_results(
         return filename
 
     with zipfile.ZipFile(file_response.tmp_path, "w", zipfile.ZIP_DEFLATED) as archive:
-        for index, entity in selected:
-            name = default_result_name(
-                plugin_task.registry, plugin_id, method_name, index
-            )
-
-            if isinstance(entity, Path):
+        for output in selected:
+            if output.type == "ocel":
+                db_path = plugin_task.session.get_ocel(output.id).db_path
                 with NamedTemporaryFile(suffix=".json") as ocel_file:
-                    export_duckdb_ocel(entity, ocel_file.name)
-                    archive.write(ocel_file.name, arcname=_unique(name, ".json"))
+                    export_duckdb_ocel(db_path, ocel_file.name)
+                    archive.write(ocel_file.name, arcname=_unique(output.name, ".json"))
             else:
                 with (
                     NamedTemporaryFile(suffix=".ocelescope") as resource_file,
-                    plugin_task.session.open_store(entity) as resource,
+                    plugin_task.session.open_resource(output.id) as resource,
                 ):
                     resource.write(resource_file.name)
                     archive.write(
-                        resource_file.name, arcname=_unique(name, ".ocelescope")
+                        resource_file.name,
+                        arcname=_unique(output.name, ".ocelescope"),
                     )
 
     return file_response

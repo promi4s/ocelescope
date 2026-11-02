@@ -17,9 +17,7 @@ export const SaveAction = ({
   const { handleSave, isSaved, isSaving } = useSaveOutputs({ taskId });
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
 
-  const areOutputsSaved = isSaved(
-    outputs.map(({ result_index }) => result_index),
-  );
+  const areOutputsSaved = isSaved(outputs.map(({ id }) => id));
 
   return (
     <>

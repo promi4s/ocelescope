@@ -1,33 +1,21 @@
-from pathlib import Path
-
 from fastapi.exceptions import HTTPException
-from ocelescope_backend.app.internal.model.resource import ResourceStore
+from ocelescope_backend.app.internal.tasks.base import TaskState
 
-from ocelescope_module_plugin.registry import PluginRegistry
+from ocelescope_module_plugin.models.plugin_result import PluginOutput
 from ocelescope_module_plugin.tasks import PluginTask
 
 
-def select_results(
-    plugin_task: PluginTask, indices: list[int]
-) -> list[tuple[int, Path | ResourceStore]]:
-    """Resolve the requested result indices, validating each one."""
-    if plugin_task.result is None:
+def select_outputs(plugin_task: PluginTask, ids: list[str]) -> list[PluginOutput]:
+    """Resolve the requested output ids, rejecting any the task did not produce."""
+    if plugin_task.state != TaskState.SUCCESS:
         raise HTTPException(status_code=409, detail="Task has no results yet")
 
-    selected: list[tuple[int, Path | ResourceStore]] = []
-    for index in indices:
-        if index < 0 or index >= len(plugin_task.result):
-            raise HTTPException(
-                status_code=404, detail=f"Result index {index} does not exist"
-            )
-        selected.append((index, plugin_task.result[index]))
+    outputs = {output.id: output for output in PluginOutput.from_task(plugin_task)}
+
+    selected: list[PluginOutput] = []
+    for id in ids:
+        if id not in outputs:
+            raise HTTPException(status_code=404, detail=f"Output {id} does not exist")
+        selected.append(outputs[id])
 
     return selected
-
-
-def default_result_name(
-    registry: PluginRegistry, plugin_id: str, method_name: str, index: int
-) -> str:
-    plugin = registry.get_plugin(plugin_id)
-    base = plugin.get_name() if plugin else plugin_id
-    return f"{base}_{method_name}_{index}"
