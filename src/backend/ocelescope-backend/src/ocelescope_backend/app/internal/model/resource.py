@@ -1,9 +1,42 @@
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Literal
 
+from ocelescope.resource.tabular import COLUMN_TYPE
+from ocelescope.visualization.default.table import TableDataType
 from pydantic import BaseModel, Field
 
-from ocelescope import ResourceBase
+from ocelescope import ResourceBase, Table, TableColumn, TabularResource
+
+COLUMN_DATA_TYPES: dict[COLUMN_TYPE, TableDataType] = {
+    "int": "number",
+    "float": "number",
+    "str": "string",
+    "timestamp": "datetime",
+}
+
+
+class ResourceTable(BaseModel):
+    name: str
+    columns: list[TableColumn]
+
+    @classmethod
+    def from_table(cls, name: str, table: Table) -> "ResourceTable":
+        return cls(
+            name=name,
+            columns=[
+                TableColumn(id=column_name, data_type=COLUMN_DATA_TYPES[column_type])
+                for column_name, column_type in table.schema
+            ],
+        )
+
+    @classmethod
+    def from_resource_type(
+        cls, resource_type: type[TabularResource]
+    ) -> "list[ResourceTable]":
+        return [
+            cls.from_table(name, table) for name, table in resource_type.tables.items()
+        ]
 
 
 class ResourceInfo(BaseModel):
@@ -44,3 +77,17 @@ class ResourceStore(ResourceHeader):
 class ResourceApi(ResourceHeader):
     id: str
     resource_type_label: str
+    kind: Literal["tabular", "json"]
+    has_visualization: bool
+
+    @classmethod
+    def from_store(
+        cls, id: str, store: ResourceStore, resource_type: type[ResourceBase]
+    ) -> "ResourceApi":
+        return cls(
+            id=id,
+            resource_type_label=resource_type.get_label(),
+            kind="tabular" if issubclass(resource_type, TabularResource) else "json",
+            has_visualization=resource_type.has_visualization(),
+            **store.model_dump(),
+        )

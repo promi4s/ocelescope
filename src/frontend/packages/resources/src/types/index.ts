@@ -1,4 +1,4 @@
-import type { GetResourceResponse } from "@ocelescope/api-base";
+import type { resourceVisualization } from "@ocelescope/api-base";
 
 type RequireType<T> = T extends {
   type?: infer L;
@@ -7,7 +7,7 @@ type RequireType<T> = T extends {
   : T;
 
 export type VisualizationsType = RequireType<
-  NonNullable<GetResourceResponse["visualization"]>
+  NonNullable<Awaited<ReturnType<typeof resourceVisualization>>>
 >;
 export type VisualizationsTypes = NonNullable<VisualizationsType["type"]>;
 

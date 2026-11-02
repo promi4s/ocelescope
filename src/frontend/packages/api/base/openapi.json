@@ -354,6 +354,359 @@
         }
       }
     },
+    "/resources/resource/{resource_id}/tables": {
+      "get": {
+        "tags": [
+          "resources"
+        ],
+        "summary": "Get Resource Tables",
+        "operationId": "resourceTables",
+        "parameters": [
+          {
+            "name": "resource_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Resource Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ResourceTable"
+                  },
+                  "title": "Response Resourcetables"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/resources/resource/{resource_id}/tables/{table_name}": {
+      "get": {
+        "tags": [
+          "resources"
+        ],
+        "summary": "Get Resource Table Rows",
+        "operationId": "resourceTableRows",
+        "parameters": [
+          {
+            "name": "resource_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Resource Id"
+            }
+          },
+          {
+            "name": "table_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Table Name"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 20,
+              "title": "Size"
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sort By"
+            }
+          },
+          {
+            "name": "descending",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Descending"
+            }
+          },
+          {
+            "name": "filters",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Filters"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResponse_list_dict_str__Any___"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/resources/resource/{resource_id}/tables/{table_name}/columns/{column_name}/values": {
+      "get": {
+        "tags": [
+          "resources"
+        ],
+        "summary": "Get Resource Table Column Values",
+        "operationId": "resourceTableColumnValues",
+        "parameters": [
+          {
+            "name": "resource_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Resource Id"
+            }
+          },
+          {
+            "name": "table_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Table Name"
+            }
+          },
+          {
+            "name": "column_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Column Name"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Search"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 50,
+              "title": "Size"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResponse_list_str__"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/resources/resource/{resource_id}/visualization": {
+      "get": {
+        "tags": [
+          "resources"
+        ],
+        "summary": "Get Resource Visualization",
+        "operationId": "resourceVisualization",
+        "parameters": [
+          {
+            "name": "resource_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Resource Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/Graph"
+                        },
+                        {
+                          "$ref": "#/components/schemas/TableViz"
+                        },
+                        {
+                          "$ref": "#/components/schemas/SVGVis"
+                        },
+                        {
+                          "$ref": "#/components/schemas/DotVis"
+                        },
+                        {
+                          "$ref": "#/components/schemas/Plotly"
+                        },
+                        {
+                          "$ref": "#/components/schemas/PetriNetViz"
+                        },
+                        {
+                          "$ref": "#/components/schemas/OCPetriNetViz"
+                        },
+                        {
+                          "$ref": "#/components/schemas/DirectlyFollowsGraphViz"
+                        },
+                        {
+                          "$ref": "#/components/schemas/OCDirectlyFollowsGraphViz"
+                        }
+                      ],
+                      "discriminator": {
+                        "propertyName": "type",
+                        "mapping": {
+                          "graph": "#/components/schemas/Graph",
+                          "table": "#/components/schemas/TableViz",
+                          "svg": "#/components/schemas/SVGVis",
+                          "dot": "#/components/schemas/DotVis",
+                          "plotly": "#/components/schemas/Plotly",
+                          "r4pm_petri_net": "#/components/schemas/PetriNetViz",
+                          "r4pm_oc_petri_net": "#/components/schemas/OCPetriNetViz",
+                          "r4pm_dfg": "#/components/schemas/DirectlyFollowsGraphViz",
+                          "r4pm_ocdfg": "#/components/schemas/OCDirectlyFollowsGraphViz"
+                        }
+                      }
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Resourcevisualization"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/resources/resource/{resource_id}": {
       "get": {
         "tags": [
@@ -378,7 +731,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetResourceResponse"
+                  "$ref": "#/components/schemas/ResourceApi"
                 }
               }
             }
@@ -738,72 +1091,6 @@
         "type": "object",
         "title": "ElkLayoutConfig",
         "description": "ELK-based layout configuration for a `Graph` visualization.\n\nAttributes:\n    options: Additional ELK layout options passed directly to the renderer.\n        Keys and values mirror the ELK option format (e.g. ``{\"elk.algorithm\": \"force\"}``).\n\n        For all available options see https://eclipse.dev/elk/reference/options.html."
-      },
-      "GetResourceResponse": {
-        "properties": {
-          "resource": {
-            "$ref": "#/components/schemas/ResourceApi"
-          },
-          "visualization": {
-            "anyOf": [
-              {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/Graph"
-                  },
-                  {
-                    "$ref": "#/components/schemas/TableViz"
-                  },
-                  {
-                    "$ref": "#/components/schemas/SVGVis"
-                  },
-                  {
-                    "$ref": "#/components/schemas/DotVis"
-                  },
-                  {
-                    "$ref": "#/components/schemas/Plotly"
-                  },
-                  {
-                    "$ref": "#/components/schemas/PetriNetViz"
-                  },
-                  {
-                    "$ref": "#/components/schemas/OCPetriNetViz"
-                  },
-                  {
-                    "$ref": "#/components/schemas/DirectlyFollowsGraphViz"
-                  },
-                  {
-                    "$ref": "#/components/schemas/OCDirectlyFollowsGraphViz"
-                  }
-                ],
-                "discriminator": {
-                  "propertyName": "type",
-                  "mapping": {
-                    "dot": "#/components/schemas/DotVis",
-                    "graph": "#/components/schemas/Graph",
-                    "plotly": "#/components/schemas/Plotly",
-                    "r4pm_dfg": "#/components/schemas/DirectlyFollowsGraphViz",
-                    "r4pm_oc_petri_net": "#/components/schemas/OCPetriNetViz",
-                    "r4pm_ocdfg": "#/components/schemas/OCDirectlyFollowsGraphViz",
-                    "r4pm_petri_net": "#/components/schemas/PetriNetViz",
-                    "svg": "#/components/schemas/SVGVis",
-                    "table": "#/components/schemas/TableViz"
-                  }
-                }
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Visualization"
-          }
-        },
-        "type": "object",
-        "required": [
-          "resource",
-          "visualization"
-        ],
-        "title": "GetResourceResponse"
       },
       "Graph": {
         "properties": {
@@ -1483,6 +1770,81 @@
         ],
         "title": "OCPlace"
       },
+      "PaginatedResponse_list_dict_str__Any___": {
+        "properties": {
+          "response": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Response"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "page_size": {
+            "type": "integer",
+            "title": "Page Size"
+          },
+          "total_items": {
+            "type": "integer",
+            "title": "Total Items"
+          },
+          "total_pages": {
+            "type": "integer",
+            "title": "Total Pages",
+            "readOnly": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "response",
+          "page",
+          "page_size",
+          "total_items",
+          "total_pages"
+        ],
+        "title": "PaginatedResponse[list[dict[str, Any]]]"
+      },
+      "PaginatedResponse_list_str__": {
+        "properties": {
+          "response": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Response"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "page_size": {
+            "type": "integer",
+            "title": "Page Size"
+          },
+          "total_items": {
+            "type": "integer",
+            "title": "Total Items"
+          },
+          "total_pages": {
+            "type": "integer",
+            "title": "Total Pages",
+            "readOnly": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "response",
+          "page",
+          "page_size",
+          "total_items",
+          "total_pages"
+        ],
+        "title": "PaginatedResponse[list[str]]"
+      },
       "PetriNetViz": {
         "properties": {
           "transitions": {
@@ -1600,6 +1962,18 @@
           "resource_type_label": {
             "type": "string",
             "title": "Resource Type Label"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "tabular",
+              "json"
+            ],
+            "title": "Kind"
+          },
+          "has_visualization": {
+            "type": "boolean",
+            "title": "Has Visualization"
           }
         },
         "type": "object",
@@ -1607,9 +1981,32 @@
           "name",
           "schema_hash",
           "id",
-          "resource_type_label"
+          "resource_type_label",
+          "kind",
+          "has_visualization"
         ],
         "title": "ResourceApi"
+      },
+      "ResourceTable": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "columns": {
+            "items": {
+              "$ref": "#/components/schemas/TableColumn"
+            },
+            "type": "array",
+            "title": "Columns"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "columns"
+        ],
+        "title": "ResourceTable"
       },
       "ResourceTypeInfo": {
         "properties": {

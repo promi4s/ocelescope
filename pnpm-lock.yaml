@@ -1184,6 +1184,9 @@ importers:
       '@mantine/core':
         specifier: 'catalog:'
         version: 9.7.4(@mantine/hooks@9.7.4)(@types/react@19.3.0)(react-dom@19.3.1)(react@19.3.1)
+      '@mantine/hooks':
+        specifier: 'catalog:'
+        version: 9.7.4(react@19.3.1)
       '@ocelescope/api-base':
         specifier: workspace:^
         version: link:../api/base
