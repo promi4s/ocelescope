@@ -6,9 +6,12 @@ import {
   Stack,
   Tooltip,
 } from "@mantine/core";
-import { type MethodApi, useRunPlugin } from "@ocelescope/api-base";
 import { OcelSelect } from "@ocelescope/core";
-import { PluginForm } from "@ocelescope/plugin-components";
+import {
+  type MethodApi,
+  PluginForm,
+  useRunPlugin,
+} from "@ocelescope/plugin-components";
 import { ResourceSelect } from "@ocelescope/resources";
 import type Form from "@rjsf/core";
 import { EyeClosedIcon, EyeIcon } from "lucide-react";

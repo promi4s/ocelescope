@@ -1,12 +1,12 @@
 import { MultiSelect, Select } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
-import {
-  type BodyGetComputedValues,
-  useGetComputedValues,
-} from "@ocelescope/api-base";
 import type { FieldProps } from "@rjsf/utils";
 import { keepPreviousData } from "@tanstack/react-query";
 import { memo, useMemo } from "react";
+import {
+  type BodyGetComputedValues,
+  useGetComputedValues,
+} from "../../../api/plugin";
 import { usePluginForm } from "../context";
 
 const compact = (record: Record<string, unknown> | undefined) =>

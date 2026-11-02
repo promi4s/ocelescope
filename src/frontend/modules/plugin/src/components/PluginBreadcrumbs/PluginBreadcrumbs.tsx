@@ -1,5 +1,5 @@
 import { Anchor, Breadcrumbs } from "@mantine/core";
-import { useGetPlugin } from "@ocelescope/api-base";
+import { useGetPlugin } from "@ocelescope/plugin-components";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useMemo } from "react";

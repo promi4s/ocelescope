@@ -1,6 +1,6 @@
 import { Group, Stack, Text } from "@mantine/core";
-import type { MethodApi } from "@ocelescope/api-base";
 import { getModuleRoute } from "@ocelescope/core";
+import type { MethodApi } from "@ocelescope/plugin-components";
 import { ArrowRightIcon } from "lucide-react";
 import {
   LinkCard,

@@ -7,9 +7,12 @@ import {
   Text,
 } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
-import { useRunPlugin } from "@ocelescope/api-base";
 import { defineModuleRoute, useCurrentOcel } from "@ocelescope/core";
-import { PluginDashboard, PluginForm } from "@ocelescope/plugin-components";
+import {
+  PluginDashboard,
+  PluginForm,
+  useRunPlugin,
+} from "@ocelescope/plugin-components";
 import type Form from "@rjsf/core";
 import type { UiSchema } from "@rjsf/utils";
 import { useEffect, useEffectEvent, useRef, useState } from "react";

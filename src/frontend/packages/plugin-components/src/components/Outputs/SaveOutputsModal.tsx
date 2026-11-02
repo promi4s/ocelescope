@@ -1,7 +1,7 @@
 import { Badge, Button, Group, Modal, Stack, TextInput } from "@mantine/core";
 import { generateColor } from "@marko19907/string-to-color";
-import type { PluginOutput, ResultSelection } from "@ocelescope/api-base";
 import { useState } from "react";
+import type { PluginOutput, ResultSelection } from "../../api/plugin";
 
 export const SaveOutputsModal = ({
   opened,

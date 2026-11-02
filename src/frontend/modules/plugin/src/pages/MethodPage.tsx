@@ -6,8 +6,10 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-import { useGetPluginMethod } from "@ocelescope/api-base";
-import { PluginDashboard } from "@ocelescope/plugin-components";
+import {
+  PluginDashboard,
+  useGetPluginMethod,
+} from "@ocelescope/plugin-components";
 import { useState } from "react";
 import PluginInput from "../components/Form";
 import PluginBreadcrumbs from "../components/PluginBreadcrumbs/PluginBreadcrumbs";

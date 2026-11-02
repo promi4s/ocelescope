@@ -1,5 +1,5 @@
-import { useDownloadPluginResults } from "@ocelescope/api-base";
 import { useCallback } from "react";
+import { useDownloadPluginResults } from "../api/plugin";
 
 export const useDownloadOutputs = ({ taskId }: { taskId: string }) => {
   const { mutate: downloadOutputs, isPending: isDownloading } =

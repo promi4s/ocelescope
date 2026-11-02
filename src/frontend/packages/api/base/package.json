@@ -31,7 +31,7 @@
     "dev": "tsdown --watch",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "pnpm run build",
-    "generate:api": "uv run --package ocelescope-backend ocelescope-backend openapi && uv run --package ocelescope-backend ocelescope-backend openapi --module ocel --path ocel.openapi.json && uv run --package ocelescope-backend ocelescope-backend openapi --module plugin --path plugin.openapi.json && orval"
+    "generate:api": "uv run --package ocelescope-backend ocelescope-backend openapi && uv run --package ocelescope-backend ocelescope-backend openapi --module ocel --path ocel.openapi.json && orval"
   },
   "peerDependencies": {
     "@ocelescope/api-client": "workspace:^",

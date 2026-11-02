@@ -7,9 +7,9 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { generateColor } from "@marko19907/string-to-color";
-import type { PluginOutput } from "@ocelescope/api-base";
 import { DatabaseIcon, DownloadIcon, EyeIcon } from "lucide-react";
 import { useState } from "react";
+import type { PluginOutput } from "../../api/plugin";
 import { useDownloadOutputs } from "../../hooks/useDownloadOutputs";
 import { useSaveOutputs } from "../../hooks/useSaveOutputs";
 import { SaveOutputsModal } from "./SaveOutputsModal";

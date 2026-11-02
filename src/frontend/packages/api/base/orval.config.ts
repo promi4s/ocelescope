@@ -4,12 +4,6 @@ export default defineConfig({
   base: {
     output: {
       target: "./src/api/base/index.ts",
-    },
-  },
-  plugin: {
-    input: "./plugin.openapi.json",
-    output: {
-      target: "./src/api/plugin/index.ts",
       override: {
         operations: {
           getComputedValues: { query: { useQuery: true } },

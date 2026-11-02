@@ -10,10 +10,10 @@ import {
 } from "@mantine/core";
 import { useToggle } from "@mantine/hooks";
 import { generateColor } from "@marko19907/string-to-color";
-import { usePluginResult } from "@ocelescope/api-base";
 import { Visualization, type VisualizationsType } from "@ocelescope/resources";
 import { EyeOffIcon } from "lucide-react";
 import { useMemo, useState } from "react";
+import { usePluginResult } from "../../api/plugin";
 import { DownloadAction } from "./Actions/DownloadAction";
 import { OrientationAction } from "./Actions/OrientationAction";
 import { SaveAction } from "./Actions/SaveAction";

@@ -7,7 +7,7 @@ import {
   TextInput,
   Title,
 } from "@mantine/core";
-import { type MethodApi, useGetPlugin } from "@ocelescope/api-base";
+import { type MethodApi, useGetPlugin } from "@ocelescope/plugin-components";
 import { SearchIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { MethodCard } from "../components/MethodCard/MethodCard";

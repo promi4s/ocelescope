@@ -1,6 +1,6 @@
 import { Anchor, SimpleGrid, Stack, Text, Title } from "@mantine/core";
-import { usePlugins } from "@ocelescope/api-base";
 import { env } from "@ocelescope/core";
+import { usePlugins } from "@ocelescope/plugin-components";
 import {
   PluginCard,
   UploadPluginCard,
