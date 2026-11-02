@@ -1,6 +1,5 @@
 import traceback
 from collections.abc import Hashable
-from pathlib import Path
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -8,7 +7,6 @@ from typing import (
     ParamSpec,
 )
 
-from ocelescope_backend.app.internal.model.resource import ResourceStore
 from ocelescope_backend.app.internal.tasks.base import (
     TaskBase,
     TaskState,
@@ -57,7 +55,6 @@ class PluginTask(TaskBase, Generic[P]):
         self.method_name = method_name
         self.method_label = method_label
         self.input = input
-        self.result: list[Path | ResourceStore] | None = None
         self.session = session
 
     def run(self):
@@ -92,16 +89,14 @@ class PluginTask(TaskBase, Generic[P]):
                 else:
                     entities.append(item)
 
-            self.result = [
-                self.session.dump_ocel(entity)
-                if isinstance(entity, OCEL)
-                else self.session.dump_resource(
-                    entity,
-                    name=f"{self.method_name}_{index}",
-                    source_id=self.plugin_id,
-                )
-                for index, entity in enumerate(entities)
-            ]
+            for index, entity in enumerate(entities):
+                name = f"{plugin.get_name()}_{self.method_name}_{index}"
+                if isinstance(entity, OCEL):
+                    self.session.add_ocel(entity, name, source_id=self.id, hidden=True)
+                else:
+                    self.session.add_resource(
+                        entity, name, source_id=self.id, hidden=True
+                    )
 
             if self.state != TaskState.CANCELLED:
                 self.state = TaskState.SUCCESS

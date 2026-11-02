@@ -8,9 +8,9 @@ export const useDownloadOutputs = ({ taskId }: { taskId: string }) => {
     });
 
   const handleDownload = useCallback(
-    (indices: number[]) => {
+    (ids: string[]) => {
       downloadOutputs(
-        { taskId, data: { indices } },
+        { taskId, data: { ids } },
         {
           onSuccess: (data) => {
             const url = URL.createObjectURL(data as Blob);

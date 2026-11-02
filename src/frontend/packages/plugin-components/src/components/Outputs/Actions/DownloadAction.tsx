@@ -4,11 +4,11 @@ import { useDownloadOutputs } from "../../../hooks/useDownloadOutputs";
 
 export const DownloadAction = ({
   taskId,
-  outputIndices = [],
+  outputIds = [],
   disabled,
 }: {
   taskId: string;
-  outputIndices?: number[];
+  outputIds?: string[];
   disabled?: boolean;
 }) => {
   const { handleDownload, isDownloading } = useDownloadOutputs({ taskId });
@@ -16,10 +16,10 @@ export const DownloadAction = ({
     <Button
       variant="default"
       leftSection={<DownloadIcon size={16} />}
-      onClick={() => handleDownload(outputIndices)}
+      onClick={() => handleDownload(outputIds)}
       loading={isDownloading}
       {...{ autoComplete: "off" }}
-      disabled={disabled || outputIndices.length === 0}
+      disabled={disabled || outputIds.length === 0}
     >
       Download
     </Button>

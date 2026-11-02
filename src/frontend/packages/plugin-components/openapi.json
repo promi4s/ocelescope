@@ -312,6 +312,85 @@
         }
       }
     },
+    "/modules/plugin/v1/ocel/{ocel_id}/visualization": {
+      "get": {
+        "tags": [
+          "plugins"
+        ],
+        "summary": "Get Ocel Visualization",
+        "operationId": "ocelVisualization",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "original",
+                "filtered"
+              ],
+              "type": "string",
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Plotly"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/modules/plugin/v1/task/{task_id}/save": {
       "post": {
         "tags": [
@@ -497,48 +576,19 @@
   },
   "components": {
     "schemas": {
-      "Arc": {
-        "properties": {
-          "source": {
-            "type": "string",
-            "title": "Source"
-          },
-          "target": {
-            "type": "string",
-            "title": "Target"
-          },
-          "weight": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Weight"
-          }
-        },
-        "type": "object",
-        "required": [
-          "source",
-          "target"
-        ],
-        "title": "Arc"
-      },
       "Body_downloadPluginResults": {
         "properties": {
-          "indices": {
+          "ids": {
             "items": {
-              "type": "integer"
+              "type": "string"
             },
             "type": "array",
-            "title": "Indices"
+            "title": "Ids"
           }
         },
         "type": "object",
         "required": [
-          "indices"
+          "ids"
         ],
         "title": "Body_downloadPluginResults"
       },
@@ -605,702 +655,6 @@
           "input_resources"
         ],
         "title": "Body_runPlugin"
-      },
-      "DFG": {
-        "properties": {
-          "activities": {
-            "additionalProperties": {
-              "type": "integer"
-            },
-            "type": "object",
-            "title": "Activities"
-          },
-          "directly_follows_relations": {
-            "items": {
-              "prefixItems": [
-                {
-                  "prefixItems": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "string"
-                    }
-                  ],
-                  "type": "array",
-                  "maxItems": 2,
-                  "minItems": 2
-                },
-                {
-                  "type": "integer"
-                }
-              ],
-              "type": "array",
-              "maxItems": 2,
-              "minItems": 2
-            },
-            "type": "array",
-            "title": "Directly Follows Relations"
-          },
-          "start_activities": {
-            "additionalProperties": {
-              "type": "integer"
-            },
-            "type": "object",
-            "title": "Start Activities"
-          },
-          "end_activities": {
-            "additionalProperties": {
-              "type": "integer"
-            },
-            "type": "object",
-            "title": "End Activities"
-          }
-        },
-        "type": "object",
-        "title": "DFG",
-        "description": "A directly-follows graph in the shape the r4pm viewers expect.\n\nAttributes:\n    activities: Occurrence count per activity.\n    directly_follows_relations: ``((source, target), count)`` pairs.\n    start_activities: Count per activity of how often it starts a trace.\n    end_activities: Count per activity of how often it ends a trace."
-      },
-      "DirectlyFollowsGraphViz": {
-        "properties": {
-          "activities": {
-            "additionalProperties": {
-              "type": "integer"
-            },
-            "type": "object",
-            "title": "Activities"
-          },
-          "directly_follows_relations": {
-            "items": {
-              "prefixItems": [
-                {
-                  "prefixItems": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "string"
-                    }
-                  ],
-                  "type": "array",
-                  "maxItems": 2,
-                  "minItems": 2
-                },
-                {
-                  "type": "integer"
-                }
-              ],
-              "type": "array",
-              "maxItems": 2,
-              "minItems": 2
-            },
-            "type": "array",
-            "title": "Directly Follows Relations"
-          },
-          "start_activities": {
-            "additionalProperties": {
-              "type": "integer"
-            },
-            "type": "object",
-            "title": "Start Activities"
-          },
-          "end_activities": {
-            "additionalProperties": {
-              "type": "integer"
-            },
-            "type": "object",
-            "title": "End Activities"
-          },
-          "type": {
-            "type": "string",
-            "const": "r4pm_dfg",
-            "title": "Type",
-            "default": "r4pm_dfg"
-          }
-        },
-        "type": "object",
-        "title": "DirectlyFollowsGraphViz"
-      },
-      "DotVis": {
-        "properties": {
-          "type": {
-            "type": "string",
-            "const": "dot",
-            "title": "Type",
-            "default": "dot"
-          },
-          "dot_str": {
-            "type": "string",
-            "title": "Dot Str"
-          },
-          "layout_engine": {
-            "type": "string",
-            "enum": [
-              "circo",
-              "dot",
-              "fdp",
-              "sfdp",
-              "neato",
-              "osage",
-              "patchwork",
-              "twopi",
-              "nop",
-              "nop2"
-            ],
-            "title": "Layout Engine",
-            "default": "dot"
-          }
-        },
-        "type": "object",
-        "required": [
-          "dot_str"
-        ],
-        "title": "DotVis",
-        "description": "Graphviz DOT visualization.\n\nThis visualization stores a raw DOT source string plus the selected layout engine.\nIt is useful when you already have DOT output (for example from `graphviz.Digraph`)\nand want to render it directly.\n\nAttributes:\n    type: Fixed discriminator `\"dot\"`.\n    dot_str: The DOT source string.\n    layout_engine: Graphviz layout engine used for layouting."
-      },
-      "EdgeStyle": {
-        "properties": {
-          "dashed": {
-            "type": "boolean",
-            "title": "Dashed",
-            "default": false
-          },
-          "bold": {
-            "type": "boolean",
-            "title": "Bold",
-            "default": false
-          }
-        },
-        "type": "object",
-        "title": "EdgeStyle",
-        "description": "Visual style options for a `GraphEdge`.\n\nAttributes:\n    dashed: Renders the edge as a dashed line.\n    bold: Renders the edge as a bold line."
-      },
-      "ElkLayoutConfig": {
-        "properties": {
-          "type": {
-            "type": "string",
-            "const": "elk",
-            "title": "Type",
-            "default": "elk"
-          },
-          "options": {
-            "anyOf": [
-              {
-                "additionalProperties": {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "integer"
-                    },
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "boolean"
-                    }
-                  ]
-                },
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Options"
-          }
-        },
-        "type": "object",
-        "title": "ElkLayoutConfig",
-        "description": "ELK-based layout configuration for a `Graph` visualization.\n\nAttributes:\n    options: Additional ELK layout options passed directly to the renderer.\n        Keys and values mirror the ELK option format (e.g. ``{\"elk.algorithm\": \"force\"}``).\n\n        For all available options see https://eclipse.dev/elk/reference/options.html."
-      },
-      "Graph": {
-        "properties": {
-          "type": {
-            "type": "string",
-            "const": "graph",
-            "title": "Type",
-            "default": "graph"
-          },
-          "nodes": {
-            "items": {
-              "$ref": "#/components/schemas/GraphNode"
-            },
-            "type": "array",
-            "title": "Nodes"
-          },
-          "edges": {
-            "items": {
-              "$ref": "#/components/schemas/GraphEdge"
-            },
-            "type": "array",
-            "title": "Edges"
-          },
-          "layout_config": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/GraphvizLayoutConfig"
-              },
-              {
-                "$ref": "#/components/schemas/ElkLayoutConfig"
-              }
-            ],
-            "title": "Layout Config",
-            "discriminator": {
-              "propertyName": "type",
-              "mapping": {
-                "elk": "#/components/schemas/ElkLayoutConfig",
-                "graphviz": "#/components/schemas/GraphvizLayoutConfig"
-              }
-            }
-          }
-        },
-        "type": "object",
-        "title": "Graph",
-        "description": "Graph visualization composed of nodes and directed edges.\n\nThis visualization is meant for model-like structures (for example Petri nets\nor directly-follows graphs). Layout is performed by the frontend renderer (ELK).\n\nAttributes:\n    type: Fixed discriminator `\"graph\"`.\n    nodes: List of nodes.\n    edges: List of edges.\n    layout_config: Layout hints consumed by the renderer."
-      },
-      "GraphEdge": {
-        "properties": {
-          "annotation": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/Visualization"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "id": {
-            "type": "string",
-            "title": "Id"
-          },
-          "source": {
-            "type": "string",
-            "title": "Source"
-          },
-          "target": {
-            "type": "string",
-            "title": "Target"
-          },
-          "color": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Color"
-          },
-          "label": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Label"
-          },
-          "style": {
-            "$ref": "#/components/schemas/EdgeStyle",
-            "default": {
-              "dashed": false,
-              "bold": false
-            }
-          },
-          "start_arrow": {
-            "anyOf": [
-              {
-                "type": "string",
-                "enum": [
-                  "triangle",
-                  "circle-triangle",
-                  "triangle-backcurve",
-                  "tee",
-                  "circle",
-                  "chevron",
-                  "triangle-tee",
-                  "triangle-cross",
-                  "vee",
-                  "square",
-                  "diamond"
-                ]
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Start Arrow"
-          },
-          "end_arrow": {
-            "anyOf": [
-              {
-                "type": "string",
-                "enum": [
-                  "triangle",
-                  "circle-triangle",
-                  "triangle-backcurve",
-                  "tee",
-                  "circle",
-                  "chevron",
-                  "triangle-tee",
-                  "triangle-cross",
-                  "vee",
-                  "square",
-                  "diamond"
-                ]
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "End Arrow"
-          },
-          "start_label": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Start Label"
-          },
-          "end_label": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "End Label"
-          },
-          "layout_attrs": {
-            "anyOf": [
-              {
-                "additionalProperties": {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "integer"
-                    },
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "boolean"
-                    }
-                  ]
-                },
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Layout Attrs"
-          }
-        },
-        "type": "object",
-        "required": [
-          "source",
-          "target"
-        ],
-        "title": "GraphEdge",
-        "description": "A directed edge in a `Graph` visualization.\n\nAn edge connects `source` -> `target` and can carry labels and arrowhead styles.\n\nAttributes:\n    id: Unique edge id. Defaults to a generated UUID string.\n    source: Source node id.\n    target: Target node id.\n    color: Optional edge color.\n    label: Optional label shown along the edge.\n    style: Visual style options.\n    start_arrow: Optional arrowhead style at the start of the edge.\n    end_arrow: Optional arrowhead style at the end of the edge.\n    start_label: Optional label shown near the source.\n    end_label: Optional label shown near the target.\n    annotation: Optional attached visualization."
-      },
-      "GraphNode": {
-        "properties": {
-          "annotation": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/Visualization"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "id": {
-            "type": "string",
-            "title": "Id"
-          },
-          "label": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Label"
-          },
-          "shape": {
-            "type": "string",
-            "enum": [
-              "circle",
-              "triangle",
-              "rectangle",
-              "diamond",
-              "hexagon"
-            ],
-            "title": "Shape"
-          },
-          "width": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Width"
-          },
-          "height": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Height"
-          },
-          "color": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Color"
-          },
-          "x": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "X"
-          },
-          "y": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Y"
-          },
-          "border_color": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Border Color"
-          },
-          "style": {
-            "$ref": "#/components/schemas/NodeStyle",
-            "default": {
-              "double_border": false
-            }
-          },
-          "label_pos": {
-            "type": "string",
-            "enum": [
-              "top",
-              "center",
-              "bottom"
-            ],
-            "title": "Label Pos",
-            "default": "center"
-          },
-          "rank": {
-            "anyOf": [
-              {
-                "type": "string",
-                "enum": [
-                  "source",
-                  "sink"
-                ]
-              },
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Rank"
-          },
-          "layout_attrs": {
-            "anyOf": [
-              {
-                "additionalProperties": {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "integer"
-                    },
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "boolean"
-                    }
-                  ]
-                },
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Layout Attrs"
-          }
-        },
-        "type": "object",
-        "required": [
-          "shape"
-        ],
-        "title": "GraphNode",
-        "description": "A node in a `Graph` visualization.\n\nA node defines its identity and visual appearance (shape, label, colors, size).\nLayout coordinates (`x`, `y`) are typically filled by the layouting step, not\nby the resource author.\n\nAttributes:\n    id: Unique node id. Defaults to a generated UUID string.\n    label: Optional label shown near the node.\n    shape: Node shape identifier.\n    width: Optional node width.\n    height: Optional node height.\n    color: Optional fill color (for example hex).\n    x: Optional x-coordinate after layouting.\n    y: Optional y-coordinate after layouting.\n    border_color: Optional border/stroke color.\n    style: Visual style options.\n    label_pos: Label position relative to the node.\n    rank: Optional layout constraint (source/sink or numeric rank).\n    annotation: Optional attached visualization."
-      },
-      "GraphvizLayoutConfig": {
-        "properties": {
-          "type": {
-            "type": "string",
-            "const": "graphviz",
-            "title": "Type",
-            "default": "graphviz"
-          },
-          "engine": {
-            "type": "string",
-            "enum": [
-              "circo",
-              "dot",
-              "fdp",
-              "sfdp",
-              "neato",
-              "osage",
-              "patchwork",
-              "twopi",
-              "nop",
-              "nop2"
-            ],
-            "title": "Engine",
-            "default": "dot"
-          },
-          "graphAttrs": {
-            "anyOf": [
-              {
-                "additionalProperties": {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "integer"
-                    },
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "boolean"
-                    }
-                  ]
-                },
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Graphattrs"
-          },
-          "nodeAttrs": {
-            "anyOf": [
-              {
-                "additionalProperties": {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "integer"
-                    },
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "boolean"
-                    }
-                  ]
-                },
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Nodeattrs"
-          },
-          "edgeAttrs": {
-            "anyOf": [
-              {
-                "additionalProperties": {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "integer"
-                    },
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "boolean"
-                    }
-                  ]
-                },
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Edgeattrs"
-          }
-        },
-        "type": "object",
-        "title": "GraphvizLayoutConfig"
       },
       "HTTPValidationError": {
         "properties": {
@@ -1400,116 +754,6 @@
         ],
         "title": "MethodApi"
       },
-      "NodeStyle": {
-        "properties": {
-          "double_border": {
-            "type": "boolean",
-            "title": "Double Border",
-            "default": false
-          },
-          "inner_symbol": {
-            "anyOf": [
-              {
-                "type": "string",
-                "enum": [
-                  "triangle",
-                  "square"
-                ]
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Inner Symbol"
-          },
-          "initial_tokens": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Initial Tokens"
-          },
-          "final_tokens": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Final Tokens"
-          }
-        },
-        "type": "object",
-        "title": "NodeStyle",
-        "description": "Visual style options for a `GraphNode`.\n\nAttributes:\n    double_border: Renders a second border inside the node (e.g. final-marking places).\n    inner_symbol: Optional symbol rendered inside the node shape.\n    initial_tokens: Optional initial token count rendered inside a place node.\n    final_tokens: Optional final token count rendered inside a place node."
-      },
-      "OCArc": {
-        "properties": {
-          "source": {
-            "type": "string",
-            "title": "Source"
-          },
-          "target": {
-            "type": "string",
-            "title": "Target"
-          },
-          "weight": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Weight"
-          },
-          "variable": {
-            "type": "boolean",
-            "title": "Variable",
-            "default": false
-          }
-        },
-        "type": "object",
-        "required": [
-          "source",
-          "target"
-        ],
-        "title": "OCArc"
-      },
-      "OCDirectlyFollowsGraphViz": {
-        "properties": {
-          "type": {
-            "type": "string",
-            "const": "r4pm_ocdfg",
-            "title": "Type",
-            "default": "r4pm_ocdfg"
-          },
-          "object_type_to_dfg": {
-            "additionalProperties": {
-              "$ref": "#/components/schemas/DFG"
-            },
-            "type": "object",
-            "title": "Object Type To Dfg"
-          },
-          "object_counts": {
-            "additionalProperties": {
-              "type": "integer"
-            },
-            "type": "object",
-            "title": "Object Counts"
-          }
-        },
-        "type": "object",
-        "title": "OCDirectlyFollowsGraphViz",
-        "description": "An object-centric directly-follows graph: one DFG per object type.\n\nAttributes:\n    object_type_to_dfg: The directly-follows graph of each object type.\n    object_counts: Number of objects per object type."
-      },
       "OCELIOApi": {
         "properties": {
           "name": {
@@ -1555,137 +799,6 @@
           "type"
         ],
         "title": "OCELIOApi"
-      },
-      "OCPetriNetViz": {
-        "properties": {
-          "transitions": {
-            "items": {
-              "$ref": "#/components/schemas/Transition"
-            },
-            "type": "array",
-            "title": "Transitions"
-          },
-          "initial_marking": {
-            "additionalProperties": {
-              "type": "integer"
-            },
-            "type": "object",
-            "title": "Initial Marking"
-          },
-          "final_marking": {
-            "additionalProperties": {
-              "type": "integer"
-            },
-            "type": "object",
-            "title": "Final Marking"
-          },
-          "type": {
-            "type": "string",
-            "const": "r4pm_oc_petri_net",
-            "title": "Type",
-            "default": "r4pm_oc_petri_net"
-          },
-          "places": {
-            "items": {
-              "$ref": "#/components/schemas/OCPlace"
-            },
-            "type": "array",
-            "title": "Places"
-          },
-          "arcs": {
-            "items": {
-              "$ref": "#/components/schemas/OCArc"
-            },
-            "type": "array",
-            "title": "Arcs"
-          }
-        },
-        "type": "object",
-        "required": [
-          "arcs"
-        ],
-        "title": "OCPetriNetViz"
-      },
-      "OCPlace": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "title": "Id"
-          },
-          "object_type": {
-            "type": "string",
-            "title": "Object Type"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "object_type"
-        ],
-        "title": "OCPlace"
-      },
-      "PetriNetViz": {
-        "properties": {
-          "transitions": {
-            "items": {
-              "$ref": "#/components/schemas/Transition"
-            },
-            "type": "array",
-            "title": "Transitions"
-          },
-          "initial_marking": {
-            "additionalProperties": {
-              "type": "integer"
-            },
-            "type": "object",
-            "title": "Initial Marking"
-          },
-          "final_marking": {
-            "additionalProperties": {
-              "type": "integer"
-            },
-            "type": "object",
-            "title": "Final Marking"
-          },
-          "type": {
-            "type": "string",
-            "const": "r4pm_petri_net",
-            "title": "Type",
-            "default": "r4pm_petri_net"
-          },
-          "places": {
-            "items": {
-              "$ref": "#/components/schemas/Place"
-            },
-            "type": "array",
-            "title": "Places"
-          },
-          "arcs": {
-            "items": {
-              "$ref": "#/components/schemas/Arc"
-            },
-            "type": "array",
-            "title": "Arcs"
-          }
-        },
-        "type": "object",
-        "required": [
-          "arcs"
-        ],
-        "title": "PetriNetViz"
-      },
-      "Place": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "title": "Id"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id"
-        ],
-        "title": "Place"
       },
       "Plotly": {
         "properties": {
@@ -1758,78 +871,38 @@
       },
       "PluginOutput": {
         "properties": {
-          "result_index": {
-            "type": "integer",
-            "title": "Result Index"
-          },
-          "default_name": {
+          "id": {
             "type": "string",
-            "title": "Default Name"
+            "title": "Id"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "ocel",
+              "resource"
+            ],
+            "title": "Type"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
           },
           "type_label": {
             "type": "string",
             "title": "Type Label"
           },
-          "visualization": {
-            "anyOf": [
-              {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/Graph"
-                  },
-                  {
-                    "$ref": "#/components/schemas/TableViz"
-                  },
-                  {
-                    "$ref": "#/components/schemas/SVGVis"
-                  },
-                  {
-                    "$ref": "#/components/schemas/DotVis"
-                  },
-                  {
-                    "$ref": "#/components/schemas/Plotly"
-                  },
-                  {
-                    "$ref": "#/components/schemas/PetriNetViz"
-                  },
-                  {
-                    "$ref": "#/components/schemas/OCPetriNetViz"
-                  },
-                  {
-                    "$ref": "#/components/schemas/DirectlyFollowsGraphViz"
-                  },
-                  {
-                    "$ref": "#/components/schemas/OCDirectlyFollowsGraphViz"
-                  }
-                ],
-                "discriminator": {
-                  "propertyName": "type",
-                  "mapping": {
-                    "dot": "#/components/schemas/DotVis",
-                    "graph": "#/components/schemas/Graph",
-                    "plotly": "#/components/schemas/Plotly",
-                    "r4pm_dfg": "#/components/schemas/DirectlyFollowsGraphViz",
-                    "r4pm_oc_petri_net": "#/components/schemas/OCPetriNetViz",
-                    "r4pm_ocdfg": "#/components/schemas/OCDirectlyFollowsGraphViz",
-                    "r4pm_petri_net": "#/components/schemas/PetriNetViz",
-                    "svg": "#/components/schemas/SVGVis",
-                    "table": "#/components/schemas/TableViz"
-                  }
-                }
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Visualization"
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
           }
         },
         "type": "object",
         "required": [
-          "result_index",
-          "default_name",
+          "id",
+          "type",
+          "name",
           "type_label",
-          "visualization"
+          "created_at"
         ],
         "title": "PluginOutput"
       },
@@ -1891,9 +964,9 @@
       },
       "ResultSelection": {
         "properties": {
-          "index": {
-            "type": "integer",
-            "title": "Index"
+          "id": {
+            "type": "string",
+            "title": "Id"
           },
           "name": {
             "anyOf": [
@@ -1909,30 +982,10 @@
         },
         "type": "object",
         "required": [
-          "index",
+          "id",
           "name"
         ],
         "title": "ResultSelection"
-      },
-      "SVGVis": {
-        "properties": {
-          "type": {
-            "type": "string",
-            "const": "svg",
-            "title": "Type",
-            "default": "svg"
-          },
-          "svg": {
-            "type": "string",
-            "title": "Svg"
-          }
-        },
-        "type": "object",
-        "required": [
-          "svg"
-        ],
-        "title": "SVGVis",
-        "description": "SVG visualization.\n\nUse this visualization when you want full control over the rendered output\nby providing raw SVG markup.\n\nAttributes:\n    type: Fixed discriminator `\"svg\"`.\n    svg: SVG markup as a string."
       },
       "SavedResults": {
         "properties": {
@@ -1957,109 +1010,6 @@
           "resource_ids"
         ],
         "title": "SavedResults"
-      },
-      "TableColumn": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "title": "Id"
-          },
-          "label": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Label"
-          },
-          "data_type": {
-            "type": "string",
-            "enum": [
-              "string",
-              "number",
-              "boolean",
-              "date",
-              "datetime"
-            ],
-            "title": "Data Type",
-            "default": "string"
-          },
-          "sortable": {
-            "type": "boolean",
-            "title": "Sortable",
-            "default": true
-          },
-          "visible": {
-            "type": "boolean",
-            "title": "Visible",
-            "default": true
-          }
-        },
-        "type": "object",
-        "required": [
-          "id"
-        ],
-        "title": "TableColumn",
-        "description": "Column definition for a `TableViz` visualization.\n\nAttributes:\n    id: Column id (used as key in each row dict).\n    label: Optional human-readable column label.\n    data_type: Column data type (for example `\"string\"` or `\"number\"`).\n    sortable: Whether the column can be sorted in the frontend.\n    visible: Whether the column is visible by default."
-      },
-      "TableViz": {
-        "properties": {
-          "type": {
-            "type": "string",
-            "const": "table",
-            "title": "Type",
-            "default": "table"
-          },
-          "columns": {
-            "items": {
-              "$ref": "#/components/schemas/TableColumn"
-            },
-            "type": "array",
-            "title": "Columns"
-          },
-          "rows": {
-            "items": {
-              "additionalProperties": true,
-              "type": "object"
-            },
-            "type": "array",
-            "title": "Rows"
-          }
-        },
-        "type": "object",
-        "required": [
-          "columns",
-          "rows"
-        ],
-        "title": "TableViz",
-        "description": "Tabular visualization with typed columns and row data.\n\nRows are dictionaries keyed by `TableColumn.id`.\n\nAttributes:\n    type: Fixed discriminator `\"table\"`.\n    columns: Column definitions.\n    rows: List of row dicts."
-      },
-      "Transition": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "title": "Id"
-          },
-          "label": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Label"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id"
-        ],
-        "title": "Transition"
       },
       "ValidationError": {
         "properties": {
@@ -2100,20 +1050,6 @@
           "type"
         ],
         "title": "ValidationError"
-      },
-      "Visualization": {
-        "properties": {
-          "type": {
-            "type": "string",
-            "title": "Type"
-          }
-        },
-        "type": "object",
-        "required": [
-          "type"
-        ],
-        "title": "Visualization",
-        "description": "Base class for all frontend visualizations.\n\nA visualization is a JSON-serializable object that a `Resource.visualize()` method\ncan return so the frontend can render the resource.\n\nEvery visualization has a `type` discriminator. Concrete subclasses set `type`\nto a fixed literal value (for example `\"table\"` or `\"plotly\"`).\n\nAttributes:\n    type: Discriminator used by the frontend to select the renderer."
       }
     }
   }
