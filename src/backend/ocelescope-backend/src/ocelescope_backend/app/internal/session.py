@@ -99,11 +99,18 @@ class Session:
         ocel.to_duckdb(db_path)
         return db_path
 
-    def add_ocel(self, ocel: OCEL | Path, name: str) -> str:
+    def add_ocel(
+        self,
+        ocel: OCEL | Path,
+        name: str,
+        source_id: str | None = None,
+        hidden: bool = False,
+    ) -> str:
         """Add an OCEL to the session.
 
         ``ocel`` is either an OCEL, which is dumped, or a DuckDB file written by
-        :meth:`dump_ocel` (e.g. a plugin result), which is copied.
+        :meth:`dump_ocel` (e.g. a plugin result), which is copied. A ``hidden`` OCEL
+        is left out of :meth:`list_ocels` but can still be looked up by id.
         """
         if isinstance(ocel, OCEL):
             db_path = self.dump_ocel(ocel)
@@ -118,8 +125,11 @@ class Session:
             name=name,
             created_at=datetime.now(tz=UTC).isoformat(),
             notify=self._invalidate,
+            source_id=source_id,
+            hidden=hidden,
         )
-        self._invalidate(["ocels"])
+        if not hidden:
+            self._invalidate(["ocels"])
 
         return id
 
@@ -131,6 +141,16 @@ class Session:
         if handle is None:
             raise NotFound(f"OCEL with id {ocel_id} not found")
         return handle
+
+    def list_ocels(
+        self, source_id: str | None = None, include_hidden: bool = False
+    ) -> list[SessionOCEL]:
+        return [
+            handle
+            for handle in self.ocels.values()
+            if (include_hidden or not handle.hidden)
+            and (source_id is None or handle.source_id == source_id)
+        ]
 
     def delete_ocel(self, ocel_id: str):
         handle = self.ocels.pop(ocel_id, None)
@@ -144,7 +164,11 @@ class Session:
     # endregion
     # region Resource management
     def dump_resource(
-        self, resource: ResourceBase, name: str, source_id: str | None = None
+        self,
+        resource: ResourceBase,
+        name: str,
+        source_id: str | None = None,
+        hidden: bool = False,
     ) -> ResourceStore:
         """Dump a resource into its own file without adding it to the session."""
         path = self._resource_dir / str(uuid4())
@@ -159,6 +183,7 @@ class Session:
             name=name,
             schema_hash=resource.get_schema_hash(),
             source_id=source_id,
+            hidden=hidden,
         )
 
     def add_resource(
@@ -166,14 +191,17 @@ class Session:
         resource: ResourceBase | ResourceStore,
         name: str,
         source_id: str | None = None,
+        hidden: bool = False,
     ) -> str:
         """Add a resource to the session.
 
         ``resource`` is either a resource, which is dumped, or a store written by
-        :meth:`dump_resource` (e.g. a plugin result), whose file is copied.
+        :meth:`dump_resource` (e.g. a plugin result), whose file is copied. A
+        ``hidden`` resource is left out of :meth:`list_resources` but can still be
+        looked up by id.
         """
         if isinstance(resource, ResourceBase):
-            store = self.dump_resource(resource, name, source_id)
+            store = self.dump_resource(resource, name, source_id, hidden)
         else:
             path = self._resource_dir / str(uuid4())
             shutil.copyfile(resource.path, path)
@@ -182,11 +210,13 @@ class Session:
                 name=name,
                 schema_hash=resource.schema_hash,
                 source_id=source_id or resource.source_id,
+                hidden=hidden,
             )
 
         id = str(uuid4())
         self._resources[id] = store
-        sse_manager.send_safe(self.id, InvalidationRequest(routes=["resources"]))
+        if not hidden:
+            sse_manager.send_safe(self.id, InvalidationRequest(routes=["resources"]))
 
         return id
 
@@ -257,7 +287,9 @@ class Session:
             store.delete()
         sse_manager.send_safe(self.id, InvalidationRequest(routes=["resources"]))
 
-    def list_resources(self) -> list[ResourceApi]:
+    def list_resources(
+        self, source_id: str | None = None, include_hidden: bool = False
+    ) -> list[ResourceApi]:
         resource_types = resource_registry.resource_types()
 
         return [
@@ -268,6 +300,8 @@ class Session:
             )
             for id, resource in self._resources.items()
             if resource.schema_hash in resource_types
+            and (include_hidden or not resource.hidden)
+            and (source_id is None or resource.source_id == source_id)
         ]
 
     def rename_resource(self, id: str, new_name: str):

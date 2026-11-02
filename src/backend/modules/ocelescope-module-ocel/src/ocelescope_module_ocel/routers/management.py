@@ -30,7 +30,7 @@ def get_ocels(
 ) -> list[OcelMetadata]:
     return [
         OcelMetadata.from_handle(handle, filter_applied=handle.has_active_view)
-        for handle in session.ocels.values()
+        for handle in session.list_ocels()
     ]
 
 
