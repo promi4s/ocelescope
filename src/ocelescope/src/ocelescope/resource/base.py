@@ -121,6 +121,10 @@ class ResourceBase(ABC):
     def get_label(cls) -> str:
         return cls.label or cls.__name__
 
+    @classmethod
+    def has_visualization(cls) -> bool:
+        return cls.visualize is not ResourceBase.visualize
+
     def visualize(self) -> Visualization | None:
         """Produce a visualization for this resource.
 
