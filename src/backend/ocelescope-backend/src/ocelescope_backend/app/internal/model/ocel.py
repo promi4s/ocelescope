@@ -30,11 +30,15 @@ class SessionOCEL:
         name: str,
         created_at: str,
         notify: Notify,
+        source_id: str | None = None,
+        hidden: bool = False,
     ):
         self.id = id
         self.db_path = db_path
         self.name = name
         self.created_at = created_at
+        self.source_id = source_id
+        self.hidden = hidden
         self._notify = notify
         self._views: OrderedDict[str, SessionView] = OrderedDict()
         self.active_view_id: str | None = None

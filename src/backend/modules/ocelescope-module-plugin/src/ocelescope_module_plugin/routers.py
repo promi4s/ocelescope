@@ -127,7 +127,9 @@ def save_plugin_results(
         )
 
         if isinstance(entity, Path):
-            saved.ocel_ids.append(session.add_ocel(entity, name))
+            saved.ocel_ids.append(
+                session.add_ocel(entity, name, source_id=plugin_task.plugin_id)
+            )
         else:
             saved.resource_ids.append(session.add_resource(entity, name=name))
 

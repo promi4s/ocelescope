@@ -35,6 +35,7 @@ class ResourceStore(ResourceHeader):
     """A resource dumped into its own file at ``path``, e.g. by a session."""
 
     path: Path
+    hidden: bool = False
 
     def delete(self) -> None:
         self.path.unlink(missing_ok=True)
