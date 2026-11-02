@@ -6,7 +6,7 @@ import {
   Stack,
   Text,
 } from "@mantine/core";
-import { useResource } from "@ocelescope/api-base";
+import { useResource, useResourceVisualization } from "@ocelescope/api-base";
 import { EyeOffIcon } from "lucide-react";
 import type { ComponentProps, ComponentType } from "react";
 import type {
@@ -14,6 +14,7 @@ import type {
   VisualizationsType,
   VisualizationsTypes,
 } from "../../types";
+import { TabularView } from "./TabularView";
 import { DFGViewer, OCDFGViewer } from "./Viewers/DFG";
 import DotToSvgViewer from "./Viewers/Dot";
 import GraphViewer from "./Viewers/Graph";
@@ -69,51 +70,89 @@ export const Visualization = ({
   );
 };
 
-export const ResourceViewer: React.FC<{ id: string; isPreview?: boolean }> = ({
-  id,
-  isPreview = false,
-}) => {
-  const { data, isError } = useResource(id);
+const LoadError = () => (
+  <Center h="100%" p="md">
+    <Text c="dimmed">Could not load the visualization</Text>
+  </Center>
+);
+
+const NoVisualization: React.FC<{ resourceTypeLabel: string }> = ({
+  resourceTypeLabel,
+}) => (
+  <Center h="100%" p="md">
+    <Stack align="center" gap="xs">
+      <EyeOffIcon
+        size={64}
+        strokeWidth={1.5}
+        color="var(--mantine-color-dimmed)"
+      />
+      <Text fw={500}>No visualization available</Text>
+      <Group gap={6} justify="center">
+        <Badge size="sm" color="gray">
+          {resourceTypeLabel}
+        </Badge>
+        <Text size="sm" c="dimmed">
+          does not provide a visualization
+        </Text>
+      </Group>
+    </Stack>
+  </Center>
+);
+
+const ResourceVisualization: React.FC<{
+  id: string;
+  resourceTypeLabel: string;
+  isPreview: boolean;
+}> = ({ id, resourceTypeLabel, isPreview }) => {
+  const { data, isError, isPending } = useResourceVisualization(id);
 
   if (isError) {
-    return (
-      <Center h="100%" p="md">
-        <Text c="dimmed">Could not load the visualization</Text>
-      </Center>
-    );
+    return <LoadError />;
   }
 
-  if (!data) {
+  if (isPending) {
     return <LoadingOverlay visible />;
   }
 
-  if (!data.visualization?.type) {
-    return (
-      <Center h="100%" p="md">
-        <Stack align="center" gap="xs">
-          <EyeOffIcon
-            size={64}
-            strokeWidth={1.5}
-            color="var(--mantine-color-dimmed)"
-          />
-          <Text fw={500}>No visualization available</Text>
-          <Group gap={6} justify="center">
-            <Badge size="sm" color="gray">
-              {data.resource.resource_type_label}
-            </Badge>
-            <Text size="sm" c="dimmed">
-              does not provide a visualization
-            </Text>
-          </Group>
-        </Stack>
-      </Center>
-    );
+  if (!data) {
+    return <NoVisualization resourceTypeLabel={resourceTypeLabel} />;
   }
 
   return (
     <Visualization
-      visualization={data.visualization as VisualizationsType}
+      visualization={data as VisualizationsType}
       isPreview={isPreview}
     />
   );
+};
+
+export const ResourceViewer: React.FC<{ id: string; isPreview?: boolean }> = ({
+  id,
+  isPreview = false,
+}) => {
+  const { data: resource, isError, isPending } = useResource(id);
+
+  if (isError) {
+    return <LoadError />;
+  }
+
+  if (isPending) {
+    return <LoadingOverlay visible />;
+  }
+
+  if (resource.has_visualization) {
+    return (
+      <ResourceVisualization
+        id={id}
+        resourceTypeLabel={resource.resource_type_label}
+        isPreview={isPreview}
+      />
+    );
+  }
+
+  if (resource.kind === "tabular") {
+    return <TabularView resourceId={id} />;
+  }
+
+  return <NoVisualization resourceTypeLabel={resource.resource_type_label} />;
 };

@@ -10,7 +10,7 @@ export const ResourceModal: React.FC<{ id: string; onClose: () => void }> = ({
   const { data } = useResource(id, { query: { enabled: !!id } });
 
   return (
-    data?.resource.id && (
+    data?.id && (
       <Modal
         opened={!!data}
         onClose={onClose}
@@ -22,13 +22,13 @@ export const ResourceModal: React.FC<{ id: string; onClose: () => void }> = ({
       >
         <Stack w={"100%"} h={"100%"}>
           <Group justify="space-between">
-            <Title size={"h5"}>{data.resource.name}</Title>
+            <Title size={"h5"}>{data.name}</Title>
             <ActionIcon variant={"subtle"} color="red" onClick={onClose}>
               <XIcon />
             </ActionIcon>
           </Group>
           <Box w={"100%"} h={"100%"} flex={1} mih={0}>
-            <ResourceViewer id={data.resource.id} />
+            <ResourceViewer id={data.id} />
           </Box>
         </Stack>
       </Modal>

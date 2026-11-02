@@ -293,11 +293,7 @@ class Session:
         resource_types = resource_registry.resource_types()
 
         return [
-            ResourceApi(
-                id=id,
-                resource_type_label=resource_types[resource.schema_hash].get_label(),
-                **resource.model_dump(),
-            )
+            ResourceApi.from_store(id, resource, resource_types[resource.schema_hash])
             for id, resource in list(self._resources.items())
             if resource.schema_hash in resource_types
             and (include_hidden or not resource.hidden)

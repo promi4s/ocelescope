@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import dayjs, { formatDate, formatDateTime } from "../../../util/dayjs";
 import type { VisualizationProps } from "..";
 
-const formatCell = (
+export const formatCell = (
   value: any,
   dataType?: "string" | "number" | "boolean" | "date" | "datetime",
 ) => {

@@ -36,6 +36,7 @@
     "@floating-ui/react": "catalog:",
     "@hpcc-js/wasm-graphviz": "catalog:",
     "@mantine/core": "catalog:",
+    "@mantine/hooks": "catalog:",
     "@ocelescope/api-base": "workspace:^",
     "@r4pm/components": "catalog:",
     "@xyflow/react": "catalog:",
