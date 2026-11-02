@@ -10,9 +10,6 @@ from fastapi.sse import EventSourceResponse
 
 from ocelescope_backend.app.internal.config import config
 from ocelescope_backend.app.internal.docs import init_custom_docs
-from ocelescope_backend.app.internal.registrar import (
-    register_initial_plugins,
-)
 from ocelescope_backend.app.internal.session import Session
 from ocelescope_backend.app.internal.utils import error_handler_server
 from ocelescope_backend.app.middleware import session_access_middleware
@@ -54,7 +51,6 @@ def create_app() -> FastAPI:
     app.middleware("http")(session_access_middleware)
     app.exception_handler(Exception)(error_handler_server)
 
-    register_initial_plugins()
     mount_modules(app)
 
     for route in routes:

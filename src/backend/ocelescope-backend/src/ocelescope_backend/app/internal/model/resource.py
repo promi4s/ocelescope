@@ -3,6 +3,8 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field
 
+from ocelescope import ResourceBase
+
 
 class ResourceInfo(BaseModel):
     """Ocelescope-owned metadata of a resource held by a session."""
@@ -10,6 +12,19 @@ class ResourceInfo(BaseModel):
     name: str
     created_at: str = Field(default_factory=lambda: datetime.now(tz=UTC).isoformat())
     source_id: str | None = None
+
+
+class ResourceTypeInfo(BaseModel):
+    label: str
+    description: str | None
+
+    @classmethod
+    def from_resource_type(
+        cls, resource_type: type[ResourceBase]
+    ) -> "ResourceTypeInfo":
+        return cls(
+            label=resource_type.get_label(), description=resource_type.description
+        )
 
 
 class ResourceHeader(ResourceInfo):

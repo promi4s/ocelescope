@@ -22,6 +22,7 @@ members = [
     "ocelescope-backend",
     "ocelescope-module-filter",
     "ocelescope-module-ocel",
+    "ocelescope-module-plugin",
     "ocelescope-workspace",
 ]
 
@@ -2179,6 +2180,35 @@ wheels = [
 ]
 
 [[package]]
+name = "ocelescope-module-plugin"
+version = "0.11.0"
+source = { editable = "src/backend/modules/ocelescope-module-plugin" }
+dependencies = [
+    { name = "fastapi" },
+    { name = "ocelescope", extra = ["plugin"] },
+    { name = "ocelescope-backend" },
+    { name = "orjson" },
+    { name = "packaging" },
+    { name = "pandas" },
+    { name = "plotly" },
+    { name = "pydantic" },
+    { name = "pydantic-settings" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "fastapi", specifier = ">=0.136.0" },
+    { name = "ocelescope", extras = ["plugin"], editable = "src/ocelescope" },
+    { name = "ocelescope-backend", editable = "src/backend/ocelescope-backend" },
+    { name = "orjson", specifier = ">=3.11.3" },
+    { name = "packaging", specifier = ">=24.0" },
+    { name = "pandas", specifier = ">=2.3.1" },
+    { name = "plotly", specifier = ">=6.3.1" },
+    { name = "pydantic", specifier = ">=2.11.7" },
+    { name = "pydantic-settings", specifier = ">=2.2.1,<3" },
+]
+
+[[package]]
 name = "ocelescope-workspace"
 version = "0.11.0"
 source = { virtual = "." }
@@ -2188,6 +2218,7 @@ dependencies = [
     { name = "ocelescope-module-ocel" },
     { name = "ocelescope-module-ocelot" },
     { name = "ocelescope-module-ocpn-editor" },
+    { name = "ocelescope-module-plugin" },
 ]
 
 [package.dev-dependencies]
@@ -2217,6 +2248,7 @@ requires-dist = [
     { name = "ocelescope-module-ocel", editable = "src/backend/modules/ocelescope-module-ocel" },
     { name = "ocelescope-module-ocelot", specifier = ">=0.8.0,<0.9.0" },
     { name = "ocelescope-module-ocpn-editor", specifier = ">=0.11.0,<0.12.0" },
+    { name = "ocelescope-module-plugin", editable = "src/backend/modules/ocelescope-module-plugin" },
 ]
 
 [package.metadata.requires-dev]

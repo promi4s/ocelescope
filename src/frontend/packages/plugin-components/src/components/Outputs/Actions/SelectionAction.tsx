@@ -1,8 +1,8 @@
 import { Badge, Group, MultiSelect, Text } from "@mantine/core";
 import { generateColor } from "@marko19907/string-to-color";
-import type { PluginOutput } from "@ocelescope/api-base";
 import { CheckIcon } from "lucide-react";
 import { useMemo } from "react";
+import type { PluginOutput } from "../../../api/plugin";
 
 const OutputLabel: React.FC<{
   label: string;

@@ -4,9 +4,9 @@ from typing import Self, cast
 from pydantic import BaseModel
 
 from ocelescope import OCEL, Visualization
-from ocelescope_backend.app.internal.tasks.plugin import PluginTask
-from ocelescope_backend.app.internal.util.ocel_visualization import visualize_ocel
-from ocelescope_backend.app.internal.util.plugin_result import default_result_name
+from ocelescope_module_plugin.ocel_visualization import visualize_ocel
+from ocelescope_module_plugin.results import default_result_name
+from ocelescope_module_plugin.tasks import PluginTask
 
 
 class PluginOutput(BaseModel):
@@ -21,7 +21,9 @@ class PluginOutput(BaseModel):
         outputs: list[Self] = []
 
         for index, result in enumerate(task.result or []):
-            default_name = default_result_name(plugin_id, method_name, index)
+            default_name = default_result_name(
+                task.registry, plugin_id, method_name, index
+            )
 
             if isinstance(result, Path):
                 with OCEL.read_duckdb(result, read_only=True) as ocel:

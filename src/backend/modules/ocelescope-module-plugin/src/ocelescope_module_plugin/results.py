@@ -1,10 +1,10 @@
 from pathlib import Path
 
 from fastapi.exceptions import HTTPException
-
 from ocelescope_backend.app.internal.model.resource import ResourceStore
-from ocelescope_backend.app.internal.registry import registry_manager
-from ocelescope_backend.app.internal.tasks.plugin import PluginTask
+
+from ocelescope_module_plugin.registry import PluginRegistry
+from ocelescope_module_plugin.tasks import PluginTask
 
 
 def select_results(
@@ -25,15 +25,9 @@ def select_results(
     return selected
 
 
-def _safe_get_plugin(plugin_id: str):
-    """`registry_manager.get_plugin` raises if the plugin is no longer loaded."""
-    try:
-        return registry_manager.get_plugin(plugin_id)
-    except KeyError:
-        return None
-
-
-def default_result_name(plugin_id: str, method_name: str, index: int) -> str:
-    plugin = _safe_get_plugin(plugin_id)
+def default_result_name(
+    registry: PluginRegistry, plugin_id: str, method_name: str, index: int
+) -> str:
+    plugin = registry.get_plugin(plugin_id)
     base = plugin.get_name() if plugin else plugin_id
     return f"{base}_{method_name}_{index}"

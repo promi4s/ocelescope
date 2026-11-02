@@ -8,23 +8,22 @@ from typing import (
     ParamSpec,
 )
 
-from typing_extensions import TypedDict
-
-from ocelescope import OCEL, ResourceBase
 from ocelescope_backend.app.internal.model.resource import ResourceStore
-from ocelescope_backend.app.internal.registry import registry_manager
-from ocelescope_backend.app.internal.registry.plugin import PluginNotFound
 from ocelescope_backend.app.internal.tasks.base import (
     TaskBase,
     TaskState,
     TaskSummary,
     call_with_known_params,
 )
-from ocelescope_backend.app.internal.util.hashing import generate_tuple_hash
 from ocelescope_backend.app.sse_manager import (
     ErrorNotification,
     sse_manager,
 )
+from typing_extensions import TypedDict
+
+from ocelescope import OCEL, ResourceBase
+from ocelescope_module_plugin.hashing import generate_tuple_hash
+from ocelescope_module_plugin.registry import PluginNotFound, PluginRegistry
 
 if TYPE_CHECKING:
     from ocelescope_backend.app.internal.session import Session
@@ -50,8 +49,10 @@ class PluginTask(TaskBase, Generic[P]):
         method_label: str,
         session: "Session",
         input: PluginInput,
+        registry: PluginRegistry,
     ):
         super().__init__()
+        self.registry = registry
         self.plugin_id = plugin_id
         self.method_name = method_name
         self.method_label = method_label
@@ -64,16 +65,14 @@ class PluginTask(TaskBase, Generic[P]):
         kwargs: dict[str, Any] = {}
         entities: list[OCEL | ResourceBase] = []
         try:
-            plugin = registry_manager.get_plugin(self.plugin_id)
+            plugin = self.registry.get_plugin(self.plugin_id)
 
             if plugin is None:
                 raise PluginNotFound(self.plugin_id)
 
-            method = registry_manager.get_plugin_method(
-                self.plugin_id, self.method_name
-            )
+            method = self.registry.get_method(self.plugin_id, self.method_name)
 
-            kwargs = registry_manager.get_plugin_method_kwargs(
+            kwargs = self.registry.get_plugin_kwargs(
                 session=self.session,
                 plugin_id=self.plugin_id,
                 method_name=self.method_name,
@@ -145,11 +144,12 @@ class PluginTask(TaskBase, Generic[P]):
     def create_plugin_task(
         cls,
         session: "Session",
+        registry: PluginRegistry,
         plugin_id: str,
         method_name: str,
         input: PluginInput,
     ) -> str:
-        method = registry_manager.get_plugin_method(plugin_id, method_name)
+        method = registry.get_method(plugin_id, method_name)
 
         ocel_fields = [input.name for input in method.inputs if input.io_type == "ocel"]
 
@@ -174,6 +174,7 @@ class PluginTask(TaskBase, Generic[P]):
             method_name=method_name,
             method_label=method.label,
             input=input,
+            registry=registry,
         )
         session.tasks[task.id] = task
         session._dedupe_keys[key] = task.id

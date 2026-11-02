@@ -11,7 +11,7 @@ const ROUTE_PATH: Record<InvalidationRouteName, string> = {
   ocels: "modules/ocel/",
   resources: "resources",
   tasks: "tasks",
-  plugins: "plugins",
+  plugins: "modules/plugin/",
   discoveryMethods: "discovery/methods",
 };
 

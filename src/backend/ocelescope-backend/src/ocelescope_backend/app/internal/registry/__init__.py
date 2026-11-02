@@ -1,3 +1,4 @@
-from ocelescope_backend.app.internal.registry.registry_manager import registry_manager
+from ocelescope_backend.app.internal.registry.archive import archive_handlers
+from ocelescope_backend.app.internal.registry.resource import resource_registry
 
-__all__ = ["registry_manager"]
+__all__ = ["archive_handlers", "resource_registry"]

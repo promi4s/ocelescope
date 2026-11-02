@@ -1,3 +1,4 @@
+export * from "./api/plugin";
 export { usePluginForm } from "./components/Form/context";
 export {
   default as PluginForm,

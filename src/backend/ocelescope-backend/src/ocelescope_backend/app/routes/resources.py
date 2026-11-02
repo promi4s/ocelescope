@@ -7,10 +7,9 @@ from pydantic.main import BaseModel
 
 from ocelescope import PetriNet, Visualization
 from ocelescope_backend.app.dependencies import ApiSession
-from ocelescope_backend.app.internal.model.resource import ResourceApi
+from ocelescope_backend.app.internal.model.resource import ResourceApi, ResourceTypeInfo
 from ocelescope_backend.app.internal.model.response import TempFileResponse
-from ocelescope_backend.app.internal.registry import registry_manager
-from ocelescope_backend.app.internal.registry.registry_manager import ResourceInfo
+from ocelescope_backend.app.internal.registry import resource_registry
 
 resource_router = APIRouter(prefix="/resources", tags=["resources"])
 
@@ -27,8 +26,11 @@ def get_resources(
 
 
 @resource_router.get(path="/meta", operation_id="getResourceMeta")
-def get_resource_meta() -> dict[str, ResourceInfo]:
-    return registry_manager.get_resource_info()
+def get_resource_meta() -> dict[str, ResourceTypeInfo]:
+    return {
+        schema_hash: ResourceTypeInfo.from_resource_type(resource_type)
+        for schema_hash, resource_type in resource_registry.resource_types().items()
+    }
 
 
 @resource_router.get(

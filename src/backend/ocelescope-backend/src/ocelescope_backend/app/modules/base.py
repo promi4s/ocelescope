@@ -1,13 +1,21 @@
+from __future__ import annotations
+
 import logging
+import zipfile
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import ClassVar
+from typing import TYPE_CHECKING, ClassVar
 
 from fastapi import FastAPI
 from packaging.version import Version
 
 from ocelescope import Resource
 from ocelescope_backend.app.modules.context import ModuleContext, ModuleRegistry
+
+if TYPE_CHECKING:
+    from ocelescope_backend.app.internal.session import Session
+    from ocelescope_backend.app.internal.tasks.system_tasks import ImportMetadata
+    from ocelescope_backend.app.sse_manager import SSEMessage
 
 
 @dataclass(frozen=True)
@@ -34,3 +42,8 @@ class Module(ABC):
     @abstractmethod
     def create_app(self) -> FastAPI:
         raise NotImplementedError
+
+    def import_archive(
+        self, session: Session, archive: zipfile.ZipFile, metadata: ImportMetadata
+    ) -> list[SSEMessage] | None:
+        return None

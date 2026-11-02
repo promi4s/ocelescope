@@ -12,9 +12,9 @@ import {
   ThemeIcon,
   UnstyledButton,
 } from "@mantine/core";
-import type { PluginApi } from "@ocelescope/api-base";
-import { useDeletePlugin } from "@ocelescope/api-base";
 import { FullScreenUpload, getModuleRoute } from "@ocelescope/core";
+import type { PluginApi } from "@ocelescope/plugin-components";
+import { useDeletePlugin } from "@ocelescope/plugin-components";
 import {
   ChevronRightIcon,
   EllipsisVerticalIcon,

@@ -2,7 +2,7 @@ import {
   type OCELIOApi,
   type ResourceIOApi,
   usePlugins,
-} from "@ocelescope/api-base";
+} from "@ocelescope/plugin-components";
 import { useMemo } from "react";
 
 export const useDiscoveryMethods = () => {

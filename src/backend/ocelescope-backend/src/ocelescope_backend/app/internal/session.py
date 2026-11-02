@@ -15,7 +15,7 @@ from ocelescope_backend.app.internal.exceptions import BadRequest, NotFound
 from ocelescope_backend.app.internal.model.ocel import SessionOCEL
 from ocelescope_backend.app.internal.model.resource import ResourceApi, ResourceStore
 from ocelescope_backend.app.internal.model.state import StateStore
-from ocelescope_backend.app.internal.registry import registry_manager
+from ocelescope_backend.app.internal.registry import resource_registry
 from ocelescope_backend.app.internal.tasks.base import TaskBase
 from ocelescope_backend.app.sse_manager import InvalidationRequest, Route, sse_manager
 
@@ -199,7 +199,7 @@ class Session:
         self, store: ResourceStore, resource_class: type[R] | None
     ) -> type[R | ResourceBase]:
         if resource_class is None:
-            return registry_manager.get_resource_class(store.schema_hash)
+            return resource_registry.get_resource_class(store.schema_hash)
         if store.schema_hash != resource_class.get_schema_hash():
             raise BadRequest(f"Resource is not a {resource_class.__name__}.")
         return resource_class
@@ -221,7 +221,7 @@ class Session:
         """
         store = self.get_resource(id)
         return self._resource_class(store, resource_class).load(
-            store.path, resolve=registry_manager.get_resource_class
+            store.path, resolve=resource_registry.get_resource_class
         )
 
     @overload
@@ -247,7 +247,7 @@ class Session:
     ) -> Generator[R | ResourceBase]:
         """A read-only view on a dumped resource, valid for the block."""
         with self._resource_class(store, resource_class).open(
-            store.path, resolve=registry_manager.get_resource_class
+            store.path, resolve=resource_registry.get_resource_class
         ) as resource:
             yield resource
 
@@ -258,16 +258,16 @@ class Session:
         sse_manager.send_safe(self.id, InvalidationRequest(routes=["resources"]))
 
     def list_resources(self) -> list[ResourceApi]:
-        resource_info = registry_manager.get_resource_info()
+        resource_types = resource_registry.resource_types()
 
         return [
             ResourceApi(
                 id=id,
-                resource_type_label=resource_info[resource.schema_hash]["label"],
+                resource_type_label=resource_types[resource.schema_hash].get_label(),
                 **resource.model_dump(),
             )
             for id, resource in self._resources.items()
-            if resource.schema_hash in resource_info
+            if resource.schema_hash in resource_types
         ]
 
     def rename_resource(self, id: str, new_name: str):

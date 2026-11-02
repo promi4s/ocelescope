@@ -1,7 +1,7 @@
 import { Button } from "@mantine/core";
-import type { PluginOutput } from "@ocelescope/api-base";
 import { CheckIcon, DatabaseIcon } from "lucide-react";
 import { useState } from "react";
+import type { PluginOutput } from "../../../api/plugin";
 import { useSaveOutputs } from "../../../hooks/useSaveOutputs";
 import { SaveOutputsModal } from "../SaveOutputsModal";
 

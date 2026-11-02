@@ -1,8 +1,5 @@
-import {
-  type ResultSelection,
-  useSavePluginResults,
-} from "@ocelescope/api-base";
 import { useCallback, useMemo, useState } from "react";
+import { type ResultSelection, useSavePluginResults } from "../api/plugin";
 
 export const useSaveOutputs = ({ taskId }: { taskId: string }) => {
   const { mutate: saveOutputs, isPending: isSaving } = useSavePluginResults();

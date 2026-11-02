@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from ocelescope import Resource
+from ocelescope import ResourceBase
 
 if TYPE_CHECKING:
     from ocelescope_backend.app.internal.registry.resource import ResourceRegistry
@@ -26,7 +27,7 @@ class ModuleRegistry:
         return f"{self._source_id}:{namespace}" if namespace else self._source_id
 
     def load(
-        self, resources: list[type[Resource]], namespace: str | None = None
+        self, resources: Sequence[type[ResourceBase]], namespace: str | None = None
     ) -> None:
         source_id = self.get_source_id(namespace)
         for resource in resources:

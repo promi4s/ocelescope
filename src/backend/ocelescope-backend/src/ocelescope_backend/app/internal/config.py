@@ -1,6 +1,6 @@
 from typing import Literal
 
-from pydantic import DirectoryPath, Field
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 """
@@ -25,11 +25,6 @@ class OceanConfig(BaseSettings):
     EXPOSE_ERROR_DETAILS: bool = Field(
         default=False,
         description="When set to True, passes details of internal errors via the API. Always set to False in production environment.",
-    )
-
-    PLUGIN_DIR: DirectoryPath | None = Field(
-        default=None,
-        description="Path to the directory, where plugins are stored",
     )
 
     ARCHIVE_MAX_FILES: int = Field(

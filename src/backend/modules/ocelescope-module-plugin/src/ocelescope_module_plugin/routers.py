@@ -9,45 +9,48 @@ from fastapi import Body
 from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
 from ocelescope.ocel.io import export_duckdb_ocel
-from pydantic import BaseModel
-
-from ocelescope_backend.app.dependencies import ApiPluginTask, ApiSession
-from ocelescope_backend.app.internal.config import config
+from ocelescope_backend.app.dependencies import ApiSession
 from ocelescope_backend.app.internal.exceptions import NotFound
-from ocelescope_backend.app.internal.model.plugin import MethodApi, PluginApi
-from ocelescope_backend.app.internal.model.plugin_result import (
-    PluginOutput,
-    ResultSelection,
-)
 from ocelescope_backend.app.internal.model.response import TempFileResponse
-from ocelescope_backend.app.internal.registry import registry_manager
 from ocelescope_backend.app.internal.registry.resource import RegistryError
 from ocelescope_backend.app.internal.tasks.base import call_with_known_params
-from ocelescope_backend.app.internal.tasks.plugin import PluginTask
-from ocelescope_backend.app.internal.util.plugin_result import (
-    default_result_name,
-    select_results,
-)
 from ocelescope_backend.app.sse_manager import (
     InvalidationRequest,
     sse_manager,
 )
+from pydantic import BaseModel
 
-plugin_router = APIRouter(prefix="/plugins", tags=["plugins"])
+from ocelescope_module_plugin.config import config
+from ocelescope_module_plugin.dependencies import ApiPluginRegistry, ApiPluginTask
+from ocelescope_module_plugin.models.plugin import MethodApi, PluginApi
+from ocelescope_module_plugin.models.plugin_result import (
+    PluginOutput,
+    ResultSelection,
+)
+from ocelescope_module_plugin.registry import PluginRegistry
+from ocelescope_module_plugin.results import (
+    default_result_name,
+    select_results,
+)
+from ocelescope_module_plugin.tasks import PluginTask
+
+router = APIRouter(tags=["plugins"])
 
 
-@plugin_router.get("", operation_id="plugins")
-def get_plugins(include_base: bool = False) -> list[PluginApi]:
+@router.get("/plugins", operation_id="plugins")
+def get_plugins(
+    registry: ApiPluginRegistry, include_base: bool = False
+) -> list[PluginApi]:
     return [
         plugin
-        for plugin in registry_manager.list_plugins()
-        if include_base or plugin.id != registry_manager.BASE_PLUGIN_ID
+        for plugin in registry.list_plugins()
+        if include_base or plugin.id != PluginRegistry.BASE_PLUGIN_ID
     ]
 
 
-@plugin_router.get("/plugin/{plugin_id}", operation_id="getPlugin")
-def get_plugin(plugin_id: str) -> PluginApi | None:
-    plugin = registry_manager.get_plugin(plugin_id)
+@router.get("/plugin/{plugin_id}", operation_id="getPlugin")
+def get_plugin(registry: ApiPluginRegistry, plugin_id: str) -> PluginApi | None:
+    plugin = registry.get_plugin(plugin_id)
 
     if not plugin:
         raise NotFound(f"No plugin found for {plugin_id!r}")
@@ -55,20 +58,21 @@ def get_plugin(plugin_id: str) -> PluginApi | None:
     return PluginApi.from_plugin(plugin_id, plugin)
 
 
-@plugin_router.get("/plugin/{plugin_id}/{method_name}", operation_id="getPluginMethod")
-def get_plugin_method(plugin_id: str, method_name: str) -> MethodApi | None:
+@router.get("/plugin/{plugin_id}/{method_name}", operation_id="getPluginMethod")
+def get_plugin_method(
+    registry: ApiPluginRegistry, plugin_id: str, method_name: str
+) -> MethodApi | None:
     try:
-        return MethodApi.from_method_meta(
-            registry_manager.get_plugin_method(plugin_id, method_name)
-        )
+        return MethodApi.from_method_meta(registry.get_method(plugin_id, method_name))
     except Exception:
         pass
 
 
-@plugin_router.post("/plugin/{plugin_id}/{method_name}", operation_id="runPlugin")
+@router.post("/plugin/{plugin_id}/{method_name}", operation_id="runPlugin")
 def run_plugin(
     input_resources: dict[str, str | None],
     session: ApiSession,
+    registry: ApiPluginRegistry,
     plugin_id: str,
     method_name: str,
     input: dict[str, Any] | None = None,
@@ -76,6 +80,7 @@ def run_plugin(
     try:
         return PluginTask.create_plugin_task(
             session,
+            registry,
             plugin_id=plugin_id,
             method_name=method_name,
             input={"input": input or {}, "input_resources": input_resources},
@@ -84,7 +89,7 @@ def run_plugin(
         raise NotFound(str(error))
 
 
-@plugin_router.get("/task/{task_id}", operation_id="PluginResult")
+@router.get("/task/{task_id}", operation_id="PluginResult")
 def get_plugin_result(
     plugin_task: ApiPluginTask,
 ) -> list[PluginOutput] | None:
@@ -99,7 +104,7 @@ class SavedResults(BaseModel):
     resource_ids: list[str]
 
 
-@plugin_router.post(
+@router.post(
     "/task/{task_id}/save",
     operation_id="savePluginResults",
 )
@@ -115,6 +120,7 @@ def save_plugin_results(
 
     for result, (index, entity) in zip(selection, selected, strict=True):
         name = result.name or default_result_name(
+            registry=plugin_task.registry,
             plugin_id=plugin_task.plugin_id,
             method_name=plugin_task.method_name,
             index=index,
@@ -128,7 +134,7 @@ def save_plugin_results(
     return saved
 
 
-@plugin_router.post(
+@router.post(
     "/task/{task_id}/download",
     operation_id="downloadPluginResults",
 )
@@ -161,7 +167,9 @@ def download_plugin_results(
 
     with zipfile.ZipFile(file_response.tmp_path, "w", zipfile.ZIP_DEFLATED) as archive:
         for index, entity in selected:
-            name = default_result_name(plugin_id, method_name, index)
+            name = default_result_name(
+                plugin_task.registry, plugin_id, method_name, index
+            )
 
             if isinstance(entity, Path):
                 with NamedTemporaryFile(suffix=".json") as ocel_file:
@@ -180,7 +188,7 @@ def download_plugin_results(
     return file_response
 
 
-@plugin_router.post(
+@router.post(
     "/plugin/{plugin_id}/{method_name}/computed/{provider}",
     operation_id="getComputedValues",
 )
@@ -188,12 +196,13 @@ def get_computed(
     input_resources: dict[str, str | None],
     configuration_input: dict[str, Any],
     session: ApiSession,
+    registry: ApiPluginRegistry,
     plugin_id: str,
     provider: str,
     method_name: str,
 ) -> list[str]:
     try:
-        method = registry_manager.get_plugin_method(plugin_id, method_name)
+        method = registry.get_method(plugin_id, method_name)
     except RegistryError as error:
         raise NotFound(str(error))
 
@@ -203,7 +212,7 @@ def get_computed(
         raise NotFound(f"{method_name}.{provider} not found")
 
     try:
-        with registry_manager.get_computed_kwargs(
+        with registry.computed_kwargs(
             session=session,
             plugin_id=plugin_id,
             method_name=method_name,
@@ -216,8 +225,8 @@ def get_computed(
         return []
 
 
-@plugin_router.delete("/plugin/{plugin_id}", operation_id="deletePlugin")
-def delete_plugin(plugin_id: str, session: ApiSession):
+@router.delete("/plugin/{plugin_id}", operation_id="deletePlugin")
+def delete_plugin(registry: ApiPluginRegistry, plugin_id: str, session: ApiSession):
     if not config.PLUGIN_DIR:
         raise HTTPException(status_code=404, detail="Plugin files not found")
 
@@ -226,7 +235,7 @@ def delete_plugin(plugin_id: str, session: ApiSession):
     if not plugin_path.exists():
         raise HTTPException(status_code=404, detail="Plugin files not found")
 
-    registry_manager.unload_plugins([plugin_id])
+    registry.unload_module(plugin_id)
 
     shutil.rmtree(plugin_path, ignore_errors=True)
 

@@ -1,26 +1,25 @@
-import shutil
-import tempfile
 import traceback
 import zipfile
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import Literal
-from uuid import uuid4
 
 from typing_extensions import TypedDict
 
 from ocelescope import OCEL, ResourceBase
 from ocelescope_backend.app.internal.config import config
-from ocelescope_backend.app.internal.registry import registry_manager
+from ocelescope_backend.app.internal.registry import (
+    archive_handlers,
+    resource_registry,
+)
 from ocelescope_backend.app.internal.session import Session
 from ocelescope_backend.app.internal.tasks.system import system_task
 from ocelescope_backend.app.internal.util.archive import (
     ArchiveContents,
     ArchiveError,
-    ArchiveKind,
-    extract_archive,
+    classify_archive,
     extract_member,
-    inspect_archive,
+    validate_archive,
 )
 from ocelescope_backend.app.sse_manager import (
     ErrorNotification,
@@ -111,119 +110,11 @@ def import_xes_task(
     return _import_xes(session, file_path, metadata)
 
 
-def _inspect_zip(file_path: Path) -> tuple[zipfile.ZipFile, ArchiveContents]:
+def _open_zip(file_path: Path) -> zipfile.ZipFile:
     try:
-        archive = zipfile.ZipFile(file_path, "r")
+        return zipfile.ZipFile(file_path, "r")
     except zipfile.BadZipFile as exc:
         raise ArchiveError("The uploaded file is not a valid zip archive") from exc
-
-    try:
-        contents = inspect_archive(
-            archive,
-            max_files=config.ARCHIVE_MAX_FILES,
-            max_uncompressed_bytes=config.ARCHIVE_MAX_UNCOMPRESSED_BYTES,
-        )
-    except Exception:
-        archive.close()
-        raise
-    return archive, contents
-
-
-def _import_plugin_archive(
-    session: Session,
-    file_path: Path,
-    metadata: ImportMetadata,
-    archive: zipfile.ZipFile | None = None,
-) -> list[SystemNotification | ErrorNotification | InvalidationRequest]:
-    added_plugin_ids = []
-
-    if not config.PLUGIN_DIR:
-        raise RuntimeError("Plugin uploads are disabled on this deployment")
-
-    with tempfile.TemporaryDirectory() as temp_dir:
-        owns_archive = archive is None
-        if archive is None:
-            archive, contents = _inspect_zip(file_path)
-            if contents.kind != ArchiveKind.PLUGIN:
-                archive.close()
-                raise ArchiveError("The uploaded archive is not a plugin")
-
-        try:
-            extract_archive(
-                archive,
-                Path(temp_dir),
-                max_uncompressed_bytes=config.ARCHIVE_MAX_UNCOMPRESSED_BYTES,
-            )
-        finally:
-            if owns_archive:
-                archive.close()
-
-        for plugin_candidate in Path(temp_dir).iterdir():
-            if (
-                plugin_candidate.is_dir()
-                and (plugin_candidate / "__init__.py").exists()
-            ):
-                plugin_id = f"plugin_{uuid4()!s}"
-                shutil.move(plugin_candidate, config.PLUGIN_DIR / plugin_id)
-                added_plugin_ids.append(plugin_id)
-    results: list[SystemNotification | ErrorNotification | InvalidationRequest] = []
-    loaded_plugin_ids: list[str] = []
-    for plugin_id in added_plugin_ids:
-        try:
-            loaded_plugin_ids.extend(
-                registry_manager.load_plugins([plugin_id], ignore_errors=False)
-            )
-        except Exception as exc:
-            results.append(
-                ErrorNotification(
-                    type="error",
-                    title=f"Error while uploading plugin {metadata['fileName']}",
-                    message=str(exc),
-                    trace=traceback.format_exc(),
-                )
-            )
-
-    loaded_plugins = [
-        plugin.label
-        for id in loaded_plugin_ids
-        if (plugin := registry_manager.get_plugin(id)) is not None
-    ]
-
-    if len(loaded_plugins) == 0:
-        if not results:
-            results.append(
-                SystemNotification(
-                    type="notification",
-                    title="Uploaded zip didn't contain any plugins",
-                    notification_type="error",
-                    message=f"The uploaded file {metadata['fileName']} did not contain any valid plugins",
-                )
-            )
-        return results
-
-    results.extend(
-        [
-            SystemNotification(
-                title="Plugin successfully uploaded",
-                message=f"Successfully uploaded {' '.join(loaded_plugins)}",
-                notification_type="info",
-            ),
-            InvalidationRequest(routes=["plugins", "tasks", "discoveryMethods"]),
-        ]
-    )
-    return results
-
-
-@system_task(name="importPlugin")
-def import_plugin(
-    session: Session,
-    file_path: Path,
-    metadata: ImportMetadata,
-):
-    try:
-        return _import_plugin_archive(session, file_path, metadata)
-    finally:
-        file_path.unlink(missing_ok=True)
 
 
 def _archived_member_suffix(filename: str) -> str:
@@ -241,11 +132,11 @@ def _import_resource(
             if size > config.ARCHIVE_MAX_UNCOMPRESSED_BYTES:
                 raise ArchiveError("The uploaded resource is too large to unpack")
 
-        resource_class = registry_manager.get_resource_class(
+        resource_class = resource_registry.get_resource_class(
             ResourceBase.read_schema_hash(file_path)
         )
         with resource_class.read(
-            file_path, resolve=registry_manager.get_resource_class
+            file_path, resolve=resource_registry.get_resource_class
         ) as resource:
             session.add_resource(resource, name=name)
     finally:
@@ -342,13 +233,20 @@ def import_archive(
     metadata: ImportMetadata,
 ):
     try:
-        archive, contents = _inspect_zip(file_path)
-        with archive:
-            if contents.kind == ArchiveKind.PLUGIN:
-                return _import_plugin_archive(
-                    session, file_path, metadata, archive=archive
-                )
-            return _import_archived_data(session, archive, contents, metadata)
+        with _open_zip(file_path) as archive:
+            members = validate_archive(
+                archive,
+                max_files=config.ARCHIVE_MAX_FILES,
+                max_uncompressed_bytes=config.ARCHIVE_MAX_UNCOMPRESSED_BYTES,
+            )
+
+            for handler in archive_handlers:
+                if (results := handler(session, archive, metadata)) is not None:
+                    return results
+
+            return _import_archived_data(
+                session, archive, classify_archive(members), metadata
+            )
     finally:
         file_path.unlink(missing_ok=True)
 
