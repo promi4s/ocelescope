@@ -6,7 +6,7 @@ from fastapi import Query
 from fastapi.routing import APIRouter
 from pydantic import TypeAdapter, ValidationError
 
-from ocelescope import PetriNet, TabularResource, Visualization
+from ocelescope import PetriNet, Visualization
 from ocelescope_backend.app.dependencies import ApiSession
 from ocelescope_backend.app.internal.exceptions import BadRequest
 from ocelescope_backend.app.internal.model.base import PaginatedResponse
@@ -91,13 +91,8 @@ def download_resource_as_pnml(
     path="/resource/{resource_id}/tables", operation_id="resourceTables"
 )
 def get_resource_tables(session: ApiSession, resource_id: str) -> list[ResourceTable]:
-    resource = session.get_resource(resource_id)
-    resource_type = resource_registry.get_resource_class(resource.schema_hash)
-
-    if not issubclass(resource_type, TabularResource):
-        raise BadRequest("Resource is not tabular.")
-
-    return ResourceTable.from_resource_type(resource_type)
+    with session.open_resource(resource_id) as resource:
+        return ResourceTable.from_resource(as_tabular(resource))
 
 
 @resource_router.get(

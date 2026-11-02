@@ -1,7 +1,7 @@
 from collections import defaultdict
-from typing import TypeVar
+from typing import ClassVar, TypeVar
 
-from ocelescope import ResourceBase
+from ocelescope import DirectlyFollowsGraph, OCELMapping, PetriNet, ResourceBase
 
 T = TypeVar("T", bound=ResourceBase)
 
@@ -28,10 +28,20 @@ class ResourceNotRegistered(RegistryError):
 
 
 class ResourceRegistry:
+    CORE_SOURCE_ID: ClassVar[str] = "core"
+    CORE_RESOURCES: ClassVar[list[type[ResourceBase]]] = [
+        DirectlyFollowsGraph,
+        OCELMapping,
+        PetriNet,
+    ]
+
     def __init__(self) -> None:
         self.resources: defaultdict[str, dict[str, type[ResourceBase]]] = defaultdict(
             dict
         )
+
+        for resource_class in self.CORE_RESOURCES:
+            self.register_resource(self.CORE_SOURCE_ID, resource_class)
 
     def register_resource(self, source_id: str, resource_class: type[T]):
         self.resources[resource_class.get_schema_hash()][source_id] = resource_class

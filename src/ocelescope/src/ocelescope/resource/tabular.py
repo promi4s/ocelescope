@@ -28,6 +28,8 @@ COLUMN_TYPE = Literal[
     "float",
     "str",
     "timestamp",
+    "bool",
+    "date",
 ]
 
 COLUMN_TYPES_TO_MAP: dict[COLUMN_TYPE, DuckDBPyType] = {
@@ -35,10 +37,41 @@ COLUMN_TYPES_TO_MAP: dict[COLUMN_TYPE, DuckDBPyType] = {
     "float": DuckDBPyType(float),
     "str": DuckDBPyType(str),
     "timestamp": DuckDBPyType("TIMESTAMP"),
+    "bool": DuckDBPyType(bool),
+    "date": DuckDBPyType("DATE"),
 }
+
+INT_DUCKDB_TYPES = {
+    "tinyint",
+    "smallint",
+    "integer",
+    "bigint",
+    "hugeint",
+    "utinyint",
+    "usmallint",
+    "uinteger",
+    "ubigint",
+    "uhugeint",
+}
+FLOAT_DUCKDB_TYPES = {"float", "double", "decimal"}
 
 MANIFEST_FILE = "manifest.json"
 SET_VIEW = "_ocelescope_set"
+
+
+def _to_column_type(duckdb_type: DuckDBPyType) -> COLUMN_TYPE:
+    type_id = duckdb_type.id
+    if type_id in INT_DUCKDB_TYPES:
+        return "int"
+    if type_id in FLOAT_DUCKDB_TYPES:
+        return "float"
+    if type_id == "boolean":
+        return "bool"
+    if type_id == "date":
+        return "date"
+    if type_id.startswith("timestamp"):
+        return "timestamp"
+    return "str"
 
 
 class TabularResourceError(Exception):
@@ -66,7 +99,7 @@ class Table:
     def __init__(
         self,
         schema: list[tuple[str, COLUMN_TYPE]],
-        extra_columns: Literal["ignore", "raise"] = "ignore",
+        extra_columns: Literal["ignore", "keep", "raise"] = "ignore",
     ):
         self.schema = schema
         self.extra_columns = extra_columns
@@ -107,6 +140,19 @@ class Table:
                 table_name=self.table_name, table_ddl=table_desc, schema_ddl=schema
             )
 
+    def get_extra_columns(
+        self, con: DuckDBPyConnection
+    ) -> list[tuple[str, COLUMN_TYPE]]:
+        """The columns beyond the schema, with their types, if this table keeps any."""
+        if self.extra_columns != "keep":
+            return []
+        declared = {col_name for col_name, _ in self.schema}
+        return [
+            (column[0], _to_column_type(column[1]))
+            for column in con.table(self.table_name).description
+            if column[0] not in declared
+        ]
+
     def __get__(self, obj: "TabularResource | None", owner=None):
         if obj is None:
             return self
@@ -117,7 +163,8 @@ class Table:
 
         ``value`` can be anything DuckDB can scan: a pandas or polars DataFrame,
         an Arrow table or a ``DuckDBPyRelation``. Its schema columns are cast to
-        the declared types; any other columns are dropped.
+        the declared types; any other columns are dropped, unless ``extra_columns``
+        is ``"keep"``.
         """
         try:
             obj.con.register(SET_VIEW, value)
@@ -126,13 +173,20 @@ class Table:
                 raise
             obj.con.register(SET_VIEW, value.arrow())
 
-        columns = ", ".join(
+        columns = [
             f"CAST({ident(col_name)} AS {COLUMN_TYPES_TO_MAP[col_type]}) AS {ident(col_name)}"
             for (col_name, col_type) in self.schema
-        )
+        ]
         try:
+            if self.extra_columns == "keep":
+                declared = {col_name for col_name, _ in self.schema}
+                columns += [
+                    ident(col_name)
+                    for col_name in obj.con.sql(f"FROM {SET_VIEW}").columns
+                    if col_name not in declared
+                ]
             obj.con.sql(
-                f"CREATE OR REPLACE TABLE {ident(self.table_name)} AS SELECT {columns} FROM {SET_VIEW}"
+                f"CREATE OR REPLACE TABLE {ident(self.table_name)} AS SELECT {', '.join(columns)} FROM {SET_VIEW}"
             )
         finally:
             obj.con.unregister(SET_VIEW)

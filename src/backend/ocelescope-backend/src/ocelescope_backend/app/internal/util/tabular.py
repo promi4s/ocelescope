@@ -17,7 +17,10 @@ def _column_names(resource: TabularResource, table_name: str) -> list[str]:
     table = resource.tables.get(table_name)
     if table is None:
         raise NotFound(f"Table {table_name} not found")
-    return [column_name for column_name, _ in table.schema]
+    return [
+        column_name
+        for column_name, _ in [*table.schema, *table.get_extra_columns(resource.con)]
+    ]
 
 
 def query_table(
