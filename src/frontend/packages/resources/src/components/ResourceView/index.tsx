@@ -1,4 +1,11 @@
-import { LoadingOverlay, Stack, ThemeIcon } from "@mantine/core";
+import {
+  Badge,
+  Center,
+  Group,
+  LoadingOverlay,
+  Stack,
+  Text,
+} from "@mantine/core";
 import { useResource } from "@ocelescope/api-base";
 import { EyeOffIcon } from "lucide-react";
 import type { ComponentProps, ComponentType } from "react";
@@ -66,19 +73,40 @@ export const ResourceViewer: React.FC<{ id: string; isPreview?: boolean }> = ({
   id,
   isPreview = false,
 }) => {
-  const { data } = useResource(id);
+  const { data, isError } = useResource(id);
+
+  if (isError) {
+    return (
+      <Center h="100%" p="md">
+        <Text c="dimmed">Could not load the visualization</Text>
+      </Center>
+    );
+  }
 
   if (!data) {
-    return <LoadingOverlay />;
+    return <LoadingOverlay visible />;
   }
 
   if (!data.visualization?.type) {
     return (
-      <Stack justify="center" align="center" h={"100%"}>
-        <ThemeIcon w={150} h={150} variant="transparent" color="gray">
-          <EyeOffIcon width={150} height={150} />
-        </ThemeIcon>
-      </Stack>
+      <Center h="100%" p="md">
+        <Stack align="center" gap="xs">
+          <EyeOffIcon
+            size={64}
+            strokeWidth={1.5}
+            color="var(--mantine-color-dimmed)"
+          />
+          <Text fw={500}>No visualization available</Text>
+          <Group gap={6} justify="center">
+            <Badge size="sm" color="gray">
+              {data.resource.resource_type_label}
+            </Badge>
+            <Text size="sm" c="dimmed">
+              does not provide a visualization
+            </Text>
+          </Group>
+        </Stack>
+      </Center>
     );
   }
 

@@ -7,6 +7,7 @@ from typing import (
     ParamSpec,
 )
 
+from ocelescope_backend.app.internal.registry import resource_registry
 from ocelescope_backend.app.internal.tasks.base import (
     TaskBase,
     TaskState,
@@ -57,6 +58,13 @@ class PluginTask(TaskBase, Generic[P]):
         self.input = input
         self.session = session
 
+    def _discard_outputs(self) -> None:
+        session = self.session
+        for ocel in session.list_ocels(source_id=self.id, include_hidden=True):
+            session.delete_ocel(ocel.id)
+        for resource in session.list_resources(source_id=self.id, include_hidden=True):
+            session.delete_resource(resource.id)
+
     def run(self):
         self.state = TaskState.STARTED
         kwargs: dict[str, Any] = {}
@@ -94,6 +102,7 @@ class PluginTask(TaskBase, Generic[P]):
                 if isinstance(entity, OCEL):
                     self.session.add_ocel(entity, name, source_id=self.id, hidden=True)
                 else:
+                    resource_registry.get_resource_class(entity.get_schema_hash())
                     self.session.add_resource(
                         entity, name, source_id=self.id, hidden=True
                     )
@@ -103,6 +112,7 @@ class PluginTask(TaskBase, Generic[P]):
 
         except Exception as e:
             self.error = e
+            self._discard_outputs()
             self.state = TaskState.FAILURE
             sse_manager.send_safe(
                 session_id=self.session.id,
@@ -157,7 +167,8 @@ class PluginTask(TaskBase, Generic[P]):
         key = cls._dedupe_key(plugin_id, method_name, input, views)
 
         existing_id = session._dedupe_keys.get(key)
-        if existing_id and existing_id in session.tasks:
+        existing_task = session.tasks.get(existing_id) if existing_id else None
+        if existing_id and existing_task and existing_task.state != TaskState.FAILURE:
             print(
                 f"[Task: {plugin_id} {method_name}] Skipped (deduplicated) -> {existing_id}"
             )

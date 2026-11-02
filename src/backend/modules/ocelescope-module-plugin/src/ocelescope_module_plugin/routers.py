@@ -94,7 +94,7 @@ def run_plugin(
 def get_plugin_result(
     plugin_task: ApiPluginTask,
 ) -> list[PluginOutput] | None:
-    if plugin_task.state != TaskState.SUCCESS:
+    if plugin_task.state in (TaskState.PENDING, TaskState.STARTED):
         return None
 
     return PluginOutput.from_task(plugin_task)
