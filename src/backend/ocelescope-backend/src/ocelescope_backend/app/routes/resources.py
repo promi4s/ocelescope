@@ -11,6 +11,7 @@ from ocelescope_backend.app.dependencies import ApiSession
 from ocelescope_backend.app.internal.exceptions import BadRequest
 from ocelescope_backend.app.internal.model.base import PaginatedResponse
 from ocelescope_backend.app.internal.model.resource import (
+    DefaultResource,
     ResourceApi,
     ResourceTable,
     ResourceTypeInfo,
@@ -30,7 +31,7 @@ TABLE_FILTERS = TypeAdapter(dict[str, list[str]])
 
 @resource_router.get(path="", operation_id="resources")
 def get_resources(
-    session: ApiSession, schema_hash: str | None = None
+    session: ApiSession, schema_hash: DefaultResource | str | None = None
 ) -> list[ResourceApi]:
     return [
         resource

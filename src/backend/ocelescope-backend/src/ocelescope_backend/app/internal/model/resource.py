@@ -1,12 +1,23 @@
 from datetime import UTC, datetime
+from enum import StrEnum
 from pathlib import Path
 from typing import Literal
 
 from ocelescope.resource.tabular import COLUMN_TYPE
 from ocelescope.visualization.default.table import TableDataType
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, GetJsonSchemaHandler
+from pydantic.json_schema import JsonSchemaValue
+from pydantic_core import CoreSchema
 
-from ocelescope import ResourceBase, Table, TableColumn, TabularResource
+from ocelescope import (
+    DirectlyFollowsGraph,
+    OCELMapping,
+    PetriNet,
+    ResourceBase,
+    Table,
+    TableColumn,
+    TabularResource,
+)
 
 COLUMN_DATA_TYPES: dict[COLUMN_TYPE, TableDataType] = {
     "int": "number",
@@ -16,6 +27,20 @@ COLUMN_DATA_TYPES: dict[COLUMN_TYPE, TableDataType] = {
     "bool": "boolean",
     "date": "date",
 }
+
+
+class DefaultResource(StrEnum):
+    DirectlyFollowsGraph = DirectlyFollowsGraph.get_schema_hash()
+    OCELMapping = OCELMapping.get_schema_hash()
+    PetriNet = PetriNet.get_schema_hash()
+
+    @classmethod
+    def __get_pydantic_json_schema__(
+        cls, core_schema: CoreSchema, handler: GetJsonSchemaHandler
+    ) -> JsonSchemaValue:
+        json_schema = handler.resolve_ref_schema(handler(core_schema))
+        json_schema["x-enum-varnames"] = [member.name for member in cls]
+        return json_schema
 
 
 class ResourceTable(BaseModel):

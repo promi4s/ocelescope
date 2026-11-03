@@ -65,6 +65,7 @@ class SystemTask(TaskBase, Generic[P]):
                 session=self.session,
                 stop_event=self.stop_event,
                 metadata=self.metadata,
+                task_id=self.id,
                 **self.kwargs,
             )
             if self.state != TaskState.CANCELLED:
