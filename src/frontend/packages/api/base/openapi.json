@@ -211,6 +211,9 @@
             "schema": {
               "anyOf": [
                 {
+                  "$ref": "#/components/schemas/DefaultResource"
+                },
+                {
                   "type": "string"
                 },
                 {
@@ -937,6 +940,20 @@
         "type": "object",
         "title": "DFG",
         "description": "A directly-follows graph in the shape the r4pm viewers expect.\n\nAttributes:\n    activities: Occurrence count per activity.\n    directly_follows_relations: ``((source, target), count)`` pairs.\n    start_activities: Count per activity of how often it starts a trace.\n    end_activities: Count per activity of how often it ends a trace."
+      },
+      "DefaultResource": {
+        "type": "string",
+        "enum": [
+          "6571002166dd3a7bf25bac89a6e4774c3ba9b2bed506f1639ebb5da1ddc3165b",
+          "55de364ec6b09b1c17c43044d63e61ef05fdac44afcd69c82b188070eb75e958",
+          "b971a209faca6fd153aa64a906a3f03dd5a15666f95354be97c457e954d870bf"
+        ],
+        "title": "DefaultResource",
+        "x-enum-varnames": [
+          "DirectlyFollowsGraph",
+          "OCELMapping",
+          "PetriNet"
+        ]
       },
       "DirectlyFollowsGraphViz": {
         "properties": {
