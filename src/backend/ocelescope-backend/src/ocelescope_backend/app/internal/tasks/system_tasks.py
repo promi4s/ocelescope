@@ -123,7 +123,7 @@ def _archived_member_suffix(filename: str) -> str:
 
 
 def _import_resource(
-    session: Session, file_path: Path, name: str
+    session: Session, file_path: Path, name: str, source_id: str | None = None
 ) -> list[SystemNotification | InvalidationRequest]:
     try:
         if zipfile.is_zipfile(file_path):
@@ -138,7 +138,7 @@ def _import_resource(
         with resource_class.read(
             file_path, resolve=resource_registry.get_resource_class
         ) as resource:
-            session.add_resource(resource, name=name)
+            session.add_resource(resource, name=name, source_id=source_id)
     finally:
         file_path.unlink(missing_ok=True)
 
@@ -256,6 +256,9 @@ def import_resource(
     session: Session,
     file_path: Path,
     metadata: ImportMetadata,
+    task_id: str | None = None,
 ):
     name = Path(metadata["fileName"]).stem
-    return _import_resource(session=session, file_path=file_path, name=name)
+    return _import_resource(
+        session=session, file_path=file_path, name=name, source_id=task_id
+    )
