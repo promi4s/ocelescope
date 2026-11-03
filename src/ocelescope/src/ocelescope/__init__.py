@@ -32,6 +32,7 @@ from ocelescope.plugin import (
 )
 from ocelescope.resource import (
     DirectlyFollowsGraph,
+    OCELMapping,
     PetriNet,
     Resource,
     ResourceBase,
@@ -93,6 +94,7 @@ __all__ = [
     "LayoutConfig",
     "O2OCountFilter",
     "OCELAnnotation",
+    "OCELMapping",
     "OCELView",
     "ObjectAttributeFilter",
     "ObjectIdFilter",

@@ -196,7 +196,10 @@
     "dfgs",
     "iterchildren",
     "levelprefix",
-    "sqltypes"
+    "sqltypes",
+    "utinyint",
+    "usmallint",
+    "uhugeint"
   ],
   "ignorePaths": [
     "pnpm-lock.yaml",

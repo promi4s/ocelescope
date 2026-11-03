@@ -13,6 +13,8 @@ COLUMN_DATA_TYPES: dict[COLUMN_TYPE, TableDataType] = {
     "float": "number",
     "str": "string",
     "timestamp": "datetime",
+    "bool": "boolean",
+    "date": "date",
 }
 
 
@@ -21,21 +23,25 @@ class ResourceTable(BaseModel):
     columns: list[TableColumn]
 
     @classmethod
-    def from_table(cls, name: str, table: Table) -> "ResourceTable":
+    def from_table(
+        cls, name: str, table: Table, resource: TabularResource
+    ) -> "ResourceTable":
         return cls(
             name=name,
             columns=[
                 TableColumn(id=column_name, data_type=COLUMN_DATA_TYPES[column_type])
-                for column_name, column_type in table.schema
+                for column_name, column_type in [
+                    *table.schema,
+                    *table.get_extra_columns(resource.con),
+                ]
             ],
         )
 
     @classmethod
-    def from_resource_type(
-        cls, resource_type: type[TabularResource]
-    ) -> "list[ResourceTable]":
+    def from_resource(cls, resource: TabularResource) -> "list[ResourceTable]":
         return [
-            cls.from_table(name, table) for name, table in resource_type.tables.items()
+            cls.from_table(name, table, resource)
+            for name, table in resource.tables.items()
         ]
 
 
