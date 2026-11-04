@@ -31,6 +31,7 @@ export { FullScreenUpload } from "./components/Dropzone/FullScreenUpload";
 export { sseHandler } from "./components/EventHandler";
 export { HelpModal } from "./components/HelpModal/HelpModal";
 export { createModulesPage } from "./components/ModulePage";
+export { OCELMappingWindow } from "./components/OCELMappingWindow/OCELMappingWindow";
 export { OcelescopeApp } from "./components/OcelescopeApp";
 export { OcelescopeDocument } from "./components/OcelescopeDocument";
 export { OcelSelect } from "./components/OcelSelect/OcelSelect";
