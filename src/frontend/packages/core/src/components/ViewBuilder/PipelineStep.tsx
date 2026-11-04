@@ -10,28 +10,29 @@ import {
   UnstyledButton,
 } from "@mantine/core";
 import { GripVerticalIcon, XIcon } from "lucide-react";
-import type { BaseStep, StepKinds } from "./types";
-import { kindOf, problemOf } from "./util";
+import type { ReactNode } from "react";
 
-type PipelineStepProps<S extends BaseStep> = {
+type PipelineStepProps = {
   id: string;
   index: number;
-  step: S;
-  kinds: StepKinds<S>;
+  title: string;
+  summary: ReactNode;
+  problem?: string;
   selected: boolean;
   onSelect: () => void;
   onRemove: () => void;
 };
 
-export const PipelineStep = <S extends BaseStep>({
+export const PipelineStep = ({
   id,
   index,
-  step,
-  kinds,
+  title,
+  summary,
+  problem,
   selected,
   onSelect,
   onRemove,
-}: PipelineStepProps<S>) => {
+}: PipelineStepProps) => {
   const {
     attributes,
     listeners,
@@ -40,8 +41,6 @@ export const PipelineStep = <S extends BaseStep>({
     transition,
     isDragging,
   } = useSortable({ id });
-  const kind = kindOf(kinds, step);
-  const problem = problemOf(kinds, step);
 
   return (
     <Paper
@@ -86,7 +85,7 @@ export const PipelineStep = <S extends BaseStep>({
                 {index + 1}
               </Text>
               <Text size="sm" fw={500} truncate>
-                {kind.title}
+                {title}
               </Text>
               {problem && (
                 <Badge size="xs" color="yellow" variant="light">
@@ -95,7 +94,7 @@ export const PipelineStep = <S extends BaseStep>({
               )}
             </Group>
             <Text size="xs" c={problem ? "yellow" : "dimmed"} truncate>
-              {problem ?? kind.summary(step)}
+              {problem ?? summary}
             </Text>
           </Stack>
           <ActionIcon

@@ -39,6 +39,7 @@ import type {
   StepType,
   ViewBuilderLabels,
 } from "./types";
+import { kindOf, problemOf } from "./util";
 
 type OwnProps<S extends BaseStep> = {
   kinds: StepKinds<S>;
@@ -128,19 +129,22 @@ export const PipelineList = <S extends BaseStep>({
             <SortableContext items={ids} strategy={verticalListSortingStrategy}>
               {fields.map(({ id }, index) => {
                 const step = steps[index];
+                if (!step) {
+                  return null;
+                }
+                const kind = kindOf(kinds, step);
                 return (
-                  step && (
-                    <PipelineStep
-                      key={id}
-                      id={id}
-                      index={index}
-                      step={step}
-                      kinds={kinds}
-                      selected={index === selected}
-                      onSelect={() => onSelect(index)}
-                      onRemove={() => onRemove(index)}
-                    />
-                  )
+                  <PipelineStep
+                    key={id}
+                    id={id}
+                    index={index}
+                    title={kind.title}
+                    summary={kind.summary(step)}
+                    problem={problemOf(kinds, step)}
+                    selected={index === selected}
+                    onSelect={() => onSelect(index)}
+                    onRemove={() => onRemove(index)}
+                  />
                 );
               })}
             </SortableContext>
