@@ -36,7 +36,7 @@ const FilterPage = () => {
     <>
       {filterPipeline && ocelId && (
         <OCELViewBuilder
-          key={hash(filterPipeline)}
+          key={`${ocelId}:${hash(filterPipeline)}`}
           ocelId={ocelId}
           kinds={FILTER_KINDS}
           useView={useFilterView}
