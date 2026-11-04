@@ -34,9 +34,6 @@
   },
   "peerDependencies": {
     "@dagrejs/dagre": "catalog:",
-    "@dnd-kit/core": "catalog:",
-    "@dnd-kit/sortable": "catalog:",
-    "@dnd-kit/utilities": "catalog:",
     "@mantine/core": "catalog:",
     "@mantine/dates": "catalog:",
     "@mantine/hooks": "catalog:",
@@ -55,13 +52,9 @@
     "next": "catalog:",
     "object-hash": "catalog:",
     "react": "catalog:",
-    "react-dom": "catalog:",
-    "react-hook-form": "catalog:"
+    "react-dom": "catalog:"
   },
   "devDependencies": {
-    "@dnd-kit/core": "catalog:",
-    "@dnd-kit/sortable": "catalog:",
-    "@dnd-kit/utilities": "catalog:",
     "@mantine/notifications": "catalog:",
     "@ocelescope/api-config": "workspace:^",
     "@types/node": "catalog:",
