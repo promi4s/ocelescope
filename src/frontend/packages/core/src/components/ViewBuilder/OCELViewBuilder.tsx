@@ -175,16 +175,20 @@ export const OCELViewBuilder = <S extends BaseStep>({
                 key={selected}
                 control={control}
                 name={`steps.${selected}` as Path<PipelineForm<S>>}
-                render={({ field }) => (
-                  <kind.Panel
-                    ocelId={ocelId}
-                    viewId={viewId}
-                    step={field.value as S}
-                    onChange={(step) =>
-                      field.onChange({ target: { value: step } })
-                    }
-                  />
-                )}
+                render={({ field }) => {
+                  const step = field.value as S;
+                  const { Panel } = kindOf(kinds, step);
+                  return (
+                    <Panel
+                      ocelId={ocelId}
+                      viewId={viewId}
+                      step={step}
+                      onChange={(next) =>
+                        field.onChange({ target: { value: next } })
+                      }
+                    />
+                  );
+                }}
               />
             )}
           </Stack>

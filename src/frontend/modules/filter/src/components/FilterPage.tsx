@@ -5,9 +5,14 @@ import {
   useCurrentOcel,
   useInvalidate,
 } from "@ocelescope/core";
+import { useQueryClient } from "@tanstack/react-query";
 import { CheckIcon, RotateCcwIcon, Trash2Icon } from "lucide-react";
 import hash from "object-hash";
-import { useGetFilter, useSetFilter } from "../api/base";
+import {
+  getRegisterViewQueryKey,
+  useGetFilter,
+  useSetFilter,
+} from "../api/base";
 import { useFilterView } from "../hooks/useView";
 import { FILTER_KINDS } from "./FilterViews";
 
@@ -22,10 +27,14 @@ const FilterPage = () => {
   });
 
   const invalidate = useInvalidate();
+  const queryClient = useQueryClient();
 
   const { mutate, status } = useSetFilter({
     mutation: {
-      onSuccess: async () => {
+      onSuccess: async (_, { ocelId }) => {
+        queryClient.removeQueries({
+          queryKey: getRegisterViewQueryKey(ocelId).slice(0, 2),
+        });
         refetch();
         await invalidate(["ocels"]);
       },
