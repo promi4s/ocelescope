@@ -20,6 +20,7 @@ import {
 } from "@ocelescope/api-base";
 import {
   FullScreenUpload,
+  OCELMappingWindow,
   UploadSection,
   useDownloadOCEL,
   useDownloadResource,
@@ -53,6 +54,10 @@ const ResourceManagementTable: React.FC = () => {
   const [exportOcelId, setExportOcelId] = useState<string | undefined>(
     undefined,
   );
+
+  const [mappedOcel, setMappedOcel] = useState<
+    { id: string; name: string } | undefined
+  >(undefined);
 
   const { download: downloadOCEL } = useDownloadOCEL();
   const { download: downloadResource } = useDownloadResource();
@@ -326,6 +331,7 @@ const ResourceManagementTable: React.FC = () => {
             onInspect={setViewedResource}
             onDownloadOcel={downloadOcelAs}
             onExportAsXes={setExportOcelId}
+            onCreateMapping={setMappedOcel}
             onDownloadResource={downloadResource}
             onDownloadResourceAsPnml={downloadResourceAsPnml}
             onDelete={deleteEntity}
@@ -361,6 +367,11 @@ const ResourceManagementTable: React.FC = () => {
         key={exportOcelId}
         ocelId={exportOcelId}
         onClose={() => setExportOcelId(undefined)}
+      />
+      <OCELMappingWindow
+        key={mappedOcel?.id}
+        ocel={mappedOcel}
+        onClose={() => setMappedOcel(undefined)}
       />
       {hasEntities ? (
         <>
