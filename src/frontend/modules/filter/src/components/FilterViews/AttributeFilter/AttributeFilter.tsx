@@ -1,26 +1,26 @@
 import { useEventAttributes, useObjectAttributes } from "@ocelescope/api-base";
-import { AttributesTable } from "@ocelescope/core";
+import type { StepKind, StepPanel } from "@ocelescope/core";
+import { AttributesTable, viewParams, viewProps } from "@ocelescope/core";
 import { keepPreviousData } from "@tanstack/react-query";
 import { useMemo } from "react";
+import type {
+  EventAttributeFilter,
+  ObjectAttributeFilter,
+} from "../../../api/base";
 import { useAttributeFilter } from "../../../hooks/useAttributeFilterColumns";
-import { useView, viewProps } from "../../../hooks/useView";
-import type { FilterKind, FilterOf, FilterPanel } from "../../../types/filter";
 import dayjs from "../../../util/dayjs";
-import Previewed from "../../Previewed";
 import AttributeDetail from "./AttributeDetail";
-
-type AttributeKey = "event_attribute" | "object_attribute";
+import type { AttributeFilter } from "./util";
 
 const AttributePanel: (
   entityType: "objects" | "events",
-) => FilterPanel<AttributeKey> = (entityType) => {
+) => StepPanel<AttributeFilter> = (entityType) => {
   const useTypedAttributes =
     entityType === "events" ? useEventAttributes : useObjectAttributes;
-  return ({ ocelId, filter, onChange, before }) => {
+  return ({ ocelId, viewId, step: filter, onChange }) => {
     const { filterColumns } = useAttributeFilter({ filter, onChange });
-    const view = useView(ocelId, before);
-    const typed = useTypedAttributes(ocelId, view, {
-      query: { enabled: view !== undefined, placeholderData: keepPreviousData },
+    const typed = useTypedAttributes(ocelId, viewParams(viewId), {
+      query: { placeholderData: keepPreviousData },
     });
     const scopes = useMemo(
       () =>
@@ -37,7 +37,7 @@ const AttributePanel: (
           entityType={entityType}
           filter={filter}
           onChange={onChange}
-          before={before}
+          viewId={viewId}
           scopes={scopes}
           onClear={() => onChange({ type: filter.type, attribute: "" })}
         />
@@ -45,24 +45,20 @@ const AttributePanel: (
     }
 
     return (
-      <Previewed query={{ data: view, isPending: true, error: null }}>
-        {(view) => (
-          <AttributesTable
-            ocelId={ocelId}
-            entityType={entityType}
-            {...viewProps(view)}
-            extraColumns={filterColumns}
-            subTableExtraColumns={filterColumns}
-            hideRange
-            hideValues
-          />
-        )}
-      </Previewed>
+      <AttributesTable
+        ocelId={ocelId}
+        entityType={entityType}
+        {...viewProps(viewId)}
+        extraColumns={filterColumns}
+        subTableExtraColumns={filterColumns}
+        hideRange
+        hideValues
+      />
     );
   };
 };
 
-const condition = (filter: FilterOf<AttributeKey>) => {
+const condition = (filter: AttributeFilter) => {
   if (filter.regex) {
     return `matches /${filter.regex}/`;
   }
@@ -84,7 +80,7 @@ const condition = (filter: FilterOf<AttributeKey>) => {
   return "any value";
 };
 
-const summary = (filter: FilterOf<AttributeKey>) => {
+const summary = (filter: AttributeFilter) => {
   if (!filter.attribute) {
     return "No attribute selected";
   }
@@ -93,22 +89,25 @@ const summary = (filter: FilterOf<AttributeKey>) => {
   return `${filter.attribute}${scope}: ${negation}${condition(filter)}`;
 };
 
-export const EventAttributeFilter: FilterKind<"event_attribute"> = {
+const validate = (filter: AttributeFilter) =>
+  filter.attribute ? {} : { attribute: "Pick an attribute" };
+
+export const eventAttributeKind: StepKind<EventAttributeFilter> = {
   title: "Event Attribute",
   description:
     "Keeps the events whose value of one attribute satisfies a condition, such as a value range or a pattern. Pick the attribute with Use, then set the condition on its value distribution: a range for numbers and dates, chosen values or a pattern otherwise. With Exclude, the matching events are removed instead. Activities without the attribute are left untouched.",
-  Panel: AttributePanel("events") as FilterPanel<"event_attribute">,
+  Panel: AttributePanel("events") as StepPanel<EventAttributeFilter>,
   create: () => ({ type: "event_attribute", attribute: "" }),
   summary,
-  isComplete: (filter) => filter.attribute !== "",
+  validate,
 };
 
-export const ObjectAttributeFilter: FilterKind<"object_attribute"> = {
+export const objectAttributeKind: StepKind<ObjectAttributeFilter> = {
   title: "Object Attribute",
   description:
     "Keeps the objects whose value of one attribute satisfies a condition, such as a value range or a pattern. Pick the attribute with Use, then set the condition on its value distribution: a range for numbers and dates, chosen values or a pattern otherwise. With Exclude, the matching objects are removed instead. Object types without the attribute are left untouched.",
-  Panel: AttributePanel("objects") as FilterPanel<"object_attribute">,
+  Panel: AttributePanel("objects") as StepPanel<ObjectAttributeFilter>,
   create: () => ({ type: "object_attribute", attribute: "" }),
   summary,
-  isComplete: (filter) => filter.attribute !== "",
+  validate,
 };

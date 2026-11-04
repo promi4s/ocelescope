@@ -33,6 +33,9 @@
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
+    "@dnd-kit/core": "catalog:",
+    "@dnd-kit/sortable": "catalog:",
+    "@dnd-kit/utilities": "catalog:",
     "@mantine/core": "catalog:",
     "@mantine/dropzone": "catalog:",
     "@mantine/hooks": "catalog:",
@@ -54,6 +57,7 @@
     "qs": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "react-hook-form": "catalog:",
     "zod": "catalog:",
     "zustand": "catalog:"
   },

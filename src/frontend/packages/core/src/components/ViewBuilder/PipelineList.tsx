@@ -8,6 +8,7 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import {
+  arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
@@ -22,38 +23,79 @@ import {
 } from "@mantine/core";
 import { PlusIcon } from "lucide-react";
 import { useState } from "react";
-import type { FilterKey, NativeFilter } from "../../types/filter";
-import { FILTER_KINDS } from "../FilterViews";
-import PipelineStep from "./PipelineStep";
+import {
+  type Control,
+  type FieldArray,
+  type FieldArrayPath,
+  type Path,
+  useFieldArray,
+  useWatch,
+} from "react-hook-form";
+import { PipelineStep } from "./PipelineStep";
+import type {
+  BaseStep,
+  PipelineForm,
+  StepKinds,
+  StepType,
+  ViewBuilderLabels,
+} from "./types";
 
-const KEYS = Object.keys(FILTER_KINDS) as FilterKey[];
-
-type OwnProps = {
-  ids: string[];
-  steps: NativeFilter[];
-  selectedId?: string;
-  onSelect: (id: string) => void;
-  onRemove: (index: number) => void;
-  onMove: (from: number, to: number) => void;
-  onAdd: (kind: FilterKey) => void;
+type OwnProps<S extends BaseStep> = {
+  kinds: StepKinds<S>;
+  control: Control<PipelineForm<S>>;
+  labels: ViewBuilderLabels;
+  selected?: number;
+  onSelect: (index: number | undefined) => void;
 };
 
-type PipelineListProps = OwnProps & Omit<StackProps, keyof OwnProps>;
+type PipelineListProps<S extends BaseStep> = OwnProps<S> &
+  Omit<StackProps, keyof OwnProps<S>>;
 
-const PipelineList = ({
-  ids,
-  steps,
-  selectedId,
+export const PipelineList = <S extends BaseStep>({
+  kinds,
+  control,
+  labels,
+  selected,
   onSelect,
-  onRemove,
-  onMove,
-  onAdd,
   ...stackProps
-}: PipelineListProps) => {
+}: PipelineListProps<S>) => {
   const [search, setSearch] = useState("");
-  const shown = KEYS.filter((key) =>
-    FILTER_KINDS[key].title.toLowerCase().includes(search.trim().toLowerCase()),
+  const types = Object.keys(kinds) as StepType<S>[];
+  const shown = types.filter((type) =>
+    kinds[type].title.toLowerCase().includes(search.trim().toLowerCase()),
   );
+  const { fields, append, remove, move } = useFieldArray({
+    control,
+    name: "steps" as FieldArrayPath<PipelineForm<S>>,
+  });
+
+  const steps = useWatch({
+    control,
+    name: "steps" as Path<PipelineForm<S>>,
+  }) as S[];
+
+  const ids = fields.map(({ id }) => id);
+
+  const add = (type: StepType<S>) => {
+    append(kinds[type].create() as FieldArray<PipelineForm<S>>);
+    onSelect(fields.length);
+  };
+
+  const selectedId = selected === undefined ? undefined : ids[selected];
+  const reselect = (next: string[]) => {
+    const index = selectedId === undefined ? -1 : next.indexOf(selectedId);
+    onSelect(index === -1 ? undefined : index);
+  };
+
+  const onRemove = (index: number) => {
+    remove(index);
+    reselect(ids.filter((_, i) => i !== index));
+  };
+
+  const onMove = (from: number, to: number) => {
+    move(from, to);
+    reselect(arrayMove(ids, from, to));
+  };
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
@@ -73,9 +115,9 @@ const PipelineList = ({
     <Stack gap="xs" {...stackProps}>
       <ScrollArea flex={1} mih={0} type="auto" scrollbarSize={6}>
         <Stack gap="xs">
-          {ids.length === 0 && (
+          {fields.length === 0 && (
             <Text size="sm" c="dimmed">
-              No filters yet. Add one to start the pipeline.
+              {labels.emptyList}
             </Text>
           )}
           <DndContext
@@ -84,7 +126,7 @@ const PipelineList = ({
             onDragEnd={onDragEnd}
           >
             <SortableContext items={ids} strategy={verticalListSortingStrategy}>
-              {ids.map((id, index) => {
+              {fields.map(({ id }, index) => {
                 const step = steps[index];
                 return (
                   step && (
@@ -93,8 +135,9 @@ const PipelineList = ({
                       id={id}
                       index={index}
                       step={step}
-                      selected={id === selectedId}
-                      onSelect={() => onSelect(id)}
+                      kinds={kinds}
+                      selected={index === selected}
+                      onSelect={() => onSelect(index)}
                       onRemove={() => onRemove(index)}
                     />
                   )
@@ -111,25 +154,23 @@ const PipelineList = ({
             leftSection={<PlusIcon size={16} />}
             fullWidth
           >
-            Add filter
+            {labels.add}
           </Button>
         </Menu.Target>
         <Menu.Dropdown>
           <Menu.Search
             value={search}
             onChange={(event) => setSearch(event.currentTarget.value)}
-            placeholder="Search filters"
+            placeholder={labels.search}
           />
-          {shown.map((key) => (
-            <Menu.Item key={key} onClick={() => onAdd(key)}>
-              {FILTER_KINDS[key].title}
+          {shown.map((type) => (
+            <Menu.Item key={type} onClick={() => add(type)}>
+              {kinds[type].title}
             </Menu.Item>
           ))}
-          {shown.length === 0 && <Menu.Label>No filter matches</Menu.Label>}
+          {shown.length === 0 && <Menu.Label>{labels.noMatch}</Menu.Label>}
         </Menu.Dropdown>
       </Menu>
     </Stack>
   );
 };
-
-export default PipelineList;

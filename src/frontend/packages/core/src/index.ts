@@ -38,6 +38,7 @@ export * from "./components/Pickers";
 export { default as RelationTable } from "./components/RelationTable";
 export { UploadModal } from "./components/UploadModal/UploadModal";
 export { UploadSection } from "./components/UploadSection/UploadSection";
+export * from "./components/ViewBuilder";
 export { useCurrentOcel } from "./hooks/useCurrentOCEL";
 export {
   useDownloadFile,

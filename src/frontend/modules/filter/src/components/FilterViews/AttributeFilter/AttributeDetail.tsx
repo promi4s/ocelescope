@@ -1,7 +1,9 @@
 import {
   Badge,
   Button,
+  Center,
   Group,
+  Loader,
   SegmentedControl,
   Select,
   SimpleGrid,
@@ -10,12 +12,10 @@ import {
   Title,
 } from "@mantine/core";
 import { useAttributeDistribution } from "@ocelescope/api-base";
+import { viewParams } from "@ocelescope/core";
 import { keepPreviousData } from "@tanstack/react-query";
 import { ArrowLeftIcon } from "lucide-react";
 import { memo } from "react";
-import { useView } from "../../../hooks/useView";
-import type { NativeFilter } from "../../../types/filter";
-import Previewed from "../../Previewed";
 import { type AttributeFilter, type FieldProps, formatValue } from "./util";
 import DateRangeView from "./views/RangeView/DateRangeView";
 import NumberRangeView from "./views/RangeView/NumberRangeView";
@@ -46,31 +46,28 @@ const Stat: React.FC<{ label: string; value: string | number }> = ({
 type AttributeDetailProps = FieldProps & {
   ocelId: string;
   entityType: "events" | "objects";
-  before: NativeFilter[];
+  viewId: string | null;
   scopes: string[];
   onClear: () => void;
 };
 
 const AttributeDetail: React.FC<AttributeDetailProps> = memo(
-  ({ ocelId, entityType, filter, onChange, before, scopes, onClear }) => {
-    const view = useView(ocelId, before);
+  ({ ocelId, entityType, filter, onChange, viewId, scopes, onClear }) => {
     const distribution = useAttributeDistribution(
       ocelId,
       {
-        ...view,
+        ...viewParams(viewId),
         attribute: filter.attribute,
         entity_type: entityType,
         entity_names: filter.target_type ? [filter.target_type] : undefined,
         bins: BINS,
       },
       {
-        query: {
-          enabled: view !== undefined,
-          placeholderData: keepPreviousData,
-        },
+        query: { placeholderData: keepPreviousData },
       },
     );
 
+    const data = distribution.data;
     const typeNoun = entityType === "events" ? "activities" : "object types";
 
     return (
@@ -128,47 +125,42 @@ const AttributeDetail: React.FC<AttributeDetailProps> = memo(
           </Group>
         </Group>
 
-        <Previewed query={distribution}>
-          {(data) =>
-            data ? (
-              <Stack gap="md" flex={1} mih={0}>
-                <SimpleGrid cols={4}>
-                  <Stat label="Values" value={data.count} />
-                  <Stat label="Distinct" value={data.distinct_values} />
-                  <Stat label="Min" value={formatValue(data.min, data.type)} />
-                  <Stat label="Max" value={formatValue(data.max, data.type)} />
-                </SimpleGrid>
-                {data.type === "int" || data.type === "float" ? (
-                  <NumberRangeView
-                    data={data}
-                    filter={filter}
-                    onChange={onChange}
-                  />
-                ) : data.type === "date" ? (
-                  <DateRangeView
-                    data={data}
-                    filter={filter}
-                    onChange={onChange}
-                  />
-                ) : (
-                  <ValuesView
-                    data={data}
-                    filter={filter}
-                    onChange={onChange}
-                    ocelId={ocelId}
-                    entityType={entityType}
-                    before={before}
-                  />
-                )}
-              </Stack>
+        {data === undefined ? (
+          <Center flex={1} mih={120}>
+            <Loader size="sm" />
+          </Center>
+        ) : data ? (
+          <Stack gap="md" flex={1} mih={0}>
+            <SimpleGrid cols={4}>
+              <Stat label="Values" value={data.count} />
+              <Stat label="Distinct" value={data.distinct_values} />
+              <Stat label="Min" value={formatValue(data.min, data.type)} />
+              <Stat label="Max" value={formatValue(data.max, data.type)} />
+            </SimpleGrid>
+            {data.type === "int" || data.type === "float" ? (
+              <NumberRangeView
+                data={data}
+                filter={filter}
+                onChange={onChange}
+              />
+            ) : data.type === "date" ? (
+              <DateRangeView data={data} filter={filter} onChange={onChange} />
             ) : (
-              <Text size="sm" c="dimmed">
-                The attribute has no values in the log as the steps before leave
-                it.
-              </Text>
-            )
-          }
-        </Previewed>
+              <ValuesView
+                data={data}
+                filter={filter}
+                onChange={onChange}
+                ocelId={ocelId}
+                entityType={entityType}
+                viewId={viewId}
+              />
+            )}
+          </Stack>
+        ) : (
+          <Text size="sm" c="dimmed">
+            The attribute has no values in the log as the steps before leave it.
+          </Text>
+        )}
       </Stack>
     );
   },

@@ -1,25 +1,9 @@
+import type { UseView } from "@ocelescope/core";
 import { keepPreviousData } from "@tanstack/react-query";
 import { useRegisterView } from "../api/base";
-import type { NativeFilter } from "../types/filter";
+import type { NativeFilter } from "../components/FilterViews";
 
-export type ViewParams = { view_id: string } | { ocel_version: "original" };
-
-const ORIGINAL: ViewParams = { ocel_version: "original" };
-
-export const useView = (
-  ocelId: string,
-  steps: NativeFilter[],
-): ViewParams | undefined => {
-  const { data } = useRegisterView(ocelId, steps, undefined, {
+export const useFilterView: UseView<NativeFilter> = (ocelId, steps) =>
+  useRegisterView(ocelId, steps, undefined, {
     query: { placeholderData: keepPreviousData, staleTime: Infinity },
-  });
-  if (data === undefined) {
-    return undefined;
-  }
-  return data === null ? ORIGINAL : { view_id: data };
-};
-
-export const viewProps = (view: ViewParams) =>
-  "view_id" in view
-    ? { viewId: view.view_id }
-    : { ocelVersion: "original" as const };
+  }).data;

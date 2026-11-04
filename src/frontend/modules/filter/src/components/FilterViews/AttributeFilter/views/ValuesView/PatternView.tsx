@@ -1,9 +1,8 @@
 import { Group, Loader, Stack, Text, TextInput } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { useAttributeValues } from "@ocelescope/api-base";
-import { BarList } from "@ocelescope/core";
+import { BarList, viewParams } from "@ocelescope/core";
 import { keepPreviousData } from "@tanstack/react-query";
-import { useView } from "../../../../../hooks/useView";
 import type { DistributionViewProps, PreviewProps } from "../../util";
 
 const PatternView: React.FC<DistributionViewProps & PreviewProps> = ({
@@ -12,16 +11,15 @@ const PatternView: React.FC<DistributionViewProps & PreviewProps> = ({
   onChange,
   ocelId,
   entityType,
-  before,
+  viewId,
 }) => {
   const [pattern] = useDebouncedValue(filter.regex ?? "", 300);
   const exclude = filter.mode === "exclude";
 
-  const view = useView(ocelId, before);
   const matches = useAttributeValues(
     ocelId,
     {
-      ...view,
+      ...viewParams(viewId),
       attribute: filter.attribute,
       regex: pattern,
       entity_type: entityType,
@@ -29,7 +27,7 @@ const PatternView: React.FC<DistributionViewProps & PreviewProps> = ({
     },
     {
       query: {
-        enabled: view !== undefined && pattern !== "",
+        enabled: pattern !== "",
         placeholderData: keepPreviousData,
         retry: false,
       },

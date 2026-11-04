@@ -9,13 +9,12 @@ import {
 } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
 import { type EntityTimeInfo, useTimeInfo } from "@ocelescope/api-base";
+import { type StepKind, type StepPanel, viewParams } from "@ocelescope/core";
 import { keepPreviousData } from "@tanstack/react-query";
 import type { EChartsOption } from "echarts";
 import EChartsReact from "echarts-for-react";
 import { memo, useMemo } from "react";
-import type { TimeFrameFilterMode } from "../../api/base";
-import { useView } from "../../hooks/useView";
-import type { FilterKind, FilterPanel } from "../../types/filter";
+import type { TimeFrameFilter, TimeFrameFilterMode } from "../../api/base";
 import dayjs from "../../util/dayjs";
 
 const DATE_FORMAT = "YYYY-MM-DD HH:mm";
@@ -140,18 +139,12 @@ const TimeFrameSlider: React.FC<{
   );
 };
 
-const TimeFramePanel: FilterPanel<"time_frame"> = memo(
-  ({ ocelId, filter, onChange, before }) => {
-    const view = useView(ocelId, before);
+const TimeFramePanel: StepPanel<TimeFrameFilter> = memo(
+  ({ ocelId, viewId, step: filter, onChange }) => {
     const { data: timeInfo, isLoading } = useTimeInfo(
       ocelId,
-      { ...view, periods: 100 },
-      {
-        query: {
-          enabled: view !== undefined,
-          placeholderData: keepPreviousData,
-        },
-      },
+      { ...viewParams(viewId), periods: 100 },
+      { query: { placeholderData: keepPreviousData } },
     );
     const [start, end] = filter.time_range;
     const mode = filter.mode ?? "include";
@@ -218,7 +211,7 @@ const TimeFramePanel: FilterPanel<"time_frame"> = memo(
 const bound = (value: string | null, open: string) =>
   value ? dayjs(value).format(DATE_FORMAT) : open;
 
-export const TimeFrameFilter: FilterKind<"time_frame"> = {
+export const timeFrameKind: StepKind<TimeFrameFilter> = {
   title: "Timeframe",
   description:
     "Keeps only the events that occur within the selected time range, or with Exclude, removes them and keeps everything outside it. Use the date pickers or drag the range slider to set the start and end; the bar chart shows the event distribution over time, with kept events highlighted and removed events dimmed.",
@@ -232,5 +225,6 @@ export const TimeFrameFilter: FilterKind<"time_frame"> = {
     start || end
       ? `${mode === "exclude" ? "Excluding " : ""}${bound(start, "start")} – ${bound(end, "end")}`
       : "No range set",
-  isComplete: ({ time_range: [start, end] }) => start != null || end != null,
+  validate: ({ time_range: [start, end] }) =>
+    start != null || end != null ? {} : { time_range: "Set a start or an end" },
 };

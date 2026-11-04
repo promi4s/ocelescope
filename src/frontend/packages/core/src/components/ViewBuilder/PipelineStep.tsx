@@ -10,26 +10,28 @@ import {
   UnstyledButton,
 } from "@mantine/core";
 import { GripVerticalIcon, XIcon } from "lucide-react";
-import type { NativeFilter } from "../../types/filter";
-import { kindOf } from "../FilterViews";
+import type { BaseStep, StepKinds } from "./types";
+import { kindOf, problemOf } from "./util";
 
-type PipelineStepProps = {
+type PipelineStepProps<S extends BaseStep> = {
   id: string;
   index: number;
-  step: NativeFilter;
+  step: S;
+  kinds: StepKinds<S>;
   selected: boolean;
   onSelect: () => void;
   onRemove: () => void;
 };
 
-const PipelineStep = ({
+export const PipelineStep = <S extends BaseStep>({
   id,
   index,
   step,
+  kinds,
   selected,
   onSelect,
   onRemove,
-}: PipelineStepProps) => {
+}: PipelineStepProps<S>) => {
   const {
     attributes,
     listeners,
@@ -38,8 +40,8 @@ const PipelineStep = ({
     transition,
     isDragging,
   } = useSortable({ id });
-  const kind = kindOf(step);
-  const complete = kind.isComplete(step);
+  const kind = kindOf(kinds, step);
+  const problem = problemOf(kinds, step);
 
   return (
     <Paper
@@ -86,14 +88,14 @@ const PipelineStep = ({
               <Text size="sm" fw={500} truncate>
                 {kind.title}
               </Text>
-              {!complete && (
+              {problem && (
                 <Badge size="xs" color="yellow" variant="light">
                   incomplete
                 </Badge>
               )}
             </Group>
-            <Text size="xs" c="dimmed" truncate>
-              {kind.summary(step)}
+            <Text size="xs" c={problem ? "yellow" : "dimmed"} truncate>
+              {problem ?? kind.summary(step)}
             </Text>
           </Stack>
           <ActionIcon
@@ -113,5 +115,3 @@ const PipelineStep = ({
     </Paper>
   );
 };
-
-export default PipelineStep;

@@ -4,9 +4,7 @@ import {
   useO2o,
   useO2oCountDistribution,
 } from "@ocelescope/api-base";
-import type { FilterOf, NativeFilter } from "../../../types/filter";
-
-export type RelationKey = "e2o_count" | "o2o_count";
+import type { E2OCountFilter, O2OCountFilter } from "../../../api/base";
 
 export type RelationKind = "e2o" | "o2o";
 
@@ -20,7 +18,7 @@ export const RELATION_HOOKS: Record<RelationKind, RelationHooks> = {
   o2o: { useRelations: useO2o, useDistribution: useO2oCountDistribution },
 };
 
-export type RelationFilter = FilterOf<RelationKey>;
+export type RelationFilter = E2OCountFilter | O2OCountFilter;
 
 export type RelationViewProps = {
   ocelId: string;
@@ -28,5 +26,5 @@ export type RelationViewProps = {
   hooks: RelationHooks;
   filter: RelationFilter;
   onChange: (filter: RelationFilter) => void;
-  before: NativeFilter[];
+  viewId: string | null;
 };

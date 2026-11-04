@@ -1,13 +1,14 @@
-import type { FilterKind, FilterOf, FilterPanel } from "../../../types/filter";
+import type { StepKind, StepPanel } from "@ocelescope/core";
+import type { E2OCountFilter, O2OCountFilter } from "../../../api/base";
 import RelationDetail from "./RelationDetail";
 import RelationGraph from "./RelationGraph";
-import { RELATION_HOOKS, type RelationKey, type RelationKind } from "./util";
+import { RELATION_HOOKS, type RelationFilter, type RelationKind } from "./util";
 
-const RelationCountPanel: (kind: RelationKind) => FilterPanel<RelationKey> = (
+const RelationCountPanel: (kind: RelationKind) => StepPanel<RelationFilter> = (
   kind,
 ) => {
   const hooks = RELATION_HOOKS[kind];
-  return ({ ocelId, filter, onChange, before }) =>
+  return ({ ocelId, viewId, step: filter, onChange }) =>
     filter.source ? (
       <RelationDetail
         ocelId={ocelId}
@@ -15,7 +16,7 @@ const RelationCountPanel: (kind: RelationKind) => FilterPanel<RelationKey> = (
         hooks={hooks}
         filter={filter}
         onChange={onChange}
-        before={before}
+        viewId={viewId}
         onClear={() =>
           onChange({
             type: filter.type,
@@ -32,12 +33,12 @@ const RelationCountPanel: (kind: RelationKind) => FilterPanel<RelationKey> = (
         hooks={hooks}
         filter={filter}
         onChange={onChange}
-        before={before}
+        viewId={viewId}
       />
     );
 };
 
-const summary = (filter: FilterOf<RelationKey>) => {
+const summary = (filter: RelationFilter) => {
   if (!filter.source) {
     return "No relation selected";
   }
@@ -46,11 +47,14 @@ const summary = (filter: FilterOf<RelationKey>) => {
   return `${filter.source} → ${filter.target}${qualifier}: ${low ?? 0} – ${high ?? "∞"}`;
 };
 
-export const E2OCountFilter: FilterKind<"e2o_count"> = {
+const validate = (filter: RelationFilter) =>
+  filter.source && filter.target ? {} : { source: "Pick a relation" };
+
+export const e2oCountKind: StepKind<E2OCountFilter> = {
   title: "E2O Count",
   description:
     "Keeps the events of the source activity whose number of related objects of the target type (event-to-object relations) falls within a range. Pick the relation by clicking its edge in the graph, then set a minimum and/or maximum count on its distribution. Events of other activities are left untouched.",
-  Panel: RelationCountPanel("e2o") as FilterPanel<"e2o_count">,
+  Panel: RelationCountPanel("e2o") as StepPanel<E2OCountFilter>,
   create: () => ({
     type: "e2o_count",
     source: "",
@@ -58,14 +62,14 @@ export const E2OCountFilter: FilterKind<"e2o_count"> = {
     range: [null, null],
   }),
   summary,
-  isComplete: (filter) => filter.source !== "" && filter.target !== "",
+  validate,
 };
 
-export const O2OCountFilter: FilterKind<"o2o_count"> = {
+export const o2oCountKind: StepKind<O2OCountFilter> = {
   title: "O2O Count",
   description:
     "Keeps the objects of the source type whose number of related objects of the target type (object-to-object relations) falls within a range. Pick the relation by clicking its edge in the graph, then set a minimum and/or maximum count on its distribution. Objects of other types are left untouched.",
-  Panel: RelationCountPanel("o2o") as FilterPanel<"o2o_count">,
+  Panel: RelationCountPanel("o2o") as StepPanel<O2OCountFilter>,
   create: () => ({
     type: "o2o_count",
     source: "",
@@ -73,5 +77,5 @@ export const O2OCountFilter: FilterKind<"o2o_count"> = {
     range: [null, null],
   }),
   summary,
-  isComplete: (filter) => filter.source !== "" && filter.target !== "",
+  validate,
 };

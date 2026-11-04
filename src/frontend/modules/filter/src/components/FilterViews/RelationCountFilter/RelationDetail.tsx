@@ -1,6 +1,8 @@
 import {
   Button,
+  Center,
   Group,
+  Loader,
   NumberInput,
   SegmentedControl,
   Select,
@@ -10,11 +12,10 @@ import {
   Title,
 } from "@mantine/core";
 import type { RelationCountDistribution } from "@ocelescope/api-base";
+import { viewParams } from "@ocelescope/core";
 import { keepPreviousData } from "@tanstack/react-query";
 import { ArrowLeftIcon } from "lucide-react";
 import { useMemo } from "react";
-import { useView } from "../../../hooks/useView";
-import Previewed from "../../Previewed";
 import RangeView, { type Bin, type Range } from "../../RangeView";
 import type { RelationViewProps } from "./util";
 
@@ -40,15 +41,12 @@ const RelationDetail: React.FC<RelationViewProps & { onClear: () => void }> = ({
   hooks,
   filter,
   onChange,
-  before,
+  viewId,
   onClear,
 }) => {
   const direction = filter.direction ?? "source";
-  const view = useView(ocelId, before);
-
-  const options = {
-    query: { enabled: view !== undefined, placeholderData: keepPreviousData },
-  };
+  const view = viewParams(viewId);
+  const options = { query: { placeholderData: keepPreviousData } };
 
   const relations = hooks.useRelations(
     ocelId,
@@ -140,17 +138,19 @@ const RelationDetail: React.FC<RelationViewProps & { onClear: () => void }> = ({
         </Group>
       </Group>
 
-      <Previewed query={distribution}>
-        {(data) => (
-          <CountRange
-            data={data}
-            filter={filter}
-            onChange={onChange}
-            countedLabel={countedNoun === "event" ? "Events" : "Objects"}
-            caption={caption}
-          />
-        )}
-      </Previewed>
+      {distribution.data === undefined ? (
+        <Center flex={1} mih={120}>
+          <Loader size="sm" />
+        </Center>
+      ) : (
+        <CountRange
+          data={distribution.data}
+          filter={filter}
+          onChange={onChange}
+          countedLabel={countedNoun === "event" ? "Events" : "Objects"}
+          caption={caption}
+        />
+      )}
     </Stack>
   );
 };

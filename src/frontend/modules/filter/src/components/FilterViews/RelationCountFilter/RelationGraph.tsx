@@ -2,7 +2,9 @@ import {
   ActionIcon,
   Box,
   Button,
+  Center,
   Group,
+  Loader,
   Popover,
   Slider,
   Stack,
@@ -11,13 +13,11 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { useEventCounts, useObjectCounts } from "@ocelescope/api-base";
-import { OptionPicker } from "@ocelescope/core";
+import { OptionPicker, viewParams } from "@ocelescope/core";
 import { keepPreviousData } from "@tanstack/react-query";
 import { FilterIcon, XIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import { type ReactNode, useMemo, useState } from "react";
-import { useView } from "../../../hooks/useView";
-import Previewed from "../../Previewed";
 import type { RelationFilter, RelationViewProps } from "./util";
 
 const OcelTypeGraph = dynamic(
@@ -81,7 +81,7 @@ const RelationGraph: React.FC<RelationViewProps> = ({
   hooks,
   filter,
   onChange,
-  before,
+  viewId,
 }) => {
   const theme = useMantineTheme();
   const [showQualifiers, setShowQualifiers] = useState(true);
@@ -90,10 +90,8 @@ const RelationGraph: React.FC<RelationViewProps> = ({
   const [pending, setPending] = useState<string | null>(null);
   const [edgeLimit, setEdgeLimit] = useState(EDGE_LIMIT);
 
-  const view = useView(ocelId, before);
-  const options = {
-    query: { enabled: view !== undefined, placeholderData: keepPreviousData },
-  };
+  const view = viewParams(viewId);
+  const options = { query: { placeholderData: keepPreviousData } };
   const relations = hooks.useRelations(
     ocelId,
     { ...view, with_qualifier: false },
@@ -104,12 +102,8 @@ const RelationGraph: React.FC<RelationViewProps> = ({
     { ...view, with_qualifier: true },
     options,
   );
-  const events = useEventCounts(ocelId, view, {
-    query: { enabled: view !== undefined, placeholderData: keepPreviousData },
-  });
-  const objects = useObjectCounts(ocelId, view, {
-    query: { enabled: view !== undefined, placeholderData: keepPreviousData },
-  });
+  const events = useEventCounts(ocelId, view, options);
+  const objects = useObjectCounts(ocelId, view, options);
 
   const graph = useMemo(() => {
     if (!relations.data || !qualified.data || !events.data || !objects.data) {
@@ -180,16 +174,6 @@ const RelationGraph: React.FC<RelationViewProps> = ({
     showQualifiers,
   ]);
 
-  const query = {
-    data: graph,
-    isPending:
-      relations.isPending ||
-      qualified.isPending ||
-      events.isPending ||
-      objects.isPending,
-    error: relations.error ?? qualified.error ?? events.error ?? objects.error,
-  };
-
   const select = (relation: Relation) =>
     onChange({
       ...filter,
@@ -198,178 +182,170 @@ const RelationGraph: React.FC<RelationViewProps> = ({
       range: [null, null],
     });
 
+  if (!graph) {
+    return (
+      <Center flex={1} mih={120}>
+        <Loader size="sm" />
+      </Center>
+    );
+  }
+  const { nodes, edges: allEdges, activityCounts, objectTypeCounts } = graph;
+  const activities = pickedActivities ?? Object.keys(activityCounts);
+  const objectTypes = pickedObjectTypes ?? Object.keys(objectTypeCounts);
+  const picked = new Set([
+    ...activities.map(eventId),
+    ...objectTypes.map(objectId),
+  ]);
+  const candidates = allEdges.filter(
+    ({ source, target }) => picked.has(source) && picked.has(target),
+  );
+  const pairs = new Map(candidates.map(({ pair, pairSum }) => [pair, pairSum]));
+  const shownPairs = new Set(
+    [...pairs]
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, edgeLimit)
+      .map(([pair]) => pair),
+  );
+  const edges = candidates.filter(({ pair }) => shownPairs.has(pair));
+  const visibleNodeIds = new Set(
+    edges.flatMap(({ source, target }) => [source, target]),
+  );
+  const shownNodes = nodes.filter(({ id }) => visibleNodeIds.has(id));
+  const structure = edges
+    .map(({ id }) => id)
+    .sort()
+    .join("|");
+  const largest = Math.max(1, ...edges.map(({ sum }) => sum));
+  const byId = new Map(edges.map((edge) => [edge.id, edge]));
+  const neighbours = (id: string) =>
+    new Set(
+      edges.flatMap(({ source, target }) =>
+        source === id ? [target] : target === id ? [source] : [],
+      ),
+    );
+  const connected = pending ? neighbours(pending) : undefined;
+
+  const clickNode = (id: string) => {
+    if (!pending || pending === id) {
+      setPending(pending === id ? null : id);
+      return;
+    }
+    const candidates = edges.filter(
+      ({ source, target }) =>
+        (source === pending && target === id) ||
+        (source === id && target === pending),
+    );
+    const [first] = candidates;
+    if (!first) {
+      setPending(id);
+      return;
+    }
+    setPending(null);
+    select({
+      ...first.relation,
+      qualifier: candidates.length === 1 ? first.relation.qualifier : null,
+    });
+  };
+
   return (
-    <Previewed query={query}>
-      {({ nodes, edges: allEdges, activityCounts, objectTypeCounts }) => {
-        const activities = pickedActivities ?? Object.keys(activityCounts);
-        const objectTypes = pickedObjectTypes ?? Object.keys(objectTypeCounts);
-        const picked = new Set([
-          ...activities.map(eventId),
-          ...objectTypes.map(objectId),
-        ]);
-        const candidates = allEdges.filter(
-          ({ source, target }) => picked.has(source) && picked.has(target),
-        );
-        const pairs = new Map(
-          candidates.map(({ pair, pairSum }) => [pair, pairSum]),
-        );
-        const shownPairs = new Set(
-          [...pairs]
-            .sort(([, a], [, b]) => b - a)
-            .slice(0, edgeLimit)
-            .map(([pair]) => pair),
-        );
-        const edges = candidates.filter(({ pair }) => shownPairs.has(pair));
-        const visibleNodeIds = new Set(
-          edges.flatMap(({ source, target }) => [source, target]),
-        );
-        const shownNodes = nodes.filter(({ id }) => visibleNodeIds.has(id));
-        const structure = edges
-          .map(({ id }) => id)
-          .sort()
-          .join("|");
-        const largest = Math.max(1, ...edges.map(({ sum }) => sum));
-        const byId = new Map(edges.map((edge) => [edge.id, edge]));
-        const neighbours = (id: string) =>
-          new Set(
-            edges.flatMap(({ source, target }) =>
-              source === id ? [target] : target === id ? [source] : [],
-            ),
-          );
-        const connected = pending ? neighbours(pending) : undefined;
-
-        const clickNode = (id: string) => {
-          if (!pending || pending === id) {
-            setPending(pending === id ? null : id);
-            return;
-          }
-          const candidates = edges.filter(
-            ({ source, target }) =>
-              (source === pending && target === id) ||
-              (source === id && target === pending),
-          );
-          const [first] = candidates;
-          if (!first) {
-            setPending(id);
-            return;
-          }
-          setPending(null);
-          select({
-            ...first.relation,
-            qualifier:
-              candidates.length === 1 ? first.relation.qualifier : null,
-          });
-        };
-
-        return (
-          <Stack gap="xs" flex={1} mih={0}>
-            <Group justify="space-between">
-              <Group gap="md">
-                {kind === "e2o" && (
-                  <ScopePicker
-                    label="Activities"
-                    count={activities.length}
-                    total={Object.keys(activityCounts).length}
-                  >
-                    <OptionPicker<string>
-                      options={countOptions(activityCounts)}
-                      variant="list"
-                      multiple
-                      cutoff
-                      value={activities}
-                      onChange={(next) => setActivities([...next])}
-                    />
-                  </ScopePicker>
-                )}
-                <ScopePicker
-                  label="Object types"
-                  count={objectTypes.length}
-                  total={Object.keys(objectTypeCounts).length}
-                >
-                  <OptionPicker<string>
-                    options={countOptions(objectTypeCounts)}
-                    variant="list"
-                    multiple
-                    cutoff
-                    value={objectTypes}
-                    onChange={(next) => setObjectTypes([...next])}
-                  />
-                </ScopePicker>
-                <Group gap="xs">
-                  <Text size="xs" c="dimmed">
-                    Relations: top {Math.min(edgeLimit, pairs.size)} of{" "}
-                    {pairs.size}
-                  </Text>
-                  <Slider
-                    w={140}
-                    size="sm"
-                    min={1}
-                    max={Math.max(1, pairs.size)}
-                    value={Math.min(edgeLimit, Math.max(1, pairs.size))}
-                    onChange={setEdgeLimit}
-                  />
-                </Group>
-                <Switch
-                  size="xs"
-                  label="Qualifiers"
-                  checked={showQualifiers}
-                  onChange={(event) =>
-                    setShowQualifiers(event.currentTarget.checked)
-                  }
-                />
-              </Group>
-              {pending ? (
-                <Button
-                  size="compact-xs"
-                  variant="light"
-                  rightSection={<XIcon size={12} />}
-                  onClick={() => setPending(null)}
-                >
-                  {pending.slice(pending.indexOf(":") + 1)}: pick the second
-                  node
-                </Button>
-              ) : (
-                <Text size="xs" c="dimmed">
-                  Click an edge, or two nodes, to pick a relation
-                </Text>
-              )}
-            </Group>
-            <Box flex={1} mih={420} pos="relative">
-              <OcelTypeGraph
-                key={structure}
-                nodes={shownNodes}
-                edges={edges}
-                nodeRingColor={(id) =>
-                  id === pending ? theme.colors.blue[6] : undefined
-                }
-                nodeDimmed={(id) =>
-                  connected !== undefined &&
-                  id !== pending &&
-                  !connected.has(id)
-                }
-                edgeStyle={(id) => {
-                  const edge = byId.get(id);
-                  return edge
-                    ? {
-                        width:
-                          MIN_WIDTH +
-                          (MAX_WIDTH - MIN_WIDTH) * (edge.sum / largest),
-                      }
-                    : undefined;
-                }}
-                onNodeClick={clickNode}
-                onEdgeClick={(id) => {
-                  const edge = byId.get(id);
-                  if (edge) {
-                    select(edge.relation);
-                  }
-                }}
+    <Stack gap="xs" flex={1} mih={0}>
+      <Group justify="space-between">
+        <Group gap="md">
+          {kind === "e2o" && (
+            <ScopePicker
+              label="Activities"
+              count={activities.length}
+              total={Object.keys(activityCounts).length}
+            >
+              <OptionPicker<string>
+                options={countOptions(activityCounts)}
+                variant="list"
+                multiple
+                cutoff
+                value={activities}
+                onChange={(next) => setActivities([...next])}
               />
-            </Box>
-          </Stack>
-        );
-      }}
-    </Previewed>
+            </ScopePicker>
+          )}
+          <ScopePicker
+            label="Object types"
+            count={objectTypes.length}
+            total={Object.keys(objectTypeCounts).length}
+          >
+            <OptionPicker<string>
+              options={countOptions(objectTypeCounts)}
+              variant="list"
+              multiple
+              cutoff
+              value={objectTypes}
+              onChange={(next) => setObjectTypes([...next])}
+            />
+          </ScopePicker>
+          <Group gap="xs">
+            <Text size="xs" c="dimmed">
+              Relations: top {Math.min(edgeLimit, pairs.size)} of {pairs.size}
+            </Text>
+            <Slider
+              w={140}
+              size="sm"
+              min={1}
+              max={Math.max(1, pairs.size)}
+              value={Math.min(edgeLimit, Math.max(1, pairs.size))}
+              onChange={setEdgeLimit}
+            />
+          </Group>
+          <Switch
+            size="xs"
+            label="Qualifiers"
+            checked={showQualifiers}
+            onChange={(event) => setShowQualifiers(event.currentTarget.checked)}
+          />
+        </Group>
+        {pending ? (
+          <Button
+            size="compact-xs"
+            variant="light"
+            rightSection={<XIcon size={12} />}
+            onClick={() => setPending(null)}
+          >
+            {pending.slice(pending.indexOf(":") + 1)}: pick the second node
+          </Button>
+        ) : (
+          <Text size="xs" c="dimmed">
+            Click an edge, or two nodes, to pick a relation
+          </Text>
+        )}
+      </Group>
+      <Box flex={1} mih={420} pos="relative">
+        <OcelTypeGraph
+          key={structure}
+          nodes={shownNodes}
+          edges={edges}
+          nodeRingColor={(id) =>
+            id === pending ? theme.colors.blue[6] : undefined
+          }
+          nodeDimmed={(id) =>
+            connected !== undefined && id !== pending && !connected.has(id)
+          }
+          edgeStyle={(id) => {
+            const edge = byId.get(id);
+            return edge
+              ? {
+                  width:
+                    MIN_WIDTH + (MAX_WIDTH - MIN_WIDTH) * (edge.sum / largest),
+                }
+              : undefined;
+          }}
+          onNodeClick={clickNode}
+          onEdgeClick={(id) => {
+            const edge = byId.get(id);
+            if (edge) {
+              select(edge.relation);
+            }
+          }}
+        />
+      </Box>
+    </Stack>
   );
 };
 
