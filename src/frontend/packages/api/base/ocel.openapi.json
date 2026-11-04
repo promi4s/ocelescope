@@ -3111,6 +3111,93 @@
         }
       }
     },
+    "/modules/ocel/v1/{ocel_id}/mapping": {
+      "post": {
+        "summary": "Create an OCEL mapping from the OCEL",
+        "operationId": "createOcelMapping",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "original",
+                "filtered"
+              ],
+              "type": "string",
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OcelMappingRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "title": "Response Createocelmapping"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/modules/ocel/v1/{ocel_id}/query": {
       "post": {
         "summary": "Run SQL against an OCEL",
@@ -3480,6 +3567,19 @@
         ],
         "title": "DefaultOCEL"
       },
+      "EntityMappingSelection": {
+        "properties": {
+          "attributes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Attributes"
+          }
+        },
+        "type": "object",
+        "title": "EntityMappingSelection"
+      },
       "Entity_Time_Info": {
         "properties": {
           "start_time": {
@@ -3577,6 +3677,49 @@
         ],
         "title": "ObjectVariant",
         "description": "A single object variant: a distinct activity sequence objects of a type follow.\n\nAttributes:\n    variant_id: Identifier of the variant\n        (``<object_type>_<hash of the activity sequence>``). It depends only\n        on the sequence, so it stays the same across filtered views of a log.\n    activities: The ordered activity sequence that defines the variant.\n    event_count: Number of events in the variant (length of ``activities``).\n    case_count: Number of objects (cases) that follow this variant."
+      },
+      "OcelMappingRequest": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "events": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EntityMappingSelection"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "objects": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EntityMappingSelection"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "e2o": {
+            "type": "boolean",
+            "title": "E2O",
+            "default": false
+          },
+          "o2o": {
+            "type": "boolean",
+            "title": "O2O",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "OcelMappingRequest"
       },
       "OcelMetadata": {
         "properties": {

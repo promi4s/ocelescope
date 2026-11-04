@@ -14,6 +14,7 @@ import {
   useSetFilter,
 } from "../api/base";
 import { useFilterView } from "../hooks/useView";
+import { CreateMappingAction } from "./CreateMappingAction";
 import { FILTER_KINDS } from "./FilterViews";
 
 const CLEANUP_NOTE =
@@ -62,6 +63,9 @@ const FilterPage = () => {
           }}
           actions={({ completeSteps, isDirty, reset }) => (
             <>
+              {completeSteps.length > 0 && (
+                <CreateMappingAction ocelId={ocelId} steps={completeSteps} />
+              )}
               {isDirty && (
                 <>
                   <Tooltip label="Apply">

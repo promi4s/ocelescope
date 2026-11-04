@@ -1,5 +1,6 @@
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Self
+from typing import TYPE_CHECKING, Self
 
 import duckdb
 
@@ -9,10 +10,22 @@ from ocelescope.ocel.constants import (
     O2O_QUALIFIER,
     O2O_SOURCE_ID,
     O2O_TARGET_ID,
+    OBJECT_CHANGED_FIELD,
     OID_COL,
+    TIMESTAMP_COL,
+)
+from ocelescope.ocel.constants.tables import (
+    E2O_TABLE,
+    EVENTS_TABLE,
+    O2O_TABLE,
+    OBJECT_CHANGES_TABLE,
+    OBJECTS_TABLE,
 )
 from ocelescope.resource.tabular import Table, TabularResource
 from ocelescope.util.sql import ident, literal
+
+if TYPE_CHECKING:
+    from ocelescope.ocel import OCEL
 
 _CSV_TABLES: list[tuple[str, list[str], str | None]] = [
     ("e2o", [EID_COL, OID_COL], E2O_QUALIFIER),
@@ -45,6 +58,62 @@ class OCELMapping(TabularResource):
         [(O2O_SOURCE_ID, "str"), (O2O_TARGET_ID, "str"), (O2O_QUALIFIER, "str")],
         extra_columns="keep",
     )
+
+    @classmethod
+    def from_ocel(
+        cls,
+        ocel: "OCEL",
+        *,
+        events: bool = False,
+        event_attributes: Sequence[str] = (),
+        objects: bool = False,
+        object_attributes: Sequence[str] = (),
+        e2o: bool = False,
+        o2o: bool = False,
+    ) -> Self:
+        mapping = cls()
+
+        if events:
+            known = set(ocel.events.attribute_names)
+            columns = "".join(
+                f", {ident(name)}" for name in event_attributes if name in known
+            )
+            mapping.events = ocel.sql(
+                f"SELECT {ident(EID_COL)}{columns} FROM {ident(EVENTS_TABLE)}"
+            )
+
+        if objects:
+            known = set(ocel.objects.attribute_names)
+            oid, field, ts = (
+                ident(OID_COL),
+                ident(OBJECT_CHANGED_FIELD),
+                ident(TIMESTAMP_COL),
+            )
+            columns = "".join(
+                f", arg_max(c.{ident(name)}, c.{ts}) "
+                f"FILTER (WHERE c.{field} = {literal(name)}) AS {ident(name)}"
+                for name in object_attributes
+                if name in known
+            )
+            mapping.objects = ocel.sql(
+                f"SELECT o.{oid}{columns} FROM {ident(OBJECTS_TABLE)} o "
+                f"LEFT JOIN {ident(OBJECT_CHANGES_TABLE)} c ON c.{oid} = o.{oid} "
+                f"GROUP BY o.{oid}"
+            )
+
+        if e2o:
+            mapping.e2o = ocel.sql(
+                f"SELECT DISTINCT {ident(EID_COL)}, {ident(OID_COL)}, "
+                f"{ident(E2O_QUALIFIER)} FROM {ident(E2O_TABLE)}"
+            )
+
+        if o2o:
+            mapping.o2o = ocel.sql(
+                f"SELECT DISTINCT {ident(O2O_SOURCE_ID)}, {ident(O2O_TARGET_ID)}, "
+                f"{ident(O2O_QUALIFIER)} FROM {ident(O2O_TABLE)}"
+            )
+
+        return mapping
 
     @classmethod
     def from_csv(cls, path: str | Path) -> Self:

@@ -5,6 +5,7 @@ import {
   EllipsisVerticalIcon,
   EyeIcon,
   PencilIcon,
+  TableIcon,
   TrashIcon,
 } from "lucide-react";
 import { memo } from "react";
@@ -20,6 +21,7 @@ type EntityActionsMenuProps = {
   onInspect: (id: string) => void;
   onDownloadOcel: (id: string, extension: OcelExtension) => void;
   onExportAsXes: (id: string) => void;
+  onCreateMapping: (entity: Entity) => void;
   onDownloadResource: (id: string) => void;
   onDownloadResourceAsPnml: (id: string) => void;
   onDelete: (id: string, type: Entity["type"]) => void;
@@ -31,6 +33,7 @@ const EntityActionsMenu: React.FC<EntityActionsMenuProps> = ({
   onInspect,
   onDownloadOcel,
   onExportAsXes,
+  onCreateMapping,
   onDownloadResource,
   onDownloadResourceAsPnml,
   onDelete,
@@ -62,6 +65,14 @@ const EntityActionsMenu: React.FC<EntityActionsMenuProps> = ({
           >
             Inspect
           </MenuItem>
+        )}
+        {type === "ocel" && (
+          <Menu.Item
+            leftSection={<TableIcon size={16} />}
+            onClick={() => onCreateMapping(entity)}
+          >
+            Create mapping
+          </Menu.Item>
         )}
         {type === "ocel" ? (
           <Menu.Sub position="right-start">
