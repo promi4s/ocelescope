@@ -9,8 +9,13 @@ import {
   Title,
   Tooltip,
 } from "@mantine/core";
+import {
+  readLocalStorageValue,
+  useDebouncedCallback,
+  useLocalStorage,
+} from "@mantine/hooks";
 import { InfoIcon } from "lucide-react";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import {
   Controller,
   type DefaultValues,
@@ -29,6 +34,8 @@ import type {
 } from "./types";
 import { completeSteps, kindOf } from "./util";
 
+type Draft<S> = { base: S[]; steps: S[] };
+
 const DEFAULT_LABELS: ViewBuilderLabels = {
   title: "Pipeline",
   add: "Add step",
@@ -44,6 +51,7 @@ export type OCELViewBuilderProps<S extends BaseStep> = {
   kinds: StepKinds<S>;
   useView: UseView<S>;
   defaultSteps?: S[];
+  storageKey?: string;
   labels?: Partial<ViewBuilderLabels>;
   actions?: (state: ViewBuilderState<S>) => ReactNode;
 };
@@ -53,6 +61,7 @@ export const OCELViewBuilder = <S extends BaseStep>({
   kinds,
   useView,
   defaultSteps = [],
+  storageKey,
   labels: labelOverrides,
   actions,
 }: OCELViewBuilderProps<S>) => {
@@ -61,7 +70,7 @@ export const OCELViewBuilder = <S extends BaseStep>({
     defaultValues: { steps: defaultSteps } as DefaultValues<PipelineForm<S>>,
   });
 
-  const { control, reset, formState } = form;
+  const { control, reset, formState, subscribe } = form;
 
   const steps = useWatch({
     control,
@@ -71,6 +80,58 @@ export const OCELViewBuilder = <S extends BaseStep>({
   const [selected, setSelected] = useState<number | undefined>(
     defaultSteps.length > 0 ? 0 : undefined,
   );
+
+  const draftKey = storageKey
+    ? `ocelescope:${storageKey}:${ocelId}`
+    : undefined;
+  const base = JSON.stringify(defaultSteps);
+  const [, setDraft, removeDraft] = useLocalStorage<Draft<S>>({
+    key: draftKey ?? "",
+    sync: false,
+  });
+
+  useEffect(() => {
+    if (!draftKey) {
+      return;
+    }
+    const draft = readLocalStorageValue<Draft<S>>({ key: draftKey });
+    if (!draft) {
+      return;
+    }
+    if (JSON.stringify(draft.base) !== base) {
+      removeDraft();
+      return;
+    }
+    reset({ steps: draft.steps } as PipelineForm<S>, {
+      keepDefaultValues: true,
+    });
+    setSelected(draft.steps.length > 0 ? 0 : undefined);
+  }, [draftKey, base, reset, removeDraft]);
+
+  const saveDraft = useDebouncedCallback(
+    (next: S[], isDirty: boolean) => {
+      if (!draftKey) {
+        return;
+      }
+      if (isDirty) {
+        setDraft({ base: defaultSteps, steps: next });
+      } else {
+        removeDraft();
+      }
+    },
+    { delay: 400, flushOnUnmount: true },
+  );
+
+  useEffect(
+    () =>
+      subscribe({
+        formState: { values: true, isDirty: true },
+        callback: ({ values, isDirty }) =>
+          saveDraft(values.steps, isDirty ?? false),
+      }),
+    [subscribe, saveDraft],
+  );
+
   const selectedStep = selected === undefined ? undefined : steps[selected];
   const before = completeSteps(kinds, steps.slice(0, selected ?? 0));
   const viewId = useView(ocelId, before);

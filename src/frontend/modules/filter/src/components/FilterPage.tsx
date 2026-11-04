@@ -41,6 +41,7 @@ const FilterPage = () => {
           kinds={FILTER_KINDS}
           useView={useFilterView}
           defaultSteps={filterPipeline}
+          storageKey="filter"
           labels={{
             note: CLEANUP_NOTE,
             add: "Add filter",
