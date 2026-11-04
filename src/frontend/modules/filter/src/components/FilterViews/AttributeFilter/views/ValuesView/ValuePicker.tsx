@@ -4,10 +4,9 @@ import {
   type AttributeValueCount,
   useAttributeValues,
 } from "@ocelescope/api-base";
-import { OptionPicker, type PickerOption } from "@ocelescope/core";
+import { OptionPicker, type PickerOption, viewParams } from "@ocelescope/core";
 import { keepPreviousData } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { useView } from "../../../../../hooks/useView";
 import type { DistributionViewProps, PreviewProps } from "../../util";
 
 const ValuePicker: React.FC<DistributionViewProps & PreviewProps> = ({
@@ -16,17 +15,16 @@ const ValuePicker: React.FC<DistributionViewProps & PreviewProps> = ({
   onChange,
   ocelId,
   entityType,
-  before,
+  viewId,
 }) => {
   const theme = useMantineTheme();
   const [search, setSearch] = useState("");
   const [debounced] = useDebouncedValue(search.trim(), 300);
 
-  const view = useView(ocelId, before);
   const found = useAttributeValues(
     ocelId,
     {
-      ...view,
+      ...viewParams(viewId),
       attribute: filter.attribute,
       search: debounced,
       entity_type: entityType,
@@ -34,7 +32,7 @@ const ValuePicker: React.FC<DistributionViewProps & PreviewProps> = ({
     },
     {
       query: {
-        enabled: view !== undefined && debounced !== "",
+        enabled: debounced !== "",
         placeholderData: keepPreviousData,
       },
     },
@@ -64,7 +62,7 @@ const ValuePicker: React.FC<DistributionViewProps & PreviewProps> = ({
   const picked = useAttributeValues(
     ocelId,
     {
-      ...view,
+      ...viewParams(viewId),
       attribute: filter.attribute,
       values: selected,
       entity_type: entityType,
@@ -72,7 +70,7 @@ const ValuePicker: React.FC<DistributionViewProps & PreviewProps> = ({
     },
     {
       query: {
-        enabled: view !== undefined && selected.length > 0,
+        enabled: selected.length > 0,
         placeholderData: keepPreviousData,
       },
     },

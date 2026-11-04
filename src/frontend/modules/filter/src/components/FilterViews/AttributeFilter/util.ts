@@ -1,8 +1,11 @@
 import type { AttributeDistribution } from "@ocelescope/api-base";
-import type { FilterOf, NativeFilter } from "../../../types/filter";
+import type {
+  EventAttributeFilter,
+  ObjectAttributeFilter,
+} from "../../../api/base";
 import dayjs from "../../../util/dayjs";
 
-export type AttributeFilter = FilterOf<"event_attribute" | "object_attribute">;
+export type AttributeFilter = EventAttributeFilter | ObjectAttributeFilter;
 
 export type FieldProps = {
   filter: AttributeFilter;
@@ -16,7 +19,7 @@ export type DistributionViewProps = FieldProps & {
 export type PreviewProps = {
   ocelId: string;
   entityType: "events" | "objects";
-  before: NativeFilter[];
+  viewId: string | null;
 };
 
 const DATE_FORMAT = "YYYY-MM-DD HH:mm";

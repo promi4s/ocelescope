@@ -2,9 +2,8 @@ import { Button } from "@mantine/core";
 import type { AggregatedAttribute, TypedAttribute } from "@ocelescope/api-base";
 import type { DataTableColumn } from "mantine-datatable";
 import { useMemo } from "react";
-import type { FilterOf } from "../types/filter";
 
-type AttributeFilter = FilterOf<"event_attribute" | "object_attribute">;
+import type { AttributeFilter } from "../components/FilterViews/AttributeFilter/util";
 
 type Condition = Omit<AttributeFilter, "target_type" | "type" | "attribute">;
 

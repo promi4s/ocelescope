@@ -1,32 +1,24 @@
-import type {
-  FilterKey,
-  FilterKind,
-  FilterOf,
-  NativeFilter,
-} from "../../types/filter";
+import type { StepKinds } from "@ocelescope/core";
+import type { GetFilterQueryResult } from "../../api/base";
 import {
-  EventAttributeFilter,
-  ObjectAttributeFilter,
+  eventAttributeKind,
+  objectAttributeKind,
 } from "./AttributeFilter/AttributeFilter";
 import {
-  E2OCountFilter,
-  O2OCountFilter,
+  e2oCountKind,
+  o2oCountKind,
 } from "./RelationCountFilter/RelationCountFilter";
-import { TimeFrameFilter } from "./TimeFrameFilter";
-import { ActivityFilter, ObjectTypeFilter } from "./TypeForm";
+import { timeFrameKind } from "./TimeFrameFilter";
+import { activityKind, objectTypeKind } from "./TypeForm";
 
-export const FILTER_KINDS: { [T in FilterKey]: FilterKind<T> } = {
-  activity: ActivityFilter,
-  object_type: ObjectTypeFilter,
-  time_frame: TimeFrameFilter,
-  event_attribute: EventAttributeFilter,
-  object_attribute: ObjectAttributeFilter,
-  e2o_count: E2OCountFilter,
-  o2o_count: O2OCountFilter,
-} as const;
+export type NativeFilter = GetFilterQueryResult[number];
 
-export const kindOf = <T extends FilterKey>(filter: FilterOf<T>) =>
-  FILTER_KINDS[filter.type as T] as FilterKind<T>;
-
-export const completeSteps = (steps: NativeFilter[]) =>
-  steps.filter((step) => kindOf(step).isComplete(step));
+export const FILTER_KINDS: StepKinds<NativeFilter> = {
+  activity: activityKind,
+  object_type: objectTypeKind,
+  time_frame: timeFrameKind,
+  event_attribute: eventAttributeKind,
+  object_attribute: objectAttributeKind,
+  e2o_count: e2oCountKind,
+  o2o_count: o2oCountKind,
+};
