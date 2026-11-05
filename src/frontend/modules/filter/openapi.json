@@ -312,6 +312,55 @@
         "title": "ActivityFilter",
         "description": "Keep (or exclude) events of the given activities."
       },
+      "AttributeCondition": {
+        "properties": {
+          "condition": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/RangeCondition"
+              },
+              {
+                "$ref": "#/components/schemas/TimeRangeCondition"
+              },
+              {
+                "$ref": "#/components/schemas/ValuesCondition"
+              },
+              {
+                "$ref": "#/components/schemas/PatternCondition"
+              },
+              {
+                "$ref": "#/components/schemas/NullCondition"
+              }
+            ],
+            "title": "Condition",
+            "discriminator": {
+              "propertyName": "kind",
+              "mapping": {
+                "null": "#/components/schemas/NullCondition",
+                "pattern": "#/components/schemas/PatternCondition",
+                "range": "#/components/schemas/RangeCondition",
+                "time_range": "#/components/schemas/TimeRangeCondition",
+                "values": "#/components/schemas/ValuesCondition"
+              }
+            }
+          },
+          "negate": {
+            "type": "boolean",
+            "title": "Negate",
+            "default": false
+          },
+          "null": {
+            "type": "boolean",
+            "title": "Null",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "condition"
+        ],
+        "title": "AttributeCondition"
+      },
       "E2OCountFilter": {
         "properties": {
           "source": {
@@ -388,148 +437,65 @@
       },
       "EventAttributeFilter": {
         "properties": {
-          "target_type": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Target Type"
-          },
-          "attribute": {
-            "type": "string",
-            "title": "Attribute"
-          },
-          "time_range": {
-            "anyOf": [
-              {
-                "prefixItems": [
-                  {
-                    "anyOf": [
-                      {
-                        "type": "string"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  },
-                  {
-                    "anyOf": [
-                      {
-                        "type": "string"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  }
-                ],
-                "type": "array",
-                "maxItems": 2,
-                "minItems": 2
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Time Range"
-          },
-          "number_range": {
-            "anyOf": [
-              {
-                "prefixItems": [
-                  {
-                    "anyOf": [
-                      {
-                        "type": "number"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  },
-                  {
-                    "anyOf": [
-                      {
-                        "type": "number"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  }
-                ],
-                "type": "array",
-                "maxItems": 2,
-                "minItems": 2
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Number Range"
-          },
-          "values": {
-            "anyOf": [
-              {
-                "items": {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "integer"
-                    },
-                    {
-                      "type": "number"
-                    }
-                  ]
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Values"
-          },
-          "regex": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Regex"
-          },
-          "mode": {
-            "type": "string",
-            "enum": [
-              "exclude",
-              "include"
-            ],
-            "title": "Mode",
-            "default": "include"
-          },
           "type": {
             "type": "string",
             "const": "event_attribute",
             "title": "Type"
+          },
+          "target": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "all",
+                  "carrying"
+                ]
+              }
+            ],
+            "title": "Target",
+            "default": "carrying"
+          },
+          "conditions": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/AttributeCondition"
+            },
+            "type": "object",
+            "title": "Conditions"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "include",
+              "exclude"
+            ],
+            "title": "Mode",
+            "default": "include"
           }
         },
         "type": "object",
         "required": [
-          "attribute",
-          "type"
+          "type",
+          "conditions"
         ],
-        "title": "EventAttributeFilter",
-        "description": "Keep events whose attribute matches; activities without it are untouched."
+        "title": "EventAttributeFilter"
+      },
+      "FirstValue": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "first",
+            "title": "Kind",
+            "default": "first"
+          }
+        },
+        "type": "object",
+        "title": "FirstValue"
       },
       "HTTPValidationError": {
         "properties": {
@@ -543,6 +509,42 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "InitialValue": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "initial",
+            "title": "Kind",
+            "default": "initial"
+          }
+        },
+        "type": "object",
+        "title": "InitialValue"
+      },
+      "LastValue": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "last",
+            "title": "Kind",
+            "default": "last"
+          }
+        },
+        "type": "object",
+        "title": "LastValue"
+      },
+      "NullCondition": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "null",
+            "title": "Kind",
+            "default": "null"
+          }
+        },
+        "type": "object",
+        "title": "NullCondition"
       },
       "O2OCountFilter": {
         "properties": {
@@ -618,150 +620,133 @@
         "title": "O2OCountFilter",
         "description": "Keep objects by how many O2O relations of a given kind they have."
       },
-      "ObjectAttributeFilter": {
+      "ObjectAttributeCondition": {
         "properties": {
-          "target_type": {
-            "anyOf": [
+          "condition": {
+            "oneOf": [
               {
-                "type": "string"
+                "$ref": "#/components/schemas/RangeCondition"
               },
               {
-                "type": "null"
-              }
-            ],
-            "title": "Target Type"
-          },
-          "attribute": {
-            "type": "string",
-            "title": "Attribute"
-          },
-          "time_range": {
-            "anyOf": [
-              {
-                "prefixItems": [
-                  {
-                    "anyOf": [
-                      {
-                        "type": "string"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  },
-                  {
-                    "anyOf": [
-                      {
-                        "type": "string"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  }
-                ],
-                "type": "array",
-                "maxItems": 2,
-                "minItems": 2
+                "$ref": "#/components/schemas/TimeRangeCondition"
               },
               {
-                "type": "null"
-              }
-            ],
-            "title": "Time Range"
-          },
-          "number_range": {
-            "anyOf": [
-              {
-                "prefixItems": [
-                  {
-                    "anyOf": [
-                      {
-                        "type": "number"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  },
-                  {
-                    "anyOf": [
-                      {
-                        "type": "number"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  }
-                ],
-                "type": "array",
-                "maxItems": 2,
-                "minItems": 2
+                "$ref": "#/components/schemas/ValuesCondition"
               },
               {
-                "type": "null"
-              }
-            ],
-            "title": "Number Range"
-          },
-          "values": {
-            "anyOf": [
-              {
-                "items": {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "integer"
-                    },
-                    {
-                      "type": "number"
-                    }
-                  ]
-                },
-                "type": "array"
+                "$ref": "#/components/schemas/PatternCondition"
               },
               {
-                "type": "null"
+                "$ref": "#/components/schemas/NullCondition"
               }
             ],
-            "title": "Values"
+            "title": "Condition",
+            "discriminator": {
+              "propertyName": "kind",
+              "mapping": {
+                "null": "#/components/schemas/NullCondition",
+                "pattern": "#/components/schemas/PatternCondition",
+                "range": "#/components/schemas/RangeCondition",
+                "time_range": "#/components/schemas/TimeRangeCondition",
+                "values": "#/components/schemas/ValuesCondition"
+              }
+            }
           },
-          "regex": {
-            "anyOf": [
+          "negate": {
+            "type": "boolean",
+            "title": "Negate",
+            "default": false
+          },
+          "null": {
+            "type": "boolean",
+            "title": "Null",
+            "default": false
+          },
+          "value": {
+            "oneOf": [
               {
-                "type": "string"
+                "$ref": "#/components/schemas/InitialValue"
               },
               {
-                "type": "null"
+                "$ref": "#/components/schemas/FirstValue"
+              },
+              {
+                "$ref": "#/components/schemas/LastValue"
+              },
+              {
+                "$ref": "#/components/schemas/ValueAt"
               }
             ],
-            "title": "Regex"
-          },
-          "mode": {
-            "type": "string",
-            "enum": [
-              "exclude",
-              "include"
-            ],
-            "title": "Mode",
-            "default": "include"
-          },
-          "type": {
-            "type": "string",
-            "const": "object_attribute",
-            "title": "Type"
+            "title": "Value",
+            "default": {
+              "kind": "first"
+            },
+            "discriminator": {
+              "propertyName": "kind",
+              "mapping": {
+                "at": "#/components/schemas/ValueAt",
+                "first": "#/components/schemas/FirstValue",
+                "initial": "#/components/schemas/InitialValue",
+                "last": "#/components/schemas/LastValue"
+              }
+            }
           }
         },
         "type": "object",
         "required": [
-          "attribute",
-          "type"
+          "condition"
         ],
-        "title": "ObjectAttributeFilter",
-        "description": "Keep objects whose (static) attribute matches; types without it are untouched."
+        "title": "ObjectAttributeCondition"
+      },
+      "ObjectAttributeFilter": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "object_attribute",
+            "title": "Type"
+          },
+          "target": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "all",
+                  "carrying"
+                ]
+              }
+            ],
+            "title": "Target",
+            "default": "carrying"
+          },
+          "conditions": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ObjectAttributeCondition"
+            },
+            "type": "object",
+            "title": "Conditions"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "include",
+              "exclude"
+            ],
+            "title": "Mode",
+            "default": "include"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "conditions"
+        ],
+        "title": "ObjectAttributeFilter"
       },
       "ObjectTypeFilter": {
         "properties": {
@@ -795,6 +780,68 @@
         ],
         "title": "ObjectTypeFilter",
         "description": "Keep (or exclude) objects of the given object types."
+      },
+      "PatternCondition": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "pattern",
+            "title": "Kind",
+            "default": "pattern"
+          },
+          "regex": {
+            "type": "string",
+            "title": "Regex"
+          }
+        },
+        "type": "object",
+        "required": [
+          "regex"
+        ],
+        "title": "PatternCondition"
+      },
+      "RangeCondition": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "range",
+            "title": "Kind",
+            "default": "range"
+          },
+          "range": {
+            "prefixItems": [
+              {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            ],
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "Range"
+          }
+        },
+        "type": "object",
+        "required": [
+          "range"
+        ],
+        "title": "RangeCondition"
       },
       "TimeFrameFilter": {
         "properties": {
@@ -849,6 +896,49 @@
         "title": "TimeFrameFilter",
         "description": "Keep (or exclude) events whose timestamp falls in ``[start, end]``."
       },
+      "TimeRangeCondition": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "time_range",
+            "title": "Kind",
+            "default": "time_range"
+          },
+          "range": {
+            "prefixItems": [
+              {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            ],
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "Range"
+          }
+        },
+        "type": "object",
+        "required": [
+          "range"
+        ],
+        "title": "TimeRangeCondition"
+      },
       "ValidationError": {
         "properties": {
           "loc": {
@@ -888,6 +978,57 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "ValueAt": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "at",
+            "title": "Kind",
+            "default": "at"
+          },
+          "timestamp": {
+            "type": "string",
+            "title": "Timestamp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "timestamp"
+        ],
+        "title": "ValueAt"
+      },
+      "ValuesCondition": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "values",
+            "title": "Kind",
+            "default": "values"
+          },
+          "values": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "number"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Values"
+          }
+        },
+        "type": "object",
+        "required": [
+          "values"
+        ],
+        "title": "ValuesCondition"
       }
     }
   }

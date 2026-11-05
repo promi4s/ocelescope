@@ -6,16 +6,10 @@ from ocelescope.ocel.filter import (
     E2OCountFilter as _E2OCountFilter,
 )
 from ocelescope.ocel.filter import (
-    EventAttributeFilter as _EventAttributeFilter,
-)
-from ocelescope.ocel.filter import (
     EventTypeFilter as _EventTypeFilter,
 )
 from ocelescope.ocel.filter import (
     O2OCountFilter as _O2OCountFilter,
-)
-from ocelescope.ocel.filter import (
-    ObjectAttributeFilter as _ObjectAttributeFilter,
 )
 from ocelescope.ocel.filter import (
     ObjectTypeFilter as _ObjectTypeFilter,
@@ -24,6 +18,11 @@ from ocelescope.ocel.filter import (
     TimeFrameFilter as _TimeFrameFilter,
 )
 from pydantic import Field
+
+from ocelescope_module_filter.filters.attribute import (
+    EventAttributeFilter,
+    ObjectAttributeFilter,
+)
 
 FILTER_SOURCE = "FilterV1"
 
@@ -49,18 +48,6 @@ class ObjectTypeFilter(_ObjectTypeFilter):
 
     type: Literal["object_type"]
     mode: Mode = "include"
-
-
-class EventAttributeFilter(_EventAttributeFilter):
-    """Keep events whose attribute matches; activities without it are untouched."""
-
-    type: Literal["event_attribute"]
-
-
-class ObjectAttributeFilter(_ObjectAttributeFilter):
-    """Keep objects whose (static) attribute matches; types without it are untouched."""
-
-    type: Literal["object_attribute"]
 
 
 class E2OCountFilter(_E2OCountFilter):
