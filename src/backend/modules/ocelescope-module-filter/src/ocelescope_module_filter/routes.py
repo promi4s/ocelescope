@@ -2,13 +2,15 @@ import json
 import time
 from typing import Annotated
 
-from fastapi import APIRouter, Body
+from fastapi import APIRouter, Body, Query
 from ocelescope.ocel.view import Clean
-from ocelescope_backend.app.dependencies import ApiSession
+from ocelescope_backend.app.dependencies import ApiOcel, ApiSession
 from ocelescope_backend.app.internal.model.ocel import SessionOCEL
 from ocelescope_backend.app.internal.model.view import SessionView
 from ocelescope_backend.app.sse_manager import SystemNotification, sse_manager
+from ocelescope_module_ocel.util.attributes import EntityType
 
+from ocelescope_module_filter.attributes import SharedAttribute, shared_attributes
 from ocelescope_module_filter.filters import FILTER_SOURCE, NativeFilter
 from ocelescope_module_filter.state import (
     ApiFilterState,
@@ -57,6 +59,15 @@ def register_view(
         name=name or "Filter preview",
         temporary=name is None,
     ).id
+
+
+@router.get("/{ocel_id}/attributes/shared", operation_id="getSharedAttributes")
+def get_shared_attributes(
+    ocel: ApiOcel,
+    entity_type: Annotated[EntityType, Query()] = "events",
+    entity_names: Annotated[list[str] | None, Query()] = None,
+) -> list[SharedAttribute]:
+    return shared_attributes(ocel, entity_type, entity_names)
 
 
 def active_filter(handle: SessionOCEL, state: FilterModuleState) -> FilterState | None:

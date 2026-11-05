@@ -4,18 +4,21 @@ import {
   type AttributeValueCount,
   useAttributeValues,
 } from "@ocelescope/api-base";
-import { OptionPicker, type PickerOption, viewParams } from "@ocelescope/core";
+import { OptionPicker, type PickerOption } from "@ocelescope/core";
 import { keepPreviousData } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import type { DistributionViewProps, PreviewProps } from "../../util";
+import {
+  type DistributionViewProps,
+  type PreviewProps,
+  scopeParams,
+} from "../../util";
 
 const ValuePicker: React.FC<DistributionViewProps & PreviewProps> = ({
   data,
-  filter,
+  condition,
   onChange,
   ocelId,
-  entityType,
-  viewId,
+  ...scope
 }) => {
   const theme = useMantineTheme();
   const [search, setSearch] = useState("");
@@ -23,13 +26,7 @@ const ValuePicker: React.FC<DistributionViewProps & PreviewProps> = ({
 
   const found = useAttributeValues(
     ocelId,
-    {
-      ...viewParams(viewId),
-      attribute: filter.attribute,
-      search: debounced,
-      entity_type: entityType,
-      entity_names: filter.target_type ? [filter.target_type] : undefined,
-    },
+    { ...scopeParams(scope), search: debounced },
     {
       query: {
         enabled: debounced !== "",
@@ -57,17 +54,14 @@ const ValuePicker: React.FC<DistributionViewProps & PreviewProps> = ({
     [values, theme],
   );
 
-  const selected = (filter.values ?? []).map(String);
-  const exclude = filter.mode === "exclude";
+  const selected =
+    condition.condition.kind === "values"
+      ? condition.condition.values.map(String)
+      : [];
+  const negate = condition.negate ?? false;
   const picked = useAttributeValues(
     ocelId,
-    {
-      ...viewParams(viewId),
-      attribute: filter.attribute,
-      values: selected,
-      entity_type: entityType,
-      entity_names: filter.target_type ? [filter.target_type] : undefined,
-    },
+    { ...scopeParams(scope), values: selected },
     {
       query: {
         enabled: selected.length > 0,
@@ -75,20 +69,13 @@ const ValuePicker: React.FC<DistributionViewProps & PreviewProps> = ({
       },
     },
   );
-  const matched = picked.data?.count ?? 0;
-  const kept =
-    selected.length === 0
-      ? exclude
-        ? 0
-        : data.count
-      : exclude
-        ? data.count - matched
-        : matched;
+  const matched = selected.length > 0 ? (picked.data?.count ?? 0) : 0;
+  const kept = negate ? data.count - matched : matched;
 
   return (
     <Stack gap="sm">
       <Text size="sm" c="dimmed">
-        Keeping {kept.toLocaleString()} of {data.count.toLocaleString()} values
+        Matching {kept.toLocaleString()} of {data.count.toLocaleString()} values
       </Text>
       <OptionPicker<string>
         variant="list"
@@ -104,7 +91,10 @@ const ValuePicker: React.FC<DistributionViewProps & PreviewProps> = ({
         total={total}
         value={selected}
         onChange={(next) =>
-          onChange({ ...filter, values: next.length ? next : null })
+          onChange({
+            ...condition,
+            condition: { kind: "values", values: next },
+          })
         }
       />
       {values.length < total && (
@@ -115,7 +105,7 @@ const ValuePicker: React.FC<DistributionViewProps & PreviewProps> = ({
       )}
       {selected.length === 0 && (
         <Text size="xs" c="dimmed">
-          No value picked: every value is {exclude ? "removed" : "kept"}.
+          No value picked: {negate ? "every value matches" : "nothing matches"}.
         </Text>
       )}
     </Stack>

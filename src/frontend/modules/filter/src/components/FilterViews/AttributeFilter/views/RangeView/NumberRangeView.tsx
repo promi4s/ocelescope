@@ -10,7 +10,7 @@ const formatFloat = (value: number) =>
 
 const NumberRangeView: React.FC<DistributionViewProps> = ({
   data,
-  filter,
+  condition,
   onChange,
 }) => {
   const isInt = data.type === "int";
@@ -27,10 +27,13 @@ const NumberRangeView: React.FC<DistributionViewProps> = ({
     [data.bins, isInt],
   );
 
-  const [low, high] = filter.number_range ?? [null, null];
+  const [low, high] =
+    condition.condition.kind === "range"
+      ? condition.condition.range
+      : [null, null];
   const value: Range = [low ?? min, high ?? max];
-  const setRange = (number_range: Range) =>
-    onChange({ ...filter, number_range });
+  const setRange = (range: Range) =>
+    onChange({ ...condition, condition: { kind: "range", range } });
 
   const toNumber = (next: string | number) =>
     typeof next === "number" ? next : undefined;
@@ -42,7 +45,7 @@ const NumberRangeView: React.FC<DistributionViewProps> = ({
       max={max}
       value={value}
       onChange={setRange}
-      exclude={filter.mode === "exclude"}
+      exclude={condition.negate ?? false}
       format={isInt ? formatInt : formatFloat}
       snap={isInt ? Math.round : undefined}
       inputs={

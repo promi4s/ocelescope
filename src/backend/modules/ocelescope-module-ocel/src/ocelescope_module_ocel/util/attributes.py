@@ -80,7 +80,7 @@ def _marshal(value: str | None, value_type: ValueType) -> str | int | float:
     return value
 
 
-def _attribute_types(ocel: OCEL, entity_type: EntityType) -> dict[str, ValueType]:
+def attribute_types(ocel: OCEL, entity_type: EntityType) -> dict[str, ValueType]:
     """Every attribute of ``entity_type``, with the ValueType its column reports.
 
     Attributes are the stored table's columns bar the OCEL ones -- an event table
@@ -112,7 +112,7 @@ def long_table(
     ``attribute_names`` = the attributes to include (``None`` = all of them),
     ``entity_names`` the entity types (``None`` = all; empty list = nothing).
     """
-    names = list(_attribute_types(ocel, entity_type))
+    names = list(attribute_types(ocel, entity_type))
     if attribute_names is not None:
         wanted = set(attribute_names)
         names = [name for name in names if name in wanted]
@@ -218,7 +218,7 @@ def aggregate_attributes(
     present values, plus the entity types it appears in. Attributes with no present
     values never reach the long table and are therefore omitted.
     """
-    types = _attribute_types(ocel, entity_type)
+    types = attribute_types(ocel, entity_type)
     numeric = [n for n, t in types.items() if t in (ValueType.INT, ValueType.FLOAT)]
     rows = (
         long_table(ocel, entity_type, attribute_names, entity_names)
@@ -256,7 +256,7 @@ def typed_attributes(
     reports, for every activity / object type, each attribute's min / max /
     distinct-count over its present values within that type.
     """
-    types = _attribute_types(ocel, entity_type)
+    types = attribute_types(ocel, entity_type)
     numeric = [n for n, t in types.items() if t in (ValueType.INT, ValueType.FLOAT)]
     group = ident(ENTITY_TYPE)
 
@@ -289,7 +289,7 @@ def entity_values(
     attribute: str,
     entity_names: list[str] | None = None,
 ) -> duckdb.DuckDBPyRelation:
-    if entity_type == "events" or attribute not in _attribute_types(ocel, "objects"):
+    if entity_type == "events" or attribute not in attribute_types(ocel, "objects"):
         return long_table(ocel, entity_type, [attribute], entity_names)
 
     params: list[object] = []
@@ -315,7 +315,7 @@ def attribute_distribution(
     bins: int = 50,
     top: int = 200,
 ) -> AttributeDistribution | None:
-    value_type = _attribute_types(ocel, entity_type).get(attribute)
+    value_type = attribute_types(ocel, entity_type).get(attribute)
     if value_type is None:
         return None
 

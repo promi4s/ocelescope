@@ -15,7 +15,7 @@ const formatTime = (value: number) => dayjs(value).format("YYYY-MM-DD HH:mm");
 
 const DateRangeView: React.FC<DistributionViewProps> = ({
   data,
-  filter,
+  condition,
   onChange,
 }) => {
   const min = toTime(data.min);
@@ -31,13 +31,19 @@ const DateRangeView: React.FC<DistributionViewProps> = ({
     [data.bins],
   );
 
-  const [start, end] = filter.time_range ?? [null, null];
+  const [start, end] =
+    condition.condition.kind === "time_range"
+      ? condition.condition.range
+      : [null, null];
   const value: Range = [
     start != null ? toTime(start) : min,
     end != null ? toTime(end) : max,
   ];
   const setRange = ([low, high]: Range) =>
-    onChange({ ...filter, time_range: [toDate(low), toDate(high)] });
+    onChange({
+      ...condition,
+      condition: { kind: "time_range", range: [toDate(low), toDate(high)] },
+    });
 
   return (
     <RangeView
@@ -46,7 +52,7 @@ const DateRangeView: React.FC<DistributionViewProps> = ({
       max={max}
       value={value}
       onChange={setRange}
-      exclude={filter.mode === "exclude"}
+      exclude={condition.negate ?? false}
       format={formatTime}
       inputs={
         <Group wrap="nowrap" align="end" gap="xs">

@@ -116,6 +116,119 @@
         }
       }
     },
+    "/modules/filter/v1/{ocel_id}/attributes/shared": {
+      "get": {
+        "summary": "Get Shared Attributes",
+        "operationId": "getSharedAttributes",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "entity_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "events",
+                "objects"
+              ],
+              "type": "string",
+              "default": "events",
+              "title": "Entity Type"
+            }
+          },
+          {
+            "name": "entity_names",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Entity Names"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "original",
+                "filtered"
+              ],
+              "type": "string",
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SharedAttribute"
+                  },
+                  "title": "Response Getsharedattributes"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/modules/filter/v1/{ocel_id}/filter": {
       "get": {
         "summary": "Getfilter",
@@ -843,6 +956,31 @@
         ],
         "title": "RangeCondition"
       },
+      "SharedAttribute": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ValueType"
+          },
+          "entity_types": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Entity Types"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "type",
+          "entity_types"
+        ],
+        "title": "SharedAttribute"
+      },
       "TimeFrameFilter": {
         "properties": {
           "time_range": {
@@ -997,6 +1135,18 @@
           "timestamp"
         ],
         "title": "ValueAt"
+      },
+      "ValueType": {
+        "type": "string",
+        "enum": [
+          "empty",
+          "string",
+          "bool",
+          "int",
+          "float",
+          "date"
+        ],
+        "title": "ValueType"
       },
       "ValuesCondition": {
         "properties": {

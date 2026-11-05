@@ -81,12 +81,17 @@ def get_event_attributes(
 def get_attribute_names(
     ocel: ApiOcel,
     entity_type: Annotated[EntityType | None, Query()] = None,
+    entity_names: Annotated[list[str] | None, Query()] = None,
 ) -> list[str]:
     names: list[str] = []
     if entity_type != "events":
-        names += attribute_util.attribute_names(ocel, "objects")
+        names += attribute_util.attribute_names(
+            ocel, "objects", entity_names=entity_names
+        )
     if entity_type != "objects":
-        names += attribute_util.attribute_names(ocel, "events")
+        names += attribute_util.attribute_names(
+            ocel, "events", entity_names=entity_names
+        )
     return names
 
 
