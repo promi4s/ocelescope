@@ -655,25 +655,6 @@
             }
           },
           {
-            "name": "entity_names",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Entity Names"
-            }
-          },
-          {
             "name": "ocel_version",
             "in": "query",
             "required": false,

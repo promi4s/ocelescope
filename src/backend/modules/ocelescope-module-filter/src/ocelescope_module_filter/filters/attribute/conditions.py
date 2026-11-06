@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
 from collections.abc import Mapping
 from typing import Annotated, Literal
 
@@ -15,18 +14,7 @@ from ocelescope_module_filter.filters.attribute.sql import (
 )
 
 
-class ValueCondition(BaseModel, ABC):
-    @abstractmethod
-    def predicate(self, value: str) -> str: ...
-
-    def match(self, value: str, negate: bool) -> str:
-        present = f"coalesce({self.predicate(value)}, false)"
-        if negate:
-            present = f"NOT {present}"
-        return f"(NOT {absent(value)} AND {present})"
-
-
-class RangeCondition(ValueCondition):
+class RangeCondition(BaseModel):
     kind: Literal["range"] = "range"
     range: tuple[float | None, float | None]
 
@@ -37,7 +25,7 @@ class RangeCondition(ValueCondition):
         return between(f"TRY_CAST({value} AS DOUBLE)", low, high)
 
 
-class TimeRangeCondition(ValueCondition):
+class TimeRangeCondition(BaseModel):
     kind: Literal["time_range"] = "time_range"
     range: tuple[str | None, str | None]
 
@@ -49,7 +37,7 @@ class TimeRangeCondition(ValueCondition):
         return between(f"TRY_CAST({value} AS TIMESTAMP)", low, high)
 
 
-class ValuesCondition(ValueCondition):
+class ValuesCondition(BaseModel):
     kind: Literal["values"] = "values"
     values: list[str | int | float]
 
@@ -65,7 +53,7 @@ class ValuesCondition(ValueCondition):
         return f"{value}::VARCHAR IN ({listed})"
 
 
-class PatternCondition(ValueCondition):
+class PatternCondition(BaseModel):
     kind: Literal["pattern"] = "pattern"
     regex: str
 
@@ -73,35 +61,32 @@ class PatternCondition(ValueCondition):
         return f"regexp_matches({value}::VARCHAR, {literal(self.regex)})"
 
 
-class NullCondition(BaseModel):
-    kind: Literal["null"] = "null"
-
-    def predicate(self, value: str) -> str:
-        return absent(value)
-
-    def match(self, value: str, negate: bool) -> str:
-        return f"NOT {self.predicate(value)}" if negate else self.predicate(value)
-
-
 Condition = Annotated[
-    RangeCondition
-    | TimeRangeCondition
-    | ValuesCondition
-    | PatternCondition
-    | NullCondition,
+    RangeCondition | TimeRangeCondition | ValuesCondition | PatternCondition,
     Field(discriminator="kind"),
 ]
 
 
 class AttributeCondition(BaseModel):
-    condition: Condition
+    condition: Condition | None = None
     negate: bool = False
-    null: bool = False
+    null: Literal["exclude", "include", "only"] = "exclude"
 
     def predicate(self, value: str) -> str:
-        match = self.condition.match(value, self.negate)
-        if self.null:
-            match = f"({match} OR {absent(value)})"
+        if self.null == "only":
+            return absent(value)
+
+        present = (
+            "true"
+            if self.condition is None
+            else f"coalesce({self.condition.predicate(value)}, false)"
+        )
+        if self.negate:
+            present = f"NOT {present}"
+        match = f"(NOT {absent(value)} AND {present})"
+
+        if self.null == "include":
+            return f"({match} OR {absent(value)})"
         return match
 
 

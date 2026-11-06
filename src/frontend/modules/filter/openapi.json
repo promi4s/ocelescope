@@ -116,6 +116,119 @@
         }
       }
     },
+    "/modules/filter/v1/{ocel_id}/attributes/shared": {
+      "get": {
+        "summary": "Get Shared Attributes",
+        "operationId": "getSharedAttributes",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "entity_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "events",
+                "objects"
+              ],
+              "type": "string",
+              "default": "events",
+              "title": "Entity Type"
+            }
+          },
+          {
+            "name": "entity_names",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Entity Names"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "original",
+                "filtered"
+              ],
+              "type": "string",
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SharedAttribute"
+                  },
+                  "title": "Response Getsharedattributes"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/modules/filter/v1/{ocel_id}/filter": {
       "get": {
         "summary": "Getfilter",
@@ -315,34 +428,37 @@
       "AttributeCondition": {
         "properties": {
           "condition": {
-            "oneOf": [
+            "anyOf": [
               {
-                "$ref": "#/components/schemas/RangeCondition"
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/RangeCondition"
+                  },
+                  {
+                    "$ref": "#/components/schemas/TimeRangeCondition"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ValuesCondition"
+                  },
+                  {
+                    "$ref": "#/components/schemas/PatternCondition"
+                  }
+                ],
+                "discriminator": {
+                  "propertyName": "kind",
+                  "mapping": {
+                    "pattern": "#/components/schemas/PatternCondition",
+                    "range": "#/components/schemas/RangeCondition",
+                    "time_range": "#/components/schemas/TimeRangeCondition",
+                    "values": "#/components/schemas/ValuesCondition"
+                  }
+                }
               },
               {
-                "$ref": "#/components/schemas/TimeRangeCondition"
-              },
-              {
-                "$ref": "#/components/schemas/ValuesCondition"
-              },
-              {
-                "$ref": "#/components/schemas/PatternCondition"
-              },
-              {
-                "$ref": "#/components/schemas/NullCondition"
+                "type": "null"
               }
             ],
-            "title": "Condition",
-            "discriminator": {
-              "propertyName": "kind",
-              "mapping": {
-                "null": "#/components/schemas/NullCondition",
-                "pattern": "#/components/schemas/PatternCondition",
-                "range": "#/components/schemas/RangeCondition",
-                "time_range": "#/components/schemas/TimeRangeCondition",
-                "values": "#/components/schemas/ValuesCondition"
-              }
-            }
+            "title": "Condition"
           },
           "negate": {
             "type": "boolean",
@@ -350,15 +466,17 @@
             "default": false
           },
           "null": {
-            "type": "boolean",
+            "type": "string",
+            "enum": [
+              "exclude",
+              "include",
+              "only"
+            ],
             "title": "Null",
-            "default": false
+            "default": "exclude"
           }
         },
         "type": "object",
-        "required": [
-          "condition"
-        ],
         "title": "AttributeCondition"
       },
       "E2OCountFilter": {
@@ -534,18 +652,6 @@
         "type": "object",
         "title": "LastValue"
       },
-      "NullCondition": {
-        "properties": {
-          "kind": {
-            "type": "string",
-            "const": "null",
-            "title": "Kind",
-            "default": "null"
-          }
-        },
-        "type": "object",
-        "title": "NullCondition"
-      },
       "O2OCountFilter": {
         "properties": {
           "source": {
@@ -623,34 +729,37 @@
       "ObjectAttributeCondition": {
         "properties": {
           "condition": {
-            "oneOf": [
+            "anyOf": [
               {
-                "$ref": "#/components/schemas/RangeCondition"
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/RangeCondition"
+                  },
+                  {
+                    "$ref": "#/components/schemas/TimeRangeCondition"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ValuesCondition"
+                  },
+                  {
+                    "$ref": "#/components/schemas/PatternCondition"
+                  }
+                ],
+                "discriminator": {
+                  "propertyName": "kind",
+                  "mapping": {
+                    "pattern": "#/components/schemas/PatternCondition",
+                    "range": "#/components/schemas/RangeCondition",
+                    "time_range": "#/components/schemas/TimeRangeCondition",
+                    "values": "#/components/schemas/ValuesCondition"
+                  }
+                }
               },
               {
-                "$ref": "#/components/schemas/TimeRangeCondition"
-              },
-              {
-                "$ref": "#/components/schemas/ValuesCondition"
-              },
-              {
-                "$ref": "#/components/schemas/PatternCondition"
-              },
-              {
-                "$ref": "#/components/schemas/NullCondition"
+                "type": "null"
               }
             ],
-            "title": "Condition",
-            "discriminator": {
-              "propertyName": "kind",
-              "mapping": {
-                "null": "#/components/schemas/NullCondition",
-                "pattern": "#/components/schemas/PatternCondition",
-                "range": "#/components/schemas/RangeCondition",
-                "time_range": "#/components/schemas/TimeRangeCondition",
-                "values": "#/components/schemas/ValuesCondition"
-              }
-            }
+            "title": "Condition"
           },
           "negate": {
             "type": "boolean",
@@ -658,9 +767,14 @@
             "default": false
           },
           "null": {
-            "type": "boolean",
+            "type": "string",
+            "enum": [
+              "exclude",
+              "include",
+              "only"
+            ],
             "title": "Null",
-            "default": false
+            "default": "exclude"
           },
           "value": {
             "oneOf": [
@@ -693,9 +807,6 @@
           }
         },
         "type": "object",
-        "required": [
-          "condition"
-        ],
         "title": "ObjectAttributeCondition"
       },
       "ObjectAttributeFilter": {
@@ -842,6 +953,39 @@
           "range"
         ],
         "title": "RangeCondition"
+      },
+      "SharedAttribute": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "string",
+              "bool",
+              "int",
+              "float",
+              "date"
+            ],
+            "title": "Type"
+          },
+          "entity_types": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Entity Types"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "type",
+          "entity_types"
+        ],
+        "title": "SharedAttribute"
       },
       "TimeFrameFilter": {
         "properties": {

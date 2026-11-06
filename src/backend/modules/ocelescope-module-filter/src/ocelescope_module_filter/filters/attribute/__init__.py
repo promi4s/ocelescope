@@ -1,7 +1,6 @@
 from ocelescope_module_filter.filters.attribute.conditions import (
     AttributeCondition,
     Condition,
-    NullCondition,
     PatternCondition,
     RangeCondition,
     TimeRangeCondition,
@@ -29,7 +28,6 @@ __all__ = [
     "FirstValue",
     "InitialValue",
     "LastValue",
-    "NullCondition",
     "ObjectAttributeCondition",
     "ObjectAttributeFilter",
     "PatternCondition",
