@@ -42,8 +42,9 @@ required-version = ">=0.17.2"
 ignore = ["E731", "BLE001", "S110"]
 extend-select = ["RUF022" ]
 
-[tool.ty.environment]
-extra-paths = ["typings"]
+[tool.ty.analysis]
+# Ebi is a compiled extension without type information.
+replace-imports-with-any = ["ebi"]
 
 [tool.ty.rules]
 # Existing `# type: ignore` comments target mypy/pyright; ty uses its own
