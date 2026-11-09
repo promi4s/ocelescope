@@ -15,6 +15,7 @@ classifiers = [
 
 dependencies = [
   "duckdb>=1.5.4,<2",
+  "ebi-pm>=0.3.14",
   "graphviz>=0.21",
   "ijson>=3.5.0",
   "lxml>=6.1.1",

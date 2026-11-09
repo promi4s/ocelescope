@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from ocelescope.discovery import inductive_miner, ocdfg_miner
+from ocelescope.discovery import ebi_inductive_miner, inductive_miner, ocdfg_miner
 
 from ocelescope import (
     OCEL,
@@ -64,6 +64,39 @@ class DiscoveryDFGInput(PluginInput):
     activities: Activities
 
 
+class DiscoveryPetriInputEbi(PluginInput):
+    noise_threshold: Annotated[
+        float,
+        SLIDER_FIELD(
+            min=0.0,
+            max=1,
+            step=0.01,
+            default=0.2,
+            title="Noise threshold",
+            description=(
+                "Fraction of infrequent behaviour to filter out (0 = no filtering)."
+            ),
+        ),
+    ]
+    variable_arc_threshold: Annotated[
+        float,
+        SLIDER_FIELD(
+            min=0.0,
+            max=1,
+            step=0.01,
+            default=0.8,
+            title="Variable arcs",
+            description=(
+                "Share of an activity's events that must involve exactly one object "
+                "of a type for its arc to stay normal. "
+                "Higher values give more variable arcs."
+            ),
+        ),
+    ]
+    object_types: ObjectTypes
+    activities: Activities
+
+
 class BasePlugin(Plugin):
     label = "Base Discovery"
     description = "Discover object-centric process models from an event log."
@@ -100,6 +133,23 @@ class BasePlugin(Plugin):
             ocel,
             # pm4py's noise threshold counts what to drop, the slider what to keep.
             noise_threshold=1 - input.paths,
+            included_activities=input.activities,
+            included_object_types=input.object_types,
+        )
+
+    @plugin_method(
+        label="Discover Petri Net (Ebi)",
+        description="Discover an object-centric Petri net with Ebi's inductive miner.",
+    )
+    def discover_ocpn_ebi(
+        self,
+        ocel: Annotated[OCEL, OCELAnnotation(label="Event log")],
+        input: DiscoveryPetriInputEbi,
+    ) -> Annotated[PetriNet, ResourceAnnotation(label="Petri Net")]:
+        return ebi_inductive_miner(
+            ocel,
+            noise_threshold=input.noise_threshold,
+            variable_arc_threshold=input.variable_arc_threshold,
             included_activities=input.activities,
             included_object_types=input.object_types,
         )

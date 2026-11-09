@@ -12,6 +12,7 @@ from ocelescope.ocel.filter import (
     ObjectTypeFrequencyFilter,
     TimeFrameFilter,
 )
+from ocelescope.ocel.util import to_pm4py_discovery_log
 from ocelescope.ocel.view import Clean, OCELView, Step, ViewOperation
 
 __all__ = [
@@ -31,4 +32,5 @@ __all__ = [
     "Step",
     "TimeFrameFilter",
     "ViewOperation",
+    "to_pm4py_discovery_log",
 ]
