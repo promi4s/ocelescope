@@ -106,7 +106,6 @@ const AttributeInput: React.FC<AttributeInputProps> = ({
       onChange: (next: AttributeValueCondition) =>
         onChange({ ...value, condition: next }),
       inverted,
-      includeNull: value.includeNull ?? true,
     };
     switch (kind) {
       case "range":

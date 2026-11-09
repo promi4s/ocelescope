@@ -30,15 +30,3 @@ export const formatValue = (
   }
   return `${value}`;
 };
-
-export const matching = (
-  summary: AttributeSummary,
-  matched: number,
-  inverted: boolean,
-  includeNull: boolean,
-) => ({
-  kept:
-    (inverted ? summary.count - matched : matched) +
-    (includeNull ? summary.missing : 0),
-  total: summary.count + summary.missing,
-});

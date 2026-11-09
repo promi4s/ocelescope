@@ -5,14 +5,12 @@ import { useMemo, useState } from "react";
 import { OptionPicker, type PickerOption } from "../../Pickers";
 import { useAttributeValues } from "../hooks";
 import type { ViewProps } from "../types";
-import { matching } from "../util";
 
 const ValuePicker: React.FC<ViewProps> = ({
   summary,
   value: condition,
   onChange,
   inverted,
-  includeNull,
   objectValue,
   ...scope
 }) => {
@@ -39,26 +37,9 @@ const ValuePicker: React.FC<ViewProps> = ({
 
   const selected =
     condition?.kind === "values" ? condition.values.map(String) : [];
-  const picked = useAttributeValues(
-    scope,
-    objectValue,
-    { values: selected },
-    selected.length > 0,
-  );
-  const matched = selected.length > 0 ? (picked.data?.count ?? 0) : 0;
-  const { kept, total: entities } = matching(
-    summary,
-    matched,
-    inverted,
-    includeNull,
-  );
 
   return (
     <Stack gap="sm">
-      <Text size="sm" c="dimmed">
-        Matching {kept.toLocaleString()} of {entities.toLocaleString()}{" "}
-        {scope.entityType}
-      </Text>
       <OptionPicker<string>
         variant="list"
         multiple

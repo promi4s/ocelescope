@@ -38,5 +38,4 @@ export type ViewProps = AttributeScope & {
   value: AttributeValueCondition | null;
   onChange: (value: AttributeValueCondition) => void;
   inverted: boolean;
-  includeNull: boolean;
 };

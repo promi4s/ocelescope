@@ -1,16 +1,13 @@
-import { Group, Loader, Stack, Text, TextInput } from "@mantine/core";
+import { Loader, Stack, Text, TextInput } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { BarList } from "../../BarList/BarList";
 import { useAttributeValues } from "../hooks";
 import type { ViewProps } from "../types";
-import { matching } from "../util";
 
 const PatternView: React.FC<ViewProps> = ({
   summary,
   value: condition,
   onChange,
-  inverted,
-  includeNull,
   objectValue,
   ...scope
 }) => {
@@ -25,7 +22,6 @@ const PatternView: React.FC<ViewProps> = ({
   const matched = matches.data?.count ?? summary.count;
   const values = matches.data?.values ?? [];
   const distinct = matches.data?.distinct_values ?? summary.distinct_values;
-  const { kept, total } = matching(summary, matched, inverted, includeNull);
 
   return (
     <Stack gap="sm" flex={1} mih={0}>
@@ -39,17 +35,11 @@ const PatternView: React.FC<ViewProps> = ({
           onChange({ kind: "pattern", regex: event.currentTarget.value })
         }
       />
-      <Group justify="space-between">
-        <Text size="sm" fw={500}>
-          {isEmpty
-            ? "Most frequent values"
-            : `${matched.toLocaleString()} values match (${distinct.toLocaleString()} distinct)`}
-        </Text>
-        <Text size="sm" c="dimmed">
-          Matching {kept.toLocaleString()} of {total.toLocaleString()}{" "}
-          {scope.entityType}
-        </Text>
-      </Group>
+      <Text size="sm" fw={500}>
+        {isEmpty
+          ? "Most frequent values"
+          : `${matched.toLocaleString()} values match (${distinct.toLocaleString()} distinct)`}
+      </Text>
       {values.length > 0 ? (
         <BarList
           data={Object.fromEntries(
