@@ -22,7 +22,7 @@ type AttributeTableProps = {
   viewId: string | null;
   entityType: "events" | "objects";
   types?: string[];
-  added: string[];
+  conditions: Record<string, string>;
   onAdd: (attribute: SharedAttribute) => void;
   onEdit: (attribute: string) => void;
   onRemove: (attribute: string) => void;
@@ -33,7 +33,7 @@ const AttributeTable: React.FC<AttributeTableProps> = ({
   viewId,
   entityType,
   types,
-  added,
+  conditions,
   onAdd,
   onEdit,
   onRemove,
@@ -58,9 +58,9 @@ const AttributeTable: React.FC<AttributeTableProps> = ({
       (data ?? []).filter(
         ({ name }) =>
           (searched.length === 0 || searched.includes(name)) &&
-          (!appliedOnly || added.includes(name)),
+          (!appliedOnly || name in conditions),
       ),
-    [data, searched, appliedOnly, added],
+    [data, searched, appliedOnly, conditions],
   );
 
   const columns = useMemo<DataTableColumn<SharedAttribute>[]>(
@@ -102,6 +102,15 @@ const AttributeTable: React.FC<AttributeTableProps> = ({
         ),
       },
       {
+        accessor: "condition",
+        title: "Condition",
+        render: ({ name }) => (
+          <Text size="sm" c={name in conditions ? undefined : "dimmed"}>
+            {conditions[name] ?? "–"}
+          </Text>
+        ),
+      },
+      {
         accessor: "actions",
         title: "",
         textAlign: "right",
@@ -115,7 +124,7 @@ const AttributeTable: React.FC<AttributeTableProps> = ({
         ),
         filtering: appliedOnly,
         render: (attribute) =>
-          added.includes(attribute.name) ? (
+          attribute.name in conditions ? (
             <ActionIcon.Group style={{ justifyContent: "flex-end" }}>
               <Tooltip label="Edit the condition">
                 <ActionIcon
@@ -153,7 +162,16 @@ const AttributeTable: React.FC<AttributeTableProps> = ({
           ),
       },
     ],
-    [added, appliedOnly, onAdd, onEdit, onRemove, entityType, names, searched],
+    [
+      conditions,
+      appliedOnly,
+      onAdd,
+      onEdit,
+      onRemove,
+      entityType,
+      names,
+      searched,
+    ],
   );
 
   return (

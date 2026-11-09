@@ -1,57 +1,50 @@
 import { Group, Loader, Stack, Text, TextInput } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
-import { useAttributeValues } from "@ocelescope/api-base";
-import { BarList, viewParams } from "@ocelescope/core";
-import { keepPreviousData } from "@tanstack/react-query";
-import type { DistributionViewProps, PreviewProps } from "../../util";
+import { BarList } from "@ocelescope/core";
+import { useAttributeValues } from "../hooks";
+import type { ViewProps } from "../types";
 
-const PatternView: React.FC<DistributionViewProps & PreviewProps> = ({
-  data,
-  filter,
+const PatternView: React.FC<ViewProps> = ({
+  summary,
+  value: filterValue,
   onChange,
-  ocelId,
-  entityType,
-  viewId,
+  inverted,
+  objectValue,
+  ...scope
 }) => {
-  const [pattern] = useDebouncedValue(filter.regex ?? "", 300);
-  const exclude = filter.mode === "exclude";
+  const current = filterValue;
+  const regex = current?.kind === "pattern" ? current.regex : "";
+  const [pattern] = useDebouncedValue(regex, 300);
+
+  const top = useAttributeValues(scope, objectValue);
 
   const matches = useAttributeValues(
-    ocelId,
-    {
-      ...viewParams(viewId),
-      attribute: filter.attribute,
-      regex: pattern,
-      entity_type: entityType,
-      entity_names: filter.target_type ? [filter.target_type] : undefined,
-    },
-    {
-      query: {
-        enabled: pattern !== "",
-        placeholderData: keepPreviousData,
-        retry: false,
-      },
-    },
+    scope,
+    objectValue,
+    { regex: pattern },
+    pattern !== "",
   );
 
   const isEmpty = pattern === "";
-  const matched = isEmpty ? data.count : (matches.data?.count ?? 0);
-  const values = isEmpty ? (data.values ?? []) : (matches.data?.values ?? []);
+  const matched = isEmpty ? summary.count : (matches.data?.count ?? 0);
+  const values = isEmpty
+    ? (top.data?.values ?? [])
+    : (matches.data?.values ?? []);
   const distinct = isEmpty
-    ? data.distinct_values
+    ? summary.distinct_values
     : (matches.data?.distinct_values ?? 0);
-  const kept = exclude ? data.count - matched : matched;
+  const kept = inverted ? summary.count - matched : matched;
 
   return (
     <Stack gap="sm" flex={1} mih={0}>
       <TextInput
         label="Regular expression"
         placeholder="e.g. ^Warehouse"
-        value={filter.regex ?? ""}
+        value={regex}
         error={!isEmpty && matches.error ? "Invalid pattern" : undefined}
         rightSection={matches.isFetching ? <Loader size="xs" /> : undefined}
         onChange={(event) =>
-          onChange({ ...filter, regex: event.currentTarget.value })
+          onChange({ kind: "pattern", regex: event.currentTarget.value })
         }
       />
       <Group justify="space-between">
@@ -61,7 +54,7 @@ const PatternView: React.FC<DistributionViewProps & PreviewProps> = ({
             : `${matched.toLocaleString()} values match (${distinct.toLocaleString()} distinct)`}
         </Text>
         <Text size="sm" c="dimmed">
-          Keeping {kept.toLocaleString()} of {data.count.toLocaleString()}{" "}
+          Matching {kept.toLocaleString()} of {summary.count.toLocaleString()}{" "}
           values
         </Text>
       </Group>

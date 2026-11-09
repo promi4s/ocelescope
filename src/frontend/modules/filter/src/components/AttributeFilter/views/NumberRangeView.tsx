@@ -1,36 +1,42 @@
 import { Group, NumberInput, Text } from "@mantine/core";
 import { useMemo } from "react";
-import RangeView, { type Bin, type Range } from "../../../../RangeView";
-import type { DistributionViewProps } from "../../util";
+import RangeView, { type Bin, type Range } from "../../RangeView";
+import { useAttributeBins } from "../hooks";
+import type { ViewProps } from "../types";
 
 const formatInt = (value: number) => value.toLocaleString();
 
 const formatFloat = (value: number) =>
   value.toLocaleString(undefined, { maximumFractionDigits: 2 });
 
-const NumberRangeView: React.FC<DistributionViewProps> = ({
-  data,
-  filter,
+const NumberRangeView: React.FC<ViewProps> = ({
+  summary,
+  value: filterValue,
   onChange,
+  inverted,
+  objectValue,
+  ...scope
 }) => {
-  const isInt = data.type === "int";
-  const min = Number(data.min);
-  const max = Number(data.max);
+  const { data } = useAttributeBins(scope, objectValue);
+
+  const isInt = summary.type === "int";
+  const min = Number(summary.min ?? 0);
+  const max = Number(summary.max ?? 0);
 
   const bins = useMemo<Bin[]>(
     () =>
-      (data.bins ?? []).map(({ start, end, count }, index, all) => ({
+      (data ?? []).map(({ start, end, count }, index, all) => ({
         start: Number(start),
         end: isInt && index < all.length - 1 ? Number(end) - 1 : Number(end),
         count,
       })),
-    [data.bins, isInt],
+    [data, isInt],
   );
 
-  const [low, high] = filter.number_range ?? [null, null];
+  const current = filterValue;
+  const [low, high] = current?.kind === "range" ? current.range : [null, null];
   const value: Range = [low ?? min, high ?? max];
-  const setRange = (number_range: Range) =>
-    onChange({ ...filter, number_range });
+  const setRange = (range: Range) => onChange({ kind: "range", range });
 
   const toNumber = (next: string | number) =>
     typeof next === "number" ? next : undefined;
@@ -42,7 +48,7 @@ const NumberRangeView: React.FC<DistributionViewProps> = ({
       max={max}
       value={value}
       onChange={setRange}
-      exclude={filter.mode === "exclude"}
+      exclude={inverted}
       format={isInt ? formatInt : formatFloat}
       snap={isInt ? Math.round : undefined}
       inputs={

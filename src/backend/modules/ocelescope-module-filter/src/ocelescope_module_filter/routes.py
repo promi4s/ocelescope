@@ -1,22 +1,43 @@
 import json
 import time
-from typing import Annotated
+from typing import Annotated, Literal
 
+import duckdb
 from fastapi import APIRouter, Body, Query
 from ocelescope.ocel.view import Clean
 from ocelescope_backend.app.dependencies import ApiOcel, ApiSession
+from ocelescope_backend.app.internal.exceptions import BadRequest
 from ocelescope_backend.app.internal.model.ocel import SessionOCEL
 from ocelescope_backend.app.internal.model.view import SessionView
 from ocelescope_backend.app.sse_manager import SystemNotification, sse_manager
 from ocelescope_module_ocel.util.attributes import EntityType
 
 from ocelescope_module_filter.filters import FILTER_SOURCE, NativeFilter
+from ocelescope_module_filter.filters.attribute.selectors import (
+    FirstValue,
+    InitialValue,
+    LastValue,
+    ValueAt,
+    ValueSelector,
+)
 from ocelescope_module_filter.state import (
     ApiFilterState,
     FilterModuleState,
     FilterState,
 )
-from ocelescope_module_filter.util.attributes import SharedAttribute, shared_attributes
+from ocelescope_module_filter.util.attributes import (
+    AttributeBin,
+    AttributeSummary,
+    AttributeValues,
+    SharedAttribute,
+    event_attribute_bins,
+    event_attribute_summary,
+    event_attribute_values,
+    object_attribute_bins,
+    object_attribute_summary,
+    object_attribute_values,
+    shared_attributes,
+)
 
 router = APIRouter()
 
@@ -68,6 +89,120 @@ def get_shared_attributes(
     entity_names: Annotated[list[str] | None, Query()] = None,
 ) -> list[SharedAttribute]:
     return shared_attributes(ocel, entity_type, entity_names)
+
+
+ObjectValueKind = Literal["first", "initial", "last", "at"]
+
+
+def _selector(kind: ObjectValueKind, at: str | None) -> ValueSelector:
+    match kind:
+        case "initial":
+            return InitialValue()
+        case "last":
+            return LastValue()
+        case "at":
+            if at is None:
+                raise BadRequest("object_value_at is required for object_value=at")
+            return ValueAt(timestamp=at)
+        case _:
+            return FirstValue()
+
+
+@router.get(
+    "/{ocel_id}/events/attributes/summary", operation_id="getEventAttributeSummary"
+)
+def get_event_attribute_summary(
+    ocel: ApiOcel,
+    attribute: Annotated[str, Query()],
+    entity_names: Annotated[list[str] | None, Query()] = None,
+) -> AttributeSummary | None:
+    return event_attribute_summary(ocel, attribute, entity_names)
+
+
+@router.get(
+    "/{ocel_id}/objects/attributes/summary",
+    operation_id="getObjectAttributeSummary",
+)
+def get_object_attribute_summary(
+    ocel: ApiOcel,
+    attribute: Annotated[str, Query()],
+    entity_names: Annotated[list[str] | None, Query()] = None,
+    object_value: Annotated[ObjectValueKind, Query()] = "first",
+    object_value_at: Annotated[str | None, Query()] = None,
+) -> AttributeSummary | None:
+    return object_attribute_summary(
+        ocel, attribute, entity_names, _selector(object_value, object_value_at)
+    )
+
+
+@router.get("/{ocel_id}/events/attributes/bins", operation_id="getEventAttributeBins")
+def get_event_attribute_bins(
+    ocel: ApiOcel,
+    attribute: Annotated[str, Query()],
+    entity_names: Annotated[list[str] | None, Query()] = None,
+    bins: Annotated[int, Query(ge=1, le=500)] = 40,
+) -> list[AttributeBin]:
+    return event_attribute_bins(ocel, attribute, entity_names, bins)
+
+
+@router.get("/{ocel_id}/objects/attributes/bins", operation_id="getObjectAttributeBins")
+def get_object_attribute_bins(
+    ocel: ApiOcel,
+    attribute: Annotated[str, Query()],
+    entity_names: Annotated[list[str] | None, Query()] = None,
+    object_value: Annotated[ObjectValueKind, Query()] = "first",
+    object_value_at: Annotated[str | None, Query()] = None,
+    bins: Annotated[int, Query(ge=1, le=500)] = 40,
+) -> list[AttributeBin]:
+    return object_attribute_bins(
+        ocel, attribute, entity_names, _selector(object_value, object_value_at), bins
+    )
+
+
+@router.get(
+    "/{ocel_id}/events/attributes/values", operation_id="getEventAttributeValues"
+)
+def get_event_attribute_values(
+    ocel: ApiOcel,
+    attribute: Annotated[str, Query()],
+    entity_names: Annotated[list[str] | None, Query()] = None,
+    regex: Annotated[str | None, Query()] = None,
+    search: Annotated[str | None, Query()] = None,
+    values: Annotated[list[str] | None, Query()] = None,
+) -> AttributeValues:
+    try:
+        return event_attribute_values(
+            ocel, attribute, entity_names, regex, search, values
+        )
+    except duckdb.InvalidInputException as error:
+        raise BadRequest(str(error)) from error
+
+
+@router.get(
+    "/{ocel_id}/objects/attributes/values", operation_id="getObjectAttributeValues"
+)
+def get_object_attribute_values(
+    ocel: ApiOcel,
+    attribute: Annotated[str, Query()],
+    entity_names: Annotated[list[str] | None, Query()] = None,
+    object_value: Annotated[ObjectValueKind, Query()] = "first",
+    object_value_at: Annotated[str | None, Query()] = None,
+    regex: Annotated[str | None, Query()] = None,
+    search: Annotated[str | None, Query()] = None,
+    values: Annotated[list[str] | None, Query()] = None,
+) -> AttributeValues:
+    try:
+        return object_attribute_values(
+            ocel,
+            attribute,
+            entity_names,
+            _selector(object_value, object_value_at),
+            regex,
+            search,
+            values,
+        )
+    except duckdb.InvalidInputException as error:
+        raise BadRequest(str(error)) from error
 
 
 def active_filter(handle: SessionOCEL, state: FilterModuleState) -> FilterState | None:
