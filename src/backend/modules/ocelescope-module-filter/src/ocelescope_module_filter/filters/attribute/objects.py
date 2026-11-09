@@ -19,10 +19,7 @@ from ocelescope_module_filter.filters.attribute.conditions import (
     AttributeCondition,
     matches,
 )
-from ocelescope_module_filter.filters.attribute.sql import (
-    Mode,
-    attribute_names,
-)
+from ocelescope_module_filter.filters.attribute.sql import Mode
 
 
 class ObjectAttributeCondition(AttributeCondition):
@@ -35,53 +32,27 @@ class ObjectAttributeFilter(BaseFilter):
     conditions: dict[str, ObjectAttributeCondition]
     mode: Mode = "include"
 
-    def _targeted(self) -> str:
-        if self.target is None:
-            return "true"
-        return in_list(ident(OTYPE_COL), self.target)
-
-    def _source(self, step: Step, known: dict[str, ObjectAttributeCondition]) -> str:
-        oid, otype = ident(OID_COL), ident(OTYPE_COL)
-        if not known:
-            return f"SELECT o.{oid}, o.{otype} FROM {step[OBJECTS_TABLE]} o"
-
-        ts, field = ident(TIMESTAMP_COL), ident(OBJECT_CHANGED_FIELD)
-        selected = []
-        for attribute, condition in known.items():
-            rows = f"{field} = {literal(attribute)}"
-            aggregate = condition.value.aggregate(ident(attribute), ts, rows)
-            selected.append(f"{aggregate} AS {ident(attribute)}")
-        columns = ", ".join(f"changes.{ident(attribute)}" for attribute in known)
-        fields = ", ".join(literal(attribute) for attribute in known)
-
-        return (
-            f"SELECT o.{oid}, o.{otype}, {columns} "
-            f"FROM {step[OBJECTS_TABLE]} o LEFT JOIN ("
-            f"SELECT {oid}, {', '.join(selected)} "
-            f"FROM {step[OBJECT_CHANGES_TABLE]} "
-            f"WHERE {field} IN ({fields}) GROUP BY {oid}"
-            f") changes ON changes.{oid} = o.{oid}"
-        )
-
     def build(self, step: Step) -> None:
         if not self.conditions:
             return
 
-        names = attribute_names(step, OBJECT_CHANGES_TABLE)
-        known = {
-            attribute: condition
+        oid, otype = ident(OID_COL), ident(OTYPE_COL)
+        ts, field = ident(TIMESTAMP_COL), ident(OBJECT_CHANGED_FIELD)
+        targeted = "true" if self.target is None else in_list(otype, self.target)
+        selected = ", ".join(
+            condition.value.aggregate(
+                ident(attribute), ts, f"{field} = {literal(attribute)}"
+            )
+            + f" AS {ident(attribute)}"
             for attribute, condition in self.conditions.items()
-            if attribute in names
-        }
-        values = {
-            attribute: ident(attribute) if attribute in known else "NULL"
-            for attribute in self.conditions
-        }
+        )
+        fields = ", ".join(literal(attribute) for attribute in self.conditions)
 
         step.keep(
             OBJECTS_TABLE,
-            f"WITH object AS ({self._source(step, known)}) "
-            f"SELECT {ident(OID_COL)} FROM object "
-            f"WHERE NOT ({self._targeted()}) "
-            f"OR ({matches(self.conditions, values, self.mode)})",
+            f"SELECT o.{oid} FROM {step[OBJECTS_TABLE]} o LEFT JOIN ("
+            f"SELECT {oid}, {selected} FROM {step[OBJECT_CHANGES_TABLE]} "
+            f"WHERE {field} IN ({fields}) GROUP BY {oid}"
+            f") changes ON changes.{oid} = o.{oid} "
+            f"WHERE NOT ({targeted}) OR ({matches(self.conditions, self.mode)})",
         )

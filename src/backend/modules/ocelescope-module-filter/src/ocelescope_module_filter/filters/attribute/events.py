@@ -13,10 +13,7 @@ from ocelescope_module_filter.filters.attribute.conditions import (
     AttributeCondition,
     matches,
 )
-from ocelescope_module_filter.filters.attribute.sql import (
-    Mode,
-    attribute_names,
-)
+from ocelescope_module_filter.filters.attribute.sql import Mode
 
 
 class EventAttributeCondition(AttributeCondition):
@@ -29,25 +26,16 @@ class EventAttributeFilter(BaseFilter):
     conditions: dict[str, EventAttributeCondition]
     mode: Mode = "include"
 
-    def _targeted(self) -> str:
-        if self.target is None:
-            return "true"
-        return in_list(ident(ACTIVITY_COL), self.target)
-
     def build(self, step: Step) -> None:
         if not self.conditions:
             return
 
-        names = attribute_names(step, EVENTS_TABLE)
-        values = {
-            attribute: ident(attribute) if attribute in names else "NULL"
-            for attribute in self.conditions
-        }
-        events = step[EVENTS_TABLE]
+        targeted = (
+            "true" if self.target is None else in_list(ident(ACTIVITY_COL), self.target)
+        )
 
         step.keep(
             EVENTS_TABLE,
-            f"SELECT {ident(EID_COL)} FROM {events} "
-            f"WHERE NOT ({self._targeted()}) "
-            f"OR ({matches(self.conditions, values, self.mode)})",
+            f"SELECT {ident(EID_COL)} FROM {step[EVENTS_TABLE]} "
+            f"WHERE NOT ({targeted}) OR ({matches(self.conditions, self.mode)})",
         )

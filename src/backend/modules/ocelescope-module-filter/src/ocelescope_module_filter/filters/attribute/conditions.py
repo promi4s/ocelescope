@@ -4,7 +4,7 @@ from collections.abc import Mapping
 from typing import Annotated, Literal
 
 from ocelescope.ocel.filter.base import number_literal, timestamp_literal, utc_bound
-from ocelescope.util.sql import literal
+from ocelescope.util.sql import ident, literal
 from ocelescope_module_ocel.util.sql import absent
 from pydantic import BaseModel, Field
 
@@ -84,11 +84,9 @@ class AttributeCondition(BaseModel):
         return match
 
 
-def matches(
-    conditions: Mapping[str, AttributeCondition], values: dict[str, str], mode: Mode
-) -> str:
+def matches(conditions: Mapping[str, AttributeCondition], mode: Mode) -> str:
     match = " AND ".join(
-        condition.predicate(values[attribute])
+        condition.predicate(ident(attribute))
         for attribute, condition in conditions.items()
     )
     return f"NOT ({match})" if mode == "exclude" else match
