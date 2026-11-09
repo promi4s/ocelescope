@@ -1,3 +1,11 @@
+from ocelescope_module_ocel.util.selectors import (
+    FirstValue,
+    InitialValue,
+    LastValue,
+    ValueAt,
+    ValueSelector,
+)
+
 from ocelescope_module_filter.filters.attribute.conditions import (
     AttributeCondition,
     Condition,
@@ -12,13 +20,6 @@ from ocelescope_module_filter.filters.attribute.events import (
 from ocelescope_module_filter.filters.attribute.objects import (
     ObjectAttributeCondition,
     ObjectAttributeFilter,
-)
-from ocelescope_module_filter.filters.attribute.selectors import (
-    FirstValue,
-    InitialValue,
-    LastValue,
-    ValueAt,
-    ValueSelector,
 )
 
 __all__ = [

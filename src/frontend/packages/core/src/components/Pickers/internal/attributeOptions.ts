@@ -1,4 +1,4 @@
-import type { TypedAttribute, ValueType } from "@ocelescope/api-base";
+import type { AttributeStats, ValueType } from "@ocelescope/api-base";
 import type { PickerGroup, PickerOption } from "./options";
 
 /**
@@ -9,7 +9,7 @@ import type { PickerGroup, PickerOption } from "./options";
  * object type that carries it, so "status" on two object types is merged.
  */
 export const attributeOptions = <T>(
-  attributes: readonly TypedAttribute[] | undefined,
+  attributes: readonly AttributeStats[] | undefined,
   valueTypes: readonly ValueType[] | undefined,
   toValue: (name: string) => T,
   group?: PickerGroup,

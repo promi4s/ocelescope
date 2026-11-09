@@ -7,15 +7,15 @@ import {
   Text,
   Tooltip,
 } from "@mantine/core";
+import {
+  type SharedAttribute,
+  useSharedAttributes,
+} from "@ocelescope/api-base";
 import { viewParams } from "@ocelescope/core";
 import { keepPreviousData } from "@tanstack/react-query";
 import { PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
 import { DataTable, type DataTableColumn } from "mantine-datatable";
 import { useMemo, useState } from "react";
-import {
-  type SharedAttribute,
-  useGetSharedAttributes,
-} from "../../../api/base";
 
 type AttributeTableProps = {
   ocelId: string;
@@ -41,7 +41,7 @@ const AttributeTable: React.FC<AttributeTableProps> = ({
   const [searched, setSearched] = useState<string[]>([]);
   const [appliedOnly, setAppliedOnly] = useState(false);
 
-  const { data, isFetching } = useGetSharedAttributes(
+  const { data, isFetching } = useSharedAttributes(
     ocelId,
     {
       ...viewParams(viewId),

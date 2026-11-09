@@ -1,48 +1,19 @@
 import json
 import time
-from typing import Annotated, Literal
+from typing import Annotated
 
-import duckdb
-from fastapi import APIRouter, Body, Query
+from fastapi import APIRouter, Body
 from ocelescope.ocel.view import Clean
-from ocelescope.util.sql import ident
-from ocelescope_backend.app.dependencies import ApiOcel, ApiSession
-from ocelescope_backend.app.internal.exceptions import BadRequest
+from ocelescope_backend.app.dependencies import ApiSession
 from ocelescope_backend.app.internal.model.ocel import SessionOCEL
 from ocelescope_backend.app.internal.model.view import SessionView
 from ocelescope_backend.app.sse_manager import SystemNotification, sse_manager
-from ocelescope_module_ocel.util.attributes import (
-    ENTITY_TYPE,
-    EntityType,
-    attribute_types,
-    long_table,
-)
 
 from ocelescope_module_filter.filters import FILTER_SOURCE, NativeFilter
-from ocelescope_module_filter.filters.attribute.selectors import (
-    FirstValue,
-    InitialValue,
-    LastValue,
-    ValueAt,
-    ValueSelector,
-)
-from ocelescope_module_filter.models import (
-    AttributeSummary,
-    AttributeValues,
-    Bin,
-    SharedAttribute,
-)
 from ocelescope_module_filter.state import (
     ApiFilterState,
     FilterModuleState,
     FilterState,
-)
-from ocelescope_module_filter.util.attributes import (
-    attribute_bins,
-    attribute_counts,
-    attribute_summary,
-    attribute_values,
-    is_dynamic,
 )
 
 router = APIRouter()
@@ -86,159 +57,6 @@ def register_view(
         name=name or "Filter preview",
         temporary=name is None,
     ).id
-
-
-@router.get("/{ocel_id}/attributes/shared", operation_id="getSharedAttributes")
-def get_shared_attributes(
-    ocel: ApiOcel,
-    entity_type: Annotated[EntityType, Query()] = "events",
-    entity_names: Annotated[list[str] | None, Query()] = None,
-) -> list[SharedAttribute]:
-    types = attribute_types(ocel, entity_type)
-    rows = (
-        long_table(ocel, entity_type, entity_names=entity_names)
-        .query(
-            "long",
-            f"SELECT name, list(DISTINCT {ident(ENTITY_TYPE)} "
-            f"ORDER BY {ident(ENTITY_TYPE)}) "
-            "FROM long GROUP BY name ORDER BY name",
-        )
-        .fetchall()
-    )
-    return [
-        SharedAttribute(name=name, type=types[name], entity_types=entities)
-        for name, entities in rows
-    ]
-
-
-ObjectValueKind = Literal["first", "initial", "last", "at"]
-
-
-def _selector(kind: ObjectValueKind, at: str | None) -> ValueSelector:
-    match kind:
-        case "initial":
-            return InitialValue()
-        case "last":
-            return LastValue()
-        case "at":
-            if at is None:
-                raise BadRequest("object_value_at is required for object_value=at")
-            return ValueAt(timestamp=at)
-        case _:
-            return FirstValue()
-
-
-@router.get(
-    "/{ocel_id}/events/attributes/summary", operation_id="getEventAttributeSummary"
-)
-def get_event_attribute_summary(
-    ocel: ApiOcel,
-    attribute: Annotated[str, Query()],
-    entity_names: Annotated[list[str] | None, Query()] = None,
-) -> AttributeSummary | None:
-    selected = attribute_values(ocel, "events", attribute, entity_names)
-    return attribute_summary(*selected) if selected else None
-
-
-@router.get(
-    "/{ocel_id}/objects/attributes/summary",
-    operation_id="getObjectAttributeSummary",
-)
-def get_object_attribute_summary(
-    ocel: ApiOcel,
-    attribute: Annotated[str, Query()],
-    entity_names: Annotated[list[str] | None, Query()] = None,
-    object_value: Annotated[ObjectValueKind, Query()] = "first",
-    object_value_at: Annotated[str | None, Query()] = None,
-) -> AttributeSummary | None:
-    selected = attribute_values(
-        ocel,
-        "objects",
-        attribute,
-        entity_names,
-        _selector(object_value, object_value_at),
-    )
-    if selected is None:
-        return None
-    return attribute_summary(*selected, is_dynamic(ocel, attribute, entity_names))
-
-
-@router.get("/{ocel_id}/events/attributes/bins", operation_id="getEventAttributeBins")
-def get_event_attribute_bins(
-    ocel: ApiOcel,
-    attribute: Annotated[str, Query()],
-    entity_names: Annotated[list[str] | None, Query()] = None,
-    bins: Annotated[int, Query(ge=1, le=500)] = 40,
-) -> list[Bin]:
-    selected = attribute_values(ocel, "events", attribute, entity_names)
-    return attribute_bins(*selected, bins) if selected else []
-
-
-@router.get("/{ocel_id}/objects/attributes/bins", operation_id="getObjectAttributeBins")
-def get_object_attribute_bins(
-    ocel: ApiOcel,
-    attribute: Annotated[str, Query()],
-    entity_names: Annotated[list[str] | None, Query()] = None,
-    object_value: Annotated[ObjectValueKind, Query()] = "first",
-    object_value_at: Annotated[str | None, Query()] = None,
-    bins: Annotated[int, Query(ge=1, le=500)] = 40,
-) -> list[Bin]:
-    selected = attribute_values(
-        ocel,
-        "objects",
-        attribute,
-        entity_names,
-        _selector(object_value, object_value_at),
-    )
-    return attribute_bins(*selected, bins) if selected else []
-
-
-@router.get(
-    "/{ocel_id}/events/attributes/values", operation_id="getEventAttributeValues"
-)
-def get_event_attribute_values(
-    ocel: ApiOcel,
-    attribute: Annotated[str, Query()],
-    entity_names: Annotated[list[str] | None, Query()] = None,
-    regex: Annotated[str | None, Query()] = None,
-    search: Annotated[str | None, Query()] = None,
-    values: Annotated[list[str] | None, Query()] = None,
-) -> AttributeValues:
-    try:
-        selected = attribute_values(ocel, "events", attribute, entity_names)
-        if selected is None:
-            return AttributeValues(count=0, distinct_values=0, values=[])
-        return attribute_counts(selected[0], regex, search, values)
-    except duckdb.InvalidInputException as error:
-        raise BadRequest(str(error)) from error
-
-
-@router.get(
-    "/{ocel_id}/objects/attributes/values", operation_id="getObjectAttributeValues"
-)
-def get_object_attribute_values(
-    ocel: ApiOcel,
-    attribute: Annotated[str, Query()],
-    entity_names: Annotated[list[str] | None, Query()] = None,
-    object_value: Annotated[ObjectValueKind, Query()] = "first",
-    object_value_at: Annotated[str | None, Query()] = None,
-    regex: Annotated[str | None, Query()] = None,
-    search: Annotated[str | None, Query()] = None,
-    values: Annotated[list[str] | None, Query()] = None,
-) -> AttributeValues:
-    try:
-        selected = attribute_values(
-            ocel,
-            "objects",
-            attribute,
-            entity_names,
-            _selector(object_value, object_value_at),
-        )
-        if selected is None:
-            return AttributeValues(count=0, distinct_values=0, values=[])
-        return attribute_counts(selected[0], regex, search, values)
-    except duckdb.InvalidInputException as error:
-        raise BadRequest(str(error)) from error
 
 
 def active_filter(handle: SessionOCEL, state: FilterModuleState) -> FilterState | None:

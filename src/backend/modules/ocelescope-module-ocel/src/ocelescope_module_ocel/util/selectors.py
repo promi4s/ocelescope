@@ -6,7 +6,7 @@ from ocelescope.ocel.constants.misc import EPOCH_SQL
 from ocelescope.ocel.filter.base import timestamp_literal, utc_bound
 from pydantic import BaseModel, Field
 
-from ocelescope_module_filter.filters.attribute.sql import absent
+from ocelescope_module_ocel.util.sql import absent
 
 
 class InitialValue(BaseModel):

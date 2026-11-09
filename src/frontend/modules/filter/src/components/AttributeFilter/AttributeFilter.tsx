@@ -9,7 +9,7 @@ import {
   Switch,
   Text,
 } from "@mantine/core";
-import type { AttributeSummary } from "../../api/base";
+import type { AttributeSummary } from "@ocelescope/api-base";
 import { useAttributeSummary } from "./hooks";
 import ObjectValueSelect from "./ObjectValueSelect";
 import type {

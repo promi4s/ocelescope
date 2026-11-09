@@ -1,4 +1,4 @@
-import type { AttributeSummary } from "../../api/base";
+import type { AttributeSummary } from "@ocelescope/api-base";
 
 export type AttributeValueCondition =
   | { kind: "values"; values: (string | number)[] }

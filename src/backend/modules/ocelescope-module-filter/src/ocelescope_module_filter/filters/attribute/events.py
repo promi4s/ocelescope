@@ -7,6 +7,7 @@ from ocelescope.ocel.constants.tables import EVENTS_TABLE
 from ocelescope.ocel.filter import BaseFilter
 from ocelescope.ocel.view.step import Step
 from ocelescope.util.sql import ident
+from ocelescope_module_ocel.util.sql import in_list
 
 from ocelescope_module_filter.filters.attribute.conditions import (
     AttributeCondition,
@@ -15,7 +16,6 @@ from ocelescope_module_filter.filters.attribute.conditions import (
 from ocelescope_module_filter.filters.attribute.sql import (
     Mode,
     attribute_names,
-    in_list,
 )
 
 

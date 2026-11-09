@@ -1,8 +1,8 @@
 import { Stack, Text, useMantineTheme } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
+import type { AttributeValueCount } from "@ocelescope/api-base";
 import { OptionPicker, type PickerOption } from "@ocelescope/core";
 import { useMemo, useState } from "react";
-import type { AttributeValueCount } from "../../../api/base";
 import { useAttributeValues } from "../hooks";
 import type { ViewProps } from "../types";
 

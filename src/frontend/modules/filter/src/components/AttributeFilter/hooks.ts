@@ -1,18 +1,23 @@
-import { keepPreviousData } from "@tanstack/react-query";
 import {
-  useGetEventAttributeBins,
-  useGetEventAttributeSummary,
-  useGetEventAttributeValues,
-  useGetObjectAttributeBins,
-  useGetObjectAttributeSummary,
-  useGetObjectAttributeValues,
-} from "../../api/base";
+  type AttributeBinsQueryResult,
+  type AttributeSummaryQueryResult,
+  type AttributeValuesQueryResult,
+  useAttributeBins as useBins,
+  useAttributeSummary as useSummary,
+  useAttributeValues as useValues,
+} from "@ocelescope/api-base";
+import { keepPreviousData } from "@tanstack/react-query";
 import type { AttributeScope, ObjectValue } from "./types";
 import { scopeParams } from "./util";
 
 const BINS = 40;
 
-const objectValueParams = (value: ObjectValue | undefined) => ({
+const params = (
+  scope: Omit<AttributeScope, "ocelId">,
+  value: ObjectValue | undefined,
+) => ({
+  ...scopeParams(scope),
+  entity_type: scope.entityType,
   object_value: value?.kind ?? "first",
   object_value_at: value?.kind === "at" ? value.timestamp : undefined,
 });
@@ -20,53 +25,33 @@ const objectValueParams = (value: ObjectValue | undefined) => ({
 export const useAttributeSummary = (
   { ocelId, ...scope }: AttributeScope,
   objectValue: ObjectValue | undefined,
-) => {
-  const isObjects = scope.entityType === "objects";
-  const params = scopeParams(scope);
-  const events = useGetEventAttributeSummary(ocelId, params, {
-    query: { enabled: !isObjects, placeholderData: keepPreviousData },
-  });
-  const objects = useGetObjectAttributeSummary(
+) =>
+  useSummary<AttributeSummaryQueryResult, unknown>(
     ocelId,
-    { ...params, ...objectValueParams(objectValue) },
-    { query: { enabled: isObjects, placeholderData: keepPreviousData } },
+    params(scope, objectValue),
+    {
+      query: { placeholderData: keepPreviousData },
+    },
   );
-  return isObjects ? objects : events;
-};
 
 export const useAttributeBins = (
   { ocelId, ...scope }: AttributeScope,
   objectValue: ObjectValue | undefined,
-) => {
-  const isObjects = scope.entityType === "objects";
-  const params = { ...scopeParams(scope), bins: BINS };
-  const events = useGetEventAttributeBins(ocelId, params, {
-    query: { enabled: !isObjects, placeholderData: keepPreviousData },
-  });
-  const objects = useGetObjectAttributeBins(
+) =>
+  useBins<AttributeBinsQueryResult, unknown>(
     ocelId,
-    { ...params, ...objectValueParams(objectValue) },
-    { query: { enabled: isObjects, placeholderData: keepPreviousData } },
+    { ...params(scope, objectValue), bins: BINS },
+    { query: { placeholderData: keepPreviousData } },
   );
-  return isObjects ? objects : events;
-};
 
 export const useAttributeValues = (
   { ocelId, ...scope }: AttributeScope,
   objectValue: ObjectValue | undefined,
   filter: { regex?: string; search?: string; values?: string[] } = {},
   enabled = true,
-) => {
-  const isObjects = scope.entityType === "objects";
-  const params = { ...scopeParams(scope), ...filter };
-  const query = { placeholderData: keepPreviousData, retry: false };
-  const events = useGetEventAttributeValues(ocelId, params, {
-    query: { ...query, enabled: enabled && !isObjects },
-  });
-  const objects = useGetObjectAttributeValues(
+) =>
+  useValues<AttributeValuesQueryResult, unknown>(
     ocelId,
-    { ...params, ...objectValueParams(objectValue) },
-    { query: { ...query, enabled: enabled && isObjects } },
+    { ...params(scope, objectValue), ...filter },
+    { query: { placeholderData: keepPreviousData, retry: false, enabled } },
   );
-  return isObjects ? objects : events;
-};

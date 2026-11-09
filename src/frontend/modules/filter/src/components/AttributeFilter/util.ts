@@ -1,5 +1,5 @@
+import type { AttributeSummary } from "@ocelescope/api-base";
 import { viewParams } from "@ocelescope/core";
-import type { AttributeSummary } from "../../api/base";
 import dayjs from "../../util/dayjs";
 import type { AttributeScope } from "./types";
 

@@ -1,7 +1,6 @@
 import {
+  useAttributeStats,
   useE2o,
-  useEventAttributes,
-  useObjectAttributes,
   type ValueType,
 } from "@ocelescope/api-base";
 import { useColorOf } from "@r4pm/components";
@@ -52,9 +51,13 @@ export const AttributePicker = ({
   const objectTypeColor = useColorOf("objectType");
   const enabled = id != null && activity !== undefined;
 
-  const events = useEventAttributes(
+  const events = useAttributeStats(
     id,
-    { ocel_version: ocelVersion, names: activity ? [activity] : [] },
+    {
+      entity_type: "events",
+      ocel_version: ocelVersion,
+      entity_names: activity ? [activity] : [],
+    },
     { query: { enabled } },
   );
   const relations = useE2o(
@@ -86,9 +89,14 @@ export const AttributePicker = ({
       .filter((type) => !onlyUniquelyRelated || isUnique(type));
   }, [relations.data, activity, objectTypes, onlyUniquelyRelated]);
 
-  const objects = useObjectAttributes(
+  const objects = useAttributeStats(
     id,
-    { ocel_version: ocelVersion, names: relatedTypes },
+    {
+      entity_type: "objects",
+      per_type: true,
+      ocel_version: ocelVersion,
+      entity_names: relatedTypes,
+    },
     { query: { enabled: enabled && relatedTypes.length > 0 } },
   );
 
@@ -96,7 +104,7 @@ export const AttributePicker = ({
     if (activity === undefined) return [];
     return [
       ...attributeOptions(
-        events.data,
+        events.data?.response,
         valueTypes,
         (name): AttributeRef => ({ target: "event", activity, name }),
         {
@@ -107,7 +115,9 @@ export const AttributePicker = ({
       ),
       ...relatedTypes.flatMap((objectType) =>
         attributeOptions(
-          objects.data?.filter((a) => a.entity_type === objectType),
+          objects.data?.response.filter((a) =>
+            a.entity_types.includes(objectType),
+          ),
           valueTypes,
           (name): AttributeRef => ({ target: "object", objectType, name }),
           {

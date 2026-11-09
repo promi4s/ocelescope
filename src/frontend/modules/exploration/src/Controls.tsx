@@ -14,11 +14,7 @@ import {
   Stack,
   ThemeIcon,
 } from "@mantine/core";
-import {
-  useEventAttributes,
-  useObjectAttributes,
-  ValueType,
-} from "@ocelescope/api-base";
+import { useAttributeStats, ValueType } from "@ocelescope/api-base";
 import {
   ActivityPicker,
   EventAttributePicker,
@@ -47,19 +43,19 @@ export const useNumeric = (values: Values) => {
         ? values.activity.map(String)
         : [String(values.activity)];
   const type = values.object_type == null ? [] : [String(values.object_type)];
-  const events = useEventAttributes(
+  const events = useAttributeStats(
     id,
-    { names: activity },
+    { entity_type: "events", entity_names: activity },
     { query: { enabled: id != null && activity.length > 0 } },
   );
-  const objects = useObjectAttributes(
+  const objects = useAttributeStats(
     id,
-    { names: type },
+    { entity_type: "objects", entity_names: type },
     { query: { enabled: id != null && type.length > 0 } },
   );
 
   return (attribute: string) =>
-    [...(events.data ?? []), ...(objects.data ?? [])].some(
+    [...(events.data?.response ?? []), ...(objects.data?.response ?? [])].some(
       (candidate) =>
         candidate.name === attribute && BINNED.includes(candidate.type),
     );

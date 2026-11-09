@@ -1,9 +1,9 @@
 from ocelescope_module_ocel.models.attributes import (
-    AggregatedAttribute,
-    Attribute,
-    AttributeMatches,
+    AttributeStats,
+    AttributeSummary,
     AttributeValueCount,
-    TypedAttribute,
+    AttributeValues,
+    SharedAttribute,
 )
 from ocelescope_module_ocel.models.histogram import Bin
 from ocelescope_module_ocel.models.metadata import OcelMetadata
@@ -20,10 +20,10 @@ from ocelescope_module_ocel.models.time import (
 from ocelescope_module_ocel.models.variants import ObjectTypeVariants, ObjectVariant
 
 __all__ = [
-    "AggregatedAttribute",
-    "Attribute",
-    "AttributeMatches",
+    "AttributeStats",
+    "AttributeSummary",
     "AttributeValueCount",
+    "AttributeValues",
     "Bin",
     "Date_Distribution_Item",
     "Entity_Time_Info",
@@ -34,5 +34,5 @@ __all__ = [
     "RelationCombination",
     "RelationCountDistribution",
     "RelationCountSummary",
-    "TypedAttribute",
+    "SharedAttribute",
 ]

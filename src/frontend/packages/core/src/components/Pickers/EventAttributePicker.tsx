@@ -1,4 +1,4 @@
-import { useEventAttributes, type ValueType } from "@ocelescope/api-base";
+import { useAttributeStats, type ValueType } from "@ocelescope/api-base";
 import { useMemo } from "react";
 import {
   attributeDefaults,
@@ -25,13 +25,17 @@ export const EventAttributePicker = ({
   ...picker
 }: EventAttributePickerProps) => {
   const id = useOcelId(ocelId);
-  const { data, isPending, error } = useEventAttributes(
+  const { data, isPending, error } = useAttributeStats(
     id,
-    { ocel_version: ocelVersion, ...(activity ? { names: [activity] } : {}) },
+    {
+      entity_type: "events",
+      ocel_version: ocelVersion,
+      ...(activity ? { entity_names: [activity] } : {}),
+    },
     { query: { enabled: id != null } },
   );
   const options = useMemo(
-    () => attributeOptions(data, valueTypes, (name) => name),
+    () => attributeOptions(data?.response, valueTypes, (name) => name),
     [data, valueTypes],
   );
 

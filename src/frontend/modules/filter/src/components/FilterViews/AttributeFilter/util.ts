@@ -1,9 +1,9 @@
+import type { SharedAttribute } from "@ocelescope/api-base";
 import type {
   AttributeCondition,
   EventAttributeFilter,
   ObjectAttributeCondition,
   ObjectAttributeFilter,
-  SharedAttribute,
 } from "../../../api/base";
 import dayjs from "../../../util/dayjs";
 

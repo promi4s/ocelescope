@@ -5,13 +5,10 @@ from typing import Annotated, Literal
 
 from ocelescope.ocel.filter.base import number_literal, timestamp_literal, utc_bound
 from ocelescope.util.sql import literal
+from ocelescope_module_ocel.util.sql import absent
 from pydantic import BaseModel, Field
 
-from ocelescope_module_filter.filters.attribute.sql import (
-    Mode,
-    absent,
-    between,
-)
+from ocelescope_module_filter.filters.attribute.sql import Mode, between
 
 
 class RangeCondition(BaseModel):
