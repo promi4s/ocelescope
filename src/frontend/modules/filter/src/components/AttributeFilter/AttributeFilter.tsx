@@ -1,6 +1,7 @@
 import {
   Center,
   Group,
+  Input,
   Loader,
   SegmentedControl,
   SimpleGrid,
@@ -140,6 +141,22 @@ const AttributeFilter: React.FC<AttributeFilterProps> = ({
             onChange={(next) => onChange({ ...value, value: next })}
           />
         )}
+        {kinds.length > 1 && (
+          <Input.Wrapper label="Condition" size="xs">
+            <SegmentedControl
+              size="xs"
+              display="flex"
+              data={kinds.map((option) => ({
+                value: option,
+                label: KIND_LABELS[option],
+              }))}
+              value={kind}
+              onChange={(next) =>
+                onChange({ ...value, condition: emptyCondition(next as Kind) })
+              }
+            />
+          </Input.Wrapper>
+        )}
         <Group gap="lg" ml="auto">
           <Switch
             size="sm"
@@ -162,20 +179,6 @@ const AttributeFilter: React.FC<AttributeFilterProps> = ({
           />
         </Group>
       </Group>
-      {kinds.length > 1 && (
-        <SegmentedControl
-          size="xs"
-          w="fit-content"
-          data={kinds.map((option) => ({
-            value: option,
-            label: KIND_LABELS[option],
-          }))}
-          value={kind}
-          onChange={(next) =>
-            onChange({ ...value, condition: emptyCondition(next as Kind) })
-          }
-        />
-      )}
       {body()}
     </Stack>
   );
