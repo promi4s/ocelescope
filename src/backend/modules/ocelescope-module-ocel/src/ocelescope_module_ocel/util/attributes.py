@@ -15,8 +15,7 @@ types are read from the stored columns before that and the extremes are cast bac
 
 from __future__ import annotations
 
-import math
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import Literal
 
 import duckdb
@@ -37,8 +36,6 @@ from ocelescope.util.sql import ident, literal
 from ocelescope import OCEL
 from ocelescope_module_ocel.models import (
     AggregatedAttribute,
-    AttributeBin,
-    AttributeDistribution,
     AttributeMatches,
     AttributeValueCount,
     TypedAttribute,
@@ -304,97 +301,6 @@ def entity_values(
         f"{_type_filter(f'o.{ident(OTYPE_COL)}', entity_names, params) or 'WHERE true'} "
         f"AND earliest.value <> ''",
         params,
-    )
-
-
-def attribute_distribution(
-    ocel: OCEL,
-    entity_type: EntityType,
-    attribute: str,
-    entity_names: list[str] | None = None,
-    bins: int = 50,
-    top: int = 200,
-) -> AttributeDistribution | None:
-    value_type = attribute_types(ocel, entity_type).get(attribute)
-    if value_type is None:
-        return None
-
-    long = entity_values(ocel, entity_type, attribute, entity_names)
-    count, distinct, first, last = long.query(
-        "long",
-        "SELECT count(*), count(DISTINCT value), min(value), max(value) FROM long",
-    ).fetchone() or (0, 0, None, None)
-    if not count:
-        return None
-
-    if value_type in (ValueType.INT, ValueType.FLOAT, ValueType.DATE):
-        x = (
-            "epoch(try_cast(value AS TIMESTAMP))"
-            if value_type is ValueType.DATE
-            else "try_cast(value AS DOUBLE)"
-        )
-        low, high = long.query(
-            "long", f"SELECT min({x}), max({x}) FROM long"
-        ).fetchone() or (None, None)
-        if low is None or high is None:
-            return None
-        span = high - low
-        if value_type is ValueType.INT:
-            width = float(max(1, math.ceil((span + 1) / bins)))
-            n = int(span // width) + 1
-        else:
-            n = bins if span > 0 else 1
-            width = span / n if span > 0 else 1.0
-
-        counts = dict(
-            long.query(
-                "long",
-                f"SELECT least(floor(({x} - {low!r}) / {width!r})::BIGINT, {n - 1}) AS b, "
-                f"count(*) FROM long WHERE {x} IS NOT NULL GROUP BY b",
-            ).fetchall()
-        )
-
-        def bound(value: float) -> float | str:
-            if value_type is ValueType.DATE:
-                return (
-                    datetime.fromtimestamp(value, UTC).replace(tzinfo=None).isoformat()
-                )
-            return value
-
-        histogram = [
-            AttributeBin(
-                start=bound(low + i * width),
-                end=bound(high if i == n - 1 else low + (i + 1) * width),
-                count=int(counts.get(i, 0)),
-            )
-            for i in range(n)
-        ]
-        return AttributeDistribution(
-            name=attribute,
-            type=value_type,
-            count=count,
-            distinct_values=distinct,
-            min=bound(low)
-            if value_type is ValueType.DATE
-            else _marshal(str(low), value_type),
-            max=bound(high)
-            if value_type is ValueType.DATE
-            else _marshal(str(high), value_type),
-            bins=histogram,
-        )
-
-    frequent = long.query(
-        "long",
-        f"SELECT value, count(*) AS n FROM long GROUP BY value ORDER BY n DESC, value LIMIT {int(top)}",
-    ).fetchall()
-    return AttributeDistribution(
-        name=attribute,
-        type=value_type,
-        count=count,
-        distinct_values=distinct,
-        min=_marshal(first, value_type),
-        max=_marshal(last, value_type),
-        values=[AttributeValueCount(value=value, count=n) for value, n in frequent],
     )
 
 

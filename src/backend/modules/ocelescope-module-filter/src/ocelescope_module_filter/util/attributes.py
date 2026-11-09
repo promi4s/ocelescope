@@ -28,10 +28,10 @@ from ocelescope_module_filter.filters.attribute.selectors import (
 )
 from ocelescope_module_filter.filters.attribute.sql import absent, in_list
 from ocelescope_module_filter.models import (
-    AttributeBin,
     AttributeSummary,
     AttributeValueCount,
     AttributeValues,
+    Bin,
 )
 
 
@@ -121,7 +121,7 @@ def attribute_summary(
 
 def attribute_bins(
     rows: DuckDBPyRelation, value_type: ValueType, count: int
-) -> list[AttributeBin]:
+) -> list[Bin]:
     if value_type not in ("int", "float", "date"):
         return []
     x = "epoch(value)" if value_type == "date" else "value::DOUBLE"
@@ -153,7 +153,7 @@ def attribute_bins(
         return value
 
     return [
-        AttributeBin(
+        Bin(
             start=bound(low + i * width),
             end=bound(high if i == n - 1 else low + (i + 1) * width),
             count=int(counts.get(i, 0)),

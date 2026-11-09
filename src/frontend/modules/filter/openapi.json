@@ -585,7 +585,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/AttributeBin"
+                    "$ref": "#/components/schemas/Bin"
                   },
                   "title": "Response Geteventattributebins"
                 }
@@ -737,7 +737,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/AttributeBin"
+                    "$ref": "#/components/schemas/Bin"
                   },
                   "title": "Response Getobjectattributebins"
                 }
@@ -1295,43 +1295,6 @@
         "title": "ActivityFilter",
         "description": "Keep (or exclude) events of the given activities."
       },
-      "AttributeBin": {
-        "properties": {
-          "start": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "string"
-              }
-            ],
-            "title": "Start"
-          },
-          "end": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "string"
-              }
-            ],
-            "title": "End"
-          },
-          "count": {
-            "type": "integer",
-            "title": "Count"
-          }
-        },
-        "type": "object",
-        "required": [
-          "start",
-          "end",
-          "count"
-        ],
-        "title": "AttributeBin"
-      },
       "AttributeCondition": {
         "properties": {
           "condition": {
@@ -1491,6 +1454,43 @@
           "values"
         ],
         "title": "AttributeValues"
+      },
+      "Bin": {
+        "properties": {
+          "start": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Start"
+          },
+          "end": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "End"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "start",
+          "end",
+          "count"
+        ],
+        "title": "Bin"
       },
       "E2OCountFilter": {
         "properties": {

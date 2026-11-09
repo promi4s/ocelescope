@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from ocelescope_module_ocel.models.attributes import AttributeBin
+from ocelescope_module_ocel.models.histogram import Bin
 
 
 class RelationCombination(BaseModel):
@@ -49,4 +49,4 @@ class RelationCountDistribution(BaseModel):
     relations: int
     min: int
     max: int
-    bins: list[AttributeBin]
+    bins: list[Bin]

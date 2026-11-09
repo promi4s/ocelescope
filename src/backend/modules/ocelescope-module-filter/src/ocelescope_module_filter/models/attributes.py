@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ocelescope_module_ocel.models import AttributeBin, AttributeValueCount
+from ocelescope_module_ocel.models import AttributeValueCount, Bin
 from ocelescope_module_ocel.models.attributes import ValueType
 from pydantic import BaseModel
 
@@ -28,9 +28,9 @@ class AttributeSummary(BaseModel):
 
 
 __all__ = [
-    "AttributeBin",
     "AttributeSummary",
     "AttributeValueCount",
     "AttributeValues",
+    "Bin",
     "SharedAttribute",
 ]

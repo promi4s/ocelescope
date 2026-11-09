@@ -31,7 +31,7 @@ from ocelescope_backend.app.internal.model.base import PaginatedResponse
 
 from ocelescope import OCEL
 from ocelescope_module_ocel.models import (
-    AttributeBin,
+    Bin,
     RelationCombination,
     RelationCountDistribution,
     RelationCountSummary,
@@ -305,7 +305,7 @@ def count_distribution(
         min=low,
         max=high,
         bins=[
-            AttributeBin(
+            Bin(
                 start=low + i * width,
                 end=high if i == n - 1 else low + (i + 1) * width,
                 count=int(counts.get(i, 0)),

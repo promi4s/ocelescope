@@ -27,9 +27,9 @@ from ocelescope_module_filter.filters.attribute.selectors import (
     ValueSelector,
 )
 from ocelescope_module_filter.models import (
-    AttributeBin,
     AttributeSummary,
     AttributeValues,
+    Bin,
     SharedAttribute,
 )
 from ocelescope_module_filter.state import (
@@ -169,7 +169,7 @@ def get_event_attribute_bins(
     attribute: Annotated[str, Query()],
     entity_names: Annotated[list[str] | None, Query()] = None,
     bins: Annotated[int, Query(ge=1, le=500)] = 40,
-) -> list[AttributeBin]:
+) -> list[Bin]:
     selected = attribute_values(ocel, "events", attribute, entity_names)
     return attribute_bins(*selected, bins) if selected else []
 
@@ -182,7 +182,7 @@ def get_object_attribute_bins(
     object_value: Annotated[ObjectValueKind, Query()] = "first",
     object_value_at: Annotated[str | None, Query()] = None,
     bins: Annotated[int, Query(ge=1, le=500)] = 40,
-) -> list[AttributeBin]:
+) -> list[Bin]:
     selected = attribute_values(
         ocel,
         "objects",

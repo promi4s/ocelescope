@@ -36,26 +36,9 @@ class TypedAttribute(Attribute):
     entity_type: str
 
 
-class AttributeBin(BaseModel):
-    start: float | str
-    end: float | str
-    count: int
-
-
 class AttributeValueCount(BaseModel):
     value: str
     count: int
-
-
-class AttributeDistribution(BaseModel):
-    name: str
-    type: ValueType
-    count: int
-    distinct_values: int
-    min: str | int | float
-    max: str | int | float
-    bins: list[AttributeBin] = []
-    values: list[AttributeValueCount] = []
 
 
 class AttributeMatches(BaseModel):
