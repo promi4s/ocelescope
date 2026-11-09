@@ -359,7 +359,7 @@
               "include"
             ],
             "title": "Null",
-            "default": "exclude"
+            "default": "include"
           }
         },
         "type": "object",
@@ -654,7 +654,7 @@
               "include"
             ],
             "title": "Null",
-            "default": "exclude"
+            "default": "include"
           },
           "value": {
             "oneOf": [

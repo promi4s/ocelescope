@@ -67,7 +67,7 @@ Condition = Annotated[
 class AttributeCondition(BaseModel):
     condition: Condition | None = None
     negate: bool = False
-    null: Literal["exclude", "include"] = "exclude"
+    null: Literal["exclude", "include"] = "include"
 
     def predicate(self, value: str) -> str:
         present = (

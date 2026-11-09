@@ -1,7 +1,6 @@
 import {
   Center,
   Group,
-  Input,
   Loader,
   SegmentedControl,
   SimpleGrid,
@@ -12,11 +11,7 @@ import {
 import type { AttributeSummary } from "@ocelescope/api-base";
 import { useAttributeSummary } from "./hooks";
 import ObjectValueSelect from "./ObjectValueSelect";
-import type {
-  AttributeFilterProps,
-  AttributeValueCondition,
-  MissingValues,
-} from "./types";
+import type { AttributeFilterProps, AttributeValueCondition } from "./types";
 import { formatValue } from "./util";
 import DateRangeView from "./views/DateRangeView";
 import NumberRangeView from "./views/NumberRangeView";
@@ -24,11 +19,6 @@ import PatternView from "./views/PatternView";
 import ValuePicker from "./views/ValuePicker";
 
 type Kind = AttributeValueCondition["kind"];
-
-const MISSING_OPTIONS = [
-  { value: "exclude", label: "Exclude" },
-  { value: "include", label: "Include" },
-];
 
 const KIND_LABELS: Record<Kind, string> = {
   range: "Range",
@@ -150,25 +140,27 @@ const AttributeFilter: React.FC<AttributeFilterProps> = ({
             onChange={(next) => onChange({ ...value, value: next })}
           />
         )}
-        <Input.Wrapper label="Missing values" size="xs">
-          <SegmentedControl
-            size="xs"
-            display="flex"
-            data={MISSING_OPTIONS}
-            value={value.null ?? "exclude"}
-            onChange={(next) =>
-              onChange({ ...value, null: next as MissingValues })
+        <Group gap="lg" ml="auto">
+          <Switch
+            size="sm"
+            label="Include null"
+            checked={(value.null ?? "include") === "include"}
+            onChange={(event) =>
+              onChange({
+                ...value,
+                null: event.currentTarget.checked ? "include" : "exclude",
+              })
             }
           />
-        </Input.Wrapper>
-        <Switch
-          size="sm"
-          label="Negate"
-          checked={inverted}
-          onChange={(event) =>
-            onChange({ ...value, negate: event.currentTarget.checked })
-          }
-        />
+          <Switch
+            size="sm"
+            label="Negate"
+            checked={inverted}
+            onChange={(event) =>
+              onChange({ ...value, negate: event.currentTarget.checked })
+            }
+          />
+        </Group>
       </Group>
       {kinds.length > 1 && (
         <SegmentedControl
