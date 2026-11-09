@@ -25,6 +25,15 @@ class AttributeStats(BaseModel):
     entity_types: list[str]
 
 
+class TypedAttribute(BaseModel):
+    name: str
+    min: str | int | float
+    max: str | int | float
+    distinct_values: int
+    type: ValueType
+    entity_type: str
+
+
 class AttributeValueCount(BaseModel):
     value: str
     count: int

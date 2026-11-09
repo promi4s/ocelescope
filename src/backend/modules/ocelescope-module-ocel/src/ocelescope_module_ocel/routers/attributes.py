@@ -10,12 +10,14 @@ from ocelescope_backend.app.dependencies import ApiOcel
 from ocelescope_backend.app.internal.exceptions import BadRequest
 from ocelescope_backend.app.internal.model.base import PaginatedResponse
 
+from ocelescope import OCEL
 from ocelescope_module_ocel.models import (
     AttributeInfo,
     AttributeStats,
     AttributeSummary,
     AttributeValues,
     Bin,
+    TypedAttribute,
 )
 from ocelescope_module_ocel.util import attributes as attribute_util
 from ocelescope_module_ocel.util.attributes import AttributeRows, EntityType
@@ -62,6 +64,53 @@ def get_attributes(
     entity_names: Annotated[list[str] | None, Query()] = None,
 ) -> list[AttributeInfo]:
     return attribute_util.list_attributes(ocel, entity_type, entity_names)
+
+
+def _typed(
+    ocel: OCEL,
+    entity_type: EntityType,
+    attribute_names: list[str],
+    names: list[str] | None,
+) -> list[TypedAttribute]:
+    return [
+        TypedAttribute(
+            name=stats.name,
+            min=stats.min,
+            max=stats.max,
+            distinct_values=stats.distinct_values,
+            type=stats.type,
+            entity_type=stats.entity_types[0],
+        )
+        for stats in attribute_util.attribute_stats(
+            ocel, entity_type, attribute_names or None, names, per_type=True
+        )
+    ]
+
+
+@router.get(
+    "/{ocel_id}/events/attributes",
+    operation_id="eventAttributes",
+    deprecated=True,
+)
+def get_event_attributes(
+    ocel: ApiOcel,
+    attribute_names: Annotated[list[str], Query(default_factory=list)],
+    names: Annotated[list[str] | None, Query()] = None,
+) -> list[TypedAttribute]:
+    return _typed(ocel, "events", attribute_names, names)
+
+
+@router.get(
+    "/{ocel_id}/objects/attributes",
+    operation_id="objectAttributes",
+    deprecated=True,
+)
+def get_object_attributes(
+    ocel: ApiOcel,
+    attribute_names: Annotated[list[str], Query(default_factory=list)],
+    names: Annotated[list[str] | None, Query()] = None,
+) -> list[TypedAttribute]:
+    return _typed(ocel, "objects", attribute_names, names)
 
 
 @router.get("/{ocel_id}/attributes/names", operation_id="attributeNames")

@@ -4,6 +4,7 @@ from ocelescope_module_ocel.models.attributes import (
     AttributeSummary,
     AttributeValueCount,
     AttributeValues,
+    TypedAttribute,
 )
 from ocelescope_module_ocel.models.histogram import Bin
 from ocelescope_module_ocel.models.metadata import OcelMetadata
@@ -35,4 +36,5 @@ __all__ = [
     "RelationCombination",
     "RelationCountDistribution",
     "RelationCountSummary",
+    "TypedAttribute",
 ]
