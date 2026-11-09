@@ -67,9 +67,6 @@ const selected = (condition: FilterCondition) => {
 };
 
 const matched = (condition: FilterCondition) => {
-  if (condition.null === "only") {
-    return "missing";
-  }
   const negation = condition.negate ? "not " : "";
   const missing = condition.null === "include" ? " or missing" : "";
   return `${negation}${describe(condition)}${missing}`;

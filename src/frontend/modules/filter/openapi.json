@@ -1339,8 +1339,7 @@
             "type": "string",
             "enum": [
               "exclude",
-              "include",
-              "only"
+              "include"
             ],
             "title": "Null",
             "default": "exclude"
@@ -1778,8 +1777,7 @@
             "type": "string",
             "enum": [
               "exclude",
-              "include",
-              "only"
+              "include"
             ],
             "title": "Null",
             "default": "exclude"

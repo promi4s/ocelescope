@@ -28,7 +28,6 @@ type Kind = AttributeValueCondition["kind"];
 const MISSING_OPTIONS = [
   { value: "exclude", label: "Exclude" },
   { value: "include", label: "Include" },
-  { value: "only", label: "Only" },
 ];
 
 const KIND_LABELS: Record<Kind, string> = {
@@ -88,20 +87,11 @@ const AttributeFilter: React.FC<AttributeFilterProps> = ({
   const { data } = useAttributeSummary(scope, selected);
   const condition = value.condition ?? null;
   const inverted = value.negate ?? false;
-  const onlyMissing = value.null === "only";
   const kinds = data ? kindsFor(data.type) : [];
   const kind: Kind | undefined =
     condition && kinds.includes(condition.kind) ? condition.kind : kinds[0];
 
   const body = () => {
-    if (onlyMissing) {
-      return (
-        <Text size="sm" c="dimmed">
-          Only the {entityType} without a value (empty or none) match; the value
-          condition is not used.
-        </Text>
-      );
-    }
     if (data === undefined) {
       return (
         <Center flex={1} mih={120}>
@@ -174,14 +164,13 @@ const AttributeFilter: React.FC<AttributeFilterProps> = ({
         <Switch
           size="sm"
           label="Negate"
-          disabled={onlyMissing}
           checked={inverted}
           onChange={(event) =>
             onChange({ ...value, negate: event.currentTarget.checked })
           }
         />
       </Group>
-      {kinds.length > 1 && !onlyMissing && (
+      {kinds.length > 1 && (
         <SegmentedControl
           size="xs"
           w="fit-content"

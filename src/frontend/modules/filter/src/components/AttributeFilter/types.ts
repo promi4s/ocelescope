@@ -6,7 +6,7 @@ export type AttributeValueCondition =
   | { kind: "range"; range: [number | null, number | null] }
   | { kind: "time_range"; range: [string | null, string | null] };
 
-export type MissingValues = "exclude" | "include" | "only";
+export type MissingValues = "exclude" | "include";
 
 export type ObjectValue =
   | { kind: "first" }
