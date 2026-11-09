@@ -1,14 +1,16 @@
 import { Group, Loader, Stack, Text, TextInput } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
-import { BarList } from "@ocelescope/core";
+import { BarList } from "../../BarList/BarList";
 import { useAttributeValues } from "../hooks";
 import type { ViewProps } from "../types";
+import { matching } from "../util";
 
 const PatternView: React.FC<ViewProps> = ({
   summary,
   value: filterValue,
   onChange,
   inverted,
+  includeNull,
   objectValue,
   ...scope
 }) => {
@@ -16,24 +18,15 @@ const PatternView: React.FC<ViewProps> = ({
   const regex = current?.kind === "pattern" ? current.regex : "";
   const [pattern] = useDebouncedValue(regex, 300);
 
-  const top = useAttributeValues(scope, objectValue);
-
-  const matches = useAttributeValues(
-    scope,
-    objectValue,
-    { regex: pattern },
-    pattern !== "",
-  );
+  const matches = useAttributeValues(scope, objectValue, {
+    regex: pattern || undefined,
+  });
 
   const isEmpty = pattern === "";
-  const matched = isEmpty ? summary.count : (matches.data?.count ?? 0);
-  const values = isEmpty
-    ? (top.data?.values ?? [])
-    : (matches.data?.values ?? []);
-  const distinct = isEmpty
-    ? summary.distinct_values
-    : (matches.data?.distinct_values ?? 0);
-  const kept = inverted ? summary.count - matched : matched;
+  const matched = matches.data?.count ?? summary.count;
+  const values = matches.data?.values ?? [];
+  const distinct = matches.data?.distinct_values ?? summary.distinct_values;
+  const { kept, total } = matching(summary, matched, inverted, includeNull);
 
   return (
     <Stack gap="sm" flex={1} mih={0}>
@@ -54,8 +47,8 @@ const PatternView: React.FC<ViewProps> = ({
             : `${matched.toLocaleString()} values match (${distinct.toLocaleString()} distinct)`}
         </Text>
         <Text size="sm" c="dimmed">
-          Matching {kept.toLocaleString()} of {summary.count.toLocaleString()}{" "}
-          values
+          Matching {kept.toLocaleString()} of {total.toLocaleString()}{" "}
+          {scope.entityType}
         </Text>
       </Group>
       {values.length > 0 ? (

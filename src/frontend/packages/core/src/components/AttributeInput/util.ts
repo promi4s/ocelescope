@@ -1,6 +1,6 @@
 import type { AttributeSummary } from "@ocelescope/api-base";
-import { viewParams } from "@ocelescope/core";
-import dayjs from "../../util/dayjs";
+import dayjs from "../../lib/dayjs";
+import { viewParams } from "../ViewBuilder/util";
 import type { AttributeScope } from "./types";
 
 export const scopeParams = ({
@@ -30,3 +30,15 @@ export const formatValue = (
   }
   return `${value}`;
 };
+
+export const matching = (
+  summary: AttributeSummary,
+  matched: number,
+  inverted: boolean,
+  includeNull: boolean,
+) => ({
+  kept:
+    (inverted ? summary.count - matched : matched) +
+    (includeNull ? summary.missing : 0),
+  total: summary.count + summary.missing,
+});

@@ -1,7 +1,7 @@
 import { Group, Text } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
 import { useMemo } from "react";
-import dayjs from "../../../util/dayjs";
+import dayjs from "../../../lib/dayjs";
 import RangeView, { type Bin, type Range } from "../../RangeView";
 import { useAttributeBins } from "../hooks";
 import type { ViewProps } from "../types";

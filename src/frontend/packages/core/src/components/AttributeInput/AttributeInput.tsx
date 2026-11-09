@@ -12,7 +12,7 @@ import {
 import type { AttributeSummary } from "@ocelescope/api-base";
 import { useAttributeSummary } from "./hooks";
 import ObjectValueSelect from "./ObjectValueSelect";
-import type { AttributeFilterProps, AttributeValueCondition } from "./types";
+import type { AttributeInputProps, AttributeValueCondition } from "./types";
 import { formatValue } from "./util";
 import DateRangeView from "./views/DateRangeView";
 import NumberRangeView from "./views/NumberRangeView";
@@ -67,14 +67,14 @@ const Stat: React.FC<{ label: string; value: string | number }> = ({
   </Stack>
 );
 
-const AttributeFilter: React.FC<AttributeFilterProps> = ({
+const AttributeInput: React.FC<AttributeInputProps> = ({
   value,
   onChange,
   ...scope
 }) => {
   const { entityType } = scope;
   const isObjects = entityType === "objects";
-  const selected = value.value;
+  const selected = value.objectValue;
   const { data } = useAttributeSummary(scope, selected);
   const condition = value.condition ?? null;
   const inverted = value.negate ?? false;
@@ -106,6 +106,7 @@ const AttributeFilter: React.FC<AttributeFilterProps> = ({
       onChange: (next: AttributeValueCondition) =>
         onChange({ ...value, condition: next }),
       inverted,
+      includeNull: value.includeNull ?? true,
     };
     switch (kind) {
       case "range":
@@ -138,7 +139,7 @@ const AttributeFilter: React.FC<AttributeFilterProps> = ({
         {isObjects && data?.dynamic && (
           <ObjectValueSelect
             value={selected}
-            onChange={(next) => onChange({ ...value, value: next })}
+            onChange={(next) => onChange({ ...value, objectValue: next })}
           />
         )}
         {kinds.length > 1 && (
@@ -161,12 +162,9 @@ const AttributeFilter: React.FC<AttributeFilterProps> = ({
           <Switch
             size="sm"
             label="Include null"
-            checked={(value.null ?? "include") === "include"}
+            checked={value.includeNull ?? true}
             onChange={(event) =>
-              onChange({
-                ...value,
-                null: event.currentTarget.checked ? "include" : "exclude",
-              })
+              onChange({ ...value, includeNull: event.currentTarget.checked })
             }
           />
           <Switch
@@ -184,4 +182,4 @@ const AttributeFilter: React.FC<AttributeFilterProps> = ({
   );
 };
 
-export default AttributeFilter;
+export default AttributeInput;

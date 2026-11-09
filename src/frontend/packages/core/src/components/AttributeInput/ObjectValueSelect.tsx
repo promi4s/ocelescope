@@ -1,6 +1,6 @@
 import { Group, Select } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
-import dayjs from "../../util/dayjs";
+import dayjs from "../../lib/dayjs";
 import type { ObjectValue } from "./types";
 
 const VALUE_OPTIONS = [

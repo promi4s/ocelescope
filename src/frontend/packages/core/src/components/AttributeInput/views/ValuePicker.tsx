@@ -1,16 +1,18 @@
 import { Stack, Text, useMantineTheme } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import type { AttributeValueCount } from "@ocelescope/api-base";
-import { OptionPicker, type PickerOption } from "@ocelescope/core";
 import { useMemo, useState } from "react";
+import { OptionPicker, type PickerOption } from "../../Pickers";
 import { useAttributeValues } from "../hooks";
 import type { ViewProps } from "../types";
+import { matching } from "../util";
 
 const ValuePicker: React.FC<ViewProps> = ({
   summary,
   value: filterValue,
   onChange,
   inverted,
+  includeNull,
   objectValue,
   ...scope
 }) => {
@@ -18,22 +20,11 @@ const ValuePicker: React.FC<ViewProps> = ({
   const [search, setSearch] = useState("");
   const [debounced] = useDebouncedValue(search.trim(), 300);
 
-  const top = useAttributeValues(scope, objectValue);
-
-  const found = useAttributeValues(
-    scope,
-    objectValue,
-    { search: debounced },
-    debounced !== "",
-  );
-
-  const isSearching = debounced !== "";
-  const values: AttributeValueCount[] = isSearching
-    ? (found.data?.values ?? [])
-    : (top.data?.values ?? []);
-  const total = isSearching
-    ? (found.data?.distinct_values ?? 0)
-    : summary.distinct_values;
+  const list = useAttributeValues(scope, objectValue, {
+    search: debounced || undefined,
+  });
+  const values: AttributeValueCount[] = list.data?.values ?? [];
+  const total = list.data?.distinct_values ?? summary.distinct_values;
 
   const options = useMemo<PickerOption<string>[]>(
     () =>
@@ -55,13 +46,18 @@ const ValuePicker: React.FC<ViewProps> = ({
     selected.length > 0,
   );
   const matched = selected.length > 0 ? (picked.data?.count ?? 0) : 0;
-  const kept = inverted ? summary.count - matched : matched;
+  const { kept, total: entities } = matching(
+    summary,
+    matched,
+    inverted,
+    includeNull,
+  );
 
   return (
     <Stack gap="sm">
       <Text size="sm" c="dimmed">
-        Matching {kept.toLocaleString()} of {summary.count.toLocaleString()}{" "}
-        values
+        Matching {kept.toLocaleString()} of {entities.toLocaleString()}{" "}
+        {scope.entityType}
       </Text>
       <OptionPicker<string>
         variant="list"
@@ -71,7 +67,7 @@ const ValuePicker: React.FC<ViewProps> = ({
         cutoff
         sort="count"
         options={options}
-        loading={found.isFetching}
+        loading={list.isFetching}
         search={search}
         onSearch={setSearch}
         total={total}
@@ -87,7 +83,7 @@ const ValuePicker: React.FC<ViewProps> = ({
       {selected.length === 0 && (
         <Text size="xs" c="dimmed">
           No value picked:{" "}
-          {inverted ? "every value matches" : "nothing matches"}.
+          {inverted ? "every value matches" : "no value matches"}.
         </Text>
       )}
     </Stack>

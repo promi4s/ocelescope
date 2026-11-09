@@ -1,3 +1,4 @@
+export * from "./components/AttributeInput";
 export { default as AttributesTable } from "./components/AttributeTable";
 export { BarList } from "./components/BarList/BarList";
 export {
@@ -36,6 +37,11 @@ export { OcelescopeApp } from "./components/OcelescopeApp";
 export { OcelescopeDocument } from "./components/OcelescopeDocument";
 export { OcelSelect } from "./components/OcelSelect/OcelSelect";
 export * from "./components/Pickers";
+export {
+  type Bin as RangeBin,
+  default as RangeView,
+  type Range as RangeValue,
+} from "./components/RangeView";
 export { default as RelationTable } from "./components/RelationTable";
 export { UploadModal } from "./components/UploadModal/UploadModal";
 export { UploadSection } from "./components/UploadSection/UploadSection";

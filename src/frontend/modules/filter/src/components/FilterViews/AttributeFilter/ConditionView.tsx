@@ -1,11 +1,7 @@
 import { Button, Group, Stack, Title } from "@mantine/core";
+import { AttributeInput, type AttributeScope } from "@ocelescope/core";
 import { ArrowLeftIcon, TrashIcon } from "lucide-react";
-import {
-  AttributeFilter,
-  type AttributeFilterValue,
-  type AttributeScope,
-} from "../../AttributeFilter";
-import type { FilterCondition } from "./util";
+import { type FilterCondition, fromInputValue, toInputValue } from "./util";
 
 type ConditionViewProps = AttributeScope & {
   condition: FilterCondition;
@@ -46,10 +42,10 @@ const ConditionView: React.FC<ConditionViewProps> = ({
         Remove
       </Button>
     </Group>
-    <AttributeFilter
+    <AttributeInput
       {...scope}
-      value={condition as AttributeFilterValue}
-      onChange={(next) => onChange({ ...condition, ...next })}
+      value={toInputValue(condition)}
+      onChange={(next) => onChange(fromInputValue(condition, next))}
     />
   </Stack>
 );

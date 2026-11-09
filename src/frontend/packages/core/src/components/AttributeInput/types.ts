@@ -6,19 +6,17 @@ export type AttributeValueCondition =
   | { kind: "range"; range: [number | null, number | null] }
   | { kind: "time_range"; range: [string | null, string | null] };
 
-export type MissingValues = "exclude" | "include";
-
 export type ObjectValue =
   | { kind: "first" }
   | { kind: "initial" }
   | { kind: "last" }
   | { kind: "at"; timestamp: string };
 
-export type AttributeFilterValue = {
+export type AttributeInputValue = {
   condition?: AttributeValueCondition | null;
   negate?: boolean;
-  null?: MissingValues;
-  value?: ObjectValue;
+  includeNull?: boolean;
+  objectValue?: ObjectValue;
 };
 
 export type AttributeScope = {
@@ -29,9 +27,9 @@ export type AttributeScope = {
   entityNames?: string[];
 };
 
-export type AttributeFilterProps = AttributeScope & {
-  value: AttributeFilterValue;
-  onChange: (value: AttributeFilterValue) => void;
+export type AttributeInputProps = AttributeScope & {
+  value: AttributeInputValue;
+  onChange: (value: AttributeInputValue) => void;
 };
 
 export type ViewProps = AttributeScope & {
@@ -40,4 +38,5 @@ export type ViewProps = AttributeScope & {
   value: AttributeValueCondition | null;
   onChange: (value: AttributeValueCondition) => void;
   inverted: boolean;
+  includeNull: boolean;
 };

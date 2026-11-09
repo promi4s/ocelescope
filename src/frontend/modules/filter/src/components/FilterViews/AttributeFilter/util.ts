@@ -1,5 +1,10 @@
 import type { AttributeInfo } from "@ocelescope/api-base";
 import type {
+  AttributeInputValue,
+  AttributeValueCondition,
+  ObjectValue,
+} from "@ocelescope/core";
+import type {
   AttributeCondition,
   EventAttributeFilter,
   ObjectAttributeCondition,
@@ -10,6 +15,27 @@ import dayjs from "../../../util/dayjs";
 export type AttributeFilter = EventAttributeFilter | ObjectAttributeFilter;
 
 export type FilterCondition = AttributeCondition | ObjectAttributeCondition;
+
+export const toInputValue = (
+  condition: FilterCondition,
+): AttributeInputValue => ({
+  condition: condition.condition as AttributeValueCondition | null | undefined,
+  negate: condition.negate,
+  includeNull: condition.null !== "exclude",
+  objectValue:
+    "value" in condition ? (condition.value as ObjectValue) : undefined,
+});
+
+export const fromInputValue = (
+  condition: FilterCondition,
+  value: AttributeInputValue,
+): FilterCondition => ({
+  ...condition,
+  condition: value.condition,
+  negate: value.negate,
+  null: value.includeNull === false ? "exclude" : "include",
+  ...(value.objectValue && { value: value.objectValue }),
+});
 
 export const initialCondition = ({
   type,
