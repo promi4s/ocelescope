@@ -1,8 +1,8 @@
 import { MultiSelect, Select } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import {
-  type AttributeStatsEntityType,
-  useAttributeStats,
+  type AttributeNamesEntityType,
+  useAttributeNames,
   useE2oQualifier,
   useEventCounts,
   useEventIds,
@@ -24,9 +24,9 @@ import { FrequencyPicker } from "../components/R4pmInputs";
 import { usePluginForm } from "../context";
 
 const AttributeSelect =
-  (entityType: AttributeStatsEntityType): React.FC<OcelSelectProps> =>
+  (entityType: AttributeNamesEntityType): React.FC<OcelSelectProps> =>
   ({ ocelId, isMulti, value, onChange, ...props }) => {
-    const { data } = useAttributeStats(ocelId, {
+    const { data: names = [] } = useAttributeNames(ocelId, {
       entity_type: entityType,
     });
 
@@ -35,11 +35,6 @@ const AttributeSelect =
     useEffect(() => {
       reset();
     }, [ocelId, isMulti]);
-
-    const names = useMemo(
-      () => [...new Set((data?.response ?? []).map(({ name }) => name))],
-      [data],
-    );
 
     const SelectComponent = isMulti ? MultiSelect : Select;
 
