@@ -314,10 +314,11 @@ def is_dynamic(
     column = f"c.{ident(attribute)}"
     types = "" if object_types is None else f"AND {in_list(f'o.{otype}', object_types)}"
     (dynamic,) = ocel.sql(
-        f"SELECT coalesce(bool_or(c.{ts} <> {EPOCH_SQL} AND NOT {absent(column)}), false) "
+        f"SELECT coalesce(bool_or(c.{ts} <> {EPOCH_SQL}), false) "
         f"FROM {ident(OBJECT_CHANGES_TABLE)} c "
         f"JOIN {ident(OBJECTS_TABLE)} o ON o.{oid} = c.{oid} "
-        f"WHERE c.{ident(OBJECT_CHANGED_FIELD)} = {literal(attribute)} {types}"
+        f"WHERE c.{ident(OBJECT_CHANGED_FIELD)} = {literal(attribute)} "
+        f"AND NOT {absent(column)} {types}"
     ).fetchone() or (False,)
     return bool(dynamic)
 
