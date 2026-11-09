@@ -1,4 +1,4 @@
-import type { SharedAttribute } from "@ocelescope/api-base";
+import type { AttributeInfo } from "@ocelescope/api-base";
 import type {
   AttributeCondition,
   EventAttributeFilter,
@@ -13,7 +13,7 @@ export type FilterCondition = AttributeCondition | ObjectAttributeCondition;
 
 export const initialCondition = ({
   type,
-}: Pick<SharedAttribute, "type">): AttributeCondition => {
+}: Pick<AttributeInfo, "type">): AttributeCondition => {
   switch (type) {
     case "int":
     case "float":

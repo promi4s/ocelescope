@@ -408,110 +408,10 @@
         }
       }
     },
-    "/modules/ocel/v1/{ocel_id}/attributes/names": {
+    "/modules/ocel/v1/{ocel_id}/attributes": {
       "get": {
-        "summary": "Get Attribute Names",
-        "operationId": "attributeNames",
-        "parameters": [
-          {
-            "name": "ocel_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Ocel Id"
-            }
-          },
-          {
-            "name": "entity_type",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "enum": [
-                    "events",
-                    "objects"
-                  ],
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Entity Type"
-            }
-          },
-          {
-            "name": "ocel_version",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "enum": [
-                "original",
-                "filtered"
-              ],
-              "type": "string",
-              "default": "filtered",
-              "title": "Ocel Version"
-            }
-          },
-          {
-            "name": "view_id",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "View Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  },
-                  "title": "Response Attributenames"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/modules/ocel/v1/{ocel_id}/attributes/shared": {
-      "get": {
-        "summary": "Get Shared Attributes",
-        "operationId": "sharedAttributes",
+        "summary": "Get Attributes",
+        "operationId": "attributes",
         "parameters": [
           {
             "name": "ocel_id",
@@ -601,9 +501,103 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/SharedAttribute"
+                    "$ref": "#/components/schemas/AttributeInfo"
                   },
-                  "title": "Response Sharedattributes"
+                  "title": "Response Attributes"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/modules/ocel/v1/{ocel_id}/attributes/names": {
+      "get": {
+        "summary": "Get Attribute Names",
+        "operationId": "attributeNames",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "entity_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "events",
+                "objects"
+              ],
+              "type": "string",
+              "default": "events",
+              "title": "Entity Type"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "original",
+                "filtered"
+              ],
+              "type": "string",
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "title": "Response Attributenames"
                 }
               }
             }
@@ -1015,6 +1009,18 @@
                 }
               ],
               "title": "Values"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 10000,
+              "minimum": 1,
+              "default": 200,
+              "title": "Limit"
             }
           },
           {
@@ -3413,6 +3419,31 @@
   },
   "components": {
     "schemas": {
+      "AttributeInfo": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ValueType"
+          },
+          "entity_types": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Entity Types"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "type",
+          "entity_types"
+        ],
+        "title": "AttributeInfo"
+      },
       "AttributeStats": {
         "properties": {
           "name": {
@@ -4129,31 +4160,6 @@
         ],
         "title": "RelationCountSummary",
         "description": "Summary statistics for relationship multiplicities in O2O or E2O relations.\n\nFor each (source type, target type[, qualifier]) combination, captures how many\nrelated items occur per source instance.\n\nAttributes:\n    qualifier: The relation qualifier (empty string when none applies).\n    qualifiers: The qualifiers aggregated under a (source, target) pair. For\n        aggregated rows (``with_qualifier=False``) this lists every qualifier;\n        for per-qualifier rows it is the single-element list ``[qualifier]``.\n    source: The source object or event type.\n    target: The target object or event type.\n    min_count: The minimum number of related items for any source instance.\n    max_count: The maximum number of related items for any source instance.\n    sum: The total number of relation occurrences across all instances."
-      },
-      "SharedAttribute": {
-        "properties": {
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "type": {
-            "$ref": "#/components/schemas/ValueType"
-          },
-          "entity_types": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Entity Types"
-          }
-        },
-        "type": "object",
-        "required": [
-          "name",
-          "type",
-          "entity_types"
-        ],
-        "title": "SharedAttribute"
       },
       "SqlColumn": {
         "properties": {

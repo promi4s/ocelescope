@@ -36,7 +36,7 @@ class AttributeValues(BaseModel):
     values: list[AttributeValueCount]
 
 
-class SharedAttribute(BaseModel):
+class AttributeInfo(BaseModel):
     name: str
     type: ValueType
     entity_types: list[str]

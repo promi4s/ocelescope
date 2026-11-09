@@ -11,11 +11,11 @@ from ocelescope_backend.app.internal.exceptions import BadRequest
 from ocelescope_backend.app.internal.model.base import PaginatedResponse
 
 from ocelescope_module_ocel.models import (
+    AttributeInfo,
     AttributeStats,
     AttributeSummary,
     AttributeValues,
     Bin,
-    SharedAttribute,
 )
 from ocelescope_module_ocel.util import attributes as attribute_util
 from ocelescope_module_ocel.util.attributes import AttributeRows, EntityType
@@ -55,43 +55,24 @@ def get_attribute_stats(
     )
 
 
-@router.get("/{ocel_id}/attributes/names", operation_id="attributeNames")
-def get_attribute_names(
-    ocel: ApiOcel,
-    entity_type: Annotated[EntityType | None, Query()] = None,
-) -> list[str]:
-    names: list[str] = []
-    if entity_type != "events":
-        names += attribute_util.attribute_names(ocel, "objects")
-    if entity_type != "objects":
-        names += attribute_util.attribute_names(ocel, "events")
-    return names
-
-
-@router.get("/{ocel_id}/attributes/shared", operation_id="sharedAttributes")
-def get_shared_attributes(
+@router.get("/{ocel_id}/attributes", operation_id="attributes")
+def get_attributes(
     ocel: ApiOcel,
     entity_type: Annotated[EntityType, Query()] = "events",
     entity_names: Annotated[list[str] | None, Query()] = None,
-) -> list[SharedAttribute]:
-    return attribute_util.shared_attributes(ocel, entity_type, entity_names)
+) -> list[AttributeInfo]:
+    return attribute_util.list_attributes(ocel, entity_type, entity_names)
+
+
+@router.get("/{ocel_id}/attributes/names", operation_id="attributeNames")
+def get_attribute_names(
+    ocel: ApiOcel,
+    entity_type: Annotated[EntityType, Query()] = "events",
+) -> list[str]:
+    return sorted(attribute_util.attribute_types(ocel, entity_type))
 
 
 ObjectValueKind = Literal["first", "initial", "last", "at"]
-
-
-def _selector(kind: ObjectValueKind, at: str | None) -> ValueSelector:
-    match kind:
-        case "initial":
-            return InitialValue()
-        case "last":
-            return LastValue()
-        case "at":
-            if at is None:
-                raise BadRequest("object_value_at is required for object_value=at")
-            return ValueAt(timestamp=at)
-        case _:
-            return FirstValue()
 
 
 def _values(
@@ -102,12 +83,20 @@ def _values(
     object_value: Annotated[ObjectValueKind, Query()] = "first",
     object_value_at: Annotated[str | None, Query()] = None,
 ) -> AttributeRows | None:
+    selector: ValueSelector
+    match object_value:
+        case "initial":
+            selector = InitialValue()
+        case "last":
+            selector = LastValue()
+        case "at":
+            if object_value_at is None:
+                raise BadRequest("object_value_at is required for object_value=at")
+            selector = ValueAt(timestamp=object_value_at)
+        case _:
+            selector = FirstValue()
     return attribute_util.attribute_values(
-        ocel,
-        entity_type,
-        attribute,
-        entity_names,
-        _selector(object_value, object_value_at),
+        ocel, entity_type, attribute, entity_names, selector
     )
 
 
@@ -144,10 +133,13 @@ def get_attribute_values(
     regex: Annotated[str | None, Query()] = None,
     search: Annotated[str | None, Query()] = None,
     values: Annotated[list[str] | None, Query()] = None,
+    limit: Annotated[int, Query(ge=1, le=10_000)] = 200,
 ) -> AttributeValues:
     if selected is None:
         return AttributeValues(count=0, distinct_values=0, values=[])
     try:
-        return attribute_util.attribute_counts(selected[0], regex, search, values)
+        return attribute_util.attribute_counts(
+            selected[0], regex, search, values, limit
+        )
     except duckdb.InvalidInputException as error:
         raise BadRequest(str(error)) from error

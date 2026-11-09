@@ -7,10 +7,7 @@ import {
   Text,
   Tooltip,
 } from "@mantine/core";
-import {
-  type SharedAttribute,
-  useSharedAttributes,
-} from "@ocelescope/api-base";
+import { type AttributeInfo, useAttributes } from "@ocelescope/api-base";
 import { viewParams } from "@ocelescope/core";
 import { keepPreviousData } from "@tanstack/react-query";
 import { PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
@@ -23,7 +20,7 @@ type AttributeTableProps = {
   entityType: "events" | "objects";
   types?: string[];
   conditions: Record<string, string>;
-  onAdd: (attribute: SharedAttribute) => void;
+  onAdd: (attribute: AttributeInfo) => void;
   onEdit: (attribute: string) => void;
   onRemove: (attribute: string) => void;
 };
@@ -41,7 +38,7 @@ const AttributeTable: React.FC<AttributeTableProps> = ({
   const [searched, setSearched] = useState<string[]>([]);
   const [appliedOnly, setAppliedOnly] = useState(false);
 
-  const { data, isFetching } = useSharedAttributes(
+  const { data, isFetching } = useAttributes(
     ocelId,
     {
       ...viewParams(viewId),
@@ -63,7 +60,7 @@ const AttributeTable: React.FC<AttributeTableProps> = ({
     [data, searched, appliedOnly, conditions],
   );
 
-  const columns = useMemo<DataTableColumn<SharedAttribute>[]>(
+  const columns = useMemo<DataTableColumn<AttributeInfo>[]>(
     () => [
       {
         accessor: "name",

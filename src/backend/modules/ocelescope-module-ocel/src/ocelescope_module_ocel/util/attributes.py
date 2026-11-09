@@ -37,12 +37,12 @@ from ocelescope.util.sql import ident, literal
 
 from ocelescope import OCEL
 from ocelescope_module_ocel.models import (
+    AttributeInfo,
     AttributeStats,
     AttributeSummary,
     AttributeValueCount,
     AttributeValues,
     Bin,
-    SharedAttribute,
 )
 from ocelescope_module_ocel.models.attributes import ValueType
 from ocelescope_module_ocel.util.selectors import FirstValue, ValueSelector
@@ -245,11 +245,11 @@ def attribute_stats(
     ]
 
 
-def shared_attributes(
+def list_attributes(
     ocel: OCEL,
     entity_type: EntityType,
     entity_names: list[str] | None = None,
-) -> list[SharedAttribute]:
+) -> list[AttributeInfo]:
     types = attribute_types(ocel, entity_type)
     rows = (
         long_table(ocel, entity_type, entity_names=entity_names)
@@ -262,7 +262,7 @@ def shared_attributes(
         .fetchall()
     )
     return [
-        SharedAttribute(name=name, type=types[name], entity_types=entities)
+        AttributeInfo(name=name, type=types[name], entity_types=entities)
         for name, entities in rows
     ]
 
@@ -399,7 +399,7 @@ def attribute_counts(
     regex: str | None = None,
     search: str | None = None,
     listed: list[str] | None = None,
-    top: int = 200,
+    limit: int = 200,
 ) -> AttributeValues:
     conditions = ["value IS NOT NULL"]
     if regex is not None:
@@ -421,7 +421,7 @@ def attribute_counts(
     frequent = matched.query(
         "matched",
         "SELECT value, count(*) AS n FROM matched GROUP BY value "
-        f"ORDER BY n DESC, value LIMIT {int(top)}",
+        f"ORDER BY n DESC, value LIMIT {int(limit)}",
     ).fetchall()
     return AttributeValues(
         count=count,

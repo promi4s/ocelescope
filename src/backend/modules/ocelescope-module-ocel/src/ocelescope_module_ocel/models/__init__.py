@@ -1,9 +1,9 @@
 from ocelescope_module_ocel.models.attributes import (
+    AttributeInfo,
     AttributeStats,
     AttributeSummary,
     AttributeValueCount,
     AttributeValues,
-    SharedAttribute,
 )
 from ocelescope_module_ocel.models.histogram import Bin
 from ocelescope_module_ocel.models.metadata import OcelMetadata
@@ -20,6 +20,7 @@ from ocelescope_module_ocel.models.time import (
 from ocelescope_module_ocel.models.variants import ObjectTypeVariants, ObjectVariant
 
 __all__ = [
+    "AttributeInfo",
     "AttributeStats",
     "AttributeSummary",
     "AttributeValueCount",
@@ -34,5 +35,4 @@ __all__ = [
     "RelationCombination",
     "RelationCountDistribution",
     "RelationCountSummary",
-    "SharedAttribute",
 ]
