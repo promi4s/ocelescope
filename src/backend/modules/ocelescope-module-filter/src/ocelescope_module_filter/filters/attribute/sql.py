@@ -27,10 +27,6 @@ def in_list(column: str, names: list[str]) -> str:
     return f"{column} IN ({', '.join(literal(name) for name in names)})"
 
 
-def carried(values: dict[str, str]) -> str:
-    return " AND ".join(f"bool_or(NOT {absent(value)})" for value in values.values())
-
-
 def attribute_names(step: Step, table: str) -> set[str]:
     columns = step.sql(f"SELECT * FROM {step[table]} LIMIT 0").columns
     return {column for column in columns if not column.startswith("ocel:")}

@@ -24,7 +24,6 @@ from ocelescope_module_filter.filters.attribute.selectors import (
 from ocelescope_module_filter.filters.attribute.sql import (
     Mode,
     attribute_names,
-    carried,
     in_list,
 )
 
@@ -35,22 +34,14 @@ class ObjectAttributeCondition(AttributeCondition):
 
 class ObjectAttributeFilter(BaseFilter):
     type: Literal["object_attribute"]
-    target: list[str] | Literal["all", "carrying"] = "carrying"
+    target: list[str] | None = None
     conditions: dict[str, ObjectAttributeCondition]
     mode: Mode = "include"
 
-    def _targeted(self, values: dict[str, str]) -> str:
-        object_type = ident(OTYPE_COL)
-        match self.target:
-            case "all":
-                return "true"
-            case "carrying":
-                return (
-                    f"{object_type} IN (SELECT {object_type} FROM object "
-                    f"GROUP BY {object_type} HAVING {carried(values)})"
-                )
-            case list():
-                return in_list(object_type, self.target)
+    def _targeted(self) -> str:
+        if self.target is None:
+            return "true"
+        return in_list(ident(OTYPE_COL), self.target)
 
     def _source(self, step: Step, known: dict[str, ObjectAttributeCondition]) -> str:
         oid, otype = ident(OID_COL), ident(OTYPE_COL)
@@ -94,6 +85,6 @@ class ObjectAttributeFilter(BaseFilter):
             OBJECTS_TABLE,
             f"WITH object AS ({self._source(step, known)}) "
             f"SELECT {ident(OID_COL)} FROM object "
-            f"WHERE NOT ({self._targeted(values)}) "
+            f"WHERE NOT ({self._targeted()}) "
             f"OR ({matches(self.conditions, values, self.mode)})",
         )

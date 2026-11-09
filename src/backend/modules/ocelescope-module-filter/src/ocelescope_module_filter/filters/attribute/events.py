@@ -15,29 +15,20 @@ from ocelescope_module_filter.filters.attribute.conditions import (
 from ocelescope_module_filter.filters.attribute.sql import (
     Mode,
     attribute_names,
-    carried,
     in_list,
 )
 
 
 class EventAttributeFilter(BaseFilter):
     type: Literal["event_attribute"]
-    target: list[str] | Literal["all", "carrying"] = "carrying"
+    target: list[str] | None = None
     conditions: dict[str, AttributeCondition]
     mode: Mode = "include"
 
-    def _targeted(self, events: str, values: dict[str, str]) -> str:
-        activity = ident(ACTIVITY_COL)
-        match self.target:
-            case "all":
-                return "true"
-            case "carrying":
-                return (
-                    f"{activity} IN (SELECT {activity} FROM {events} "
-                    f"GROUP BY {activity} HAVING {carried(values)})"
-                )
-            case list():
-                return in_list(activity, self.target)
+    def _targeted(self) -> str:
+        if self.target is None:
+            return "true"
+        return in_list(ident(ACTIVITY_COL), self.target)
 
     def build(self, step: Step) -> None:
         if not self.conditions:
@@ -53,6 +44,6 @@ class EventAttributeFilter(BaseFilter):
         step.keep(
             EVENTS_TABLE,
             f"SELECT {ident(EID_COL)} FROM {events} "
-            f"WHERE NOT ({self._targeted(events, values)}) "
+            f"WHERE NOT ({self._targeted()}) "
             f"OR ({matches(self.conditions, values, self.mode)})",
         )
