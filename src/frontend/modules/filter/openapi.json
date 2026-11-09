@@ -1389,15 +1389,7 @@
       "AttributeSummary": {
         "properties": {
           "type": {
-            "type": "string",
-            "enum": [
-              "string",
-              "bool",
-              "int",
-              "float",
-              "date"
-            ],
-            "title": "Type"
+            "$ref": "#/components/schemas/ValueType"
           },
           "count": {
             "type": "integer",
@@ -1972,15 +1964,7 @@
             "title": "Name"
           },
           "type": {
-            "type": "string",
-            "enum": [
-              "string",
-              "bool",
-              "int",
-              "float",
-              "date"
-            ],
-            "title": "Type"
+            "$ref": "#/components/schemas/ValueType"
           },
           "entity_types": {
             "items": {
@@ -2152,6 +2136,18 @@
           "timestamp"
         ],
         "title": "ValueAt"
+      },
+      "ValueType": {
+        "type": "string",
+        "enum": [
+          "empty",
+          "string",
+          "bool",
+          "int",
+          "float",
+          "date"
+        ],
+        "title": "ValueType"
       },
       "ValuesCondition": {
         "properties": {
