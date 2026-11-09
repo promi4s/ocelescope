@@ -19,10 +19,14 @@ from ocelescope_module_filter.filters.attribute.sql import (
 )
 
 
+class EventAttributeCondition(AttributeCondition):
+    pass
+
+
 class EventAttributeFilter(BaseFilter):
     type: Literal["event_attribute"]
     target: list[str] | None = None
-    conditions: dict[str, AttributeCondition]
+    conditions: dict[str, EventAttributeCondition]
     mode: Mode = "include"
 
     def _targeted(self) -> str:

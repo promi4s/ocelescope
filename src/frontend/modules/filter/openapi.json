@@ -312,59 +312,6 @@
         "title": "ActivityFilter",
         "description": "Keep (or exclude) events of the given activities."
       },
-      "AttributeCondition": {
-        "properties": {
-          "condition": {
-            "anyOf": [
-              {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/RangeCondition"
-                  },
-                  {
-                    "$ref": "#/components/schemas/TimeRangeCondition"
-                  },
-                  {
-                    "$ref": "#/components/schemas/ValuesCondition"
-                  },
-                  {
-                    "$ref": "#/components/schemas/PatternCondition"
-                  }
-                ],
-                "discriminator": {
-                  "propertyName": "kind",
-                  "mapping": {
-                    "pattern": "#/components/schemas/PatternCondition",
-                    "range": "#/components/schemas/RangeCondition",
-                    "time_range": "#/components/schemas/TimeRangeCondition",
-                    "values": "#/components/schemas/ValuesCondition"
-                  }
-                }
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Condition"
-          },
-          "negate": {
-            "type": "boolean",
-            "title": "Negate",
-            "default": false
-          },
-          "null": {
-            "type": "string",
-            "enum": [
-              "exclude",
-              "include"
-            ],
-            "title": "Null",
-            "default": "include"
-          }
-        },
-        "type": "object",
-        "title": "AttributeCondition"
-      },
       "E2OCountFilter": {
         "properties": {
           "source": {
@@ -439,6 +386,59 @@
         "title": "E2OCountFilter",
         "description": "Keep events/objects by how many E2O relations of a given kind they have."
       },
+      "EventAttributeCondition": {
+        "properties": {
+          "condition": {
+            "anyOf": [
+              {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/RangeCondition"
+                  },
+                  {
+                    "$ref": "#/components/schemas/TimeRangeCondition"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ValuesCondition"
+                  },
+                  {
+                    "$ref": "#/components/schemas/PatternCondition"
+                  }
+                ],
+                "discriminator": {
+                  "propertyName": "kind",
+                  "mapping": {
+                    "pattern": "#/components/schemas/PatternCondition",
+                    "range": "#/components/schemas/RangeCondition",
+                    "time_range": "#/components/schemas/TimeRangeCondition",
+                    "values": "#/components/schemas/ValuesCondition"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Condition"
+          },
+          "negate": {
+            "type": "boolean",
+            "title": "Negate",
+            "default": false
+          },
+          "null": {
+            "type": "string",
+            "enum": [
+              "exclude",
+              "include"
+            ],
+            "title": "Null",
+            "default": "include"
+          }
+        },
+        "type": "object",
+        "title": "EventAttributeCondition"
+      },
       "EventAttributeFilter": {
         "properties": {
           "type": {
@@ -462,7 +462,7 @@
           },
           "conditions": {
             "additionalProperties": {
-              "$ref": "#/components/schemas/AttributeCondition"
+              "$ref": "#/components/schemas/EventAttributeCondition"
             },
             "type": "object",
             "title": "Conditions"

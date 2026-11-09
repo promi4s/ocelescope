@@ -5,7 +5,7 @@ import type {
   ObjectValue,
 } from "@ocelescope/core";
 import type {
-  AttributeCondition,
+  EventAttributeCondition,
   EventAttributeFilter,
   ObjectAttributeCondition,
   ObjectAttributeFilter,
@@ -14,7 +14,9 @@ import dayjs from "../../../util/dayjs";
 
 export type AttributeFilter = EventAttributeFilter | ObjectAttributeFilter;
 
-export type FilterCondition = AttributeCondition | ObjectAttributeCondition;
+export type FilterCondition =
+  | EventAttributeCondition
+  | ObjectAttributeCondition;
 
 export const toInputValue = (
   condition: FilterCondition,
@@ -39,7 +41,7 @@ export const fromInputValue = (
 
 export const initialCondition = ({
   type,
-}: Pick<AttributeInfo, "type">): AttributeCondition => {
+}: Pick<AttributeInfo, "type">): FilterCondition => {
   switch (type) {
     case "int":
     case "float":

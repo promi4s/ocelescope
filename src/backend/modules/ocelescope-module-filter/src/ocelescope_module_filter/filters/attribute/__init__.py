@@ -15,6 +15,7 @@ from ocelescope_module_filter.filters.attribute.conditions import (
     ValuesCondition,
 )
 from ocelescope_module_filter.filters.attribute.events import (
+    EventAttributeCondition,
     EventAttributeFilter,
 )
 from ocelescope_module_filter.filters.attribute.objects import (
@@ -25,6 +26,7 @@ from ocelescope_module_filter.filters.attribute.objects import (
 __all__ = [
     "AttributeCondition",
     "Condition",
+    "EventAttributeCondition",
     "EventAttributeFilter",
     "FirstValue",
     "InitialValue",
