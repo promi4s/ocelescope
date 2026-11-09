@@ -23,6 +23,7 @@ If you only want to **run** Ocelescope, please follow the installation steps in 
 ## 🧱 Prerequisites
 
 Make sure you have the following tools installed:
+
 - [uv](https://docs.astral.sh/uv/)
 - [pnpm](https://pnpm.io/)
 
@@ -39,6 +40,7 @@ pnpm run init
 ```
 
 This will:
+
 - install backend dependencies (via `uv`)
 - install frontend dependencies (via `pnpm`)
 - generate and build the frontend API client
