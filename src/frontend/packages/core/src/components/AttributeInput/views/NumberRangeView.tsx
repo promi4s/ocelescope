@@ -11,7 +11,7 @@ const formatFloat = (value: number) =>
 
 const NumberRangeView: React.FC<ViewProps> = ({
   summary,
-  value: filterValue,
+  value: condition,
   onChange,
   inverted,
   objectValue,
@@ -33,8 +33,8 @@ const NumberRangeView: React.FC<ViewProps> = ({
     [data, isInt],
   );
 
-  const current = filterValue;
-  const [low, high] = current?.kind === "range" ? current.range : [null, null];
+  const [low, high] =
+    condition?.kind === "range" ? condition.range : [null, null];
   const value: Range = [low ?? min, high ?? max];
   const setRange = (range: Range) => onChange({ kind: "range", range });
 

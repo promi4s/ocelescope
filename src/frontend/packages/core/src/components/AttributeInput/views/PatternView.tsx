@@ -7,15 +7,14 @@ import { matching } from "../util";
 
 const PatternView: React.FC<ViewProps> = ({
   summary,
-  value: filterValue,
+  value: condition,
   onChange,
   inverted,
   includeNull,
   objectValue,
   ...scope
 }) => {
-  const current = filterValue;
-  const regex = current?.kind === "pattern" ? current.regex : "";
+  const regex = condition?.kind === "pattern" ? condition.regex : "";
   const [pattern] = useDebouncedValue(regex, 300);
 
   const matches = useAttributeValues(scope, objectValue, {

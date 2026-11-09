@@ -9,7 +9,7 @@ import { matching } from "../util";
 
 const ValuePicker: React.FC<ViewProps> = ({
   summary,
-  value: filterValue,
+  value: condition,
   onChange,
   inverted,
   includeNull,
@@ -37,8 +37,8 @@ const ValuePicker: React.FC<ViewProps> = ({
     [values, theme],
   );
 
-  const current = filterValue;
-  const selected = current?.kind === "values" ? current.values.map(String) : [];
+  const selected =
+    condition?.kind === "values" ? condition.values.map(String) : [];
   const picked = useAttributeValues(
     scope,
     objectValue,

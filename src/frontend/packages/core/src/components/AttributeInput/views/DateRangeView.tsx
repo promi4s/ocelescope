@@ -16,7 +16,7 @@ const formatTime = (value: number) => dayjs(value).format("YYYY-MM-DD HH:mm");
 
 const DateRangeView: React.FC<ViewProps> = ({
   summary,
-  value: filterValue,
+  value: condition,
   onChange,
   inverted,
   objectValue,
@@ -37,9 +37,8 @@ const DateRangeView: React.FC<ViewProps> = ({
     [data],
   );
 
-  const current = filterValue;
   const [start, end] =
-    current?.kind === "time_range" ? current.range : [null, null];
+    condition?.kind === "time_range" ? condition.range : [null, null];
   const value: Range = [
     start != null ? toTime(start) : min,
     end != null ? toTime(end) : max,
