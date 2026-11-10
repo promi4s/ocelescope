@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
-from ocelescope_backend.app.internal.tasks.base import TaskState
-from ocelescope_backend.app.internal.tasks.store import TaskRecord
+from ocelescope_backend.app.internal.tasks.store import TaskRecord, TaskState
 
 
 class TaskApi(BaseModel):

@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import shutil
 import tempfile
-from collections.abc import Callable, Generator, Hashable
+from collections.abc import Generator
 from contextlib import AbstractContextManager, contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
@@ -16,11 +16,9 @@ from ocelescope_backend.app.internal.model.ocel import SessionOCEL
 from ocelescope_backend.app.internal.model.resource import ResourceApi, ResourceStore
 from ocelescope_backend.app.internal.model.state import StateStore
 from ocelescope_backend.app.internal.registry import resource_registry
-from ocelescope_backend.app.internal.tasks.base import TaskBase
 from ocelescope_backend.app.internal.tasks.inputs import OcelInput, ResourceInput
 from ocelescope_backend.app.sse_manager import InvalidationRequest, Route, sse_manager
 
-S = TypeVar("S", bound=TaskBase)
 T = TypeVar("T")
 R = TypeVar("R", bound=ResourceBase)
 
@@ -33,10 +31,6 @@ class Session:
         id: str | None = None,
     ):
         self.id = id or str(uuid4())
-
-        # Tasks
-        self._tasks: dict[str, TaskBase] = {}
-        self._dedupe_keys: dict[Hashable, str] = {}
 
         # Plugins
         self.module_states = StateStore()
@@ -57,20 +51,6 @@ class Session:
 
         # Store session in static variable
         Session.sessions[self.id] = self
-
-    @property
-    def tasks(self):
-        return self._tasks
-
-    def get_task(self, task_id: str):
-        return self._tasks.get(task_id, None)
-
-    def list_tasks(self, task_type: type[S], filter: Callable[[S], bool]):
-        return [
-            task.summarize()
-            for task in self._tasks.values()
-            if isinstance(task, task_type) and filter(task)
-        ]
 
     @staticmethod
     def get(session_id: str) -> Session | None:

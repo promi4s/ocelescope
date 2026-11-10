@@ -3,9 +3,17 @@ from __future__ import annotations
 import threading
 from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
+from enum import Enum
 from typing import Any
 
-from ocelescope_backend.app.internal.tasks.base import TaskState
+
+class TaskState(str, Enum):
+    PENDING = "PENDING"
+    STARTED = "STARTED"
+    SUCCESS = "SUCCESS"
+    FAILURE = "FAILURE"
+    SKIPPED = "SKIPPED"
+    CANCELLED = "CANCELLED"
 
 
 def _now() -> str:
@@ -19,6 +27,7 @@ class TaskRecord:
     name: str
     state: TaskState = TaskState.PENDING
     label: str | None = None
+    arguments: dict[str, Any] = field(default_factory=dict)
     dedupe_key: str | None = None
     created_at: str = field(default_factory=_now)
     started_at: str | None = None

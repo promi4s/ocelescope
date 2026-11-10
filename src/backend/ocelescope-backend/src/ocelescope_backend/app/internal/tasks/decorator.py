@@ -3,9 +3,12 @@ from __future__ import annotations
 import hashlib
 import inspect
 from collections.abc import Callable
+from datetime import datetime
+from enum import Enum
 from typing import TYPE_CHECKING, Any, Generic, ParamSpec
 
-from ocelescope_backend.app.internal.tasks.base import make_hashable
+from pydantic import BaseModel
+
 from ocelescope_backend.app.internal.tasks.inputs import find_open_entities
 from ocelescope_backend.app.internal.tasks.outputs import TaskResult
 from ocelescope_backend.app.internal.tasks.runner import task_runner
@@ -14,6 +17,22 @@ if TYPE_CHECKING:
     from ocelescope_backend.app.internal.session import Session
 
 P = ParamSpec("P")
+
+
+def make_hashable(obj: Any) -> Any:
+    if isinstance(obj, dict):
+        return tuple(sorted((k, make_hashable(v)) for k, v in obj.items()))
+    if isinstance(obj, list | tuple | set):
+        return tuple(make_hashable(i) for i in obj)
+    if isinstance(obj, BaseModel):
+        return make_hashable(obj.model_dump())
+    if isinstance(obj, Enum):
+        return obj.value
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    if isinstance(obj, str | int | float | bool | None):
+        return obj
+    return str(obj)
 
 
 class Task(Generic[P]):
@@ -56,7 +75,7 @@ class Task(Generic[P]):
             session,
             function_ref=self.function_ref,
             name=self.name,
-            kwargs=arguments,
+            arguments=arguments,
             hidden=self.hidden,
             label=None if label is None else str(label),
             dedupe_key=self._dedupe_key(arguments) if self.dedupe else None,

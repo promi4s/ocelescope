@@ -9,9 +9,12 @@ from ocelescope_backend.app.dependencies import ApiSession
 from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.model.task import TaskApi
 from ocelescope_backend.app.internal.session import Session
-from ocelescope_backend.app.internal.tasks.base import TaskState
 from ocelescope_backend.app.internal.tasks.runner import task_runner
-from ocelescope_backend.app.internal.tasks.store import TaskRecord, task_store
+from ocelescope_backend.app.internal.tasks.store import (
+    TaskRecord,
+    TaskState,
+    task_store,
+)
 
 tasks_router = APIRouter(prefix="/tasks", tags=["tasks"])
 

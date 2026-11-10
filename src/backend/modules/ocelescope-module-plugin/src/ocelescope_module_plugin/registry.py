@@ -3,7 +3,6 @@ import shutil
 import sys
 from collections.abc import Generator
 from contextlib import ExitStack, contextmanager
-from copy import deepcopy
 from pathlib import Path
 from types import ModuleType
 from typing import TYPE_CHECKING, Any
@@ -18,6 +17,7 @@ from ocelescope_module_plugin.dynamic_import import (
     is_wheel_compatible,
 )
 from ocelescope_module_plugin.models.plugin import PluginApi
+from ocelescope_module_plugin.plugin_inputs import ResourceArg, match_resource_class
 
 if TYPE_CHECKING:
     from ocelescope_backend.app.internal.session import Session
@@ -82,6 +82,32 @@ def find_plugin_class(module: ModuleType) -> type[Plugin]:
     return plugin_class
 
 
+def import_plugin_module(plugin_dir: Path, id: str) -> ModuleType:
+    if id in sys.modules:
+        return sys.modules[id]
+
+    module_path = plugin_dir / id
+
+    # TODO: Put wheels folder into config
+    if (module_path / "wheels").exists():
+        for wheel in (module_path / "wheels").iterdir():
+            if wheel.suffix == ".whl" and is_wheel_compatible(wheel.name):
+                import_wheel_dynamically(wheel)
+
+    spec = importlib.util.spec_from_file_location(id, module_path / "__init__.py")
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Could not create module spec for plugin {id!r}")
+
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[id] = module
+    try:
+        spec.loader.exec_module(module)
+    except Exception:
+        sys.modules.pop(id, None)
+        raise
+    return module
+
+
 class PluginRegistry:
     BASE_PLUGIN_ID: str = "__BASE_PLUGIN_ID__"
 
@@ -118,35 +144,14 @@ class PluginRegistry:
             if id in sys.modules:
                 continue
 
-            # TODO: Put wheels folder into config
-            if (module_path / "wheels").exists():
-                compatible_wheels = [
-                    wheel_file
-                    for wheel_file in (module_path / "wheels").iterdir()
-                    if wheel_file.suffix == ".whl"
-                    and is_wheel_compatible(wheel_file.name)
-                ]
-
-                for wheel in compatible_wheels:
-                    import_wheel_dynamically(wheel)
-
-            spec = importlib.util.spec_from_file_location(
-                id, module_path / "__init__.py"
-            )
-
             try:
-                if spec and spec.loader:
-                    module = importlib.util.module_from_spec(spec)
-                    sys.modules[id] = module
-                    spec.loader.exec_module(module)
-                    try:
-                        self.add_plugin(id, find_plugin_class(module))
-                        loaded_plugins.append(id)
-                    except Exception:
-                        self.unload_module(id)
-                        raise
-                else:
-                    raise ImportError(f"Could not create module spec for plugin {id!r}")
+                module = import_plugin_module(plugin_dir, id)
+                try:
+                    self.add_plugin(id, find_plugin_class(module))
+                    loaded_plugins.append(id)
+                except Exception:
+                    self.unload_module(id)
+                    raise
             except Exception:
                 shutil.rmtree(module_path, ignore_errors=True)
 
@@ -175,73 +180,46 @@ class PluginRegistry:
 
         return method
 
-    def _resolve_plugin_input(
-        self,
-        session: "Session",
-        io: PluginIO,
-        input_resources: dict[str, str | None],
-        input_stack: ExitStack | None = None,
-    ) -> ResourceBase | OCEL | None:
-        id = input_resources.get(io.name, None)
-
-        if not id:
-            return
-
-        if io.io_type == "ocel":
-            ocel = session.get_ocel(id).open()
-
-            if input_stack is not None:
-                return input_stack.enter_context(ocel)
-
-            with ocel:
-                return deepcopy(ocel)
-
-        schema_hash = session.get_resource(id).schema_hash
-        resource_class = next(
-            (t for t in io.resource_types if t.get_schema_hash() == schema_hash), None
-        )
-
+    @staticmethod
+    def _resource_class(
+        session: "Session", io: PluginIO, id: str
+    ) -> type[ResourceBase]:
+        resource_class = match_resource_class(io, session.get_resource(id).schema_hash)
         if resource_class is None:
             raise BadRequest(
                 f"Resource {id} cannot be passed as {io.name!r}: expected "
                 + " or ".join(t.__name__ for t in io.resource_types)
             )
+        return resource_class
 
-        if input_stack is not None:
-            return input_stack.enter_context(session.open_resource(id, resource_class))
-
-        return session.load_resource(id, resource_class)
-
-    def get_plugin_kwargs(
+    def task_inputs(
         self,
         session: "Session",
         plugin_id: str,
         method_name: str,
         input_resources: dict[str, str | None],
-        require_inputs: bool = True,
-        input_stack: ExitStack | None = None,
-    ) -> dict[str, Any]:
-
+    ) -> dict[str, OCEL | ResourceArg | None]:
         method = self.get_method(plugin_id, method_name)
+        inputs: dict[str, OCEL | ResourceArg | None] = {}
+        missing: list[str] = []
 
-        kwargs: dict[str, Any] = {
-            io.name: self._resolve_plugin_input(
-                session, io, input_resources, input_stack
-            )
-            for io in method.inputs
-        }
+        for io in method.inputs:
+            id = input_resources.get(io.name)
+            if not id:
+                inputs[io.name] = None
+                if not io.is_optional:
+                    missing.append(io.name)
+            elif io.io_type == "ocel":
+                inputs[io.name] = session.ocel_input(id)
+            else:
+                self._resource_class(session, io, id)
+                store = session.get_resource(id)
+                inputs[io.name] = ResourceArg(store.path, store.schema_hash)
 
-        if require_inputs:
-            missing = [
-                io.name
-                for io in method.inputs
-                if not io.is_optional and kwargs[io.name] is None
-            ]
+        if missing:
+            raise BadRequest(f"Missing required input: {', '.join(missing)}")
 
-            if missing:
-                raise ValueError(f"Missing required input: {', '.join(missing)}")
-
-        return kwargs
+        return inputs
 
     @contextmanager
     def computed_kwargs(
@@ -258,15 +236,22 @@ class PluginRegistry:
         exits and must not outlive it. Inputs are not required to be filled in
         yet either: the form the provider computes a field for is still open.
         """
+        method = self.get_method(plugin_id, method_name)
         with ExitStack() as input_stack:
-            yield self.get_plugin_kwargs(
-                session=session,
-                plugin_id=plugin_id,
-                method_name=method_name,
-                input_resources=input_resources,
-                require_inputs=False,
-                input_stack=input_stack,
-            )
+            kwargs: dict[str, Any] = {}
+            for io in method.inputs:
+                id = input_resources.get(io.name)
+                if not id:
+                    kwargs[io.name] = None
+                elif io.io_type == "ocel":
+                    kwargs[io.name] = input_stack.enter_context(
+                        session.get_ocel(id).open()
+                    )
+                else:
+                    kwargs[io.name] = input_stack.enter_context(
+                        session.open_resource(id, self._resource_class(session, io, id))
+                    )
+            yield kwargs
 
     def unload_module(self, id: str):
         self._registry.pop(id, None)

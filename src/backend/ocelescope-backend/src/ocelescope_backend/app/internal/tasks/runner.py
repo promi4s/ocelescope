@@ -18,9 +18,12 @@ from ocelescope import ResourceBase
 from ocelescope_backend.app.internal.config import config
 from ocelescope_backend.app.internal.registry import resource_registry
 from ocelescope_backend.app.internal.tasks import child
-from ocelescope_backend.app.internal.tasks.base import TaskState
 from ocelescope_backend.app.internal.tasks.child import WrittenOutput
-from ocelescope_backend.app.internal.tasks.store import TaskRecord, task_store
+from ocelescope_backend.app.internal.tasks.store import (
+    TaskRecord,
+    TaskState,
+    task_store,
+)
 from ocelescope_backend.app.sse_manager import (
     ErrorNotification,
     InvalidationRequest,
@@ -67,6 +70,7 @@ class TaskRunner:
         )
         self._processes: dict[str, BaseProcess] = {}
         self._cancelled: set[str] = set()
+        self._output_dirs: set[Path] = set()
         self._lock = threading.Lock()
 
     def submit(
@@ -75,7 +79,7 @@ class TaskRunner:
         *,
         function_ref: str,
         name: str,
-        kwargs: dict[str, Any],
+        arguments: dict[str, Any],
         hidden: bool = False,
         label: str | None = None,
         dedupe_key: str | None = None,
@@ -90,12 +94,11 @@ class TaskRunner:
             session_id=session.id,
             name=name,
             label=label,
+            arguments=arguments,
             dedupe_key=dedupe_key,
         )
         task_store.add(record)
-        self._pool.submit(
-            self._supervise, session, record, function_ref, kwargs, hidden
-        )
+        self._pool.submit(self._supervise, session, record, function_ref, hidden)
         self._invalidate(session.id)
         return record.id
 
@@ -118,9 +121,12 @@ class TaskRunner:
     def shutdown(self) -> None:
         with self._lock:
             processes = list(self._processes.values())
+            output_dirs = list(self._output_dirs)
         for process in processes:
             _signal_group(process, signal.SIGKILL)
         self._pool.shutdown(wait=False, cancel_futures=True)
+        for output_dir in output_dirs:
+            shutil.rmtree(output_dir, ignore_errors=True)
 
     def _is_cancelled(self, task_id: str) -> bool:
         with self._lock:
@@ -134,7 +140,6 @@ class TaskRunner:
         session: Session,
         record: TaskRecord,
         function_ref: str,
-        kwargs: dict[str, Any],
         hidden: bool,
     ) -> None:
         if self._is_cancelled(record.id):
@@ -142,14 +147,17 @@ class TaskRunner:
                 self._cancelled.discard(record.id)
             return
         output_dir = Path(tempfile.mkdtemp(prefix=f"ocelescope_task_{record.id}_"))
+        with self._lock:
+            self._output_dirs.add(output_dir)
         try:
             outcome, held, exitcode = self._run_process(
-                session, record, function_ref, kwargs, output_dir
+                session, record, function_ref, output_dir
             )
             self._finish(session, record, outcome, held, exitcode, hidden)
         finally:
             shutil.rmtree(output_dir, ignore_errors=True)
             with self._lock:
+                self._output_dirs.discard(output_dir)
                 self._cancelled.discard(record.id)
             self._invalidate(session.id)
 
@@ -158,13 +166,19 @@ class TaskRunner:
         session: Session,
         record: TaskRecord,
         function_ref: str,
-        kwargs: dict[str, Any],
         output_dir: Path,
     ) -> tuple[Outcome, list[SSEMessage], int | None]:
         reader, writer = self._mp.Pipe(duplex=False)
         process = self._mp.Process(
             target=child.run,
-            args=(function_ref, record.id, record.name, kwargs, output_dir, writer),
+            args=(
+                function_ref,
+                record.id,
+                record.name,
+                record.arguments,
+                output_dir,
+                writer,
+            ),
         )
         with self._lock:
             if record.id in self._cancelled:
@@ -275,6 +289,7 @@ class TaskRunner:
                     schema_hash = output.schema_hash or _validate_resource_file(
                         output.path
                     )
+                    resource_registry.get_resource_class(schema_hash)
                     session.register_resource(
                         output.id,
                         output.path,

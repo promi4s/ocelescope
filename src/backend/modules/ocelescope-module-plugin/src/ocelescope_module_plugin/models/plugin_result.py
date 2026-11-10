@@ -1,8 +1,10 @@
-from typing import Literal, Self
+from typing import TYPE_CHECKING, Literal, Self
 
+from ocelescope_backend.app.internal.tasks.store import TaskRecord
 from pydantic import BaseModel
 
-from ocelescope_module_plugin.tasks import PluginTask
+if TYPE_CHECKING:
+    from ocelescope_backend.app.internal.session import Session
 
 
 class PluginOutput(BaseModel):
@@ -13,9 +15,7 @@ class PluginOutput(BaseModel):
     created_at: str
 
     @classmethod
-    def from_task(cls, task: PluginTask) -> list[Self]:
-        session = task.session
-
+    def from_task(cls, session: "Session", task: TaskRecord) -> list[Self]:
         ocels = [
             cls(
                 id=ocel.id,
