@@ -7,7 +7,7 @@ from collections.abc import Callable, Generator, Hashable
 from contextlib import AbstractContextManager, contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, ClassVar, Self, TypeVar, overload
+from typing import Any, ClassVar, Self, TypeVar, cast, overload
 from uuid import uuid4
 
 from ocelescope import OCEL, ResourceBase
@@ -17,6 +17,7 @@ from ocelescope_backend.app.internal.model.resource import ResourceApi, Resource
 from ocelescope_backend.app.internal.model.state import StateStore
 from ocelescope_backend.app.internal.registry import resource_registry
 from ocelescope_backend.app.internal.tasks.base import TaskBase
+from ocelescope_backend.app.internal.tasks.inputs import OcelInput, ResourceInput
 from ocelescope_backend.app.sse_manager import InvalidationRequest, Route, sse_manager
 
 S = TypeVar("S", bound=TaskBase)
@@ -86,7 +87,10 @@ class Session:
 
     def close(self) -> None:
         """Forget the session and delete the files of its OCELs and resources."""
+        from ocelescope_backend.app.internal.tasks.runner import task_runner
+
         Session.sessions.pop(self.id, None)
+        task_runner.cancel_session(self.id)
         for handle in self.ocels.values():
             handle.delete()
         shutil.rmtree(self._ocel_dir, ignore_errors=True)
@@ -132,6 +136,39 @@ class Session:
             self._invalidate(["ocels"])
 
         return id
+
+    def register_ocel(
+        self,
+        id: str,
+        path: Path,
+        name: str,
+        source_id: str | None = None,
+        hidden: bool = False,
+    ) -> None:
+        db_path = self._ocel_dir / f"{id}.duckdb"
+        shutil.move(path, db_path)
+        self.ocels[id] = SessionOCEL(
+            id=id,
+            db_path=db_path,
+            name=name,
+            created_at=datetime.now(tz=UTC).isoformat(),
+            notify=self._invalidate,
+            source_id=source_id,
+            hidden=hidden,
+        )
+        if not hidden:
+            self._invalidate(["ocels"])
+
+    def ocel_input(self, ocel_id: str, use_original: bool = False) -> OCEL:
+        handle = self.get_ocel(ocel_id)
+        view = None if use_original else handle.active_view
+        if view is None:
+            placeholder = OcelInput(handle.db_path, "duckdb")
+        else:
+            placeholder = OcelInput(
+                view.path, "duckdb" if view.materialized else "view"
+            )
+        return cast(OCEL, placeholder)
 
     def _invalidate(self, routes: list[Route]) -> None:
         sse_manager.send_safe(self.id, InvalidationRequest(routes=routes))
@@ -219,6 +256,32 @@ class Session:
             sse_manager.send_safe(self.id, InvalidationRequest(routes=["resources"]))
 
         return id
+
+    def register_resource(
+        self,
+        id: str,
+        path: Path,
+        name: str,
+        schema_hash: str,
+        source_id: str | None = None,
+        hidden: bool = False,
+    ) -> None:
+        target = self._resource_dir / id
+        shutil.move(path, target)
+        self._resources[id] = ResourceStore(
+            path=target,
+            name=name,
+            schema_hash=schema_hash,
+            source_id=source_id,
+            hidden=hidden,
+        )
+        if not hidden:
+            self._invalidate(["resources"])
+
+    def resource_input(self, id: str, resource_class: type[R]) -> R:
+        store = self.get_resource(id)
+        self._resource_class(store, resource_class)
+        return cast(R, ResourceInput(store.path, resource_class))
 
     def get_resource(self, id: str) -> ResourceStore:
         if id not in self._resources:

@@ -134,7 +134,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/SystemTaskSummary"
+                    "$ref": "#/components/schemas/TaskApi"
                   },
                   "title": "Response Getsystemtasks"
                 }
@@ -178,8 +178,48 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SystemTaskSummary"
+                  "$ref": "#/components/schemas/TaskApi"
                 }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tasks/system/{task_id}/cancel": {
+      "post": {
+        "tags": [
+          "tasks"
+        ],
+        "summary": "stops a pending or running task",
+        "operationId": "cancelTask",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
               }
             }
           },
@@ -2070,34 +2110,6 @@
         "title": "SVGVis",
         "description": "SVG visualization.\n\nUse this visualization when you want full control over the rendered output\nby providing raw SVG markup.\n\nAttributes:\n    type: Fixed discriminator `\"svg\"`.\n    svg: SVG markup as a string."
       },
-      "SystemTaskSummary": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "title": "Id"
-          },
-          "state": {
-            "$ref": "#/components/schemas/TaskState"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "metadata": {
-            "additionalProperties": true,
-            "type": "object",
-            "title": "Metadata"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "state",
-          "name",
-          "metadata"
-        ],
-        "title": "SystemTaskSummary"
-      },
       "TableColumn": {
         "properties": {
           "id": {
@@ -2176,6 +2188,69 @@
         ],
         "title": "TableViz",
         "description": "Tabular visualization with typed columns and row data.\n\nRows are dictionaries keyed by `TableColumn.id`.\n\nAttributes:\n    type: Fixed discriminator `\"table\"`.\n    columns: Column definitions.\n    rows: List of row dicts."
+      },
+      "TaskApi": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          },
+          "state": {
+            "$ref": "#/components/schemas/TaskState"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "label",
+          "state",
+          "created_at",
+          "started_at",
+          "finished_at"
+        ],
+        "title": "TaskApi"
       },
       "TaskState": {
         "type": "string",
