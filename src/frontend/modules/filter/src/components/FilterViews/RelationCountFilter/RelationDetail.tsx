@@ -12,11 +12,15 @@ import {
   Title,
 } from "@mantine/core";
 import type { RelationCountDistribution } from "@ocelescope/api-base";
-import { viewParams } from "@ocelescope/core";
+import {
+  type RangeBin as Bin,
+  type RangeValue as Range,
+  RangeView,
+  viewParams,
+} from "@ocelescope/core";
 import { keepPreviousData } from "@tanstack/react-query";
 import { ArrowLeftIcon } from "lucide-react";
 import { useMemo } from "react";
-import RangeView, { type Bin, type Range } from "../../RangeView";
 import type { RelationViewProps } from "./util";
 
 const ANY_QUALIFIER = "__any__";

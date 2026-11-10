@@ -16,30 +16,22 @@ class ValueType(StrEnum):
 AnalyticalType = Literal["categorical", "discrete", "continuous", "temporal", "unknown"]
 
 
-class Attribute(BaseModel):
+class AttributeStats(BaseModel):
+    name: str
+    type: ValueType
+    min: str | int | float
+    max: str | int | float
+    distinct_values: int
+    entity_types: list[str]
+
+
+class TypedAttribute(BaseModel):
     name: str
     min: str | int | float
     max: str | int | float
     distinct_values: int
     type: ValueType
-
-
-class AggregatedAttribute(Attribute):
-    """An attribute summarized across every entity type that carries it."""
-
-    entity_type_names: list[str]
-
-
-class TypedAttribute(Attribute):
-    """An attribute summarized for a single entity type (activity / object type)."""
-
     entity_type: str
-
-
-class AttributeBin(BaseModel):
-    start: float | str
-    end: float | str
-    count: int
 
 
 class AttributeValueCount(BaseModel):
@@ -47,18 +39,23 @@ class AttributeValueCount(BaseModel):
     count: int
 
 
-class AttributeDistribution(BaseModel):
-    name: str
-    type: ValueType
-    count: int
-    distinct_values: int
-    min: str | int | float
-    max: str | int | float
-    bins: list[AttributeBin] = []
-    values: list[AttributeValueCount] = []
-
-
-class AttributeMatches(BaseModel):
+class AttributeValues(BaseModel):
     count: int
     distinct_values: int
     values: list[AttributeValueCount]
+
+
+class AttributeInfo(BaseModel):
+    name: str
+    type: ValueType
+    entity_types: list[str]
+
+
+class AttributeSummary(BaseModel):
+    type: ValueType
+    count: int
+    missing: int
+    distinct_values: int
+    min: str | float | None
+    max: str | float | None
+    dynamic: bool = False

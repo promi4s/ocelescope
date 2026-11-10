@@ -1,12 +1,9 @@
 import { MultiSelect, ThemeIcon } from "@mantine/core";
 import {
-  type AggregatedAttribute,
-  type TypedAttribute,
+  type AttributeStats,
   useActivities,
-  useAggregatedAttributes,
   useAttributeNames,
-  useEventAttributes,
-  useObjectAttributes,
+  useAttributeStats,
   useObjectTypes,
 } from "@ocelescope/api-base";
 import { keepPreviousData } from "@tanstack/react-query";
@@ -37,7 +34,7 @@ const SubAttributeTable: React.FC<{
   hideValues?: boolean;
   ocelVersion?: OcelVersion;
   viewId?: string;
-  extraColumns?: DataTableColumn<TypedAttribute>[];
+  extraColumns?: DataTableColumn<AttributeStats>[];
 }> = ({
   ocelId,
   entityType = "objects",
@@ -51,20 +48,20 @@ const SubAttributeTable: React.FC<{
 }) => {
   const isEvent = entityType === "events";
 
-  const { data, isFetching } = (
-    isEvent ? useEventAttributes : useObjectAttributes
-  )(
+  const { data, isFetching } = useAttributeStats(
     ocelId,
     {
+      entity_type: entityType,
+      per_type: true,
       attribute_names: [attributeName],
-      names: entityNames,
+      entity_names: entityNames,
       ocel_version: ocelVersion,
       view_id: viewId,
     },
     { query: { placeholderData: keepPreviousData } },
   );
 
-  const columns: DataTableColumn<TypedAttribute>[] = useMemo(
+  const columns: DataTableColumn<AttributeStats>[] = useMemo(
     () =>
       [
         {
@@ -78,9 +75,10 @@ const SubAttributeTable: React.FC<{
           width: COLUMN_WIDTHS.name,
         },
         {
-          accessor: "entity_type",
+          accessor: "entity_types",
           title: isEvent ? "Activity" : "Object Type",
           width: COLUMN_WIDTHS.entityType,
+          render: ({ entity_types }) => entity_types.join(", "),
         },
         {
           accessor: "type",
@@ -102,15 +100,15 @@ const SubAttributeTable: React.FC<{
           hidden: hideValues,
         },
         ...extraColumns,
-      ] satisfies DataTableColumn<TypedAttribute>[],
+      ] satisfies DataTableColumn<AttributeStats>[],
     [isEvent, hideRange, hideValues, extraColumns],
   );
 
   return (
     <DataTable
       noHeader
-      idAccessor={"entity_type"}
-      records={data ?? []}
+      idAccessor={({ entity_types }) => entity_types.join("\u0000")}
+      records={data?.response ?? []}
       columns={columns}
       fetching={isFetching}
       backgroundColor={{ light: "gray.0", dark: "dark.6" }}
@@ -121,8 +119,8 @@ const SubAttributeTable: React.FC<{
 const AttributesTable: React.FC<{
   ocelId: string;
   entityType?: "events" | "objects";
-  extraColumns?: DataTableColumn<AggregatedAttribute>[];
-  subTableExtraColumns?: DataTableColumn<TypedAttribute>[];
+  extraColumns?: DataTableColumn<AttributeStats>[];
+  subTableExtraColumns?: DataTableColumn<AttributeStats>[];
   hideRange?: boolean;
   hideValues?: boolean;
   ocelVersion?: OcelVersion;
@@ -193,7 +191,7 @@ const AttributesTable: React.FC<{
   const showNoAttributes =
     isConstrained && effectiveAttributeNames.length === 0;
 
-  const { data, isFetching } = useAggregatedAttributes(
+  const { data, isFetching } = useAttributeStats(
     ocelId,
     {
       entity_type: entityType,
@@ -214,15 +212,15 @@ const AttributesTable: React.FC<{
   );
   const [selectedAttributes, setSelectedAttributes] = useState<string[]>([]);
 
-  const columns: DataTableColumn<AggregatedAttribute>[] = useMemo(
+  const columns: DataTableColumn<AttributeStats>[] = useMemo(
     () =>
       [
         {
           accessor: "selector",
           title: "",
           textAlign: "center",
-          render: ({ entity_type_names, name }) => {
-            if (!alwaysExpandable && entity_type_names.length === 1) {
+          render: ({ entity_types, name }) => {
+            if (!alwaysExpandable && entity_types.length === 1) {
               return null;
             }
             return (
@@ -262,8 +260,8 @@ const AttributesTable: React.FC<{
           accessor: "entityTypeField",
           title: isEvent ? "Activity" : "Object Type",
           width: COLUMN_WIDTHS.entityType,
-          render: ({ entity_type_names }) =>
-            `${entity_type_names.slice(0, 2).join(", ")}${entity_type_names.length > 3 ? `, ... (${entity_type_names.length} total)` : ""}`,
+          render: ({ entity_types }) =>
+            `${entity_types.slice(0, 2).join(", ")}${entity_types.length > 3 ? `, ... (${entity_types.length} total)` : ""}`,
           filter: () => (
             <MultiSelect
               data={entityNames}
@@ -295,7 +293,7 @@ const AttributesTable: React.FC<{
           hidden: hideValues,
         },
         ...extraColumns,
-      ] satisfies DataTableColumn<AggregatedAttribute>[],
+      ] satisfies DataTableColumn<AttributeStats>[],
     [
       isEvent,
       entityNames,
@@ -327,8 +325,8 @@ const AttributesTable: React.FC<{
       style={{ flex: 1, minHeight: 0, ...style }}
       rowExpansion={{
         allowMultiple: false,
-        expandable: ({ record: { entity_type_names } }) =>
-          alwaysExpandable || entity_type_names.length > 1,
+        expandable: ({ record: { entity_types } }) =>
+          alwaysExpandable || entity_types.length > 1,
         expanded: {
           recordIds: selectedAttributes,
           onRecordIdsChange: setSelectedAttributes,

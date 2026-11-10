@@ -1,12 +1,12 @@
 import { MultiSelect, Select } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import {
+  type AttributeNamesEntityType,
+  useAttributeNames,
   useE2oQualifier,
-  useEventAttributes,
   useEventCounts,
   useEventIds,
   useO2oQualifier,
-  useObjectAttributes,
   useObjectCounts,
   useObjectIds,
 } from "@ocelescope/api-base";
@@ -24,22 +24,17 @@ import { FrequencyPicker } from "../components/R4pmInputs";
 import { usePluginForm } from "../context";
 
 const AttributeSelect =
-  (
-    useAttributes: typeof useObjectAttributes | typeof useEventAttributes,
-  ): React.FC<OcelSelectProps> =>
+  (entityType: AttributeNamesEntityType): React.FC<OcelSelectProps> =>
   ({ ocelId, isMulti, value, onChange, ...props }) => {
-    const { data: attributes } = useAttributes(ocelId);
+    const { data: names = [] } = useAttributeNames(ocelId, {
+      entity_type: entityType,
+    });
 
     const reset = useEffectEvent(() => onChange(isMulti ? [] : undefined));
 
     useEffect(() => {
       reset();
     }, [ocelId, isMulti]);
-
-    const names = useMemo(
-      () => [...new Set((attributes ?? []).map(({ name }) => name))],
-      [attributes],
-    );
 
     const SelectComponent = isMulti ? MultiSelect : Select;
 
@@ -176,8 +171,8 @@ const QualifierSelect =
 const OCEL_FIELDS: Record<string, ComponentType<OcelSelectProps>> = {
   event_type: TypeSelect(useEventCounts),
   object_type: TypeSelect(useObjectCounts),
-  event_attribute: AttributeSelect(useEventAttributes),
-  object_attribute: AttributeSelect(useObjectAttributes),
+  event_attribute: AttributeSelect("events"),
+  object_attribute: AttributeSelect("objects"),
   event_id: IdSelect(useEventIds),
   object_id: IdSelect(useObjectIds),
   e2o_qualifier: QualifierSelect(useE2oQualifier),

@@ -1,9 +1,10 @@
 import { Group, Text } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
 import { useMemo } from "react";
-import dayjs from "../../../../../util/dayjs";
-import RangeView, { type Bin, type Range } from "../../../../RangeView";
-import type { DistributionViewProps } from "../../util";
+import dayjs from "../../../lib/dayjs";
+import RangeView, { type Bin, type Range } from "../../RangeView";
+import { useAttributeBins } from "../hooks";
+import type { ViewProps } from "../types";
 
 const PICKER_FORMAT = "YYYY-MM-DD HH:mm:ss";
 
@@ -13,31 +14,37 @@ const toDate = (value: number) => dayjs(value).format(PICKER_FORMAT);
 
 const formatTime = (value: number) => dayjs(value).format("YYYY-MM-DD HH:mm");
 
-const DateRangeView: React.FC<DistributionViewProps> = ({
-  data,
-  filter,
+const DateRangeView: React.FC<ViewProps> = ({
+  summary,
+  value: condition,
   onChange,
+  inverted,
+  objectValue,
+  ...scope
 }) => {
-  const min = toTime(data.min);
-  const max = toTime(data.max);
+  const { data } = useAttributeBins(scope, objectValue);
+
+  const min = toTime(summary.min ?? 0);
+  const max = toTime(summary.max ?? 0);
 
   const bins = useMemo<Bin[]>(
     () =>
-      (data.bins ?? []).map(({ start, end, count }) => ({
+      (data ?? []).map(({ start, end, count }) => ({
         start: toTime(start),
         end: toTime(end),
         count,
       })),
-    [data.bins],
+    [data],
   );
 
-  const [start, end] = filter.time_range ?? [null, null];
+  const [start, end] =
+    condition?.kind === "time_range" ? condition.range : [null, null];
   const value: Range = [
     start != null ? toTime(start) : min,
     end != null ? toTime(end) : max,
   ];
   const setRange = ([low, high]: Range) =>
-    onChange({ ...filter, time_range: [toDate(low), toDate(high)] });
+    onChange({ kind: "time_range", range: [toDate(low), toDate(high)] });
 
   return (
     <RangeView
@@ -46,7 +53,7 @@ const DateRangeView: React.FC<DistributionViewProps> = ({
       max={max}
       value={value}
       onChange={setRange}
-      exclude={filter.mode === "exclude"}
+      exclude={inverted}
       format={formatTime}
       inputs={
         <Group wrap="nowrap" align="end" gap="xs">

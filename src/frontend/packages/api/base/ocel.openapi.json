@@ -232,10 +232,10 @@
         }
       }
     },
-    "/modules/ocel/v1/{ocel_id}/attributes": {
+    "/modules/ocel/v1/{ocel_id}/attributes/stats": {
       "get": {
-        "summary": "Get Aggr Attributes",
-        "operationId": "AggregatedAttributes",
+        "summary": "Get Attribute Stats",
+        "operationId": "attributeStats",
         "parameters": [
           {
             "name": "ocel_id",
@@ -251,27 +251,6 @@
                 }
               ],
               "title": "Ocel Id"
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "default": 1,
-              "title": "Page"
-            }
-          },
-          {
-            "name": "page_size",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 10,
-              "title": "Page Size"
             }
           },
           {
@@ -337,6 +316,44 @@
             }
           },
           {
+            "name": "per_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Per Type"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Page Size"
+            }
+          },
+          {
             "name": "ocel_version",
             "in": "query",
             "required": false,
@@ -373,7 +390,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PaginatedResponse_list_AggregatedAttribute__"
+                  "$ref": "#/components/schemas/PaginatedResponse_list_AttributeStats__"
                 }
               }
             }
@@ -391,10 +408,10 @@
         }
       }
     },
-    "/modules/ocel/v1/{ocel_id}/objects/attributes": {
+    "/modules/ocel/v1/{ocel_id}/attributes": {
       "get": {
-        "summary": "Get Object Attributes",
-        "operationId": "objectAttributes",
+        "summary": "Get Attributes",
+        "operationId": "attributes",
         "parameters": [
           {
             "name": "ocel_id",
@@ -413,19 +430,21 @@
             }
           },
           {
-            "name": "attribute_names",
+            "name": "entity_type",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              },
-              "title": "Attribute Names"
+              "enum": [
+                "events",
+                "objects"
+              ],
+              "type": "string",
+              "default": "events",
+              "title": "Entity Type"
             }
           },
           {
-            "name": "names",
+            "name": "entity_names",
             "in": "query",
             "required": false,
             "schema": {
@@ -440,7 +459,7 @@
                   "type": "null"
                 }
               ],
-              "title": "Names"
+              "title": "Entity Names"
             }
           },
           {
@@ -482,9 +501,9 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/TypedAttribute"
+                    "$ref": "#/components/schemas/AttributeInfo"
                   },
-                  "title": "Response Objectattributes"
+                  "title": "Response Attributes"
                 }
               }
             }
@@ -506,6 +525,7 @@
       "get": {
         "summary": "Get Event Attributes",
         "operationId": "eventAttributes",
+        "deprecated": true,
         "parameters": [
           {
             "name": "ocel_id",
@@ -613,10 +633,122 @@
         }
       }
     },
-    "/modules/ocel/v1/{ocel_id}/attribute/names": {
+    "/modules/ocel/v1/{ocel_id}/objects/attributes": {
+      "get": {
+        "summary": "Get Object Attributes",
+        "operationId": "objectAttributes",
+        "deprecated": true,
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
+            "name": "attribute_names",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "title": "Attribute Names"
+            }
+          },
+          {
+            "name": "names",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Names"
+            }
+          },
+          {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "original",
+                "filtered"
+              ],
+              "type": "string",
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TypedAttribute"
+                  },
+                  "title": "Response Objectattributes"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/modules/ocel/v1/{ocel_id}/attributes/names": {
       "get": {
         "summary": "Get Attribute Names",
-        "operationId": "AttributeNames",
+        "operationId": "attributeNames",
         "parameters": [
           {
             "name": "ocel_id",
@@ -639,18 +771,12 @@
             "in": "query",
             "required": false,
             "schema": {
-              "anyOf": [
-                {
-                  "enum": [
-                    "events",
-                    "objects"
-                  ],
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
+              "enum": [
+                "events",
+                "objects"
               ],
+              "type": "string",
+              "default": "events",
               "title": "Entity Type"
             }
           },
@@ -713,10 +839,10 @@
         }
       }
     },
-    "/modules/ocel/v1/{ocel_id}/attributes/distribution": {
+    "/modules/ocel/v1/{ocel_id}/attributes/summary": {
       "get": {
-        "summary": "Get Attribute Distribution",
-        "operationId": "attributeDistribution",
+        "summary": "Get Attribute Summary",
+        "operationId": "attributeSummary",
         "parameters": [
           {
             "name": "ocel_id",
@@ -777,6 +903,122 @@
             }
           },
           {
+            "name": "ocel_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "original",
+                "filtered"
+              ],
+              "type": "string",
+              "default": "filtered",
+              "title": "Ocel Version"
+            }
+          },
+          {
+            "name": "view_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "View Id"
+            }
+          },
+          {
+            "name": "object_value",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "first",
+                "initial",
+                "last",
+                "at"
+              ],
+              "type": "string",
+              "default": "first",
+              "title": "Object Value"
+            }
+          },
+          {
+            "name": "object_value_at",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Object Value At"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/AttributeSummary"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Attributesummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/modules/ocel/v1/{ocel_id}/attributes/bins": {
+      "get": {
+        "summary": "Get Attribute Bins",
+        "operationId": "attributeBins",
+        "parameters": [
+          {
+            "name": "ocel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ocel Id"
+            }
+          },
+          {
             "name": "bins",
             "in": "query",
             "required": false,
@@ -784,8 +1026,82 @@
               "type": "integer",
               "maximum": 500,
               "minimum": 1,
-              "default": 50,
+              "default": 40,
               "title": "Bins"
+            }
+          },
+          {
+            "name": "attribute",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Attribute"
+            }
+          },
+          {
+            "name": "entity_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "events",
+                "objects"
+              ],
+              "type": "string",
+              "default": "events",
+              "title": "Entity Type"
+            }
+          },
+          {
+            "name": "entity_names",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Entity Names"
+            }
+          },
+          {
+            "name": "object_value",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "first",
+                "initial",
+                "last",
+                "at"
+              ],
+              "type": "string",
+              "default": "first",
+              "title": "Object Value"
+            }
+          },
+          {
+            "name": "object_value_at",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Object Value At"
             }
           },
           {
@@ -825,15 +1141,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/AttributeDistribution"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "title": "Response Attributedistribution"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Bin"
+                  },
+                  "title": "Response Attributebins"
                 }
               }
             }
@@ -870,48 +1182,6 @@
                 }
               ],
               "title": "Ocel Id"
-            }
-          },
-          {
-            "name": "attribute",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Attribute"
-            }
-          },
-          {
-            "name": "entity_type",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "enum": [
-                "events",
-                "objects"
-              ],
-              "type": "string",
-              "default": "events",
-              "title": "Entity Type"
-            }
-          },
-          {
-            "name": "entity_names",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Entity Names"
             }
           },
           {
@@ -966,6 +1236,92 @@
             }
           },
           {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 10000,
+              "minimum": 1,
+              "default": 200,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "attribute",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Attribute"
+            }
+          },
+          {
+            "name": "entity_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "events",
+                "objects"
+              ],
+              "type": "string",
+              "default": "events",
+              "title": "Entity Type"
+            }
+          },
+          {
+            "name": "entity_names",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Entity Names"
+            }
+          },
+          {
+            "name": "object_value",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "first",
+                "initial",
+                "last",
+                "at"
+              ],
+              "type": "string",
+              "default": "first",
+              "title": "Object Value"
+            }
+          },
+          {
+            "name": "object_value_at",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Object Value At"
+            }
+          },
+          {
             "name": "ocel_version",
             "in": "query",
             "required": false,
@@ -1002,7 +1358,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AttributeMatches"
+                  "$ref": "#/components/schemas/AttributeValues"
                 }
               }
             }
@@ -3287,11 +3643,39 @@
   },
   "components": {
     "schemas": {
-      "AggregatedAttribute": {
+      "AttributeInfo": {
         "properties": {
           "name": {
             "type": "string",
             "title": "Name"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ValueType"
+          },
+          "entity_types": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Entity Types"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "type",
+          "entity_types"
+        ],
+        "title": "AttributeInfo"
+      },
+      "AttributeStats": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ValueType"
           },
           "min": {
             "anyOf": [
@@ -3325,30 +3709,132 @@
             "type": "integer",
             "title": "Distinct Values"
           },
-          "type": {
-            "$ref": "#/components/schemas/ValueType"
-          },
-          "entity_type_names": {
+          "entity_types": {
             "items": {
               "type": "string"
             },
             "type": "array",
-            "title": "Entity Type Names"
+            "title": "Entity Types"
           }
         },
         "type": "object",
         "required": [
           "name",
+          "type",
           "min",
           "max",
           "distinct_values",
-          "type",
-          "entity_type_names"
+          "entity_types"
         ],
-        "title": "AggregatedAttribute",
-        "description": "An attribute summarized across every entity type that carries it."
+        "title": "AttributeStats"
       },
-      "AttributeBin": {
+      "AttributeSummary": {
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/ValueType"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "missing": {
+            "type": "integer",
+            "title": "Missing"
+          },
+          "distinct_values": {
+            "type": "integer",
+            "title": "Distinct Values"
+          },
+          "min": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min"
+          },
+          "max": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max"
+          },
+          "dynamic": {
+            "type": "boolean",
+            "title": "Dynamic",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "count",
+          "missing",
+          "distinct_values",
+          "min",
+          "max"
+        ],
+        "title": "AttributeSummary"
+      },
+      "AttributeValueCount": {
+        "properties": {
+          "value": {
+            "type": "string",
+            "title": "Value"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "value",
+          "count"
+        ],
+        "title": "AttributeValueCount"
+      },
+      "AttributeValues": {
+        "properties": {
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "distinct_values": {
+            "type": "integer",
+            "title": "Distinct Values"
+          },
+          "values": {
+            "items": {
+              "$ref": "#/components/schemas/AttributeValueCount"
+            },
+            "type": "array",
+            "title": "Values"
+          }
+        },
+        "type": "object",
+        "required": [
+          "count",
+          "distinct_values",
+          "values"
+        ],
+        "title": "AttributeValues"
+      },
+      "Bin": {
         "properties": {
           "start": {
             "anyOf": [
@@ -3383,124 +3869,7 @@
           "end",
           "count"
         ],
-        "title": "AttributeBin"
-      },
-      "AttributeDistribution": {
-        "properties": {
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "type": {
-            "$ref": "#/components/schemas/ValueType"
-          },
-          "count": {
-            "type": "integer",
-            "title": "Count"
-          },
-          "distinct_values": {
-            "type": "integer",
-            "title": "Distinct Values"
-          },
-          "min": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "integer"
-              },
-              {
-                "type": "number"
-              }
-            ],
-            "title": "Min"
-          },
-          "max": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "integer"
-              },
-              {
-                "type": "number"
-              }
-            ],
-            "title": "Max"
-          },
-          "bins": {
-            "items": {
-              "$ref": "#/components/schemas/AttributeBin"
-            },
-            "type": "array",
-            "title": "Bins",
-            "default": []
-          },
-          "values": {
-            "items": {
-              "$ref": "#/components/schemas/AttributeValueCount"
-            },
-            "type": "array",
-            "title": "Values",
-            "default": []
-          }
-        },
-        "type": "object",
-        "required": [
-          "name",
-          "type",
-          "count",
-          "distinct_values",
-          "min",
-          "max"
-        ],
-        "title": "AttributeDistribution"
-      },
-      "AttributeMatches": {
-        "properties": {
-          "count": {
-            "type": "integer",
-            "title": "Count"
-          },
-          "distinct_values": {
-            "type": "integer",
-            "title": "Distinct Values"
-          },
-          "values": {
-            "items": {
-              "$ref": "#/components/schemas/AttributeValueCount"
-            },
-            "type": "array",
-            "title": "Values"
-          }
-        },
-        "type": "object",
-        "required": [
-          "count",
-          "distinct_values",
-          "values"
-        ],
-        "title": "AttributeMatches"
-      },
-      "AttributeValueCount": {
-        "properties": {
-          "value": {
-            "type": "string",
-            "title": "Value"
-          },
-          "count": {
-            "type": "integer",
-            "title": "Count"
-          }
-        },
-        "type": "object",
-        "required": [
-          "value",
-          "count"
-        ],
-        "title": "AttributeValueCount"
+        "title": "Bin"
       },
       "Date_Distribution_Item": {
         "properties": {
@@ -3756,11 +4125,11 @@
         ],
         "title": "OcelMetadata"
       },
-      "PaginatedResponse_list_AggregatedAttribute__": {
+      "PaginatedResponse_list_AttributeStats__": {
         "properties": {
           "response": {
             "items": {
-              "$ref": "#/components/schemas/AggregatedAttribute"
+              "$ref": "#/components/schemas/AttributeStats"
             },
             "type": "array",
             "title": "Response"
@@ -3791,7 +4160,7 @@
           "total_items",
           "total_pages"
         ],
-        "title": "PaginatedResponse[list[AggregatedAttribute]]"
+        "title": "PaginatedResponse[list[AttributeStats]]"
       },
       "PaginatedResponse_list_RelationCountSummary__": {
         "properties": {
@@ -3953,7 +4322,7 @@
           },
           "bins": {
             "items": {
-              "$ref": "#/components/schemas/AttributeBin"
+              "$ref": "#/components/schemas/Bin"
             },
             "type": "array",
             "title": "Bins"
@@ -4146,8 +4515,7 @@
           "type",
           "entity_type"
         ],
-        "title": "TypedAttribute",
-        "description": "An attribute summarized for a single entity type (activity / object type)."
+        "title": "TypedAttribute"
       },
       "ValidationError": {
         "properties": {

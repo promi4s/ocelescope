@@ -1085,6 +1085,12 @@ importers:
       '@xyflow/react':
         specifier: 'catalog:'
         version: 12.12.1(@types/react-dom@19.3.0)(@types/react@19.3.0)(immer@11.2.9)(react-dom@19.3.1)(react@19.3.1)
+      echarts:
+        specifier: 'catalog:'
+        version: 6.1.0
+      echarts-for-react:
+        specifier: 'catalog:'
+        version: 3.0.6(echarts@6.1.0)(react@19.3.1)
       qs:
         specifier: 'catalog:'
         version: 6.17.1

@@ -1,4 +1,4 @@
-import { useObjectAttributes, type ValueType } from "@ocelescope/api-base";
+import { useAttributeStats, type ValueType } from "@ocelescope/api-base";
 import { useMemo } from "react";
 import {
   attributeDefaults,
@@ -25,16 +25,17 @@ export const ObjectAttributePicker = ({
   ...picker
 }: ObjectAttributePickerProps) => {
   const id = useOcelId(ocelId);
-  const { data, isPending, error } = useObjectAttributes(
+  const { data, isPending, error } = useAttributeStats(
     id,
     {
+      entity_type: "objects",
       ocel_version: ocelVersion,
-      ...(objectType ? { names: [objectType] } : {}),
+      ...(objectType ? { entity_names: [objectType] } : {}),
     },
     { query: { enabled: id != null } },
   );
   const options = useMemo(
-    () => attributeOptions(data, valueTypes, (name) => name),
+    () => attributeOptions(data?.response, valueTypes, (name) => name),
     [data, valueTypes],
   );
 
