@@ -6,8 +6,8 @@ from fastapi import FastAPI
 from ocelescope_backend.app.internal.docs import init_custom_docs
 from ocelescope_backend.app.internal.logger import get_logger, logger
 from ocelescope_backend.app.internal.registry import (
-    archive_handlers,
     resource_registry,
+    upload_claimers,
 )
 from ocelescope_backend.app.modules.base import Module
 from ocelescope_backend.app.modules.context import ModuleContext, ModuleRegistry
@@ -77,7 +77,7 @@ def mount_modules(app: FastAPI) -> list[type[Module]]:
             init_custom_docs(sub_app)
 
         app.mount(module_path, sub_app)
-        archive_handlers.append(module.import_archive)
+        upload_claimers.append(module.claim_upload)
         logger.info(f"Mounted module {meta.key} v{meta.version} at {module_path}")
 
         seen_modules.add((meta.key, meta.version.major))

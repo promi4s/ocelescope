@@ -1,7 +1,9 @@
 import zipfile
-from typing import TYPE_CHECKING
+from pathlib import Path
 
 from fastapi import FastAPI
+from ocelescope_backend.app.internal.config import config as backend_config
+from ocelescope_backend.app.internal.util.archive import validate_archive
 from ocelescope_backend.app.modules import Module, ModuleMeta
 from ocelescope_backend.app.modules.context import ModuleContext
 from ocelescope_backend.app.sse_manager import SSEMessage
@@ -12,10 +14,6 @@ from ocelescope_module_plugin.base_plugin import BasePlugin
 from ocelescope_module_plugin.config import config
 from ocelescope_module_plugin.registry import PluginRegistry
 from ocelescope_module_plugin.routers import router
-
-if TYPE_CHECKING:
-    from ocelescope_backend.app.internal.session import Session
-    from ocelescope_backend.app.internal.tasks.system_tasks import ImportMetadata
 
 
 class PluginModule(Module):
@@ -45,13 +43,17 @@ class PluginModule(Module):
 
         return app
 
-    def import_archive(
-        self,
-        session: "Session",
-        archive: zipfile.ZipFile,
-        metadata: "ImportMetadata",
-    ) -> list[SSEMessage] | None:
-        if not is_plugin_archive(archive):
+    def claim_upload(self, file_path: Path, file_name: str) -> list[SSEMessage] | None:
+        if not zipfile.is_zipfile(file_path):
             return None
 
-        return import_plugin_archive(self.plugins, archive, metadata["fileName"])
+        with zipfile.ZipFile(file_path) as archive:
+            if not is_plugin_archive(archive):
+                return None
+
+            validate_archive(
+                archive,
+                max_files=backend_config.ARCHIVE_MAX_FILES,
+                max_uncompressed_bytes=backend_config.ARCHIVE_MAX_UNCOMPRESSED_BYTES,
+            )
+            return import_plugin_archive(self.plugins, archive, file_name)

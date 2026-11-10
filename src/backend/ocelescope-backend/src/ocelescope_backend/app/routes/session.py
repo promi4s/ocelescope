@@ -1,15 +1,18 @@
 from __future__ import annotations
 
+import traceback
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Annotated
 
 from fastapi import File, Request, UploadFile
+from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse, Response
 from fastapi.routing import APIRouter
 
 from ocelescope_backend.app.dependencies import ApiSession
 from ocelescope_backend.app.internal.config import config
+from ocelescope_backend.app.internal.registry import upload_claimers
 from ocelescope_backend.app.internal.session import Session
 from ocelescope_backend.app.internal.tasks.system_tasks import (
     import_archive,
@@ -18,9 +21,31 @@ from ocelescope_backend.app.internal.tasks.system_tasks import (
     import_xes_task,
 )
 from ocelescope_backend.app.internal.util.spool_upload import spool_upload_to_tempfile
-from ocelescope_backend.app.sse_manager import SystemNotification, sse_manager
+from ocelescope_backend.app.sse_manager import (
+    ErrorNotification,
+    SSEMessage,
+    SystemNotification,
+    sse_manager,
+)
 
 session_router = APIRouter(prefix="/session", tags=["session"])
+
+
+def _claim_upload(file_path: Path, file_name: str) -> list[SSEMessage] | None:
+    for claim in upload_claimers:
+        try:
+            if (messages := claim(file_path, file_name)) is not None:
+                return messages
+        except Exception as exc:
+            return [
+                ErrorNotification(
+                    type="error",
+                    title=f"Could not import {file_name}",
+                    message=str(exc),
+                    trace=traceback.format_exc(),
+                )
+            ]
+    return None
 
 
 @session_router.post(
@@ -35,6 +60,14 @@ async def upload(
             continue
 
         file_path = Path(file.filename)
+        tmp_path = await spool_upload_to_tempfile(file, suffix=file_path.suffix)
+
+        claimed = await run_in_threadpool(_claim_upload, tmp_path, file_path.name)
+        if claimed is not None:
+            tmp_path.unlink(missing_ok=True)
+            for message in claimed:
+                await sse_manager.send(session_id=session.id, message=message)
+            continue
 
         task_method = None
         match file_path.suffix.lower():
@@ -64,6 +97,7 @@ async def upload(
                 task_method = import_xes_task
 
         if task_method is None:
+            tmp_path.unlink(missing_ok=True)
             await sse_manager.send(
                 session_id=session.id,
                 message=SystemNotification(
@@ -74,8 +108,6 @@ async def upload(
             )
 
             continue
-
-        tmp_path = await spool_upload_to_tempfile(file, suffix=file_path.suffix)
 
         tasks.append(
             task_method(

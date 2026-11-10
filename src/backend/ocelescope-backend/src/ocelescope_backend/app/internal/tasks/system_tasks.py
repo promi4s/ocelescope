@@ -8,10 +8,7 @@ from typing_extensions import TypedDict
 
 from ocelescope import OCEL, ResourceBase
 from ocelescope_backend.app.internal.config import config
-from ocelescope_backend.app.internal.registry import (
-    archive_handlers,
-    resource_registry,
-)
+from ocelescope_backend.app.internal.registry import resource_registry
 from ocelescope_backend.app.internal.session import Session
 from ocelescope_backend.app.internal.tasks.system import system_task
 from ocelescope_backend.app.internal.util.archive import (
@@ -239,11 +236,6 @@ def import_archive(
                 max_files=config.ARCHIVE_MAX_FILES,
                 max_uncompressed_bytes=config.ARCHIVE_MAX_UNCOMPRESSED_BYTES,
             )
-
-            for handler in archive_handlers:
-                if (results := handler(session, archive, metadata)) is not None:
-                    return results
-
             return _import_archived_data(
                 session, archive, classify_archive(members), metadata
             )
