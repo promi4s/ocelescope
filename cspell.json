@@ -199,7 +199,8 @@
     "sqltypes",
     "utinyint",
     "usmallint",
-    "uhugeint"
+    "uhugeint",
+    "Berti"
   ],
   "ignorePaths": [
     "pnpm-lock.yaml",

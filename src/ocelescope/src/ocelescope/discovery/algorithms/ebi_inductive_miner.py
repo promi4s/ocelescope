@@ -35,12 +35,14 @@ def ebi_inductive_miner(
     included_activities: list[str] | None = None,
 ) -> PetriNet:
     def discover(flattened: DataFrame, object_type: str) -> PetriNet:
-        tree_imf = ebi.discover_non_stochastic_inductive_miner_infrequent(
+        # Ebi is a compiled extension without type information.
+        tree_imf = ebi.discover_non_stochastic_inductive_miner_infrequent(  # type: ignore
             _to_ebi_log(flattened), noise_threshold
         )
-        net = PetriNet.from_ebi(ebi.convert_labelled_petri_net(tree_imf), object_type)
+        lpn = ebi.convert_labelled_petri_net(tree_imf)  # type: ignore
+        net = PetriNet.from_ebi(lpn, object_type)
         # Ebi does not set the final marking but we know that the inductive miner
-        # discoveres workflow nets. Thus there is a single sink place
+        # discovers workflow nets. Thus there is a single sink place
         net.final_marking = {_sink(net): 1}
         return net
 
