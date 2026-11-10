@@ -1,9 +1,13 @@
+import json
 import traceback
 import zipfile
 from pathlib import Path
-from tempfile import NamedTemporaryFile
+from tempfile import NamedTemporaryFile, TemporaryDirectory
 
-from ocelescope import OCEL
+import duckdb
+from ocelescope.util.sql import ident, literal
+
+from ocelescope import OCEL, ResourceBase
 from ocelescope_backend.app.internal.config import config
 from ocelescope_backend.app.internal.tasks.context import task_context
 from ocelescope_backend.app.internal.tasks.decorator import task
@@ -49,15 +53,37 @@ def _read_log(file_path: Path, file_name: str, xes: bool) -> Output:
 
 
 def _read_resource(file_path: Path, file_name: str) -> Output:
-    if zipfile.is_zipfile(file_path):
-        with zipfile.ZipFile(file_path) as archive:
-            size = sum(member.file_size for member in archive.infolist())
-        if size > config.ARCHIVE_MAX_UNCOMPRESSED_BYTES:
-            file_path.unlink(missing_ok=True)
-            raise ArchiveError("The uploaded resource is too large to unpack")
+    path = file_path
+    try:
+        if zipfile.is_zipfile(file_path):
+            path = file_path.with_suffix(".duckdb")
+            with TemporaryDirectory() as tmp, zipfile.ZipFile(file_path) as archive:
+                size = sum(member.file_size for member in archive.infolist())
+                if size > config.ARCHIVE_MAX_UNCOMPRESSED_BYTES:
+                    raise ArchiveError("The uploaded resource is too large to unpack")
+
+                manifest = json.loads(archive.read("manifest.json"))
+                schema_hash = manifest["schema_hash"]
+                con = duckdb.connect(str(path))
+                try:
+                    for table in manifest["tables"]:
+                        file = archive.extract(f"{table}.parquet", tmp)
+                        con.sql(
+                            f"CREATE TABLE {ident(table)} "
+                            f"AS FROM read_parquet({literal(file)})"
+                        )
+                finally:
+                    con.close()
+            file_path.unlink()
+        else:
+            schema_hash = ResourceBase.read_schema_hash(file_path)
+    except Exception:
+        file_path.unlink(missing_ok=True)
+        path.unlink(missing_ok=True)
+        raise
 
     name = Path(file_name).stem
-    out = Output(file_path, name=name)
+    out = Output((path, schema_hash), name=name)
     task_context().notify(
         SystemNotification(
             title="Resource successfully uploaded",

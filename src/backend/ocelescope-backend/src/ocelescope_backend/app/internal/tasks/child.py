@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib
 import os
+import shutil
 import traceback
 from contextlib import ExitStack
 from dataclasses import dataclass
@@ -22,9 +23,10 @@ from ocelescope_backend.app.internal.tasks.outputs import Output, TaskResult
 class WrittenOutput:
     id: str
     name: str
-    kind: Literal["ocel", "resource", "resource_file"]
+    kind: Literal["ocel", "resource"]
     path: Path
     schema_hash: str | None = None
+    imported: bool = False
 
 
 def resolve_function(ref: str) -> Any:
@@ -52,11 +54,13 @@ def _write(
         path = output_dir / f"{output.id}.duckdb"
         value.to_duckdb(path)
         return WrittenOutput(output.id, name, "ocel", path)
+    path = output_dir / output.id
     if isinstance(value, ResourceBase):
-        path = output_dir / output.id
         value.dump(path)
         return WrittenOutput(output.id, name, "resource", path, value.get_schema_hash())
-    return WrittenOutput(output.id, name, "resource_file", value)
+    source, schema_hash = value
+    shutil.move(source, path)
+    return WrittenOutput(output.id, name, "resource", path, schema_hash, imported=True)
 
 
 def run(
@@ -82,12 +86,12 @@ def run(
         channel.send(("done", written))
     except BaseException as exc:
         for output in outputs:
-            if isinstance(output.value, Path):
-                output.value.unlink(missing_ok=True)
+            if isinstance(output.value, tuple):
+                output.value[0].unlink(missing_ok=True)
         channel.send(("failed", str(exc), traceback.format_exc()))
     finally:
         for output in outputs:
-            if not isinstance(output.value, Path):
+            if not isinstance(output.value, tuple):
                 output.value.close()
         set_task_context(None)
         channel.close()

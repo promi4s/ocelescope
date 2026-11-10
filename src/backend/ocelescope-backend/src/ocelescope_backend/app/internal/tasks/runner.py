@@ -14,7 +14,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
-from ocelescope import ResourceBase
 from ocelescope_backend.app.internal.config import config
 from ocelescope_backend.app.internal.registry import resource_registry
 from ocelescope_backend.app.internal.tasks import child
@@ -217,35 +216,25 @@ class TaskRunner:
         exitcode: int | None,
         hidden: bool,
     ) -> None:
-        written: list[WrittenOutput] = (
-            outcome[1] if outcome is not None and outcome[0] == "done" else []
-        )
+        if self._is_cancelled(record.id):
+            task_store.update(record.id, state=TaskState.CANCELLED, finished_at=_now())
+            return
+        if outcome is None:
+            self._fail(
+                session,
+                record,
+                f"The task process exited unexpectedly (exit code {exitcode})",
+                "",
+            )
+            return
+        if outcome[0] == "failed":
+            self._fail(session, record, outcome[1], outcome[2])
+            return
         try:
-            if self._is_cancelled(record.id):
-                task_store.update(
-                    record.id, state=TaskState.CANCELLED, finished_at=_now()
-                )
-                return
-            if outcome is None:
-                self._fail(
-                    session,
-                    record,
-                    f"The task process exited unexpectedly (exit code {exitcode})",
-                    "",
-                )
-                return
-            if outcome[0] == "failed":
-                self._fail(session, record, outcome[1], outcome[2])
-                return
-            try:
-                self._commit(session, record, written, hidden)
-            except Exception as exc:
-                self._fail(session, record, str(exc), traceback.format_exc())
-                return
-        finally:
-            for output in written:
-                if output.kind == "resource_file":
-                    output.path.unlink(missing_ok=True)
+            self._commit(session, record, outcome[1], hidden)
+        except Exception as exc:
+            self._fail(session, record, str(exc), traceback.format_exc())
+            return
 
         task_store.update(record.id, state=TaskState.SUCCESS, finished_at=_now())
         for notification in held:
@@ -284,15 +273,21 @@ class TaskRunner:
                         hidden=hidden,
                     )
                 else:
-                    schema_hash = output.schema_hash or _validate_resource_file(
-                        output.path
+                    if output.schema_hash is None:
+                        raise ValueError(f"Output {output.name!r} has no schema hash")
+                    resource_class = resource_registry.get_resource_class(
+                        output.schema_hash
                     )
-                    resource_registry.get_resource_class(schema_hash)
+                    if output.imported:
+                        with resource_class.open(
+                            output.path, resolve=resource_registry.get_resource_class
+                        ):
+                            pass
                     session.register_resource(
                         output.id,
                         output.path,
                         output.name,
-                        schema_hash,
+                        output.schema_hash,
                         source_id=record.id,
                         hidden=hidden,
                     )
@@ -304,14 +299,6 @@ class TaskRunner:
                 else:
                     session.delete_resource(output.id)
             raise
-
-
-def _validate_resource_file(path: Path) -> str:
-    schema_hash = ResourceBase.read_schema_hash(path)
-    resource_class = resource_registry.get_resource_class(schema_hash)
-    with resource_class.read(path, resolve=resource_registry.get_resource_class):
-        pass
-    return schema_hash
 
 
 task_runner = TaskRunner(config.MAX_CONCURRENT_TASKS)

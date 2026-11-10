@@ -14,7 +14,7 @@ def _new_id() -> str:
 
 @dataclass
 class Output:
-    value: OCEL | ResourceBase | Path
+    value: OCEL | ResourceBase | tuple[Path, str]
     name: str | None = None
     id: str = field(default_factory=_new_id)
 
