@@ -81,7 +81,6 @@ class TaskRunner:
         name: str,
         arguments: dict[str, Any],
         hidden: bool = False,
-        label: str | None = None,
         dedupe_key: str | None = None,
     ) -> str:
         if dedupe_key is not None and (
@@ -93,7 +92,6 @@ class TaskRunner:
             id=str(uuid4()),
             session_id=session.id,
             name=name,
-            label=label,
             arguments=arguments,
             dedupe_key=dedupe_key,
         )

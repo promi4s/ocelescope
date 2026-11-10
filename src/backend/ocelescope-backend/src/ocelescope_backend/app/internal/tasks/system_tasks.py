@@ -69,22 +69,22 @@ def _read_resource(file_path: Path, file_name: str) -> Output:
     return out
 
 
-@task(name="importOCEL", label="file_name")
+@task(name="importOCEL")
 def import_ocel(file_path: Path, file_name: str) -> TaskResult:
     return _read_log(file_path, file_name, xes=False)
 
 
-@task(name="importXES", label="file_name")
+@task(name="importXES")
 def import_xes(file_path: Path, file_name: str) -> TaskResult:
     return _read_log(file_path, file_name, xes=True)
 
 
-@task(name="importResource", label="file_name")
+@task(name="importResource")
 def import_resource(file_path: Path, file_name: str) -> TaskResult:
     return _read_resource(file_path, file_name)
 
 
-@task(name="importArchive", label="file_name")
+@task(name="importArchive")
 def import_archive(file_path: Path, file_name: str) -> TaskResult:
     outputs: list[Output] = []
     try:
@@ -142,3 +142,6 @@ def import_archive(file_path: Path, file_name: str) -> TaskResult:
     finally:
         file_path.unlink(missing_ok=True)
     return outputs
+
+
+SYSTEM_TASKS = [import_ocel, import_xes, import_resource, import_archive]

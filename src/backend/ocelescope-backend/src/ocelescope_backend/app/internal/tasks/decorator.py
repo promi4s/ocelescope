@@ -42,21 +42,14 @@ class Task(Generic[P]):
         name: str,
         hidden: bool,
         dedupe: bool,
-        label: str | None,
     ) -> None:
         self.fn = fn
         self.name = name
         self.hidden = hidden
         self.dedupe = dedupe
-        self.label = label
         qualname: str = fn.__qualname__  # ty: ignore[unresolved-attribute]
         self.function_ref = f"{fn.__module__}:{qualname}"
         self._signature = inspect.signature(fn)
-
-        if label is not None and label not in self._signature.parameters:
-            raise ValueError(
-                f"Task {name!r}: label {label!r} is not a parameter of {qualname}"
-            )
 
     def submit(self, session: Session, *args: P.args, **kwargs: P.kwargs) -> str:
         bound = self._signature.bind(*args, **kwargs)
@@ -69,15 +62,12 @@ class Task(Generic[P]):
                 "pass session.ocel_input(...) or session.resource_input(...) instead"
             )
 
-        label = arguments.get(self.label) if self.label is not None else None
-
         return task_runner.submit(
             session,
             function_ref=self.function_ref,
             name=self.name,
             arguments=arguments,
             hidden=self.hidden,
-            label=None if label is None else str(label),
             dedupe_key=self._dedupe_key(arguments) if self.dedupe else None,
         )
 
@@ -91,10 +81,9 @@ def task(
     *,
     hidden: bool = False,
     dedupe: bool = False,
-    label: str | None = None,
 ) -> Callable[[Callable[P, TaskResult]], Task[P]]:
     def decorator(fn: Callable[P, TaskResult]) -> Task[P]:
         task_name = name or fn.__name__  # ty: ignore[unresolved-attribute]
-        return Task(fn, task_name, hidden, dedupe, label)
+        return Task(fn, task_name, hidden, dedupe)
 
     return decorator

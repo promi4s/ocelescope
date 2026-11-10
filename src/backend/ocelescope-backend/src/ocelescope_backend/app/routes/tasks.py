@@ -7,7 +7,7 @@ from fastapi.routing import APIRouter
 
 from ocelescope_backend.app.dependencies import ApiSession
 from ocelescope_backend.app.internal.exceptions import NotFound
-from ocelescope_backend.app.internal.model.task import TaskApi
+from ocelescope_backend.app.internal.model.task import SystemTaskApi
 from ocelescope_backend.app.internal.session import Session
 from ocelescope_backend.app.internal.tasks.runner import task_runner
 from ocelescope_backend.app.internal.tasks.store import (
@@ -15,6 +15,9 @@ from ocelescope_backend.app.internal.tasks.store import (
     TaskState,
     task_store,
 )
+from ocelescope_backend.app.internal.tasks.system_tasks import SYSTEM_TASKS
+
+SYSTEM_TASK_NAMES = [task.name for task in SYSTEM_TASKS]
 
 tasks_router = APIRouter(prefix="/tasks", tags=["tasks"])
 
@@ -34,12 +37,15 @@ def get_system_tasks(
     task_names: Annotated[list[str] | None, Query()] = None,
     task_ids: Annotated[list[str] | None, Query()] = None,
     only_running: bool = True,
-) -> list[TaskApi]:
+) -> list[SystemTaskApi]:
+    names = [name for name in SYSTEM_TASK_NAMES if not task_names or name in task_names]
+    if not names:
+        return []
     states = [TaskState.PENDING, TaskState.STARTED] if only_running else None
     return [
-        TaskApi.from_record(record)
+        SystemTaskApi.from_record(record)
         for record in task_store.query(
-            session.id, names=task_names, ids=task_ids, states=states
+            session.id, names=names, ids=task_ids, states=states
         )
     ]
 
@@ -49,8 +55,11 @@ def get_system_tasks(
     summary="returns the task of a given taskId",
     operation_id="getSystemTask",
 )
-def get_system_task(session: ApiSession, task_id: str) -> TaskApi:
-    return TaskApi.from_record(_session_task(session, task_id))
+def get_system_task(session: ApiSession, task_id: str) -> SystemTaskApi:
+    record = _session_task(session, task_id)
+    if record.name not in SYSTEM_TASK_NAMES:
+        raise NotFound("Task could not be found")
+    return SystemTaskApi.from_record(record)
 
 
 @tasks_router.post(

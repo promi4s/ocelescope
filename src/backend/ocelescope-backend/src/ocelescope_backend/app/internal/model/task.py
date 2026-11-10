@@ -5,21 +5,21 @@ from pydantic import BaseModel
 from ocelescope_backend.app.internal.tasks.store import TaskRecord, TaskState
 
 
-class TaskApi(BaseModel):
+class SystemTaskApi(BaseModel):
     id: str
     name: str
-    label: str | None
+    file_name: str
     state: TaskState
     created_at: str
     started_at: str | None
     finished_at: str | None
 
     @classmethod
-    def from_record(cls, record: TaskRecord) -> TaskApi:
+    def from_record(cls, record: TaskRecord) -> SystemTaskApi:
         return cls(
             id=record.id,
             name=record.name,
-            label=record.label,
+            file_name=record.arguments["file_name"],
             state=record.state,
             created_at=record.created_at,
             started_at=record.started_at,

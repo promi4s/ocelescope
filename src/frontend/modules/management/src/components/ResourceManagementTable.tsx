@@ -151,10 +151,10 @@ const ResourceManagementTable: React.FC = () => {
       }),
     );
 
-    const taskEntity = tasks.map<Entity>(({ id, label, created_at }) => ({
+    const taskEntity = tasks.map<Entity>(({ id, file_name, created_at }) => ({
       id: id,
       createdAt: dayjs(created_at).toISOString(),
-      name: label ?? "",
+      name: file_name,
       entityTypeName: "OCEL",
       type: "ocel",
       isUploading: true,

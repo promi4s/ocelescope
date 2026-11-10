@@ -26,7 +26,6 @@ class TaskRecord:
     session_id: str
     name: str
     state: TaskState = TaskState.PENDING
-    label: str | None = None
     arguments: dict[str, Any] = field(default_factory=dict)
     dedupe_key: str | None = None
     created_at: str = field(default_factory=_now)
