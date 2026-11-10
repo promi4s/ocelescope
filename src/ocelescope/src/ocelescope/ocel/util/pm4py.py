@@ -45,11 +45,11 @@ def to_pm4py_discovery_log(
     relations = (
         ocel.e2o.table.filter(" AND ".join(conditions)).distinct().order(order).df()
     )
-    events = relations[[EID_COL, ACTIVITY_COL, TIMESTAMP_COL]].drop_duplicates(
-        EID_COL, ignore_index=True
-    )
-    objects = relations[[OID_COL, OTYPE_COL]].drop_duplicates(
-        OID_COL, ignore_index=True
-    )
+    events = relations.drop_duplicates(EID_COL, ignore_index=True)[
+        [EID_COL, ACTIVITY_COL, TIMESTAMP_COL]
+    ]
+    objects = relations.drop_duplicates(OID_COL, ignore_index=True)[
+        [OID_COL, OTYPE_COL]
+    ]
 
     return PM4PYOCEL(events=events, objects=objects, relations=relations)

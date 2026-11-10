@@ -47,7 +47,8 @@ def discover_ocpn(
         return PetriNet()
 
     nets = []
-    for object_type, type_relations in relations.groupby(OTYPE_COL):
+    for group_key, type_relations in relations.groupby(OTYPE_COL):
+        object_type = str(group_key)
         flattened = _flatten(type_relations)
         net = miner(flattened, object_type)
         net_ = _make_names_unique(net, object_type)
@@ -61,13 +62,13 @@ def discover_ocpn(
 
 def _flatten(relations: DataFrame) -> DataFrame:
     """One case per object, holding the events the object takes part in."""
-    return relations.rename(
-        columns={
-            OID_COL: "case:concept:name",
-            ACTIVITY_COL: "concept:name",
-            TIMESTAMP_COL: "time:timestamp",
+    return DataFrame(
+        {
+            "case:concept:name": relations[OID_COL],
+            "concept:name": relations[ACTIVITY_COL],
+            "time:timestamp": relations[TIMESTAMP_COL],
         }
-    )[["case:concept:name", "concept:name", "time:timestamp"]]
+    )
 
 
 def _make_names_unique(net: PetriNet, object_type: str) -> PetriNet:
