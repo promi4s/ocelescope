@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections import Counter, defaultdict
 from enum import Enum
 from typing import TYPE_CHECKING, Any
 from uuid import UUID
@@ -117,6 +117,53 @@ class Marking(defaultdict):
 
     def __str__(self) -> str:
         return self.__repr__()
+
+
+class _EbiLpnReader:
+    """Reads Ebi's labelled Petri net text, skipping blank lines and comments."""
+
+    def __init__(self, text: str) -> None:
+        self._lines = (line.removesuffix("\r") for line in text.split("\n"))
+
+    def line(self) -> str:
+        for line in self._lines:
+            if line.strip() and not line.lstrip().startswith("#"):
+                return line
+        raise ValueError("Unexpected end of Ebi labelled Petri net.")
+
+    def expect(self, header: str) -> None:
+        if self.line() != header:
+            raise ValueError(f"Expected {header!r} in Ebi labelled Petri net.")
+
+    def count(self) -> int:
+        count = int(self.line())
+        if count < 0:
+            raise ValueError("Expected a non-negative count in Ebi labelled Petri net.")
+        return count
+
+    def places(self) -> list[int]:
+        """A count, followed by that many place indices."""
+        return [self.count() for _ in range(self.count())]
+
+    def label(self) -> str | None:
+        """A transition label; `None` for a silent transition."""
+        header = self.line()
+        if header == "silent":
+            return None
+        if header.startswith("label "):
+            return header.removeprefix("label ")
+        if header == "multiline label":
+            return self._multiline_label()
+        raise ValueError(f"Unknown Ebi transition header {header!r}.")
+
+    def _multiline_label(self) -> str:
+        # Read raw lines: inside a label, blank lines and "#" are content.
+        lines = []
+        for line in self._lines:
+            if line == "multiline$":
+                return "\n".join(lines)
+            lines.append(line[:-1] if line.endswith("$$") else line)
+        raise ValueError("Unterminated multiline label in Ebi labelled Petri net.")
 
 
 class PetriNet(Resource):
@@ -332,6 +379,39 @@ class PetriNet(Resource):
             edges=edges,
             layout_config=DIRECTED_ELK_GRAPH_LAYOUT,
         )
+
+    @classmethod
+    def from_ebi(cls, lpn: str, object_type: str) -> "PetriNet":
+        """Convert an Ebi labelled Petri net into a net for one object type.
+
+        Ebi has no final marking: a run ends when no transition is enabled.
+        The returned net therefore has none either. Callers that know they get
+        a workflow net can set it to the sink place.
+        """
+        reader = _EbiLpnReader(lpn)
+        reader.expect("labelled Petri net")
+        place_count = reader.line()
+        if place_count == "empty language":
+            return cls()
+        places = [f"p:{index}" for index in range(int(place_count))]
+        tokens = [reader.count() for _ in places]
+        net = cls(
+            places=[Place(name=place, object_type=object_type) for place in places],
+            initial_marking={place: n for place, n in zip(places, tokens) if n},
+        )
+
+        for index in range(reader.count()):
+            transition = f"t:{index}"
+            net.transitions.append(Transition(name=transition, label=reader.label()))
+            for place, weight in Counter(reader.places()).items():
+                net.arcs.append(
+                    Arc(source=places[place], target=transition, weight=weight)
+                )
+            for place, weight in Counter(reader.places()).items():
+                net.arcs.append(
+                    Arc(source=transition, target=places[place], weight=weight)
+                )
+        return net
 
     @classmethod
     def from_pm4py(cls, ocpn: Any) -> "PetriNet":

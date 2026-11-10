@@ -1,5 +1,5 @@
 version = 1
-revision = 5
+revision = 3
 requires-python = ">=3.11"
 resolution-markers = [
     "python_full_version >= '3.14' and sys_platform == 'win32'",
@@ -564,6 +564,43 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/ef/a5/6f8099d9a5a02ddff89e5c85875df3465054845b0920fb0703fbdf8dd2ec/duckdb-1.5.6-cp314-cp314-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:19c5e485e59613b8878d1670bcaa7a010f53c5a4da5ae8e08863e5e529ca6182", size = 21575132, upload-time = "2026-09-28T13:38:31.231Z" },
     { url = "https://files.pythonhosted.org/packages/9f/58/762f7159662d7859e201fa05ca29f306795daeabf84f3e087215a966b001/duckdb-1.5.6-cp314-cp314-win_amd64.whl", hash = "sha256:ebcbd09cd8578ab1093393e9b16289cda0e8f1791ac595bf00eb5bad75c3cf00", size = 13713963, upload-time = "2026-09-28T13:38:33.543Z" },
     { url = "https://files.pythonhosted.org/packages/46/69/64d165db322de13f5c3e75d377b6b9694df1821155ad1fa4b14b04601abc/duckdb-1.5.6-cp314-cp314-win_arm64.whl", hash = "sha256:820a8384faef11cd86068ea48c5da57ce2d8f1c7b3d2bdb9be3398317a7c3728", size = 14514368, upload-time = "2026-09-28T13:38:35.676Z" },
+]
+
+[[package]]
+name = "ebi-pm"
+version = "0.3.14"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pm4py" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f0/9b/6d42f82f44886ed95de5af0575f9f01d62b0e649a786a9f43e5f20e8761d/ebi_pm-0.3.14.tar.gz", hash = "sha256:a71a2319d58a4f9beacb325dbddf7f6f1958db82b0d634d3d945e589236ed5d3", size = 334061, upload-time = "2026-08-19T18:40:29.447Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1d/31/2569e64847adfd101bce3727f9c219c427321f29a772a2919997e0591adf/ebi_pm-0.3.14-cp314-cp314t-macosx_10_12_x86_64.whl", hash = "sha256:1a8d9ecf08d31e22330e018d2cdaa45b6f3eff270e6df16b67b3e96c4d27c01c", size = 6531085, upload-time = "2026-08-19T18:40:07.008Z" },
+    { url = "https://files.pythonhosted.org/packages/93/f1/d742f6bfd3231c876802264b151fedecd4f47cced23dafbbe4899b10f604/ebi_pm-0.3.14-cp314-cp314t-macosx_11_0_arm64.whl", hash = "sha256:e83cd39b8ca57e80d6a03ec77efecbf379c6a0669961d3728ac5d0401aa7e9d9", size = 5793581, upload-time = "2026-08-19T18:40:02.909Z" },
+    { url = "https://files.pythonhosted.org/packages/4e/3b/d8212ba865a40433c122e3849f17a2af36a73c9ea380cd8c18a517f46c9a/ebi_pm-0.3.14-cp314-cp314t-manylinux_2_12_i686.manylinux2010_i686.whl", hash = "sha256:6ee12c63340a2c5526df86f8fbb668ee2d516703b6f435bf724d28bf542e7b34", size = 7254120, upload-time = "2026-08-19T18:39:53.426Z" },
+    { url = "https://files.pythonhosted.org/packages/05/9e/bf62082699f8c829a462f6c5ab8998f838958677387eab8d0985a8cf3463/ebi_pm-0.3.14-cp314-cp314t-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:c5737dae0bbf9afc38ee59fb4859b9555ece3b544adde007ff343812c7f3c81d", size = 6283045, upload-time = "2026-08-19T18:39:34.893Z" },
+    { url = "https://files.pythonhosted.org/packages/24/d2/fcfcbda3984bcb3313d7541cc56a9512cdb33cafe7e6ecb0e0efd705db12/ebi_pm-0.3.14-cp314-cp314t-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:94cbfe67dfc3d47dcaea07cf80d3a99be82fa6b124a6531194b9a112ebcfeaea", size = 6650558, upload-time = "2026-08-19T18:39:39.872Z" },
+    { url = "https://files.pythonhosted.org/packages/db/de/0a47203c2eeeaea2450553531853eed55949243918a8c1d9052cf2be882b/ebi_pm-0.3.14-cp314-cp314t-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:7e7f42e35b379bb8851d6f03672b67defb67080cff586a9f9641780a8ca61605", size = 7570831, upload-time = "2026-08-19T18:39:43.999Z" },
+    { url = "https://files.pythonhosted.org/packages/d6/ff/9825f361cc2066f65efcca5c1a9e749d8b9e738691237451a7330fd391d7/ebi_pm-0.3.14-cp314-cp314t-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:edb8166e52efde39b81bb4d7d55219d4f4ea3de8fd74d59ee140b87c26e05aa0", size = 7604564, upload-time = "2026-08-19T18:39:48.183Z" },
+    { url = "https://files.pythonhosted.org/packages/13/70/84f23b6c81c717b912d6063d4ca05190c83769cc67b15fe341394f1fc2f3/ebi_pm-0.3.14-cp314-cp314t-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:9d34ec024247a069f9aaad7624da39649d7d9484618d9f709d134be364316344", size = 6827088, upload-time = "2026-08-19T18:39:58.074Z" },
+    { url = "https://files.pythonhosted.org/packages/9b/7d/d56a972f9e0d272e57c1807a5cb3a76583c8d94c30be653dade7418d9aef/ebi_pm-0.3.14-cp314-cp314t-musllinux_1_2_aarch64.whl", hash = "sha256:b19226acc0bf5385c3dddbfde126eadaa959a7b6916b7548ce4e4bb9468ba395", size = 6452022, upload-time = "2026-08-19T18:40:11.374Z" },
+    { url = "https://files.pythonhosted.org/packages/3f/81/871e43458061b6298383cd6e7627c066f2639cf4db45ae4d6119c28dd22a/ebi_pm-0.3.14-cp314-cp314t-musllinux_1_2_armv7l.whl", hash = "sha256:86a5395697d40f5e7e5e51e97bac7e994ab1f0da15e5818ef664f2539c5da08e", size = 6923406, upload-time = "2026-08-19T18:40:16.387Z" },
+    { url = "https://files.pythonhosted.org/packages/88/15/597120a5e5b785f9a026a1845f252e094e6e241a80a065d2859f5a89dcb6/ebi_pm-0.3.14-cp314-cp314t-musllinux_1_2_i686.whl", hash = "sha256:386f5af3e6462cf21ce7c0c01d9c5f342f0142910b8fe08e05923ab0ccbd5319", size = 7201054, upload-time = "2026-08-19T18:40:20.586Z" },
+    { url = "https://files.pythonhosted.org/packages/fe/7d/ef2e2a8a65f11ca72389cdf92f68689e4f43e633fe03f37eba84e94e59e0/ebi_pm-0.3.14-cp314-cp314t-musllinux_1_2_x86_64.whl", hash = "sha256:aa001f16914bc1188d0cc85ff89a9bf5d5994901bc97da8763596a1990989353", size = 7046400, upload-time = "2026-08-19T18:40:24.951Z" },
+    { url = "https://files.pythonhosted.org/packages/98/e9/6d47db8d6f6402bcc9971eee8fde549c82b0eca6acd290668524269b918e/ebi_pm-0.3.14-cp314-cp314t-win_amd64.whl", hash = "sha256:c2133f0c75a50e97db4ebe194875fb4263f10d9a4ec1f3823d1418b85d1f1459", size = 6548193, upload-time = "2026-08-19T18:40:31.192Z" },
+    { url = "https://files.pythonhosted.org/packages/b8/72/95555160510232b5ee33bf78dc40597fae63feea86a9e368a6f03b59c746/ebi_pm-0.3.14-cp37-abi3-macosx_10_12_x86_64.whl", hash = "sha256:404e877585cd816cf9d6bc0b10e26eb8b4537377303032c1f68a050603dcb953", size = 6530151, upload-time = "2026-08-19T18:40:09.207Z" },
+    { url = "https://files.pythonhosted.org/packages/e3/46/84875ea753a06e8342bd8361d88e61b8f568dab11892a5e48839defdd380/ebi_pm-0.3.14-cp37-abi3-macosx_11_0_arm64.whl", hash = "sha256:081c732ed9106cd7e278c93dc8c977082fd9585329be3e0f055a2bbc64996555", size = 5794785, upload-time = "2026-08-19T18:40:04.864Z" },
+    { url = "https://files.pythonhosted.org/packages/78/d5/b38b18ab5ce8d84ec1474a66c864a5d7aa33c90adf18b60ee260f4d5d4c0/ebi_pm-0.3.14-cp37-abi3-manylinux_2_12_i686.manylinux2010_i686.whl", hash = "sha256:0b61b8aefb4c51bf3db9ddb4f3e8f4df6fa7a132790f87e26e711ee9525cb963", size = 7250569, upload-time = "2026-08-19T18:39:55.483Z" },
+    { url = "https://files.pythonhosted.org/packages/c9/a7/c3c8c59c802f74873b291c503e544a4b12fdeeb6e1b285224d10f7689a19/ebi_pm-0.3.14-cp37-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:97cc955a1c2a384830d49398280d2a8a108a7cbefba7e96f0ab58b5e8ee294cd", size = 6274452, upload-time = "2026-08-19T18:39:37.663Z" },
+    { url = "https://files.pythonhosted.org/packages/99/81/e5f7ea0cc0a5b96d9dd966144f11e776ec91e1b03f9e6c3572662e247ba6/ebi_pm-0.3.14-cp37-abi3-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:72656d0ef3830aaa59d96358feef0d567ad0d9689a045cc28193d73fe5999cfc", size = 6647083, upload-time = "2026-08-19T18:39:41.833Z" },
+    { url = "https://files.pythonhosted.org/packages/7e/79/41d30f6e3742bcae41ce68845fd049e211cb6b93759f4ae2ff6761a05c05/ebi_pm-0.3.14-cp37-abi3-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:e4b4c8230af2d3b767903242f724ad5c5f70f584f08dadebbfa2daa963cdd48e", size = 7572962, upload-time = "2026-08-19T18:39:46.221Z" },
+    { url = "https://files.pythonhosted.org/packages/52/a5/916dbfaadf9b1e826fc22fe9e854addcf6dec74291f287c99e5c05d2a8c7/ebi_pm-0.3.14-cp37-abi3-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:e627649a46ac8c39b316ae10034b3d919b8dcf5419d389813605bcb3bd72d25b", size = 7598005, upload-time = "2026-08-19T18:39:50.619Z" },
+    { url = "https://files.pythonhosted.org/packages/0a/28/ee88ae4066826039ef4c29d1edbc458e27c13de21c25a340d9ca2cd7ed4c/ebi_pm-0.3.14-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:11181e0ebeef7f6f6204b1bdace5d8fb99ff8a2471d5331ef9473232402191cc", size = 6838226, upload-time = "2026-08-19T18:40:00.829Z" },
+    { url = "https://files.pythonhosted.org/packages/0c/e8/c34c2a088b2cdc7dc5237267d774a7f82913816f7152b980d4f67055e7d6/ebi_pm-0.3.14-cp37-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:b9ce1d9968b92539f7221eb1bf7aa1d4a9e758752ea0dac1ae7cd63d6cd4e3d2", size = 6442819, upload-time = "2026-08-19T18:40:13.902Z" },
+    { url = "https://files.pythonhosted.org/packages/bc/6f/9c6ee4716c4c46af8fec17d2d0ae6095b989bdba73be46d99c8e63aa25e8/ebi_pm-0.3.14-cp37-abi3-musllinux_1_2_armv7l.whl", hash = "sha256:03d2dff8bf04391cd268b989e5eb440e68067f861c9ae5e38294c76b784f284e", size = 6921591, upload-time = "2026-08-19T18:40:18.39Z" },
+    { url = "https://files.pythonhosted.org/packages/ad/39/43645bbe9636a22d365861357026ab534aa1d6790538c6b0ea9a56a9697d/ebi_pm-0.3.14-cp37-abi3-musllinux_1_2_i686.whl", hash = "sha256:9d688a985e45fb0b579f608643d348022f89dc35a12b62b10b780821cc18ae55", size = 7201691, upload-time = "2026-08-19T18:40:22.659Z" },
+    { url = "https://files.pythonhosted.org/packages/bb/58/bcdf0665de833ba8f09fee8d26c69ee32fd981e3a303d608ec1321fd807e/ebi_pm-0.3.14-cp37-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:2aa9c13700183d79fd0cf20f956173232b93239ad66687af8c8f5df1c7dd51df", size = 7049418, upload-time = "2026-08-19T18:40:27.134Z" },
+    { url = "https://files.pythonhosted.org/packages/15/89/44cb6403b93e51d4991799156a4ee50b1bf36992f3a21526b442a6036eb4/ebi_pm-0.3.14-cp37-abi3-win_amd64.whl", hash = "sha256:d04e13ca6a77fcd0c572925669b8ca09a5c479997ae4ff120dace8276472deba", size = 6546876, upload-time = "2026-08-19T18:40:33.302Z" },
 ]
 
 [[package]]
@@ -2010,6 +2047,7 @@ version = "0.12.0"
 source = { editable = "src/ocelescope" }
 dependencies = [
     { name = "duckdb" },
+    { name = "ebi-pm" },
     { name = "graphviz" },
     { name = "ijson" },
     { name = "lxml" },
@@ -2043,6 +2081,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "duckdb", specifier = ">=1.5.4,<2" },
+    { name = "ebi-pm", specifier = ">=0.3.14" },
     { name = "graphviz", specifier = ">=0.21" },
     { name = "ijson", specifier = ">=3.5.0" },
     { name = "lxml", specifier = ">=6.1.1" },
