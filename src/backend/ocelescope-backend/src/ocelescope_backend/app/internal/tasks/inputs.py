@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+import os
+import shutil
+from collections.abc import Callable
 from contextlib import ExitStack
 from dataclasses import dataclass
+from itertools import count
 from pathlib import Path
 from typing import Any, Literal
 
@@ -30,16 +34,39 @@ class ResourceInput:
         return self.resource_class.open(self.path)
 
 
-def open_inputs(value: Any, stack: ExitStack) -> Any:
-    if isinstance(value, OcelInput | ResourceInput):
-        return stack.enter_context(value.open())
+def map_inputs(value: Any, fn: Callable[[Any], Any]) -> Any:
     if isinstance(value, dict):
-        return {key: open_inputs(item, stack) for key, item in value.items()}
+        return {key: map_inputs(item, fn) for key, item in value.items()}
     if isinstance(value, list):
-        return [open_inputs(item, stack) for item in value]
+        return [map_inputs(item, fn) for item in value]
     if isinstance(value, tuple):
-        return tuple(open_inputs(item, stack) for item in value)
-    return value
+        return tuple(map_inputs(item, fn) for item in value)
+    return fn(value)
+
+
+def copy_files(value: Any, task_dir: Path) -> Any:
+    index = count()
+
+    def copy(item: Any) -> Any:
+        if not isinstance(item, Path) or not item.is_file():
+            return item
+        target = task_dir / f"input_{next(index)}_{item.name}"
+        try:
+            os.link(item, target)
+        except OSError:
+            shutil.copy2(item, target)
+        return target
+
+    return map_inputs(value, copy)
+
+
+def open_inputs(value: Any, stack: ExitStack) -> Any:
+    def open_input(item: Any) -> Any:
+        if isinstance(item, OcelInput | ResourceInput):
+            return stack.enter_context(item.open())
+        return item
+
+    return map_inputs(value, open_input)
 
 
 def find_open_entities(value: Any) -> list[str]:

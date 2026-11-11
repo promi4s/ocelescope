@@ -18,6 +18,7 @@ from ocelescope_backend.app.internal.config import config
 from ocelescope_backend.app.internal.registry import resource_registry
 from ocelescope_backend.app.internal.tasks import child
 from ocelescope_backend.app.internal.tasks.child import WrittenOutput
+from ocelescope_backend.app.internal.tasks.inputs import copy_files
 from ocelescope_backend.app.internal.tasks.store import (
     TaskRecord,
     TaskState,
@@ -68,7 +69,7 @@ class TaskRunner:
         )
         self._processes: dict[str, BaseProcess] = {}
         self._cancelled: set[str] = set()
-        self._output_dirs: set[Path] = set()
+        self._task_dirs: set[Path] = set()
         self._lock = threading.Lock()
 
     def submit(
@@ -81,16 +82,28 @@ class TaskRunner:
         hidden: bool = False,
         dedupe_key: str | None = None,
     ) -> str:
+        task_id = str(uuid4())
+        task_dir = Path(tempfile.mkdtemp(prefix=f"ocelescope_task_{task_id}_"))
+        try:
+            arguments = copy_files(arguments, task_dir)
+        except Exception:
+            shutil.rmtree(task_dir, ignore_errors=True)
+            raise
         record = TaskRecord(
-            id=str(uuid4()),
+            id=task_id,
             session_id=session.id,
             name=name,
             arguments=arguments,
             dedupe_key=dedupe_key,
         )
         if (stored := task_store.add(record)) is not record:
+            shutil.rmtree(task_dir, ignore_errors=True)
             return stored.id
-        self._pool.submit(self._supervise, session, record, function_ref, hidden)
+        with self._lock:
+            self._task_dirs.add(task_dir)
+        self._pool.submit(
+            self._supervise, session, record, function_ref, hidden, task_dir
+        )
         self._invalidate(session.id)
         return record.id
 
@@ -116,12 +129,12 @@ class TaskRunner:
     def shutdown(self) -> None:
         with self._lock:
             processes = list(self._processes.values())
-            output_dirs = list(self._output_dirs)
+            task_dirs = list(self._task_dirs)
         for process in processes:
             _signal_group(process, signal.SIGKILL)
         self._pool.shutdown(wait=False, cancel_futures=True)
-        for output_dir in output_dirs:
-            shutil.rmtree(output_dir, ignore_errors=True)
+        for task_dir in task_dirs:
+            shutil.rmtree(task_dir, ignore_errors=True)
 
     def _is_cancelled(self, task_id: str) -> bool:
         with self._lock:
@@ -136,23 +149,19 @@ class TaskRunner:
         record: TaskRecord,
         function_ref: str,
         hidden: bool,
+        task_dir: Path,
     ) -> None:
-        if self._is_cancelled(record.id):
-            with self._lock:
-                self._cancelled.discard(record.id)
-            return
-        output_dir = Path(tempfile.mkdtemp(prefix=f"ocelescope_task_{record.id}_"))
-        with self._lock:
-            self._output_dirs.add(output_dir)
         try:
+            if self._is_cancelled(record.id):
+                return
             outcome, exitcode = self._run_process(
-                session, record, function_ref, output_dir
+                session, record, function_ref, task_dir
             )
             self._finish(session, record, outcome, exitcode, hidden)
         finally:
-            shutil.rmtree(output_dir, ignore_errors=True)
+            shutil.rmtree(task_dir, ignore_errors=True)
             with self._lock:
-                self._output_dirs.discard(output_dir)
+                self._task_dirs.discard(task_dir)
                 self._cancelled.discard(record.id)
             self._invalidate(session.id)
 
@@ -161,7 +170,7 @@ class TaskRunner:
         session: Session,
         record: TaskRecord,
         function_ref: str,
-        output_dir: Path,
+        task_dir: Path,
     ) -> tuple[Outcome, int | None]:
         reader, writer = self._mp.Pipe(duplex=False)
         process = self._mp.Process(
@@ -171,7 +180,7 @@ class TaskRunner:
                 record.id,
                 record.name,
                 record.arguments,
-                output_dir,
+                task_dir,
                 writer,
             ),
         )

@@ -108,9 +108,14 @@ async def upload(
 
             continue
 
-        tasks.append(
-            task_method.submit(session, file_path=tmp_path, file_name=file_path.name)
-        )
+        try:
+            tasks.append(
+                task_method.submit(
+                    session, file_path=tmp_path, file_name=file_path.name
+                )
+            )
+        finally:
+            tmp_path.unlink(missing_ok=True)
 
     return tasks
 

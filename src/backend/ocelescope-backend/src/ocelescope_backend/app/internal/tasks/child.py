@@ -45,16 +45,14 @@ def _as_list(result: TaskResult) -> list[Output]:
     return list(result)
 
 
-def _write(
-    output: Output, index: int, task_name: str, output_dir: Path
-) -> WrittenOutput:
+def _write(output: Output, index: int, task_name: str, task_dir: Path) -> WrittenOutput:
     name = output.name or f"{task_name}_{index}"
     value = output.value
     if isinstance(value, OCEL):
-        path = output_dir / f"{output.id}.duckdb"
+        path = task_dir / f"{output.id}.duckdb"
         value.to_duckdb(path)
         return WrittenOutput(output.id, name, "ocel", path)
-    path = output_dir / output.id
+    path = task_dir / output.id
     if isinstance(value, ResourceBase):
         value.dump(path)
         return WrittenOutput(output.id, name, "resource", path, value.get_schema_hash())
@@ -68,11 +66,11 @@ def run(
     task_id: str,
     task_name: str,
     kwargs: dict[str, Any],
-    output_dir: Path,
+    task_dir: Path,
     channel: Connection,
 ) -> None:
     os.setpgrp()
-    set_task_context(TaskContext(task_id, channel))
+    set_task_context(TaskContext(task_id, task_dir, channel))
     outputs: list[Output] = []
     try:
         fn = resolve_function(function_ref)
@@ -80,14 +78,11 @@ def run(
             kwargs = open_inputs(kwargs, stack)
             outputs = _as_list(fn(**kwargs))
             written = [
-                _write(output, index, task_name, output_dir)
+                _write(output, index, task_name, task_dir)
                 for index, output in enumerate(outputs)
             ]
         channel.send(("done", written))
     except BaseException as exc:
-        for output in outputs:
-            if isinstance(output.value, tuple):
-                output.value[0].unlink(missing_ok=True)
         channel.send(("failed", str(exc), traceback.format_exc()))
     finally:
         for output in outputs:

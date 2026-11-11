@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from multiprocessing.connection import Connection
+from pathlib import Path
 
 from ocelescope_backend.app.sse_manager import ErrorNotification, SystemNotification
 
@@ -9,6 +10,7 @@ from ocelescope_backend.app.sse_manager import ErrorNotification, SystemNotifica
 @dataclass
 class TaskContext:
     task_id: str
+    work_dir: Path
     _channel: Connection
 
     def notify(self, notification: SystemNotification | ErrorNotification) -> None:

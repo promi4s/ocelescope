@@ -2,7 +2,7 @@ import json
 import traceback
 import zipfile
 from pathlib import Path
-from tempfile import NamedTemporaryFile, TemporaryDirectory
+from tempfile import TemporaryDirectory
 
 import duckdb
 from ocelescope.util.sql import ident, literal
@@ -28,11 +28,7 @@ def _log_name(file_name: str) -> str:
 
 def _read_log(file_path: Path, file_name: str, xes: bool) -> Output:
     name = Path(file_name).stem if xes else _log_name(file_name)
-    try:
-        ocel = OCEL.read_xes(file_path) if xes else OCEL.read(file_path)
-    finally:
-        file_path.unlink(missing_ok=True)
-
+    ocel = OCEL.read_xes(file_path) if xes else OCEL.read(file_path)
     task_context().notify(
         SystemNotification(
             title="XES was uploaded successfully"
@@ -47,33 +43,30 @@ def _read_log(file_path: Path, file_name: str, xes: bool) -> Output:
 
 def _read_resource(file_path: Path, file_name: str) -> Output:
     path = file_path
-    try:
-        if zipfile.is_zipfile(file_path):
-            path = file_path.with_suffix(".duckdb")
-            with TemporaryDirectory() as tmp, zipfile.ZipFile(file_path) as archive:
-                size = sum(member.file_size for member in archive.infolist())
-                if size > config.ARCHIVE_MAX_UNCOMPRESSED_BYTES:
-                    raise ArchiveError("The uploaded resource is too large to unpack")
+    if zipfile.is_zipfile(file_path):
+        path = file_path.with_suffix(".duckdb")
+        with (
+            TemporaryDirectory(dir=task_context().work_dir) as tmp,
+            zipfile.ZipFile(file_path) as archive,
+        ):
+            size = sum(member.file_size for member in archive.infolist())
+            if size > config.ARCHIVE_MAX_UNCOMPRESSED_BYTES:
+                raise ArchiveError("The uploaded resource is too large to unpack")
 
-                manifest = json.loads(archive.read("manifest.json"))
-                schema_hash = manifest["schema_hash"]
-                con = duckdb.connect(str(path))
-                try:
-                    for table in manifest["tables"]:
-                        file = archive.extract(f"{table}.parquet", tmp)
-                        con.sql(
-                            f"CREATE TABLE {ident(table)} "
-                            f"AS FROM read_parquet({literal(file)})"
-                        )
-                finally:
-                    con.close()
-            file_path.unlink()
-        else:
-            schema_hash = ResourceBase.read_schema_hash(file_path)
-    except Exception:
-        file_path.unlink(missing_ok=True)
-        path.unlink(missing_ok=True)
-        raise
+            manifest = json.loads(archive.read("manifest.json"))
+            schema_hash = manifest["schema_hash"]
+            con = duckdb.connect(str(path))
+            try:
+                for table in manifest["tables"]:
+                    file = archive.extract(f"{table}.parquet", tmp)
+                    con.sql(
+                        f"CREATE TABLE {ident(table)} "
+                        f"AS FROM read_parquet({literal(file)})"
+                    )
+            finally:
+                con.close()
+    else:
+        schema_hash = ResourceBase.read_schema_hash(file_path)
 
     name = Path(file_name).stem
     task_context().notify(
@@ -103,61 +96,56 @@ def import_resource(file_path: Path, file_name: str) -> TaskResult:
 
 @task(name="importArchive")
 def import_archive(file_path: Path, file_name: str) -> TaskResult:
-    outputs: list[Output] = []
     try:
-        try:
-            archive = zipfile.ZipFile(file_path, "r")
-        except zipfile.BadZipFile as exc:
-            raise ArchiveError("The uploaded file is not a valid zip archive") from exc
+        archive = zipfile.ZipFile(file_path, "r")
+    except zipfile.BadZipFile as exc:
+        raise ArchiveError("The uploaded file is not a valid zip archive") from exc
 
-        with archive:
-            contents = classify_archive(
-                validate_archive(
+    outputs: list[Output] = []
+    work_dir = task_context().work_dir
+    with archive:
+        contents = classify_archive(
+            validate_archive(
+                archive,
+                max_files=config.ARCHIVE_MAX_FILES,
+                max_uncompressed_bytes=config.ARCHIVE_MAX_UNCOMPRESSED_BYTES,
+            )
+        )
+        members = sorted(
+            (*contents.log_members, *contents.resource_members),
+            key=lambda member: member.header_offset,
+        )
+        for index, member in enumerate(members):
+            member_name = Path(member.filename).name
+            lower = member_name.lower()
+            suffix = ".xes.gz" if lower.endswith(".xes.gz") else Path(lower).suffix
+            member_path = work_dir / f"member_{index}{suffix}"
+            try:
+                extract_member(
                     archive,
-                    max_files=config.ARCHIVE_MAX_FILES,
+                    member,
+                    member_path,
                     max_uncompressed_bytes=config.ARCHIVE_MAX_UNCOMPRESSED_BYTES,
                 )
-            )
-            members = sorted(
-                (*contents.log_members, *contents.resource_members),
-                key=lambda member: member.header_offset,
-            )
-            for member in members:
-                member_name = Path(member.filename).name
-                lower = member_name.lower()
-                suffix = ".xes.gz" if lower.endswith(".xes.gz") else Path(lower).suffix
-                with NamedTemporaryFile(delete=False, suffix=suffix) as temp_file:
-                    temp_path = Path(temp_file.name)
-                temp_path.unlink()
-                try:
-                    extract_member(
-                        archive,
-                        member,
-                        temp_path,
-                        max_uncompressed_bytes=config.ARCHIVE_MAX_UNCOMPRESSED_BYTES,
-                    )
-                    if suffix == ".ocelescope":
-                        outputs.append(_read_resource(temp_path, member_name))
-                    else:
-                        outputs.append(
-                            _read_log(
-                                temp_path,
-                                member_name,
-                                xes=suffix in {".xes", ".xes.gz"},
-                            )
-                        )
-                except Exception as exc:
-                    temp_path.unlink(missing_ok=True)
-                    task_context().notify(
-                        ErrorNotification(
-                            type="error",
-                            title=f"Could not import {member_name}",
-                            message=str(exc),
-                            trace=traceback.format_exc(),
+                if suffix == ".ocelescope":
+                    outputs.append(_read_resource(member_path, member_name))
+                else:
+                    outputs.append(
+                        _read_log(
+                            member_path,
+                            member_name,
+                            xes=suffix in {".xes", ".xes.gz"},
                         )
                     )
-    finally:
-        file_path.unlink(missing_ok=True)
+            except Exception as exc:
+                task_context().notify(
+                    ErrorNotification(
+                        type="error",
+                        title=f"Could not import {member_name}",
+                        message=str(exc),
+                        trace=traceback.format_exc(),
+                    )
+                )
     return outputs
 
 
