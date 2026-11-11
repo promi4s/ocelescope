@@ -18,12 +18,7 @@ from ocelescope_backend.app.internal.util.archive import (
     extract_member,
     validate_archive,
 )
-from ocelescope_backend.app.sse_manager import (
-    ErrorNotification,
-    OcelLink,
-    ResourceLink,
-    SystemNotification,
-)
+from ocelescope_backend.app.sse_manager import ErrorNotification, SystemNotification
 
 
 def _log_name(file_name: str) -> str:
@@ -38,7 +33,6 @@ def _read_log(file_path: Path, file_name: str, xes: bool) -> Output:
     finally:
         file_path.unlink(missing_ok=True)
 
-    out = Output(ocel, name=name)
     task_context().notify(
         SystemNotification(
             title="XES was uploaded successfully"
@@ -46,10 +40,9 @@ def _read_log(file_path: Path, file_name: str, xes: bool) -> Output:
             else "OCEL successfully uploaded",
             message=f"{name} was uploaded successfully",
             notification_type="info",
-            link=OcelLink(ocel_id=out.id),
         )
     )
-    return out
+    return Output(ocel, name=name)
 
 
 def _read_resource(file_path: Path, file_name: str) -> Output:
@@ -83,16 +76,14 @@ def _read_resource(file_path: Path, file_name: str) -> Output:
         raise
 
     name = Path(file_name).stem
-    out = Output((path, schema_hash), name=name)
     task_context().notify(
         SystemNotification(
             title="Resource successfully uploaded",
             message=f"{name} uploaded successfully",
             notification_type="info",
-            link=ResourceLink(resource_id=out.id),
         )
     )
-    return out
+    return Output((path, schema_hash), name=name)
 
 
 @task(name="importOCEL")

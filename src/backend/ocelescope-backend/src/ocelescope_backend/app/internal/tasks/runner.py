@@ -26,7 +26,6 @@ from ocelescope_backend.app.internal.tasks.store import (
 from ocelescope_backend.app.sse_manager import (
     ErrorNotification,
     InvalidationRequest,
-    SSEMessage,
     sse_manager,
 )
 
@@ -147,10 +146,10 @@ class TaskRunner:
         with self._lock:
             self._output_dirs.add(output_dir)
         try:
-            outcome, held, exitcode = self._run_process(
+            outcome, exitcode = self._run_process(
                 session, record, function_ref, output_dir
             )
-            self._finish(session, record, outcome, held, exitcode, hidden)
+            self._finish(session, record, outcome, exitcode, hidden)
         finally:
             shutil.rmtree(output_dir, ignore_errors=True)
             with self._lock:
@@ -164,7 +163,7 @@ class TaskRunner:
         record: TaskRecord,
         function_ref: str,
         output_dir: Path,
-    ) -> tuple[Outcome, list[SSEMessage], int | None]:
+    ) -> tuple[Outcome, int | None]:
         reader, writer = self._mp.Pipe(duplex=False)
         process = self._mp.Process(
             target=child.run,
@@ -179,7 +178,7 @@ class TaskRunner:
         )
         with self._lock:
             if record.id in self._cancelled:
-                return None, [], None
+                return None, None
             process.start()
             self._processes[record.id] = process
         writer.close()
@@ -187,7 +186,6 @@ class TaskRunner:
         self._invalidate(session.id)
 
         outcome: Outcome = None
-        held: list[SSEMessage] = []
         try:
             while outcome is None:
                 try:
@@ -196,8 +194,6 @@ class TaskRunner:
                     break
                 if message[0] != "notify":
                     outcome = message
-                elif getattr(message[1], "link", None) is not None:
-                    held.append(message[1])
                 else:
                     sse_manager.send_safe(session.id, message[1])
         finally:
@@ -205,14 +201,13 @@ class TaskRunner:
             process.join()
             with self._lock:
                 self._processes.pop(record.id, None)
-        return outcome, held, process.exitcode
+        return outcome, process.exitcode
 
     def _finish(
         self,
         session: Session,
         record: TaskRecord,
         outcome: Outcome,
-        held: list[SSEMessage],
         exitcode: int | None,
         hidden: bool,
     ) -> None:
@@ -237,8 +232,6 @@ class TaskRunner:
             return
 
         task_store.update(record.id, state=TaskState.SUCCESS, finished_at=_now())
-        for notification in held:
-            sse_manager.send_safe(session.id, notification)
 
     def _fail(
         self, session: Session, record: TaskRecord, message: str, trace: str
