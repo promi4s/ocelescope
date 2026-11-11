@@ -4,6 +4,30 @@
 
 Ocelescope is part of a project by the Chair of Process and Data Science ([PADS](https://www.pads.rwth-aachen.de/go/id/pnbx/)) at RWTH Aachen University.
 
+## 📝 Cite Ocelescope
+
+If you use Ocelescope in your research, please cite our [paper](https://ceur-ws.org/Vol-4274/paper-30.pdf):
+
+<!-- cspell:disable -->
+
+> Öztürk, G.-E., Graves, N., Küsters, A., Menne, S., & van der Aalst, W. M. P. (2026). Ocelescope: An extensible web framework for object-centric process mining. *CEUR Workshop Proceedings*, *4274*, 173–177. https://ceur-ws.org/Vol-4274/paper-30.pdf
+
+```bibtex
+@inproceedings{ocelescope2026,
+  title     = {Ocelescope: An Extensible Web Framework for Object-Centric Process Mining},
+  author    = {{\"O}zt{\"u}rk, G{\"o}rkem-Emre and Graves, Nina and K{\"u}sters, Aaron and Menne, Sebastian and van der Aalst, Wil M. P.},
+  booktitle = {Joint Proceedings of the Best Dissertation Award, Doctoral Consortium, and Demonstration \& Resources Forum at BPM 2026},
+  series    = {CEUR Workshop Proceedings},
+  volume    = {4274},
+  pages     = {173--177},
+  publisher = {CEUR-WS.org},
+  year      = {2026},
+  url       = {https://ceur-ws.org/Vol-4274/paper-30.pdf}
+}
+```
+
+<!-- cspell:enable -->
+
 > ⚠️ **Project Status: Active Development**
 >
 > This repository is under active development.
