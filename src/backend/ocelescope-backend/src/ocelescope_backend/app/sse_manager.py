@@ -5,34 +5,11 @@ from typing import Annotated, Literal
 from pydantic import BaseModel, Field
 
 
-class OcelLink(BaseModel):
-    type: Literal["ocel"] = "ocel"
-    ocel_id: str
-
-
-class ResourceLink(BaseModel):
-    type: Literal["resource"] = "resource"
-    resource_id: str
-
-
-class PluginLink(BaseModel):
-    type: Literal["plugin"] = "plugin"
-    id: str
-    method: str
-    task_id: str
-
-
-SystemLink = Annotated[
-    OcelLink | PluginLink | ResourceLink, Field(discriminator="type")
-]
-
-
 class SystemNotification(BaseModel):
     type: Literal["notification"] = "notification"
     title: str
     message: str
     notification_type: Literal["warning", "info", "error"]
-    link: SystemLink | None = None
 
 
 class ErrorNotification(BaseModel):
