@@ -81,11 +81,6 @@ class TaskRunner:
         hidden: bool = False,
         dedupe_key: str | None = None,
     ) -> str:
-        if dedupe_key is not None and (
-            existing := task_store.find_duplicate(session.id, dedupe_key)
-        ):
-            return existing.id
-
         record = TaskRecord(
             id=str(uuid4()),
             session_id=session.id,
@@ -93,7 +88,8 @@ class TaskRunner:
             arguments=arguments,
             dedupe_key=dedupe_key,
         )
-        task_store.add(record)
+        if (stored := task_store.add(record)) is not record:
+            return stored.id
         self._pool.submit(self._supervise, session, record, function_ref, hidden)
         self._invalidate(session.id)
         return record.id

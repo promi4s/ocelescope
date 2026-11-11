@@ -38,9 +38,14 @@ class TaskStore:
         self._tasks: dict[str, TaskRecord] = {}
         self._lock = threading.Lock()
 
-    def add(self, record: TaskRecord) -> None:
+    def add(self, record: TaskRecord) -> TaskRecord:
         with self._lock:
+            if record.dedupe_key is not None and (
+                existing := self._find_duplicate(record.session_id, record.dedupe_key)
+            ):
+                return existing
             self._tasks[record.id] = record
+            return record
 
     def get(self, task_id: str) -> TaskRecord | None:
         return self._tasks.get(task_id)
@@ -69,7 +74,7 @@ class TaskStore:
             and (not states or record.state in states)
         ]
 
-    def find_duplicate(self, session_id: str, dedupe_key: str) -> TaskRecord | None:
+    def _find_duplicate(self, session_id: str, dedupe_key: str) -> TaskRecord | None:
         return next(
             (
                 record
