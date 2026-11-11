@@ -18,8 +18,8 @@ import {
 } from "@ocelescope/core";
 import { keepPreviousData } from "@tanstack/react-query";
 import { useMemo } from "react";
-import type { TimeFrameFilter, TimeFrameFilterMode } from "../../api/base";
-import dayjs from "../../util/dayjs";
+import type { TimeFrameFilter, TimeFrameFilterMode } from "../../../api/base";
+import dayjs from "../../../util/dayjs";
 
 const DATE_FORMAT = "YYYY-MM-DD HH:mm";
 const PICKER_FORMAT = "YYYY-MM-DD HH:mm:ss";

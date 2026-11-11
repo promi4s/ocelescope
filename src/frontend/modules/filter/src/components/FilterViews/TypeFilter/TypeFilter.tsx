@@ -6,7 +6,7 @@ import {
   type StepPanel,
   viewProps,
 } from "@ocelescope/core";
-import type { ActivityFilter, ObjectTypeFilter } from "../../api/base";
+import type { ActivityFilter, ObjectTypeFilter } from "../../../api/base";
 
 const PICKER_CLASS = "ocelescope-type-filter-picker";
 
