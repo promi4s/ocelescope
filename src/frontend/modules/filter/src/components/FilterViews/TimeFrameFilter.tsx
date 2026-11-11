@@ -1,212 +1,135 @@
 import {
   Box,
-  Grid,
   Group,
   LoadingOverlay,
-  RangeSlider,
   SegmentedControl,
-  useMantineTheme,
+  Stack,
+  Text,
 } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
-import { type EntityTimeInfo, useTimeInfo } from "@ocelescope/api-base";
-import { type StepKind, type StepPanel, viewParams } from "@ocelescope/core";
+import { useTimeInfo } from "@ocelescope/api-base";
+import {
+  type RangeBin,
+  type RangeValue,
+  RangeView,
+  type StepKind,
+  type StepPanel,
+  viewParams,
+} from "@ocelescope/core";
 import { keepPreviousData } from "@tanstack/react-query";
-import type { EChartsOption } from "echarts";
-import EChartsReact from "echarts-for-react";
-import { memo, useMemo } from "react";
+import { useMemo } from "react";
 import type { TimeFrameFilter, TimeFrameFilterMode } from "../../api/base";
 import dayjs from "../../util/dayjs";
 
 const DATE_FORMAT = "YYYY-MM-DD HH:mm";
+const PICKER_FORMAT = "YYYY-MM-DD HH:mm:ss";
 
 const MODE_OPTIONS = [
   { label: "Include", value: "include" },
   { label: "Exclude", value: "exclude" },
 ];
 
-const TimeGraph: React.FC<{
-  timeInfo: EntityTimeInfo;
-  startDate?: string;
-  endDate?: string;
-  mode: TimeFrameFilterMode;
-}> = memo(({ timeInfo, startDate, endDate, mode }) => {
-  const theme = useMantineTheme();
+const toTime = (value: string | number) => dayjs(value).valueOf();
+const toDate = (value: number) => dayjs(value).format(PICKER_FORMAT);
+const formatTime = (value: number) => dayjs(value).format(DATE_FORMAT);
 
-  const option: EChartsOption = useMemo(() => {
-    const buckets = timeInfo.date_distribution.map(
-      ({ start_timestamp, end_timestamp, entity_count }) => {
-        const overlapsRange =
-          (!startDate || dayjs(end_timestamp).isAfter(dayjs(startDate))) &&
-          (!endDate || dayjs(start_timestamp).isBefore(dayjs(endDate)));
-        const insideRange =
-          (!startDate || !dayjs(start_timestamp).isBefore(dayjs(startDate))) &&
-          (!endDate || !dayjs(end_timestamp).isAfter(dayjs(endDate)));
+const TimeFramePanel: StepPanel<TimeFrameFilter> = ({
+  ocelId,
+  viewId,
+  step: filter,
+  onChange,
+}) => {
+  const { data: timeInfo, isLoading } = useTimeInfo(
+    ocelId,
+    { ...viewParams(viewId), periods: 100 },
+    { query: { placeholderData: keepPreviousData } },
+  );
+  const mode = filter.mode ?? "include";
 
-        return {
-          label: `${dayjs(start_timestamp).format(DATE_FORMAT)} - ${dayjs(end_timestamp).format(DATE_FORMAT)}`,
+  const bins = useMemo<RangeBin[]>(
+    () =>
+      (timeInfo?.date_distribution ?? []).map(
+        ({ start_timestamp, end_timestamp, entity_count }) => ({
+          start: toTime(start_timestamp),
+          end: toTime(end_timestamp),
           count: Object.values(entity_count).reduce(
-            (acc, curr) => acc + curr,
+            (total, count) => total + count,
             0,
           ),
-          isKept: mode === "exclude" ? !insideRange : overlapsRange,
-        };
-      },
-    );
-
-    return {
-      tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
-      grid: { left: 0, right: 0, top: 8, bottom: 0 },
-      xAxis: {
-        type: "category",
-        data: buckets.map(({ label }) => label),
-        show: false,
-      },
-      yAxis: { type: "value", show: false },
-      series: [
-        {
-          type: "bar",
-          name: "count",
-          barCategoryGap: 0,
-          data: buckets.map(({ count, isKept }) => ({
-            value: count,
-            itemStyle: {
-              color: theme.colors.blue[6],
-              opacity: isKept ? 1 : 0.25,
-            },
-          })),
-        },
-      ],
-    };
-  }, [timeInfo, startDate, endDate, mode, theme]);
-
-  return <EChartsReact option={option} style={{ height: 300 }} />;
-});
-
-const TimeFrameSlider: React.FC<{
-  timeInfo: EntityTimeInfo;
-  startTime: string;
-  endTime: string;
-  mode: TimeFrameFilterMode;
-  onChange: (newTimeFrame: [string, string]) => void;
-}> = ({ timeInfo, startTime, endTime, mode, onChange }) => {
-  const distribution = timeInfo.date_distribution;
-  const lastIndex = distribution.length - 1;
-
-  const startIndex = useMemo(() => {
-    const index = distribution.findIndex(({ end_timestamp }) =>
-      dayjs(startTime).isBefore(end_timestamp),
-    );
-
-    return index === -1 ? Math.max(lastIndex, 0) : index;
-  }, [startTime, distribution, lastIndex]);
-
-  const endIndex = useMemo(() => {
-    const index = distribution.findLastIndex(({ start_timestamp }) =>
-      dayjs(endTime).isAfter(start_timestamp),
-    );
-
-    return index === -1 ? 0 : index;
-  }, [endTime, distribution]);
-
-  if (lastIndex < 0) {
-    return null;
-  }
-
-  return (
-    <RangeSlider
-      min={0}
-      max={lastIndex}
-      minRange={0}
-      inverted={mode === "exclude"}
-      value={[startIndex, endIndex]}
-      label={(value) => {
-        const bucket = distribution[value];
-
-        return bucket
-          ? dayjs(bucket.start_timestamp).format(DATE_FORMAT)
-          : null;
-      }}
-      onChange={([start, end]) => {
-        onChange([
-          //TODO: Find out why index shift is happening
-          start === startIndex
-            ? startTime
-            : (distribution[start]?.start_timestamp ?? startTime),
-          distribution[end]?.end_timestamp ?? endTime,
-        ]);
-      }}
-    />
+        }),
+      ),
+    [timeInfo],
   );
-};
 
-const TimeFramePanel: StepPanel<TimeFrameFilter> = memo(
-  ({ ocelId, viewId, step: filter, onChange }) => {
-    const { data: timeInfo, isLoading } = useTimeInfo(
-      ocelId,
-      { ...viewParams(viewId), periods: 100 },
-      { query: { placeholderData: keepPreviousData } },
-    );
-    const [start, end] = filter.time_range;
-    const mode = filter.mode ?? "include";
-    const setRange = (time_range: [string | null, string | null]) =>
-      onChange({ ...filter, time_range });
-
+  if (!timeInfo) {
     return (
-      <Box pos={"relative"} w={"100%"} h={"100%"}>
+      <Box pos="relative" w="100%" h="100%">
         <LoadingOverlay visible={isLoading} />
-        {timeInfo && (
-          <Grid justify="center" align="center">
-            <Grid.Col span={12}>
-              <Group justify="flex-end">
-                <SegmentedControl
-                  size="xs"
-                  data={MODE_OPTIONS}
-                  value={mode}
-                  onChange={(next) =>
-                    onChange({ ...filter, mode: next as TimeFrameFilterMode })
-                  }
-                />
-              </Group>
-            </Grid.Col>
-            <Grid.Col span={12}>
-              <TimeGraph
-                timeInfo={timeInfo}
-                startDate={start ?? undefined}
-                endDate={end ?? undefined}
-                mode={mode}
-              />
-            </Grid.Col>
-            <Grid.Col span={3}>
-              <DateTimePicker
-                minDate={timeInfo.start_time}
-                maxDate={end ?? timeInfo.end_time}
-                onChange={(newStart) => setRange([newStart, end])}
-                value={start ?? timeInfo.start_time}
-              />
-            </Grid.Col>
-            <Grid.Col span={6}>
-              <TimeFrameSlider
-                onChange={setRange}
-                timeInfo={timeInfo}
-                startTime={start ?? timeInfo.start_time}
-                endTime={end ?? timeInfo.end_time}
-                mode={mode}
-              />
-            </Grid.Col>
-            <Grid.Col span={3}>
-              <DateTimePicker
-                minDate={start ?? timeInfo.start_time}
-                maxDate={timeInfo.end_time}
-                onChange={(newEnd) => setRange([start, newEnd])}
-                value={end ?? timeInfo.end_time}
-              />
-            </Grid.Col>
-          </Grid>
-        )}
       </Box>
     );
-  },
-);
+  }
+
+  const min = toTime(timeInfo.start_time);
+  const max = toTime(timeInfo.end_time);
+  const [start, end] = filter.time_range;
+  const value: RangeValue = [
+    start != null ? toTime(start) : min,
+    end != null ? toTime(end) : max,
+  ];
+  const setRange = ([low, high]: RangeValue) =>
+    onChange({ ...filter, time_range: [toDate(low), toDate(high)] });
+
+  return (
+    <Stack gap="md">
+      <Group justify="flex-end">
+        <SegmentedControl
+          size="xs"
+          data={MODE_OPTIONS}
+          value={mode}
+          onChange={(next) =>
+            onChange({ ...filter, mode: next as TimeFrameFilterMode })
+          }
+        />
+      </Group>
+      <RangeView
+        bins={bins}
+        min={min}
+        max={max}
+        value={value}
+        onChange={setRange}
+        exclude={mode === "exclude"}
+        format={formatTime}
+        inputs={
+          <Group wrap="nowrap" align="end" gap="xs">
+            <DateTimePicker
+              flex={1}
+              withSeconds
+              value={toDate(value[0])}
+              minDate={toDate(min)}
+              maxDate={toDate(value[1])}
+              onChange={(next) =>
+                setRange([next ? toTime(next) : min, value[1]])
+              }
+            />
+            <Text c="dimmed" size="sm" pb={8}>
+              -
+            </Text>
+            <DateTimePicker
+              flex={1}
+              withSeconds
+              value={toDate(value[1])}
+              minDate={toDate(value[0])}
+              maxDate={toDate(max)}
+              onChange={(next) =>
+                setRange([value[0], next ? toTime(next) : max])
+              }
+            />
+          </Group>
+        }
+      />
+    </Stack>
+  );
+};
 
 const bound = (value: string | null, open: string) =>
   value ? dayjs(value).format(DATE_FORMAT) : open;
