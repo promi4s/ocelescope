@@ -95,6 +95,9 @@ class TaskRunner:
         return record.id
 
     def cancel(self, task_id: str) -> None:
+        record = task_store.get(task_id)
+        if record is None or record.state not in (TaskState.PENDING, TaskState.STARTED):
+            return
         with self._lock:
             self._cancelled.add(task_id)
             process = self._processes.get(task_id)
