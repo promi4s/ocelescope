@@ -74,7 +74,7 @@ def _normalized_relation(kind: RelationKind, direction: Direction) -> str:
     return (
         f"SELECT {src[0]} AS src_id, {src[1]} AS src_type, "
         f"{tgt[0]} AS tgt_id, {tgt[1]} AS tgt_type, "
-        f"r.{ident(QUALIFIER)} AS qualifier FROM {base}"
+        f"NULLIF(r.{ident(QUALIFIER)}, '') AS qualifier FROM {base}"
     )
 
 
@@ -109,8 +109,7 @@ def relation_summary(
     key_sql = ", ".join(keys)
 
     params: list[object] = []
-    # A qualifier-grouped row needs a qualifier (drop null-qualifier relations).
-    conditions = ["qualifier IS NOT NULL"] if with_qualifier else []
+    conditions: list[str] = []
     for column, values in (
         ("src_type", source_types),
         ("tgt_type", target_types),

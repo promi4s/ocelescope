@@ -42,6 +42,7 @@ export {
   default as RangeView,
   type Range as RangeValue,
 } from "./components/RangeView";
+export * from "./components/RelationGraphInput";
 export { default as RelationTable } from "./components/RelationTable";
 export { UploadModal } from "./components/UploadModal/UploadModal";
 export { UploadSection } from "./components/UploadSection/UploadSection";
