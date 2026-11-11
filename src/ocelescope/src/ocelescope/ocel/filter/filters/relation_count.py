@@ -31,6 +31,7 @@ class RelationCountFilterConfig(BaseModel):
     target: str
     range: tuple[int | None, int | None]
     qualifier: str | None = None
+    mode: Literal["include", "exclude"] = "include"
 
     def _qualified(self, column: str) -> str:
         """SQL restricting the relations to ``qualifier``, if one is set."""
@@ -46,6 +47,7 @@ def _keep_counted(
     counted_type: str,
     counted: str,
     count_range: tuple[int | None, int | None],
+    exclude: bool = False,
 ) -> str:
     """Ids of the counted type whose count is in range, plus every other entity.
 
@@ -64,13 +66,14 @@ def _keep_counted(
         if bound is not None
     )
     counted_type = literal(counted_type)
+    kept = f"NOT ({in_range or 'true'})" if exclude else (in_range or "true")
 
     return f"""
         SELECT e.{id_col} FROM {table} e
         LEFT JOIN (SELECT id, count(*) AS n FROM ({counted}) GROUP BY id) counts
             ON counts.id = e.{id_col}
         WHERE e.{type_col} <> {counted_type}
-            OR (e.{type_col} = {counted_type} AND {in_range or "true"})
+            OR (e.{type_col} = {counted_type} AND {kept})
     """
 
 
@@ -106,6 +109,7 @@ class E2OCountFilter(BaseFilter, RelationCountFilterConfig):
                     self.source,
                     counted,
                     self.range,
+                    self.mode == "exclude",
                 ),
             )
         else:
@@ -118,6 +122,7 @@ class E2OCountFilter(BaseFilter, RelationCountFilterConfig):
                     self.target,
                     counted,
                     self.range,
+                    self.mode == "exclude",
                 ),
             )
 
@@ -154,5 +159,6 @@ class O2OCountFilter(BaseFilter, RelationCountFilterConfig):
                 self.source if is_source else self.target,
                 counted,
                 self.range,
+                self.mode == "exclude",
             ),
         )
