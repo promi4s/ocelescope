@@ -221,6 +221,8 @@ class PluginRegistry:
 
         return inputs
 
+    # TODO: Providers run plugin code synchronously in the API process, so a slow
+    # provider blocks the server. Run them through the task system instead.
     @contextmanager
     def computed_kwargs(
         self,
