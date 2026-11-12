@@ -461,11 +461,6 @@
             ],
             "title": "Qualifier"
           },
-          "drop_unmatched_events": {
-            "type": "boolean",
-            "title": "Drop Unmatched Events",
-            "default": false
-          },
           "mode": {
             "type": "string",
             "enum": [

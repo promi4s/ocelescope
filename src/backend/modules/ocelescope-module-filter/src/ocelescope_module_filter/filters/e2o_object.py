@@ -25,7 +25,6 @@ class E2OObjectFilter(BaseFilter):
     target: str
     range: tuple[int | None, int | None]
     qualifier: str | None = None
-    drop_unmatched_events: bool = False
     mode: Mode = "include"
 
     def build(self, step: Step) -> None:
@@ -60,10 +59,3 @@ class E2OObjectFilter(BaseFilter):
             f"SELECT {oid} FROM {step[OBJECTS_TABLE]} WHERE {negate} {oid} IN ("
             f"SELECT {oid} FROM {step[E2O_TABLE]} WHERE {in_matched})",
         )
-
-        if self.drop_unmatched_events:
-            step.keep(
-                EVENTS_TABLE,
-                f"SELECT {eid} FROM {step[EVENTS_TABLE]} "
-                f"WHERE {activity} <> {source} OR {negate} {in_matched}",
-            )
