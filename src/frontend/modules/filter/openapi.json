@@ -63,6 +63,9 @@
                       "$ref": "#/components/schemas/E2OCountFilter"
                     },
                     {
+                      "$ref": "#/components/schemas/E2OObjectFilter"
+                    },
+                    {
                       "$ref": "#/components/schemas/O2OCountFilter"
                     }
                   ],
@@ -75,6 +78,7 @@
                       "event_attribute": "#/components/schemas/EventAttributeFilter",
                       "object_attribute": "#/components/schemas/ObjectAttributeFilter",
                       "e2o_count": "#/components/schemas/E2OCountFilter",
+                      "e2o_object": "#/components/schemas/E2OObjectFilter",
                       "o2o_count": "#/components/schemas/O2OCountFilter"
                     }
                   }
@@ -159,6 +163,9 @@
                         "$ref": "#/components/schemas/E2OCountFilter"
                       },
                       {
+                        "$ref": "#/components/schemas/E2OObjectFilter"
+                      },
+                      {
                         "$ref": "#/components/schemas/O2OCountFilter"
                       }
                     ],
@@ -171,6 +178,7 @@
                         "event_attribute": "#/components/schemas/EventAttributeFilter",
                         "object_attribute": "#/components/schemas/ObjectAttributeFilter",
                         "e2o_count": "#/components/schemas/E2OCountFilter",
+                        "e2o_object": "#/components/schemas/E2OObjectFilter",
                         "o2o_count": "#/components/schemas/O2OCountFilter"
                       }
                     }
@@ -233,6 +241,9 @@
                       "$ref": "#/components/schemas/E2OCountFilter"
                     },
                     {
+                      "$ref": "#/components/schemas/E2OObjectFilter"
+                    },
+                    {
                       "$ref": "#/components/schemas/O2OCountFilter"
                     }
                   ],
@@ -245,6 +256,7 @@
                       "event_attribute": "#/components/schemas/EventAttributeFilter",
                       "object_attribute": "#/components/schemas/ObjectAttributeFilter",
                       "e2o_count": "#/components/schemas/E2OCountFilter",
+                      "e2o_object": "#/components/schemas/E2OObjectFilter",
                       "o2o_count": "#/components/schemas/O2OCountFilter"
                     }
                   }
@@ -361,6 +373,15 @@
             ],
             "title": "Qualifier"
           },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "include",
+              "exclude"
+            ],
+            "title": "Mode",
+            "default": "include"
+          },
           "direction": {
             "type": "string",
             "enum": [
@@ -385,6 +406,80 @@
         ],
         "title": "E2OCountFilter",
         "description": "Keep events/objects by how many E2O relations of a given kind they have."
+      },
+      "E2OObjectFilter": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "e2o_object",
+            "title": "Type"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "target": {
+            "type": "string",
+            "title": "Target"
+          },
+          "range": {
+            "prefixItems": [
+              {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            ],
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "Range"
+          },
+          "qualifier": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qualifier"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "include",
+              "exclude"
+            ],
+            "title": "Mode",
+            "default": "include"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "source",
+          "target",
+          "range"
+        ],
+        "title": "E2OObjectFilter",
+        "description": "Keep the objects that share an event of an activity with a given number of related objects of a type."
       },
       "EventAttributeCondition": {
         "properties": {
@@ -581,6 +676,15 @@
               }
             ],
             "title": "Qualifier"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "include",
+              "exclude"
+            ],
+            "title": "Mode",
+            "default": "include"
           },
           "direction": {
             "type": "string",

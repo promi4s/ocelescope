@@ -23,6 +23,7 @@ from ocelescope_module_filter.filters.attribute import (
     EventAttributeFilter,
     ObjectAttributeFilter,
 )
+from ocelescope_module_filter.filters.e2o_object import E2OObjectFilter
 
 FILTER_SOURCE = "FilterV1"
 
@@ -69,6 +70,7 @@ NativeFilter: TypeAlias = Annotated[
     | EventAttributeFilter
     | ObjectAttributeFilter
     | E2OCountFilter
+    | E2OObjectFilter
     | O2OCountFilter,
     Field(discriminator="type"),
 ]
