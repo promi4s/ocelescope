@@ -211,14 +211,14 @@ catalogs:
       specifier: ^4.7.0
       version: 4.7.0
     '@ocelescope/alignments':
-      specifier: ^0.11.0
-      version: 0.11.1
+      specifier: ^0.13.0
+      version: 0.13.0
     '@ocelescope/ocelot':
-      specifier: ^0.8.0
-      version: 0.8.0
+      specifier: ^0.13.0
+      version: 0.13.0
     '@ocelescope/ocpn-editor':
-      specifier: ^0.11.0
-      version: 0.11.1
+      specifier: ^0.13.0
+      version: 0.13.0
     '@r4pm/components':
       specifier: ^0.4.0
       version: 0.4.1
@@ -376,7 +376,7 @@ importers:
     dependencies:
       '@ocelescope/alignments':
         specifier: 'catalog:'
-        version: 0.11.1(@mantine/core@9.7.5)(@mantine/hooks@9.7.5)(@mantine/notifications@9.7.5)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@ocelescope/resources@src+frontend+packages+resources)(@r4pm/components@0.4.1)(@tanstack/react-query@5.107.1)(@xyflow/react@12.12.1)(axios@1.21.0)(lucide-react@1.70.0)(next@16.4.5)(react-dom@19.3.1)(react@19.3.1)
+        version: 0.13.0(@mantine/core@9.7.5)(@mantine/hooks@9.7.5)(@mantine/notifications@9.7.5)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@ocelescope/resources@src+frontend+packages+resources)(@r4pm/components@0.4.1)(@tanstack/react-query@5.107.1)(@xyflow/react@12.12.1)(axios@1.21.0)(lucide-react@1.70.0)(next@16.4.5)(react-dom@19.3.1)(react@19.3.1)
       '@ocelescope/api-base':
         specifier: workspace:^
         version: link:../packages/api/base
@@ -400,10 +400,10 @@ importers:
         version: link:../modules/management
       '@ocelescope/ocelot':
         specifier: 'catalog:'
-        version: 0.8.0(@dagrejs/dagre@3.1.3)(@mantine/core@9.7.5)(@mantine/hooks@9.7.5)(@ocelescope/api-base@src+frontend+packages+api+base)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@tanstack/react-query@5.107.1)(@xyflow/react@12.12.1)(axios@1.21.0)(dayjs@1.11.23)(elkjs@0.12.1)(file-saver@2.0.5)(html-to-image@1.11.13)(lucide-react@1.70.0)(mantine-datatable@9.4.0)(react-dom@19.3.1)(react@19.3.1)(recharts@3.10.1)
+        version: 0.13.0(@dagrejs/dagre@3.1.3)(@mantine/core@9.7.5)(@mantine/hooks@9.7.5)(@ocelescope/api-base@src+frontend+packages+api+base)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@tanstack/react-query@5.107.1)(@xyflow/react@12.12.1)(axios@1.21.0)(dayjs@1.11.23)(elkjs@0.12.1)(file-saver@2.0.5)(html-to-image@1.11.13)(lucide-react@1.70.0)(mantine-datatable@9.4.0)(react-dom@19.3.1)(react@19.3.1)
       '@ocelescope/ocpn-editor':
         specifier: 'catalog:'
-        version: 0.11.1(@mantine/core@9.7.5)(@mantine/hooks@9.7.5)(@mantine/notifications@9.7.5)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@ocelescope/resources@src+frontend+packages+resources)(@r4pm/components@0.4.1)(@tanstack/react-query@5.107.1)(@xyflow/react@12.12.1)(axios@1.21.0)(lucide-react@1.70.0)(react-dom@19.3.1)(react@19.3.1)
+        version: 0.13.0(@mantine/core@9.7.5)(@mantine/hooks@9.7.5)(@mantine/notifications@9.7.5)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@ocelescope/resources@src+frontend+packages+resources)(@r4pm/components@0.4.1)(@tanstack/react-query@5.107.1)(@xyflow/react@12.12.1)(axios@1.21.0)(lucide-react@1.70.0)(react-dom@19.3.1)(react@19.3.1)
       '@ocelescope/plugin':
         specifier: workspace:^
         version: link:../modules/plugin
@@ -2136,55 +2136,54 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@ocelescope/alignments@0.11.1':
-    resolution: {integrity: sha512-QZb2kkMQU6nwX6moTf7g9gbNs2LwzQ8CwxhCvhmDOdOhnR2LTvvfCumdegHl23LdOzxYttMQsDm9D3JCFlV91Q==}
+  '@ocelescope/alignments@0.13.0':
+    resolution: {integrity: sha512-eBh13NhEyLdWrYE3YC7+dGwnuojAgzuSuwT3YeNBkh+eu/j8wB5cQq8EzQ2Hcr6JlQZEr9N+QiWVVBDj8AhrAA==}
     peerDependencies:
       '@mantine/core': ^9.7.4
       '@mantine/hooks': ^9.7.4
       '@mantine/notifications': ^9.7.4
-      '@ocelescope/api-client': ^0.12.0
-      '@ocelescope/core': ^0.12.0
-      '@ocelescope/resources': ^0.12.0
+      '@ocelescope/api-client': ^0.13.0
+      '@ocelescope/core': ^0.13.0
+      '@ocelescope/resources': ^0.13.0
       '@r4pm/components': ^0.4.0
       '@tanstack/react-query': ^5.105.0
       '@xyflow/react': ^12.12.0
       axios: ^1.21.0
       lucide-react: ^1.63.0
-      next: 16.4.3
+      next: 16.4.5
       react: ^19.3.1
       react-dom: ^19.3.1
 
-  '@ocelescope/ocelot@0.8.0':
-    resolution: {integrity: sha512-thZZnXH+jUYIS9OQfwsEG095iDrYHHCXYy18vDfGmckhtLThf+xjJwP91lx1LPHXH38z1NUVc4ncWTdxIPlHbA==}
+  '@ocelescope/ocelot@0.13.0':
+    resolution: {integrity: sha512-jWuptrxLILS6aomHhBW1J8aCR9SRRUjxwR4AbggALFZkBxdjumk3YmJNVovVVEHmR7vp/vBsA4IqWN+fQbigJQ==}
     peerDependencies:
-      '@dagrejs/dagre': ^3.0.0
-      '@mantine/core': ^9.5.1
-      '@mantine/hooks': ^9.5.1
-      '@ocelescope/api-base': ^0.8.0
-      '@ocelescope/api-client': ^0.8.0
-      '@ocelescope/core': ^0.8.0
-      '@tanstack/react-query': ^5.90.21
-      '@xyflow/react': ^12.11.3
-      axios: ^1.20.0
+      '@dagrejs/dagre': ^3.1.3
+      '@mantine/core': ^9.7.4
+      '@mantine/hooks': ^9.7.4
+      '@ocelescope/api-base': ^0.13.0
+      '@ocelescope/api-client': ^0.13.0
+      '@ocelescope/core': ^0.13.0
+      '@tanstack/react-query': ^5.105.0
+      '@xyflow/react': ^12.12.0
+      axios: ^1.21.0
       dayjs: ^1.11.23
       elkjs: ^0.12.0
       file-saver: ^2.0.5
       html-to-image: 1.11.13
-      lucide-react: ^1.0.0
+      lucide-react: ^1.63.0
       mantine-datatable: ^9.4.0
-      react: ^19.3.0
-      react-dom: ^19.3.0
-      recharts: ^3.2.1
+      react: ^19.3.1
+      react-dom: ^19.3.1
 
-  '@ocelescope/ocpn-editor@0.11.1':
-    resolution: {integrity: sha512-o8KjagvCQ8G3cdc3XirLHlnvvvauq94HnXop37wN2/dXIGnkOKBLMIrG2ZEuoXGVkUYdxBGILQr1Pmj2Tz0oHg==}
+  '@ocelescope/ocpn-editor@0.13.0':
+    resolution: {integrity: sha512-4IWuxr7C1WMqGF3SweOAzQ+PDdSR/d0irhpqdWWg/BFMqZUVec2rZhr27b5ZafKzq8761RZKrN47rMBgzYp/AA==}
     peerDependencies:
       '@mantine/core': ^9.7.4
       '@mantine/hooks': ^9.7.4
       '@mantine/notifications': ^9.7.4
-      '@ocelescope/api-client': ^0.11.0
-      '@ocelescope/core': ^0.11.0
-      '@ocelescope/resources': ^0.11.0
+      '@ocelescope/api-client': ^0.13.0
+      '@ocelescope/core': ^0.13.0
+      '@ocelescope/resources': ^0.13.0
       '@r4pm/components': ^0.4.0
       '@tanstack/react-query': ^5.105.0
       '@xyflow/react': ^12.12.0
@@ -3031,20 +3030,6 @@ packages:
       '@types/react-dom':
         optional: true
 
-  '@reduxjs/toolkit@2.14.0':
-    resolution: {integrity: sha512-m/PxMwRe0xLL6XUsAgy0YjInklHcfi9uMwFhJk+QINqjxqPvyc89T5cMjszA5bDmTE0gwGc7zr9LRO4gL+mhaw==}
-    peerDependencies:
-      '@types/react': '*'
-      react: ^16.9.0 || ^17.0.0 || ^18 || ^19
-      react-redux: ^7.2.1 || ^8.1.3 || ^9.0.0
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      react:
-        optional: true
-      react-redux:
-        optional: true
-
   '@rjsf/core@6.11.1':
     resolution: {integrity: sha512-2kH39lspUUQf552l+vSTj9vnwdv1gSOyDKqSDmFuTo16+92zbJ381knrQpk3KKowjp/sbxu4qPiBptgXH6i4UQ==}
     engines: {node: '>=20'}
@@ -3291,12 +3276,6 @@ packages:
     peerDependencies:
       solid-js: ^1.6.12
 
-  '@standard-schema/spec@1.1.0':
-    resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
-
-  '@standard-schema/utils@0.3.0':
-    resolution: {integrity: sha512-e7Mew686owMaPJVNNLs55PUvgz371nKgwsc4vxE49zsODpJEnxgxRo2y/OKrqueavXgZNMDVj3DdHFlaSAeU8g==}
-
   '@streetsidesoftware/unindent@1.0.1':
     resolution: {integrity: sha512-ZXfg7MT3AT9ZOq/hgzbqNc01zVPG+PFkr+kbB2OHlMcNrtvK10ZPkNgy38MqTErjNeajh4VG1sSSv5zIyjOXxg==}
     engines: {node: '>=22.18.0'}
@@ -3390,38 +3369,17 @@ packages:
   '@tybys/wasm-util@0.10.4':
     resolution: {integrity: sha512-W3c4gRigFS0T/Ma4qIYF3GDAc5AQdHb1yL5znJT1Zv1YaD9Kitx656wBjvr19qbiosmZT8lWDM5BEMynUqX65A==}
 
-  '@types/d3-array@3.2.2':
-    resolution: {integrity: sha512-hOLWVbm7uRza0BYXpIIW5pxfrKe0W+D5lrFiAEYR+pb6w3N2SwSMaJbXdUfSEv+dT4MfHBLtn5js0LAWaO6otw==}
-
   '@types/d3-color@3.1.3':
     resolution: {integrity: sha512-iO90scth9WAbmgv7ogoq57O9YpKmFBbmoEoCHDB2xMBY0+/KVrqAaCDyCE16dUspeOvIxFFRI+0sEtqDqy2b4A==}
 
   '@types/d3-drag@3.0.7':
     resolution: {integrity: sha512-HE3jVKlzU9AaMazNufooRJ5ZpWmLIoc90A37WU2JMmeq28w1FQqCZswHZ3xR+SuxYftzHq6WU6KJHvqxKzTxxQ==}
 
-  '@types/d3-ease@3.0.2':
-    resolution: {integrity: sha512-NcV1JjO5oDzoK26oMzbILE6HW7uVXOHLQvHshBUW4UMdZGfiY6v5BeQwh9a9tCzv+CeefZQHJt5SRgK154RtiA==}
-
   '@types/d3-interpolate@3.0.4':
     resolution: {integrity: sha512-mgLPETlrpVV1YRJIglr4Ez47g7Yxjl1lj7YKsiMCb27VJH9W8NVM6Bb9d8kkpG/uAQS5AmbA48q2IAolKKo1MA==}
 
-  '@types/d3-path@3.1.1':
-    resolution: {integrity: sha512-VMZBYyQvbGmWyWVea0EHs/BwLgxc+MKi1zLDCONksozI4YJMcTt8ZEuIR4Sb1MMTE8MMW49v0IwI5+b7RmfWlg==}
-
-  '@types/d3-scale@4.0.9':
-    resolution: {integrity: sha512-dLmtwB8zkAeO/juAMfnV+sItKjlsw2lKdZVVy6LRr0cBmegxSABiLEpGVmSJJ8O08i4+sGR6qQtb6WtuwJdvVw==}
-
   '@types/d3-selection@3.0.12':
     resolution: {integrity: sha512-Qe/KWYhEiIIxGs7HrAAjMfShxKldx19SJtr5zu53f3afPsdZNz7HHtdTLXo/kqeiWNXVycI24kSnfzBYkTzpgw==}
-
-  '@types/d3-shape@3.2.0':
-    resolution: {integrity: sha512-kVd74ta9eof3eJOvbNd1vGKS/XERRyQbT26Og63hIsvDO84cjD5gEOhsXf26w3FSoNlPVz84DOFcKv/oou+fMw==}
-
-  '@types/d3-time@3.0.4':
-    resolution: {integrity: sha512-yuzZug1nkAAaBlBBikKZTgzCeA+k1uy4ZFwWANOfKw5z5LRhV0gNA7gNkKm7HoK+HRN0wX3EkxGk0fpbWhmB7g==}
-
-  '@types/d3-timer@3.0.2':
-    resolution: {integrity: sha512-Ps3T8E8dZDam6fUyNiMkekK3XUsaUEik+idO9/YjPtfj2qruF8tFBXS7XhtE4iIXBLxhmLjP3SXpLhVf21I9Lw==}
 
   '@types/d3-transition@3.0.9':
     resolution: {integrity: sha512-uZS5shfxzO3rGlu0cC3bjmMFKsXv+SmZZcgp0KD22ts4uGXp5EVYGzu/0YdwZeKmddhcAccYtREJKkPfXkZuCg==}
@@ -3466,9 +3424,6 @@ packages:
 
   '@types/trusted-types@2.0.7':
     resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
-
-  '@types/use-sync-external-store@0.0.6':
-    resolution: {integrity: sha512-zFDAD+tlpf2r4asuHEj0XH6pY6i0g5NeAHPn+15wk3BV6JA69eERFXC1gyGThDkVa1zCyKr5jox1+2LbV/AMLg==}
 
   '@x0k/json-schema-merge@1.1.0':
     resolution: {integrity: sha512-QA8fHqP7e+Lvi4ih8X9r1ZnITC2Lo0uhh5qpP8yM7l6HYs7KljtMfoljSRh52jfU55oXSyO4/GhMyjqh8rQjWQ==}
@@ -3819,10 +3774,6 @@ packages:
   d3-array@2.12.1:
     resolution: {integrity: sha512-B0ErZK/66mHtEsR1TkPEEkwdy+WDesimkM5gpZr5Dsg54BiTA5RXtYW5qTLIAcekaS9xfZrzBLF/OAkB3Qn1YQ==}
 
-  d3-array@3.2.5:
-    resolution: {integrity: sha512-Th8qGXoBalmWsstpkuhmBuTsBQIFqYOJtjlBvNVvBfJ8E3uYusBUwUR8HU20U0qKKQkgCvKyR1YjiozWadk5QA==}
-    engines: {node: '>=12'}
-
   d3-collection@1.0.7:
     resolution: {integrity: sha512-ii0/r5f4sjKNTfh84Di+DpztYwqKhEyUlKoPrzUFfeSkWxjW49xU2QzO9qrPrNkpdI0XJkfzvmTu8V2Zylln6A==}
 
@@ -3851,10 +3802,6 @@ packages:
   d3-format@1.4.5:
     resolution: {integrity: sha512-J0piedu6Z8iB6TbIGfZgDzfXxUFN3qQRMofy2oPdXzQibYGqPB/9iMcxr/TGalU+2RsyDO+U4f33id8tbnSRMQ==}
 
-  d3-format@3.1.3:
-    resolution: {integrity: sha512-+F+/49swqmGuQJmSKnVMIDH/QkEFV5li9QRj0xm/KhyAUBv099O5PrvpQFxBp24PYph17Mnvt9mjKQV0ii0nMA==}
-    engines: {node: '>=12'}
-
   d3-geo-projection@2.9.0:
     resolution: {integrity: sha512-ZULvK/zBn87of5rWAfFMc9mJOipeSo57O+BBitsKIXmU4rTVAnX1kSsJkE0R+TxY8pGNoM1nbyRRE7GYHhdOEQ==}
     hasBin: true
@@ -3872,16 +3819,8 @@ packages:
   d3-path@1.0.9:
     resolution: {integrity: sha512-VLaYcn81dtHVTjEHd8B+pbe9yHWpXKZUC87PzoFmsFrJqgFwDe/qxfp5MlfsfM1V5E/iVt0MmEbWQ7FVIXh/bg==}
 
-  d3-path@3.1.1:
-    resolution: {integrity: sha512-jsbgV8zIT38ReB9O7X7gcLndTQRONSqNNd+oGIaTBdUug4r5jFmp0N6RY9R5GWbdUDucn0qoTGyfjapT4tDhcg==}
-    engines: {node: '>=12'}
-
   d3-quadtree@1.0.7:
     resolution: {integrity: sha512-RKPAeXnkC59IDGD0Wu5mANy0Q2V28L+fNe65pOCXVdVuTJS3WPKaJlFHer32Rbh9gIo9qMuJXio8ra4+YmIymA==}
-
-  d3-scale@4.0.3:
-    resolution: {integrity: sha512-66cWobCNzcMvlfoaDHCxuIv9TBUWG1BLOWdv9kHHFuCr1JdqAWPvTmsaEYDD5NRMyWZ5+7u0GqiCDfMXMqh3hg==}
-    engines: {node: '>=12'}
 
   d3-selection@3.0.1:
     resolution: {integrity: sha512-ODSf35vqCrlCfp7hrm0eZjvOosSXSYLjqvIlhMBV9q9VOx7EBJG6pc+uXBswEZNJgCGJ+qnKYcWutbZDIxe/Xg==}
@@ -3890,23 +3829,11 @@ packages:
   d3-shape@1.3.7:
     resolution: {integrity: sha512-EUkvKjqPFUAZyOlhY5gzCxCeI0Aep04LwIRpsZ/mLFelJiUfnK56jo5JMDSE7yyP2kLSb6LtF+S5chMk7uqPqw==}
 
-  d3-shape@3.2.1:
-    resolution: {integrity: sha512-dm2o+lbKdzg9tY7GEag/dB9hcbodLfwkE/DkvqbELJXaMz0yKzWWhZqhbI7CKubukA7HnRyz0avdtvi7EPxPvw==}
-    engines: {node: '>=12'}
-
   d3-time-format@2.3.0:
     resolution: {integrity: sha512-guv6b2H37s2Uq/GefleCDtbe0XZAuy7Wa49VGkPVPMfLL9qObgBST3lEHJBMUp8S7NdLQAGIvr2KXk8Hc98iKQ==}
 
-  d3-time-format@4.1.1:
-    resolution: {integrity: sha512-22XaqjyCjpqgda20erhsOjGmC3vvYwTNYniKAd45W5UWLDF43moeOuV9qYpRqobIlsnK0UhnKZjUUJm3VgORUA==}
-    engines: {node: '>=12'}
-
   d3-time@1.1.0:
     resolution: {integrity: sha512-Xh0isrZ5rPYYdqhAVk8VLnMEidhz5aP7htAADH6MfzgmmicPkTo8LhkLxci61/lCB7n7UmE3bN0leRt+qvkLxA==}
-
-  d3-time@3.1.1:
-    resolution: {integrity: sha512-Ze7rjrhMzdeulh0/hjcfFj7XLAHOfowtEMfsoG6DU866HPynQNW7Wfen6hzXcqKTv8XzxvF6Hzr5XD6bMHr2ug==}
-    engines: {node: '>=12'}
 
   d3-timer@1.0.10:
     resolution: {integrity: sha512-B1JDm0XDaQC+uvo4DT79H0XmBskgS3l6Ve+1SBCfxgmtIb1AVrPIoqd+nPSv+loMX8szQ0sVUhGngL7D5QPiXw==}
@@ -3948,9 +3875,6 @@ packages:
     peerDependenciesMeta:
       supports-color:
         optional: true
-
-  decimal.js-light@2.5.1:
-    resolution: {integrity: sha512-qIMFpTMZmny+MMIitAB6D7iVPEorVw6YQRWkvarTkT4tBeSLLiHzcwj6q0MmYSFCiVpiqPJTJEYIrpcPzVEIvg==}
 
   defined@1.0.1:
     resolution: {integrity: sha512-hsBd2qSVCRE+5PmNdHt1uzyrFu5d3RwmFDKzyNZMFq/EwDNJF7Ee5+D5oEKF0hU6LhtoUF1macFvOe4AskQC1Q==}
@@ -4065,9 +3989,6 @@ packages:
     resolution: {integrity: sha512-j6vWzfrGVfyXxge+O0x5sh6cvxAog0a/4Rdd2K36zCMV5eJ+/+tOAngRO8cODMNWbVRdVlmGZQL2YS3yR8bIUA==}
     engines: {node: '>= 0.4'}
 
-  es-toolkit@1.53.2:
-    resolution: {integrity: sha512-iUqZ+NlwH4jUgRmXZUxFBsV/9762TQEa1O4IXLFBmDEjVHScBytKuseX23I0+v9ShZ5MYxEx6WKNzm6IPnex8g==}
-
   es5-ext@0.10.64:
     resolution: {integrity: sha512-p2snDhiLaXe6dahss1LddxqEm+SkuDvV8dnIQG0MWjyHpcMNfXKPE+/Cc0y+PhxJX3A4xGNeFCj5oc0BUh6deg==}
     engines: {node: '>=0.10'}
@@ -4115,9 +4036,6 @@ packages:
   event-emitter@0.3.7:
     resolution: {integrity: sha512-R9h/VgWniW4ZRqx3Pd2/n3aGGbPmWilvHwzgrc6YQcFd2HzwPsIFLbrtfoU0hWorKUowd5Iqr5x3ZNv5H6bP+w==}
     engines: {node: '>=0.12'}
-
-  eventemitter3@5.0.4:
-    resolution: {integrity: sha512-mlsTRyGaPBjPedk6Bvw+aqbsXDtoAyAzm5MO7JgU+yVRyMQ5O8bD4Kcci7BS85f93veegeCPkL8R4GLClnjLFw==}
 
   events@3.3.0:
     resolution: {integrity: sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==}
@@ -4378,10 +4296,6 @@ packages:
 
   internmap@1.0.1:
     resolution: {integrity: sha512-lDB5YccMydFBtasVtxnZ3MRBHuaoE8GKsppq+EchKL2U4nK/DmEpPHNH8MZe5HkMtpSiTSOZwfN0tzYjO/lJEw==}
-
-  internmap@2.0.3:
-    resolution: {integrity: sha512-5Hh7Y1wQbvY5ooGgPbDaL5iYLAPzMTUrjMulskHLH6wnv/A+1q5rgEaiuqEjB+oxGXIVZs1FF+R/KPN3ZSQYYg==}
-    engines: {node: '>=12'}
 
   iobuffer@5.4.0:
     resolution: {integrity: sha512-DRebOWuqDvxunfkNJAlc3IzWIPD5xVxwUNbHr7xKB8E6aLJxIPfNX3CoMJghcFjpv6RWQsrcJbghtEwSPoJqMA==}
@@ -4927,18 +4841,6 @@ packages:
       plotly.js: '>=3.0.0'
       react: ^18.0.0 || ^19.0.0
 
-  react-redux@9.3.1:
-    resolution: {integrity: sha512-vxMLT0lalUjbZPkoTepWyKAZbjIIFssNx/CEL9lTfwQBU6XpkGSmCNdcCIrkOBUgB68uftZMnbXVb6DwGnhRKQ==}
-    peerDependencies:
-      '@types/react': ^18.2.25 || ^19
-      react: ^18.0 || ^19
-      redux: ^5.0.0
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      redux:
-        optional: true
-
   react-remove-scroll-bar@2.3.8:
     resolution: {integrity: sha512-9r+yi9+mgU33AKcj6IbT9oRCO78WriSj6t/cF8DWBZJ9aOGPOTEDvdUDz1FwKim7QXWwmHqtdHnRJfhAxEG46Q==}
     engines: {node: '>=10'}
@@ -4996,22 +4898,6 @@ packages:
     resolution: {integrity: sha512-Kko+Y5XQ6fM+Ce3dq3m9YGxnacYZYl9cA1wZjaF3Vbry2L3i1qVg8+CAgNPsXRArPMUMCaOR7oa9Nqntc43JKA==}
     engines: {node: '>= 20.19.0'}
 
-  recharts@3.10.1:
-    resolution: {integrity: sha512-QXFrvt6IVcw7eeZCoyXTwkIJAX3Dv1nyVhMicXJ47GsGDDpcN8z6o644DibE9XjpBTThtsomLKnTV6lc+cVFUA==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-      react-dom: ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-      react-is: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-
-  redux-thunk@3.1.0:
-    resolution: {integrity: sha512-NW2r5T6ksUKXCabzhL9z+h206HQw/NJkcLm1GPImRQ8IzfXwRGqjVhKJGauHirT0DAuyy6hjdnMZaRoAcy0Klw==}
-    peerDependencies:
-      redux: ^5.0.0
-
-  redux@5.0.1:
-    resolution: {integrity: sha512-M9/ELqF6fy8FwmkpnF0S3YKOqMyoWJ4+CS5Efg2ct3oY9daQvd/Pc71FpGZsVsbl3Cpb+IIcjBDUnnyBdQbq4w==}
-
   regenerator-runtime@0.13.11:
     resolution: {integrity: sha512-kY1AZVr2Ra+t+piVaJ4gxaFaReZVH40AKNo7UCX6W+dEwBo/2oZJzqfuN1qLq1oL45o56cPaTXELwrTh8Fpggg==}
 
@@ -5036,9 +4922,6 @@ packages:
   require-from-string@2.0.2:
     resolution: {integrity: sha512-Xf0nWe6RseziFMu+Ap9biiUbmplq6S9/p+7w7YXP/JBHhrUDDUhwa+vANyubuqfZWTveU//DYVGsDG7RKL/vEw==}
     engines: {node: '>=0.10.0'}
-
-  reselect@5.2.0:
-    resolution: {integrity: sha512-AgZ3UOZm3YndfrJ4OYjgrT7bmCm/1iqkjvEfH/oYjzh6PD2qw4QuT3jjnXIrpdt4MTpMXclMT3lXbmRY+XRakw==}
 
   resolve-from@5.0.0:
     resolution: {integrity: sha512-qYg9KP24dD5qka9J47d0aVky0N+b4fTU89LN9iDnjB5waksiC49rvMB0PrUJQGoTmH50XPiqOvAjDfaijGxYZw==}
@@ -5280,9 +5163,6 @@ packages:
   through2@2.0.5:
     resolution: {integrity: sha512-/mrRod8xqpA+IHSLyGCQ2s8SPHiCDEeQJSep1jqLYeEUClOFG2Qsh+4FU6G9VeqpZnGW/Su8LQGc4YKni5rYSQ==}
 
-  tiny-invariant@1.3.3:
-    resolution: {integrity: sha512-+FbBPE1o9QAYvviau/qC5SE3caw21q3xkvWKBtja5vgqOWIHHJ3ioaq1VPfn/Szqctz2bU/oYeKd9/z5BL+PVg==}
-
   tinyexec@1.3.1:
     resolution: {integrity: sha512-GCvB3aoys96IuDFBMcTB46JOR6mdMtAToqwiW8JlWhsoh1mhHi/xn9ss/Dg7N555GiJyEt2qzoG/NHCwM6h1EA==}
     engines: {node: '>=18'}
@@ -5426,9 +5306,6 @@ packages:
   verkit@0.5.0:
     resolution: {integrity: sha512-u4J1hr6Y+C/hit34GwL3eIcUf3wngT8TlYUjK7tk0jxydKLAq3sYvifjdTDA6U3KCKRcQCQDGf/srjxfZF3l7g==}
     engines: {node: '>=18.12.0'}
-
-  victory-vendor@37.4.1:
-    resolution: {integrity: sha512-geV4p2GVfVM9lgm9ZRS3pvsbAPS+BUGhM9W9nPzPHTKi+/+KjNrFXdgP6KkG+XspNZuvcXmchcrtklfuQ4gniw==}
 
   vscode-languageserver-textdocument@1.0.16:
     resolution: {integrity: sha512-qeNEuOi9a3qkqRf7Gfez2WL2VwlBTLCNekHBGO9kxPVUp9XuY15yfTJ9jwvOwKI0I2MhUUfZq95NSp+LK1CLQg==}
@@ -6237,7 +6114,7 @@ snapshots:
   '@next/swc-win32-x64-msvc@16.4.5':
     optional: true
 
-  '@ocelescope/alignments@0.11.1(@mantine/core@9.7.5)(@mantine/hooks@9.7.5)(@mantine/notifications@9.7.5)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@ocelescope/resources@src+frontend+packages+resources)(@r4pm/components@0.4.1)(@tanstack/react-query@5.107.1)(@xyflow/react@12.12.1)(axios@1.21.0)(lucide-react@1.70.0)(next@16.4.5)(react-dom@19.3.1)(react@19.3.1)':
+  '@ocelescope/alignments@0.13.0(@mantine/core@9.7.5)(@mantine/hooks@9.7.5)(@mantine/notifications@9.7.5)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@ocelescope/resources@src+frontend+packages+resources)(@r4pm/components@0.4.1)(@tanstack/react-query@5.107.1)(@xyflow/react@12.12.1)(axios@1.21.0)(lucide-react@1.70.0)(next@16.4.5)(react-dom@19.3.1)(react@19.3.1)':
     dependencies:
       '@mantine/core': 9.7.5(@mantine/hooks@9.7.5)(@types/react@19.3.0)(react-dom@19.3.1)(react@19.3.1)
       '@mantine/hooks': 9.7.5(react@19.3.1)
@@ -6254,7 +6131,7 @@ snapshots:
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
 
-  '@ocelescope/ocelot@0.8.0(@dagrejs/dagre@3.1.3)(@mantine/core@9.7.5)(@mantine/hooks@9.7.5)(@ocelescope/api-base@src+frontend+packages+api+base)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@tanstack/react-query@5.107.1)(@xyflow/react@12.12.1)(axios@1.21.0)(dayjs@1.11.23)(elkjs@0.12.1)(file-saver@2.0.5)(html-to-image@1.11.13)(lucide-react@1.70.0)(mantine-datatable@9.4.0)(react-dom@19.3.1)(react@19.3.1)(recharts@3.10.1)':
+  '@ocelescope/ocelot@0.13.0(@dagrejs/dagre@3.1.3)(@mantine/core@9.7.5)(@mantine/hooks@9.7.5)(@ocelescope/api-base@src+frontend+packages+api+base)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@tanstack/react-query@5.107.1)(@xyflow/react@12.12.1)(axios@1.21.0)(dayjs@1.11.23)(elkjs@0.12.1)(file-saver@2.0.5)(html-to-image@1.11.13)(lucide-react@1.70.0)(mantine-datatable@9.4.0)(react-dom@19.3.1)(react@19.3.1)':
     dependencies:
       '@dagrejs/dagre': 3.1.3
       '@mantine/core': 9.7.5(@mantine/hooks@9.7.5)(@types/react@19.3.0)(react-dom@19.3.1)(react@19.3.1)
@@ -6273,9 +6150,8 @@ snapshots:
       mantine-datatable: 9.4.0(@mantine/core@9.7.5)(@mantine/hooks@9.7.5)(clsx@2.1.1)(react-dom@19.3.1)(react@19.3.1)
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
-      recharts: 3.10.1(@types/react@19.3.0)(react-dom@19.3.1)(react-is@18.3.1)(react@19.3.1)(redux@5.0.1)
 
-  '@ocelescope/ocpn-editor@0.11.1(@mantine/core@9.7.5)(@mantine/hooks@9.7.5)(@mantine/notifications@9.7.5)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@ocelescope/resources@src+frontend+packages+resources)(@r4pm/components@0.4.1)(@tanstack/react-query@5.107.1)(@xyflow/react@12.12.1)(axios@1.21.0)(lucide-react@1.70.0)(react-dom@19.3.1)(react@19.3.1)':
+  '@ocelescope/ocpn-editor@0.13.0(@mantine/core@9.7.5)(@mantine/hooks@9.7.5)(@mantine/notifications@9.7.5)(@ocelescope/api-client@src+frontend+packages+api+client)(@ocelescope/core@src+frontend+packages+core)(@ocelescope/resources@src+frontend+packages+resources)(@r4pm/components@0.4.1)(@tanstack/react-query@5.107.1)(@xyflow/react@12.12.1)(axios@1.21.0)(lucide-react@1.70.0)(react-dom@19.3.1)(react@19.3.1)':
     dependencies:
       '@mantine/core': 9.7.5(@mantine/hooks@9.7.5)(@types/react@19.3.0)(react-dom@19.3.1)(react@19.3.1)
       '@mantine/hooks': 9.7.5(react@19.3.1)
@@ -7225,19 +7101,6 @@ snapshots:
       '@types/react': 19.3.0
       '@types/react-dom': 19.3.0(@types/react@19.3.0)
 
-  '@reduxjs/toolkit@2.14.0(@types/react@19.3.0)(react-redux@9.3.1)(react@19.3.1)':
-    dependencies:
-      '@standard-schema/spec': 1.1.0
-      '@standard-schema/utils': 0.3.0
-      immer: 11.2.9
-      redux: 5.0.1
-      redux-thunk: 3.1.0(redux@5.0.1)
-      reselect: 5.2.0
-    optionalDependencies:
-      '@types/react': 19.3.0
-      react: 19.3.1
-      react-redux: 9.3.1(@types/react@19.3.0)(react@19.3.1)(redux@5.0.1)
-
   '@rjsf/core@6.11.1(@rjsf/utils@6.11.1)(react@19.3.1)(solid-js@1.9.18)':
     dependencies:
       '@rjsf/utils': 6.11.1(react@19.3.1)
@@ -7457,10 +7320,6 @@ snapshots:
     dependencies:
       solid-js: 1.9.18
 
-  '@standard-schema/spec@1.1.0': {}
-
-  '@standard-schema/utils@0.3.0': {}
-
   '@streetsidesoftware/unindent@1.0.1': {}
 
   '@swc/helpers@0.5.23':
@@ -7567,35 +7426,17 @@ snapshots:
       tslib: 2.9.1
     optional: true
 
-  '@types/d3-array@3.2.2': {}
-
   '@types/d3-color@3.1.3': {}
 
   '@types/d3-drag@3.0.7':
     dependencies:
       '@types/d3-selection': 3.0.12
 
-  '@types/d3-ease@3.0.2': {}
-
   '@types/d3-interpolate@3.0.4':
     dependencies:
       '@types/d3-color': 3.1.3
 
-  '@types/d3-path@3.1.1': {}
-
-  '@types/d3-scale@4.0.9':
-    dependencies:
-      '@types/d3-time': 3.0.4
-
   '@types/d3-selection@3.0.12': {}
-
-  '@types/d3-shape@3.2.0':
-    dependencies:
-      '@types/d3-path': 3.1.1
-
-  '@types/d3-time@3.0.4': {}
-
-  '@types/d3-timer@3.0.2': {}
 
   '@types/d3-transition@3.0.9':
     dependencies:
@@ -7637,8 +7478,6 @@ snapshots:
 
   '@types/trusted-types@2.0.7':
     optional: true
-
-  '@types/use-sync-external-store@0.0.6': {}
 
   '@x0k/json-schema-merge@1.1.0':
     dependencies:
@@ -8015,10 +7854,6 @@ snapshots:
     dependencies:
       internmap: 1.0.1
 
-  d3-array@3.2.5:
-    dependencies:
-      internmap: 2.0.3
-
   d3-collection@1.0.7: {}
 
   d3-color@3.1.1: {}
@@ -8043,8 +7878,6 @@ snapshots:
 
   d3-format@1.4.5: {}
 
-  d3-format@3.1.3: {}
-
   d3-geo-projection@2.9.0:
     dependencies:
       commander: 2.20.3
@@ -8064,17 +7897,7 @@ snapshots:
 
   d3-path@1.0.9: {}
 
-  d3-path@3.1.1: {}
-
   d3-quadtree@1.0.7: {}
-
-  d3-scale@4.0.3:
-    dependencies:
-      d3-array: 3.2.5
-      d3-format: 3.1.3
-      d3-interpolate: 3.0.2
-      d3-time: 3.1.1
-      d3-time-format: 4.1.1
 
   d3-selection@3.0.1: {}
 
@@ -8082,23 +7905,11 @@ snapshots:
     dependencies:
       d3-path: 1.0.9
 
-  d3-shape@3.2.1:
-    dependencies:
-      d3-path: 3.1.1
-
   d3-time-format@2.3.0:
     dependencies:
       d3-time: 1.1.0
 
-  d3-time-format@4.1.1:
-    dependencies:
-      d3-time: 3.1.1
-
   d3-time@1.1.0: {}
-
-  d3-time@3.1.1:
-    dependencies:
-      d3-array: 3.2.5
 
   d3-timer@1.0.10: {}
 
@@ -8135,8 +7946,6 @@ snapshots:
   debug@4.4.3:
     dependencies:
       ms: 2.1.3
-
-  decimal.js-light@2.5.1: {}
 
   defined@1.0.1: {}
 
@@ -8242,8 +8051,6 @@ snapshots:
       has-tostringtag: 1.0.2
       hasown: 2.0.4
 
-  es-toolkit@1.53.2: {}
-
   es5-ext@0.10.64:
     dependencies:
       es6-iterator: 2.0.3
@@ -8326,8 +8133,6 @@ snapshots:
       d: 1.0.2
       es5-ext: 0.10.64
       type: 2.7.3
-
-  eventemitter3@5.0.4: {}
 
   events@3.3.0: {}
 
@@ -8628,7 +8433,8 @@ snapshots:
     dependencies:
       safer-buffer: 2.1.2
 
-  immer@11.2.9: {}
+  immer@11.2.9:
+    optional: true
 
   import-fresh@4.0.1: {}
 
@@ -8641,8 +8447,6 @@ snapshots:
   ini@6.0.0: {}
 
   internmap@1.0.1: {}
-
-  internmap@2.0.3: {}
 
   iobuffer@5.4.0: {}
 
@@ -9197,15 +9001,6 @@ snapshots:
       plotly.js: 4.2.0
       react: 19.3.1
 
-  react-redux@9.3.1(@types/react@19.3.0)(react@19.3.1)(redux@5.0.1):
-    dependencies:
-      '@types/use-sync-external-store': 0.0.6
-      react: 19.3.1
-      use-sync-external-store: 1.7.0(react@19.3.1)
-    optionalDependencies:
-      '@types/react': 19.3.0
-      redux: 5.0.1
-
   react-remove-scroll-bar@2.3.8(@types/react@19.3.0)(react@19.3.1):
     dependencies:
       react: 19.3.1
@@ -9268,32 +9063,6 @@ snapshots:
 
   readdirp@5.1.1: {}
 
-  recharts@3.10.1(@types/react@19.3.0)(react-dom@19.3.1)(react-is@18.3.1)(react@19.3.1)(redux@5.0.1):
-    dependencies:
-      '@reduxjs/toolkit': 2.14.0(@types/react@19.3.0)(react-redux@9.3.1)(react@19.3.1)
-      clsx: 2.1.1
-      decimal.js-light: 2.5.1
-      es-toolkit: 1.53.2
-      eventemitter3: 5.0.4
-      immer: 11.2.9
-      react: 19.3.1
-      react-dom: 19.3.1(react@19.3.1)
-      react-is: 18.3.1
-      react-redux: 9.3.1(@types/react@19.3.0)(react@19.3.1)(redux@5.0.1)
-      reselect: 5.2.0
-      tiny-invariant: 1.3.3
-      use-sync-external-store: 1.7.0(react@19.3.1)
-      victory-vendor: 37.4.1
-    transitivePeerDependencies:
-      - '@types/react'
-      - redux
-
-  redux-thunk@3.1.0(redux@5.0.1):
-    dependencies:
-      redux: 5.0.1
-
-  redux@5.0.1: {}
-
   regenerator-runtime@0.13.11:
     optional: true
 
@@ -9350,8 +9119,6 @@ snapshots:
   remove-accents@0.5.0: {}
 
   require-from-string@2.0.2: {}
-
-  reselect@5.2.0: {}
 
   resolve-from@5.0.0: {}
 
@@ -9607,8 +9374,6 @@ snapshots:
       readable-stream: 2.3.8
       xtend: 4.0.2
 
-  tiny-invariant@1.3.3: {}
-
   tinyexec@1.3.1: {}
 
   tinyglobby@0.2.17:
@@ -9722,23 +9487,6 @@ snapshots:
     optional: true
 
   verkit@0.5.0: {}
-
-  victory-vendor@37.4.1:
-    dependencies:
-      '@types/d3-array': 3.2.2
-      '@types/d3-ease': 3.0.2
-      '@types/d3-interpolate': 3.0.4
-      '@types/d3-scale': 4.0.9
-      '@types/d3-shape': 3.2.0
-      '@types/d3-time': 3.0.4
-      '@types/d3-timer': 3.0.2
-      d3-array: 3.2.5
-      d3-ease: 3.0.2
-      d3-interpolate: 3.0.2
-      d3-scale: 4.0.3
-      d3-shape: 3.2.1
-      d3-time: 3.1.1
-      d3-timer: 3.0.2
 
   vscode-languageserver-textdocument@1.0.16: {}
 
