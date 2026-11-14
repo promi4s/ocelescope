@@ -242,7 +242,7 @@ catalogs:
       version: 5.107.1
     '@tsconfig/strictest':
       specifier: ^2.0.8
-      version: 2.0.8
+      version: 2.0.9
     '@tsdown/css':
       specifier: ^0.23.3
       version: 0.23.7
@@ -364,7 +364,7 @@ importers:
         version: 2.6.6
       '@tsconfig/strictest':
         specifier: 'catalog:'
-        version: 2.0.8
+        version: 2.0.9
       cspell:
         specifier: 'catalog:'
         version: 10.4.1
@@ -3329,8 +3329,8 @@ packages:
   '@tanstack/virtual-core@3.19.11':
     resolution: {integrity: sha512-/5iHb0RHBvj8Di59FDs4ESNm45jls33aZAi4zccVXZjc/6ZvwQP6nzEYeT6weXjTf9E6/vrp2JhYWRyO+ZP13A==}
 
-  '@tsconfig/strictest@2.0.8':
-    resolution: {integrity: sha512-XnQ7vNz5HRN0r88GYf1J9JJjqtZPiHt2woGJOo2dYqyHGGcd6OLGqSlBB6p1j9mpzja6Oe5BoPqWmeDx6X9rLw==}
+  '@tsconfig/strictest@2.0.9':
+    resolution: {integrity: sha512-CbwIySRXoGapLZYXqQHF15cg0wQImJa25Ynmubb7816vnHqTdQrmQlSbZxkJrrBusHLbF1kFbNVn8XtxmQ3EpQ==}
 
   '@tsdown/css@0.23.7':
     resolution: {integrity: sha512-Y47O40X1/jpR0D6R92NFE5KC+huaZHorIb8huy9h0X7SsZ0C9Nq83/+gtRsoB/wzfu4mNtXS/ylFDxV0I+aYlQ==}
@@ -7381,7 +7381,7 @@ snapshots:
 
   '@tanstack/virtual-core@3.19.11': {}
 
-  '@tsconfig/strictest@2.0.8': {}
+  '@tsconfig/strictest@2.0.9': {}
 
   '@tsdown/css@0.23.7(jiti@2.7.0)(postcss@8.5.23)(tsdown@0.23.7)(yaml@2.9.1)':
     dependencies:
