@@ -194,8 +194,8 @@ def plugin_method(
 
     def decorator(func: Callable[..., PluginReturnType]):
         plugin_method_meta = PluginMethod(
-            name=func.__name__,  # ty: ignore[unresolved-attribute]
-            label=label or func.__name__,  # ty: ignore[unresolved-attribute]
+            name=func.__name__,  # ty: ignore[missing-attribute]
+            label=label or func.__name__,  # ty: ignore[missing-attribute]
             description=description,
             method=func,
         )

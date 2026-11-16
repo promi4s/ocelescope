@@ -47,7 +47,7 @@ class Task(Generic[P]):
         self.name = name
         self.hidden = hidden
         self.dedupe = dedupe
-        qualname: str = fn.__qualname__  # ty: ignore[unresolved-attribute]
+        qualname: str = fn.__qualname__  # ty: ignore[missing-attribute]
         self.function_ref = f"{fn.__module__}:{qualname}"
         self._signature = inspect.signature(fn)
 
@@ -83,7 +83,7 @@ def task(
     dedupe: bool = False,
 ) -> Callable[[Callable[P, TaskResult]], Task[P]]:
     def decorator(fn: Callable[P, TaskResult]) -> Task[P]:
-        task_name = name or fn.__name__  # ty: ignore[unresolved-attribute]
+        task_name = name or fn.__name__  # ty: ignore[missing-attribute]
         return Task(fn, task_name, hidden, dedupe)
 
     return decorator
