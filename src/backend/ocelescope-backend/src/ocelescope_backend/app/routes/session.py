@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import traceback
-from datetime import UTC, datetime
 from pathlib import Path
 from typing import Annotated
 
@@ -16,9 +15,9 @@ from ocelescope_backend.app.internal.registry import upload_claimers
 from ocelescope_backend.app.internal.session import Session
 from ocelescope_backend.app.internal.tasks.system_tasks import (
     import_archive,
-    import_ocel_task,
+    import_ocel,
     import_resource,
-    import_xes_task,
+    import_xes,
 )
 from ocelescope_backend.app.internal.util.spool_upload import spool_upload_to_tempfile
 from ocelescope_backend.app.sse_manager import (
@@ -87,14 +86,14 @@ async def upload(
                 | ".csv"
                 | ".zip"
             ):
-                task_method = import_ocel_task
+                task_method = import_ocel
             case ".xes":
-                task_method = import_xes_task
+                task_method = import_xes
             case ".gz" if [suffix.lower() for suffix in file_path.suffixes[-2:]] == [
                 ".xes",
                 ".gz",
             ]:
-                task_method = import_xes_task
+                task_method = import_xes
 
         if task_method is None:
             tmp_path.unlink(missing_ok=True)
@@ -109,16 +108,14 @@ async def upload(
 
             continue
 
-        tasks.append(
-            task_method(
-                session=session,
-                file_path=tmp_path,
-                metadata={
-                    "fileName": file_path.name,
-                    "uploaded_at": datetime.now(UTC).isoformat(),
-                },
+        try:
+            tasks.append(
+                task_method.submit(
+                    session, file_path=tmp_path, file_name=file_path.name
+                )
             )
-        )
+        finally:
+            tmp_path.unlink(missing_ok=True)
 
     return tasks
 

@@ -134,7 +134,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/SystemTaskSummary"
+                    "$ref": "#/components/schemas/SystemTaskApi"
                   },
                   "title": "Response Getsystemtasks"
                 }
@@ -178,8 +178,48 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SystemTaskSummary"
+                  "$ref": "#/components/schemas/SystemTaskApi"
                 }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tasks/system/{task_id}/cancel": {
+      "post": {
+        "tags": [
+          "tasks"
+        ],
+        "summary": "stops a pending or running task",
+        "operationId": "cancelTask",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
               }
             }
           },
@@ -2070,33 +2110,61 @@
         "title": "SVGVis",
         "description": "SVG visualization.\n\nUse this visualization when you want full control over the rendered output\nby providing raw SVG markup.\n\nAttributes:\n    type: Fixed discriminator `\"svg\"`.\n    svg: SVG markup as a string."
       },
-      "SystemTaskSummary": {
+      "SystemTaskApi": {
         "properties": {
           "id": {
             "type": "string",
             "title": "Id"
           },
-          "state": {
-            "$ref": "#/components/schemas/TaskState"
-          },
           "name": {
             "type": "string",
             "title": "Name"
           },
-          "metadata": {
-            "additionalProperties": true,
-            "type": "object",
-            "title": "Metadata"
+          "file_name": {
+            "type": "string",
+            "title": "File Name"
+          },
+          "state": {
+            "$ref": "#/components/schemas/TaskState"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
           }
         },
         "type": "object",
         "required": [
           "id",
-          "state",
           "name",
-          "metadata"
+          "file_name",
+          "state",
+          "created_at",
+          "started_at",
+          "finished_at"
         ],
-        "title": "SystemTaskSummary"
+        "title": "SystemTaskApi"
       },
       "TableColumn": {
         "properties": {

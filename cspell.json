@@ -199,7 +199,9 @@
     "sqltypes",
     "utinyint",
     "usmallint",
-    "uhugeint"
+    "uhugeint",
+    "setpgrp",
+    "killpg"
   ],
   "ignorePaths": [
     "pnpm-lock.yaml",

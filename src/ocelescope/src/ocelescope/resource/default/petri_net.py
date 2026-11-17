@@ -399,13 +399,13 @@ class PetriNet(Resource):
         place_map: dict[str, Pm4pyPetriNet.Place] = {}
         for place in self.places:
             p = Pm4pyPetriNet.Place(place.name)
-            net.places.add(p)  # ty: ignore[unresolved-attribute]
+            net.places.add(p)  # ty: ignore[missing-attribute]
             place_map[place.name] = p
 
         transition_map: dict[str, Pm4pyPetriNet.Transition] = {}
         for transition in self.transitions:
             t = Pm4pyPetriNet.Transition(transition.name, transition.label)
-            net.transitions.add(t)  # ty: ignore[unresolved-attribute]
+            net.transitions.add(t)  # ty: ignore[missing-attribute]
             transition_map[transition.name] = t
 
         node_map: dict[str, Any] = {**place_map, **transition_map}

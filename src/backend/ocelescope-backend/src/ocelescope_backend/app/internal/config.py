@@ -1,3 +1,4 @@
+import os
 from typing import Literal
 
 from pydantic import Field
@@ -36,6 +37,12 @@ class OceanConfig(BaseSettings):
         default=5 * 1024 * 1024 * 1024,  # 5gb
         ge=1,
         description="Maximum total expanded size accepted for an uploaded zip archive",
+    )
+
+    MAX_CONCURRENT_TASKS: int = Field(
+        default_factory=lambda: os.cpu_count() or 1,
+        ge=1,
+        description="Maximum number of tasks running at the same time, each in its own process",
     )
 
     LOG_LEVEL: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = Field(

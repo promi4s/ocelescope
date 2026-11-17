@@ -11,6 +11,7 @@ from fastapi.sse import EventSourceResponse
 from ocelescope_backend.app.internal.config import config
 from ocelescope_backend.app.internal.docs import init_custom_docs
 from ocelescope_backend.app.internal.session import Session
+from ocelescope_backend.app.internal.tasks.runner import task_runner
 from ocelescope_backend.app.internal.utils import error_handler_server
 from ocelescope_backend.app.middleware import session_access_middleware
 from ocelescope_backend.app.modules.loader import mount_modules
@@ -24,6 +25,7 @@ async def lifespan(app: FastAPI):
     sse_manager.set_loop(asyncio.get_running_loop())
     yield
 
+    task_runner.shutdown()
     for session in list(Session.sessions.values()):
         session.close()
 

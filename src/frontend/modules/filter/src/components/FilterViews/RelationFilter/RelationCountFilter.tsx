@@ -1,19 +1,17 @@
 import type { StepKind, StepPanel } from "@ocelescope/core";
+import { RelationGraphInput } from "@ocelescope/core";
 import type { E2OCountFilter, O2OCountFilter } from "../../../api/base";
-import RelationDetail from "./RelationDetail";
-import RelationGraph from "./RelationGraph";
-import { RELATION_HOOKS, type RelationFilter, type RelationKind } from "./util";
+import RelationCountDetail from "./components/RelationCountDetail";
+import type { RelationFilter, RelationKind } from "./types";
 
 const RelationCountPanel: (kind: RelationKind) => StepPanel<RelationFilter> = (
   kind,
 ) => {
-  const hooks = RELATION_HOOKS[kind];
   return ({ ocelId, viewId, step: filter, onChange }) =>
     filter.source ? (
-      <RelationDetail
+      <RelationCountDetail
         ocelId={ocelId}
         kind={kind}
-        hooks={hooks}
         filter={filter}
         onChange={onChange}
         viewId={viewId}
@@ -27,13 +25,21 @@ const RelationCountPanel: (kind: RelationKind) => StepPanel<RelationFilter> = (
         }
       />
     ) : (
-      <RelationGraph
+      <RelationGraphInput
         ocelId={ocelId}
-        kind={kind}
-        hooks={hooks}
-        filter={filter}
-        onChange={onChange}
         viewId={viewId}
+        mode={kind}
+        value={null}
+        onChange={(relation) => {
+          if (relation) {
+            onChange({
+              ...filter,
+              ...relation,
+              direction: "source",
+              range: [null, null],
+            });
+          }
+        }}
       />
     );
 };
@@ -44,7 +50,8 @@ const summary = (filter: RelationFilter) => {
   }
   const [low, high] = filter.range;
   const qualifier = filter.qualifier ? ` (${filter.qualifier})` : "";
-  return `${filter.source} → ${filter.target}${qualifier}: ${low ?? 0} – ${high ?? "∞"}`;
+  const outside = filter.mode === "exclude" ? "not " : "";
+  return `${filter.source} → ${filter.target}${qualifier}: ${outside}${low ?? 0} – ${high ?? "∞"}`;
 };
 
 const validate = (filter: RelationFilter) =>

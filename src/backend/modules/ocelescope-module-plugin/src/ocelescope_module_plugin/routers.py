@@ -12,10 +12,7 @@ from ocelescope_backend.app.dependencies import ApiOcel, ApiSession
 from ocelescope_backend.app.internal.exceptions import NotFound
 from ocelescope_backend.app.internal.model.response import TempFileResponse
 from ocelescope_backend.app.internal.registry.resource import RegistryError
-from ocelescope_backend.app.internal.tasks.base import (
-    TaskState,
-    call_with_known_params,
-)
+from ocelescope_backend.app.internal.tasks.store import TaskState
 from ocelescope_backend.app.sse_manager import (
     InvalidationRequest,
     sse_manager,
@@ -33,7 +30,7 @@ from ocelescope_module_plugin.models.plugin_result import (
 from ocelescope_module_plugin.ocel_visualization import visualize_ocel
 from ocelescope_module_plugin.registry import PluginRegistry
 from ocelescope_module_plugin.results import select_outputs
-from ocelescope_module_plugin.tasks import PluginTask
+from ocelescope_module_plugin.tasks import call_with_known_params, run_plugin_method
 
 router = APIRouter(tags=["plugins"])
 
@@ -79,25 +76,28 @@ def run_plugin(
     input: dict[str, Any] | None = None,
 ) -> str:
     try:
-        return PluginTask.create_plugin_task(
-            session,
-            registry,
-            plugin_id=plugin_id,
-            method_name=method_name,
-            input={"input": input or {}, "input_resources": input_resources},
-        )
+        inputs = registry.task_inputs(session, plugin_id, method_name, input_resources)
     except RegistryError as error:
         raise NotFound(str(error))
+
+    return run_plugin_method.submit(
+        session,
+        plugin_id=plugin_id,
+        method_name=method_name,
+        inputs=inputs,
+        configuration=input or {},
+    )
 
 
 @router.get("/task/{task_id}", operation_id="PluginResult")
 def get_plugin_result(
+    session: ApiSession,
     plugin_task: ApiPluginTask,
 ) -> list[PluginOutput] | None:
     if plugin_task.state in (TaskState.PENDING, TaskState.STARTED):
         return None
 
-    return PluginOutput.from_task(plugin_task)
+    return PluginOutput.from_task(session, plugin_task)
 
 
 @router.get("/ocel/{ocel_id}/visualization", operation_id="ocelVisualization")
@@ -120,7 +120,8 @@ def save_plugin_results(
     selection: list[ResultSelection],
 ) -> SavedResults:
     """Save the selected results into the session as OCELs / resources."""
-    selected = select_outputs(plugin_task, [result.id for result in selection])
+    selected = select_outputs(session, plugin_task, [result.id for result in selection])
+    plugin_id = plugin_task.arguments["plugin_id"]
 
     saved = SavedResults(ocel_ids=[], resource_ids=[])
 
@@ -132,7 +133,7 @@ def save_plugin_results(
                 session.add_ocel(
                     session.get_ocel(output.id).db_path,
                     name,
-                    source_id=plugin_task.plugin_id,
+                    source_id=plugin_id,
                 )
             )
         else:
@@ -140,7 +141,7 @@ def save_plugin_results(
                 session.add_resource(
                     session.get_resource(output.id),
                     name=name,
-                    source_id=plugin_task.plugin_id,
+                    source_id=plugin_id,
                 )
             )
 
@@ -152,13 +153,15 @@ def save_plugin_results(
     operation_id="downloadPluginResults",
 )
 def download_plugin_results(
+    session: ApiSession,
     plugin_task: ApiPluginTask,
     ids: Annotated[list[str], Body(embed=True)],
 ) -> TempFileResponse:
     """Bundle the selected results into a zip for download."""
-    selected = select_outputs(plugin_task, ids)
+    selected = select_outputs(session, plugin_task, ids)
 
-    archive_name = f"{plugin_task.plugin_id}_{plugin_task.method_name}_results"
+    arguments = plugin_task.arguments
+    archive_name = f"{arguments['plugin_id']}_{arguments['method_name']}_results"
     file_response = TempFileResponse(
         prefix=datetime.now(tz=UTC).strftime("%Y%m%d-%H%M%S") + "-",
         suffix=".zip",
@@ -179,14 +182,14 @@ def download_plugin_results(
     with zipfile.ZipFile(file_response.tmp_path, "w", zipfile.ZIP_DEFLATED) as archive:
         for output in selected:
             if output.type == "ocel":
-                db_path = plugin_task.session.get_ocel(output.id).db_path
+                db_path = session.get_ocel(output.id).db_path
                 with NamedTemporaryFile(suffix=".json") as ocel_file:
                     export_duckdb_ocel(db_path, ocel_file.name)
                     archive.write(ocel_file.name, arcname=_unique(output.name, ".json"))
             else:
                 with (
                     NamedTemporaryFile(suffix=".ocelescope") as resource_file,
-                    plugin_task.session.open_resource(output.id) as resource,
+                    session.open_resource(output.id) as resource,
                 ):
                     resource.write(resource_file.name)
                     archive.write(
