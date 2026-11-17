@@ -38,6 +38,17 @@ const BIB_ENTRY = String.raw`@inproceedings{ocelescope2026,
   year      = {2026},
   url       = {${PAPER_URL}}
 }`;
+
+const APA_REFERENCE = (
+  <>
+    Öztürk, G.-E., Graves, N., Küsters, A., Menne, S., & van der Aalst, W. M. P.
+    (2026). Ocelescope: An extensible web framework for object-centric process
+    mining. <i>CEUR Workshop Proceedings</i>, <i>4274</i>, 173–177.{" "}
+    <Anchor href={PAPER_URL} target="_blank" rel="noopener noreferrer">
+      {PAPER_URL}
+    </Anchor>
+  </>
+);
 // cspell:enable
 
 const HelpLink: React.FC<{
@@ -108,17 +119,9 @@ export const HelpModal: React.FC<{
           href={`mailto:${env.contactEmail}`}
         />
         <Divider label="Cite Ocelescope" labelPosition="left" mt="xs" />
-        {/* cspell:disable */}
         <Text size="xs" c="dimmed">
-          Öztürk, G.-E., Graves, N., Küsters, A., Menne, S., & van der Aalst, W.
-          M. P. (2026). Ocelescope: An extensible web framework for
-          object-centric process mining. <i>CEUR Workshop Proceedings</i>,{" "}
-          <i>4274</i>, 173–177.{" "}
-          <Anchor href={PAPER_URL} target="_blank" rel="noopener noreferrer">
-            {PAPER_URL}
-          </Anchor>
+          {APA_REFERENCE}
         </Text>
-        {/* cspell:enable */}
         <Group gap="xs">
           <CopyButton value={BIB_ENTRY}>
             {({ copied, copy }) => (
