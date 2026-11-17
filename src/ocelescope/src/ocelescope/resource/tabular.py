@@ -4,7 +4,7 @@ import json
 import tempfile
 import zipfile
 from pathlib import Path
-from typing import Any, ClassVar, Literal, Self
+from typing import Any, ClassVar, Literal, Self, overload
 
 import duckdb
 from duckdb import (
@@ -153,7 +153,17 @@ class Table:
             if column[0] not in declared
         ]
 
-    def __get__(self, obj: "TabularResource | None", owner=None):
+    @overload
+    def __get__(self, obj: None, owner: type | None = None) -> Self: ...
+
+    @overload
+    def __get__(
+        self, obj: "TabularResource", owner: type | None = None
+    ) -> DuckDBPyRelation: ...
+
+    def __get__(
+        self, obj: "TabularResource | None", owner: type | None = None
+    ) -> "Self | DuckDBPyRelation":
         if obj is None:
             return self
         return obj.con.table(self.table_name)
