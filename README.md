@@ -10,7 +10,7 @@ If you use Ocelescope in your research, please cite our [paper](https://ceur-ws.
 
 <!-- cspell:disable -->
 
-> Öztürk, G.-E., Graves, N., Küsters, A., Menne, S., & van der Aalst, W. M. P. (2026). Ocelescope: An extensible web framework for object-centric process mining. *CEUR Workshop Proceedings*, *4274*, 173–177. https://ceur-ws.org/Vol-4274/paper-30.pdf
+> Öztürk, G.-E., Graves, N., Küsters, A., Menne, S., & van der Aalst, W. M. P. (2026). Ocelescope: An extensible web framework for object-centric process mining. _CEUR Workshop Proceedings_, _4274_, 173–177. https://ceur-ws.org/Vol-4274/paper-30.pdf
 
 ```bibtex
 @inproceedings{ocelescope2026,
