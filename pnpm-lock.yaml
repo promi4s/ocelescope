@@ -1130,6 +1130,9 @@ importers:
       '@ocelescope/api-client':
         specifier: workspace:^
         version: link:../api/client
+      '@ocelescope/core':
+        specifier: workspace:^
+        version: link:../core
       '@ocelescope/resources':
         specifier: workspace:^
         version: link:../resources

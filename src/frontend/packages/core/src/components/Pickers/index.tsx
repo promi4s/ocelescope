@@ -17,6 +17,7 @@ export type { AttributePickerProps } from "./AttributePicker";
 export type { E2ORelationPickerProps } from "./E2ORelationPicker";
 export type { EventAttributePickerProps } from "./EventAttributePicker";
 export type { EventPickerProps } from "./EventPicker";
+export type { IdSelectProps } from "./IdSelect";
 export type { O2ORelationPickerProps } from "./O2ORelationPicker";
 export type { ObjectAttributePickerProps } from "./ObjectAttributePicker";
 export type { ObjectPickerProps } from "./ObjectPicker";
@@ -72,4 +73,10 @@ export const E2ORelationPicker = clientOnly(() =>
 );
 export const O2ORelationPicker = clientOnly(() =>
   import("./O2ORelationPicker").then((m) => m.O2ORelationPicker),
+);
+export const EventIdSelect = clientOnly(() =>
+  import("./IdSelect").then((m) => m.EventIdSelect),
+);
+export const ObjectIdSelect = clientOnly(() =>
+  import("./IdSelect").then((m) => m.ObjectIdSelect),
 );

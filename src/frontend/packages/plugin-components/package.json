@@ -37,6 +37,7 @@
     "@mantine/hooks": "catalog:",
     "@monaco-editor/react": "catalog:",
     "@ocelescope/api-base": "workspace:^",
+    "@ocelescope/core": "workspace:^",
     "@ocelescope/api-client": "workspace:^",
     "@ocelescope/resources": "workspace:^",
     "@rjsf/core": "catalog:",
