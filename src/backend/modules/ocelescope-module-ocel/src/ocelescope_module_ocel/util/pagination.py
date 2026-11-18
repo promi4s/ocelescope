@@ -13,10 +13,16 @@ def paginate_ids(
     search: str | None,
     page: int,
     size: int,
+    type_col: str | None = None,
+    types: list[str] | None = None,
 ) -> PaginatedResponse[list[str]]:
     """Search (case-insensitive substring) and paginate a single id column."""
 
     query = rel
+    if type_col and types:
+        query = query.filter(
+            f"{ident(type_col)} IN ({', '.join(literal(t) for t in types)})"
+        )
     if search:
         query = query.filter(
             f"contains(lower({ident(id_col)}), lower({literal(search)}))"

@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter
-from ocelescope.ocel.constants.pm4py import OID_COL
+from typing import Annotated
+
+from fastapi import APIRouter, Query
+from ocelescope.ocel.constants.pm4py import OID_COL, OTYPE_COL
 from ocelescope_backend.app.dependencies import ApiOcel
 from ocelescope_backend.app.internal.model.base import PaginatedResponse
 
@@ -38,8 +40,11 @@ def get_object_ids(
     search: str | None = None,
     size: int = 10,
     page: int = 1,
+    object_types: Annotated[list[str] | None, Query()] = None,
 ) -> PaginatedResponse[list[str]]:
-    return paginate_ids(ocel.objects.table, OID_COL, search, page, size)
+    return paginate_ids(
+        ocel.objects.table, OID_COL, search, page, size, OTYPE_COL, object_types
+    )
 
 
 @router.get(

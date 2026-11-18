@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from typing import Annotated
 
 import pandas as pd
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 from ocelescope.ocel.constants.pm4py import ACTIVITY_COL, EID_COL, TIMESTAMP_COL
 from ocelescope_backend.app.dependencies import ApiOcel
 from ocelescope_backend.app.internal.model.base import PaginatedResponse
@@ -40,8 +41,11 @@ def get_event_ids(
     search: str | None = None,
     size: int = 10,
     page: int = 1,
+    activities: Annotated[list[str] | None, Query()] = None,
 ) -> PaginatedResponse[list[str]]:
-    return paginate_ids(ocel.events.table, EID_COL, search, page, size)
+    return paginate_ids(
+        ocel.events.table, EID_COL, search, page, size, ACTIVITY_COL, activities
+    )
 
 
 @router.get(
