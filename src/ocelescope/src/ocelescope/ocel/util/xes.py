@@ -9,6 +9,9 @@ from ocelescope.ocel.constants.pm4py import (
     ACTIVITY_COL,
     E2O_QUALIFIER,
     EID_COL,
+    O2O_QUALIFIER,
+    O2O_SOURCE_ID,
+    O2O_TARGET_ID,
     OBJECT_CHANGED_FIELD,
     OID_COL,
     OTYPE_COL,
@@ -45,6 +48,13 @@ RESOURCE_COL = "org:resource"
 RESOURCE_PREFIX = "resource:"
 RESOURCE_TYPE = "Resource"
 
+ROLE_COL = "org:role"
+
+GROUP_COL = "org:group"
+GROUP_PREFIX = "group:"
+GROUP_TYPE = "Group"
+GROUP_QUALIFIER = "member of"
+
 
 def create_ocel_from_xml(path: str, fallback_object_name: str = "LogObject") -> "OCEL":
     from ocelescope.ocel.core import OCEL  # avoid circular import
@@ -52,6 +62,10 @@ def create_ocel_from_xml(path: str, fallback_object_name: str = "LogObject") -> 
     log, _meta = r4pm.df.import_xes(path)
 
     log = log.rename({**RENAME_MAP}, strict=False)
+
+    org_cols = (
+        (RESOURCE_COL, ROLE_COL, GROUP_COL) if RESOURCE_COL in log.columns else ()
+    )
 
     global_cols = [
         col.removeprefix("case:") for col in log.columns if col.startswith("case:")
@@ -61,8 +75,8 @@ def create_ocel_from_xml(path: str, fallback_object_name: str = "LogObject") -> 
         col
         for col in log.columns
         if not col.startswith("case:")
-        and col
-        not in (EID_COL, OID_COL, ACTIVITY_COL, TIMESTAMP_COL, OTYPE_COL, RESOURCE_COL)
+        and col not in (EID_COL, OID_COL, ACTIVITY_COL, TIMESTAMP_COL, OTYPE_COL)
+        and col not in org_cols
     ]
 
     log = log.with_columns(
@@ -100,20 +114,30 @@ def create_ocel_from_xml(path: str, fallback_object_name: str = "LogObject") -> 
         [EID_COL, OTYPE_COL, ACTIVITY_COL, OID_COL, TIMESTAMP_COL]
     ).with_columns(pl.lit(None, dtype=pl.String).alias(E2O_QUALIFIER))
 
+    o2o_table = None
+
     if RESOURCE_COL in log.columns:
-        resources = (
+        resource_events = (
             log.filter(pl.col(RESOURCE_COL).is_not_null())
             .unique(subset=[EID_COL])
-            .select(
-                EID_COL,
-                pl.lit(RESOURCE_TYPE).alias(OTYPE_COL),
-                ACTIVITY_COL,
+            .with_columns(
                 (pl.lit(RESOURCE_PREFIX) + pl.col(RESOURCE_COL).cast(pl.String)).alias(
                     OID_COL
-                ),
-                TIMESTAMP_COL,
-                pl.lit(None, dtype=pl.String).alias(E2O_QUALIFIER),
+                )
             )
+        )
+
+        resources = resource_events.select(
+            EID_COL,
+            pl.lit(RESOURCE_TYPE).alias(OTYPE_COL),
+            ACTIVITY_COL,
+            OID_COL,
+            TIMESTAMP_COL,
+            (
+                pl.col(ROLE_COL).cast(pl.String)
+                if ROLE_COL in log.columns
+                else pl.lit(None, dtype=pl.String)
+            ).alias(E2O_QUALIFIER),
         )
 
         object_table = pl.concat(
@@ -125,10 +149,35 @@ def create_ocel_from_xml(path: str, fallback_object_name: str = "LogObject") -> 
         )
         e2o_table = pl.concat([e2o_table, resources], how="vertical_relaxed")
 
+        if GROUP_COL in log.columns:
+            o2o_table = (
+                resource_events.filter(pl.col(GROUP_COL).is_not_null())
+                .select(
+                    pl.col(OID_COL).alias(O2O_SOURCE_ID),
+                    (pl.lit(GROUP_PREFIX) + pl.col(GROUP_COL).cast(pl.String)).alias(
+                        O2O_TARGET_ID
+                    ),
+                    pl.lit(GROUP_QUALIFIER).alias(O2O_QUALIFIER),
+                )
+                .unique()
+            )
+
+            object_table = pl.concat(
+                [
+                    object_table,
+                    o2o_table.select(
+                        pl.lit(GROUP_TYPE).alias(OTYPE_COL),
+                        pl.col(O2O_TARGET_ID).alias(OID_COL),
+                    ).unique(subset=[OID_COL]),
+                ],
+                how="diagonal_relaxed",
+            )
+
     return OCEL.from_frames(
         events=event_table,
         objects=object_table,
         relations=e2o_table,
+        o2o=o2o_table,
     )
 
 
