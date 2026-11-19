@@ -121,7 +121,10 @@ type ManagedProps =
   | "rightSectionProps"
   | "rightSectionPointerEvents"
   | "placeholder"
-  | "nothingFoundMessage";
+  | "nothingFoundMessage"
+  | "loading"
+  | "loadingPosition"
+  | "loaderProps";
 
 export type IdSelectProps = DistributiveOmit<MergedSelectProps, ManagedProps> &
   OcelSource & {
@@ -190,6 +193,10 @@ const createIdSelect = (entityType: keyof typeof entities) => {
                   variant="transparent"
                   color={filtered ? undefined : "gray"}
                   loading={isFetching}
+                  loaderProps={{
+                    size: 14,
+                    color: "var(--mantine-primary-color-filled)",
+                  }}
                   aria-label={`Filter by ${label} type`}
                 >
                   <FilterIcon size={16} />
