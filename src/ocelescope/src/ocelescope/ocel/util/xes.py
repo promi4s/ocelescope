@@ -41,6 +41,10 @@ XES_NAMES = {column: name for name, column in RENAME_MAP.items()}
 #: collide with an event attribute called the same.
 DYNAMIC_PREFIX = "object:"
 
+RESOURCE_COL = "org:resource"
+RESOURCE_PREFIX = "resource:"
+RESOURCE_TYPE = "Resource"
+
 
 def create_ocel_from_xml(path: str, fallback_object_name: str = "LogObject") -> "OCEL":
     from ocelescope.ocel.core import OCEL  # avoid circular import
@@ -57,7 +61,8 @@ def create_ocel_from_xml(path: str, fallback_object_name: str = "LogObject") -> 
         col
         for col in log.columns
         if not col.startswith("case:")
-        and col not in (EID_COL, OID_COL, ACTIVITY_COL, TIMESTAMP_COL, OTYPE_COL)
+        and col
+        not in (EID_COL, OID_COL, ACTIVITY_COL, TIMESTAMP_COL, OTYPE_COL, RESOURCE_COL)
     ]
 
     log = log.with_columns(
@@ -94,6 +99,31 @@ def create_ocel_from_xml(path: str, fallback_object_name: str = "LogObject") -> 
     e2o_table = log.select(
         [EID_COL, OTYPE_COL, ACTIVITY_COL, OID_COL, TIMESTAMP_COL]
     ).with_columns(pl.lit(None, dtype=pl.String).alias(E2O_QUALIFIER))
+
+    if RESOURCE_COL in log.columns:
+        resources = (
+            log.filter(pl.col(RESOURCE_COL).is_not_null())
+            .unique(subset=[EID_COL])
+            .select(
+                EID_COL,
+                pl.lit(RESOURCE_TYPE).alias(OTYPE_COL),
+                ACTIVITY_COL,
+                (pl.lit(RESOURCE_PREFIX) + pl.col(RESOURCE_COL).cast(pl.String)).alias(
+                    OID_COL
+                ),
+                TIMESTAMP_COL,
+                pl.lit(None, dtype=pl.String).alias(E2O_QUALIFIER),
+            )
+        )
+
+        object_table = pl.concat(
+            [
+                object_table,
+                resources.select(OTYPE_COL, OID_COL).unique(subset=[OID_COL]),
+            ],
+            how="diagonal_relaxed",
+        )
+        e2o_table = pl.concat([e2o_table, resources], how="vertical_relaxed")
 
     return OCEL.from_frames(
         events=event_table,
