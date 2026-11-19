@@ -58,5 +58,17 @@
       "matchPackageNames": ["ghcr.io/astral-sh/uv"],
       "allowedVersions": "/^python3\\.13-/"
     }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Keep the biome.json $schema version in sync with @biomejs/biome",
+      "managerFilePatterns": ["/^biome\\.json$/"],
+      "matchStrings": [
+        "\"\\$schema\":\\s*\"https://biomejs\\.dev/schemas/(?<currentValue>[^/]+)/schema\\.json\""
+      ],
+      "depNameTemplate": "@biomejs/biome",
+      "datasourceTemplate": "npm"
+    }
   ]
 }
