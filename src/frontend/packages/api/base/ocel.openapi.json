@@ -1594,6 +1594,25 @@
             }
           },
           {
+            "name": "object_types",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Object Types"
+            }
+          },
+          {
             "name": "ocel_version",
             "in": "query",
             "required": false,
@@ -1949,6 +1968,25 @@
               "type": "integer",
               "default": 1,
               "title": "Page"
+            }
+          },
+          {
+            "name": "activities",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Activities"
             }
           },
           {

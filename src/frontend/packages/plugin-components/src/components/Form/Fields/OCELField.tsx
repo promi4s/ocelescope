@@ -1,15 +1,13 @@
 import { MultiSelect, Select } from "@mantine/core";
-import { useDebouncedValue } from "@mantine/hooks";
 import {
   type AttributeNamesEntityType,
   useAttributeNames,
   useE2oQualifier,
   useEventCounts,
-  useEventIds,
   useO2oQualifier,
   useObjectCounts,
-  useObjectIds,
 } from "@ocelescope/api-base";
+import { EventIdSelect, ObjectIdSelect } from "@ocelescope/core";
 import type { FieldProps } from "@rjsf/utils";
 import {
   type ComponentType,
@@ -17,8 +15,8 @@ import {
   useEffect,
   useEffectEvent,
   useMemo,
-  useState,
 } from "react";
+
 import type { OcelSelectProps } from "../../../types";
 import { FrequencyPicker } from "../components/R4pmInputs";
 import { usePluginForm } from "../context";
@@ -121,26 +119,15 @@ const TypeSelect =
   };
 
 const IdSelect =
-  (
-    useIds: typeof useEventIds | typeof useObjectIds,
-  ): React.FC<OcelSelectProps> =>
+  (type: "events" | "objects"): React.FC<OcelSelectProps> =>
   ({ ocelId, isMulti, value, onChange, ...props }) => {
-    const [search, setSearch] = useState<string | undefined>();
-    const [debouncedSearch] = useDebouncedValue(search, 300);
-
-    const { data: ids } = useIds(ocelId, { search: debouncedSearch });
-
-    const SelectComponent = isMulti ? MultiSelect : Select;
-
+    const SelectComponent = type === "events" ? EventIdSelect : ObjectIdSelect;
     return (
       <SelectComponent
         {...props}
         value={value ?? (isMulti ? [] : null)}
-        data={ids?.response}
         onChange={onChange}
-        searchValue={search}
-        onSearchChange={setSearch}
-        searchable
+        multiple={isMulti}
       />
     );
   };
@@ -173,8 +160,8 @@ const OCEL_FIELDS: Record<string, ComponentType<OcelSelectProps>> = {
   object_type: TypeSelect(useObjectCounts),
   event_attribute: AttributeSelect("events"),
   object_attribute: AttributeSelect("objects"),
-  event_id: IdSelect(useEventIds),
-  object_id: IdSelect(useObjectIds),
+  event_id: IdSelect("events"),
+  object_id: IdSelect("objects"),
   e2o_qualifier: QualifierSelect(useE2oQualifier),
   o2o_qualifier: QualifierSelect(useO2oQualifier),
 };
