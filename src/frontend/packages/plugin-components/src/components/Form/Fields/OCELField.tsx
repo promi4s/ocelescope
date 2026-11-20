@@ -125,6 +125,7 @@ const IdSelect =
     return (
       <SelectComponent
         {...props}
+        ocelId={ocelId ?? undefined}
         value={value ?? (isMulti ? [] : null)}
         onChange={onChange}
         multiple={isMulti}
