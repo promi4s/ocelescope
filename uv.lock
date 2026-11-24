@@ -1,5 +1,5 @@
 version = 1
-revision = 5
+revision = 3
 requires-python = ">=3.11"
 resolution-markers = [
     "python_full_version >= '3.14' and sys_platform == 'win32'",
@@ -2054,7 +2054,7 @@ requires-dist = [
     { name = "pulp", marker = "extra == 'plugin'", specifier = ">=3.3.2,<4" },
     { name = "pyarrow", specifier = ">=24.0.0" },
     { name = "pydantic", specifier = ">=2.11.7" },
-    { name = "r4pm-full", extras = ["polars"], specifier = ">=0.6.2" },
+    { name = "r4pm-full", extras = ["polars"], specifier = ">=0.7.1,<0.8" },
     { name = "scikit-learn", marker = "extra == 'plugin'", specifier = ">=1.9.0" },
 ]
 provides-extras = ["plugin"]
@@ -3192,16 +3192,16 @@ wheels = [
 
 [[package]]
 name = "r4pm-full"
-version = "0.6.2"
+version = "0.7.1"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/d0/2e/d0bea745606cd681f6ba08bff600674eda171af864e69751fa9c4b435741/r4pm_full-0.6.2.tar.gz", hash = "sha256:ea3e1d54b5060b4d67ca92f44cedfa3de8343c791c4f746d05ecb8e2ca216ab5", size = 70660, upload-time = "2026-08-21T11:23:58.03Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/18/c8/b1c7482b9f80765c693d5f543db992aae6c247dc05a879f7427cf6d4356e/r4pm_full-0.7.1.tar.gz", hash = "sha256:ccb9f8d1add89f3dc89cf2146cd899144829f93bf731923e608d027e81c152b5", size = 115573, upload-time = "2026-11-19T17:04:53.454Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f0/e9/da6c42911b96978de59b97502b68e924c56ff588dddedf3930b7199f2fb4/r4pm_full-0.6.2-cp39-abi3-macosx_10_12_x86_64.whl", hash = "sha256:c60c49a2be0b0a0adc791e35a29dd6ff231c8f2fe2031646fd426dc58dd75010", size = 24568567, upload-time = "2026-08-21T11:23:39.731Z" },
-    { url = "https://files.pythonhosted.org/packages/a7/b7/6c9d0b0ba39c67b8665c701b1487b2b5550b42b78e96eec12d87d305b81b/r4pm_full-0.6.2-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:b768a6452f121de9adb934ab1d7e7a114855416c0154418e9e337c86d38bb275", size = 23396161, upload-time = "2026-08-21T11:23:42.596Z" },
-    { url = "https://files.pythonhosted.org/packages/10/21/2bfd9acc4d13b7a1b0b0fba479c17863e9a3fbe2dc0e0be28b8d5f1f969e/r4pm_full-0.6.2-cp39-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:5acb191b88bc143f3ff42e94fc8f2dbb45ccc426cdf0fb408c8189e0d2f39bd1", size = 27197014, upload-time = "2026-08-21T11:23:45.039Z" },
-    { url = "https://files.pythonhosted.org/packages/79/14/de4654b548b1f1f44c0008a89c06c0ccbea52cb538801d4efd7eb5cf4914/r4pm_full-0.6.2-cp39-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:f4fe058fe17b6170f227411a9558bbe4517cf73e04d99063dbf10287da510d71", size = 27835360, upload-time = "2026-08-21T11:23:48.853Z" },
-    { url = "https://files.pythonhosted.org/packages/5d/cf/9f2dd3c1c83fc62d145ef5425eaf8390d0151dba37d641d2858cfaf73019/r4pm_full-0.6.2-cp39-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:de5013d777c44c637098aa1e4e6952a55253ce905ca63b94244f9c654a72227c", size = 35407615, upload-time = "2026-08-21T11:23:51.641Z" },
-    { url = "https://files.pythonhosted.org/packages/cf/c4/df5d2526d42f7a1733dcfe93532b7715f3661cfcb65d5b0830882fd5a566/r4pm_full-0.6.2-cp39-abi3-win_amd64.whl", hash = "sha256:850fdea609b6d3ebdec52e2ef534ccdb5aad17718cde892935fbacea6fb2bec6", size = 21233850, upload-time = "2026-08-21T11:23:54.327Z" },
+    { url = "https://files.pythonhosted.org/packages/43/72/4c1b70103ee5cdf57f51913d1225326cf0faefc30f8495ad73fe267607b0/r4pm_full-0.7.1-cp39-abi3-macosx_10_12_x86_64.whl", hash = "sha256:e0292123147e8c7b0402e20c2b5795b1c4beee4ead4a02238706dcc0850f4999", size = 28334572, upload-time = "2026-11-19T17:04:26.712Z" },
+    { url = "https://files.pythonhosted.org/packages/d6/09/13c8c0ef13a94144bbb66b5a80052a62378ee6ae77297dd46c17f1e5ca26/r4pm_full-0.7.1-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:a7dd112effd8cafccaba83322e6e1b1f9106893adfb284c9ad1e90d936ed3348", size = 26967700, upload-time = "2026-11-19T17:04:31.143Z" },
+    { url = "https://files.pythonhosted.org/packages/2a/7f/af4a6531ce14e686dbca7f13c570a2dbdd99192f28180785be2b83af8380/r4pm_full-0.7.1-cp39-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:fe653081c674aa5a2e77eaa1261f73e37e2532224e23b15845303dc9ca38b384", size = 31401917, upload-time = "2026-11-19T17:04:35.686Z" },
+    { url = "https://files.pythonhosted.org/packages/fe/d6/2f5d2122fb1a8709b0f0afd0c537d7ba056345374438b9735744ec589517/r4pm_full-0.7.1-cp39-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:2693807514f3d843c0cbdd1846e7d66572f72463b07e619bcc7f0d77772e697f", size = 31962195, upload-time = "2026-11-19T17:04:40.23Z" },
+    { url = "https://files.pythonhosted.org/packages/19/2c/2140b699ff259dd11321852e513b2a339220d2b9cad3e3a5a655df0022ea/r4pm_full-0.7.1-cp39-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:881b7be985175f6bd5d5d240738ba0d057145cf0a42c9e7add774a782a6d1b97", size = 39919986, upload-time = "2026-11-19T17:04:45.573Z" },
+    { url = "https://files.pythonhosted.org/packages/5f/ab/09e7d368ce7ab4dca78234cb956ec9bf6213923bb5456e1f602925b66418/r4pm_full-0.7.1-cp39-abi3-win_amd64.whl", hash = "sha256:74a04c234afbe1d95cb3f0697466f78baa6ba9663410b1e66342c1ea2f821e8a", size = 24911967, upload-time = "2026-11-19T17:04:49.498Z" },
 ]
 
 [package.optional-dependencies]

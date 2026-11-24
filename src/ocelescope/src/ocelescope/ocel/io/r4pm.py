@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from tempfile import NamedTemporaryFile, TemporaryDirectory
+from tempfile import TemporaryDirectory
 from typing import Literal
 
 import duckdb
@@ -105,11 +105,13 @@ def import_ocel_r4pm_streamed(source: Path | str, target: DuckDBTarget) -> None:
             what keeps an in-memory database alive past this call.
     """
 
-    with NamedTemporaryFile() as fp:
-        r4pm.bindings.stream_ocel_to_duckdb(str(source), fp.name)
+    with TemporaryDirectory() as tmp:
+        # r4pm refuses to write over an existing file, so it gets a fresh path
+        r4pm_file = Path(tmp) / "ocel.duckdb"
+        r4pm.bindings.stream_ocel_file_to_duckdb(str(source), str(r4pm_file))
 
         with connect_target(target) as con:
-            con.execute(f"ATTACH {literal(str(fp.name))} AS {ident(SRC)} (READ_ONLY)")
+            con.execute(f"ATTACH {literal(str(r4pm_file))} AS {ident(SRC)} (READ_ONLY)")
 
             con.execute(f"""
                 CREATE OR REPLACE TABLE object_changes AS
@@ -216,9 +218,9 @@ def export_ocel_r4pm_streamed(source: DuckDBTarget, target: str | Path) -> None:
     """Write the flat OCEL tables at ``source`` into an r4pm DuckDB log at ``target``.
 
     The inverse of :func:`import_ocel_r4pm_streamed`: it produces the seven tables
-    of r4pm's consolidated schema -- the layout ``stream_ocel_to_duckdb`` writes and
-    ``read_consolidated_ocel_from_duckdb`` reads -- so r4pm can take the result from
-    here and write any OCEL 2.0 format from it.
+    of r4pm's consolidated schema -- the layout ``stream_ocel_file_to_duckdb`` writes
+    and ``import_item("OCEL", ...)`` reads -- so r4pm can take the result from here
+    and write any OCEL 2.0 format from it.
 
     Args:
         source: Path to a DuckDB database holding the flat OCEL tables, or an open
@@ -355,5 +357,6 @@ def export_ocel_r4pm_streamed(source: DuckDBTarget, target: str | Path) -> None:
             finally:
                 con.execute(f"DETACH {ident(OUT)}")
 
-        ocel = r4pm.bindings.read_consolidated_ocel_from_duckdb(str(r4pm_file))
+        # r4pm reads a .duckdb in its consolidated schema back as an OCEL
+        ocel = r4pm.import_item("OCEL", str(r4pm_file))
         r4pm.export_item(ocel, str(target))
