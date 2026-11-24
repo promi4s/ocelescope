@@ -926,7 +926,7 @@
                 "contentMediaType": "application/json",
                 "contentSchema": {
                   "additionalProperties": {
-                    "$ref": "#/components/schemas/XesUploadExtras"
+                    "$ref": "#/components/schemas/UploadExtras"
                   },
                   "type": "object"
                 }
@@ -2299,6 +2299,40 @@
         ],
         "title": "Transition"
       },
+      "UploadExtras": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "xes",
+            "title": "Kind",
+            "default": "xes"
+          },
+          "object_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Object Type"
+          },
+          "type_attribute": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Type Attribute"
+          }
+        },
+        "type": "object",
+        "title": "XesUploadExtras"
+      },
       "ValidationError": {
         "properties": {
           "loc": {
@@ -2352,40 +2386,6 @@
         ],
         "title": "Visualization",
         "description": "Base class for all frontend visualizations.\n\nA visualization is a JSON-serializable object that a `Resource.visualize()` method\ncan return so the frontend can render the resource.\n\nEvery visualization has a `type` discriminator. Concrete subclasses set `type`\nto a fixed literal value (for example `\"table\"` or `\"plotly\"`).\n\nAttributes:\n    type: Discriminator used by the frontend to select the renderer."
-      },
-      "XesUploadExtras": {
-        "properties": {
-          "kind": {
-            "type": "string",
-            "const": "xes",
-            "title": "Kind",
-            "default": "xes"
-          },
-          "object_type": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Object Type"
-          },
-          "type_attribute": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Type Attribute"
-          }
-        },
-        "type": "object",
-        "title": "XesUploadExtras"
       }
     }
   }

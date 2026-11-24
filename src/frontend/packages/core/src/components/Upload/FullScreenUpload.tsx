@@ -5,6 +5,7 @@ import { DownloadIcon, UploadIcon, XIcon } from "lucide-react";
 import { type ComponentProps, useState } from "react";
 import { useInvalidate } from "../../hooks/useInvalidate";
 import { findUploadOption } from "./options/configs";
+import type { UploadExtras } from "./options/types";
 import { UploadOptions } from "./options/UploadOptions";
 
 const defaultLabel = `Drag'n'drop your ${["OCELs", "Plugins", "Resources"].join(", ")} here to upload.`;
@@ -28,8 +29,13 @@ export const FullScreenUpload: React.FC<{
 
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
 
-  const upload = (files: File[]) => {
-    mutate({ data: { files } });
+  const upload = (files: File[], extras: Record<string, UploadExtras> = {}) => {
+    mutate({
+      data: {
+        files,
+        extras: Object.keys(extras).length > 0 ? JSON.stringify(extras) : null,
+      },
+    });
     setPendingFiles([]);
   };
 

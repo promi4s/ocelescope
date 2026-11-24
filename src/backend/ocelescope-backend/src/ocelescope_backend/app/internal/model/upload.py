@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Literal
 
 from pydantic import BaseModel
+from typing_extensions import TypeAliasType
 
 
 class XesUploadExtras(BaseModel):
@@ -11,4 +12,4 @@ class XesUploadExtras(BaseModel):
     type_attribute: str | None = None
 
 
-UploadExtras = XesUploadExtras
+UploadExtras = TypeAliasType("UploadExtras", XesUploadExtras)

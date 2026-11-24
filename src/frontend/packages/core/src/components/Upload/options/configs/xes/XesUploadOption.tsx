@@ -44,12 +44,9 @@ const XesInput: UploadOption["input"] = ({ file, value, onChange }) => {
         data={attributes ?? []}
         disabled={isLoading || attributes.length === 0}
         value={value.type_attribute ?? null}
-        onChange={(typeAttribute) => {
-          const { type_attribute: _, ...rest } = value;
-          onChange(
-            typeAttribute ? { ...rest, type_attribute: typeAttribute } : rest,
-          );
-        }}
+        onChange={(typeAttribute) =>
+          onChange({ ...value, kind: "xes", type_attribute: typeAttribute })
+        }
         searchable
         clearable
       />
@@ -60,7 +57,11 @@ const XesInput: UploadOption["input"] = ({ file, value, onChange }) => {
         placeholder="Case"
         value={value.object_type ?? ""}
         onChange={(event) =>
-          onChange({ ...value, object_type: event.currentTarget.value })
+          onChange({
+            ...value,
+            kind: "xes",
+            object_type: event.currentTarget.value,
+          })
         }
       />
     </Stack>

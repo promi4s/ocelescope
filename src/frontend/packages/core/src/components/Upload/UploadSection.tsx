@@ -10,6 +10,7 @@ import { useCallback, useState } from "react";
 import { useInvalidate } from "../../hooks/useInvalidate";
 import { FileDropzone } from "../Dropzone/Dropzone";
 import { findUploadOption } from "./options/configs";
+import type { UploadExtras } from "./options/types";
 import { UploadOptions } from "./options/UploadOptions";
 
 const DefaultOcels: React.FC<{
@@ -98,8 +99,13 @@ export const UploadSection: React.FC<{ onSuccess?: () => void }> = ({
 
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
 
-  const upload = (files: File[]) => {
-    mutate({ data: { files } });
+  const upload = (files: File[], extras: Record<string, UploadExtras> = {}) => {
+    mutate({
+      data: {
+        files,
+        extras: Object.keys(extras).length > 0 ? JSON.stringify(extras) : null,
+      },
+    });
     setPendingFiles([]);
   };
 

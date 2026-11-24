@@ -1,6 +1,7 @@
+import type { UploadExtras } from "@ocelescope/api-base";
 import type { ComponentType } from "react";
 
-export type UploadExtras = Record<string, string>;
+export type { UploadExtras };
 
 export type UploadOption = {
   fileExtension: string[];
