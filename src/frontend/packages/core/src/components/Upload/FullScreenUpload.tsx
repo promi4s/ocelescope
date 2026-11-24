@@ -1,9 +1,11 @@
-import { Group, LoadingOverlay, Text } from "@mantine/core";
+import { Group, LoadingOverlay, Modal, Text } from "@mantine/core";
 import { Dropzone, type FileWithPath } from "@mantine/dropzone";
 import { useUpload } from "@ocelescope/api-base";
 import { DownloadIcon, UploadIcon, XIcon } from "lucide-react";
-import type { ComponentProps } from "react";
+import { type ComponentProps, useState } from "react";
 import { useInvalidate } from "../../hooks/useInvalidate";
+import { findUploadOption } from "./options/configs";
+import { UploadOptions } from "./options/UploadOptions";
 
 const defaultLabel = `Drag'n'drop your ${["OCELs", "Plugins", "Resources"].join(", ")} here to upload.`;
 
@@ -15,7 +17,7 @@ export const FullScreenUpload: React.FC<{
 }> = ({ onSuccess, accept, label = defaultLabel, active = true }) => {
   const invalidate = useInvalidate();
 
-  const { mutate: upload, isPending } = useUpload({
+  const { mutate, isPending } = useUpload({
     mutation: {
       onSuccess: async () => {
         await invalidate(["tasks"]);
@@ -24,9 +26,29 @@ export const FullScreenUpload: React.FC<{
     },
   });
 
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+
+  const upload = (files: File[]) => {
+    mutate({ data: { files } });
+    setPendingFiles([]);
+  };
+
   return (
     <>
       <LoadingOverlay visible={isPending} overlayProps={{ blur: 2 }} />
+      <Modal
+        opened={pendingFiles.length > 0}
+        onClose={() => setPendingFiles([])}
+        centered
+        size="lg"
+        title={<Text fw={600}>Upload options</Text>}
+      >
+        <UploadOptions
+          files={pendingFiles}
+          onUpload={upload}
+          onCancel={() => setPendingFiles([])}
+        />
+      </Modal>
       <Dropzone.FullScreen
         active={active}
         accept={accept}
@@ -45,9 +67,11 @@ export const FullScreenUpload: React.FC<{
             justifyContent: "center",
           },
         }}
-        onDrop={(files: FileWithPath[]) => {
-          upload({ data: { files } });
-        }}
+        onDrop={(files: FileWithPath[]) =>
+          files.some((file) => findUploadOption(file))
+            ? setPendingFiles(files)
+            : upload(files)
+        }
       >
         <Group
           justify="center"

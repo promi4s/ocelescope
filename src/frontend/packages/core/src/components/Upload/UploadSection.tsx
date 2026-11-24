@@ -9,6 +9,8 @@ import { DataTable } from "mantine-datatable";
 import { useCallback, useState } from "react";
 import { useInvalidate } from "../../hooks/useInvalidate";
 import { FileDropzone } from "../Dropzone/Dropzone";
+import { findUploadOption } from "./options/configs";
+import { UploadOptions } from "./options/UploadOptions";
 
 const DefaultOcels: React.FC<{
   onSuccess: () => void;
@@ -59,33 +61,20 @@ const DefaultOcels: React.FC<{
   );
 };
 
-const FileUploadZone: React.FC<{
-  onSuccess: () => void;
-  setIsPending: (pendingState: boolean) => void;
-}> = ({ onSuccess, setIsPending }) => {
-  const { mutate: upload } = useUpload({
-    mutation: {
-      onSuccess,
-      onMutate: () => setIsPending(true),
-      onSettled: () => setIsPending(false),
-    },
-  });
-
-  return (
-    <FileDropzone
-      content={{
-        description: (
-          <span>
-            {`Drag'n'drop your ${["OCELs", "Plugins", "Resources"].join(", ")} here to upload.`}
-          </span>
-        ),
-      }}
-      onUpload={async (files: File[]) => {
-        upload({ data: { files } });
-      }}
-    />
-  );
-};
+const FileUploadZone: React.FC<{ onDrop: (files: File[]) => void }> = ({
+  onDrop,
+}) => (
+  <FileDropzone
+    content={{
+      description: (
+        <span>
+          {`Drag'n'drop your ${["OCELs", "Plugins", "Resources"].join(", ")} here to upload.`}
+        </span>
+      ),
+    }}
+    onUpload={onDrop}
+  />
+);
 
 export const UploadSection: React.FC<{ onSuccess?: () => void }> = ({
   onSuccess,
@@ -99,14 +88,48 @@ export const UploadSection: React.FC<{ onSuccess?: () => void }> = ({
     onSuccess?.();
   }, [onSuccess]);
 
+  const { mutate } = useUpload({
+    mutation: {
+      onSuccess: onUploadSuccess,
+      onMutate: () => setIsPending(true),
+      onSettled: () => setIsPending(false),
+    },
+  });
+
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+
+  const upload = (files: File[]) => {
+    mutate({ data: { files } });
+    setPendingFiles([]);
+  };
+
   return (
     <Stack gap={"xs"} pos="relative">
       <LoadingOverlay
         visible={isPending}
         overlayProps={{ radius: "sm", blur: 2 }}
       />
-      <FileUploadZone onSuccess={onUploadSuccess} setIsPending={setIsPending} />
-      <DefaultOcels onSuccess={onUploadSuccess} setIsPending={setIsPending} />
+      {pendingFiles.length > 0 ? (
+        <UploadOptions
+          files={pendingFiles}
+          onUpload={upload}
+          onCancel={() => setPendingFiles([])}
+        />
+      ) : (
+        <>
+          <FileUploadZone
+            onDrop={(files) =>
+              files.some((file) => findUploadOption(file))
+                ? setPendingFiles(files)
+                : upload(files)
+            }
+          />
+          <DefaultOcels
+            onSuccess={onUploadSuccess}
+            setIsPending={setIsPending}
+          />
+        </>
+      )}
     </Stack>
   );
 };

@@ -64,6 +64,7 @@ catalog:
   object-hash: ^3.0.0
   orval: ^8.45.0
   qs: ^6.17.0
+  saxes: ^6.0.0
   react: ^19.3.1
   react-dom: ^19.3.1
   react-hook-form: ^7.91.0

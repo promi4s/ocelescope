@@ -61,6 +61,7 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-hook-form": "catalog:",
+    "saxes": "catalog:",
     "zod": "catalog:",
     "zustand": "catalog:"
   },
@@ -77,6 +78,7 @@
     "echarts": "catalog:",
     "echarts-for-react": "catalog:",
     "qs": "catalog:",
+    "saxes": "catalog:",
     "tsdown": "catalog:",
     "typescript": "catalog:"
   }
