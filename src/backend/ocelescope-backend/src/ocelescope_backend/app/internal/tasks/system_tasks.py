@@ -9,6 +9,10 @@ from ocelescope.util.sql import ident, literal
 
 from ocelescope import OCEL, ResourceBase
 from ocelescope_backend.app.internal.config import config
+from ocelescope_backend.app.internal.model.upload import (
+    UploadExtras,
+    XesUploadExtras,
+)
 from ocelescope_backend.app.internal.tasks.context import task_context
 from ocelescope_backend.app.internal.tasks.decorator import task
 from ocelescope_backend.app.internal.tasks.outputs import Output, TaskResult
@@ -26,9 +30,23 @@ def _log_name(file_name: str) -> str:
     return name[: -len(".ocel")] if name.lower().endswith(".ocel") else name
 
 
-def _read_log(file_path: Path, file_name: str, xes: bool) -> Output:
+def _read_log(
+    file_path: Path,
+    file_name: str,
+    xes: bool,
+    xes_extras: XesUploadExtras | None = None,
+) -> Output:
     name = Path(file_name).stem if xes else _log_name(file_name)
-    ocel = OCEL.read_xes(file_path) if xes else OCEL.read(file_path)
+    options = xes_extras or XesUploadExtras()
+    ocel = (
+        OCEL.read_xes(
+            file_path,
+            fallback_object_name=options.object_type or "Case",
+            type_attribute=options.type_attribute or None,
+        )
+        if xes
+        else OCEL.read(file_path)
+    )
     task_context().notify(
         SystemNotification(
             title="XES was uploaded successfully"
@@ -80,22 +98,31 @@ def _read_resource(file_path: Path, file_name: str) -> Output:
 
 
 @task(name="importOCEL")
-def import_ocel(file_path: Path, file_name: str) -> TaskResult:
+def import_ocel(
+    file_path: Path, file_name: str, extras: UploadExtras | None = None
+) -> TaskResult:
     return _read_log(file_path, file_name, xes=False)
 
 
 @task(name="importXES")
-def import_xes(file_path: Path, file_name: str) -> TaskResult:
-    return _read_log(file_path, file_name, xes=True)
+def import_xes(
+    file_path: Path, file_name: str, extras: UploadExtras | None = None
+) -> TaskResult:
+    xes_extras = extras if isinstance(extras, XesUploadExtras) else None
+    return _read_log(file_path, file_name, xes=True, xes_extras=xes_extras)
 
 
 @task(name="importResource")
-def import_resource(file_path: Path, file_name: str) -> TaskResult:
+def import_resource(
+    file_path: Path, file_name: str, extras: UploadExtras | None = None
+) -> TaskResult:
     return _read_resource(file_path, file_name)
 
 
 @task(name="importArchive")
-def import_archive(file_path: Path, file_name: str) -> TaskResult:
+def import_archive(
+    file_path: Path, file_name: str, extras: UploadExtras | None = None
+) -> TaskResult:
     try:
         archive = zipfile.ZipFile(file_path, "r")
     except zipfile.BadZipFile as exc:

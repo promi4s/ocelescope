@@ -4,13 +4,15 @@ import traceback
 from pathlib import Path
 from typing import Annotated
 
-from fastapi import File, Request, UploadFile
+from fastapi import File, Form, Request, UploadFile
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse, Response
 from fastapi.routing import APIRouter
+from pydantic import Json
 
 from ocelescope_backend.app.dependencies import ApiSession
 from ocelescope_backend.app.internal.config import config
+from ocelescope_backend.app.internal.model.upload import UploadExtras
 from ocelescope_backend.app.internal.registry import upload_claimers
 from ocelescope_backend.app.internal.session import Session
 from ocelescope_backend.app.internal.tasks.system_tasks import (
@@ -51,7 +53,9 @@ def _claim_upload(file_path: Path, file_name: str) -> list[SSEMessage] | None:
     "/upload", summary="Upload logs, plugins, or resources", operation_id="upload"
 )
 async def upload(
-    session: ApiSession, files: Annotated[list[UploadFile], File()]
+    session: ApiSession,
+    files: Annotated[list[UploadFile], File()],
+    extras: Annotated[Json[dict[str, UploadExtras]] | None, Form()] = None,
 ) -> list[str]:
     tasks = []
     for file in files:
@@ -111,7 +115,10 @@ async def upload(
         try:
             tasks.append(
                 task_method.submit(
-                    session, file_path=tmp_path, file_name=file_path.name
+                    session,
+                    file_path=tmp_path,
+                    file_name=file_path.name,
+                    extras=(extras or {}).get(file_path.name),
                 )
             )
         finally:
