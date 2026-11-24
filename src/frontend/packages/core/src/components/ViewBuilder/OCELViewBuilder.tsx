@@ -20,14 +20,17 @@ import {
   Controller,
   type DefaultValues,
   type Path,
+  type PathValue,
   useForm,
   useWatch,
 } from "react-hook-form";
 import { PipelineList } from "./PipelineList";
+import { StepOptions } from "./StepOptions";
 import type {
   BaseStep,
   PipelineForm,
   StepKinds,
+  StepType,
   UseView,
   ViewBuilderLabels,
   ViewBuilderState,
@@ -70,7 +73,7 @@ export const OCELViewBuilder = <S extends BaseStep>({
     defaultValues: { steps: defaultSteps } as DefaultValues<PipelineForm<S>>,
   });
 
-  const { control, reset, formState, subscribe } = form;
+  const { control, reset, formState, subscribe, setValue } = form;
 
   const steps = useWatch({
     control,
@@ -148,6 +151,18 @@ export const OCELViewBuilder = <S extends BaseStep>({
 
   const kind = selectedStep && kindOf(kinds, selectedStep);
 
+  const addStep = (type: StepType<S>) => {
+    setValue(
+      "steps" as Path<PipelineForm<S>>,
+      [...steps, kinds[type].create()] as PathValue<
+        PipelineForm<S>,
+        Path<PipelineForm<S>>
+      >,
+      { shouldDirty: true },
+    );
+    setSelected(steps.length);
+  };
+
   return (
     <Group h="100%" gap={0} wrap="nowrap" align="stretch">
       <Box
@@ -193,11 +208,14 @@ export const OCELViewBuilder = <S extends BaseStep>({
             )}
           </Stack>
         ) : (
-          <Center flex={1}>
-            <Text c="dimmed" size="sm" maw={360} ta="center">
-              {steps.length === 0 ? labels.emptyEditor : labels.selectHint}
-            </Text>
-          </Center>
+          <StepOptions
+            kinds={kinds}
+            title={steps.length === 0 ? labels.emptyEditor : labels.selectHint}
+            addLabel={labels.add}
+            searchLabel={labels.search}
+            noMatchLabel={labels.noMatch}
+            onAdd={addStep}
+          />
         )}
       </Box>
 
