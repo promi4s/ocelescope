@@ -56,7 +56,11 @@ GROUP_TYPE = "Group"
 GROUP_QUALIFIER = "member of"
 
 
-def create_ocel_from_xml(path: str, fallback_object_name: str = "LogObject") -> "OCEL":
+def create_ocel_from_xml(
+    path: str,
+    fallback_object_name: str = "Case",
+    type_attribute: str | None = None,
+) -> "OCEL":
     from ocelescope.ocel.core import OCEL  # avoid circular import
 
     log, _meta = r4pm.df.import_xes(path)
@@ -83,7 +87,17 @@ def create_ocel_from_xml(path: str, fallback_object_name: str = "LogObject") -> 
         pl.col(col).cast(pl.String) for col in (OID_COL, EID_COL) if col in log.columns
     )
 
-    if OTYPE_COL not in log.columns:
+    if type_attribute is not None:
+        type_col = f"case:{type_attribute}"
+        if type_col not in log.columns:
+            raise ValueError(f"{type_attribute!r} is not a case attribute of the log")
+        log = log.with_columns(
+            pl.col(type_col)
+            .cast(pl.String)
+            .fill_null(fallback_object_name)
+            .alias(OTYPE_COL)
+        )
+    elif OTYPE_COL not in log.columns:
         log = log.with_columns(pl.lit(fallback_object_name).alias(OTYPE_COL))
     elif fallback_object_name is not None:
         log = log.with_columns(pl.col(OTYPE_COL).fill_null(fallback_object_name))
