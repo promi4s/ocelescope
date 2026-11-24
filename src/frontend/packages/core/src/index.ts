@@ -28,7 +28,6 @@ export {
   type SunburstChartProps,
 } from "./components/charts";
 export { FileDropzone } from "./components/Dropzone/Dropzone";
-export { FullScreenUpload } from "./components/Dropzone/FullScreenUpload";
 export { sseHandler } from "./components/EventHandler";
 export { HelpModal } from "./components/HelpModal/HelpModal";
 export { createModulesPage } from "./components/ModulePage";
@@ -44,8 +43,9 @@ export {
 } from "./components/RangeView";
 export * from "./components/RelationGraphInput";
 export { default as RelationTable } from "./components/RelationTable";
-export { UploadModal } from "./components/UploadModal/UploadModal";
-export { UploadSection } from "./components/UploadSection/UploadSection";
+export { FullScreenUpload } from "./components/Upload/FullScreenUpload";
+export { UploadModal } from "./components/Upload/UploadModal";
+export { UploadSection } from "./components/Upload/UploadSection";
 export * from "./components/ViewBuilder";
 export { useCurrentOcel } from "./hooks/useCurrentOCEL";
 export {

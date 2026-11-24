@@ -14,7 +14,7 @@ import type { OcelescopeConfig } from "../../lib/config";
 import { env } from "../../lib/env";
 import { HelpModal } from "../HelpModal/HelpModal";
 import { CurrentOcelSelect } from "../OcelSelect/OcelSelect";
-import { UploadModal } from "../UploadModal/UploadModal";
+import { UploadModal } from "../Upload/UploadModal";
 import NavBar from "./components/NavBar";
 import { OcelescopeLogo } from "./components/OcelescopeLogo";
 

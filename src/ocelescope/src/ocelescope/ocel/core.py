@@ -394,8 +394,12 @@ class OCEL:
             self._con.execute(f"DETACH {_COPY_TARGET}")
 
     @staticmethod
-    def read_xes(path: str | PathLike, fallback_object_name: str = "LogObject") -> OCEL:
-        return create_ocel_from_xml(str(path), fallback_object_name)
+    def read_xes(
+        path: str | PathLike,
+        fallback_object_name: str = "Case",
+        type_attribute: str | None = None,
+    ) -> OCEL:
+        return create_ocel_from_xml(str(path), fallback_object_name, type_attribute)
 
     # ------------------------------------------------------------------
     # PM4PY interop

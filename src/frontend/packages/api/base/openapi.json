@@ -918,6 +918,24 @@
             },
             "type": "array",
             "title": "Files"
+          },
+          "extras": {
+            "anyOf": [
+              {
+                "type": "string",
+                "contentMediaType": "application/json",
+                "contentSchema": {
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/UploadExtras"
+                  },
+                  "type": "object"
+                }
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Extras"
           }
         },
         "type": "object",
@@ -2280,6 +2298,40 @@
           "id"
         ],
         "title": "Transition"
+      },
+      "UploadExtras": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "xes",
+            "title": "Kind",
+            "default": "xes"
+          },
+          "object_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Object Type"
+          },
+          "type_attribute": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Type Attribute"
+          }
+        },
+        "type": "object",
+        "title": "XesUploadExtras"
       },
       "ValidationError": {
         "properties": {
