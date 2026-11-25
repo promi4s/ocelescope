@@ -4,12 +4,12 @@ import {
   type StepKind,
   type StepPanel,
 } from "@ocelescope/core";
-import type { E2OObjectFilter } from "../../../api/base";
+import type { A2OTRelationFilter } from "../../../api/base";
 import RelationDetail from "./components/RelationDetail";
 
-const DEFAULT_RANGE: E2OObjectFilter["range"] = [1, null];
+const DEFAULT_RANGE: A2OTRelationFilter["range"] = [1, null];
 
-const E2OObjectPanel: StepPanel<E2OObjectFilter> = ({
+const E2OObjectPanel: StepPanel<A2OTRelationFilter> = ({
   ocelId,
   viewId,
   step: filter,
@@ -60,13 +60,13 @@ const E2OObjectPanel: StepPanel<E2OObjectFilter> = ({
     />
   );
 
-export const e2oObjectKind: StepKind<E2OObjectFilter> = {
-  title: "E2O Objects",
+export const a2otRelationKind: StepKind<A2OTRelationFilter> = {
+  title: "A2OT Relations",
   description:
     "Keeps the objects (of any type) that take part in an event of the source activity whose number of related objects of the target type falls within a range, by default at least one. Pick the relation in the graph, then set the range and optionally a qualifier. All other objects are dropped; with Exclude it is the other way around.",
   Panel: E2OObjectPanel,
   create: () => ({
-    type: "e2o_object",
+    type: "a2ot_relation",
     source: "",
     target: "",
     range: DEFAULT_RANGE,

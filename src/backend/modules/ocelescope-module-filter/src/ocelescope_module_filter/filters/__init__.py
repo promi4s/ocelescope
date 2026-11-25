@@ -19,11 +19,11 @@ from ocelescope.ocel.filter import (
 )
 from pydantic import Field
 
+from ocelescope_module_filter.filters.a2ot_relation import A2OTRelationFilter
 from ocelescope_module_filter.filters.attribute import (
     EventAttributeFilter,
     ObjectAttributeFilter,
 )
-from ocelescope_module_filter.filters.e2o_object import E2OObjectFilter
 
 FILTER_SOURCE = "FilterV1"
 
@@ -70,7 +70,7 @@ NativeFilter: TypeAlias = Annotated[
     | EventAttributeFilter
     | ObjectAttributeFilter
     | E2OCountFilter
-    | E2OObjectFilter
+    | A2OTRelationFilter
     | O2OCountFilter,
     Field(discriminator="type"),
 ]
