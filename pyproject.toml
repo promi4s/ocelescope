@@ -5,7 +5,7 @@ description = "Workspace for ocelescope package"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-  "ocelescope-module-alignments>=0.13.0,<0.14.0",
+  "ocelescope-module-alignments>=0.13.2,<0.14.0",
   "ocelescope-module-filter>=0.13.0,<0.14.0",
   "ocelescope-module-ocel>=0.13.0,<0.14.0",
   "ocelescope-module-ocelot>=0.13.0,<0.14.0",

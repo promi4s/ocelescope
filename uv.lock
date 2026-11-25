@@ -1,5 +1,5 @@
 version = 1
-revision = 5
+revision = 3
 requires-python = ">=3.11"
 resolution-markers = [
     "python_full_version >= '3.14' and sys_platform == 'win32'",
@@ -277,7 +277,7 @@ resolution-markers = [
     "python_full_version < '3.12' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/58/01/1253e6698a07380cd31a736d248a3f2a50a7c88779a1813da27503cadc2a/contourpy-1.3.3.tar.gz", hash = "sha256:083e12155b210502d0bca491432bb04d56dc3432f95a979b429f2848c3dbe880", size = 13466174, upload-time = "2025-07-26T12:03:12.549Z" }
 wheels = [
@@ -370,7 +370,7 @@ resolution-markers = [
     "python_full_version == '3.12.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.5.5", source = { registry = "https://pypi.org/simple" } },
+    { name = "numpy", version = "2.5.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/83/5a/a55177dd22553a277388e8a1b3220e92de91bacb28356cdc73caa240121d/contourpy-1.4.0.tar.gz", hash = "sha256:20156f5a1ac4f8ce02656e39a61e82164a3d359796dc8026f75b062783d500e1", size = 13323726, upload-time = "2026-09-11T19:05:05.808Z" }
 wheels = [
@@ -920,8 +920,8 @@ name = "httpcore2"
 version = "2.16.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "h11" },
-    { name = "truststore" },
+    { name = "h11", marker = "sys_platform != 'emscripten'" },
+    { name = "truststore", marker = "sys_platform != 'emscripten'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/c0/61/afa9d6b7452f9eca73f73d45324eb0bb52f098fd5e6049bf6b8263be9b4e/httpcore2-2.16.0.tar.gz", hash = "sha256:c72cd0413563b17e1cd8354677dff887466f8ec2551679759e93126534428643", size = 69886, upload-time = "2026-10-21T07:09:45.31Z" }
 wheels = [
@@ -2054,7 +2054,7 @@ requires-dist = [
     { name = "pulp", marker = "extra == 'plugin'", specifier = ">=3.3.2,<4" },
     { name = "pyarrow", specifier = ">=24.0.0" },
     { name = "pydantic", specifier = ">=2.11.7" },
-    { name = "r4pm-full", extras = ["polars"], specifier = ">=0.6.2" },
+    { name = "r4pm-full", extras = ["polars"], specifier = ">=0.7.1,<0.8" },
     { name = "scikit-learn", marker = "extra == 'plugin'", specifier = ">=1.9.0" },
 ]
 provides-extras = ["plugin"]
@@ -2094,15 +2094,16 @@ requires-dist = [
 
 [[package]]
 name = "ocelescope-module-alignments"
-version = "0.13.0"
+version = "0.13.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ocelescope-backend" },
     { name = "packaging" },
+    { name = "r4pm-full" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f9/ec/55392ac817fd434e9500ce362a589dbaf80b3857150a8fc7c1b7952562f8/ocelescope_module_alignments-0.13.0.tar.gz", hash = "sha256:90a94c6dea0c0906bd645f7be86361c6ce88bffd63552d71a5eb5b7d57422cd8", size = 5150, upload-time = "2026-11-12T14:05:18.21Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f2/f7/b5d121bccfa185acd23e12cad5dcf428f2b3ad53c8dee45d152338240813/ocelescope_module_alignments-0.13.2.tar.gz", hash = "sha256:cf58e6245cc698054d5e08fb5a39b292fe94c8d18215d7bad7be5ecb6ed8cdee", size = 5177, upload-time = "2026-11-25T11:07:47.287Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/45/e9/7bbfbf527ccd25f7a57851b8861c9ba6cee5a4a078303a7d506a666d19e0/ocelescope_module_alignments-0.13.0-py3-none-any.whl", hash = "sha256:ccbcd9e0a60fdcb03d9441ea2d0cbc23ae6fe423f04d51bc2ae00f41231974a7", size = 7232, upload-time = "2026-11-12T14:05:17.114Z" },
+    { url = "https://files.pythonhosted.org/packages/78/3a/03793a35a1c3735956067df16b075df6a164b1548cdf2082da1abd1fb76c/ocelescope_module_alignments-0.13.2-py3-none-any.whl", hash = "sha256:b5b76cc17242903615af128353c9a46c8d101677f5a705d9de457cb8cb533fad", size = 7246, upload-time = "2026-11-25T11:07:46.453Z" },
 ]
 
 [[package]]
@@ -2243,7 +2244,7 @@ typecheck = [
 
 [package.metadata]
 requires-dist = [
-    { name = "ocelescope-module-alignments", specifier = ">=0.13.0,<0.14.0" },
+    { name = "ocelescope-module-alignments", specifier = ">=0.13.2,<0.14.0" },
     { name = "ocelescope-module-filter", editable = "src/backend/modules/ocelescope-module-filter" },
     { name = "ocelescope-module-ocel", editable = "src/backend/modules/ocelescope-module-ocel" },
     { name = "ocelescope-module-ocelot", specifier = ">=0.13.0,<0.14.0" },
@@ -2535,7 +2536,7 @@ name = "pexpect"
 version = "4.9.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "ptyprocess" },
+    { name = "ptyprocess", marker = "sys_platform != 'emscripten' and sys_platform != 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/42/92/cc564bf6381ff43ce1f4d06852fc19a2f11d180f23dc32d9588bee2f149d/pexpect-4.9.0.tar.gz", hash = "sha256:ee7d41123f3c9911050ea2c2dac107568dc43b2d3b0c7557a33212c398ead30f", size = 166450, upload-time = "2023-11-25T09:07:26.339Z" }
 wheels = [
@@ -3192,16 +3193,16 @@ wheels = [
 
 [[package]]
 name = "r4pm-full"
-version = "0.6.2"
+version = "0.7.1"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/d0/2e/d0bea745606cd681f6ba08bff600674eda171af864e69751fa9c4b435741/r4pm_full-0.6.2.tar.gz", hash = "sha256:ea3e1d54b5060b4d67ca92f44cedfa3de8343c791c4f746d05ecb8e2ca216ab5", size = 70660, upload-time = "2026-08-21T11:23:58.03Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/18/c8/b1c7482b9f80765c693d5f543db992aae6c247dc05a879f7427cf6d4356e/r4pm_full-0.7.1.tar.gz", hash = "sha256:ccb9f8d1add89f3dc89cf2146cd899144829f93bf731923e608d027e81c152b5", size = 115573, upload-time = "2026-11-19T17:04:53.454Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f0/e9/da6c42911b96978de59b97502b68e924c56ff588dddedf3930b7199f2fb4/r4pm_full-0.6.2-cp39-abi3-macosx_10_12_x86_64.whl", hash = "sha256:c60c49a2be0b0a0adc791e35a29dd6ff231c8f2fe2031646fd426dc58dd75010", size = 24568567, upload-time = "2026-08-21T11:23:39.731Z" },
-    { url = "https://files.pythonhosted.org/packages/a7/b7/6c9d0b0ba39c67b8665c701b1487b2b5550b42b78e96eec12d87d305b81b/r4pm_full-0.6.2-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:b768a6452f121de9adb934ab1d7e7a114855416c0154418e9e337c86d38bb275", size = 23396161, upload-time = "2026-08-21T11:23:42.596Z" },
-    { url = "https://files.pythonhosted.org/packages/10/21/2bfd9acc4d13b7a1b0b0fba479c17863e9a3fbe2dc0e0be28b8d5f1f969e/r4pm_full-0.6.2-cp39-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:5acb191b88bc143f3ff42e94fc8f2dbb45ccc426cdf0fb408c8189e0d2f39bd1", size = 27197014, upload-time = "2026-08-21T11:23:45.039Z" },
-    { url = "https://files.pythonhosted.org/packages/79/14/de4654b548b1f1f44c0008a89c06c0ccbea52cb538801d4efd7eb5cf4914/r4pm_full-0.6.2-cp39-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:f4fe058fe17b6170f227411a9558bbe4517cf73e04d99063dbf10287da510d71", size = 27835360, upload-time = "2026-08-21T11:23:48.853Z" },
-    { url = "https://files.pythonhosted.org/packages/5d/cf/9f2dd3c1c83fc62d145ef5425eaf8390d0151dba37d641d2858cfaf73019/r4pm_full-0.6.2-cp39-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:de5013d777c44c637098aa1e4e6952a55253ce905ca63b94244f9c654a72227c", size = 35407615, upload-time = "2026-08-21T11:23:51.641Z" },
-    { url = "https://files.pythonhosted.org/packages/cf/c4/df5d2526d42f7a1733dcfe93532b7715f3661cfcb65d5b0830882fd5a566/r4pm_full-0.6.2-cp39-abi3-win_amd64.whl", hash = "sha256:850fdea609b6d3ebdec52e2ef534ccdb5aad17718cde892935fbacea6fb2bec6", size = 21233850, upload-time = "2026-08-21T11:23:54.327Z" },
+    { url = "https://files.pythonhosted.org/packages/43/72/4c1b70103ee5cdf57f51913d1225326cf0faefc30f8495ad73fe267607b0/r4pm_full-0.7.1-cp39-abi3-macosx_10_12_x86_64.whl", hash = "sha256:e0292123147e8c7b0402e20c2b5795b1c4beee4ead4a02238706dcc0850f4999", size = 28334572, upload-time = "2026-11-19T17:04:26.712Z" },
+    { url = "https://files.pythonhosted.org/packages/d6/09/13c8c0ef13a94144bbb66b5a80052a62378ee6ae77297dd46c17f1e5ca26/r4pm_full-0.7.1-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:a7dd112effd8cafccaba83322e6e1b1f9106893adfb284c9ad1e90d936ed3348", size = 26967700, upload-time = "2026-11-19T17:04:31.143Z" },
+    { url = "https://files.pythonhosted.org/packages/2a/7f/af4a6531ce14e686dbca7f13c570a2dbdd99192f28180785be2b83af8380/r4pm_full-0.7.1-cp39-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:fe653081c674aa5a2e77eaa1261f73e37e2532224e23b15845303dc9ca38b384", size = 31401917, upload-time = "2026-11-19T17:04:35.686Z" },
+    { url = "https://files.pythonhosted.org/packages/fe/d6/2f5d2122fb1a8709b0f0afd0c537d7ba056345374438b9735744ec589517/r4pm_full-0.7.1-cp39-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:2693807514f3d843c0cbdd1846e7d66572f72463b07e619bcc7f0d77772e697f", size = 31962195, upload-time = "2026-11-19T17:04:40.23Z" },
+    { url = "https://files.pythonhosted.org/packages/19/2c/2140b699ff259dd11321852e513b2a339220d2b9cad3e3a5a655df0022ea/r4pm_full-0.7.1-cp39-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:881b7be985175f6bd5d5d240738ba0d057145cf0a42c9e7add774a782a6d1b97", size = 39919986, upload-time = "2026-11-19T17:04:45.573Z" },
+    { url = "https://files.pythonhosted.org/packages/5f/ab/09e7d368ce7ab4dca78234cb956ec9bf6213923bb5456e1f602925b66418/r4pm_full-0.7.1-cp39-abi3-win_amd64.whl", hash = "sha256:74a04c234afbe1d95cb3f0697466f78baa6ba9663410b1e66342c1ea2f821e8a", size = 24911967, upload-time = "2026-11-19T17:04:49.498Z" },
 ]
 
 [package.optional-dependencies]
@@ -3478,7 +3479,7 @@ resolution-markers = [
     "python_full_version < '3.12' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/7a/97/5a3609c4f8d58b039179648e62dd220f89864f56f7357f5d4f45c29eb2cc/scipy-1.17.1.tar.gz", hash = "sha256:95d8e012d8cb8816c226aef832200b1d45109ed4464303e997c5b13122b297c0", size = 30573822, upload-time = "2026-02-23T00:26:24.851Z" }
 wheels = [
@@ -3560,7 +3561,7 @@ resolution-markers = [
     "python_full_version == '3.12.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.5.5", source = { registry = "https://pypi.org/simple" } },
+    { name = "numpy", version = "2.5.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/7e/74/66de6258867beb2ef08f35f9f2ac017a52cacd5081714d239ff1a442d458/scipy-1.18.1.tar.gz", hash = "sha256:52c4b7422442aba924d03ad4019852b08a92e64ea187b933135687bfe2747307", size = 30781235, upload-time = "2026-08-21T23:28:50.599Z" }
 wheels = [
