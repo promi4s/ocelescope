@@ -17,10 +17,10 @@ from ocelescope.util.sql import ident, literal
 from ocelescope_module_filter.filters.attribute.sql import Mode, between
 
 
-class E2OObjectFilter(BaseFilter):
+class A2OTRelationFilter(BaseFilter):
     """Keep the objects that share an event of an activity with a given number of related objects of a type."""
 
-    type: Literal["e2o_object"]
+    type: Literal["a2ot_relation"]
     source: str
     target: str
     range: tuple[int | None, int | None]

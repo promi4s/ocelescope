@@ -1,2 +1,2 @@
-export { e2oObjectKind } from "./E2OObjectFilter";
+export { a2otRelationKind } from "./A2OTRelationFilter";
 export { e2oCountKind, o2oCountKind } from "./RelationCountFilter";
