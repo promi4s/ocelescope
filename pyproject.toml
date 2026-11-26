@@ -42,8 +42,18 @@ unused-type-ignore-comment = "ignore"
 # Casts that ty considers redundant are kept for the other type checkers.
 redundant-cast = "ignore"
 
+[tool.pytest]
+testpaths = ["src/ocelescope/tests"]
+pythonpath = ["src/ocelescope/tests"]
+addopts = ["--import-mode=importlib"]
+strict = true
+
 [dependency-groups]
-dev = [{ include-group = "lint" }, { include-group = "typecheck" }]
+dev = [
+  { include-group = "lint" },
+  { include-group = "test" },
+  { include-group = "typecheck" },
+]
 
 lint = [
     "pre-commit>=4.6.2",
@@ -53,3 +63,5 @@ lint = [
 typecheck = ["lxml-stubs>=0.5.1", "ty>=0.0.51"]
 
 repl = ["ipython>=9.11.0", "ipython-autotime>=0.3.2"]
+
+test = ["pytest>=9.2.0"]
