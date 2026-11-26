@@ -11,6 +11,25 @@ from ocel_testing import (
     object_ids,
     snapshot,
 )
+from ocelescope.ocel.constants.pm4py import (
+    ACTIVITY_COL,
+    E2O_QUALIFIER,
+    EID_COL,
+    OID_COL,
+    OTYPE_COL,
+    TIMESTAMP_COL,
+)
+from ocelescope.ocel.constants.tables import (
+    E2O_TABLE,
+    EVENTS_TABLE,
+    O2O_TABLE,
+    OBJECT_CHANGES_TABLE,
+    OBJECTS_TABLE,
+)
+from ocelescope.util.sql import ident
+
+EID, OID, ACTIVITY = ident(EID_COL), ident(OID_COL), ident(ACTIVITY_COL)
+TYPE, TIME, QUALIFIER = ident(OTYPE_COL), ident(TIMESTAMP_COL), ident(E2O_QUALIFIER)
 
 
 def _rows(log, query):
@@ -27,8 +46,8 @@ class TestEvents:
         )
         assert _rows(
             log,
-            'SELECT "ocel:eid", "ocel:activity", channel, amount '
-            'FROM events ORDER BY "ocel:eid"',
+            f"SELECT {EID}, {ACTIVITY}, channel, amount "
+            f"FROM {EVENTS_TABLE} ORDER BY {EID}",
         ) == [("e1", "place", "web", None), ("e2", "pay", None, 10)]
 
     def test_events_without_time_are_an_hour_apart(self, make_log):
@@ -39,9 +58,7 @@ class TestEvents:
                 {"id": "e3", "type": "place"},
             ]
         )
-        assert _rows(
-            log, 'SELECT "ocel:timestamp" FROM events ORDER BY "ocel:eid"'
-        ) == [
+        assert _rows(log, f"SELECT {TIME} FROM {EVENTS_TABLE} ORDER BY {EID}") == [
             (datetime(2024, 1, 1, 0),),
             (datetime(2024, 1, 1, 1),),
             (datetime(2024, 1, 1, 2),),
@@ -51,7 +68,7 @@ class TestEvents:
         log = make_log(
             events=[{"id": "e1", "type": "pay", "time": "2024-03-01T00:00:00+01:00"}]
         )
-        assert _rows(log, 'SELECT "ocel:timestamp" FROM events') == [
+        assert _rows(log, f"SELECT {TIME} FROM {EVENTS_TABLE}") == [
             (datetime(2024, 2, 29, 23),)
         ]
 
@@ -62,7 +79,7 @@ class TestObjects:
             objects=[{"id": "o1", "type": "order"}, {"id": "c1", "type": "customer"}]
         )
         assert _rows(
-            log, 'SELECT "ocel:oid", "ocel:type" FROM objects ORDER BY "ocel:oid"'
+            log, f"SELECT {OID}, {TYPE} FROM {OBJECTS_TABLE} ORDER BY {OID}"
         ) == [("c1", "customer"), ("o1", "order")]
 
     def test_untimed_attributes_are_static(self, make_log):
@@ -73,7 +90,7 @@ class TestObjects:
             ]
         )
         assert log.objects.static_attribute_names == ["price"]
-        assert log.objects.pl.collect().sort("ocel:oid")["price"].to_list() == [
+        assert log.objects.pl.collect().sort(OID_COL)["price"].to_list() == [
             10.0,
             2.5,
         ]
@@ -94,8 +111,7 @@ class TestObjects:
         assert log.objects.static_attribute_names == []
         assert _rows(
             log,
-            'SELECT "ocel:timestamp", status FROM object_changes '
-            'ORDER BY "ocel:timestamp"',
+            f"SELECT {TIME}, status FROM {OBJECT_CHANGES_TABLE} ORDER BY {TIME}",
         ) == [(datetime(1970, 1, 1), "open"), (datetime(2024, 2, 1), "paid")]
 
 
@@ -111,8 +127,7 @@ class TestRelations:
         )
         assert _rows(
             log,
-            'SELECT "ocel:eid", "ocel:oid", "ocel:qualifier" FROM e2o '
-            'ORDER BY "ocel:oid"',
+            f"SELECT {EID}, {OID}, {QUALIFIER} FROM {E2O_TABLE} ORDER BY {OID}",
         ) == [("e1", "c1", "customer"), ("e1", "o1", None)]
 
     def test_o2o_arrives_with_its_qualifier(self, make_log):
@@ -120,7 +135,7 @@ class TestRelations:
             objects=[{"id": "c1", "type": "customer"}, {"id": "o1", "type": "order"}],
             o2o=[{"source": "c1", "target": "o1", "qualifier": "places"}],
         )
-        assert _rows(log, "FROM o2o") == [("c1", "o1", "places")]
+        assert _rows(log, f"FROM {O2O_TABLE}") == [("c1", "o1", "places")]
 
 
 class TestValidation:
