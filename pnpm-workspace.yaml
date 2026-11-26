@@ -28,7 +28,7 @@ catalog:
   "@ocelescope/alignments": ^0.13.0
   "@ocelescope/ocpn-editor": ^0.13.0
   "@ocelescope/ocelot": ^0.13.0
-  "@r4pm/components": ^0.4.0
+  "@r4pm/components": ^0.5.0
   "@rjsf/core": ^6.8.0
   "@rjsf/mantine": ^6.11.0
   "@rjsf/utils": ^6.8.0
