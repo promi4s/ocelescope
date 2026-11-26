@@ -2,6 +2,7 @@ import matplotlib
 
 from ocelescope.ocel import (
     OCEL,
+    ActivityFilter,
     BaseFilter,
     Clean,
     E2OCountFilter,
@@ -76,6 +77,7 @@ __all__ = [
     "RADIAL_GRAPH_LAYOUT",
     "SLIDER_FIELD",
     "SQL_FIELD",
+    "ActivityFilter",
     "BaseFilter",
     "Clean",
     "DirectlyFollowsGraph",

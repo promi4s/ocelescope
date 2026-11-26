@@ -1,5 +1,6 @@
 from ocelescope.ocel.core import OCEL
 from ocelescope.ocel.filter import (
+    ActivityFilter,
     BaseFilter,
     E2OCountFilter,
     EventAttributeFilter,
@@ -16,6 +17,7 @@ from ocelescope.ocel.view import Clean, OCELView, Step, ViewOperation
 
 __all__ = [
     "OCEL",
+    "ActivityFilter",
     "BaseFilter",
     "Clean",
     "E2OCountFilter",

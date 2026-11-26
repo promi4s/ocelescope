@@ -1,4 +1,4 @@
-from typing import Annotated, Literal
+from typing import Annotated, Literal, TypeAlias
 
 from pydantic import Field
 
@@ -16,7 +16,7 @@ def _selected(
     return f"NOT ({is_selected})" if mode == "exclude" else is_selected
 
 
-class EventTypeFilter(BaseFilter):
+class ActivityFilter(BaseFilter):
     """Keep the events of the given activities."""
 
     event_types: Annotated[
@@ -30,6 +30,9 @@ class EventTypeFilter(BaseFilter):
             f"SELECT {ident(EID_COL)} FROM {step[EVENTS_TABLE]} "
             f"WHERE {_selected(ACTIVITY_COL, self.event_types, self.mode)}",
         )
+
+
+EventTypeFilter: TypeAlias = ActivityFilter
 
 
 class ObjectTypeFilter(BaseFilter):
