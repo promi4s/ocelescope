@@ -40,13 +40,13 @@ print(ocel.o2o.df.head())  # object-to-object relations
 `OCEL.filter` applies a pipeline of filters and returns a new, filtered `OCEL`:
 
 ```python
-from ocelescope import OCEL, EventTypeFilter, ObjectTypeFilter
+from ocelescope import OCEL, ActivityFilter, ObjectTypeFilter
 
 ocel = OCEL.read("order-management.sqlite")
 
 filtered = ocel.filter(
     [
-        EventTypeFilter(event_types=["place order", "pay order"], mode="include"),
+        ActivityFilter(event_types=["place order", "pay order"], mode="include"),
         ObjectTypeFilter(object_types=["items"], mode="exclude"),
     ]
 )

@@ -3,10 +3,10 @@ from __future__ import annotations
 from typing import Annotated, Literal, TypeAlias
 
 from ocelescope.ocel.filter import (
-    E2OCountFilter as _E2OCountFilter,
+    ActivityFilter as _ActivityFilter,
 )
 from ocelescope.ocel.filter import (
-    EventTypeFilter as _EventTypeFilter,
+    E2OCountFilter as _E2OCountFilter,
 )
 from ocelescope.ocel.filter import (
     O2OCountFilter as _O2OCountFilter,
@@ -37,7 +37,7 @@ class TimeFrameFilter(_TimeFrameFilter):
     type: Literal["time_frame"]
 
 
-class ActivityFilter(_EventTypeFilter):
+class ActivityFilter(_ActivityFilter):
     """Keep (or exclude) events of the given activities."""
 
     type: Literal["activity"]
